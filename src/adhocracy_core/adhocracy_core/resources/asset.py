@@ -36,7 +36,7 @@ class IAssetsService(IServicePool):
     """The 'assets' ServicePool."""
 
 
-comments_meta = service_metadata._replace(
+assets_service_meta = service_metadata._replace(
     iresource=IAssetsService,
     content_name='assets',
     element_types=[IAsset],
@@ -48,7 +48,7 @@ def add_assets_service(context: IPool, registry: Registry, options: dict):
     registry.content.create(IAssetsService.__identifier__, parent=context)
 
 
-pool_with_assets_metadata = basicpool_metadata._replace(
+pool_with_assets_meta = basicpool_metadata._replace(
     iresource=IPoolWithAssets,
     basic_sheets=basicpool_metadata.basic_sheets + [IHasAssetPool],
     after_creation=basicpool_metadata.after_creation + [add_assets_service],
@@ -57,4 +57,6 @@ pool_with_assets_metadata = basicpool_metadata._replace(
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(pool_with_assets_metadata, config)
+    add_resource_type_to_registry(asset_meta, config)
+    add_resource_type_to_registry(assets_service_meta, config)
+    add_resource_type_to_registry(pool_with_assets_meta, config)
