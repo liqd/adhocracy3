@@ -107,7 +107,7 @@ export var register = (angular) => {
                 })
                 .specific(RICommentVersion.content_type, "", () => (resource : RICommentVersion) => {
                     return {
-                        content2Url: resource.path
+                        commentUrl: resource.path
                     };
                 })
                 .default(RIBasicPool.content_type, "create_proposal", {

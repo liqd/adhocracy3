@@ -880,7 +880,7 @@ export var register = (angular) => {
                 })
                 .specific(RIMercatorProposalVersion.content_type, "", () => (resource : RIMercatorProposalVersion) => {
                     return {
-                        content2Url: resource.path
+                        proposalUrl: resource.path
                     };
                 })
                 .default(RIMercatorProposalVersion.content_type, "edit", {
@@ -889,7 +889,7 @@ export var register = (angular) => {
                 })
                 .specific(RIMercatorProposalVersion.content_type, "edit", () => (resource : RIMercatorProposalVersion) => {
                     return {
-                        content2Url: resource.path
+                        proposalUrl: resource.path
                     };
                 })
                 .default(RIMercatorProposalVersion.content_type, "comments", {
@@ -898,9 +898,26 @@ export var register = (angular) => {
                 })
                 .specific(RIMercatorProposalVersion.content_type, "comments", () => (resource : RIMercatorProposalVersion) => {
                     return {
-                        content2Url: resource.path
+                        proposalUrl: resource.path,
+                        commentableUrl: resource.path
                     };
                 });
+
+            _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
+                adhResourceAreaProvider
+                    .default(RIMercatorProposalVersion.content_type, "comments:" + section, {
+                        space: "content",
+                        movingColumns: "is-collapse-show-show"
+                    })
+                    .specific(RIMercatorProposalVersion.content_type, "comments:" + section, () =>
+                        (resource : RIMercatorProposalVersion) => {
+                            return {
+                                proposalUrl: resource.path,
+                                commentableUrl: resource.data[SIMercatorSubResources.nick][section]
+                            };
+                        }
+                    );
+            });
         }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {

@@ -353,7 +353,7 @@ export var register = () => {
                     var callback;
 
                     beforeEach(() => {
-                        callback = topLevelStateMock.on.calls.argsFor(1)[1];
+                        callback = topLevelStateMock.on.calls.argsFor(3)[1];
                     });
 
                     it("adds class 'is-collapse-show-show' if state is collapse-show-show", () => {
