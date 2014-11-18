@@ -60,7 +60,6 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
     mercatorProposalForm? : any;
     data : {
-        countries : any;
         // 1. basic
         user_info : {
             first_name : string;
