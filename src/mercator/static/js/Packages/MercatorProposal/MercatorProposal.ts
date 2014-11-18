@@ -861,6 +861,7 @@ export var moduleName = "adhMercatorProposal";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            "duScroll",
             AdhHttp.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
@@ -916,7 +917,7 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", ($scope : IScope) => {
+        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope : IScope, $element) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
                 "heard-from-website",
@@ -965,12 +966,19 @@ export var register = (angular) => {
             };
 
             $scope.submitIfValid = () => {
+                var container = $element.parents("[data-du-scroll-container]");
+
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
                     $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
-                    $scope.submit();
-                };
+                    $scope.submit().catch(() => {
+                        container.scrollTopAnimated(0);
+                    });
+                } else {
+                    var element = $element.find(".ng-invalid");
+                    container.scrollToElementAnimated(element);
+                }
             };
         }]);
 };

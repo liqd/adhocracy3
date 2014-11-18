@@ -64,3 +64,12 @@ export var logBackendBatchError = (
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
     throw errors;
 };
+
+
+export var formatError = (error : IBackendErrorItem) : string => {
+    if (error.location === "internal") {
+        return "Internal Error";
+    } else {
+        return error.description;
+    }
+};

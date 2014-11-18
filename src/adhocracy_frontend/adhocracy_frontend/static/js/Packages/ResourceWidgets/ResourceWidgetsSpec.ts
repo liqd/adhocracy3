@@ -115,6 +115,7 @@ export var register = () => {
                     deferred: q.defer()
                 };
                 instanceMock.wrapper.eventHandler = jasmine.createSpyObj("eventHandler", ["on", "off", "trigger"]);
+                instanceMock.wrapper.triggerSubmit.and.returnValue(q.when());
 
                 resourceWidget = new AdhResourceWidgets.ResourceWidget(adhHttpMock, adhPreliminaryNamesMock, q);
             });
