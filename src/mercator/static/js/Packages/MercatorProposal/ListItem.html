@@ -1,13 +1,14 @@
-<div class="mercator-proposal-list-item">
-    <img src="" alt="" />
-    <div class="body">
+<div class="mercator-proposal-list-item" >
+    <!-- FIXME: ng-if refers to non-existant 'image' object -->
+    <div class="proposal-image" ng-if="image"><img src="" alt="" /></div>
+    <div class="proposal-body">
         <h3><a href="" data-ng-click="showDetails()">{{ data.introduction.title }}</a></h3>
-        <span>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</span>
-        <div class="meta">
-            <span>when: {{ data.user_info.createtime }}</span>
-            <span>budget: {{ data.finance.funding }} / {{ data.finance.budget }}</span>
-            <span>comments: [#comments]</span>
-            <span>votes: [#votes]</span>
-        </div>
+        <p class="proposal-username"><a href="#FIXME: link to user profile">{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>, {{data.organization_info.name}}</p>
+        <ul class="proposal-meta">
+            <li class="proposal-meta-column">when: {{ data.user_info.createtime }}</li>
+            <li class="proposal-meta-column">budget: {{ data.finance.funding }} / {{ data.finance.budget }}</li>
+            <li class="proposal-meta-column">comments: [#comments]</li>
+            <li class="proposal-meta-column">votes: [#votes]</li>
+        </ul>
     </div>
 </div>
