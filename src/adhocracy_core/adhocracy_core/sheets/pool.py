@@ -24,8 +24,8 @@ filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
                                  'count', 'aggregateby']
 
 
-filter_elements_result = namedtuple('FilterElementsResult',
-                                    ['elements', 'count', 'aggregateby'])
+FilterElementsResult = namedtuple('FilterElementsResult',
+                                  ['elements', 'count', 'aggregateby'])
 
 
 class PoolSheet(GenericResourceSheet):
@@ -101,7 +101,7 @@ class FilteringPoolSheet(PoolSheet):
                          arbitrary_filters: dict=None,
                          resolve_resources=True,
                          references: dict=None,
-                         aggregate_filter: str=None) -> filter_elements_result:
+                         aggregate_filter: str=None) -> FilterElementsResult:
         system_catalog = find_catalog(self.context, 'system')
         path_index = system_catalog['path']
         query = path_index.eq(resource_path(self.context), depth=depth,
@@ -138,7 +138,7 @@ class FilteringPoolSheet(PoolSheet):
                 if value_elements:
                     aggregateby[aggregate_filter][str(value)] = len(
                         value_elements)
-        return filter_elements_result(elements, count, aggregateby)
+        return FilterElementsResult(elements, count, aggregateby)
 
 
 class IPool(ISheet):

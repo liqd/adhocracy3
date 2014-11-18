@@ -55,10 +55,10 @@ class TestFilteringPoolSheet:
 
     @fixture
     def inst(self, meta, context):
-        from adhocracy_core.sheets.pool import filter_elements_result
+        from adhocracy_core.sheets.pool import FilterElementsResult
         inst = meta.sheet_class(meta, context)
         inst._filter_elements = Mock(spec=inst._filter_elements)
-        inst._filter_elements.return_value = filter_elements_result(['Dummy'],
+        inst._filter_elements.return_value = FilterElementsResult(['Dummy'],
                                                                     1, {})
         return inst
 
