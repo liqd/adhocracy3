@@ -135,7 +135,8 @@ class FilteringPoolSheet(PoolSheet):
         resolver = None if resolve_resources else identity
         elements = query.execute(resolver=resolver)
         # Sort
-        sort_index = system_catalog.get(sort_filter, None)
+        sort_index = system_catalog.get(sort_filter, None) \
+            or adhocracy_catalog.get(sort_filter, None)
         if sort_index is not None:
             # FIXME: We should assert the IIndexSort interfaces here, but
             # hypation.field.FieldIndex is missing this interfaces.
