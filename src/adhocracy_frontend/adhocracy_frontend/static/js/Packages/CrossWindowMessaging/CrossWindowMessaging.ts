@@ -123,14 +123,16 @@ export class Service implements IService {
     private sendLoginState(loggedIn) {
         var _self : Service = this;
 
-        if (loggedIn) {
-            _self.postMessage("login", {
-                token: _self.adhUser.token,
-                userPath: _self.adhUser.userPath,
-                userData: _self.adhUser.data
-            });
-        } else {
-            _self.postMessage("logout", {});
+        if (_self.sendAuthMessages()) {
+            if (loggedIn) {
+                _self.postMessage("login", {
+                    token: _self.adhUser.token,
+                    userPath: _self.adhUser.userPath,
+                    userData: _self.adhUser.data
+                });
+            } else {
+                _self.postMessage("logout", {});
+            }
         }
     }
 
@@ -140,10 +142,8 @@ export class Service implements IService {
         if (_self.embedderOrigin === "*") {
             _self.embedderOrigin = data.embedderOrigin;
 
-            if (_self.sendAuthMessages()) {
-                _self.$rootScope.$watch(() => _self.adhUser.loggedIn, ((loggedIn) => _self.sendLoginState(loggedIn)));
-                _self.sendLoginState(_self.adhUser.loggedIn);
-            }
+            _self.$rootScope.$watch(() => _self.adhUser.loggedIn, ((loggedIn) => _self.sendLoginState(loggedIn)));
+            _self.sendLoginState(_self.adhUser.loggedIn);
         }
     }
 

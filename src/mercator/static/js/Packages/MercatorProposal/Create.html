@@ -21,6 +21,10 @@
 
         <div class="annotated-section-body">
 
+            <div class="form-error" data-ng-repeat="error in errors track by $index">
+                <p>{{ error | adhFormatError | translate }}</p>
+            </div>
+
             <section data-ng-form="" name="mercatorProposalBasicForm" id="mercator-proposal-basic">
 
                 <h2>{{ "1. Basic" | translate }}</h2>

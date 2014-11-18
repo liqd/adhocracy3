@@ -146,9 +146,9 @@ export var resourceWrapper = () => {
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
                     .then((resources) => adhHttp.deepPost(resources))
-                    .then(() => displayOrClear(), (reason) => {
+                    .then(() => displayOrClear(), (errors : AdhHttp.IBackendErrorItem[]) => {
                         self.triggerSetMode(Mode.edit);
-                        throw reason;
+                        throw errors;
                     })
                     .then(() => triggerCallback("onSubmit"));
             };
@@ -164,6 +164,7 @@ export var resourceWrapper = () => {
 export interface IResourceWidgetScope extends ng.IScope {
     mode : Mode;
     path : string;
+    errors? : AdhHttp.IBackendErrorItem[];
 
     /**
      * Set mode to "edit"
@@ -286,7 +287,13 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         });
 
         scope.edit = () => wrapper.triggerSetMode(Mode.edit);
-        scope.submit = () => wrapper.triggerSubmit();
+        scope.submit = () => {
+            return wrapper.triggerSubmit()
+                .catch((errors : AdhHttp.IBackendErrorItem[]) => {
+                    scope.errors = errors;
+                    throw errors;
+                });
+        };
         scope.cancel = () => wrapper.triggerCancel();
         scope.delete = () => scope.$emit("triggerDelete", scope.path);
         scope.clear = () => wrapper.triggerClear();
@@ -320,6 +327,9 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             instance.deferred = self.$q.defer();
             instance.wrapper.registerResourceDirective(instance.deferred.promise);
         }
+        if (mode === Mode.display) {
+            instance.scope.errors = [];
+        }
         instance.scope.mode = mode;
     }
 
@@ -352,6 +362,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     public clear(instance : IResourceWidgetInstance<R, S>) : void {
         instance.deferred.resolve([]);
         instance.deferred = this.$q.defer();
+        instance.scope.errors = [];
         instance.wrapper.registerResourceDirective(instance.deferred.promise);
         this._clear(instance);
     }
