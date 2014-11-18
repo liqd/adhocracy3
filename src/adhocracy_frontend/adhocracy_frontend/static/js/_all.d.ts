@@ -49,7 +49,9 @@ declare module "q" {
 /**
  * Flow, ng-flow do not have DefinitelyTyped interfaces.  This is a
  * preliminary attempt to fix that.
-*/
+ *
+ * FIXME: get into DefinitelyTyped, of course.
+ */
 declare class Flow {
     events : any;
     files : FlowFile[];

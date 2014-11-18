@@ -53,15 +53,9 @@ var pkgLocation = "/MercatorProposal";
 
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
-    poolPath : string;
     showDetails : () => void;
-    showError : (fieldName : string, errorType : string) => boolean;
-    showHeardFromError : () => boolean;
-    showDetailsLocationError : () => boolean;
-    submitIfValid : () => void;
+    poolPath : string;
     mercatorProposalForm? : any;
-    mercatorProposalExtraForm? : any;
-    mercatorProposalDetailForm? : any;
     data : {
         countries : any;
         // 1. basic
@@ -126,6 +120,15 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
 
         accept_disclaimer : string;
     };
+}
+
+export interface IControllerScope extends IScope {
+    showError : (fieldName : string, errorType : string) => boolean;
+    showHeardFromError : () => boolean;
+    showDetailsLocationError : () => boolean;
+    submitIfValid : () => void;
+    mercatorProposalExtraForm? : any;
+    mercatorProposalDetailForm? : any;
 }
 
 
@@ -419,6 +422,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
         // FIXME: handle file upload in _update.
+        // FIXME: We need to wait for this promise with everything
+        // else. Otherwise, the upload could be interrupted by a hard
+        // redirect or similar.
         imagePathPromise.then(
             (path) => {
                 console.log("upload successful:");
@@ -917,7 +923,7 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope : IScope, $element) => {
+        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope : IControllerScope, $element) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
                 "heard-from-website",
