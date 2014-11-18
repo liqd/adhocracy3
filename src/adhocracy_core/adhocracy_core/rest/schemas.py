@@ -286,13 +286,19 @@ def deferred_validate_aggregateby(node: colander.MappingSchema, kw):
     # sense, e.g. username or email. We should have a blacklist to prohibit
     # calling aggregateby on such indexes.
     context = kw['context']
-    adhocracy = find_catalog(context, 'adhocracy') or {}
-    adhocracy_index = [k for k, v in adhocracy.items()
-                       if 'unique_values' in v.__dir__()]
+    indexes = _get_indexes(context)
+    valid_indexes = [x.__name__ for x in indexes
+                     if 'unique_values' in x.__dir__()]
+    return colander.OneOf(valid_indexes)
+
+
+def _get_indexes(context) -> list:
+    indexes = []
     system = find_catalog(context, 'system') or {}
-    system_index = [k for k, v in system.items()
-                    if 'unique_values' in v.__dir__()]
-    return colander.OneOf(adhocracy_index + system_index)
+    indexes.extend(system.values())
+    adhocracy = find_catalog(context, 'adhocracy') or {}
+    indexes.extend(adhocracy.values())
+    return indexes
 
 
 class GETPoolRequestSchema(colander.MappingSchema):
