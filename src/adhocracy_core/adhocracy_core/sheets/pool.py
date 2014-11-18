@@ -103,30 +103,37 @@ class FilteringPoolSheet(PoolSheet):
                          references: dict=None,
                          aggregate_filter: str=None) -> FilterElementsResult:
         system_catalog = find_catalog(self.context, 'system')
+        # filter path
         path_index = system_catalog['path']
         query = path_index.eq(resource_path(self.context), depth=depth,
                               include_origin=False)
+        # filter ifaces
         if ifaces:
             interface_index = system_catalog['interfaces']
             query &= interface_index.all(ifaces)
+        # filter arbitrary
         adhocracy_catalog = find_catalog(self.context, 'adhocracy')
         if arbitrary_filters:
             for name, value in arbitrary_filters.items():
                 index = adhocracy_catalog[name]
                 query &= index.eq(value)
+        # filter references
         if references:
             index = adhocracy_catalog['reference']
             for name, value in references.items():
                 isheet_name, isheet_field = name.split(':')
                 isheet = dotted_name_resolver.resolve(isheet_name)
                 query &= index.eq(isheet, isheet_field, value)
-        identity = lambda x: x  # pragma: no branch
-        resolver = None if resolve_resources else identity
         # Only show visible elements (not hidden or deleted)
         visibility_index = adhocracy_catalog['private_visibility']
         query &= visibility_index.eq('visible')
+        # Execute filter query
+        identity = lambda x: x  # pragma: no branch
+        resolver = None if resolve_resources else identity
         elements = query.execute(resolver=resolver)
+        # Count
         count = len(elements)
+        # Aggregate
         aggregateby = {}
         if aggregate_filter:
             aggregateby[aggregate_filter] = {}
