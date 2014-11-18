@@ -182,7 +182,9 @@ class GenericResourceSheet(PropertySheet):
         return [n.name for n in self.schema if getattr(n, 'readonly', False)]
 
     def _store_data(self, appstruct):
-        self._data.update(appstruct)
+        for key in self._data_keys:
+            if key in appstruct:
+                self._data[key] = appstruct[key]
 
     def _store_references(self, appstruct, registry):
         if self._graph:
