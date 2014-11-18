@@ -94,3 +94,6 @@ declare class FlowOpts {
     permanentErrors : number[];
     onDropStopPropagation : boolean;
 }
+
+declare module "fustyFlow" {}
+declare module "fustyFlowFactory" {}

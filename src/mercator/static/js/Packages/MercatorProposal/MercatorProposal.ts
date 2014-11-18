@@ -1,3 +1,5 @@
+import fustyFlowFactory = require("fustyFlowFactory");
+
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
@@ -894,6 +896,7 @@ export var register = (angular) => {
                 flowFactoryProvider.defaults = {};
             }
 
+            flowFactoryProvider.factory = fustyFlowFactory;
             flowFactoryProvider.defaults.singleFile = true;
             flowFactoryProvider.defaults.maxChunkRetries = 1;
             flowFactoryProvider.defaults.chunkRetryInterval = 5000;
