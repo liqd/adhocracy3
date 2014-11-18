@@ -303,9 +303,9 @@
                 <label>
                     {{ "Upload a Picture" | translate }}
                     <div data-flow-init="" name="introduction-picture-upload">
-                        <span data-ng-show="!$flow.files.length" data-flow-btn="">Select Image</span>
-                        <span data-ng-show="$flow.files.length" data-flow-btn="">Change Image</span>
-                        <span data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">Remove Image</span>
+                        <span data-ng-show="!$flow.files.length" data-flow-btn="">{{ "Select Image" | translate }}</span>
+                        <span data-ng-show="$flow.files.length" data-flow-btn="">{{ "Change Image" | translate }}</span>
+                        <span data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">{{ "Remove Image" | translate }}</span>
                         <table>
                             <tr data-ng-repeat="file in $flow.files">
                                 <td>{{$index+1}}</td>
