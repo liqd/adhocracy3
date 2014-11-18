@@ -21,7 +21,7 @@ dotted_name_resolver = DottedNameResolver()
 
 
 filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
-                                 'count', 'aggregateby']
+                                 'count', 'sort', 'aggregateby']
 
 
 FilterElementsResult = namedtuple('FilterElementsResult',
@@ -53,12 +53,14 @@ class FilteringPoolSheet(PoolSheet):
         references = self._get_reference_filters(params)
         serialization_form = params.get('elements', 'path')
         resolve_resources = serialization_form != 'omit'
+        sort = params.get('sort', '')
         aggregate_filter = params.get('aggregateby', '')
         result = self._filter_elements(depth=depth,
                                        ifaces=ifaces,
                                        arbitrary_filters=arbitraries,
                                        resolve_resources=resolve_resources,
                                        references=references,
+                                       sort_filter=sort,
                                        aggregate_filter=aggregate_filter,
                                        )
         appstruct = {}
@@ -101,6 +103,7 @@ class FilteringPoolSheet(PoolSheet):
                          arbitrary_filters: dict=None,
                          resolve_resources=True,
                          references: dict=None,
+                         sort_filter: str='',
                          aggregate_filter: str=None) -> FilterElementsResult:
         system_catalog = find_catalog(self.context, 'system')
         # filter path
@@ -131,6 +134,13 @@ class FilteringPoolSheet(PoolSheet):
         identity = lambda x: x  # pragma: no branch
         resolver = None if resolve_resources else identity
         elements = query.execute(resolver=resolver)
+        # Sort
+        sort_index = system_catalog.get(sort_filter, None)
+        if sort_index is not None:
+            # FIXME: We should assert the IIndexSort interfaces here, but
+            # hypation.field.FieldIndex is missing this interfaces.
+            assert 'sort' in sort_index.__dir__()
+            elements = elements.sort(sort_index)
         # Count
         count = len(elements)
         # Aggregate
