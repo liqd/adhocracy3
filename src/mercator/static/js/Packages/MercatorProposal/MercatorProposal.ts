@@ -968,7 +968,7 @@ export var register = (angular) => {
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
-                    $scope.data.introduction.imageUpload = angular.element($("#introduction-picture-upload")).scope().$flow;
+                    $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
                     $scope.submit();
                 };
             };
