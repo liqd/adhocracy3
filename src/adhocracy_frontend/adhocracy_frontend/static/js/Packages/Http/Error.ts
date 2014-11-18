@@ -36,8 +36,19 @@ export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendErro
 
     renderBackendError(response);
 
-    var errors : IBackendErrorItem[] = response.data.errors;
-    throw errors;
+    if (response.data.hasOwnProperty("errors")) {
+        var errors : IBackendErrorItem[] = response.data.errors;
+        throw errors;
+    } else {
+        // FIXME: sometimes, $http.get (and possibly other verbs)
+        // throw an exception when the backend responds with an error
+        // status, and whipe the response object before passing it to
+        // the error handler callback (see disabled test "do not lose
+        // error response status and body" in HttpIg.ts).
+        //
+        // the following line works around that.
+        throw [{ name: "unknown", location: "unknown", description: "unknown" }];
+    }
 };
 
 /**
