@@ -302,10 +302,19 @@
 
                 <label>
                     {{ "Upload a Picture" | translate }}
-                    <input
-                        type="file"
-                        data-ng-model="data.introduction.picture"
-                        name="introduction-picture" />
+                    <div data-flow-init="" name="introduction-picture-upload">
+                        <span data-ng-show="!$flow.files.length" data-flow-btn="">{{ "Select Image" | translate }}</span>
+                        <span data-ng-show="$flow.files.length" data-flow-btn="">{{ "Change Image" | translate }}</span>
+                        <span data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">{{ "Remove Image" | translate }}</span>
+                        <table>
+                            <tr data-ng-repeat="file in $flow.files">
+                                <td>{{$index+1}}</td>
+                                <td>{{file.name}}</td>
+                                <td>{{file.msg}}</td>
+                                <td><img data-flow-img="file" height="120" /></td>
+                            </tr>
+                        </table>
+                    </div>
                 </label>
             </section>
 
