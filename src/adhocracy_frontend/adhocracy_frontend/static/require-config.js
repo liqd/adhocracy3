@@ -51,6 +51,9 @@ require.config({
         },
         modernizr: {
             exports: "Modernizr"
-        }
+        },
+        sticky: {
+            deps: ["jquery"]
+        },
     }
 });

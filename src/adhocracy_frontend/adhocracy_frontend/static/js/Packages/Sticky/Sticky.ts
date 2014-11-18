@@ -1,12 +1,12 @@
 /// <reference path="../../_all.d.ts"/>
 
-import Sticky = require("sticky");
+import Sticky = require("sticky"); if (Sticky) { ; };
 console.log(Sticky);  // required to keep tsc from optimizing the import away.  :(
 export var createDirective = () => {
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
-            var el = <any>$(element[0]);
+            var el = element.first();
             var par = el.parents(".moving-column-body");
 
             // if we are in a moving column use this as our parent by default
@@ -17,10 +17,10 @@ export var createDirective = () => {
     };
 };
 
-export var moduleName = "sticky";
+export var moduleName = "adhSticky";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [])
-        .directive("sticky", [createDirective]);
+        .directive("adhSticky", [createDirective]);
 };
