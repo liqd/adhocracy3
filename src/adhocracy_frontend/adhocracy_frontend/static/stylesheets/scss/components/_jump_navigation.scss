@@ -1,0 +1,36 @@
+/*doc
+---
+title: Jump Navigation
+name: jump-navigation
+category: Widgets
+---
+
+A navigation list containing hash tag links
+
+```html_example
+<nav class="jump-navigation">
+    <ol>
+        <li><a>1. Element</a></li>
+        <li><a>2. Element</a></li>
+        <li><a class="active">3. Element (active)</a></li>
+    </ol>
+</nav>
+```
+*/
+.jump-navigation {
+    padding: 0.5em;
+    border: 1px solid $color-structure-border;
+    z-index: 1;
+
+    ol {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    a {
+        &.active {
+            font-weight: bold;
+        }
+    }
+}

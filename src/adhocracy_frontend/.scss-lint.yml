@@ -18,3 +18,5 @@
             style: 'double_quotes'
         MergeableSelector:
             force_nesting: false
+        PlaceholderInExtend:
+            enabled: false
