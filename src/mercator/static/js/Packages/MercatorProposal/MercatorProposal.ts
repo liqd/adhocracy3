@@ -1,3 +1,5 @@
+import fustyFlowFactory = require("fustyFlowFactory");
+
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
@@ -53,9 +55,9 @@ var pkgLocation = "/MercatorProposal";
 
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
+    showDetails : () => void;
     poolPath : string;
-    showDetails() : void;
-    mercatorProposalForm?;
+    mercatorProposalForm? : any;
     data : {
         countries : any;
         // 1. basic
@@ -78,6 +80,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
         introduction : {
             title : string;
             teaser : string;
+            imageUpload : Flow;
         };
 
         // 3. in detail
@@ -119,13 +122,49 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
 
         accept_disclaimer : string;
     };
-
 }
+
+export interface IControllerScope extends IScope {
+    showError : (fieldName : string, errorType : string) => boolean;
+    showHeardFromError : () => boolean;
+    showDetailsLocationError : () => boolean;
+    submitIfValid : () => void;
+    mercatorProposalExtraForm? : any;
+    mercatorProposalDetailForm? : any;
+}
+
+
+/**
+ * upload mercator proposal image file.  this function can potentially
+ * be more flexible; for now it just handles the Flow object and
+ * promises the path of the image resource as a string.
+ *
+ * FIXME: implement this function!
+ */
+export var uploadImageFile = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    $q : ng.IQService,
+    flow : Flow
+) : ng.IPromise<string> => {
+
+    console.log("uploadImageFile: not fully implemented, but we already collect the file meta data locally in the browser:");
+
+    flow.opts.target = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+
+    console.log(JSON.stringify(flow.opts, null, 2));
+    _.forOwn(flow.files, (value, key) => {
+        console.log(JSON.stringify(value.file, null, 2));
+    });
+
+    flow.resume();
+    return (<any>$q.reject("blöp"));
+};
 
 
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
-        adhConfig : AdhConfig.IService,
+        public adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
@@ -378,11 +417,25 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         }
     }
 
-
-
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data = this.initializeScope(instance.scope);
+        var imagePathPromise = uploadImageFile(this.adhConfig, this.adhHttp, this.$q, data.introduction.imageUpload);
+
+        // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
+        // FIXME: handle file upload in _update.
+        // FIXME: We need to wait for this promise with everything
+        // else. Otherwise, the upload could be interrupted by a hard
+        // redirect or similar.
+        imagePathPromise.then(
+            (path) => {
+                console.log("upload successful:");
+                console.log(path);
+            },
+            () => {
+                console.log("upload error:");
+                console.log(arguments);
+            });
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -810,6 +863,7 @@ export var countrySelect = () => {
     };
 };
 
+
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -837,6 +891,22 @@ export var register = (angular) => {
                      movingColumns: "is-collapse-show-hide"
                 });
         }])
+        .config(["flowFactoryProvider", (flowFactoryProvider) => {
+            if (typeof flowFactoryProvider.defaults === "undefined") {
+                flowFactoryProvider.defaults = {};
+            }
+
+            flowFactoryProvider.factory = fustyFlowFactory;
+            flowFactoryProvider.defaults.singleFile = true;
+            flowFactoryProvider.defaults.maxChunkRetries = 1;
+            flowFactoryProvider.defaults.chunkRetryInterval = 5000;
+            flowFactoryProvider.defaults.simultaneousUploads = 4;
+            flowFactoryProvider.defaults.permanentErrors = [404, 500, 501, 502, 503];
+
+            flowFactoryProvider.on("catchAll", () => {
+                console.log(arguments);
+            });
+        }])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
@@ -856,7 +926,7 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope, $element) => {
+        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope : IControllerScope, $element) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
                 "heard-from-website",
@@ -908,6 +978,9 @@ export var register = (angular) => {
                 var container = $element.parents("[data-du-scroll-container]");
 
                 if ($scope.mercatorProposalForm.$valid) {
+                    // pluck flow object from file upload scope, and
+                    // attach it to where ResourceWidgets can find it.
+                    $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
                     $scope.submit().catch(() => {
                         container.scrollTopAnimated(0);
                     });
