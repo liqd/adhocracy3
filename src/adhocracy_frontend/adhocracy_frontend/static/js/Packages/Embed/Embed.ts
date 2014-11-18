@@ -17,7 +17,14 @@ var embeddableDirectives = [
     "create-or-show-comment-listing",
     "login",
     "register",
-    "user-indicator"
+    "user-indicator",
+    "empty"
+];
+
+var metaParams = [
+    "locale",
+    "nocenter",
+    "noheader"
 ];
 
 export var location2template = ($location : ng.ILocationService) => {
@@ -28,8 +35,12 @@ export var location2template = ($location : ng.ILocationService) => {
     if (!AdhUtil.isArrayMember(widget, embeddableDirectives)) {
         throw "unknown widget: " + widget;
     }
+
+    if (widget === "empty") {
+        return "";
+    }
     for (var key in search) {
-        if (search.hasOwnProperty(key) && key !== "locale") {
+        if (search.hasOwnProperty(key) && metaParams.indexOf(key) === -1) {
             attrs.push(AdhUtil.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(search[key])));
         }
     }
@@ -52,6 +63,10 @@ export var register = (angular) => {
                         $translate.use(params.locale);
                     }
                     var template = location2template($location);
+
+                    if (!params.hasOwnProperty("nocenter")) {
+                        template = "<div class=\"l-center\">" + template + "</div>";
+                    }
 
                     if (!params.hasOwnProperty("noheader")) {
                         template = "<header class=\"l-header main-header\">" +

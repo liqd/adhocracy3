@@ -120,6 +120,20 @@ export class Service implements IService {
         return typeof _self.adhUser !== "undefined" && _.contains(_self.trustedDomains, _self.embedderOrigin);
     }
 
+    private sendLoginState(loggedIn) {
+        var _self : Service = this;
+
+        if (loggedIn) {
+            _self.postMessage("login", {
+                token: _self.adhUser.token,
+                userPath: _self.adhUser.userPath,
+                userData: _self.adhUser.data
+            });
+        } else {
+            _self.postMessage("logout", {});
+        }
+    }
+
     private setup(data: IMessageData) : void {
         var _self : Service = this;
 
@@ -127,18 +141,8 @@ export class Service implements IService {
             _self.embedderOrigin = data.embedderOrigin;
 
             if (_self.sendAuthMessages()) {
-                _self.$rootScope.$watch(() => _self.adhUser.loggedIn, (loggedIn) => {
-
-                    if (loggedIn) {
-                        _self.postMessage("login", {
-                            token: _self.adhUser.token,
-                            userPath: _self.adhUser.userPath,
-                            userData: _self.adhUser.data
-                        });
-                    } else {
-                        _self.postMessage("logout", {});
-                    }
-                });
+                _self.$rootScope.$watch(() => _self.adhUser.loggedIn, ((loggedIn) => _self.sendLoginState(loggedIn)));
+                _self.sendLoginState(_self.adhUser.loggedIn);
             }
         }
     }
