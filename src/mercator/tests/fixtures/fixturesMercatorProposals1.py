@@ -800,7 +800,7 @@ body = json.dumps([
                     "status": "planned_nonprofit",
                     "country": "CC",
                     "website": "http://www.heise.de/http://northscape.net/",
-                    "planned_date": "03/201503/2015",
+                    "planned_date": "03/2015",
                     "name": "nameconstantly"
                 }
             },
@@ -1353,7 +1353,7 @@ body = json.dumps([
                     "status": "planned_nonprofit",
                     "country": "EC",
                     "website": "http://www.heise.de/http://northscape.net/",
-                    "planned_date": "03/201511/2017",
+                    "planned_date": "11/2017",
                     "name": "nameworrier tortes"
                 }
             },
@@ -2027,7 +2027,7 @@ body = json.dumps([
                     "status": "planned_nonprofit",
                     "country": "PW",
                     "website": "http://www.heise.de/http://northscape.net/",
-                    "planned_date": "03/201501/2016",
+                    "planned_date": "01/2016",
                     "name": "namesturdiest steadying gyp's"
                 }
             },
@@ -4545,7 +4545,7 @@ body = json.dumps([
                     "status": "planned_nonprofit",
                     "country": "KY",
                     "website": "http://www.heise.de/http://northscape.net/",
-                    "planned_date": "03/201503/2015",
+                    "planned_date": "03/2015",
                     "name": "nameSisyphus"
                 }
             },
@@ -5771,7 +5771,7 @@ body = json.dumps([
                     "status": "planned_nonprofit",
                     "country": "KY",
                     "website": "http://www.heise.de/http://northscape.net/",
-                    "planned_date": "03/201501/2016",
+                    "planned_date": "01/2016",
                     "name": "namescrods"
                 }
             },
