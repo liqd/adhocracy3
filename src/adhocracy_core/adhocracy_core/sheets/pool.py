@@ -51,9 +51,9 @@ class FilteringPoolSheet(PoolSheet):
         ifaces = self._build_iface_filter(params)
         arbitraries = self._get_arbitrary_filters(params)
         references = self._get_reference_filters(params)
-        serialization_form = self._get_serialization_form(params)
+        serialization_form = params.get('elements', 'path')
         resolve_resources = serialization_form != 'omit'
-        aggregate_filter = self._get_aggregate_filter(params)
+        aggregate_filter = params.get('aggregateby', '')
         result = self._filter_elements(depth=depth,
                                        ifaces=ifaces,
                                        arbitrary_filters=arbitraries,
@@ -64,7 +64,7 @@ class FilteringPoolSheet(PoolSheet):
         appstruct = {}
         if resolve_resources:
             appstruct['elements'] = list(result.elements)
-        if self._count_matching_elements(params):
+        if params.get('count', False):
             appstruct['count'] = result.count
         if aggregate_filter:
             appstruct['aggregateby'] = result.aggregateby
@@ -93,18 +93,9 @@ class FilteringPoolSheet(PoolSheet):
             iface_filter.append(reftype.getTaggedValue('target_isheet'))
         return iface_filter
 
-    def _get_serialization_form(self, param) -> str:
-        return param.get('elements', 'path')
-
     def _build_depth(self, params) -> int:
         raw_depth = params.get('depth', '1')
         return None if raw_depth == 'all' else int(raw_depth)
-
-    def _count_matching_elements(self, params) -> bool:
-        return params.get('count', False)
-
-    def _get_aggregate_filter(self, params: dict) -> str:
-        return params.get('aggregateby', '')
 
     def _filter_elements(self, depth=1, ifaces: Iterable=None,
                          arbitrary_filters: dict=None,
