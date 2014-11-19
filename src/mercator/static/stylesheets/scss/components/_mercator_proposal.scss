@@ -24,7 +24,8 @@
     @include container;
 }
 
-.proposal-meta {
+.mercator-proposal-detail-meta,
+.mercator-propsal-list-item-meta {
     // reset ul default styling
     margin: 0;
     padding: 0;
@@ -32,20 +33,17 @@
 
     @include container;
     margin-bottom: gutter(12);
-
-    //default is 6 columns
-    .proposal-meta-column {
-        @include gallery(2 of 12);
-    }
-
-    //has 4 columns.
-    .proposal-meta-column:first-child:nth-last-child(4),
-    .proposal-meta-column:first-child:nth-last-child(4) ~ li {
-        @include gallery(3 of 12);
-    }
 }
 
-.mercator-proposal-cover {
+.mercator-propsal-detail-meta-item {
+    @include gallery(2 of 12);
+}
+
+.mercator-propsal-list-item-meta-item {
+    @include gallery(3 of 12);
+}
+
+.mercator-proposal-detail-cover {
     @include span(full);
     border-bottom: 1px solid $color-structure-border;
 }
@@ -67,15 +65,11 @@
     @include container;
     border-bottom: 1px solid $color-structure-border;
 
-    .proposal-image {
+    .mercator-proposal-list-item-image {
         @include span(3 of 12 first);
     }
 
-    .proposal-image + .proposal-body {
+    .m-has-image {
         @include span(9 of 12 last);
     }
-}
-
-.filter-set-horizontal {
-    @include inline-block;
 }

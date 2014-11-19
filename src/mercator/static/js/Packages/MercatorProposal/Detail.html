@@ -1,5 +1,5 @@
 <div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
-    <div class="mercator-proposal-cover">
+    <div class="mercator-proposal-detail-cover">
         <h2 class="chapter-header">{{ data.introduction.title }}
             <span class="mercator-proposal-cover-show-comments">
                 <!-- FIXME: Dummy data -->
@@ -7,27 +7,27 @@
             </span>
         </h2>
 
-        <ul class="proposal-meta">
-            <li class="proposal-meta-column">
+        <ul class="mercator-proposal-detail-meta">
+            <li class="mercator-propsal-detail-meta-item">
                 <strong>{{data.finance.requested_funding}} &euro;</strong> requested
             </li>
-            <li class="proposal-meta-column">
+            <li class="mercator-propsal-detail-meta-item">
                 <!-- FIXME: Link to profile -->
                 <a href="#">{{data.user_info.first_name}} {{data.user_info.last_name}}</a>
             </li>
-            <li class="proposal-meta-column">
+            <li class="mercator-propsal-detail-meta-item">
                 {{ data.basic.createtime }}
                 published
             </li>
-            <li class="proposal-meta-column">
+            <li class="mercator-propsal-detail-meta-item">
                 <!-- FIXME: Dummy data -->
                 <i class="icon-speachbubble-outline"></i> 33
             </li>
-            <li class="proposal-meta-column">
+            <li class="mercator-propsal-detail-meta-item">
                 <!-- FIXME: Dummy data -->
                 231 supporters
             </li>
-            <li class="proposal-meta-column">
+            <li class="mercator-propsal-detail-meta-item">
                 <adh-like data-refers-to="{{path}}"
                     data-post-pool-sheet="adhocracy.sheets.rate.ILikeable"
                     data-post-pool-field="post_pool">
