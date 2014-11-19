@@ -246,7 +246,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
-        data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
+        data.user_info.createtime = mercatorProposalVersion.data[SIMetaData.nick].item_creation_date;
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
 
         data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
