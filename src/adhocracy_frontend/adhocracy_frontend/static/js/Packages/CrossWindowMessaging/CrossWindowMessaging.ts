@@ -124,13 +124,14 @@ export class Service implements IService {
         var _self : Service = this;
 
         if (_self.sendAuthMessages()) {
-            if (loggedIn) {
+            // the case (loggedIn === undefined) doesn't trigger a message
+            if (loggedIn === true) {
                 _self.postMessage("login", {
                     token: _self.adhUser.token,
                     userPath: _self.adhUser.userPath,
                     userData: _self.adhUser.data
                 });
-            } else {
+            } else if (loggedIn === false) {
                 _self.postMessage("logout", {});
             }
         }
