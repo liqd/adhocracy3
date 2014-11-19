@@ -12,12 +12,15 @@ export interface Dict {
 
 export class Provider implements ng.IServiceProvider {
     public $get;
-    private defaults : {[key : string]: Dict};
+    public defaults : {[key : string]: Dict};
+    public specifics : {[key : string]: (resource) => any};  // values return either Dict or ng.IPromise<Dict>
 
     constructor() {
         var self = this;
         this.defaults = {};
-        this.$get = ["adhHttp", "adhConfig", (adhHttp, adhConfig) => new Service(self, adhHttp, adhConfig)];
+        this.specifics = {};
+        this.$get = ["$q", "$injector", "adhHttp", "adhConfig",
+            ($q, $injector, adhHttp, adhConfig) => new Service(self, $q, $injector, adhHttp, adhConfig)];
     }
 
     public default(resourceType : string, view : string, defaults : Dict) : Provider {
@@ -25,8 +28,11 @@ export class Provider implements ng.IServiceProvider {
         return this;
     }
 
-    public getDefaults(resourceType : string, view : string) : Dict {
-        return <Dict>_.extend({}, this.defaults[resourceType + "@" + view]);
+    public specific(resourceType : string, view : string, factory : Function) : Provider;
+    public specific(resourceType : string, view : string, factory : any[]) : Provider;
+    public specific(resourceType, view, factory) {
+        this.specifics[resourceType + "@" + view] = factory;
+        return this;
     }
 }
 
@@ -36,9 +42,32 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
     constructor(
         private provider : Provider,
+        private $q : ng.IQService,
+        private $injector : ng.auto.IInjectorService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService
     ) {}
+
+    private getDefaults(resourceType : string, view : string) : Dict {
+        return <Dict>_.extend({}, this.provider.defaults[resourceType + "@" + view]);
+    }
+
+    private getSpecifics(resource, view : string) : ng.IPromise<Dict> {
+        var key = resource.content_type + "@" + view;
+        var specifics;
+
+        if (this.provider.specifics.hasOwnProperty(key)) {
+            var factory = this.provider.specifics[key];
+            var fn = this.$injector.invoke(factory);
+            specifics = fn(resource);
+        } else {
+            specifics = {};
+        }
+
+        // fn may return a promise
+        return this.$q.when(specifics)
+            .then((data : Dict) => _.clone(data));
+    }
 
     public route(path : string, search : Dict) : ng.IPromise<Dict> {
         var self : Service = this;
@@ -58,38 +87,31 @@ export class Service implements AdhTopLevelState.IAreaInput {
         var resourceUrl : string = this.adhConfig.rest_url + segs.join("/");
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
-            var data = self.provider.getDefaults(resource.content_type, view);
+            return self.getSpecifics(resource, view).then((specifics : Dict) => {
+                var defaults : Dict = self.getDefaults(resource.content_type, view);
 
-            data["platform"] = segs[1];
-            data["contentType"] = resource.content_type;
-            data["view"] = view;
+                var meta : Dict = {
+                    platform: segs[1],
+                    contentType: resource.content_type,
+                    resourceUrl: resource.path,
+                    view: view
+                };
 
-            if (segs.length > 2) {
-                data["content2Url"] = resourceUrl;
-            }
-
-            for (var key in search) {
-                if (search.hasOwnProperty(key)) {
-                    data[key] = search[key];
-                }
-            }
-
-            return data;
+                return _.extend(defaults, meta, specifics, search);
+            });
         });
     }
 
     public reverse(data : Dict) : { path : string; search : Dict; } {
-        var defaults = this.provider.getDefaults(data["contentType"], data["view"]);
-        var path : string;
+        var defaults = this.getDefaults(data["contentType"], data["view"]);
+        var path = path = data["resourceUrl"].replace(this.adhConfig.rest_url, "");
 
-        if (data["content2Url"]) {
-            path = data["content2Url"].replace(this.adhConfig.rest_url, "");
-        } else {
-            path = "/" + data["platform"];
+        if (path.substr(-1) !== "/") {
+            path += "/";
         }
 
         if (data["view"]) {
-            path += "/@" + data["view"];
+            path += "@" + data["view"];
         }
 
         return {

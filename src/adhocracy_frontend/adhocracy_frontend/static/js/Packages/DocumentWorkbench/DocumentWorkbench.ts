@@ -67,6 +67,11 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
+                .specific(RIProposalVersion.content_type, "", () => (resource : RIProposalVersion) => {
+                    return {
+                        content2Url: resource.path
+                    };
+                })
                 .default(RIUser.content_type, "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"

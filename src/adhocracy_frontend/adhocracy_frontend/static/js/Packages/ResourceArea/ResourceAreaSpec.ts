@@ -11,6 +11,7 @@ export var register = () => {
             var providerMock;
             var adhHttpMock;
             var adhConfigMock;
+            var $injectorMock;
             var service;
 
             beforeEach(() => {
@@ -22,11 +23,13 @@ export var register = () => {
                     content_type: "content_type"
                 }));
 
+                $injectorMock = jasmine.createSpyObj("$injector", ["invoke"]);
+
                 adhConfigMock = {
                     rest_url: "rest_url"
                 };
 
-                service = new AdhResourceArea.Service(providerMock, adhHttpMock, adhConfigMock);
+                service = new AdhResourceArea.Service(providerMock, q, $injectorMock, adhHttpMock, adhConfigMock);
             });
 
             describe("route", () => {

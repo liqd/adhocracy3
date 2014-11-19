@@ -874,21 +874,32 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIMercatorProposal.content_type, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide"
-                })
                 .default(RIMercatorProposalVersion.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
+                })
+                .specific(RIMercatorProposalVersion.content_type, "", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        content2Url: resource.path
+                    };
                 })
                 .default(RIMercatorProposalVersion.content_type, "edit", {
                     space: "content",
                     movingColumns: "is-collapse-show-hide"
                 })
+                .specific(RIMercatorProposalVersion.content_type, "edit", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        content2Url: resource.path
+                    };
+                })
                 .default(RIMercatorProposalVersion.content_type, "comments", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
+                })
+                .specific(RIMercatorProposalVersion.content_type, "comments", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        content2Url: resource.path
+                    };
                 });
         }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {

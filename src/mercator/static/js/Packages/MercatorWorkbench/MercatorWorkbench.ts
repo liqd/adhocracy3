@@ -105,6 +105,11 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
+                .specific(RICommentVersion.content_type, "", () => (resource : RICommentVersion) => {
+                    return {
+                        content2Url: resource.path
+                    };
+                })
                 .default(RIBasicPool.content_type, "create_proposal", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
