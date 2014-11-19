@@ -55,7 +55,7 @@ def add_assets_service(context: IPool, registry: Registry, options: dict):
 pool_with_assets_meta = basicpool_metadata._replace(
     iresource=IPoolWithAssets,
     basic_sheets=basicpool_metadata.basic_sheets + [
-                 adhocracy_core.sheets.asset.IHasAssetPool],
+        adhocracy_core.sheets.asset.IHasAssetPool],
     after_creation=basicpool_metadata.after_creation + [add_assets_service],
 )
 

@@ -68,13 +68,15 @@ We need a pool with an asset pool::
     ...                               headers=god_header).json
     >>> proposal_pool_path = resp_data['path']
     >>> proposal_pool_path
-    ['http://localhost/adhocracy/ProposalPool']
+    'http://localhost/adhocracy/ProposalPool/'
 
-We can ask the pool for the location of the asset pool:
+We can ask the pool for the location of the asset pool::
 
     >>> resp_data = testapp.get(proposal_pool_path).json
-    >>> resp_data['data']['adhocracy_core.sheets.asset.IHasAssetPool']['name']
-    ['http://localhost/adhocracy/ProposalPool/assets']
+    >>> asset_pool_path = resp_data['data'][
+    ...         'adhocracy_core.sheets.asset.IHasAssetPool']['asset_pool']
+    >>> asset_pool_path
+    'http://localhost/adhocracy/ProposalPool/assets/'
 
 Asset Subtypes and MIME Type Validators
 ---------------------------------------
@@ -87,8 +89,6 @@ abstract and cannot be instantiated -- only subclasses that provide a *MIME
 Type Validator* can. To do so, create a subclass of the sheet (empty marker
 interface) and register a `adhocracy_core.interfaces.IMimeTypeValidator`
 implementation for that subclass (same as with `IRateValidator` for rates).
-
-TODO Make testable:
 
 E.g. to create a spreadsheet asset type that only accepts OpenDocument and
 Excel spreadsheets::
@@ -108,8 +108,11 @@ Excel spreadsheets::
                                     (ISpreadsheetAsset,),
                                     IMimeTypeValidator)
 
-FIXME Maybe we'll extend the SheetMetadata instead of using an adapter
-(likewise for Size Mappers).
+For consistency, there should be a corresponding subtype of the asset
+resource defined for each subtype of the asset sheet.
+
+FIXME Adapt this section, as we actually extend the SheetMetadata instead
+of using an adapter (likewise for Size Mappers).
 
 Images and Size Mappers
 -----------------------
@@ -134,8 +137,8 @@ subtype::
 
         def sizemap -> dict:
             return {
-                'thumbnail': Dimensions(width=160, height=120),
-                'detail': Dimensions(width=600, height=300),
+                'thumbnail': Dimensions(width=100, height=50),
+                'detail': Dimensions(width=500, height=250),
             }
 
     # register adapter as above
@@ -147,9 +150,9 @@ This means that the image will be made available in 'thumbnail' and in
 The image will be automatically resized to all of the specified sizes. If
 the target aspect ratio is different from the original aspect ratio, the size
 that is wider/higher is cropped so that only the middle part of it remains.
-For example, if the original image has 1600x600 pixel and the target size is
-600x300 ('detail' size in the above example), it will be scaled to 50%
-(800x300 pixel) and then 100 pixel to the left and 100 to the right will be
+For example, if the original image has 1500x500 pixel and the target size is
+500x250 ('detail' size in the above example), it will be scaled to 50%
+(750x250 pixel) and then 125 pixel to the left and 125 to the right will be
 cropped to reach the target size.
 
 Uploading Assets
@@ -166,6 +169,43 @@ request will typically have the following keys:
     the uploaded file, e.g. "image/jpeg"
 :data.adhocracy_core.sheets.asset.IAssetData.data: the binary data of the
     uploaded file, as per the HTML `<input type="file" name="asset">` tag.
+
+For example, lets upload a little picture and create a proposal version that
+references it. But first we have to create a proposal::
+
+    >>> prop_data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    ...              'data': {
+    ...                  'adhocracy_core.sheets.name.IName': {
+    ...                      'name': 'kommunismus'}
+    ...                      }
+    ...             }
+    >>> resp = testapp.post_json(proposal_pool_path, prop_data, headers=god_header)
+    >>> prop_path = resp.json["path"]
+    >>> prop_path
+    'http://localhost/adhocracy/ProposalPool/kommunismus/'
+    >>> prop_v0_path = resp.json['first_version_path']
+    >>> prop_v0_path
+    'http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000000/'
+
+Now we can upload a sample picture::
+
+    >>> pic_data = {'content_type': 'adhocracy_core.resources.asset.IAsset',
+    ...             'data': {
+    ...                 'adhocracy_core.sheets.asset.IAssetMetadata': {
+    ...                     'mime_type': 'image/jpeg'},
+    ...                 'data.adhocracy_core.sheets.asset.IAssetData': {
+    ...                     'data': 'BLAHBLAHBLAH'},
+    ...                     }
+    ...            }
+    >>> resp = testapp.post_json(asset_pool_path, pic_data, headers=god_header)
+    >>> prop_path = resp.json["path"]
+    >>> prop_path
+    'http://localhost/adhocracy/ProposalPool/kommunismus/'
+
+TODO Switch to adhocracy_core.resources.asset.IImageMetadata and
+"multipart/form-data" syntax.
+
+TODO Create proposal version referencing the image.
 
 In response, the backend sends a JSON document with the resource type and
 path of the new resource (just as with other resource types)::
