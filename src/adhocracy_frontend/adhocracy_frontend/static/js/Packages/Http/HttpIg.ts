@@ -20,6 +20,37 @@ import AdhMetaApi = require("./MetaApi");
 
 export var register = (angular, config, meta_api) => {
 
+    describe("$http.get and AdhHttp.getRaw", () => {
+        var adhHttp : AdhHttp.Service<any> = (() => {
+            var factory = ($http, $q, $timeout) => {
+                $http.defaults.headers.common["X-User-Token"] = "SECRET_GOD";
+                $http.defaults.headers.common["X-User-Path"] = "/principals/users/0000000";
+
+                var preliminaryNames = new AdhPreliminaryNames.Service();
+                return (new AdhHttp.Service($http, $q, $timeout, new AdhMetaApi.MetaApiQuery(meta_api), preliminaryNames, config));
+            };
+            factory.$inject = ["$http", "$q", "$timeout"];
+            return angular.injector(["ng"]).invoke(factory);
+        })();
+
+        // FIXME: there is a work-around for this problem in Error.ts
+        // in function logBackendError.  if this test is re-enabled
+        // and the underlying issue is fixed, remove the work-around.
+        xit("do not lose error response status and body.", (done) => {
+            adhHttp.getRaw("/does/not/exist").then(
+                (response) => {
+                    expect("should not succeed").toBe(true);
+                    done();
+                },
+                (error) => {
+                    expect(error.status).not.toBe(0);
+                    expect(error.data).not.toBe(null);
+                    done();
+                }
+            );
+        });
+    });
+
     describe("withTransaction", () => {
         var adhHttp : AdhHttp.Service<any> = (() => {
             var factory = ($http, $q, $timeout) => {
