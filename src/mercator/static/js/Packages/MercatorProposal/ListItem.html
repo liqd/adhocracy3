@@ -5,10 +5,18 @@
         <h3><a href="" data-ng-click="showDetails()">{{ data.introduction.title }}</a></h3>
         <p class="proposal-username"><a href="#FIXME: link to user profile">{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>, {{data.organization_info.name}}</p>
         <ul class="proposal-meta">
-            <li class="proposal-meta-column">when: {{ data.user_info.createtime }}</li>
-            <li class="proposal-meta-column">budget: {{ data.finance.funding }} / {{ data.finance.budget }}</li>
-            <li class="proposal-meta-column">comments: [#comments]</li>
-            <li class="proposal-meta-column">votes: [#votes]</li>
+            <li class="proposal-meta-column">
+                {{ data.user_info.createtime }}
+            </li>
+            <li class="proposal-meta-column">
+                {{ data.finance.budget }} &euro;
+            </li>
+            <li class="proposal-meta-column">
+            <!-- FIXME: Dummy data -->12
+            {{ "votes" | translate }}</li>
+            <li class="proposal-meta-column">
+            <!-- FIXME: Dummy data -->33
+             {{ "comments" | translate }}</li>
         </ul>
     </div>
 </div>
