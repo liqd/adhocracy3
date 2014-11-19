@@ -17,15 +17,7 @@
 
 .mercator-proposal-form-nav {
     @include span(first 2 of 12);
-    border: 1px solid $color-structure-border;
-    top: 0.5em;
-    z-index: 1;
-
-    a {
-        &.active {
-            font-weight: bold;
-        }
-    }
+    @extend .jump-navigation;
 }
 
 .mercator-proposal-detail-view {
@@ -65,6 +57,7 @@
 
 .mercator-proposal-detail-nav {
     @include span(first 2 of 12);
+    @extend .jump-navigation;
 }
 
 .mercator-proposal-chapters {

@@ -3,6 +3,7 @@ from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
 
 from adhocracy_core.resources.pool import IBasicPool
 
@@ -55,10 +56,10 @@ class TestFilteringPoolSheet:
 
     @fixture
     def inst(self, meta, context):
-        from adhocracy_core.sheets.pool import filter_elements_result
+        from adhocracy_core.sheets.pool import FilterElementsResult
         inst = meta.sheet_class(meta, context)
         inst._filter_elements = Mock(spec=inst._filter_elements)
-        inst._filter_elements.return_value = filter_elements_result(['Dummy'],
+        inst._filter_elements.return_value = FilterElementsResult(['Dummy'],
                                                                     1, {})
         return inst
 
@@ -86,6 +87,7 @@ class TestFilteringPoolSheet:
                                                       'arbitrary_filters': {},
                                                       'resolve_resources': True,
                                                       'references': {},
+                                                      'sort_filter': '',
                                                       'aggregate_filter': '',
                                                       }
         assert appstruct == {'elements': ['Dummy'], 'count': 1}
@@ -100,6 +102,7 @@ class TestFilteringPoolSheet:
             'arbitrary_filters': {'tag': 'BEST', 'rating': 'outstanding'},
             'resolve_resources': True,
             'references': {},
+            'sort_filter': '',
             'aggregate_filter': '',
             }
         assert appstruct == {'elements': ['Dummy']}
@@ -113,6 +116,7 @@ class TestFilteringPoolSheet:
                 'arbitrary_filters': {},
                 'resolve_resources': True,
                 'references': {},
+                'sort_filter': '',
                 'aggregate_filter': '',
                 }
         assert appstruct == {'elements': ['Dummy']}
@@ -131,6 +135,7 @@ class TestFilteringPoolSheet:
                 'arbitrary_filters': {},
                 'resolve_resources': True,
                 'references': {},
+                'sort_filter': '',
                 'aggregate_filter': 'interfaces',
                 }
         assert appstruct == {'elements': ['Dummy'], 'aggregateby': {}}
@@ -366,6 +371,26 @@ class TestIntegrationPoolSheet:
         # Values not matched by the query shouldn't be reported in the
         # aggregate
         assert str(IItem) not in result['interfaces']
+
+    def test_filter_elements_with_sort_filter(self, registry, pool_graph_catalog):
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        item = self._make_resource(registry, parent=pool_graph_catalog,
+                                   name='item')
+        self._make_resource(registry, parent=item, name='child2')
+        self._make_resource(registry, parent=item, name='child1')
+        poolsheet = get_sheet(item, IPool)
+        result = poolsheet._filter_elements(sort_filter='name').elements
+        assert [x.__name__ for x in result] == ['child1', 'child2']
+
+    def test_filter_elements_with_sort_filter_non_sortable(self, registry, pool_graph_catalog):
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        item = self._make_resource(registry, parent=pool_graph_catalog,
+                                   name='item')
+        poolsheet = get_sheet(item, IPool)
+        with raises(AssertionError):
+            poolsheet._filter_elements(sort_filter='path').elements
 
 
 @mark.usefixtures('integration')
