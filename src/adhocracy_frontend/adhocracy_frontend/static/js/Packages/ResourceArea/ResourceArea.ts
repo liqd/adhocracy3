@@ -148,8 +148,11 @@ export var resourceUrl = (adhConfig : AdhConfig.IService) => {
     return (path : string, view? : string) => {
         if (typeof path !== "undefined") {
             var url = "/r" + path.replace(adhConfig.rest_url, "");
+            if (url.substr(-1) !== "/") {
+                url += "/";
+            }
             if (typeof view !== "undefined") {
-                url += "/@" + view;
+                url += "@" + view;
             }
             return url;
         }
