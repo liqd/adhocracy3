@@ -525,14 +525,17 @@ class TestGETPoolRequestSchema():
 
     def test_deserialize_valid(self, inst, context):
         from adhocracy_core.sheets.name import IName
+        from hypatia.interfaces import IIndexSort
         catalog = context['catalogs']['adhocracy']
-        catalog['index1'] = testing.DummyResource(unique_values=lambda x: x)
+        catalog['index1'] = testing.DummyResource(unique_values=lambda x: x,
+                                                  __provides__=IIndexSort)
         inst = inst.bind(context=context)
         data = {'content_type': 'adhocracy_core.sheets.name.IName',
                 'sheet': 'adhocracy_core.sheets.name.IName',
                 'depth': '100',
                 'elements': 'content',
                 'count': 'true',
+                'sort': 'index1',
                 'aggregateby': 'index1',
                 }
         expected = {'content_type': IName,
@@ -540,6 +543,7 @@ class TestGETPoolRequestSchema():
                     'depth': '100',
                     'elements': 'content',
                     'count': True,
+                    'sort': 'index1',
                     'aggregateby': 'index1',
                     }
         assert inst.deserialize(data) == expected
@@ -588,6 +592,38 @@ class TestGETPoolRequestSchema():
         data = {'extra1': 'blah',
                 'another_extra': 'blub'}
         assert inst.typ.unknown == 'raise'
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_sort_valid_system_index(self, inst, context):
+        from hypatia.interfaces import IIndexSort
+        catalog = context['catalogs']['system']
+        catalog['index1'] = testing.DummyResource(__provides__=IIndexSort)
+        inst = inst.bind(context=context)
+        data = {'sort': 'index1'}
+        assert inst.deserialize(data)['sort'] == 'index1'
+
+    def test_deserialize_sort_valid_adhocarcy_index(self, inst, context):
+        from hypatia.interfaces import IIndexSort
+        catalog = context['catalogs']['adhocracy']
+        catalog['index1'] = testing.DummyResource(__provides__=IIndexSort)
+        inst = inst.bind(context=context)
+        data = {'sort': 'index1'}
+        assert inst.deserialize(data)['sort'] == 'index1'
+
+    def test_deserialize_sort_valid_but_index_is_missing_IIndexSortable(self, inst, context):
+        # workaround bug: hypation.field.FieldIndex is missing IIndexSortable
+        catalog = context['catalogs']['adhocracy']
+        catalog['index1'] = testing.DummyResource(sort=lambda x: x)
+        inst = inst.bind(context=context)
+        data = {'sort': 'index1'}
+        assert inst.deserialize(data)['sort'] == 'index1'
+
+    def test_deserialize_sort_invalid_non_sortable_index(self, inst, context):
+        catalog = context['catalogs']['adhocracy']
+        catalog['index1'] = testing.DummyResource()
+        inst = inst.bind(context=context)
+        data = {'sort': 'index1'}
         with raises(colander.Invalid):
             inst.deserialize(data)
 

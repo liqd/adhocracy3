@@ -21,11 +21,11 @@ dotted_name_resolver = DottedNameResolver()
 
 
 filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
-                                 'count', 'aggregateby']
+                                 'count', 'sort', 'aggregateby']
 
 
-filter_elements_result = namedtuple('FilterElementsResult',
-                                    ['elements', 'count', 'aggregateby'])
+FilterElementsResult = namedtuple('FilterElementsResult',
+                                  ['elements', 'count', 'aggregateby'])
 
 
 class PoolSheet(GenericResourceSheet):
@@ -51,20 +51,22 @@ class FilteringPoolSheet(PoolSheet):
         ifaces = self._build_iface_filter(params)
         arbitraries = self._get_arbitrary_filters(params)
         references = self._get_reference_filters(params)
-        serialization_form = self._get_serialization_form(params)
+        serialization_form = params.get('elements', 'path')
         resolve_resources = serialization_form != 'omit'
-        aggregate_filter = self._get_aggregate_filter(params)
+        sort = params.get('sort', '')
+        aggregate_filter = params.get('aggregateby', '')
         result = self._filter_elements(depth=depth,
                                        ifaces=ifaces,
                                        arbitrary_filters=arbitraries,
                                        resolve_resources=resolve_resources,
                                        references=references,
+                                       sort_filter=sort,
                                        aggregate_filter=aggregate_filter,
                                        )
         appstruct = {}
         if resolve_resources:
             appstruct['elements'] = list(result.elements)
-        if self._count_matching_elements(params):
+        if params.get('count', False):
             appstruct['count'] = result.count
         if aggregate_filter:
             appstruct['aggregateby'] = result.aggregateby
@@ -93,49 +95,56 @@ class FilteringPoolSheet(PoolSheet):
             iface_filter.append(reftype.getTaggedValue('target_isheet'))
         return iface_filter
 
-    def _get_serialization_form(self, param) -> str:
-        return param.get('elements', 'path')
-
     def _build_depth(self, params) -> int:
         raw_depth = params.get('depth', '1')
         return None if raw_depth == 'all' else int(raw_depth)
-
-    def _count_matching_elements(self, params) -> bool:
-        return params.get('count', False)
-
-    def _get_aggregate_filter(self, params: dict) -> str:
-        return params.get('aggregateby', '')
 
     def _filter_elements(self, depth=1, ifaces: Iterable=None,
                          arbitrary_filters: dict=None,
                          resolve_resources=True,
                          references: dict=None,
-                         aggregate_filter: str=None) -> filter_elements_result:
+                         sort_filter: str='',
+                         aggregate_filter: str=None) -> FilterElementsResult:
         system_catalog = find_catalog(self.context, 'system')
+        # filter path
         path_index = system_catalog['path']
         query = path_index.eq(resource_path(self.context), depth=depth,
                               include_origin=False)
+        # filter ifaces
         if ifaces:
             interface_index = system_catalog['interfaces']
             query &= interface_index.all(ifaces)
+        # filter arbitrary
         adhocracy_catalog = find_catalog(self.context, 'adhocracy')
         if arbitrary_filters:
             for name, value in arbitrary_filters.items():
                 index = adhocracy_catalog[name]
                 query &= index.eq(value)
+        # filter references
         if references:
             index = adhocracy_catalog['reference']
             for name, value in references.items():
                 isheet_name, isheet_field = name.split(':')
                 isheet = dotted_name_resolver.resolve(isheet_name)
                 query &= index.eq(isheet, isheet_field, value)
-        identity = lambda x: x  # pragma: no branch
-        resolver = None if resolve_resources else identity
         # Only show visible elements (not hidden or deleted)
         visibility_index = adhocracy_catalog['private_visibility']
         query &= visibility_index.eq('visible')
+        # Execute filter query
+        identity = lambda x: x  # pragma: no branch
+        resolver = None if resolve_resources else identity
         elements = query.execute(resolver=resolver)
+        # Sort
+        sort_index = system_catalog.get(sort_filter, None) \
+            or adhocracy_catalog.get(sort_filter, None)
+        if sort_index is not None:
+            # FIXME: We should assert the IIndexSort interfaces here, but
+            # hypation.field.FieldIndex is missing this interfaces.
+            assert 'sort' in sort_index.__dir__()
+            elements = elements.sort(sort_index)
+        # Count
         count = len(elements)
+        # Aggregate
         aggregateby = {}
         if aggregate_filter:
             aggregateby[aggregate_filter] = {}
@@ -147,7 +156,7 @@ class FilteringPoolSheet(PoolSheet):
                 if value_elements:
                     aggregateby[aggregate_filter][str(value)] = len(
                         value_elements)
-        return filter_elements_result(elements, count, aggregateby)
+        return FilterElementsResult(elements, count, aggregateby)
 
 
 class IPool(ISheet):
