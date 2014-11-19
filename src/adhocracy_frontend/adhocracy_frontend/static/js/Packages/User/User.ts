@@ -66,7 +66,7 @@ var bindServerErrors = (
 
 
 export class Service {
-    public loggedIn : boolean = false;
+    public loggedIn : boolean;
     public data : IUserBasic;
     public token : string;
     public userPath : string;
@@ -99,6 +99,8 @@ export class Service {
                         _self.deleteToken();
                     }));
                 }
+            } else if (_self.loggedIn === undefined) {
+                _self.loggedIn = false;
             }
         };
 
