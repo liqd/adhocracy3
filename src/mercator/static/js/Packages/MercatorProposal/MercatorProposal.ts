@@ -875,20 +875,20 @@ export var register = (angular) => {
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
                 .default(RIMercatorProposal.content_type, "", {
-                     space: "content",
-                     movingColumns: "is-show-show-hide"
+                    space: "content",
+                    movingColumns: "is-show-show-hide"
                 })
                 .default(RIMercatorProposalVersion.content_type, "", {
-                     space: "content",
-                     movingColumns: "is-show-show-hide"
+                    space: "content",
+                    movingColumns: "is-show-show-hide"
                 })
                 .default(RIMercatorProposalVersion.content_type, "edit", {
-                     space: "content",
-                     movingColumns: "is-collapse-show-hide"
+                    space: "content",
+                    movingColumns: "is-collapse-show-hide"
                 })
                 .default(RIMercatorProposalVersion.content_type, "comments", {
-                     space: "content",
-                     movingColumns: "is-collapse-show-show"
+                    space: "content",
+                    movingColumns: "is-collapse-show-show"
                 });
         }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {

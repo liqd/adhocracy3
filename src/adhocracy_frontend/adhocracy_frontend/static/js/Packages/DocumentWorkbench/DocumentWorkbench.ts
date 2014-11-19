@@ -59,21 +59,21 @@ export var register = (angular) => {
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
                 .default(RIBasicPool.content_type, "", {
-                     space: "content",
-                     movingColumns: "is-show-show-hide",
-                     content2Url: ""
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    content2Url: ""
                 })
                 .default(RIProposalVersion.content_type, "", {
-                     space: "content",
-                     movingColumns: "is-collapsed-show-show"
+                    space: "content",
+                    movingColumns: "is-collapse-show-show"
                 })
                 .default(RIUser.content_type, "", {
-                     space: "user",
-                     movingColumns: "is-show-show-hide"
+                    space: "user",
+                    movingColumns: "is-show-show-hide"
                 })
                 .default(RIUsersService.content_type, "", {
-                     space: "user",
-                     movingColumns: "is-show-show-hide"
+                    space: "user",
+                    movingColumns: "is-show-show-hide"
                 });
         }])
         .directive("adhDocumentWorkbench", ["adhConfig", (adhConfig) =>
