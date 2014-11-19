@@ -5,10 +5,13 @@ import colander
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.schema import Reference
+from adhocracy_core.schema import Integer
+from adhocracy_core.schema import PostPool
+from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import Text
+from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
-from adhocracy_core.sheets.pool import FilteringPoolSheet
 
 
 class IHasAssetPool(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -16,24 +19,11 @@ class IHasAssetPool(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for resources that have an asset pool."""
 
 
-class AssetPoolReference(SheetToSheet):
-
-    """Reference to an asset pool."""
-
-    source_isheet = IHasAssetPool
-    source_isheet_field = 'asset_pool'
-    target_isheet = FilteringPoolSheet
-
-
 class HasAssetPoolSchema(colander.MappingSchema):
 
-    """Commentable sheet data structure.
+    """Data structure pointing to an asset pool."""
 
-    `comments`: list of comments (not stored)
-    `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IComment`.
-    """
-
-    asset_pool = Reference(reftype=AssetPoolReference)
+    asset_pool = PostPool(iresource_or_service_name='assets')
 
 
 has_asset_pool_meta = sheet_metadata_defaults._replace(
@@ -44,6 +34,56 @@ has_asset_pool_meta = sheet_metadata_defaults._replace(
 )
 
 
+class IAssetMetadata(ISheet, ISheetReferenceAutoUpdateMarker):
+
+    """Marker interface for asset metadata."""
+
+
+class AssetReference(SheetToSheet):
+
+    """Reference to an asset."""
+
+    target_isheet = IAssetMetadata
+
+
+class AssetMetadataSchema(colander.MappingSchema):
+
+    """Data structure storing asset metadata."""
+
+    mime_type = SingleLine(missing=colander.required)
+    size = Integer(readonly=True)
+    filename = SingleLine(readonly=True)
+    attached_to = UniqueReferences(readonly=True,
+                                   backref=True,
+                                   reftype=AssetReference)
+
+
+asset_metadata_meta = sheet_metadata_defaults._replace(
+    isheet=IAssetMetadata,
+    schema_class=AssetMetadataSchema,
+)
+
+
+class IAssetData(ISheet, ISheetReferenceAutoUpdateMarker):
+
+    """Marker interface for the actual asset data."""
+
+
+class AssetDataSchema(colander.MappingSchema):
+
+    """Data structure storing for the actual asset data."""
+
+    data = Text(missing=colander.required)  # TODO set correct type
+
+
+asset_data_meta = sheet_metadata_defaults._replace(
+    isheet=IAssetData,
+    schema_class=AssetDataSchema,
+)
+
+
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(has_asset_pool_meta, config.registry)
+    add_sheet_to_registry(asset_metadata_meta, config.registry)
+    add_sheet_to_registry(asset_data_meta, config.registry)

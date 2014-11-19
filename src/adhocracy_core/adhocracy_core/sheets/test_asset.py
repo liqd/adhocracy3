@@ -1,5 +1,8 @@
+from unittest.mock import Mock
+
 from pyramid import testing
 from pytest import fixture
+from pytest import raises
 
 
 def test_includeme_register_has_asset_pool_sheet(config):
@@ -17,11 +20,6 @@ class TestIHasAssetPoolSheet:
         from adhocracy_core.sheets.asset import has_asset_pool_meta
         return has_asset_pool_meta
 
-    @fixture
-    def context(self, pool, service, mock_graph):
-        pool.__graph__ = mock_graph
-        return pool
-
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
@@ -33,25 +31,27 @@ class TestIHasAssetPoolSheet:
         assert inst.meta.isheet == IHasAssetPool
         assert inst.meta.schema_class == HasAssetPoolSchema
 
-    def test_get_empty(self, meta, context, mock_graph):
+    def test_get_without_asset_service(self, meta, context, mock_graph):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        inst = meta.sheet_class(meta, context)
+        mock_graph.get_references_for_isheet.return_value = {}
+        mock_graph.get_back_references_for_isheet.return_value = {}
+        with raises(RuntimeConfigurationError):
+            inst.get()
+
+    @fixture
+    def mock_asset_pool(self, monkeypatch):
+        from adhocracy_core import schema
+        asset_pool = testing.DummyResource()
+        mock_get_post_pool = Mock(spec=schema._get_post_pool,
+                                  return_value=asset_pool)
+        monkeypatch.setattr(schema, '_get_post_pool', mock_get_post_pool)
+        return asset_pool
+
+    def test_get_with_asset_service(self, meta, context, mock_graph,
+                                          mock_asset_pool):
         inst = meta.sheet_class(meta, context)
         mock_graph.get_references_for_isheet.return_value = {}
         mock_graph.get_back_references_for_isheet.return_value = {}
         data = inst.get()
-        assert data['asset_pool'] == ''
-
-    def test_get_with_asset_pool(self, meta, context, mock_graph):
-        asset_pool = testing.DummyResource()
-        inst = meta.sheet_class(meta, context)
-        mock_graph.get_references_for_isheet.return_value = {'asset_pool':
-                                                             [asset_pool]}
-        mock_graph.get_back_references_for_isheet.return_value = {}
-        data = inst.get()
-        assert data['asset_pool'] == asset_pool
-
-    def test_set_with_asset_pool(self, meta, context, mock_graph):
-        asset_pool = testing.DummyResource()
-        mock_graph.get_references_for_isheet.return_value = {}
-        inst = meta.sheet_class(meta, context)
-        inst.set({'asset_pool': asset_pool})
-        assert 'asset_pool' not in inst._data
+        assert data['asset_pool'] == mock_asset_pool
