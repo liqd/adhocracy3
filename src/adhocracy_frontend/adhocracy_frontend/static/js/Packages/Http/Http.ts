@@ -270,7 +270,7 @@ export class Service<Content extends ResourcesBase.Resource> {
                 // re-throw all exception lists other than ["no-fork"].
                 if (msg.hasOwnProperty("length") &&
                     msg.length === 1 &&
-                    msg[0].name === "data.adhocracy.sheets.versions.IVersionable.follows" &&
+                    msg[0].name === "data." + SIVersionable.nick + ".follows" &&
                     msg[0].location === "body" &&
                     msg[0].description === "No fork allowed"
                    ) {

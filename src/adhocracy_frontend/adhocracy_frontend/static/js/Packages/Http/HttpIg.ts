@@ -51,6 +51,11 @@ export var register = (angular, config, meta_api) => {
         });
     });
 
+    var proposalName = "Against_Curtains_" + Math.random();
+        // (we don't have a way yet to repeat this test without having
+        // to come up with new names every time, so we just
+        // randomise.)
+
     describe("withTransaction", () => {
         var adhHttp : AdhHttp.Service<any> = (() => {
             var factory = ($http, $q, $timeout) => {
@@ -68,11 +73,6 @@ export var register = (angular, config, meta_api) => {
 
         it("Deep-rewrites preliminary resource paths.", (done) => {
             var poolPath = "/adhocracy";
-            var proposalName = "Against_Curtains_" + Math.random();
-                // (we don't have a way yet to repeat this test
-                // without having to come up with new names every
-                // time, so we just randomise.)
-
             var cb = (transaction : any) : ng.IPromise<void> => {
                 var proposal : AdhHttp.ITransactionResult =
                     transaction.post(poolPath, new RIProposal({preliminaryNames: adhPreliminaryNames, name: proposalName}));
@@ -115,9 +115,42 @@ export var register = (angular, config, meta_api) => {
 
             adhHttp.withTransaction(cb);
         });
+    });
 
-        xit("Keeps track of the LAST tag properly.", () => {
-            expect(false).toBe(true);
+    describe("postNewVersionNoFork", () => {
+        var adhHttp : AdhHttp.Service<any> = (() => {
+            var factory = ($http, $q, $timeout) => {
+                $http.defaults.headers.common["X-User-Token"] = "SECRET_GOD";
+                $http.defaults.headers.common["X-User-Path"] = "/principals/users/0000000";
+
+                var preliminaryNames = new AdhPreliminaryNames.Service();
+                return (new AdhHttp.Service($http, $q, $timeout, new AdhMetaApi.MetaApiQuery(meta_api), preliminaryNames, config));
+            };
+            factory.$inject = ["$http", "$q", "$timeout"];
+            return angular.injector(["ng"]).invoke(factory);
+        })();
+
+        var adhPreliminaryNames = new AdhPreliminaryNames.Service();
+
+        it("Identifies backend 'no fork allowed' error message properly.", (done) => {
+            var firstVersionPath = "/adhocracy/" + proposalName + "/VERSION_0000000/";
+            var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+            proposalVersionResource.data[SIDocument.nick] = new SIDocument.Sheet({
+                title: proposalName,
+                description: "whoof",
+                elements: []
+            });
+
+            adhHttp.postNewVersionNoFork(firstVersionPath, proposalVersionResource).then(
+                (response) => {
+                    expect(true).toBe(true);
+                    done();
+                },
+                (error) => {
+                    expect("this should not happen.").toBe(false);
+                    done();
+                }
+            );
         });
     });
 };
