@@ -67,8 +67,8 @@ export interface IScopeData {
     user_info : {
         first_name : string;
         last_name : string;
-        country : string;  // FIXME: should be number (see #265)
-        createtime : string;  // FIXME: should be Date (see #265)
+        country : number;
+        createtime : Date;
         path : string;
         commentCount : number;
     };
@@ -77,7 +77,7 @@ export interface IScopeData {
         name : string;
         country : number;
         website : string;
-        date_of_foreseen_registration : string;  // FIXME: should be Date (see #265)
+        date_of_foreseen_registration : Date;
         how_can_we_help_you : string;
         status_other : string;
         commentCount : number;
