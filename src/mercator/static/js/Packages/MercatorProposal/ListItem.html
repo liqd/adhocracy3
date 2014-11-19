@@ -2,7 +2,7 @@
     <!-- FIXME: ng-if refers to non-existant 'image' object -->
     <div class="mercator-proposal-list-item-image" data-ng-if="image"><img src="" alt="" /></div>
     <div class="mercator-proposal-list-item-body" data-ng-class="{'m-has-image': image}">
-        <h3><a href="" data-ng-click="showDetails()">{{ data.introduction.title }}</a></h3>
+        <h3><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
         <p class="proposal-username"><a href="#FIXME: link to user profile">{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>, {{data.organization_info.name}}</p>
         <ul class="mercator-propsal-list-item-meta">
             <li class="mercator-propsal-list-item-meta-item">
