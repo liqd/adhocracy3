@@ -10,7 +10,7 @@ from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.pool import basicpool_metadata
 from adhocracy_core.resources.service import service_metadata
 from adhocracy_core.resources.simple import simple_metadata
-from adhocracy_core.sheets.asset import IHasAssetPool
+import adhocracy_core.sheets.asset
 
 
 class IPoolWithAssets(IBasicPool):
@@ -20,12 +20,16 @@ class IPoolWithAssets(IBasicPool):
 
 class IAsset(ISimple):
 
-    """Comment versions pool."""
+    """A generic asset."""
 
 
 asset_meta = simple_metadata._replace(
     content_name='Asset',
     iresource=IAsset,
+    basic_sheets=simple_metadata.basic_sheets + [
+        adhocracy_core.sheets.asset.IAssetMetadata,
+        adhocracy_core.sheets.asset.IAssetData
+    ],
     use_autonaming=True,
     permission_add='add_asset',
 )
@@ -50,7 +54,8 @@ def add_assets_service(context: IPool, registry: Registry, options: dict):
 
 pool_with_assets_meta = basicpool_metadata._replace(
     iresource=IPoolWithAssets,
-    basic_sheets=basicpool_metadata.basic_sheets + [IHasAssetPool],
+    basic_sheets=basicpool_metadata.basic_sheets + [
+                 adhocracy_core.sheets.asset.IHasAssetPool],
     after_creation=basicpool_metadata.after_creation + [add_assets_service],
 )
 
