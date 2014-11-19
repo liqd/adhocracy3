@@ -48,6 +48,7 @@ import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mer
 import SIMercatorSubResources = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMercatorSubResources");
 import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
+import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -59,12 +60,12 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
     mercatorProposalForm? : any;
     data : {
-        countries : any;
         // 1. basic
         user_info : {
             first_name : string;
             last_name : string;
             country : string;
+            createtime : string;
         };
         organization_info : {
             status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
@@ -223,6 +224,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
+        data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
 
         data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
         data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website === "true";
