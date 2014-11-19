@@ -884,6 +884,9 @@ export var register = (angular) => {
                 })
                 .whenView(RIMercatorProposalVersion.content_type, "edit", {
                      movingColumns: "is-collapse-show-hide"
+                })
+                .whenView(RIMercatorProposalVersion.content_type, "comments", {
+                     movingColumns: "is-collapse-show-show"
                 });
         }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {
