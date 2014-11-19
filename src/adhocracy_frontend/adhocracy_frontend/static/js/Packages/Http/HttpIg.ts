@@ -104,12 +104,11 @@ export var register = (angular, config, meta_api) => {
         it("Identifies backend 'no fork allowed' error message properly.", (done) => {
             var firstVersionPath = "/adhocracy/" + proposalName + "/VERSION_0000000/";
             var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
-                proposalVersionResource.data[SIDocument.nick] =
-                    new SIDocument.Sheet({
-                        title: proposalName,
-                        description: "whoof",
-                        elements: []
-                    });
+            proposalVersionResource.data[SIDocument.nick] = new SIDocument.Sheet({
+                title: proposalName,
+                description: "whoof",
+                elements: []
+            });
 
             adhHttp.postNewVersionNoFork(firstVersionPath, proposalVersionResource).then(
                 (response) => {
