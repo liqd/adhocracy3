@@ -61,6 +61,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
             var data = self.provider.getDefaults(resource.content_type, view);
 
             data["platform"] = segs[1];
+            data["contentType"] = resource.content_type;
             data["view"] = view;
 
             if (segs.length > 2) {
@@ -78,11 +79,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
     }
 
     public reverse(data : Dict) : { path : string; search : Dict; } {
-        var defaults = {
-            space: "content",
-            movingColumns: "is-show-show-hide"
-        };
-
+        var defaults = this.provider.getDefaults(data["contentType"], data["view"]);
         var path : string;
 
         if (data["content2Url"]) {

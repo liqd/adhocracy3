@@ -60,7 +60,8 @@ export var register = (angular) => {
             adhResourceAreaProvider
                 .default(RIBasicPool.content_type, "", {
                      space: "content",
-                     movingColumns: "is-show-show-hide"
+                     movingColumns: "is-show-show-hide",
+                     content2Url: ""
                 })
                 .default(RIProposalVersion.content_type, "", {
                      space: "content",
