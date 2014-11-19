@@ -93,7 +93,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 var meta : Dict = {
                     platform: segs[1],
                     contentType: resource.content_type,
-                    resourceUrl: resource.path,
+                    resourceUrl: resourceUrl,
                     view: view
                 };
 
