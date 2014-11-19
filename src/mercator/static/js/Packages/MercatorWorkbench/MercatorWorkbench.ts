@@ -112,18 +112,19 @@ export var register = (angular) => {
                     specifics["commentUrl"] = resource.path;
                     specifics["commentableUrl"] = resource.data[SIComment.nick].refers_to;
 
-                    return adhHttp.get(specifics["commentableUrl"]).then((commentable) => {
-                        if (commentable.content_type === RIMercatorProposalVersion.content_type) {
-                            specifics["proposalUrl"] = specifics["commentableUrl"];
-                        } else {
-                            var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
-                            var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
-                            return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
-                                specifics["proposalUrl"] = proposalUrl;
-                            });
-                        }
-                        return specifics;
-                    });
+                    return adhHttp.get(specifics["commentableUrl"])
+                        .then((commentable) => {
+                            if (commentable.content_type === RIMercatorProposalVersion.content_type) {
+                                specifics["proposalUrl"] = specifics["commentableUrl"];
+                            } else {
+                                var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
+                                var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
+                                return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
+                                    specifics["proposalUrl"] = proposalUrl;
+                                });
+                            }
+                        })
+                        .then(() => specifics);
                 }])
                 .default(RIBasicPool.content_type, "create_proposal", {
                     space: "content",
