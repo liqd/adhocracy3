@@ -874,18 +874,20 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .when(RIMercatorProposal.content_type, {
+                .default(RIMercatorProposal.content_type, "", {
                      space: "content",
                      movingColumns: "is-show-show-hide"
                 })
-                .when(RIMercatorProposalVersion.content_type, {
+                .default(RIMercatorProposalVersion.content_type, "", {
                      space: "content",
                      movingColumns: "is-show-show-hide"
                 })
-                .whenView(RIMercatorProposalVersion.content_type, "edit", {
+                .default(RIMercatorProposalVersion.content_type, "edit", {
+                     space: "content",
                      movingColumns: "is-collapse-show-hide"
                 })
-                .whenView(RIMercatorProposalVersion.content_type, "comments", {
+                .default(RIMercatorProposalVersion.content_type, "comments", {
+                     space: "content",
                      movingColumns: "is-collapse-show-show"
                 });
         }])

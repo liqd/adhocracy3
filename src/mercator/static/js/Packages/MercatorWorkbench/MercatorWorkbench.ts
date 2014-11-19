@@ -101,11 +101,12 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .when(RICommentVersion.content_type, {
-                    movingColumns: "is-collapse-show-show",
-                    space: "content"
+                .default(RICommentVersion.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-collapse-show-show"
                 })
-                .whenView(RIBasicPool.content_type, "create_proposal", {
+                .default(RIBasicPool.content_type, "create_proposal", {
+                    space: "content",
                     movingColumns: "is-show-hide-hide"
                 });
         }])

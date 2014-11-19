@@ -58,19 +58,19 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .when(RIBasicPool.content_type, {
+                .default(RIBasicPool.content_type, "", {
                      space: "content",
                      movingColumns: "is-show-show-hide"
                 })
-                .when(RIProposalVersion.content_type, {
+                .default(RIProposalVersion.content_type, "", {
                      space: "content",
                      movingColumns: "is-collapsed-show-show"
                 })
-                .when(RIUser.content_type, {
+                .default(RIUser.content_type, "", {
                      space: "user",
                      movingColumns: "is-show-show-hide"
                 })
-                .when(RIUsersService.content_type, {
+                .default(RIUsersService.content_type, "", {
                      space: "user",
                      movingColumns: "is-show-show-hide"
                 });

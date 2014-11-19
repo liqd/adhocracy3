@@ -14,8 +14,8 @@ export var register = () => {
             var service;
 
             beforeEach(() => {
-                providerMock = jasmine.createSpyObj("provider", ["get"]);
-                providerMock.get.and.returnValue({});
+                providerMock = jasmine.createSpyObj("provider", ["getDefaults"]);
+                providerMock.getDefaults.and.returnValue({});
 
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get"]);
                 adhHttpMock.get.and.returnValue(q.when({

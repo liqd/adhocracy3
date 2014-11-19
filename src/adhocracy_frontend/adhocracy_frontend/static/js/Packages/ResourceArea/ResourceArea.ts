@@ -12,30 +12,21 @@ export interface Dict {
 
 export class Provider implements ng.IServiceProvider {
     public $get;
-    private data : {[resourceType : string]: Dict};
+    private defaults : {[key : string]: Dict};
 
     constructor() {
         var self = this;
-        this.data = {};
+        this.defaults = {};
         this.$get = ["adhHttp", "adhConfig", (adhHttp, adhConfig) => new Service(self, adhHttp, adhConfig)];
     }
 
-    public when(resourceType : string, defaults : Dict) : Provider {
-        this.data[resourceType] = defaults;
+    public default(resourceType : string, view : string, defaults : Dict) : Provider {
+        this.defaults[resourceType + "@" + view] = defaults;
         return this;
     }
 
-    public whenView(resourceType : string, view : string, defaults : Dict) : Provider {
-        this.data[resourceType + "@" + view] = defaults;
-        return this;
-    }
-
-    public get(resourceType : string, view? : string) : Dict {
-        var defaults = _.clone(this.data[resourceType]);
-        if (typeof view !== "undefined") {
-            defaults = <Dict>_.extend(defaults, this.data[resourceType + "@" + view]);
-        }
-        return defaults;
+    public getDefaults(resourceType : string, view : string) : Dict {
+        return <Dict>_.extend({}, this.defaults[resourceType + "@" + view]);
     }
 }
 
@@ -57,7 +48,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
             throw "bad path: " + path;
         }
 
-        var view : string;
+        var view : string = "";
 
         // if path has a view segment
         if (_.last(segs).match(/^@/)) {
@@ -67,7 +58,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         var resourceUrl : string = this.adhConfig.rest_url + segs.join("/");
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
-            var data = self.provider.get(resource.content_type, view);
+            var data = self.provider.getDefaults(resource.content_type, view);
 
             data["platform"] = segs[1];
             data["view"] = view;
