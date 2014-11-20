@@ -1,5 +1,5 @@
 <adh-spaces>
-    <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-class="{'hidden': currentSpace !== 'content'}">
+    <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-show="currentSpace === 'content'">
         <div class="moving-column moving-column-structure">
             <div class="moving-column-menu placeholder"></div>
             <div class="moving-column-body">
@@ -31,7 +31,7 @@
             </div>
         </div>
     </div>
-    <div data-ng-class="{'hidden': currentSpace !== 'user'}">
+    <div data-ng-show="currentSpace === 'user'">
         <h1>User</h1>
     </div>
 </adh-spaces>
