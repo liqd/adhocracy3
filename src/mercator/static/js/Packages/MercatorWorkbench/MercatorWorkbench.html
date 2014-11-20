@@ -1,8 +1,7 @@
 <adh-spaces>
     <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-class="{'hidden': currentSpace !== 'content'}">
         <div class="moving-column moving-column-structure">
-            <div data-ng-switch="view">
-                <div data-ng-switch-when="create_proposal">
+                <div data-ng-if="view === 'create_proposal'">
                     <div class="moving-column-menu placeholder"></div>
                     <div class="moving-column-body" data-du-scroll-container="">
                         <adh-resource-wrapper data-on-submit="goToListing()" data-on-cancel="goToListing()">
@@ -14,7 +13,7 @@
                         </adh-resource-wrapper>
                     </div>
                 </div>
-                <div data-ng-switch-default="">
+                <div data-ng-if="view !== 'create_proposal'">
                     <div class="moving-column-menu placeholder">
                         <a href="" data-ng-click="proposalListingData.showFacets = !proposalListingData.showFacets">{{ "filters" | translate }}</a>
                     </div>
@@ -36,11 +35,9 @@
                         </adh-mercator-proposal-listing>
                     </div>
                 </div>
-            </div>
         </div>
         <div class="moving-column moving-column-content">
-            <div data-ng-switch="view">
-                <div data-ng-switch-when="edit">
+                <div data-ng-if="view === 'edit'">
                     <div class="moving-column-menu placeholder"></div>
                     <div class="moving-column-body" data-du-scroll-container="">
                         <adh-resource-wrapper
@@ -55,7 +52,7 @@
                         </adh-resource-wrapper>
                     </div>
                 </div>
-                <div data-ng-switch-default="">
+                <div data-ng-if="view !== 'view'">
                     <div class="moving-column-menu">
                         <!-- FIXME: permission check -->
                         <a href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
@@ -66,7 +63,6 @@
                         </adh-resource-wrapper>
                     </div>
                 </div>
-            </div>
         </div>
         <div class="moving-column moving-column-content2">
             <div class="moving-column-menu placeholder"></div>
