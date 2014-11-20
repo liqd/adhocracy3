@@ -318,8 +318,15 @@ export var movingColumns = (
                 }
             };
 
+            // FIXME: these do not really belong here
             topLevelState.on("content2Url", (url : string) => {
                 scope.content2Url = url;
+            });
+            topLevelState.on("proposalUrl", (url : string) => {
+                scope.proposalUrl = url;
+            });
+            topLevelState.on("commentableUrl", (url : string) => {
+                scope.commentableUrl = url;
             });
 
             topLevelState.on("movingColumns", move);

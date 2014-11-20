@@ -52,7 +52,7 @@
             <section class="commentable-section">
                 <h3>{{ "Pitch (Teaser)" | translate }}</h3>
                 <p>{{ data.introduction.teaser }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=introduction">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:introduction'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -67,7 +67,7 @@
                     <li data-ng-if="data.details.location_specific_3">{{ data.details.location_specific_3 }}</li>
                     <li data-ng-if="details.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
                 </ul>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=details">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:details'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -83,7 +83,7 @@
                 <h4>{{ "Other sources of income" | translate }}</h4>
                 <p class="functional-introvert">{{ data.finance.other_sources }}</p>
 
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=finance">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:finance'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -151,7 +151,7 @@
                         </div>
                     </div>
                 </div>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=organization_info">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:organization_info'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -166,7 +166,7 @@
             <section class="commentable-section">
                 <h3>{{ "Description?" | translate }}</h3>
                 <p>{{ data.details.description }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=details">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:details'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -175,7 +175,7 @@
             <section class="commentable-section">
                 <h3>{{ "Story behind the idea" | translate }}</h3>
                 <p>{{ data.story }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=story">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:story'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -190,7 +190,7 @@
             <section class="commentable-section">
                 <h3>{{ "What would be a successful outcome of your project or initiative?" | translate }}</h3>
                 <p>{{ data.outcome }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=outcome">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:outcome'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -199,7 +199,7 @@
             <section class="commentable-section">
                 <h3>{{ "How do you want to get there?" | translate }}</h3>
                 <p>{{ data.steps }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=steps">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:steps'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -208,7 +208,7 @@
             <section class="commentable-section">
                 <h3>{{ "Why does Europe need your idea?" | translate }}</h3>
                 <p>{{ data.value }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=value">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:value'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -217,7 +217,7 @@
             <section class="commentable-section">
                 <h3>{{ "Partner organisations and members list" | translate }}</h3>
                 <p>{{ data.partners }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=partners">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:partners'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </a>
@@ -243,7 +243,7 @@
                 <span data-ng-if="data.heard_from.facebook">facebook</span>
                 <span data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</span></p>
 
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments'}}?section=experience">
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:experience'}}">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i>
                 </a>

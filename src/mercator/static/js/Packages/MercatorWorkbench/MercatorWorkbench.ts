@@ -7,10 +7,12 @@ import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
+import AdhUtil = require("../Util/Util");
 
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
+import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
 
@@ -101,11 +103,31 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .when(RICommentVersion.content_type, {
-                    movingColumns: "is-collapse-show-show",
-                    space: "content"
+                .default(RICommentVersion.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-collapse-show-show"
                 })
-                .whenView(RIBasicPool.content_type, "create_proposal", {
+                .specific(RICommentVersion.content_type, "", ["adhHttp", (adhHttp) => (resource : RICommentVersion) => {
+                    var specifics = {};
+                    specifics["commentUrl"] = resource.path;
+                    specifics["commentableUrl"] = resource.data[SIComment.nick].refers_to;
+
+                    return adhHttp.get(specifics["commentableUrl"])
+                        .then((commentable) => {
+                            if (commentable.content_type === RIMercatorProposalVersion.content_type) {
+                                specifics["proposalUrl"] = specifics["commentableUrl"];
+                            } else {
+                                var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
+                                var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
+                                return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
+                                    specifics["proposalUrl"] = proposalUrl;
+                                });
+                            }
+                        })
+                        .then(() => specifics);
+                }])
+                .default(RIBasicPool.content_type, "create_proposal", {
+                    space: "content",
                     movingColumns: "is-show-hide-hide"
                 });
         }])
