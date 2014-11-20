@@ -366,6 +366,18 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         if (lines.length > 0) {
             s += lines.join("\n") + "\n";
         }
+
+        // FIXME: workaround for #261.  Remove if ticket is closed.
+        if (sheet.fields.length > 0) {
+            s += "\n";
+            s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
+            s += "        _.forOwn(args, (value, key) => {\n";
+            s += "            if (!_.contains(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
+            s += "                this[key] = value;\n";
+            s += "            }\n";
+            s += "        });\n";
+        }
+
         s += "    }\n";
         return s;
     };
