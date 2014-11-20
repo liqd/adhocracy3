@@ -1004,7 +1004,6 @@ export var register = (angular) => {
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
-
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
