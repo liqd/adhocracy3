@@ -10,7 +10,7 @@ from random import choice
 from random import randint
 
 root_uri = 'http://localhost:6542'
-verbose = True
+verbose = False
 
 ALPHABET = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789"
 def get_random_string(n=10):
