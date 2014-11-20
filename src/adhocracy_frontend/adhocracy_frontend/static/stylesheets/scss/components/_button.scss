@@ -40,7 +40,7 @@ It may have the following states:
 
 ```html_example
 <a class="button">Link</a>
-<button>Button</button>
+<button type="button">Button</button>
 <input type="submit" value="Submit" />
 <input type="submit" value="Disabled" disabled="disabled" />
 ```
@@ -57,7 +57,7 @@ A highlighted button. Each page should have one CTA at maxiumum.
 
 ```html_example
 <a class="button m-call-to-action">Link</a>
-<button class="m-call-to-action">Button</button>
+<button type="button" class="m-call-to-action">Button</button>
 <input type="submit" class="m-call-to-action" value="Submit" />
 <input type="submit" class="m-call-to-action" value="Disabled" disabled="disabled" />
 ```
