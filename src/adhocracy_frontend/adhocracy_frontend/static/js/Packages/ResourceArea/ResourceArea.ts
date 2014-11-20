@@ -37,6 +37,56 @@ export class Provider implements ng.IServiceProvider {
 }
 
 
+/**
+ * The resourceArea does not do much by itself. Just like topLevelState, it provides
+ * an infrastructure that can be configured in a variety of ways.
+ *
+ * The general idea is that the path contains a path to a backend resource and
+ * optionally a *view* which is preceded by "@". So the path
+ *
+ *     /adhocracy/proposal/VERSION_0000001/@edit
+ *
+ * would be mapped to a resource at `<rest_url>/adhocracy/proposal/VERSION_0000001`
+ * and view `"edit"`. If no view is provided, it defaults to `""`.
+ *
+ * The state `data` object as used by resourceArea consists of three different parts:
+ *
+ * -   meta
+ * -   defaults
+ * -   specifics
+ *
+ * Meta values are used as a communication channel between `route()` and `reverse()`
+ * and are generally not of interest outside of resourceArea.
+ *
+ * Defaults can be configured per contentType/view combination. They can be
+ * overwritten in `search`. Any parameters from search that do not exists in defaults
+ * are removed. Defaults can be configured like this:
+ *
+ *     resourceAreaProvider.default("<contentType>", "<view>", {
+ *         key: "value",
+ *         foo: "bar"
+ *     });
+ *
+ * Specifics are also configured per contentType/view combination. But they are
+ * not provided as a plain object. Instead, they are provided in form of a injectable
+ * factory that returns a function that takes the actual resource as a parameter and
+ * returns the specifics (that may optionally be wrapped in a promise). This sounds
+ * complex, but it allows for a great deal of flexibility. Specifics can be configured
+ * like this:
+ *
+ *     resourceAreaProvider.specific("<contentType>", "<view>", ["adhHttp", (adhHttp) => {
+ *         return (resource) => {
+ *             adhHttp.get(resource.data[<someSheet>.nick].reference).then((referencedResource) => {
+ *                 return {
+ *                     foo: referencedResource.name
+ *                 };
+ *             });
+ *         };
+ *     }]);
+ *
+ * As meta, defaults and specifics all exist in the same `data` object, name clashes are
+ * possible. In those cases, search overwrites specifics overwrites meta overwrites defaults.
+ */
 export class Service implements AdhTopLevelState.IAreaInput {
     public template : string = "<adh-page-wrapper><adh-platform></adh-platform></adh-page-wrapper>";
 
