@@ -56,7 +56,7 @@ class TestMercatorFilter(object):
 def is_filtered(browser, proposals, location=None, budget=None):
     introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
     title = lambda p: p[18]["body"]["data"][introduction_sheet]["title"]
-    expected_titles = [title(p) for p in proposals if _verify_location(location, p)]
+    expected_titles = [title(p) for p in proposals if _verify_location(location, p) and _verify_budget(budget, p)]
 
     proposal_list = browser.find_by_css(".moving-column-body").first.find_by_tag("ol").first
     actual_titles = [a.text for a in proposal_list.find_by_css("h3 a")]
@@ -79,6 +79,29 @@ def _verify_location(location, proposal):
         return details["location_is_linked_to_ruhr"]
 
     elif location is None:
+        return True
+
+    return False
+
+
+def _verify_budget(budget, proposal):
+    """Return whether the passed proposal is of given budget."""
+    data = proposal[4]["body"]["data"]
+    finance = data["adhocracy_mercator.sheets.mercator.IFinance"]
+
+    if budget == "0 - 5000 €":
+        return 0 <= finance["budget"] <= 5000
+
+    elif budget == "5000 - 10000 €":
+        return 5000 <= finance["budget"] <= 10000
+
+    elif budget == "10000 - 20000 €":
+        return 10000 <= finance["budget"] <= 20000
+
+    elif budget == "20000 - 50000 €":
+        return 20000 <= finance["budget"] <= 50000
+
+    elif budget is None:
         return True
 
     return False
