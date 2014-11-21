@@ -45,43 +45,14 @@ class TestMercatorFilter(object):
 
 
 def location_is_filtered(browser, location, proposals):
-    """
-    In order to verify correct filtering, two steps are needed. First check
-    whether every proposal in proposal list has correct location. Second verify
-    that no proposal is missing by checking all proposals with the
-    corresponding location to be shown in proposal list.
+    introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
+    title = lambda p: p[18]["body"]["data"][introduction_sheet]["title"]
+    expected_titles = [title(p) for p in proposals if _verify_location(location, p)]
 
-    """
     proposal_list = browser.find_by_css(".moving-column-body").first.find_by_tag("ol").first
-    proposal_title_list = [a.html for a in proposal_list.find_by_css("h3 a")]
+    actual_titles = [a.text for a in proposal_list.find_by_css("h3 a")]
 
-    for title in proposal_title_list:
-        for prop in proposals:
-            data = prop[18]["body"]["data"]
-            introduction = data["adhocracy_mercator.sheets.mercator.IIntroduction"]
-
-            if title == introduction["title"]:
-                if not _verify_location(location, prop):
-                    return False
-                break
-
-        else:
-            return False
-
-    for prop in proposals:
-        data = prop[18]["body"]["data"]
-        introduction = data["adhocracy_mercator.sheets.mercator.IIntroduction"]
-        prop_title = introduction["title"]
-
-        if _verify_location(location, prop):
-            for title in proposal_title_list:
-                if title == prop_title:
-                    break
-
-            else:
-                return False
-
-    return True
+    return set(expected_titles) == set(actual_titles)
 
 
 def _verify_location(location, proposal):
