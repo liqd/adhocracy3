@@ -16,15 +16,15 @@ class TestMercatorFilter(object):
 
     @fixture(scope='class')
     def sidebar(self, browser):
-        return browser.find_by_css(".moving-column-sidebar")[0].find_by_tag("ul")
+        return browser.find_by_css(".moving-column-sidebar").first.find_by_tag("ul")
 
     @fixture(scope='class')
     def locations(self, browser, sidebar):
-        return [l.find_by_tag("a")[0] for l in sidebar[1].find_by_tag("li")]
+        return [l.find_by_tag("a").first for l in sidebar[1].find_by_tag("li")]
 
     @fixture(scope='class')
     def bugdets(self, browser, sidebar):
-        return [l.find_by_tag("a")[0] for l in sidebar[2].find_by_tag("li")]
+        return [l.find_by_tag("a").first for l in sidebar[2].find_by_tag("li")]
 
     @fixture(scope='class')
     def browser(self, browser, app):
@@ -33,7 +33,7 @@ class TestMercatorFilter(object):
         browser.visit(browser.app_url + 'r/mercator/')
         wait(lambda: browser.is_element_present_by_name("filters"))
 
-        browser.find_link_by_text("filters")[0].click()
+        browser.find_link_by_text("filters").first.click()
         wait(lambda: browser.find_by_css(".moving-column-sidebar").visible)
 
         return browser
@@ -56,8 +56,8 @@ def location_is_filtered(browser, location, proposals):
     corresponding location to be shown in proposal list.
 
     """
-    proposal_list = browser.find_by_css(".moving-column-body")[0].find_by_tag("ol")[0]
-    proposal_title_list = [a.html for a in proposal_list.find_by_xpath("//h3//a")]
+    proposal_list = browser.find_by_css(".moving-column-body").first.find_by_tag("ol").first
+    proposal_title_list = [a.html for a in proposal_list.find_by_css("h3 a")]
 
     for title in proposal_title_list:
         for prop in proposals:
