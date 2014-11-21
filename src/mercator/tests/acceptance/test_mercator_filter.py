@@ -23,7 +23,7 @@ class TestMercatorFilter(object):
         return [l.find_by_tag("a").first for l in sidebar[1].find_by_tag("li")]
 
     @fixture(scope='class')
-    def bugdets(self, browser, sidebar):
+    def budgets(self, browser, sidebar):
         return [l.find_by_tag("a").first for l in sidebar[2].find_by_tag("li")]
 
     @fixture(scope='class')
@@ -40,15 +40,20 @@ class TestMercatorFilter(object):
     def test_filter_location(self, browser, locations, proposals):
         for location in locations:
             location.click()
-
-            assert wait(lambda: location_is_filtered(browser, location.text, proposals))
+            assert wait(lambda: is_filtered(browser, proposals, location=location.text))
 
     def test_unfilter_location(self, browser, locations, proposals):
         locations[-1].click()
-        assert wait(lambda: location_is_filtered(browser, None, proposals))
+        assert wait(lambda: is_filtered(browser, proposals))
+
+    def test_filter_budget(self, browser, budgets, proposals):
+        for budget in budgets:
+            budget.click()
+            assert wait(lambda: is_filtered(browser, proposals, budget=budget.text))
 
 
-def location_is_filtered(browser, location, proposals):
+
+def is_filtered(browser, proposals, location=None, budget=None):
     introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
     title = lambda p: p[18]["body"]["data"][introduction_sheet]["title"]
     expected_titles = [title(p) for p in proposals if _verify_location(location, p)]
