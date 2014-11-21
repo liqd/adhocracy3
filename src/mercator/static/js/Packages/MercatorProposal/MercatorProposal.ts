@@ -861,6 +861,58 @@ export var countrySelect = () => {
 };
 
 
+/**
+ * Recompiles children on every change of `value`. `value` is available in
+ * child scope as `key`.
+ *
+ * Example:
+ *
+ *     <adh-recompile-on-change data-value="{{proposalPath}}" data-key="path">
+ *         <adh-proposal path="{{path}}"></adh-proposal>
+ *     </adh-recompile-on-change>
+ *
+ * FIXME: move to different package
+ */
+export var recompileOnChange = ($compile : ng.ICompileService) => {
+    return {
+        restrict: "E",
+        compile: (element, link) => {
+            if (jQuery.isFunction(link)) {
+                link = {post: link};
+            }
+
+            var contents = element.contents().remove();
+            var compiledContents;
+
+            return {
+                pre: (link && link.pre) ? link.pre : null,
+                post: (scope : ng.IScope, element, attrs) => {
+                    if (!compiledContents) {
+                        compiledContents = $compile(contents);
+                    }
+
+                    var innerScope = scope.$new();
+
+                    scope.$watch(() => attrs["value"], (value) => {
+                        element.html("");
+
+                        innerScope[attrs["key"]] = value;
+
+                        compiledContents(innerScope, (clone) => {
+                            element.append(clone);
+                        });
+                    });
+
+                    if (link && link.post) {
+                        link.post.apply(null, arguments);
+                    }
+                }
+            };
+        }
+    };
+};
+
+
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -937,6 +989,7 @@ export var register = (angular) => {
                 console.log(arguments);
             });
         }])
+        .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
