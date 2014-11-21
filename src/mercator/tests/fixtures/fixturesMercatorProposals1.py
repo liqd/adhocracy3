@@ -10,7 +10,7 @@ from random import choice
 from random import randint
 
 root_uri = 'http://localhost:6542'
-verbose = False
+verbose = True
 
 ALPHABET = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789"
 def get_random_string(n=10):
@@ -50,12 +50,12 @@ def login():
 def create_proposals(n=5):
     proposals = []
 
-    login()
+    #login()
 
     uri = root_uri + "/batch"
     headers = {
         "Content-Type": "application/json;charset=UTF-8",
-        "X-User-Token": "677c59c2498168b09e25b3bae931ac13960b06ce67b9fbdd13f2187fe132b7f3e031a63587a72ff4b5330102c65d14ab93e2db6d58ec0569eee0e60aa49c5c10",
+    #    "X-User-Token": "677c59c2498168b09e25b3bae931ac13960b06ce67b9fbdd13f2187fe132b7f3e031a63587a72ff4b5330102c65d14ab93e2db6d58ec0569eee0e60aa49c5c10",
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip,deflate",
         "Connection": "keep-alive",
