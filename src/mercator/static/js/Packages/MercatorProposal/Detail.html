@@ -12,8 +12,11 @@
                 <strong>{{data.finance.requested_funding}} &euro;</strong> requested
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                <!-- FIXME: Link to profile -->
-                <a href="#">{{data.user_info.first_name}} {{data.user_info.last_name}}</a>
+                <adh-user-meta
+                    data-ng-if="data.user_info"
+                    data-path="{{data.user_info.path}}"
+                    data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                </adh-user-meta>
             </li>
             <li class="mercator-propsal-detail-meta-item">
                 {{ data.user_info.createtime }}
