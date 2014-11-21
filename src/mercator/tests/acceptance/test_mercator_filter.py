@@ -87,7 +87,7 @@ def location_is_filtered(browser, location, proposals):
 
 
 def _verify_location(location, proposal):
-    """ returns whether the passed proposal is of given location """
+    """Return whether the passed proposal is of given location."""
     data = proposal[16]["body"]["data"]
     details = data["adhocracy_mercator.sheets.mercator.IDetails"]
 
