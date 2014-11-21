@@ -51,6 +51,17 @@ class TestMercatorFilter(object):
             budget.click()
             assert wait(lambda: is_filtered(browser, proposals, budget=budget.text))
 
+    def test_unfilter_budget(self, browser, budgets, proposals):
+        budgets[-1].click()
+        assert wait(lambda: is_filtered(browser, proposals))
+
+    def test_filter_combinations(self, browser, locations, budgets, proposals):
+        for location in locations:
+            location.click()
+            for budget in budgets:
+                budget.click()
+                assert wait(lambda: is_filtered(browser, proposals, location=location.text, budget=budget.text))
+
 
 
 def is_filtered(browser, proposals, location=None, budget=None):
