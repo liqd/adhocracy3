@@ -1,15 +1,16 @@
 from webtest import TestApp
 from pytest import fixture
-from pytest import mark
 import time
 
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
 from adhocracy_frontend.tests.acceptance.shared import login_god
 from adhocracy_frontend.tests.acceptance.shared import wait
 
+
 @fixture(scope='module')
 def proposals():
     return create_proposals()
+
 
 class TestMercatorFilter(object):
 
@@ -45,6 +46,7 @@ class TestMercatorFilter(object):
             time.sleep(2)
 
             assert wait(lambda: location_is_filtered(browser, location.html, proposals))
+
 
 def location_is_filtered(browser, location, proposals):
     """
@@ -83,6 +85,7 @@ def location_is_filtered(browser, location, proposals):
                 raise AssertionError("Proposal(%s) is missing in propsal list!" % prop_title)
 
     return True
+
 
 def _verify_location(location, proposal):
     """ returns whether the passed proposal is of given location """
