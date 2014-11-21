@@ -41,9 +41,6 @@ class TestMercatorFilter(object):
         for location in locations:
             location.click()
 
-            #TODO waiting for filtering to complete
-            time.sleep(2)
-
             assert wait(lambda: location_is_filtered(browser, location.html, proposals))
 
 
@@ -64,11 +61,12 @@ def location_is_filtered(browser, location, proposals):
             introduction = data["adhocracy_mercator.sheets.mercator.IIntroduction"]
 
             if title == introduction["title"]:
-                assert _verify_location(location, prop)
+                if not _verify_location(location, prop):
+                    return False
                 break
 
         else:
-            raise AssertionError("Unknown proposal(%s) in propsal list!" % title)
+            return False
 
     for prop in proposals:
         data = prop[18]["body"]["data"]
@@ -81,7 +79,7 @@ def location_is_filtered(browser, location, proposals):
                     break
 
             else:
-                raise AssertionError("Proposal(%s) is missing in propsal list!" % prop_title)
+                return False
 
     return True
 
