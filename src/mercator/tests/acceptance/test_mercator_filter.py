@@ -41,7 +41,7 @@ class TestMercatorFilter(object):
         for location in locations:
             location.click()
 
-            assert wait(lambda: location_is_filtered(browser, location.html, proposals))
+            assert wait(lambda: location_is_filtered(browser, location.text, proposals))
 
 
 def location_is_filtered(browser, location, proposals):
