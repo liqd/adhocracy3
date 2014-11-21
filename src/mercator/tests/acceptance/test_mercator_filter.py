@@ -43,6 +43,10 @@ class TestMercatorFilter(object):
 
             assert wait(lambda: location_is_filtered(browser, location.text, proposals))
 
+    def test_unfilter_location(self, browser, locations, proposals):
+        locations[-1].click()
+        assert wait(lambda: location_is_filtered(browser, None, proposals))
+
 
 def location_is_filtered(browser, location, proposals):
     introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
@@ -68,5 +72,8 @@ def _verify_location(location, proposal):
 
     elif location == "Linked to the Ruhr area":
         return details["location_is_linked_to_ruhr"]
+
+    elif location is None:
+        return True
 
     return False
