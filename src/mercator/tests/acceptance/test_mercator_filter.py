@@ -30,10 +30,10 @@ class TestMercatorFilter(object):
     def browser(self, browser, app):
         TestApp(app)
         browser.visit(browser.app_url + 'r/mercator/')
-        wait(lambda: browser.is_element_present_by_name("filters"))
+        assert wait(lambda: browser.find_link_by_text("filters"))
 
         browser.find_link_by_text("filters").first.click()
-        wait(lambda: browser.find_by_css(".moving-column-sidebar").visible)
+        assert wait(lambda: browser.find_by_css(".moving-column-sidebar").visible)
 
         return browser
 
