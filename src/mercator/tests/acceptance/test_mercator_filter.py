@@ -29,7 +29,6 @@ class TestMercatorFilter(object):
     @fixture(scope='class')
     def browser(self, browser, app):
         TestApp(app)
-        login_god(browser)
         browser.visit(browser.app_url + 'r/mercator/')
         wait(lambda: browser.is_element_present_by_name("filters"))
 
