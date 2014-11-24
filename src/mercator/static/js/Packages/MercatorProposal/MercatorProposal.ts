@@ -560,7 +560,8 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             path: "@",
             contentType: "@",
             update: "=",
-            facets: "="
+            facets: "=",
+            sort: "="
         }
     };
 };
