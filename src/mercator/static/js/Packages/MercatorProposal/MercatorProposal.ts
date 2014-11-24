@@ -65,6 +65,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
             last_name : string;
             country : string;
             createtime : string;
+            path : string;
         };
         organization_info : {
             status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
@@ -218,6 +219,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
         data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
+        data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
 
         data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
         data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website === "true";
@@ -859,6 +861,58 @@ export var countrySelect = () => {
 };
 
 
+/**
+ * Recompiles children on every change of `value`. `value` is available in
+ * child scope as `key`.
+ *
+ * Example:
+ *
+ *     <adh-recompile-on-change data-value="{{proposalPath}}" data-key="path">
+ *         <adh-proposal path="{{path}}"></adh-proposal>
+ *     </adh-recompile-on-change>
+ *
+ * FIXME: move to different package
+ */
+export var recompileOnChange = ($compile : ng.ICompileService) => {
+    return {
+        restrict: "E",
+        compile: (element, link) => {
+            if (jQuery.isFunction(link)) {
+                link = {post: link};
+            }
+
+            var contents = element.contents().remove();
+            var compiledContents;
+
+            return {
+                pre: (link && link.pre) ? link.pre : null,
+                post: (scope : ng.IScope, element, attrs) => {
+                    if (!compiledContents) {
+                        compiledContents = $compile(contents);
+                    }
+
+                    var innerScope = scope.$new();
+
+                    scope.$watch(() => attrs["value"], (value) => {
+                        element.html("");
+
+                        innerScope[attrs["key"]] = value;
+
+                        compiledContents(innerScope, (clone) => {
+                            element.append(clone);
+                        });
+                    });
+
+                    if (link && link.post) {
+                        link.post.apply(null, arguments);
+                    }
+                }
+            };
+        }
+    };
+};
+
+
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -935,6 +989,7 @@ export var register = (angular) => {
                 console.log(arguments);
             });
         }])
+        .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);

@@ -58,9 +58,11 @@
                     <a href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
                 </div>
                 <div class="moving-column-body" data-du-scroll-container="">
-                    <adh-resource-wrapper>
-                        <adh-mercator-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-proposal-detail-view>
-                    </adh-resource-wrapper>
+                    <adh-recompile-on-change data-value="{{proposalUrl}}" data-key="proposalUrl">
+                        <adh-resource-wrapper>
+                            <adh-mercator-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-proposal-detail-view>
+                        </adh-resource-wrapper>
+                    </adh-recompile-on-change>
                 </div>
             </div>
         </div>

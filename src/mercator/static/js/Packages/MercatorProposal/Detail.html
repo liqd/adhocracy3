@@ -12,11 +12,14 @@
                 <strong>{{data.finance.requested_funding}} &euro;</strong> requested
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                <!-- FIXME: Link to profile -->
-                <a href="#">{{data.user_info.first_name}} {{data.user_info.last_name}}</a>
+                <adh-user-meta
+                    data-ng-if="data.user_info"
+                    data-path="{{data.user_info.path}}"
+                    data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                </adh-user-meta>
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                {{ data.basic.createtime }}
+                {{ data.user_info.createtime }}
                 published
             </li>
             <li class="mercator-propsal-detail-meta-item">
@@ -61,11 +64,11 @@
             <section class="commentable-section">
                 <h3>{{ "Where will this project take place?" | translate }}</h3>
                 <ul>
-                    <li ng-if="details.location_is_online">{{ "ONLINE" | translate }}</li>
+                    <li data-ng-if="data.details.location_is_online">{{ "ONLINE" | translate }}</li>
                     <li data-ng-if="data.details.location_specific_1">{{ data.details.location_specific_1 }}</li>
                     <li data-ng-if="data.details.location_specific_2">{{ data.details.location_specific_2 }}</li>
                     <li data-ng-if="data.details.location_specific_3">{{ data.details.location_specific_3 }}</li>
-                    <li data-ng-if="details.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
+                    <li data-ng-if="data.details.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
                 </ul>
                 <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:details'}}">
                     <!-- FIXME: Dummy data -->
@@ -78,7 +81,7 @@
 
                 <p class="text-functional"><strong>{{ data.finance.budget }} &euro;</strong> {{ "total project budget" | translate }}</p>
                 <p class="text-functional"><strong>{{ data.finance.requested_funding }} &euro;</strong> {{ "requested" | translate }}</p>
-                <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">project is granted</strong></p>
+                <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">{{ "project is granted" | translate }}</strong></p>
 
                 <h4>{{ "Other sources of income" | translate }}</h4>
                 <p class="functional-introvert">{{ data.finance.other_sources }}</p>
@@ -157,7 +160,6 @@
                 </a>
             </section><!-- /.commentable-section -->
 
-            <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section><!-- /chapter -->
 
         <section class="chapter" id="mercator-detail-view-detailed-proposal">
@@ -181,7 +183,6 @@
                 </a>
             </section><!-- /.commentable-section -->
 
-            <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section><!-- /chapter -->
 
         <section class="chapter" id="mercator-detail-view-goals-and-vision">
@@ -223,7 +224,6 @@
                 </a>
             </section><!-- /.commentable-section -->
 
-            <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section>
 
         <section class="chapter" id="mercator-detail-view-additional">
@@ -255,6 +255,5 @@
         <!-- FIXME: [here you should see a second manifestation of the
         support butten in the cover section.  obviously, if one of
         them is clicked, the other should change automatically.] -->
-        <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
     </div><!-- /.mercator-detail-body -->
 </div><!-- /.mercator-proposal-detail-view -->
