@@ -1,4 +1,5 @@
 """Adhocracy sheets."""
+from itertools import chain
 from logging import getLogger
 
 from persistent.mapping import PersistentMapping
@@ -129,13 +130,17 @@ class GenericResourceSheet(PropertySheet):
                 yield(key, node_backrefs)
 
     def _get_backrefs(self, node: Reference) -> dict:
-            if not self._graph:
-                return {}
-            isheet = node.reftype.getTaggedValue('source_isheet')
-            backrefs = self._graph.get_back_references_for_isheet(self.context,
-                                                                  isheet)
-            field = node.reftype.getTaggedValue('source_isheet_field')
+        if not self._graph:
+            return {}
+        isheet = node.reftype.getTaggedValue('source_isheet')
+        backrefs = self._graph.get_back_references_for_isheet(self.context,
+                                                              isheet)
+        field = node.reftype.getTaggedValue('source_isheet_field')
+        if field:
             return backrefs.get(field, None)
+        else:
+            # return all backrefs regardless of field name
+            return list(chain(*backrefs.values()))
 
     @reify
     def _back_reference_nodes(self) -> dict:

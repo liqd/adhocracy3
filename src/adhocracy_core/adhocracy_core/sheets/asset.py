@@ -79,6 +79,7 @@ class AssetDataSchema(colander.MappingSchema):
 asset_data_meta = sheet_metadata_defaults._replace(
     isheet=IAssetData,
     schema_class=AssetDataSchema,
+    readable=False,
 )
 
 
