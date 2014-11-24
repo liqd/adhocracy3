@@ -71,10 +71,11 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhSticky.moduleName
     ]);
 
-    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
+    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", "$ariaProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
         $translateProvider,
-        $locationProvider
+        $locationProvider,
+        $ariaProvider
     ) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
@@ -102,6 +103,10 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
+
+        $ariaProvider.config({
+            tabindex: false
+        });
     }]);
 
     app.value("angular", angular);
