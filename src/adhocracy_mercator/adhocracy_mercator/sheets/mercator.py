@@ -38,14 +38,19 @@ class IIntroduction(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the proposal introduction."""
 
 
-class IDetails(ISheet, ISheetReferenceAutoUpdateMarker):
+class IDescription(ISheet, ISheetReferenceAutoUpdateMarker):
 
-    """Marker interface for proposal details."""
+    """Marker interface for proposal description."""
+
+
+class ILocation(ISheet, ISheetReferenceAutoUpdateMarker):
+
+    """Marker interface for proposal location."""
 
 
 class IStory(ISheet, ISheetReferenceAutoUpdateMarker):
 
-    """Marker interface for proposal details."""
+    """Marker interface for the story description."""
 
 
 class IOutcome(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -110,11 +115,18 @@ class IntroductionReference(SheetToSheet):
     target_isheet = IIntroduction
 
 
-class DetailsReference(SheetToSheet):
+class DescriptionReference(SheetToSheet):
 
     source_isheet = IMercatorSubResources
-    source_isheet_field = 'details'
-    target_isheet = IDetails
+    source_isheet_field = 'description'
+    target_isheet = IDescription
+
+
+class LocationReference(SheetToSheet):
+
+    source_isheet = IMercatorSubResources
+    source_isheet_field = 'location'
+    target_isheet = ILocation
 
 
 class StoryReference(SheetToSheet):
@@ -170,7 +182,8 @@ class MercatorSubResourcesSchema(colander.MappingSchema):
 
     organization_info = Reference(reftype=OrganizationInfoReference)
     introduction = Reference(reftype=IntroductionReference)
-    details = Reference(reftype=DetailsReference)
+    description = Reference(reftype=DescriptionReference)
+    location = Reference(reftype=LocationReference)
     story = Reference(reftype=StoryReference)
     outcome = Reference(reftype=OutcomeReference)
     steps = Reference(reftype=StepsReference)
@@ -251,11 +264,21 @@ introduction_meta = sheet_metadata_defaults._replace(
     isheet=IIntroduction, schema_class=IntroductionSchema)
 
 
-class DetailsSchema(colander.MappingSchema):
+class DescriptionSchema(colander.MappingSchema):
 
-    """Data structure for for proposal details."""
+    """Data structure for for proposal description."""
 
     description = Text(validator=colander.Length(min=1, max=1000))
+
+
+description_meta = sheet_metadata_defaults._replace(
+    isheet=IDescription, schema_class=DescriptionSchema)
+
+
+class LocationSchema(colander.MappingSchema):
+
+    """Data structure for for proposal location."""
+
     location_is_specific = Boolean()
     location_specific_1 = SingleLine()
     location_specific_2 = SingleLine()
@@ -264,8 +287,8 @@ class DetailsSchema(colander.MappingSchema):
     location_is_linked_to_ruhr = Boolean()
 
 
-details_meta = sheet_metadata_defaults._replace(isheet=IDetails,
-                                                schema_class=DetailsSchema)
+location_meta = sheet_metadata_defaults._replace(isheet=ILocation,
+                                                 schema_class=LocationSchema)
 
 
 LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
@@ -273,14 +296,14 @@ LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
 
 def index_location(resource, default) -> list:
     """Return search index keywords based on the "location_is_..." fields."""
-    details = _get_sheet_field(resource, IMercatorSubResources, 'details')
-    # FIXME: Why is details '' in the first pass of that function
+    location = _get_sheet_field(resource, IMercatorSubResources, 'location')
+    # FIXME: Why is location '' in the first pass of that function
     # during MercatorProposal create?
-    if details is None or details == '':
+    if location is None or location == '':
         return default
     locations = []
     for keyword in LOCATION_INDEX_KEYWORDS:
-        if _get_sheet_field(details, IDetails, 'location_is_' + keyword):
+        if _get_sheet_field(location, ILocation, 'location_is_' + keyword):
             locations.append(keyword)
     return locations if locations else default
 
@@ -402,7 +425,8 @@ def includeme(config):
     add_sheet_to_registry(userinfo_meta, config.registry)
     add_sheet_to_registry(organizationinfo_meta, config.registry)
     add_sheet_to_registry(introduction_meta, config.registry)
-    add_sheet_to_registry(details_meta, config.registry)
+    add_sheet_to_registry(description_meta, config.registry)
+    add_sheet_to_registry(location_meta, config.registry)
     add_sheet_to_registry(story_meta, config.registry)
     add_sheet_to_registry(outcome_meta, config.registry)
     add_sheet_to_registry(steps_meta, config.registry)

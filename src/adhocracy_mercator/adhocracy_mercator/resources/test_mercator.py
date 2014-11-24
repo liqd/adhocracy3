@@ -8,7 +8,8 @@ def test_meractor_proposal_meta():
     from .mercator import IMercatorProposalVersion
     from .mercator import IOrganizationInfo
     from .mercator import IIntroduction
-    from .mercator import IDetails
+    from .mercator import IDescription
+    from .mercator import ILocation
     from .mercator import IStory
     from .mercator import IOutcome
     from .mercator import ISteps
@@ -23,7 +24,8 @@ def test_meractor_proposal_meta():
     assert meta.element_types == [IMercatorProposalVersion,
                                   IOrganizationInfo,
                                   IIntroduction,
-                                  IDetails,
+                                  IDescription,
+                                  ILocation,
                                   IStory,
                                   IOutcome,
                                   ISteps,
