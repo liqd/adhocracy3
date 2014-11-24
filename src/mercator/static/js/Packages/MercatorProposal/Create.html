@@ -350,15 +350,15 @@
                     {{ "description:" | translate }}
                     <textarea
                         data-msd-elastic=""
-                        data-ng-model="data.details.description"
-                        name="details-description"
+                        data-ng-model="data.description.description"
+                        name="description-description"
                         maxlength="1000"
                         placeholder="{{ '1000 c. Max.' | translate }}"
                         required="required"></textarea>
 
                     <span
                         class="input-error"
-                        data-ng-if="showError('mercatorProposalDetailForm.details-description', 'required')">
+                        data-ng-if="showError('mercatorProposalDetailForm.description-description', 'required')">
                         {{ "Please enter a description" | translate }}</span>
                 </label>
 
@@ -380,55 +380,55 @@
 
                 <!-- FIXME: red border should show on dirty -->
                 <div
-                    data-ng-class="{ 'is-invalid': showDetailsLocationError() }">
+                    data-ng-class="{ 'is-invalid': showLocationError() }">
                     <label>
                         <input
                             type="checkbox"
-                            data-ng-model="data.details.location_is_specific"
-                            name="details-location-is-specific" />
+                            data-ng-model="data.location.location_is_specific"
+                            name="location-location-is-specific" />
                         {{ "Specific Location" | translate }}
                     </label>
 
-                    <div data-ng-show="data.details.location_is_specific" >
+                    <div data-ng-show="data.location.location_is_specific" >
                         <input
                             type="text"
-                            data-ng-model="data.details.location_specific_1"
-                            name="details-location-specific-1"
+                            data-ng-model="data.location.location_specific_1"
+                            name="location-location-specific-1"
                             placeholder="{{ 'City, Country' | translate }}"
-                            data-ng-required="data.details.location_is_specific" />
+                            data-ng-required="data.location.location_is_specific" />
 
                         <input
                             type="text"
-                            data-ng-model="data.details.location_specific_2"
-                            name="details-location-specific-2"
+                            data-ng-model="data.location.location_specific_2"
+                            name="location-location-specific-2"
                             placeholder="{{ 'City, Country' | translate }}" />
 
                         <input
                             type="text"
-                            data-ng-model="data.details.location_specific_3"
-                            name="details-location-specific-3"
+                            data-ng-model="data.location.location_specific_3"
+                            name="location-location-specific-3"
                             placeholder="{{ 'City, Country' | translate }}" />
                     </div>
 
                     <label>
                         <input
                             type="checkbox"
-                            data-ng-model="data.details.location_is_online"
-                            name="details-location-is-online" />
+                            data-ng-model="data.location.location_is_online"
+                            name="location-location-is-online" />
                         {{ "Online" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
-                            data-ng-model="data.details.location_is_linked_to_ruhr"
-                            name="details-location-is-linked-to-ruhr" />
+                            data-ng-model="data.location.location_is_linked_to_ruhr"
+                            name="location-location-is-linked-to-ruhr" />
                         {{ "Linkage to the Ruhr area" | translate }}
                     </label>
 
                 </div><!-- /.ng-invalid -->
                 <span
                     class="input-error"
-                    data-ng-if="showDetailsLocationError()">
+                    data-ng-if="showLocationError()">
                     {{ "Please choose one" | translate }}</span>
 
             </div><!-- /.annotated-section-body -->

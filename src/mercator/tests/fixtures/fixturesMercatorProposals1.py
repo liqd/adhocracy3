@@ -373,41 +373,78 @@ def create_proposals(n=5):
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Details"
+                            "name": "Description"
                         }
                     },
                     "root_versions": [],
-                    "content_type": "adhocracy_mercator.resources.mercator.IDetails",
-                    "first_version_path": "@pn8"
+                    "content_type": "adhocracy_mercator.resources.mercator.IDescription",
+                    "first_version_path": "@pn8a"
                 },
-                "result_path": "@pn7",
+                "result_path": "@pn7a",
                 "method": "POST",
-                "result_first_version_path": "@pn8"
+                "result_first_version_path": "@pn8a"
             },
             {
-                "path": "@pn7",
+                "path": "@pn7a",
                 "body": {
-                    "parent": "@pn7",
+                    "parent": "@pn7a",
                     "data": {
                         "adhocracy_core.sheets.versions.IVersionable": {
                             "follows": [
-                                "@pn8"
+                                "@pn8a"
                             ]
                         },
-                        "adhocracy_mercator.sheets.mercator.IDetails": {
-                            "location_specific_1": location_specific_1,
-                            "location_is_specific": location_is_specific,
-                            "location_is_online": location_is_online,
-                            "location_is_linked_to_ruhr": location_is_linked_to_ruhr,
+                        "adhocracy_mercator.sheets.mercator.IDescription": {
                             "description": "description"
                         }
                     },
                     "root_versions": [],
-                    "content_type": "adhocracy_mercator.resources.mercator.IDetailsVersion"
+                    "content_type": "adhocracy_mercator.resources.mercator.IDescriptionVersion"
                 },
-                "result_path": "@pn9",
+                "result_path": "@pn9a",
                 "method": "POST",
-                "result_first_version_path": "@pn41"
+                "result_first_version_path": "@pn41a"
+            },
+            {
+                "path": "@pn31",
+                "body": {
+                    "parent": "@pn31",
+                    "data": {
+                        "adhocracy_core.sheets.name.IName": {
+                            "name": "Location"
+                        }
+                    },
+                    "root_versions": [],
+                    "content_type": "adhocracy_mercator.resources.mercator.ILocation",
+                    "first_version_path": "@pn8b"
+                },
+                "result_path": "@pn7b",
+                "method": "POST",
+                "result_first_version_path": "@pn8b"
+            },
+            {
+                "path": "@pn7b",
+                "body": {
+                    "parent": "@pn7b",
+                    "data": {
+                        "adhocracy_core.sheets.versions.IVersionable": {
+                            "follows": [
+                                "@pn8b"
+                            ]
+                        },
+                        "adhocracy_mercator.sheets.mercator.ILocation": {
+                            "location_specific_1": location_specific_1,
+                            "location_is_specific": location_is_specific,
+                            "location_is_online": location_is_online,
+                            "location_is_linked_to_ruhr": location_is_linked_to_ruhr,
+                        }
+                    },
+                    "root_versions": [],
+                    "content_type": "adhocracy_mercator.resources.mercator.ILocationVersion"
+                },
+                "result_path": "@pn9b",
+                "method": "POST",
+                "result_first_version_path": "@pn41b"
             },
             {
                 "path": "@pn31",
@@ -516,7 +553,8 @@ def create_proposals(n=5):
                             "steps": "@pn18",
                             "outcome": "@pn15",
                             "organization_info": "@pn3",
-                            "details": "@pn9",
+                            "description": "@pn9a",
+                            "location": "@pn9b",
                             "story": "@pn12",
                             "experience": "@pn30"
                         }
