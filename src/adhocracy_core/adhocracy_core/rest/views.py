@@ -20,12 +20,14 @@ from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
 
+from adhocracy_core.interfaces import IAsset
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
+from adhocracy_core.resources.asset import IAssetsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
@@ -96,6 +98,8 @@ def validate_request_data(context: ILocation, request: Request,
     :raises _JSONError: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
+    # TODO request.content_type == 'multipart/form-data' requires special
+    # treatment
     schema_with_binding = schema.bind(context=context, request=request,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
@@ -554,6 +558,50 @@ class UsersRESTView(PoolRESTView):
                  content_type='application/json')
     def post(self):
         return super().post()
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IAssetsService,
+    http_cache=0,
+)
+class AssetsServiceRESTView(PoolRESTView):
+
+    """View allowing multipart requests for asset upload."""
+
+    @view_config(request_method='POST',
+                 permission='add_asset',
+                 content_type='multipart/form-data')
+    def post(self):
+        # TODO adapt as needed
+        return super().post()
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IAsset,
+    http_cache=0,
+)
+class AssetRESTView(SimpleRESTView):
+
+    """View for assets."""
+
+    # TODO actually, only PUT is required for IAsset!!
+    @view_config(request_method='POST',
+                 permission='add_asset',
+                 content_type='multipart/form-data')
+    def post(self) -> dict:
+        """Create new resource and get response data."""
+        iresource = self.request.validated['content_type']
+        resource_type = iresource.__identifier__
+        appstructs = self.request.validated.get('data', {})
+        creator = get_user(self.request)
+        resource = self.registry.create(resource_type,
+                                        self.context,
+                                        creator=creator,
+                                        appstructs=appstructs,
+                                        request=self.request)
+        return self.build_post_response(resource)
 
 
 @view_defaults(
