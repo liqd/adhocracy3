@@ -66,6 +66,19 @@ def create_proposals(n=5):
 
     for i in range(n):
         name = get_random_string()
+
+        location_is_specific = true if randint(0,1) else false
+        location_is_linked_to_ruhr = true if randint(0,1) else false
+        location_is_online = true if randint(0,1) else false
+        location_specific_1 = None
+
+        if not (location_is_specific or
+                location_is_linked_to_ruhr or
+                location_is_online):
+            location_is_online = true
+        if  location_is_specific:
+            location_specific_1 = "location_is_specific"
+
         requested_proposal = [
             {
                 "path": "" + root_uri + "/mercator/",
@@ -381,10 +394,10 @@ def create_proposals(n=5):
                             ]
                         },
                         "adhocracy_mercator.sheets.mercator.IDetails": {
-                            "location_specific_1": "location_specific_1",
-                            "location_is_specific": true if randint(0,1) else false,
-                            "location_is_online": true if randint(0,1) else false,
-                            "location_is_linked_to_ruhr": true if randint(0,1) else false,
+                            "location_specific_1": location_specific_1,
+                            "location_is_specific": location_is_specific,
+                            "location_is_online": location_is_online,
+                            "location_is_linked_to_ruhr": location_is_linked_to_ruhr,
                             "description": "description"
                         }
                     },
