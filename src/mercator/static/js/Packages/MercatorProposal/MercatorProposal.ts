@@ -56,92 +56,91 @@ import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/
 var pkgLocation = "/MercatorProposal";
 
 
+export interface IScopeData {
+    commentCount : number;
+    commentCountTotal : number;
+
+    // 1. basic
+    user_info : {
+        first_name : string;
+        last_name : string;
+        country : string;  // FIXME: should be number (see #265)
+        createtime : string;  // FIXME: should be Date (see #265)
+        path : string;
+        commentCount : number;
+    };
+    organization_info : {
+        status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
+        name : string;
+        country : number;
+        website : string;
+        date_of_foreseen_registration : string;  // FIXME: should be Date (see #265)
+        how_can_we_help_you : string;
+        status_other : string;
+        commentCount : number;
+    };
+
+    // 2. introduction
+    introduction : {
+        title : string;
+        teaser : string;
+        imageUpload : Flow;
+        commentCount : number;
+        nickInstance : number;
+    };
+
+    // 3. in detail
+    details : {
+        description : string;
+        location_is_specific : boolean;
+        location_specific_1 : string;
+        location_specific_2 : string;
+        location_specific_3 : string;
+        location_is_online : boolean;
+        location_is_linked_to_ruhr : boolean;
+        commentCount : number;
+    };
+    story : string;
+    storyCommentCount : number;
+
+    // 4. motivation
+    outcome : string;
+    outcomeCommentCount : number;
+    steps : string;
+    stepsCommentCount : number;
+    value : string;
+    valueCommentCount : number;
+    partners : string;
+    partnersCommentCount : number;
+
+    // 5. financial planning
+    finance : {
+        budget : number;
+        requested_funding : number;
+        other_sources : string;
+        granted : boolean;
+        commentCount : number;
+    };
+
+    // 6. extra
+    experience : string;
+    experienceCommentCount : number;
+    heard_from : {
+        colleague : boolean;
+        website : boolean;
+        newsletter : boolean;
+        facebook : boolean;
+        other : boolean;
+        other_specify : string;
+        commentCount : number;
+    };
+    accept_disclaimer : string;
+}
+
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
     mercatorProposalForm? : any;
-    data : {
-        commentCount : number;
-        commentCountTotal : number;
-
-        // 1. basic
-        user_info : {
-            first_name : string;
-            last_name : string;
-            country : string;
-            createtime : string;
-            path : string;
-            comment_count : number;
-        };
-        organization_info : {
-            status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
-            name : string;
-            country : string;
-            website : string;
-            date_of_foreseen_registration : string;
-            how_can_we_help_you : string;
-            status_other : string;
-            comment_count : number;
-        };
-
-        // 2. introduction
-        introduction : {
-            title : string;
-            teaser : string;
-            imageUpload : Flow;
-            comment_count : number;
-            nickInstance : number;
-        };
-
-        // 3. in detail
-        details : {
-            description : string;
-            location_is_specific : boolean;
-            location_specific_1 : string;
-            location_specific_2 : string;
-            location_specific_3 : string;
-            location_is_online : boolean;
-            location_is_linked_to_ruhr : boolean;
-            comment_count : number;
-        };
-        story : string;
-        storyCommentCount : number;
-
-        // 4. motivation
-        outcome : string;
-        outcomeCommentCount : number;
-        steps : string;
-        stepsCommentCount : number;
-        value : string;
-        valueCommentCount : number;
-        partners : string;
-        partnersCommentCount : number;
-
-        // 5. financial planning
-        finance : {
-            budget : number;
-            requested_funding : number;
-            other_sources : string;
-            granted : boolean;
-            comment_count : number;
-        };
-
-        // 6. extra
-        experience : string;
-        experienceCommentCount : number;
-        heard_from : {
-            colleague : boolean;
-            website : boolean;
-            newsletter : boolean;
-            facebook : boolean;
-            other : boolean;
-            other_specify : string;
-            comment_count : number;
-        };
-
-        accept_disclaimer : string;
-
-        image : any;
-    };
+    data : IScopeData;
 }
 
 export interface IControllerScope extends IScope {
@@ -207,9 +206,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
-    private initializeScope(scope) {
+    private initializeScope(scope : IScope) : IScopeData {
         if (!scope.hasOwnProperty("data")) {
-            scope.data = {};
+            scope.data = <IScopeData>{};
         }
 
         var data = scope.data;
