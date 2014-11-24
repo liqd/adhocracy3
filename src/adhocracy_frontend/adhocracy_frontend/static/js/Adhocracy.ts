@@ -8,6 +8,7 @@
 import angular = require("angular");
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
+import angularAria = require("angularAria");  if (angularAria) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
@@ -59,6 +60,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
+        "ngAria",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
