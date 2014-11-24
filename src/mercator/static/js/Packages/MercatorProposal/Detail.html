@@ -172,8 +172,7 @@
                 <h3>{{ "Story behind the idea" | translate }}</h3>
                 <p>{{ data.story }}</p>
                 <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:story'}}">
-                    <!-- FIXME: Dummy data -->
-                    <i class="icon-speachbubble-outline"></i> 3
+                    <i class="icon-speachbubble-outline"></i> {{ data.stepsCommentCount }}
                 </a>
             </section><!-- /.commentable-section -->
 
