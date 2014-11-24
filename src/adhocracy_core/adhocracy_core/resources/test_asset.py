@@ -4,17 +4,23 @@ from pytest import mark
 
 def test_asset_meta():
     from .asset import asset_meta
-    from .asset import IAsset
+    from adhocracy_core.interfaces import IAsset
+    from adhocracy_core.sheets.metadata import IMetadata
+    from adhocracy_core.sheets.asset import IAssetData
+    from adhocracy_core.sheets.asset import IAssetMetadata
     meta = asset_meta
     assert meta.iresource is IAsset
+    assert IMetadata in meta.basic_sheets
+    assert IAssetData in meta.basic_sheets
+    assert IAssetMetadata in meta.basic_sheets
     assert meta.use_autonaming
     assert meta.permission_add == 'add_asset'
 
 
 def test_assets_service_meta():
     from .asset import assets_service_meta
-    from .asset import IAsset
     from .asset import IAssetsService
+    from adhocracy_core.interfaces import IAsset
     meta = assets_service_meta
     assert meta.iresource is IAssetsService
     assert meta.element_types == [IAsset]
@@ -48,7 +54,7 @@ class TestRoot:
         return pool
 
     def test_create_asset(self, context, registry):
-        from .asset import IAsset
+        from adhocracy_core.interfaces import IAsset
         res = registry.content.create(IAsset.__identifier__, context)
         assert IAsset.providedBy(res)
 

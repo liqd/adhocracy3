@@ -4,12 +4,13 @@ from pyramid.registry import Registry
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
-from adhocracy_core.interfaces import ISimple
+from adhocracy_core.interfaces import IAsset
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.pool import basicpool_metadata
 from adhocracy_core.resources.service import service_metadata
 from adhocracy_core.resources.simple import simple_metadata
+import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
 
 
@@ -18,15 +19,11 @@ class IPoolWithAssets(IBasicPool):
     """A pool with an auto-created asset pool."""
 
 
-class IAsset(ISimple):
-
-    """A generic asset."""
-
-
 asset_meta = simple_metadata._replace(
     content_name='Asset',
     iresource=IAsset,
-    basic_sheets=simple_metadata.basic_sheets + [
+    basic_sheets=[
+        adhocracy_core.sheets.metadata.IMetadata,
         adhocracy_core.sheets.asset.IAssetMetadata,
         adhocracy_core.sheets.asset.IAssetData
     ],

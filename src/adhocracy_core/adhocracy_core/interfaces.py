@@ -284,6 +284,11 @@ class ISimple(IResource):
     """Simple resource without versions and children."""
 
 
+class IAsset(ISimple):
+
+    """A generic asset (binary file)."""
+
+
 class ITag(ISimple):
 
     """Tag to link specific versions."""
