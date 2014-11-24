@@ -241,7 +241,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.adhHttp.get(subResourcePaths.finance),
             this.adhHttp.get(subResourcePaths.experience)]);
 
-        subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
+        return subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
             subResources.forEach((subResource : ResourcesBase.Resource) => {
                 switch (subResource.content_type) {
                     case RIMercatorOrganizationInfoVersion.content_type: (() => {
@@ -325,7 +325,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             });
         });
 
-        return this.$q.when();
     }
 
     private fill(data, resource) : void {
