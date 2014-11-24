@@ -86,6 +86,7 @@ export interface IScopeData {
         teaser : string;
         imageUpload : Flow;
         commentCount : number;
+        nickInstance : number;
     };
 
     // 3. in detail
@@ -475,7 +476,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
         mercatorProposal.data[SIName.nick] = new SIName.Sheet({
-            name: AdhUtil.normalizeName(data.introduction.title)
+            name: AdhUtil.normalizeName(data.introduction.title + data.introduction.nickInstance)
         });
 
         var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
@@ -1103,8 +1104,18 @@ export var register = (angular) => {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
                     $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
-                    $scope.submit().catch(() => {
-                        container.scrollTopAnimated(0);
+
+                    // append a random number to the nick to allow duplicate titles
+                    $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
+                        Math.floor((Math.random() * 10000) + 1);
+
+                    $scope.submit().catch((error) => {
+                        if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
+                            $scope.data.introduction.nickInstance++;
+                            $scope.submitIfValid();
+                        } else {
+                            container.scrollTopAnimated(0);
+                        }
                     });
                 } else {
                     var element = $element.find(".ng-invalid");
