@@ -141,7 +141,6 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
         accept_disclaimer : string;
 
         image : any;
-
     };
 }
 
@@ -1101,13 +1100,16 @@ export var register = (angular) => {
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
+
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
                     $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
+
                     // append a random number to the nick to allow duplicate titles
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
-                    Math.floor((Math.random() * 10000) + 1);
+                        Math.floor((Math.random() * 10000) + 1);
+
                     $scope.submit().catch((error) => {
                         if (_.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
                             $scope.data.introduction.nickInstance++;
