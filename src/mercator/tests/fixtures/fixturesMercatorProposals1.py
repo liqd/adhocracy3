@@ -465,7 +465,7 @@ def create_proposals(n=5):
                             "status": "planned_nonprofit",
                             "country": "CC",
                             "website": "http://www.heise.de/http://northscape.net/",
-                            "planned_date": "03/01/2015",
+                            "planned_date": "2014-11-19T13:19:25.405Z",
                             "name": "nameconstantly"
                         }
                     },
