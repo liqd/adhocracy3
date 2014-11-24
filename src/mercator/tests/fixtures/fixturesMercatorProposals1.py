@@ -9,6 +9,7 @@ import requests
 from random import choice
 from random import randint
 
+# FIXME: root_uri must be constructed from etc/*.ini, not hard-coded here!
 root_uri = 'http://localhost:6542'
 verbose = True
 
