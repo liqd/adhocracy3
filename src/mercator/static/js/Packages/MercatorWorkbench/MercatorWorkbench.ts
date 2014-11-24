@@ -64,8 +64,8 @@ export class MercatorWorkbench {
                             {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
                         ]
                     }, {
-                        key: "mercator_budget",
-                        name: "Budget",
+                        key: "mercator_requested_funding",
+                        name: "Requested funding",
                         items: [
                             {key: "5000", name: "0 - 5000 €"},
                             {key: "10000", name: "5000 - 10000 €"},

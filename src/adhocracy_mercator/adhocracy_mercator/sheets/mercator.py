@@ -345,7 +345,7 @@ finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
 BUDGET_INDEX_LIMIT_KEYWORDS = [5000, 10000, 20000, 50000]
 
 
-def index_budget(resource: IResource, default) -> str:
+def index_requested_funding(resource: IResource, default) -> str:
     """Return search index keyword based on the "requested_funding" field."""
     # FIXME: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
@@ -415,7 +415,7 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='mercator_location',
                          context=IMercatorSubResources)
-    config.add_indexview(index_budget,
+    config.add_indexview(index_requested_funding,
                          catalog_name='adhocracy',
-                         index_name='mercator_budget',
+                         index_name='mercator_requested_funding',
                          context=IMercatorSubResources)

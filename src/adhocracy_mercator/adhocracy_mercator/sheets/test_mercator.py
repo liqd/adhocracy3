@@ -342,56 +342,56 @@ class TestMercatorLocationIndex:
 
 
 @mark.usefixtures('integration')
-class TestMercatorBudgetIndex:
+class TestMercatorRequestedFundingIndex:
 
     @fixture
     def context(self, pool_graph):
         return pool_graph
 
     def test_index_buget_default(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(context)
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == 'default'
 
-    def test_index_budget_lte_5000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_5000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 5000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['5000']
 
-    def test_index_budget_lte_10000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_10000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 10000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['10000']
 
-    def test_index_budget_lte_20000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_20000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 20000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['20000']
 
-    def test_index_budget_lte_50000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_50000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 50000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['50000']
 
-    def test_index_budget_gt_50000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_gt_50000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 50001})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == 'default'
 
 
