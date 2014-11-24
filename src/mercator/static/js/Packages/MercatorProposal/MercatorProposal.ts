@@ -1111,7 +1111,7 @@ export var register = (angular) => {
                         Math.floor((Math.random() * 10000) + 1);
 
                     $scope.submit().catch((error) => {
-                        if (_.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
+                        if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
                             $scope.data.introduction.nickInstance++;
                             $scope.submitIfValid();
                         } else {
