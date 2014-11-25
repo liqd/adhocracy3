@@ -109,10 +109,11 @@ export class Provider {
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
     private area : IArea;
+    private currentSpace : string;
     private blockTemplate : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
-    private data : {[key : string] : string};
+    private data : {[space : string]: {[key : string] : string}};
 
     constructor(
         private provider : Provider,
@@ -128,6 +129,10 @@ export class Service {
 
         this.eventHandler = new adhEventHandlerClass();
         this.data = {};
+
+        // FIXME: select the actual space
+        this.currentSpace = "";
+        this.data[this.currentSpace] = {};
 
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
             self.fromLocation();
@@ -199,7 +204,7 @@ export class Service {
             return this.$q.when();
         } else {
             return area.route(path, search).then((data) => {
-                for (var key in this.data) {
+                for (var key in this.data[this.currentSpace]) {
                     if (!data.hasOwnProperty(key)) {
                         this._set(key, undefined);
                     }
@@ -222,7 +227,7 @@ export class Service {
     private toLocation() : void {
         var area = this.getArea();
         var search = this.$location.search();
-        var ret = area.reverse(this.data);
+        var ret = area.reverse(this.data[this.currentSpace]);
 
         this.$location.path("/" + area.prefix + ret.path);
 
@@ -241,11 +246,11 @@ export class Service {
     private _set(key : string, value) : boolean {
         if (this.get(key) !== value) {
             if (typeof value === "undefined") {
-                delete this.data[key];
+                delete this.data[this.currentSpace][key];
             } else {
-                this.data[key] = value;
+                this.data[this.currentSpace][key] = value;
             }
-            this.eventHandler.trigger(key, value);
+            this.eventHandler.trigger(this.currentSpace + ":" + key, value);
             return true;
         } else {
             return false;
@@ -260,11 +265,11 @@ export class Service {
     }
 
     public get(key : string) {
-        return this.data[key];
+        return this.data[this.currentSpace][key];
     }
 
     public on(key : string, fn) : void {
-        this.eventHandler.on(key, fn);
+        this.eventHandler.on(this.currentSpace + ":" + key, fn);
 
         // initially trigger callback
         fn(this.get(key));
