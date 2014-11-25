@@ -89,20 +89,21 @@ export class Provider {
 
     public when(prefix : string, factory : (...args : any[]) => IAreaInput);
     public when(prefix : string, factory : any[]);
-    public when(prefix, factory) {
+    public when(prefix, factory) : Provider {
         this.areas[prefix] = factory;
         return this;
     }
 
     public otherwise(factory : (...args : any[]) => IAreaInput);
     public otherwise(factory : any[]);
-    public otherwise(factory) {
+    public otherwise(factory) : Provider {
         this.default = factory;
         return this;
     }
 
-    public space(space : string, data : {[key : string]: string}) : void {
+    public space(space : string, data : {[key : string]: string}) : Provider {
         this.spaceDefaults[space] = data;
+        return this;
     }
 
     public getArea(prefix : string) : any {
