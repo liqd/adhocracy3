@@ -8,6 +8,7 @@
 import angular = require("angular");
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
+import angularAria = require("angularAria");  if (angularAria) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
@@ -63,6 +64,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
+        "ngAria",
         "duScroll",
         "flow",
         AdhComment.moduleName,
@@ -77,10 +79,11 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhSticky.moduleName
     ]);
 
-    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
+    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", "$ariaProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
         $translateProvider,
-        $locationProvider
+        $locationProvider,
+        $ariaProvider
     ) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
@@ -108,6 +111,10 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
+
+        $ariaProvider.config({
+            tabindex: false
+        });
     }]);
 
     // update hash when using anchor scroll
