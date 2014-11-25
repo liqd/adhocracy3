@@ -11,8 +11,8 @@ from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
 from substanced.content import content
-
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import Reference
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetReference
 from adhocracy_core.interfaces import SheetToSheet
@@ -23,11 +23,6 @@ from adhocracy_core.events import SheetBackReferenceAdded
 class SheetReftype(namedtuple('ISheetReftype', 'isheet field reftype')):
 
     """Fields: isheet field reftype."""
-
-
-class Reference(namedtuple('Reference', 'source isheet field target')):
-
-    """Fields: source isheet field target."""
 
 
 @content('Graph',
@@ -259,12 +254,6 @@ class Graph(Persistent):
                 return True
 
         return False
-
-
-
-def _send_events(registry: Registry, events: Iterable):
-    for event in events:
-        registry.notify(event)
 
 
 def includeme(config):  # pragma: no cover

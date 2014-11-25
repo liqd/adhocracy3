@@ -9,9 +9,9 @@ from adhocracy_core.sheets.rate import IRateable
 
 
 @fixture
-def context(context, service):
-    context['rates'] = service
-    return context
+def context(pool, service):
+    pool['rates'] = service
+    return pool
 
 
 @fixture
@@ -182,7 +182,7 @@ class TestRateValidators:
 
 
 @fixture
-def mock_sheet(context, mock_sheet, registry):
+def mock_rate_sheet(context, mock_sheet, registry):
     from adhocracy_core.testing import add_and_register_sheet
     from .rate import IRate
     mock_sheet.meta = mock_sheet.meta._replace(isheet=IRate)
@@ -190,11 +190,14 @@ def mock_sheet(context, mock_sheet, registry):
     return mock_sheet
 
 
-def test_index_rate(context, mock_sheet):
+def test_index_rate(context, mock_rate_sheet):
     from .rate import index_rate
-    context['referenced'] = testing.DummyResource()
-    mock_sheet.get.return_value = {'rate': 1}
-    assert index_rate(context, None) == 1
+    from .rate import IRate
+    context['rateable'] = testing.DummyResource(__provides__=IRate)
+    mock_rate_sheet.get.return_value = {'rate': 1}
+    assert index_rate(context['rateable'], None) == 1
+
+
 
 
 @mark.usefixtures('integration')

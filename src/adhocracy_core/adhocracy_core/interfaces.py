@@ -513,3 +513,8 @@ class IRateValidator(Interface):  # pragma: no cover
 
     def helpful_error_message(self) -> str:
         """Return a error message that explains which values are allowed."""
+
+
+class Reference(namedtuple('Reference', 'source isheet field target')):
+
+    """Fields: source isheet field target."""
