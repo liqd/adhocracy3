@@ -209,8 +209,8 @@ export class Service {
             return this.$q.when();
         } else {
             return area.route(path, search).then((data) => {
-                this.currentSpace = data["space"] || "";
-                this.data[this.currentSpace] = this.data[this.currentSpace] || {};
+                this._set("space", data["space"] || "");
+                delete data["space"];
 
                 for (var key in this.data[this.currentSpace]) {
                     if (!data.hasOwnProperty(key)) {
@@ -253,12 +253,18 @@ export class Service {
 
     private _set(key : string, value) : boolean {
         if (this.get(key) !== value) {
-            if (typeof value === "undefined") {
-                delete this.data[this.currentSpace][key];
+            if (key === "space") {
+                this.currentSpace = value;
+                this.data[this.currentSpace] = this.data[this.currentSpace] || this.provider.getSpaceDefaults(this.currentSpace) || {};
+                this.eventHandler.trigger(key, value);
             } else {
-                this.data[this.currentSpace][key] = value;
+                if (typeof value === "undefined") {
+                    delete this.data[this.currentSpace][key];
+                } else {
+                    this.data[this.currentSpace][key] = value;
+                }
+                this.eventHandler.trigger(this.currentSpace + ":" + key, value);
             }
-            this.eventHandler.trigger(this.currentSpace + ":" + key, value);
             return true;
         } else {
             return false;
@@ -273,11 +279,19 @@ export class Service {
     }
 
     public get(key : string) {
-        return this.data[this.currentSpace][key];
+        if (key === "space") {
+            return this.currentSpace;
+        } else {
+            return this.data[this.currentSpace][key];
+        }
     }
 
     public on(key : string, fn) : void {
-        this.eventHandler.on(this.currentSpace + ":" + key, fn);
+        if (key === "space") {
+            this.eventHandler.on(key, fn);
+        } else {
+            this.eventHandler.on(this.currentSpace + ":" + key, fn);
+        }
 
         // initially trigger callback
         fn(this.get(key));
