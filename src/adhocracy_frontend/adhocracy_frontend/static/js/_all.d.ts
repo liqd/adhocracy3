@@ -9,6 +9,7 @@ declare module "angular" {
 }
 
 declare module "angularAnimate" {}
+declare module "angularAria" {}
 declare module "angularTranslate" {}
 declare module "angularTranslateLoader" {}
 declare module "angularElastic" {}
