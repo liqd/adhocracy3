@@ -16,6 +16,8 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetReference
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.events import SheetBackReferenceRemoved
+from adhocracy_core.events import SheetBackReferenceAdded
 
 
 class SheetReftype(namedtuple('ISheetReftype', 'isheet field reftype')):
@@ -73,14 +75,29 @@ class Graph(Persistent):
             yield SheetReftype(isheet, field, reftype)
 
     def set_references(self, source, targets: Iterable,
-                       reftype: SheetReference):
+                       reftype: SheetReference, registry: Registry=None):
         """Set references of this source.
 
         :param targets: the reference targets, for Sequences the order
                          is preserved.
         :param reftype: the reftype mapping to one isheet field.
+        :param registry: pyramid registry to notify referenced resources.
+                         Default value is None to ease testing.
         """
         assert reftype.isOrExtends(SheetReference)
+        multireference = self._create_multireference(source, targets, reftype)
+        old = set([x for x in multireference])
+        multireference.clear()
+        multireference.connect(targets)
+        if registry is None:
+            return
+        new = set(targets)
+        removed = old - new
+        self._notify_removed_targets(source, reftype, removed, registry)
+        added = new - old
+        self._notify_added_targets(source, reftype, added, registry)
+
+    def _create_multireference(self, source, targets, reftype):
         ordered = isinstance(targets, Sequence)
         orientation = 'source'
         resolve = True  # return objects not oids
@@ -88,8 +105,28 @@ class Graph(Persistent):
         om = self._objectmap
         multireference = Multireference(source, om, reftype, ignore_missing,
                                         resolve, orientation, ordered)
-        multireference.clear()
-        multireference.connect(targets)
+        return multireference
+
+    def _notify_removed_targets(self, source, reftype, targets, registry):
+        reference_tmpl = self._create_reference_template(source, reftype)
+        target_isheet = reftype.queryTaggedValue('target_isheet')
+        for target in targets:
+            reference = reference_tmpl._replace(target=target)
+            event = SheetBackReferenceRemoved(target, target_isheet, reference, registry)
+            registry.notify(event)
+
+    def _notify_added_targets(self, source, reftype, targets, registry):
+        reference_tmpl = self._create_reference_template(source, reftype)
+        target_isheet = reftype.queryTaggedValue('target_isheet')
+        for target in targets:
+            reference = reference_tmpl._replace(target=target)
+            event = SheetBackReferenceAdded(target, target_isheet, reference, registry)
+            registry.notify(event)
+
+    def _create_reference_template(self, source, reftype):
+        source_isheet = reftype.queryTaggedValue('source_isheet')
+        source_isheet_field = reftype.queryTaggedValue('target_isheet_field')
+        return Reference(source, source_isheet, source_isheet_field, None)
 
     def get_references(self, source, base_isheet=ISheet,
                        base_reftype=SheetReference) -> Iterator:
@@ -222,6 +259,12 @@ class Graph(Persistent):
                 return True
 
         return False
+
+
+
+def _send_events(registry: Registry, events: Iterable):
+    for event in events:
+        registry.notify(event)
 
 
 def includeme(config):  # pragma: no cover
