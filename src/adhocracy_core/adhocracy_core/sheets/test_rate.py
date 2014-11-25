@@ -24,6 +24,29 @@ def _make_rateable(provides=IRateable):
     return testing.DummyResource(__provides__=provides)
 
 
+class TestRateableSheet:
+
+    @fixture
+    def inst(self, context):
+        from adhocracy_core.sheets.rate import rateable_meta
+        return rateable_meta.sheet_class(rateable_meta, context)
+
+    def test_create(self, inst):
+        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets.rate import IRateable
+        from adhocracy_core.sheets.rate import RateableSchema
+        assert isinstance(inst, GenericResourceSheet)
+        assert inst.meta.isheet == IRateable
+        assert inst.meta.schema_class == RateableSchema
+        assert inst.meta.create_mandatory is False
+
+    def test_get_empty(self, inst):
+        post_pool = inst.context['rates']
+        assert inst.get() == {'post_pool': post_pool,
+                              'rates': [],
+                              }
+
+
 class TestRateSheet:
 
     @fixture
@@ -190,6 +213,17 @@ def mock_rate_sheet(context, mock_sheet, registry):
     return mock_sheet
 
 
+@fixture
+def mock_rateable_sheet(context, mock_sheet, registry):
+    from copy import deepcopy
+    from adhocracy_core.testing import add_and_register_sheet
+    from .rate import IRateable
+    mock_sheet = deepcopy(mock_sheet)
+    mock_sheet.meta = mock_sheet.meta._replace(isheet=IRateable)
+    add_and_register_sheet(context, mock_sheet, registry)
+    return mock_sheet
+
+
 def test_index_rate(context, mock_rate_sheet):
     from .rate import index_rate
     from .rate import IRate
@@ -198,6 +232,15 @@ def test_index_rate(context, mock_rate_sheet):
     assert index_rate(context['rateable'], None) == 1
 
 
+def test_index_rates(context, mock_rate_sheet, mock_rateable_sheet):
+    from .rate import index_rates
+    from .rate import IRate
+    from .rate import IRateable
+    context['rates']['rate'] = testing.DummyResource(__provides__=IRate)
+    mock_rate_sheet.get.return_value = {'rate': 1}
+    context['rateable'] = testing.DummyResource(__provides__=IRateable)
+    mock_rateable_sheet.get.return_value = {'rates': [context['rates']['rate']]}
+    assert index_rates(context['rateable'], None) == 1
 
 
 @mark.usefixtures('integration')
@@ -213,4 +256,20 @@ def test_includeme_register_rate_sheet(config, context):
 def test_includeme_register_index_rate(registry, context):
     from .rate import IRate
     from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IRate,), IIndexView, name='adhocracy|rate')
+    assert registry.adapters.lookup((IRate,), IIndexView,
+                                    name='adhocracy|rate')
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_rates(registry, context):
+    from .rate import IRateable
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IRateable,), IIndexView,
+                                    name='adhocracy|rates')
+
+@mark.usefixtures('integration')
+def test_register_subscriber(registry):
+    from .rate import backreference_modified_subscriber
+    handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
+    assert backreference_modfied_subscriber.__name__ in handlers
+

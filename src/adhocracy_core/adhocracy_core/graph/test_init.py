@@ -375,7 +375,10 @@ class TestGraphSetReferencesForIsheet:
     def test_with_valid_references(self, context, mock_graph, registry):
         references = {'references': [object()]}
         self._call_fut(mock_graph, context, ISheet, references, registry)
-        mock_graph.set_references.assert_called_with(context, references['references'], SheetReference)
+        mock_graph.set_references.assert_called_with(context,
+                                                     references['references'],
+                                                     SheetReference,
+                                                     registry)
 
     def test_with_invalid_references(self, context, mock_graph, registry):
         references = {'invalid': [object()]}
@@ -391,7 +394,10 @@ class TestGraphSetReferencesForIsheet:
         from adhocracy_core.interfaces import IResource
         references = {'references': testing.DummyResource(__provides__=IResource)}
         self._call_fut(mock_graph, context, ISheet, references, registry)
-        mock_graph.set_references.assert_called_with(context, [references['references']], SheetReference)
+        mock_graph.set_references.assert_called_with(context,
+                                                     [references['references']],
+                                                     SheetReference,
+                                                     registry)
 
 
 class TestGraphGetBackReferencesForIsheet:

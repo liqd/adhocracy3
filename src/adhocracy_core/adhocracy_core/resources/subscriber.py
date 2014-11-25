@@ -16,6 +16,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy_core.interfaces import ISheetReferenceModified
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
@@ -27,6 +28,7 @@ from adhocracy_core.utils import raise_colander_style_error
 
 import adhocracy_core.sheets.versions
 import adhocracy_core.sheets.tags
+import adhocracy_core.sheets.rate
 
 
 changelog_metadata = ChangelogMetadata(False, False, None, None)
@@ -45,12 +47,19 @@ def resource_modified_subscriber(event):
 
 def tag_created_and_added_or_modified_subscriber(event):
     """Reindex tagged itemversions."""
+    # FIXME use ISheetBackReferenceModified subscriber instead
     adhocracy_catalog = find_catalog(event.object, 'adhocracy')
     old_elements_set = set(event.old_appstruct['elements'])
     new_elements_set = set(event.new_appstruct['elements'])
     newly_tagged_or_untagged_resources = old_elements_set ^ new_elements_set
     for tagged in newly_tagged_or_untagged_resources:
             adhocracy_catalog.reindex_resource(tagged)
+
+
+def rate_backreference_modified_subscriber(event):
+    """Reindex the rates index if a rate backreference is modified."""
+    adhocracy_catalog = find_catalog(event.object, 'adhocracy')
+    adhocracy_catalog.reindex_resource(event.object)
 
 
 def itemversion_created_subscriber(event):
@@ -233,3 +242,6 @@ def includeme(config):
     config.add_subscriber(metadata_modified_subscriber,
                           IResourceSheetModified,
                           isheet=IMetadata)
+    config.add_subscriber(rate_backreference_modified_subscriber,
+                          ISheetReferenceModified,
+                          isheet=adhocracy_core.sheets.rate.IRateable)

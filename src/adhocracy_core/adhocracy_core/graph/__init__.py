@@ -7,6 +7,7 @@ from collections.abc import Sequence
 
 from persistent import Persistent
 from pyramid.registry import Registry
+
 from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
@@ -107,7 +108,8 @@ class Graph(Persistent):
         target_isheet = reftype.queryTaggedValue('target_isheet')
         for target in targets:
             reference = reference_tmpl._replace(target=target)
-            event = SheetBackReferenceRemoved(target, target_isheet, reference, registry)
+            event = SheetBackReferenceRemoved(target, target_isheet, reference,
+                                              registry)
             registry.notify(event)
 
     def _notify_added_targets(self, source, reftype, targets, registry):
@@ -115,7 +117,8 @@ class Graph(Persistent):
         target_isheet = reftype.queryTaggedValue('target_isheet')
         for target in targets:
             reference = reference_tmpl._replace(target=target)
-            event = SheetBackReferenceAdded(target, target_isheet, reference, registry)
+            event = SheetBackReferenceAdded(target, target_isheet, reference,
+                                            registry)
             registry.notify(event)
 
     def _create_reference_template(self, source, reftype):
@@ -174,7 +177,7 @@ class Graph(Persistent):
             reftype = schema[field_name].reftype
             if IResource.providedBy(targets):
                 targets = [targets]
-            self.set_references(source, targets, reftype)
+            self.set_references(source, targets, reftype, registry)
 
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
         """ Get references of this source for one isheet only.
