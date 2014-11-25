@@ -27,6 +27,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     proposalListingData : {
         facets : AdhListing.IFacet[];
         showFacets : boolean;
+        sort : string;
         update?;
     };
 }
@@ -64,8 +65,8 @@ export class MercatorWorkbench {
                             {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
                         ]
                     }, {
-                        key: "mercator_budget",
-                        name: "Budget",
+                        key: "mercator_requested_funding",
+                        name: "Requested funding",
                         items: [
                             {key: "5000", name: "0 - 5000 €"},
                             {key: "10000", name: "5000 - 10000 €"},
@@ -73,7 +74,8 @@ export class MercatorWorkbench {
                             {key: "50000", name: "20000 - 50000 €"}
                         ]
                     }],
-                    showFacets: false
+                    showFacets: false,
+                    sort: "name"
                 };
 
                 adhTopLevelState.on("view", (value : string) => {

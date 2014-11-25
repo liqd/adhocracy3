@@ -31,7 +31,9 @@
                         data-path="{{path}}"
                         data-content-type="{{contentType}}"
                         data-update="proposalListingData.update"
-                        data-facets="proposalListingData.facets">
+                        data-facets="proposalListingData.facets"
+                        data-sort="proposalListingData.sort"
+                    >
                     </adh-mercator-proposal-listing>
                 </div>
             </div>
@@ -52,15 +54,17 @@
                     </adh-resource-wrapper>
                 </div>
             </div>
-            <div data-ng-if="view !== 'view'">
+            <div data-ng-if="view !== 'edit'">
                 <div class="moving-column-menu">
                     <!-- FIXME: permission check -->
                     <a href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
                 </div>
                 <div class="moving-column-body" data-du-scroll-container="">
-                    <adh-resource-wrapper>
-                        <adh-mercator-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-proposal-detail-view>
-                    </adh-resource-wrapper>
+                    <adh-recompile-on-change data-value="{{proposalUrl}}" data-key="proposalUrl">
+                        <adh-resource-wrapper>
+                            <adh-mercator-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-proposal-detail-view>
+                        </adh-resource-wrapper>
+                    </adh-recompile-on-change>
                 </div>
             </div>
         </div>

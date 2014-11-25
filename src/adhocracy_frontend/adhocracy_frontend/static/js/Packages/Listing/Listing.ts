@@ -55,6 +55,7 @@ export interface ListingScope<Container> extends ng.IScope {
     path : string;
     contentType? : string;
     facets? : IFacet[];
+    sort? : string;
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
@@ -100,6 +101,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 path: "@",
                 contentType: "@",
                 facets: "=",
+                sort: "=",
                 update: "=?",
                 noCreateForm: "="
             },
@@ -134,6 +136,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                                 }
                             });
                         });
+                    }
+                    if ($scope.sort) {
+                        params["sort"] = $scope.sort;
                     }
                     return adhHttp.get($scope.path, params).then((container) => {
                         $scope.container = container;

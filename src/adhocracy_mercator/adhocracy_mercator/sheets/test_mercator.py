@@ -34,11 +34,17 @@ class TestIncludeme:
         context = testing.DummyResource(__provides__=IIntroduction)
         assert get_sheet(context, IIntroduction)
 
-    def test_includeme_register_details_sheet(self, config):
-        from adhocracy_mercator.sheets.mercator import IDetails
+    def test_includeme_register_description_sheet(self, config):
+        from adhocracy_mercator.sheets.mercator import IDescription
         from adhocracy_core.utils import get_sheet
-        context = testing.DummyResource(__provides__=IDetails)
-        assert get_sheet(context, IDetails)
+        context = testing.DummyResource(__provides__=IDescription)
+        assert get_sheet(context, IDescription)
+
+    def test_includeme_register_location_sheet(self, config):
+        from adhocracy_mercator.sheets.mercator import ILocation
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=ILocation)
+        assert get_sheet(context, ILocation)
 
     def test_includeme_register_story_sheet(self, config):
         from adhocracy_mercator.sheets.mercator import IStory
@@ -242,12 +248,12 @@ class TestIntroductionSheet:
         assert inst.get() == wanted
 
 
-class TestDetailsSheet:
+class TestDescriptionSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_mercator.sheets.mercator import details_meta
-        return details_meta
+        from adhocracy_mercator.sheets.mercator import description_meta
+        return description_meta
 
     @fixture
     def context(self):
@@ -256,24 +262,58 @@ class TestDetailsSheet:
 
     @fixture
     def resource(self):
-        from adhocracy_mercator.sheets.mercator import IDetails
-        return testing.DummyResource(__provides__=IDetails)
+        from adhocracy_mercator.sheets.mercator import IDescription
+        return testing.DummyResource(__provides__=IDescription)
 
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_mercator.sheets.mercator import IDetails
-        from adhocracy_mercator.sheets.mercator import DetailsSchema
+        from adhocracy_mercator.sheets.mercator import IDescription
+        from adhocracy_mercator.sheets.mercator import DescriptionSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
-        assert inst.meta.isheet == IDetails
-        assert inst.meta.schema_class == DetailsSchema
+        assert inst.meta.isheet == IDescription
+        assert inst.meta.schema_class == DescriptionSchema
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
         wanted = {'description': '',
-                  'location_is_specific': False,
+                  }
+        assert inst.get() == wanted
+
+
+class TestLocationSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_mercator.sheets.mercator import location_meta
+        return location_meta
+
+    @fixture
+    def context(self):
+        from adhocracy_core.interfaces import IItem
+        return testing.DummyResource(__provides__=IItem)
+
+    @fixture
+    def resource(self):
+        from adhocracy_mercator.sheets.mercator import ILocation
+        return testing.DummyResource(__provides__=ILocation)
+
+    def test_create_valid(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
+        from adhocracy_mercator.sheets.mercator import ILocation
+        from adhocracy_mercator.sheets.mercator import LocationSchema
+        inst = meta.sheet_class(meta, context)
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+        assert inst.meta.isheet == ILocation
+        assert inst.meta.schema_class == LocationSchema
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        wanted = {'location_is_specific': False,
                   'location_specific_1': '',
                   'location_specific_2': '',
                   'location_specific_3': '',
@@ -283,23 +323,23 @@ class TestDetailsSheet:
         assert inst.get() == wanted
 
 
-def _make_mercator_resource(context, details_appstruct={}, finance_appstruct={}):
+def _make_mercator_resource(context, location_appstruct={}, finance_appstruct={}):
     from adhocracy_core.interfaces import IResource
     from adhocracy_mercator.sheets.mercator import IMercatorSubResources
-    from adhocracy_mercator.sheets.mercator import IDetails
+    from adhocracy_mercator.sheets.mercator import ILocation
     from adhocracy_mercator.sheets.mercator import IFinance
     from adhocracy_core.utils import get_sheet
     resource = testing.DummyResource(__provides__=[IResource,
                                                    IMercatorSubResources])
     context['res'] = resource
     sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
-    if details_appstruct:
-        details_resource = testing.DummyResource(__provides__=[IResource,
-                                                               IDetails])
-        details_sheet = get_sheet(details_resource, IDetails)
-        details_sheet.set(details_appstruct)
-        context['details'] = details_resource
-        sub_resources_sheet.set({'details': details_resource})
+    if location_appstruct:
+        location_resource = testing.DummyResource(__provides__=[IResource,
+                                                               ILocation])
+        location_sheet = get_sheet(location_resource, ILocation)
+        location_sheet.set(location_appstruct)
+        context['location'] = location_resource
+        sub_resources_sheet.set({'location': location_resource})
     if finance_appstruct:
         finance_resource = testing.DummyResource(__provides__=[IResource,
                                                                IFinance])
@@ -327,7 +367,7 @@ class TestMercatorLocationIndex:
         from adhocracy_mercator.sheets.mercator import index_location
         resource = _make_mercator_resource(
             context,
-            details_appstruct={'location_is_linked_to_ruhr': True})
+            location_appstruct={'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
         assert result == ['linked_to_ruhr']
 
@@ -335,63 +375,63 @@ class TestMercatorLocationIndex:
         from adhocracy_mercator.sheets.mercator import index_location
         resource = _make_mercator_resource(
             context,
-            details_appstruct={'location_is_online': True,
+            location_appstruct={'location_is_online': True,
                                'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
         assert set(result) == set(['online', 'linked_to_ruhr'])
 
 
 @mark.usefixtures('integration')
-class TestMercatorBudgetIndex:
+class TestMercatorRequestedFundingIndex:
 
     @fixture
     def context(self, pool_graph):
         return pool_graph
 
     def test_index_buget_default(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(context)
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == 'default'
 
-    def test_index_budget_lte_5000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_5000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 5000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['5000']
 
-    def test_index_budget_lte_10000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_10000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 10000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['10000']
 
-    def test_index_budget_lte_20000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_20000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 20000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['20000']
 
-    def test_index_budget_lte_50000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_lte_50000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 50000})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == ['50000']
 
-    def test_index_budget_gt_50000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
+    def test_index_requested_funding_gt_50000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 50001})
-        result = index_budget(resource, 'default')
+        result = index_requested_funding(resource, 'default')
         assert result == 'default'
 
 
