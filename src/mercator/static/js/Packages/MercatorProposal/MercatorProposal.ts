@@ -298,6 +298,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         var res : SIMercatorDescription.Sheet = subResource.data[SIMercatorDescription.nick];
 
                         scope.description = res.description;
+                        scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorLocationVersion.content_type: (() => {
@@ -369,10 +370,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             data.commentCountTotal =
                 data.commentCount +
                 data.introduction.commentCount +
-                data.details.commentCount +
+                data.description.commentCount +
                 data.finance.commentCount +
                 data.organization_info.commentCount +
-                data.details.commentCount +
+                data.location.commentCount +
                 data.outcomeCommentCount +
                 data.stepsCommentCount +
                 data.valueCommentCount +
@@ -402,18 +403,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 break;
             case RIMercatorDescriptionVersion.content_type:
                 resource.data[SIMercatorDescription.nick] = new SIMercatorDescription.Sheet({
-                    description: data.description.description,
-                    location_is_specific: data.description.location_is_specific,
-                    location_specific_1: data.description.location_specific_1,
-                    location_specific_2: data.description.location_specific_2,
-                    location_specific_3: data.description.location_specific_3,
-                    location_is_online: data.description.location_is_online,
-                    location_is_linked_to_ruhr: data.description.location_is_linked_to_ruhr
+                    description: data.description.description
                 });
                 break;
             case RIMercatorLocationVersion.content_type:
                 resource.data[SIMercatorLocation.nick] = new SIMercatorLocation.Sheet({
-                    description: data.location.description,
                     location_is_specific: data.location.location_is_specific,
                     location_specific_1: data.location.location_specific_1,
                     location_specific_2: data.location.location_specific_2,
