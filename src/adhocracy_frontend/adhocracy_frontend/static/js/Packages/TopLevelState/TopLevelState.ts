@@ -66,6 +66,7 @@ export interface IArea {
 export class Provider {
     public areas : {[key : string]: any};
     public default : any;
+    public spaceDefaults : {[space : string]: {[key : string]: string}};
     public $get;
 
     constructor() {
@@ -77,6 +78,7 @@ export class Provider {
                 template: "<h1>404 Not Found</h1>"
             };
         };
+        this.spaceDefaults = {};
 
         this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
             (adhEventHandlerClass, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
@@ -99,10 +101,17 @@ export class Provider {
         return this;
     }
 
+    public space(space : string, data : {[key : string]: string}) : void {
+        this.spaceDefaults[space] = data;
+    }
+
     public getArea(prefix : string) : any {
         return this.areas.hasOwnProperty(prefix) ? this.areas[prefix] : this.default;
     }
 
+    public getSpaceDefaults(name : string) : {[key : string]: string} {
+        return _.clone(this.spaceDefaults[name]);
+    }
 }
 
 
