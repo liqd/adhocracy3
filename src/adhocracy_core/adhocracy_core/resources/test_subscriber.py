@@ -338,13 +338,12 @@ class TestRateBackreferenceModifiedSubscriber:
 
     def call_fut(self, event):
         from .subscriber import rate_backreference_modified_subscriber
-        return rate_backreference_modified_subscriber
+        return rate_backreference_modified_subscriber(event)
 
     def test_index(self, context, catalog):
         event = testing.DummyResource(object=context)
         self.call_fut(event)
         catalog['adhocracy'].reindex_resource.call_count == 1
-
 
 
 class TestAddDefaultGroupToUserSubscriber:

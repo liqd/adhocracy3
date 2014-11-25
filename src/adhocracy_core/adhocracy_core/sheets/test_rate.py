@@ -266,10 +266,3 @@ def test_includeme_register_index_rates(registry, context):
     from substanced.interfaces import IIndexView
     assert registry.adapters.lookup((IRateable,), IIndexView,
                                     name='adhocracy|rates')
-
-@mark.usefixtures('integration')
-def test_register_subscriber(registry):
-    from .rate import backreference_modified_subscriber
-    handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-    assert backreference_modfied_subscriber.__name__ in handlers
-
