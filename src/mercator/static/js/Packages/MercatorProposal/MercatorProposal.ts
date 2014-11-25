@@ -350,7 +350,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.budget = parseInt(res.budget, 10);
                         scope.requested_funding = parseInt(res.requested_funding, 10);
                         scope.other_sources = res.other_sources;
-                        scope.granted = res.granted === "True";
+                        scope.granted = res.granted === "true";
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
