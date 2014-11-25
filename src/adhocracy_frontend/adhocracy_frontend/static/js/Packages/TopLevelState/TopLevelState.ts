@@ -139,10 +139,6 @@ export class Service {
         this.eventHandler = new adhEventHandlerClass();
         this.data = {};
 
-        // FIXME: select the actual space
-        this.currentSpace = "";
-        this.data[this.currentSpace] = {};
-
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
             self.fromLocation();
         });
@@ -213,6 +209,9 @@ export class Service {
             return this.$q.when();
         } else {
             return area.route(path, search).then((data) => {
+                this.currentSpace = data["space"] || "";
+                this.data[this.currentSpace] = this.data[this.currentSpace] || {};
+
                 for (var key in this.data[this.currentSpace]) {
                     if (!data.hasOwnProperty(key)) {
                         this._set(key, undefined);
