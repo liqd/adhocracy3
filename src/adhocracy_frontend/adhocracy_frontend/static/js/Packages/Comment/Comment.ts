@@ -44,6 +44,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
     createPath : string;
+    isCurrent : boolean;
     show : {
         createForm : boolean;
     };
@@ -105,6 +106,19 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                 });
             };
         };
+
+        directive.controller = ["adhTopLevelState", "$scope", (
+            adhTopLevelState : AdhTopLevelState.Service,
+            $scope : ICommentResourceScope
+        ) => {
+            adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
+                if (!commentVersionUrl) {
+                    $scope.isCurrent = false;
+                } else {
+                    $scope.isCurrent = (AdhUtil.parentPath(commentVersionUrl) === $scope.path);
+                }
+            });
+        }];
 
         return directive;
     }
