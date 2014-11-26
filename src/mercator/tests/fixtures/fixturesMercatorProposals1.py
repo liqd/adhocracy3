@@ -453,7 +453,7 @@ def create_proposal():
                     "parent": "@pn4",
                     "data": {
                         "adhocracy_mercator.sheets.mercator.IIntroduction": {
-                            "teaser": "wickerwork Ladonna's preterit's Kyoto's effaced Kenneth's emperor Candy jackknifed expectancy's pursed sultrier overcasts system Eysenck fulfils Bahia newsmen Kinney's Judith's glowworm's chintzier goatees alchemy ingratiated frigate passels Poznan's",
+                            "teaser": get_random_string(300, whitespace=True),
                             "title": name
                         },
                         "adhocracy_core.sheets.versions.IVersionable": {
