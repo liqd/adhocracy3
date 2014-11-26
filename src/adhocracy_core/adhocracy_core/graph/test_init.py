@@ -202,6 +202,42 @@ class TestGraphSetReferences:
         references = objectmap.targetids(source, SheetReference)
         assert list(references) == [target.__oid__]
 
+    def test_targets_set_add_with_registry(self, context, objectmap, config, registry):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.interfaces import ISheetBackReferenceAdded
+        from adhocracy_core.interfaces import ISheet
+        source, target, target1 = create_dummy_resources(parent=context, count=3)
+        added_listener = create_event_listener(config, ISheetBackReferenceAdded)
+        self._call_fut(objectmap, source, {target}, SheetReference, registry)
+        event = added_listener[0]
+        assert event.object == target
+        assert event.isheet == ISheet
+        assert event.reference.source == source
+        assert event.reference.target == target
+        assert event.reference.isheet == ISheet
+
+    def test_targets_set_remove_with_registry(self, context, objectmap, config, registry):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.interfaces import ISheetBackReferenceRemoved
+        source, target, target1 = create_dummy_resources(parent=context, count=3)
+        self._call_fut(objectmap, source, {target, target1}, SheetReference, registry)
+        removed_listener = create_event_listener(config, ISheetBackReferenceRemoved)
+        self._call_fut(objectmap, source, {target}, SheetReference, registry)
+        event = removed_listener[0]
+        assert event.object == target1
+
+    def test_targets_set_remove_and_add_with_registry(self, context, objectmap, config, registry):
+        from adhocracy_core.testing import create_event_listener
+        from adhocracy_core.interfaces import ISheetBackReferenceAdded
+        from adhocracy_core.interfaces import ISheetBackReferenceRemoved
+        source, target, target1 = create_dummy_resources(parent=context, count=3)
+        self._call_fut(objectmap, source, {target}, SheetReference, registry)
+        removed_listener = create_event_listener(config, ISheetBackReferenceRemoved)
+        added_listener = create_event_listener(config, ISheetBackReferenceAdded)
+        self._call_fut(objectmap, source, {target1}, SheetReference, registry)
+        assert len(removed_listener) == 1
+        assert len(added_listener) == 1
+
 
 class TestGraphGetReferences:
 
@@ -339,7 +375,10 @@ class TestGraphSetReferencesForIsheet:
     def test_with_valid_references(self, context, mock_graph, registry):
         references = {'references': [object()]}
         self._call_fut(mock_graph, context, ISheet, references, registry)
-        mock_graph.set_references.assert_called_with(context, references['references'], SheetReference)
+        mock_graph.set_references.assert_called_with(context,
+                                                     references['references'],
+                                                     SheetReference,
+                                                     registry)
 
     def test_with_invalid_references(self, context, mock_graph, registry):
         references = {'invalid': [object()]}
@@ -355,7 +394,10 @@ class TestGraphSetReferencesForIsheet:
         from adhocracy_core.interfaces import IResource
         references = {'references': testing.DummyResource(__provides__=IResource)}
         self._call_fut(mock_graph, context, ISheet, references, registry)
-        mock_graph.set_references.assert_called_with(context, [references['references']], SheetReference)
+        mock_graph.set_references.assert_called_with(context,
+                                                     [references['references']],
+                                                     SheetReference,
+                                                     registry)
 
 
 class TestGraphGetBackReferencesForIsheet:

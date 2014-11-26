@@ -1195,8 +1195,8 @@ you'll get the number of children in the pool::
     >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
     >>> assert int(child_count) >= 10
 
-If you specify *sort* you can set a custom or default filter ('name' or 'rate')
-to sort the result::
+If you specify *sort* you can set a custom or default filter ('name', 'rate',
+'rates') to sort the result::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'sort': 'name'}).json
@@ -1209,7 +1209,7 @@ Other filters cannot be used for sorting::
     ...                         params={'sort': 'path'},
     ...                         status=400).json
     >>> resp_data['errors'][0]['description']
-    '"path" is not one of content_type, name, text, rate'
+    '"path" is not one of content_type, name, text, rate, rates'
 
 The *elements* parameter allows controlling how matching element are
 returned. By default, 'elements' in the IPool sheet contains a list of paths.

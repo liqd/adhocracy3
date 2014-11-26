@@ -95,6 +95,32 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
         assert verifyObject(ISheetReferencedItemHasNewVersion, inst)
 
 
+def test_sheet_back_reference_added():
+    from . import SheetBackReferenceAdded
+    from adhocracy_core.interfaces import ISheetBackReferenceAdded
+    from adhocracy_core.interfaces import ISheet
+    from adhocracy_core.interfaces import Reference
+    context = testing.DummyResource()
+    reference = Reference(None, None, None, None)
+    registry = testing.DummyResource()
+    inst = SheetBackReferenceAdded(context, ISheet, reference, registry)
+    assert ISheetBackReferenceAdded.providedBy(inst)
+    assert verifyObject(ISheetBackReferenceAdded, inst)
+
+
+def test_sheet_back_reference_removed():
+    from . import SheetBackReferenceRemoved
+    from adhocracy_core.interfaces import ISheetBackReferenceRemoved
+    from adhocracy_core.interfaces import ISheet
+    from adhocracy_core.interfaces import Reference
+    context = testing.DummyResource()
+    reference = Reference(None, None, None, None)
+    registry = testing.DummyResource()
+    inst = SheetBackReferenceRemoved(context, ISheet, reference, registry)
+    assert ISheetBackReferenceRemoved.providedBy(inst)
+    assert verifyObject(ISheetBackReferenceRemoved, inst)
+
+
 class TestLocalRolesModified:
 
     def _make_one(self, *arg, **kwargs):

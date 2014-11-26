@@ -34,6 +34,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'tag' in catalogs['adhocracy']
     assert 'reference' in catalogs['adhocracy']
     assert 'rate' in catalogs['adhocracy']
+    assert 'rates' in catalogs['adhocracy']
 
 
 @mark.usefixtures('integration')

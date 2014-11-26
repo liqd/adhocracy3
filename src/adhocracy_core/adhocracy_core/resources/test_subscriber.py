@@ -318,6 +318,34 @@ class TestTagCreatedAndAddedOrModifiedSubscriber:
         catalog['adhocracy'].reindex_resource.call_count == 2
 
 
+class TestRateBackreferenceModifiedSubscriber:
+
+    @fixture
+    def catalog(self):
+        from substanced.interfaces import IService
+        from substanced.interfaces import IFolder
+        catalog = testing.DummyResource(
+            __provides__=(IFolder, IService), __is_service__=True)
+        catalog['adhocracy'] = testing.DummyResource(
+            __provides__=(IFolder, IService), __is_service__=True)
+        catalog['adhocracy'].reindex_resource = Mock()
+        return catalog
+
+    @fixture
+    def context(self, pool, catalog):
+        pool['catalogs'] = catalog
+        return pool
+
+    def call_fut(self, event):
+        from .subscriber import rate_backreference_modified_subscriber
+        return rate_backreference_modified_subscriber(event)
+
+    def test_index(self, context, catalog):
+        event = testing.DummyResource(object=context)
+        self.call_fut(event)
+        catalog['adhocracy'].reindex_resource.call_count == 1
+
+
 class TestAddDefaultGroupToUserSubscriber:
 
     @fixture
@@ -563,3 +591,4 @@ def test_register_subscriber(registry):
     assert subscriber.reference_has_new_version_subscriber.__name__ in handlers
     assert subscriber.tag_created_and_added_or_modified_subscriber.__name__ in handlers
     assert subscriber.user_created_and_added_subscriber.__name__ in handlers
+    assert subscriber.rate_backreference_modified_subscriber.__name__ in handlers

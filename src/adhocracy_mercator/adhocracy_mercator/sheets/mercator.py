@@ -15,7 +15,7 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
-from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 
 
 class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -296,14 +296,14 @@ LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
 
 def index_location(resource, default) -> list:
     """Return search index keywords based on the "location_is_..." fields."""
-    location = _get_sheet_field(resource, IMercatorSubResources, 'location')
+    location = get_sheet_field(resource, IMercatorSubResources, 'location')
     # FIXME: Why is location '' in the first pass of that function
     # during MercatorProposal create?
     if location is None or location == '':
         return default
     locations = []
     for keyword in LOCATION_INDEX_KEYWORDS:
-        if _get_sheet_field(location, ILocation, 'location_is_' + keyword):
+        if get_sheet_field(location, ILocation, 'location_is_' + keyword):
             locations.append(keyword)
     return locations if locations else default
 
@@ -375,20 +375,14 @@ def index_requested_funding(resource: IResource, default) -> str:
     # This sounds like a bug, the default value for References is None,
     # Note: you should not cast resources to Boolean because a resource without
     # sub resources is equal False [joka]
-    finance = _get_sheet_field(resource, IMercatorSubResources, 'finance')
+    finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
     if finance is None or finance == '':
             return default
-    funding = _get_sheet_field(finance, IFinance, 'requested_funding')
+    funding = get_sheet_field(finance, IFinance, 'requested_funding')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
         if funding <= limit:
             return [str(limit)]
     return default
-
-
-def _get_sheet_field(resource, isheet: ISheet, field_name: str) -> object:
-    sheet = get_sheet(resource, isheet)
-    field = sheet.get()[field_name]
-    return field
 
 
 class ExperienceSchema(colander.MappingSchema):

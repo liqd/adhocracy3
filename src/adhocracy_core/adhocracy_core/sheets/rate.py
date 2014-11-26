@@ -11,10 +11,11 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference
+from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
-from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 
 
 class IRate(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
@@ -139,6 +140,9 @@ class RateableSchema(PostPoolMappingSchema):
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IRate`.
     """
 
+    rates = UniqueReferences(readonly=True,
+                             backref=True,
+                             reftype=RateObjectReference)
     post_pool = PostPool(iresource_or_service_name='rates')
 
 
@@ -156,11 +160,20 @@ likeable_meta = rateable_meta._replace(
 
 
 def index_rate(resource, default):
-    """Return rate value of the :class:`IRate`.rate field."""
-    # FIXME?: can we pass the registry to get_sheet here?
-    sheet = get_sheet(resource, IRate)
-    rate = sheet.get()['rate']
+    """Return the value of field name `rate` for :class:`IRate` resources."""
+    # FIXME?: can we pass the registry to get_sheet_field her?
+    rate = get_sheet_field(resource, IRate, 'rate')
     return rate
+
+
+def index_rates(resource, default):
+    """Return aggregated values of referenceing :class:`IRate` resources."""
+    rates = get_sheet_field(resource, IRateable, 'rates')
+    rate_sum = 0
+    for rate in rates:
+        value = get_sheet_field(rate, IRate, 'rate')
+        rate_sum += value
+    return rate_sum
 
 
 def includeme(config):
@@ -179,3 +192,7 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='rate',
                          context=IRate)
+    config.add_indexview(index_rates,
+                         catalog_name='adhocracy',
+                         index_name='rates',
+                         context=IRateable)
