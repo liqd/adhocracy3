@@ -24,7 +24,7 @@ null = None
 true = True
 false = False
 
-def login():
+def login(name="god", password="password"):
     uri = root_uri + "/login_username"
     headers = {
         "Content-Type": "application/json;charset=UTF-8",
@@ -36,8 +36,8 @@ def login():
         "Content-Length": "36"
     }
     body = json.dumps({
-        "name": "god",
-        "password": "password"
+        "name": name,
+        "password": password
     })
     response = requests.post(uri, headers=headers, data=body)
     if verbose:
