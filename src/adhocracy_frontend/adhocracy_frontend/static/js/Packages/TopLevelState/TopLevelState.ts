@@ -405,17 +405,9 @@ export var spaces = (
         transclude: true,
         template: "<adh-inject></adh-inject>",
         link: (scope) => {
-            // FIXME: also save content2Url
-            // IDEA: getAll/setAll on TLS (getAll needs to clone), maybe also clear
-            var movingColumns = {};
             topLevelState.on("space", (space : string) => {
-                movingColumns[scope.currentSpace] = topLevelState.get("movingColumns");
                 scope.currentSpace = space;
-                if (typeof movingColumns[space] !== "undefined") {
-                    topLevelState.set("movingColumns", movingColumns[space]);
-                }
             });
-            scope.currentSpace = topLevelState.get("space");
             scope.isSpaceInitialized = (space : string) => topLevelState.isSpaceInitialized(space);
         }
     };
