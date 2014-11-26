@@ -77,6 +77,9 @@ export var movingColumns = (
             topLevelState.on("content2Url", (url : string) => {
                 scope.content2Url = url;
             });
+            topLevelState.on("platformUrl", (url : string) => {
+                scope.platformUrl = url;
+            });
             topLevelState.on("proposalUrl", (url : string) => {
                 scope.proposalUrl = url;
             });
