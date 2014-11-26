@@ -25,6 +25,8 @@ true = True
 false = False
 
 def login(name="god", password="password"):
+    """login user and return user token """
+
     uri = root_uri + "/login_username"
     headers = {
         "Content-Type": "application/json;charset=UTF-8",
@@ -49,6 +51,10 @@ def login(name="god", password="password"):
         print(response.text)
     assert response.status_code == 200
 
+    payload = json.loads(response.content)
+    assert payload["status"] == "success"
+
+    return payload["user_token"]
 
 def _create_proposal():
     name = get_random_string()
