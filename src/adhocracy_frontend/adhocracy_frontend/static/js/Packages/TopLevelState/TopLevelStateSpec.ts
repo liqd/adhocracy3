@@ -176,7 +176,7 @@ export var register = () => {
                 describe("fromLocation", () => {
 
                     beforeEach(() => {
-                        areaMock.route.and.returnValue({then: (fn) => fn(areaMock._data)});
+                        areaMock.route.and.callFake(() => q.when(areaMock._data));
                     });
 
                     it("skips routing if area.skip is true", () => {
