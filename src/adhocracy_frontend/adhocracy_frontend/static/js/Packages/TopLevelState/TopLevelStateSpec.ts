@@ -123,15 +123,15 @@ export var register = () => {
                     beforeEach(() => {
                         adhTopLevelStateWithPrivates.data = {mykey : "myValue", mykey2: "myValue2"};
                         areaMock.reverse.and.returnValue({
-                                        path: areaMock._basePath + areaPath,
-                                        search: adhTopLevelStateWithPrivates.data
+                            path: areaMock._basePath + areaPath,
+                            search: adhTopLevelStateWithPrivates.data
                         });
                         adhTopLevelStateWithPrivates.toLocation.and.callThrough();
                         locationMock.search.and.callFake((key?, value?) => {
-                                        if (key && value) {
-                                            searchData[key] = value;
-                                        };
-                                        return searchData;
+                            if (key && value) {
+                                searchData[key] = value;
+                            };
+                            return searchData;
                         });
                     });
 
