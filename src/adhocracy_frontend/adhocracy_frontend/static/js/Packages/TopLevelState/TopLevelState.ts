@@ -12,6 +12,12 @@
  * The application can interact with this service via the functions
  * get(), set(), and on().
  *
+ * There is a special key called "space" which can be used to create
+ * states that you can later jump back to.  The only perceivable
+ * difference is that you can set() a space which will load the
+ * complete state you left the space in (but without triggering on()
+ * callbacks). The default space is "".
+ *
  * This service very much resembles ngRoute, especially in the way
  * the areas are configured.  It differs from ngRoute in that it can
  * change paths without a reload and in being more flexibel.
