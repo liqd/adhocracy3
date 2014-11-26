@@ -5,6 +5,7 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
@@ -33,6 +34,10 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     };
 }
 
+interface IMercatorWorkbenchRootScope extends ng.IScope {
+    mercatorProposalPostPoolOptions : AdhHttp.IOptions;
+}
+
 export class MercatorWorkbench {
     public static templateUrl : string = pkgLocation + "/MercatorWorkbench.html";
 
@@ -46,10 +51,12 @@ export class MercatorWorkbench {
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
-            controller: ["adhUser", "adhTopLevelState", "$scope", "$location", (
+            controller: ["adhUser", "adhPermissions", "adhTopLevelState", "$scope", "$rootScope", "$location", (
                 adhUser : AdhUser.Service,
+                adhPermissions : AdhPermissions.Service,
                 adhTopLevelState : AdhTopLevelState.Service,
                 $scope : IMercatorWorkbenchScope,
+                $rootScope : IMercatorWorkbenchRootScope,
                 $location : ng.ILocationService
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
@@ -78,6 +85,9 @@ export class MercatorWorkbench {
                     showFacets: false,
                     sort: "name"
                 };
+
+                $rootScope.mercatorProposalPostPoolOptions = AdhHttp.emptyOptions;
+                adhPermissions.bindScope($rootScope, $scope.path, "mercatorProposalPostPoolOptions");
 
                 adhTopLevelState.on("view", (value : string) => {
                     $scope.view = value;
