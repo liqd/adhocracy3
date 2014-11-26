@@ -12,8 +12,10 @@ import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIMercatorDetails = require("../../Resources_/adhocracy_mercator/resources/mercator/IDetails");
-import RIMercatorDetailsVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IDetailsVersion");
+import RIMercatorDescription = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescription");
+import RIMercatorDescriptionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescriptionVersion");
+import RIMercatorLocation = require("../../Resources_/adhocracy_mercator/resources/mercator/ILocation");
+import RIMercatorLocationVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/ILocationVersion");
 import RIMercatorExperience = require("../../Resources_/adhocracy_mercator/resources/mercator/IExperience");
 import RIMercatorExperienceVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IExperienceVersion");
 import RIMercatorFinance = require("../../Resources_/adhocracy_mercator/resources/mercator/IFinance");
@@ -36,7 +38,8 @@ import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/res
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
-import SIMercatorDetails = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDetails");
+import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
+import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
 import SIMercatorFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
 import SIMercatorHeardFrom = require("../../Resources_/adhocracy_mercator/sheets/mercator/IHeardFrom");
@@ -90,8 +93,12 @@ export interface IScopeData {
     };
 
     // 3. in detail
-    details : {
+    description : {
         description : string;
+        commentCount : number;
+    };
+
+    location : {
         location_is_specific : boolean;
         location_specific_1 : string;
         location_specific_2 : string;
@@ -100,6 +107,7 @@ export interface IScopeData {
         location_is_linked_to_ruhr : boolean;
         commentCount : number;
     };
+
     story : string;
     storyCommentCount : number;
 
@@ -146,7 +154,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
 export interface IControllerScope extends IScope {
     showError : (fieldName : string, errorType : string) => boolean;
     showHeardFromError : () => boolean;
-    showDetailsLocationError : () => boolean;
+    showLocationError : () => boolean;
     submitIfValid : () => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
@@ -216,7 +224,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info = data.user_info || <any>{};
         data.organization_info = data.organization_info || <any>{};
         data.introduction = data.introduction || <any>{};
-        data.details = data.details || <any>{};
+        data.description = data.description || <any>{};
+        data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
         data.heard_from = data.heard_from || <any>{};
 
@@ -250,7 +259,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([
             this.adhHttp.get(subResourcePaths.organization_info),
             this.adhHttp.get(subResourcePaths.introduction),
-            this.adhHttp.get(subResourcePaths.details),
+            this.adhHttp.get(subResourcePaths.description),
+            this.adhHttp.get(subResourcePaths.location),
             this.adhHttp.get(subResourcePaths.story),
             this.adhHttp.get(subResourcePaths.outcome),
             this.adhHttp.get(subResourcePaths.steps),
@@ -285,11 +295,18 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
-                    case RIMercatorDetailsVersion.content_type: (() => {
-                        var scope = data.details;
-                        var res : SIMercatorDetails.Sheet = subResource.data[SIMercatorDetails.nick];
+                    case RIMercatorDescriptionVersion.content_type: (() => {
+                        var scope = data.description;
+                        var res : SIMercatorDescription.Sheet = subResource.data[SIMercatorDescription.nick];
 
                         scope.description = res.description;
+                        scope.commentCount = subResource.data[SICommentable.nick].comments.length;
+                    })();
+                    break;
+                    case RIMercatorLocationVersion.content_type: (() => {
+                        var scope = data.location;
+                        var res : SIMercatorLocation.Sheet = subResource.data[SIMercatorLocation.nick];
+
                         scope.location_is_specific = res.location_is_specific === "true";
                         scope.location_specific_1 = res.location_specific_1;
                         scope.location_specific_2 = res.location_specific_2;
@@ -336,7 +353,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.budget = parseInt(res.budget, 10);
                         scope.requested_funding = parseInt(res.requested_funding, 10);
                         scope.other_sources = res.other_sources;
-                        scope.granted = res.granted === "True";
+                        scope.granted = res.granted === "true";
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
@@ -355,10 +372,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             data.commentCountTotal =
                 data.commentCount +
                 data.introduction.commentCount +
-                data.details.commentCount +
+                data.description.commentCount +
                 data.finance.commentCount +
                 data.organization_info.commentCount +
-                data.details.commentCount +
+                data.location.commentCount +
                 data.outcomeCommentCount +
                 data.stepsCommentCount +
                 data.valueCommentCount +
@@ -386,15 +403,19 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     teaser: data.introduction.teaser
                 });
                 break;
-            case RIMercatorDetailsVersion.content_type:
-                resource.data[SIMercatorDetails.nick] = new SIMercatorDetails.Sheet({
-                    description: data.details.description,
-                    location_is_specific: data.details.location_is_specific,
-                    location_specific_1: data.details.location_specific_1,
-                    location_specific_2: data.details.location_specific_2,
-                    location_specific_3: data.details.location_specific_3,
-                    location_is_online: data.details.location_is_online,
-                    location_is_linked_to_ruhr: data.details.location_is_linked_to_ruhr
+            case RIMercatorDescriptionVersion.content_type:
+                resource.data[SIMercatorDescription.nick] = new SIMercatorDescription.Sheet({
+                    description: data.description.description
+                });
+                break;
+            case RIMercatorLocationVersion.content_type:
+                resource.data[SIMercatorLocation.nick] = new SIMercatorLocation.Sheet({
+                    location_is_specific: data.location.location_is_specific,
+                    location_specific_1: data.location.location_specific_1,
+                    location_specific_2: data.location.location_specific_2,
+                    location_specific_3: data.location.location_specific_3,
+                    location_is_online: data.location.location_is_online,
+                    location_is_linked_to_ruhr: data.location.location_is_linked_to_ruhr
                 });
                 break;
             case RIMercatorStoryVersion.content_type:
@@ -490,7 +511,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var subresources = _.map([
             [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
             [RIMercatorIntroduction, RIMercatorIntroductionVersion, "introduction"],
-            [RIMercatorDetails, RIMercatorDetailsVersion, "details"],
+            [RIMercatorDescription, RIMercatorDescriptionVersion, "description"],
+            [RIMercatorLocation, RIMercatorLocationVersion, "location"],
             [RIMercatorStory, RIMercatorStoryVersion, "story"],
             [RIMercatorOutcome, RIMercatorOutcomeVersion, "outcome"],
             [RIMercatorSteps, RIMercatorStepsVersion, "steps"],
@@ -1058,10 +1080,10 @@ export var register = (angular) => {
                 "heard-from-other"
             ];
 
-            var detailsLocationCheckboxes = [
-                "details-location-is-specific",
-                "details-location-is-online",
-                "details-location-is-linked-to-ruhr"
+            var locationCheckboxes = [
+                "location-location-is-specific",
+                "location-location-is-online",
+                "location-location-is-linked-to-ruhr"
             ];
 
             var getFieldByName = (fieldName : string) => {
@@ -1093,8 +1115,8 @@ export var register = (angular) => {
                 return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
             };
 
-            $scope.showDetailsLocationError = () : boolean => {
-                return showCheckboxGroupError($scope.mercatorProposalDetailForm, detailsLocationCheckboxes);
+            $scope.showLocationError = () : boolean => {
+                return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
             };
 
             $scope.submitIfValid = () => {

@@ -73,34 +73,65 @@ introduction_meta = item_metadata._replace(
 )
 
 
-class IDetailsVersion(IItemVersion):
+class IDescriptionVersion(IItemVersion):
 
     """One of the mercator commentable subresources."""
 
 
-details_version_meta = itemversion_metadata._replace(
-    content_name='DetailsVersion',
-    iresource=IDetailsVersion,
+description_version_meta = itemversion_metadata._replace(
+    content_name='DescriptionVersion',
+    iresource=IDescriptionVersion,
     extended_sheets=[
-        adhocracy_mercator.sheets.mercator.IDetails,
+        adhocracy_mercator.sheets.mercator.IDescription,
         ICommentable],
 )
 
 
-class IDetails(IItem):
+class IDescription(IItem):
 
     """One of the mercator commentable subresources version pool."""
 
 
-details_meta = item_metadata._replace(
-    content_name='Details',
-    iresource=IDetails,
-    element_types=[IDetailsVersion,
+description_meta = item_metadata._replace(
+    content_name='Description',
+    iresource=IDescription,
+    element_types=[IDescriptionVersion,
                    ],
     after_creation=item_metadata.after_creation + [
         add_commentsservice,
     ],
-    item_type=IDetailsVersion,
+    item_type=IDescriptionVersion,
+)
+
+
+class ILocationVersion(IItemVersion):
+
+    """One of the mercator commentable subresources."""
+
+
+location_version_meta = itemversion_metadata._replace(
+    content_name='LocationVersion',
+    iresource=ILocationVersion,
+    extended_sheets=[
+        adhocracy_mercator.sheets.mercator.ILocation,
+        ICommentable],
+)
+
+
+class ILocation(IItem):
+
+    """One of the mercator commentable subresources version pool."""
+
+
+location_meta = item_metadata._replace(
+    content_name='Location',
+    iresource=ILocation,
+    element_types=[ILocationVersion,
+                   ],
+    after_creation=item_metadata.after_creation + [
+        add_commentsservice,
+    ],
+    item_type=ILocationVersion,
 )
 
 
@@ -348,7 +379,8 @@ mercator_proposal_meta = item_metadata._replace(
     element_types=[IMercatorProposalVersion,
                    IOrganizationInfo,
                    IIntroduction,
-                   IDetails,
+                   IDescription,
+                   ILocation,
                    IStory,
                    IOutcome,
                    ISteps,
@@ -374,8 +406,10 @@ def includeme(config):
     add_resource_type_to_registry(organization_info_version_meta, config)
     add_resource_type_to_registry(introduction_meta, config)
     add_resource_type_to_registry(introduction_version_meta, config)
-    add_resource_type_to_registry(details_meta, config)
-    add_resource_type_to_registry(details_version_meta, config)
+    add_resource_type_to_registry(description_meta, config)
+    add_resource_type_to_registry(description_version_meta, config)
+    add_resource_type_to_registry(location_meta, config)
+    add_resource_type_to_registry(location_version_meta, config)
     add_resource_type_to_registry(story_meta, config)
     add_resource_type_to_registry(story_version_meta, config)
     add_resource_type_to_registry(outcome_meta, config)

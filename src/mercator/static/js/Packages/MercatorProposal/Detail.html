@@ -62,14 +62,14 @@
             <section class="commentable-section">
                 <h3>{{ "Where will this project take place?" | translate }}</h3>
                 <ul>
-                    <li data-ng-if="data.details.location_is_online">{{ "ONLINE" | translate }}</li>
-                    <li data-ng-if="data.details.location_specific_1">{{ data.details.location_specific_1 }}</li>
-                    <li data-ng-if="data.details.location_specific_2">{{ data.details.location_specific_2 }}</li>
-                    <li data-ng-if="data.details.location_specific_3">{{ data.details.location_specific_3 }}</li>
-                    <li data-ng-if="data.details.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
+                    <li data-ng-if="data.location.location_is_online">{{ "ONLINE" | translate }}</li>
+                    <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
+                    <li data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</li>
+                    <li data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</li>
+                    <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
                 </ul>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:details'}}">
-                    <i class="icon-speachbubble-outline"></i> {{ data.details.commentCount }}
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:location'}}">
+                    <i class="icon-speachbubble-outline"></i> {{ data.location.commentCount }}
                 </a>
             </section><!-- /.commentable-section -->
 
@@ -162,9 +162,9 @@
 
             <section class="commentable-section">
                 <h3>{{ "Description?" | translate }}</h3>
-                <p>{{ data.details.description }}</p>
-                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:details'}}">
-                    <i class="icon-speachbubble-outline"></i> {{ data.details.commentCount }}
+                <p>{{ data.description.description }}</p>
+                <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:description'}}">
+                    <i class="icon-speachbubble-outline"></i> {{ data.description.commentCount }}
                 </a>
             </section><!-- /.commentable-section -->
 

@@ -14,6 +14,7 @@ require.config({
         jquery: "../lib/jquery/dist/jquery",
         angular: "../lib/angular/angular",
         angularAnimate: "../lib/angular-animate/angular-animate",
+        angularAria: "../lib/angular-aria/angular-aria",
         angularTranslate: "../lib/angular-translate/angular-translate",
         angularTranslateLoader: "../lib/angular-translate-loader-static-files/angular-translate-loader-static-files",
         angularElastic: "../lib/angular-elastic/elastic",
@@ -36,6 +37,9 @@ require.config({
             exports: "angular"
         },
         angularAnimate: {
+            deps: ["angular"]
+        },
+        angularAria: {
             deps: ["angular"]
         },
         angularTranslate: {

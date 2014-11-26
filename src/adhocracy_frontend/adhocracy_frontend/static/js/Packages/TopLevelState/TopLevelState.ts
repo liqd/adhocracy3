@@ -201,7 +201,7 @@ export class Service {
             return area.route(path, search).then((data) => {
                 for (var key in this.data) {
                     if (!data.hasOwnProperty(key)) {
-                        delete this.data[key];
+                        this._set(key, undefined);
                     }
                 }
                 for (var key2 in data) {
@@ -240,7 +240,11 @@ export class Service {
 
     private _set(key : string, value) : boolean {
         if (this.get(key) !== value) {
-            this.data[key] = value;
+            if (typeof value === "undefined") {
+                delete this.data[key];
+            } else {
+                this.data[key] = value;
+            }
             this.eventHandler.trigger(key, value);
             return true;
         } else {

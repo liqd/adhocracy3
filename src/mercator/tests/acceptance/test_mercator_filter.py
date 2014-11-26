@@ -66,7 +66,7 @@ class TestMercatorFilter(object):
 
 def is_filtered(browser, proposals, location=None, requested_funding=None):
     introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
-    title = lambda p: p[18]["body"]["data"][introduction_sheet]["title"]
+    title = lambda p: p[20]["body"]["data"][introduction_sheet]["title"]
     expected_titles = [title(p) for p in proposals if _verify_location(location, p) and _verify_requested_funding(requested_funding, p)]
 
     proposal_list = browser.find_by_css(".moving-column-body").first.find_by_tag("ol").first
@@ -77,17 +77,17 @@ def is_filtered(browser, proposals, location=None, requested_funding=None):
 
 def _verify_location(location, proposal):
     """Return whether the passed proposal is of given location."""
-    data = proposal[16]["body"]["data"]
-    details = data["adhocracy_mercator.sheets.mercator.IDetails"]
+    data = proposal[18]["body"]["data"]
+    data_location = data["adhocracy_mercator.sheets.mercator.ILocation"]
 
     if location == "Specific":
-        return details["location_is_specific"]
+        return data_location["location_is_specific"]
 
     elif location == "Online":
-        return details["location_is_online"]
+        return data_location["location_is_online"]
 
     elif location == "Linked to the Ruhr area":
-        return details["location_is_linked_to_ruhr"]
+        return data_location["location_is_linked_to_ruhr"]
 
     elif location is None:
         return True
