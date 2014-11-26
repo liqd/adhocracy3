@@ -3,14 +3,12 @@ from pytest import fixture
 import time
 
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
-from mercator.tests.fixtures.fixturesMercatorProposals1 import login
-from adhocracy_frontend.tests.acceptance.shared import login_god
 from adhocracy_frontend.tests.acceptance.shared import wait
-
+from mercator.tests.acceptance.shared import login_god
 
 @fixture(scope='module')
 def proposals():
-    return create_proposals(user_token=login())
+    return create_proposals(user_token=login_god())
 
 class TestMercatorFilter(object):
 

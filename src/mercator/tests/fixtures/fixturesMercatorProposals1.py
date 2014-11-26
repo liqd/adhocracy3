@@ -24,37 +24,6 @@ null = None
 true = True
 false = False
 
-def login(name="god", password="password"):
-    """login user and return user token """
-
-    uri = root_uri + "/login_username"
-    headers = {
-        "Content-Type": "application/json;charset=UTF-8",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip,deflate",
-        "Connection": "keep-alive",
-        "Accept-Language": "en-US,en;q=0.8",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
-        "Content-Length": "36"
-    }
-    body = json.dumps({
-        "name": name,
-        "password": password
-    })
-    response = requests.post(uri, headers=headers, data=body)
-    if verbose:
-        print('\n')
-        print(uri)
-        print(headers)
-        print(body)
-        print(response)
-        print(response.text)
-    assert response.status_code == 200
-
-    payload = json.loads(response.text)
-    assert payload["status"] == "success"
-
-    return payload["user_token"]
 
 def _create_proposal():
     name = get_random_string()
@@ -590,6 +559,3 @@ def create_proposals(user_token, n=5):
         proposals.append(requested_proposal)
 
     return proposals
-
-if __name__ == "__main__":
-    create_proposals(login())
