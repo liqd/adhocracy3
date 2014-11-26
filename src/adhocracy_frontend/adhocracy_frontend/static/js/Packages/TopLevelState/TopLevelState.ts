@@ -138,7 +138,8 @@ export class Service {
         var self : Service = this;
 
         this.eventHandler = new adhEventHandlerClass();
-        this.data = {};
+        this.currentSpace = "";
+        this.data = {"": <any>{}};
 
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
             self.fromLocation();
