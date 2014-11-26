@@ -329,7 +329,7 @@ export var register = () => {
                 directive = AdhTopLevelState.movingColumns(topLevelStateMock);
                 topLevelStateMock.get.and.callFake((key) => {
                     return {
-                        space: "space",
+                        something: "something",
                         movingColumns: "initial"
                     }[key];
                 });
@@ -343,7 +343,7 @@ export var register = () => {
                 beforeEach(() => {
                     scopeMock = {};
                     attrsMock = {
-                        space: "space"
+                        something: "something"
                     };
                     elementMock = <any>jasmine.createSpyObj("elementMock", ["addClass", "removeClass"]);
 
