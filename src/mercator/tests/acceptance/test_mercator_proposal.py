@@ -66,6 +66,7 @@ class TestMercatorForm:
         browser.find_by_name('user-info-first-name').first.fill('')
         assert not is_valid(browser)
 
+    @mark.xfail
     def test_login_is_required(self, browser):
         with raises(AssertionError):
             create_proposals(user_token="", n=1)
