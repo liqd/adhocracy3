@@ -50,40 +50,22 @@ def login():
     assert response.status_code == 200
 
 
-def create_proposals(n=5):
-    proposals = []
+def create_proposal():
+    name = get_random_string()
 
-    #login()
+    location_is_specific = true if randint(0,1) else false
+    location_is_linked_to_ruhr = true if randint(0,1) else false
+    location_is_online = true if randint(0,1) else false
+    location_specific_1 = None
 
-    uri = root_uri + "/batch"
-    headers = {
-        "Content-Type": "application/json;charset=UTF-8",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip,deflate",
-        "Connection": "keep-alive",
-        "X-User-Path": "" + root_uri + "/principals/users/0000000/",
-        "Accept-Language": "en-US,en;q=0.8",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
-        "Content-Length": "8206"
-    }
+    if not (location_is_specific or
+            location_is_linked_to_ruhr or
+            location_is_online):
+        location_is_online = true
+    if  location_is_specific:
+        location_specific_1 = "location_is_specific"
 
-    for i in range(n):
-        name = get_random_string()
-
-        location_is_specific = true if randint(0,1) else false
-        location_is_linked_to_ruhr = true if randint(0,1) else false
-        location_is_online = true if randint(0,1) else false
-        location_specific_1 = None
-
-        if not (location_is_specific or
-                location_is_linked_to_ruhr or
-                location_is_online):
-            location_is_online = true
-        if  location_is_specific:
-            location_specific_1 = "location_is_specific"
-
-        requested_proposal = [
-            {
+    return   [{
                 "path": "" + root_uri + "/mercator/",
                 "body": {
                     "parent": "" + root_uri + "/mercator/",
@@ -567,8 +549,27 @@ def create_proposals(n=5):
                 "result_path": "@pn33",
                 "method": "POST",
                 "result_first_version_path": "@pn44"
-            }
-        ]
+            }]
+
+def create_proposals(n=5):
+    proposals = []
+
+    #login()
+
+    uri = root_uri + "/batch"
+    headers = {
+        "Content-Type": "application/json;charset=UTF-8",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip,deflate",
+        "Connection": "keep-alive",
+        "X-User-Path": "" + root_uri + "/principals/users/0000000/",
+        "Accept-Language": "en-US,en;q=0.8",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
+        "Content-Length": "8206"
+    }
+
+    for i in range(n):
+        requested_proposal = create_proposal()
 
         body = json.dumps(requested_proposal)
         response = requests.post(uri, headers=headers, data=body)
