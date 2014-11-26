@@ -218,9 +218,7 @@ export var register = () => {
 
                         adhTopLevelStateWithPrivates.fromLocation().then(() => {
                             _.forOwn(data, (value, key) => {
-                                if (adhTopLevelStateWithPrivates.data.hasOwnProperty()) {
-                                    expect(adhTopLevelStateWithPrivates.data[key]).toBe(data[key]);
-                                };
+                                expect(adhTopLevelStateWithPrivates.data[key]).toBe(data[key]);
                             });
                             done();
                         });
@@ -248,16 +246,12 @@ export var register = () => {
                         areaMock._data = data;
 
                         _.forOwn(data, (value, key) => {
-                            if (adhTopLevelStateWithPrivates.data.hasOwnProperty(key)) {
-                                expect(adhTopLevelStateWithPrivates.data[key]).not.toEqual(value);
-                            };
+                            expect(adhTopLevelStateWithPrivates.data[key]).not.toEqual(value);
                         });
 
                         adhTopLevelStateWithPrivates.fromLocation().then(() => {
                             _.forOwn(data, (value, key) => {
-                                if (adhTopLevelStateWithPrivates.data.hasOwnProperty(key)) {
-                                    expect(adhTopLevelStateWithPrivates.data[key]).toBe(data[key]);
-                                };
+                                expect(adhTopLevelStateWithPrivates.data[key]).toBe(data[key]);
                             });
                             done();
                         });
