@@ -25,8 +25,9 @@ export var movingColumns = (
                 var totalWidth : number = element.width();
                 var collapseWidth : number = 3 * fontSize;
                 var showWidth : number = (totalWidth - collapseCount * collapseWidth) / showCount;
+                showWidth = Math.min(showWidth, 50 * fontSize);
 
-                var offset : number = 0;
+                var offset : number = (totalWidth - collapseCount * collapseWidth - showCount * showWidth) / 2;
 
                 for (var i = 2; i >= 0; i--) {
                     var child = element.children().eq(i);
