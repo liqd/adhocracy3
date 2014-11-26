@@ -8,12 +8,43 @@ export var movingColumns = (
         link: (scope, element, attrs) => {
             var cls;
 
+            var resize = () => {
+                var fontSize : number = parseInt(element.css("font-size"), 10);
+
+                var collapseCount : number = cls.split("-").filter((v) => v === "collapse").length;
+                var showCount : number = cls.split("-").filter((v) => v === "show").length;
+
+                var totalWidth : number = element.width();
+                var collapseWidth : number = 3 * fontSize;
+                var showWidth : number = (totalWidth - collapseCount * collapseWidth) / showCount;
+
+                var offset : number = 0;
+
+                for (var i = 2; i >= 0; i--) {
+                    var child = element.children().eq(i);
+                    child.css({right: offset});
+                    switch (cls.split("-")[i + 1]) {
+                        case "show":
+                            child.width(showWidth);
+                            offset += showWidth;
+                            break;
+                        case "collapse":
+                            child.width(collapseWidth);
+                            offset += collapseWidth;
+                            break;
+                        case "hide":
+                            child.width(0);
+                    }
+                }
+            };
+
             var move = (newCls) => {
                 if (topLevelState.get("space") === attrs["space"]) {
                     if (newCls !== cls) {
                         element.removeClass(cls);
                         element.addClass(newCls);
                         cls = newCls;
+                        resize();
                     }
                 }
             };
