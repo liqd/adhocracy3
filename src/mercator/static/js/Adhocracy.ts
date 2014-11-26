@@ -31,6 +31,7 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
 import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
+import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -156,6 +157,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhMercatorProposal.register(angular);
     AdhMercatorWorkbench.register(angular);
+    AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
     AdhProposal.register(angular);

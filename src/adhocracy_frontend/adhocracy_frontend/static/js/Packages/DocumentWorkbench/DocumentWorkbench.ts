@@ -2,6 +2,7 @@
 
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhProposal = require("../Proposal/Proposal");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhUser = require("../User/User");
@@ -52,6 +53,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhComment.moduleName,
+            AdhMovingColumns.moduleName,
             AdhProposal.moduleName,
             AdhResourceArea.moduleName,
             AdhUser.moduleName

@@ -5,6 +5,7 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
@@ -123,6 +124,7 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhListing.moduleName,
             AdhMercatorProposal.moduleName,
+            AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName,
