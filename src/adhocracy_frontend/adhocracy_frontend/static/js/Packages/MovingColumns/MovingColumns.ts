@@ -8,6 +8,12 @@ export var movingColumns = (
         link: (scope, element, attrs) => {
             var cls;
 
+            var clearStates = (element) => {
+                element.removeClass("is-show");
+                element.removeClass("is-collapse");
+                element.removeClass("is-hide");
+            };
+
             var resize = () => {
                 var fontSize : number = parseInt(element.css("font-size"), 10);
 
@@ -23,16 +29,23 @@ export var movingColumns = (
                 for (var i = 2; i >= 0; i--) {
                     var child = element.children().eq(i);
                     child.css({right: offset});
+                    clearStates(child);
                     switch (cls.split("-")[i + 1]) {
                         case "show":
+                            child.addClass("is-show");
+                            child.attr("aria-visible", "true");
                             child.width(showWidth);
                             offset += showWidth;
                             break;
                         case "collapse":
+                            child.addClass("is-collapse");
+                            child.attr("aria-visible", "false");
                             child.width(collapseWidth);
                             offset += collapseWidth;
                             break;
                         case "hide":
+                            child.addClass("is-hide");
+                            child.attr("aria-visible", "false");
                             child.width(0);
                     }
                 }
