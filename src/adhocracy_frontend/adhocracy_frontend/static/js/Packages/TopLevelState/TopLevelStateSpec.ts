@@ -9,19 +9,31 @@ export var register = () => {
     describe("TopLevelState", () => {
         describe("Service", () => {
             var adhTopLevelState : AdhTopLevelState.Service;
+            var areaInput;
             var eventHandlerMockClass;
             var locationMock;
             var rootScopeMock;
+            var injectorMock;
+            var providerMock;
             var trigger;
             var off;
             var on;
 
             beforeEach(() => {
+                areaInput = {};
+
                 on = jasmine.createSpy("on");
                 off = jasmine.createSpy("off");
                 trigger = jasmine.createSpy("trigger");
                 locationMock = jasmine.createSpyObj("locationMock", ["url", "search", "path", "replace"]);
                 rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
+
+                providerMock = jasmine.createSpyObj("providerMock", ["getArea", "getSpaceDefaults"]);
+                providerMock.getArea.and.callThrough();
+                providerMock.getSpaceDefaults.and.callThrough();
+
+                injectorMock = jasmine.createSpyObj("injectorMock", ["invoke"]);
+                injectorMock.invoke.and.returnValue(areaInput);
 
                 eventHandlerMockClass = <any>function() {
                     this.on = on;
@@ -30,7 +42,7 @@ export var register = () => {
                 };
 
                 adhTopLevelState = <any>new AdhTopLevelState.Service(
-                    null, eventHandlerMockClass, locationMock, rootScopeMock, null, q, null, null);
+                    providerMock, eventHandlerMockClass, locationMock, rootScopeMock, null, q, injectorMock, null);
 
                 spyOn(adhTopLevelState, "toLocation");
 
@@ -56,20 +68,9 @@ export var register = () => {
                 });
 
                 describe("getArea", () => {
-                    var injectorMock;
                     var prefix = "p";
-                    var providerMock;
-                    var areaInput;
 
                     beforeEach(() => {
-                        areaInput = {};
-                        providerMock = jasmine.createSpyObj("providerMock", ["getArea"]);
-                        injectorMock = jasmine.createSpyObj("injectorMock", ["invoke"]);
-                        injectorMock.invoke.and.returnValue(areaInput);
-                        providerMock.getArea.and.callThrough();
-
-                        adhTopLevelStateWithPrivates.provider = providerMock;
-                        adhTopLevelStateWithPrivates.$injector = injectorMock;
                         adhTopLevelStateWithPrivates.getArea.and.callThrough();
                         adhTopLevelStateWithPrivates.area = areaMock;
 
