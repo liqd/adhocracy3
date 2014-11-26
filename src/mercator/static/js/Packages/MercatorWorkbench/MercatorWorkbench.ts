@@ -110,7 +110,11 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhComment.moduleName,
+            AdhHttp.moduleName,
+            AdhListing.moduleName,
             AdhMercatorProposal.moduleName,
+            AdhPermissions.moduleName,
+            AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
