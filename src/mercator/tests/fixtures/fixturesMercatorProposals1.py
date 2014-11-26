@@ -557,10 +557,8 @@ def _create_proposal():
                 "result_first_version_path": "@pn44"
             }]
 
-def create_proposals(n=5):
+def create_proposals(user_token, n=5):
     proposals = []
-
-    #login()
 
     uri = root_uri + "/batch"
     headers = {
@@ -568,6 +566,7 @@ def create_proposals(n=5):
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip,deflate",
         "Connection": "keep-alive",
+        "X-User-Token": user_token,
         "X-User-Path": "" + root_uri + "/principals/users/0000000/",
         "Accept-Language": "en-US,en;q=0.8",
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
@@ -593,4 +592,4 @@ def create_proposals(n=5):
     return proposals
 
 if __name__ == "__main__":
-    create_proposals()
+    create_proposals(login())
