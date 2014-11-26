@@ -261,13 +261,13 @@ export var register = () => {
 
             it("dispatches calls to set() to eventHandler", () => {
                 adhTopLevelState.set("content2Url", "some/path");
-                expect(trigger).toHaveBeenCalledWith("content2Url", "some/path");
+                expect(trigger).toHaveBeenCalledWith(":content2Url", "some/path");
             });
 
             it("dispatches calls to on() to eventHandler", () => {
                 var callback = (url) => undefined;
                 adhTopLevelState.on("content2Url", callback);
-                expect(on).toHaveBeenCalledWith("content2Url", callback);
+                expect(on).toHaveBeenCalledWith(":content2Url", callback);
             });
 
             describe("cameFrom", () => {
