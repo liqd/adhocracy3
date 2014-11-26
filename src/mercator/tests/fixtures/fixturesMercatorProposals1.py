@@ -14,8 +14,10 @@ root_uri = 'http://localhost:6542'
 verbose = True
 
 ALPHABET = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789"
-def get_random_string(n=10):
-    return "".join(choice(ALPHABET) for i in range(n));
+WHITESPACE = " "
+def get_random_string(n=10, whitespace=False):
+    alphabet = ALPHABET + WHITESPACE if whitespace else ALPHABET
+    return "".join(choice(alphabet) for i in range(n));
 
 # for more javascript-ish json representation:
 null = None
