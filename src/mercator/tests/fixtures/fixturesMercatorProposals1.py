@@ -50,7 +50,7 @@ def login(name="god", password="password"):
     assert response.status_code == 200
 
 
-def create_proposal():
+def _create_proposal():
     name = get_random_string()
 
     location_is_specific = true if randint(0,1) else false
@@ -569,7 +569,7 @@ def create_proposals(n=5):
     }
 
     for i in range(n):
-        requested_proposal = create_proposal()
+        requested_proposal = _create_proposal()
 
         body = json.dumps(requested_proposal)
         response = requests.post(uri, headers=headers, data=body)
