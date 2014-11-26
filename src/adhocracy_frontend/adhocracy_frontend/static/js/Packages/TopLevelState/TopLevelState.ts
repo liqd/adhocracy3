@@ -298,6 +298,10 @@ export class Service {
         fn(this.get(key));
     }
 
+    public isSpaceInitialized(space : string) : boolean {
+        return this.data.hasOwnProperty(space);
+    }
+
     // FIXME: {set,get}CameFrom should be worked into the class
     // doc-comment, but I don't feel I understand that comment well
     // enough to edit it.  (also, the entire toplevelstate thingy will
@@ -388,7 +392,11 @@ export var adhFocusSwitch = (topLevelState : Service) => {
     };
 };
 
-
+/**
+ * Note that topLevelState.on() refers to the current space. So directives
+ * that call topLevelState.on() in their initialization should only be
+ * rendered when the space they are on is currently active.
+ */
 export var spaces = (
     topLevelState : Service
 ) => {
@@ -408,6 +416,7 @@ export var spaces = (
                 }
             });
             scope.currentSpace = topLevelState.get("space");
+            scope.isSpaceInitialized = (space : string) => topLevelState.isSpaceInitialized(space);
         }
     };
 };

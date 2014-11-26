@@ -1,5 +1,5 @@
 <adh-spaces>
-    <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-show="currentSpace === 'content'">
+    <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-show="currentSpace === 'content'" data-ng-if="isSpaceInitialized('content')">
         <div class="moving-column moving-column-structure">
             <div data-ng-if="view === 'create_proposal'">
                 <div class="moving-column-menu placeholder"></div>
@@ -75,7 +75,7 @@
             </div>
         </div>
     </div>
-    <div data-ng-show="currentSpace === 'user'">
+    <div data-ng-show="currentSpace === 'user'" data-ng-if="isSpaceInitialized('user')">
         <h1>User</h1>
     </div>
 </adh-spaces>
