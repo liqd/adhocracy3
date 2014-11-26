@@ -8,7 +8,12 @@ export var movingColumns = (
 ) => {
     return {
         link: (scope, element, attrs) => {
-            var cls;
+            var cls : string;
+            var fontSize : number = parseInt(element.css("font-size"), 10);
+
+            var maxShowWidth = 55 * fontSize;
+            var minShowWidth = 35 * fontSize;
+            var collapseWidth = 3 * fontSize;
 
             var clearStates = (element) => {
                 element.removeClass("is-show");
@@ -16,16 +21,40 @@ export var movingColumns = (
                 element.removeClass("is-hide");
             };
 
-            var resize = () => {
-                var fontSize : number = parseInt(element.css("font-size"), 10);
+            // if there is not enough space, collapse all but one column.
+            var responsiveClass = (cls : string) : string => {
+                if ($($window).width() < 2 * minShowWidth + collapseWidth) {
+                    var s = "";
+                    var parts = cls.split("-");
+                    var collapse = false;
 
-                var collapseCount : number = cls.split("-").filter((v) => v === "collapse").length;
-                var showCount : number = cls.split("-").filter((v) => v === "show").length;
+                    for (var i = 3; i > 0; i--) {
+                        if (collapse) {
+                            s = "-collapse" + s;
+                        } else {
+                            s = "-" + parts[i] + s;
+                        }
+
+                        if (parts[i] === "show") {
+                            collapse = true;
+                        }
+                    }
+
+                    return "is" + s;
+                } else {
+                    return cls;
+                }
+            };
+
+            var resize = () => {
+                var parts = responsiveClass(cls).split("-");
+
+                var collapseCount : number = parts.filter((v) => v === "collapse").length;
+                var showCount : number = parts.filter((v) => v === "show").length;
 
                 var totalWidth : number = element.width();
-                var collapseWidth : number = 3 * fontSize;
                 var showWidth : number = (totalWidth - collapseCount * collapseWidth) / showCount;
-                showWidth = Math.min(showWidth, 50 * fontSize);
+                showWidth = Math.min(showWidth, maxShowWidth);
 
                 var offset : number = (totalWidth - collapseCount * collapseWidth - showCount * showWidth) / 2;
 
@@ -33,7 +62,7 @@ export var movingColumns = (
                     var child = element.children().eq(i);
                     child.css({right: offset});
                     clearStates(child);
-                    switch (cls.split("-")[i + 1]) {
+                    switch (parts[i + 1]) {
                         case "show":
                             child.addClass("is-show");
                             child.attr("aria-visible", "true");
