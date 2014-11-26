@@ -2,6 +2,7 @@
 
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
+import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
@@ -109,7 +110,8 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RICommentVersion.content_type, "", ["adhHttp", (adhHttp) => (resource : RICommentVersion) => {
+                .specific(RICommentVersion.content_type, "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) =>
+                                                              (resource : RICommentVersion) => {
                     var specifics = {};
                     specifics["commentUrl"] = resource.path;
                     specifics["commentableUrl"] = resource.data[SIComment.nick].refers_to;

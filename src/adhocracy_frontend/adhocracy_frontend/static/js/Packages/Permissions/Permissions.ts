@@ -19,7 +19,7 @@ export class Service {
         scope[key] = AdhHttp.emptyOptions;
 
         var update = () => {
-            return self.adhHttp.options(path).then((options) => {
+            return self.adhHttp.options(path).then((options : AdhHttp.IOptions) => {
                 scope[key] = options;
             });
         };
