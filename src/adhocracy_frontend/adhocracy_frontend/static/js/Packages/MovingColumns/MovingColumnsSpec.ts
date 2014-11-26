@@ -7,10 +7,15 @@ export var register = () => {
         describe("MovingColumns", () => {
             var directive;
             var topLevelStateMock;
+            var $windowMock;
+            var $timeoutMock;
 
             beforeEach(() => {
                 topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock", ["on", "get"]);
-                directive = AdhMovingColumns.movingColumns(topLevelStateMock);
+                $windowMock = window;
+                $timeoutMock = jasmine.createSpy("$timeout");
+
+                directive = AdhMovingColumns.movingColumns(topLevelStateMock, $timeoutMock, $windowMock);
                 topLevelStateMock.get.and.callFake((key) => {
                     return {
                         something: "something",

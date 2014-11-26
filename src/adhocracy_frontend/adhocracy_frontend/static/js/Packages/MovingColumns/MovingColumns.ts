@@ -2,7 +2,9 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
 export var movingColumns = (
-    topLevelState : AdhTopLevelState.Service
+    topLevelState : AdhTopLevelState.Service,
+    $timeout,
+    $window
 ) => {
     return {
         link: (scope, element, attrs) => {
@@ -50,6 +52,15 @@ export var movingColumns = (
                     }
                 }
             };
+
+            $($window).resize(() => {
+                var transition = element.children().css("transition");
+                element.children().css("transition", "none");
+                resize();
+                $timeout(() => {
+                    element.children().css("transition", transition);
+                }, 1);
+            });
 
             var move = (newCls) => {
                 if (topLevelState.get("space") === attrs["space"]) {
@@ -108,6 +119,6 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhTopLevelState.moduleName
         ])
-        .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
+        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns])
         .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch]);
 };
