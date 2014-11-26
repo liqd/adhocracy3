@@ -51,7 +51,7 @@ def login(name="god", password="password"):
         print(response.text)
     assert response.status_code == 200
 
-    payload = json.loads(response.content)
+    payload = json.loads(response.text)
     assert payload["status"] == "success"
 
     return payload["user_token"]
