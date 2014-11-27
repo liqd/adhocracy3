@@ -6,6 +6,7 @@ from webtest import TestApp
 from adhocracy_frontend.tests.acceptance.shared import login_god
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
 
+
 class TestMercatorForm:
 
     @fixture(scope='class')
@@ -70,6 +71,7 @@ class TestMercatorForm:
     def test_login_is_required(self, browser):
         with raises(AssertionError):
             create_proposals(user_token="", n=1)
+
 
 def is_valid(browser):
     form = browser.find_by_css('.mercator-proposal-form').first
