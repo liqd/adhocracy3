@@ -158,7 +158,8 @@ export var register = (angular) => {
                 }])
                 .default(RIBasicPool.content_type, "", {
                     space: "content",
-                    movingColumns: "is-show-hide-hide"
+                    movingColumns: "is-show-hide-hide",
+                    content2Url: ""  // used on documentWorkbench
                 })
                 .default(RIBasicPool.content_type, "create_proposal", {
                     space: "content",
