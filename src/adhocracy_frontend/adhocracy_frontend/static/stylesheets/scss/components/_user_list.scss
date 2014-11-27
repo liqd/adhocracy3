@@ -25,23 +25,12 @@ A user list item within a listing widget
 ```
 */
 
-.user-list {
-    border-top: 1px solid $color-structure-border;
-}
-
 .user-list-item {
     overflow: hidden;
 
     .user-profile-button {
         float: right;
     }
-}
-
-
-.user-list-item,
-.user-list-me {
-    border-bottom: 1px solid $color-structure-border;
-    padding: 10px;
 }
 
 .user-list-me {
