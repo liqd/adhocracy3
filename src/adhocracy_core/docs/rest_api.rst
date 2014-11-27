@@ -1203,7 +1203,7 @@ sorting to sort the result::
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
     ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/', ...
 
-*Note* All resource in the result set must have a value in the choosen sort
+*Note* All resource in the result set must have a value in the chosen sort
 filter. For example if you use *rates* you have to limit the result to resources
 with :class:`adhocracy_core.sheet.rate.IRateable` sheet.
 

@@ -72,7 +72,7 @@ class MetadataSchema(colander.MappingSchema):
                           to make :class:`adhocracy_core.interfaces.Item`
                          /`IItemVersion` one `thing`.
                          defaults to now.
-    `creator`: creator (user resources) of this resource.
+    `creator`: creator (user resource) of this resource.
     `modified_by`: the last person (user resources) who modified a resource,
                    initally the creator
     `modification_date`: Modification date of this resource. defaults to now.

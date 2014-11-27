@@ -3,14 +3,13 @@ from pytest import fixture
 from pytest import mark
 
 
-def register_and_add_sheet(context, registry, mock_sheet):
-    from zope.interface import alsoProvides
-    from adhocracy_core.interfaces import IResourceSheet
-    isheet = mock_sheet.meta.isheet
-    alsoProvides(context, isheet)
-    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
+@fixture
+def mock_metadata_sheet(context, mock_sheet, registry):
+    from adhocracy_core.testing import add_and_register_sheet
+    from .metadata import IMetadata
+    mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
+    add_and_register_sheet(context, mock_sheet, registry)
+    return mock_sheet
 
 
 class TestResourceModifiedMetadataSubscriber:
@@ -19,19 +18,15 @@ class TestResourceModifiedMetadataSubscriber:
         from adhocracy_core.sheets.metadata import resource_modified_metadata_subscriber
         return resource_modified_metadata_subscriber(event)
 
-    def test_with_metadata_isheet(self, context, registry, mock_sheet,
+    def test_with_metadata_isheet(self, context, registry, mock_metadata_sheet,
                                   cornice_request):
         from datetime import datetime
-        from adhocracy_core.sheets.metadata import IMetadata
         event = testing.DummyResource(object=context,
                                       registry=registry,
                                       request=cornice_request)
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
-        register_and_add_sheet(context, registry, mock_sheet)
-
         self._call_fut(event)
 
-        set_modification_date = mock_sheet.set.call_args[0][0]['modification_date']
+        set_modification_date = mock_metadata_sheet.set.call_args[0][0]['modification_date']
         assert set_modification_date.date() == datetime.now().date()
 
 
