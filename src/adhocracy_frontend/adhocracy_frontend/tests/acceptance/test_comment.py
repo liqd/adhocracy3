@@ -55,6 +55,7 @@ class TestComment:
 
 def create_comment(browser, name):
     """Go to content2 column and create comment with content 'comment1'."""
+    browser.visit(browser.app_url + 'r/adhocracy/?movingColumns=is-show-show-hide')
     content = get_column_listing(browser, 'content')
     proposal = create_proposal(content, 'test proposal with comments')
     show_proposal_comments(proposal)

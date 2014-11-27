@@ -13,6 +13,7 @@ class TestProposal:
 
     def test_create(self, browser):
         login_god(browser)
+        browser.visit(browser.app_url + 'r/adhocracy/?movingColumns=is-show-show-hide')
         content = get_column_listing(browser, 'content')
         proposal = create_proposal(content, 'test proposal')
         assert proposal is not None
@@ -22,12 +23,6 @@ class TestProposal:
         content_listing = get_column_listing(browser, 'content')
         browser.click_link_by_partial_text('test proposal')
         assert proposal_details_are_in_listing(content_listing, 'test proposal')
-
-
-def add_proposal_to_content_listing(browser, name) -> WebDriverElement:
-    """Go to content listing and create proposal with title `test proposal`."""
-    proposal = create_proposal(listing, name)
-    return proposal
 
 
 def create_proposal(listing: WebDriverElement, title: str, description='',
