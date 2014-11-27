@@ -13,6 +13,7 @@ class TestProposal:
 
     def test_create(self, browser):
         login_god(browser)
+        browser.visit(browser.app_url + 'r/adhocracy/?movingColumns=is-show-show-hide')
         content = get_column_listing(browser, 'content')
         proposal = create_proposal(content, 'test proposal')
         assert proposal is not None
