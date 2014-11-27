@@ -2,7 +2,9 @@
     <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-show="currentSpace === 'content'" data-ng-if="isSpaceInitialized('content')">
         <div class="moving-column moving-column-structure">
             <div data-ng-if="view === 'create_proposal'">
-                <div class="moving-column-menu placeholder"></div>
+                <div class="moving-column-menu">
+                    <a href="{{ platformUrl | adhResourceUrl }}">{{ "Cancel" | translate }}</a>
+                </div>
                 <div class="moving-column-body" data-du-scroll-container="">
                     <adh-resource-wrapper data-on-submit="goToListing()" data-on-cancel="goToListing()">
                         <adh-mercator-proposal-create
@@ -14,7 +16,7 @@
                 </div>
             </div>
             <div data-ng-if="view !== 'create_proposal'">
-                <div class="moving-column-menu placeholder">
+                <div class="moving-column-menu">
                     <a href="" data-ng-click="proposalListingData.showFacets = !proposalListingData.showFacets">{{ "filters" | translate }}</a>
                 </div>
                 <div
@@ -40,7 +42,9 @@
         </div>
         <div class="moving-column moving-column-content">
             <div data-ng-if="view === 'edit'">
-                <div class="moving-column-menu placeholder"></div>
+                <div class="moving-column-menu">
+                    <a href="{{ proposalUrl | adhResourceUrl }}">{{ 'cancel' | translate }}</a>
+                </div>
                 <div class="moving-column-body" data-du-scroll-container="">
                     <adh-resource-wrapper
                         data-on-submit="goToProposal(proposalUrl)"
@@ -58,6 +62,7 @@
                 <div class="moving-column-menu">
                     <!-- FIXME: permission check -->
                     <a href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
+                    <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
                 </div>
                 <div class="moving-column-body" data-du-scroll-container="">
                     <adh-recompile-on-change data-value="{{proposalUrl}}" data-key="proposalUrl">
@@ -69,7 +74,9 @@
             </div>
         </div>
         <div class="moving-column moving-column-content2">
-            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-menu">
+                <a href="{{ proposalUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
+            </div>
             <div class="moving-column-body" data-du-scroll-container="">
                 <adh-comment-listing data-ng-if="commentableUrl" data-path="{{commentableUrl}}">
             </div>

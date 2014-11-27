@@ -147,6 +147,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
                     view: view
                 };
 
+                meta["platformUrl"] = this.adhConfig.rest_url + "/" + meta["platform"];
+
                 return _.extend(defaults, meta, specifics, search);
             });
         });
