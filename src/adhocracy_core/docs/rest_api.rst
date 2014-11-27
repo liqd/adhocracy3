@@ -1213,7 +1213,7 @@ Not supported filters cannot be used for sorting::
     ...                         params={'sort': 'path'},
     ...                         status=400).json
     >>> resp_data['errors'][0]['description']
-    '"path" is not one of content_type, name, text, rate, ...
+    '"path" is not one of content_type, name, text,...
 
 The *elements* parameter allows controlling how matching element are
 returned. By default, 'elements' in the IPool sheet contains a list of paths.
