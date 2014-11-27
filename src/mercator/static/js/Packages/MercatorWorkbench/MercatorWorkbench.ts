@@ -86,7 +86,7 @@ export class MercatorWorkbench {
                         ]
                     }],
                     showFacets: false,
-                    sort: "rates"
+                    sort: "-rates"
                 };
 
                 $rootScope.mercatorProposalPostPoolOptions = AdhHttp.emptyOptions;
