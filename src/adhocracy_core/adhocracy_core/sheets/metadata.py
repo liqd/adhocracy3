@@ -4,6 +4,7 @@ from logging import getLogger
 
 from pyramid.registry import Registry
 from pyramid.location import lineage
+from pyramid.traversal import resource_path
 import colander
 
 from adhocracy_core.interfaces import IResource
@@ -18,6 +19,7 @@ from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
+from adhocracy_core.utils import get_sheet_field
 
 
 logger = getLogger(__name__)
@@ -98,6 +100,13 @@ metadata_metadata = sheet_metadata_defaults._replace(
     creatable=True,
     readable=True,
 )
+
+
+def index_creator(resource, default):
+    """Return creator userid value for the creator index."""
+    creator = get_sheet_field(resource, IMetadata, 'creator')
+    userid = resource_path(creator)
+    return userid
 
 
 def is_deleted(resource: IResource) -> dict:
@@ -182,5 +191,10 @@ def includeme(config):
     config.add_indexview(index_visibility,
                          catalog_name='adhocracy',
                          index_name='private_visibility',
+                         context=IMetadata,
+                         )
+    config.add_indexview(index_visibility,
+                         catalog_name='adhocracy',
+                         index_name='creator',
                          context=IMetadata,
                          )

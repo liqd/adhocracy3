@@ -81,6 +81,13 @@ class TestMetadataSheet:
         assert inst.meta.readable is True
 
 
+def test_index_creator(context, mock_metadata_sheet):
+    from .metadata import index_creator
+    context['user1'] = testing.DummyResource()
+    mock_metadata_sheet.get.return_value = {'creator': context['user1']}
+    assert index_creator(context, 'default') == '/user1'
+
+
 @fixture
 def integration(config):
     config.include('adhocracy_core.catalog')
@@ -94,6 +101,14 @@ def test_includeme_register_metadata_sheet(config):
     from adhocracy_core.utils import get_sheet
     context = testing.DummyResource(__provides__=IMetadata)
     assert get_sheet(context, IMetadata)
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_creator(registry):
+    from .metadata import IMetadata
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IMetadata,), IIndexView,
+                                    name='adhocracy|creator')
 
 
 @mark.usefixtures('integration')

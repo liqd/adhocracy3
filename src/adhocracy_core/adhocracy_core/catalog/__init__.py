@@ -23,6 +23,7 @@ class AdhocracyCatalogIndexes:
     private_visibility = catalog.Keyword()  # visible / deleted / hidden
     rate = catalog.Field()
     rates = catalog.Field()
+    creator = catalog.Field()
     reference = Reference()
 
 

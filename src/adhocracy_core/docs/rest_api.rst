@@ -1276,6 +1276,10 @@ custom filters:
   sheet.
   Supports sorting.
 
+* *creator* the :term:`userid` of the resource creator. This is the path of the
+  user resource url.
+  Supports sorting.
+
 *<package.sheets.sheet.ISheet:FieldName>* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
 the isheet plus the field name separated by ':' The value is the wanted
