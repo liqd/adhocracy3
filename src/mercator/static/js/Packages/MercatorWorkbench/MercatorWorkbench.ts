@@ -157,10 +157,10 @@ export var register = (angular) => {
                         })
                         .then(() => specifics);
                 }])
-                .specific(RIUser.content_type, "", () => (resource : RICommentVersion) => {
-                    var specifics = {};
-                    specifics["userUrl"] = resource.path;
-                    return specifics;
+                .specific(RIUser.content_type, "", () => (resource : RIUser) => {
+                    return {
+                        userUrl: resource.path
+                    };
                 })
                 .default(RIBasicPool.content_type, "", {
                     space: "content",
