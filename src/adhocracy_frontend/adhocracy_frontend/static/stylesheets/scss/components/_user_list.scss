@@ -26,7 +26,9 @@ A user list item within a listing widget
 */
 
 .user-list-item {
+    border-bottom: 1px solid $color-structure-border;
     overflow: hidden;
+    padding: 10px;
 
     .user-profile-button {
         float: right;
@@ -37,5 +39,4 @@ A user list item within a listing widget
     @extend .user-list-item;
     @extend .listing-element;
     background: $color-structure-surface;
-    border: 0;
 }
