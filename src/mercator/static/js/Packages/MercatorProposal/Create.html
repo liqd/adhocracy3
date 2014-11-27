@@ -306,17 +306,29 @@
                         data-flow-files-submitted="$flow.upload()"
                         data-flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
                         data-flow-init=""
+                        data-ng-model="data.introduction.imageUpload"
+                        data-ng-class="{ 'is-invalid': mercatorProposalIntroductionForm['introduction-picture-upload'].$invalid }"
                         name="introduction-picture-upload">
                         <button
                             type="button"
                             data-flow-btn=""
                             flow-attrs="{accept:'image/*'}">
-                            <span data-ng-if="$flow.files.length">{{ "Change Image" | translate }}</span>
-                            <span data-ng-if="!$flow.files.length">{{ "Choose Image" | translate }}</span>
+                            <span data-ng-if="$flow.files.length > 0">{{ "Change Image" | translate }}</span>
+                            <span data-ng-if="!$flow.files.length || $flow.files.length == 0">{{ "Choose Image" | translate }}</span>
                         </button>
                         <p>{{"Only PNG,GIF,JPG files allowed." | translate}}</p>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalIntroductionForm.introduction-picture-upload', 'tooWide')">
+                            Image must be no more that {{flowOptions.maximumWidth}}px wide
+                        </span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalIntroductionForm.introduction-picture-upload', 'tooBig')">
+                            Image must be smaller than {{flowOptions.maximumByteSize/1000000}}MB
+                        </span>
                         <button type="button" data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">{{ "Remove Image" | translate }}</button>
-                        <p data-ng-if="$flow.files.length" data-flow-directory=""></p>
+                        <p data-ng-if="$flow.files.length > 0" data-flow-directory=""></p>
                         <div class="picture-upload-file" data-ng-repeat="file in $flow.files">
                             <img data-flow-img="file" height="120" /><br/>{{file.name}}
                         </div>

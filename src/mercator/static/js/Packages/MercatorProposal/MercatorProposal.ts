@@ -1041,11 +1041,18 @@ export var register = (angular) => {
                 flowFactoryProvider.defaults = {};
             }
             flowFactoryProvider.factory = fustyFlowFactory;
-            flowFactoryProvider.defaults.singleFile = true;
-            flowFactoryProvider.defaults.maxChunkRetries = 1;
-            flowFactoryProvider.defaults.chunkRetryInterval = 5000;
-            flowFactoryProvider.defaults.simultaneousUploads = 4;
-            flowFactoryProvider.defaults.permanentErrors = [404, 500, 501, 502, 503];
+            flowFactoryProvider.defaults = {
+                singleFile : true,
+                maxChunkRetries : 1,
+                chunkRetryInterval : 5000,
+                simultaneousUploads : 4,
+                permanentErrors : [404, 500, 501, 502, 503],
+                // these are not native to flow but used by custom functions
+                maximumWidth : 900,
+                minimumWidth : 800,
+                maximumByteSize : 1000000
+            };
+
             flowFactoryProvider.on("catchAll", () => {
                 // console.log(arguments);
             });
@@ -1120,15 +1127,27 @@ export var register = (angular) => {
 
             $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
                 flow.on( "fileAdded", (file, event) => {
+                    (<any>$scope).flowOptions = flow.opts;
+                    var elem = (<any>$scope).mercatorProposalIntroductionForm["introduction-picture-upload"];
+                    if(file.size > flow.opts.maximumByteSize) {
+                        console.log(elem);
+                        elem.$setValidity("tooBig",false);
+                        elem.$setViewValue(false);
+                        return false;
+                    }
                     var img = new Image();
                     img.onload = () => {
                         var imageWidth = img.width;
                         var imageHeight = img.height;
-                        console.log(imageWidth, imageHeight);
+                        if(imageWidth > flow.opts.maximumWidth) {
+                            elem.$setValidity("tooWide",false);
+                        }
+                        else if(imageWidth <= flow.opts.minimumWidth) {
+                            elem.$setValidity("tooNarrow",false);
+                        }
                     };
-                    var _URL = window.URL || window.webkitURL;
+                    var _URL = (<any>window).URL || (<any>window).webkitURL;
                     img.src = _URL.createObjectURL(file.file);
-
                 });
             });
 
@@ -1159,3 +1178,5 @@ export var register = (angular) => {
             };
         }]);
 };
+
+
