@@ -344,61 +344,6 @@ export class Service {
 }
 
 
-export var movingColumns = (
-    topLevelState : Service
-) => {
-    return {
-        link: (scope, element, attrs) => {
-            var cls;
-
-            var move = (newCls) => {
-                if (topLevelState.get("space") === attrs["space"]) {
-                    if (newCls !== cls) {
-                        element.removeClass(cls);
-                        element.addClass(newCls);
-                        cls = newCls;
-                    }
-                }
-            };
-
-            // FIXME: these do not really belong here
-            topLevelState.on("content2Url", (url : string) => {
-                scope.content2Url = url;
-            });
-            topLevelState.on("proposalUrl", (url : string) => {
-                scope.proposalUrl = url;
-            });
-            topLevelState.on("commentableUrl", (url : string) => {
-                scope.commentableUrl = url;
-            });
-
-            topLevelState.on("movingColumns", move);
-        }
-    };
-};
-
-
-/**
- * A simple focus switcher that can be used until we have a proper widget for this.
- */
-export var adhFocusSwitch = (topLevelState : Service) => {
-    return {
-        restrict: "E",
-        template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
-        link: (scope) => {
-            scope.switchFocus = () => {
-                var currentState = topLevelState.get("movingColumns");
-
-                if (currentState.split("-")[1] === "show") {
-                    topLevelState.set("movingColumns", "is-collapse-show-show");
-                } else {
-                    topLevelState.set("movingColumns", "is-show-show-hide");
-                }
-            };
-        }
-    };
-};
-
 /**
  * Note that topLevelState.on() refers to the current space. So directives
  * that call topLevelState.on() in their initialization should only be
@@ -468,8 +413,6 @@ export var register = (angular) => {
         ])
         .provider("adhTopLevelState", Provider)
         .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
-        .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
-        .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch])
         .directive("adhSpaces", ["adhTopLevelState", spaces])
         .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch])
         .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);

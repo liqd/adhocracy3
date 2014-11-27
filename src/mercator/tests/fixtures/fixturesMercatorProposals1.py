@@ -14,74 +14,33 @@ root_uri = 'http://localhost:6542'
 verbose = True
 
 ALPHABET = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789"
-def get_random_string(n=10):
-    return "".join(choice(ALPHABET) for i in range(n));
+WHITESPACE = " "
+def get_random_string(n=10, whitespace=False):
+    alphabet = ALPHABET + WHITESPACE if whitespace else ALPHABET
+    return "".join(choice(alphabet) for i in range(n));
 
 # for more javascript-ish json representation:
 null = None
 true = True
 false = False
 
-def login():
-    uri = root_uri + "/login_username"
-    headers = {
-        "Content-Type": "application/json;charset=UTF-8",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip,deflate",
-        "Connection": "keep-alive",
-        "Accept-Language": "en-US,en;q=0.8",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
-        "Content-Length": "36"
-    }
-    body = json.dumps({
-        "name": "god",
-        "password": "password"
-    })
-    response = requests.post(uri, headers=headers, data=body)
-    if verbose:
-        print('\n')
-        print(uri)
-        print(headers)
-        print(body)
-        print(response)
-        print(response.text)
-    assert response.status_code == 200
 
+def _create_proposal():
+    name = get_random_string()
 
-def create_proposals(n=5):
-    proposals = []
+    location_is_specific = true if randint(0,1) else false
+    location_is_linked_to_ruhr = true if randint(0,1) else false
+    location_is_online = true if randint(0,1) else false
+    location_specific_1 = None
 
-    #login()
+    if not (location_is_specific or
+            location_is_linked_to_ruhr or
+            location_is_online):
+        location_is_online = true
+    if  location_is_specific:
+        location_specific_1 = "location_is_specific"
 
-    uri = root_uri + "/batch"
-    headers = {
-        "Content-Type": "application/json;charset=UTF-8",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip,deflate",
-        "Connection": "keep-alive",
-        "X-User-Path": "" + root_uri + "/principals/users/0000000/",
-        "Accept-Language": "en-US,en;q=0.8",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
-        "Content-Length": "8206"
-    }
-
-    for i in range(n):
-        name = get_random_string()
-
-        location_is_specific = true if randint(0,1) else false
-        location_is_linked_to_ruhr = true if randint(0,1) else false
-        location_is_online = true if randint(0,1) else false
-        location_specific_1 = None
-
-        if not (location_is_specific or
-                location_is_linked_to_ruhr or
-                location_is_online):
-            location_is_online = true
-        if  location_is_specific:
-            location_specific_1 = "location_is_specific"
-
-        requested_proposal = [
-            {
+    return   [{
                 "path": "" + root_uri + "/mercator/",
                 "body": {
                     "parent": "" + root_uri + "/mercator/",
@@ -469,7 +428,7 @@ def create_proposals(n=5):
                     "parent": "@pn4",
                     "data": {
                         "adhocracy_mercator.sheets.mercator.IIntroduction": {
-                            "teaser": "wickerwork Ladonna's preterit's Kyoto's effaced Kenneth's emperor Candy jackknifed expectancy's pursed sultrier overcasts system Eysenck fulfils Bahia newsmen Kinney's Judith's glowworm's chintzier goatees alchemy ingratiated frigate passels Poznan's",
+                            "teaser": get_random_string(300, whitespace=True),
                             "title": name
                         },
                         "adhocracy_core.sheets.versions.IVersionable": {
@@ -565,8 +524,26 @@ def create_proposals(n=5):
                 "result_path": "@pn33",
                 "method": "POST",
                 "result_first_version_path": "@pn44"
-            }
-        ]
+            }]
+
+def create_proposals(user_token, n=5):
+    proposals = []
+
+    uri = root_uri + "/batch"
+    headers = {
+        "Content-Type": "application/json;charset=UTF-8",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip,deflate",
+        "Connection": "keep-alive",
+        "X-User-Token": user_token,
+        "X-User-Path": "" + root_uri + "/principals/users/0000000/",
+        "Accept-Language": "en-US,en;q=0.8",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
+        "Content-Length": "8206"
+    }
+
+    for i in range(n):
+        requested_proposal = _create_proposal()
 
         body = json.dumps(requested_proposal)
         response = requests.post(uri, headers=headers, data=body)
@@ -582,6 +559,3 @@ def create_proposals(n=5):
         proposals.append(requested_proposal)
 
     return proposals
-
-if __name__ == "__main__":
-    create_proposals()

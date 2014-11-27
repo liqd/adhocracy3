@@ -1,8 +1,10 @@
 from pytest import fixture
+from pytest import raises
 from pytest import mark
 from webtest import TestApp
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
+from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
 
 
 class TestMercatorForm:
@@ -65,6 +67,10 @@ class TestMercatorForm:
         browser.find_by_name('user-info-first-name').first.fill('')
         assert not is_valid(browser)
 
+    @mark.xfail
+    def test_login_is_required(self, browser):
+        with raises(AssertionError):
+            create_proposals(user_token="", n=1)
 
 
 def is_valid(browser):

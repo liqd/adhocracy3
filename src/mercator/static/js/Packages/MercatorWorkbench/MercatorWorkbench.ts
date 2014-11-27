@@ -5,6 +5,7 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
@@ -14,6 +15,7 @@ import AdhUtil = require("../Util/Util");
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
+import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -123,6 +125,7 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhListing.moduleName,
             AdhMercatorProposal.moduleName,
+            AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName,
@@ -154,6 +157,16 @@ export var register = (angular) => {
                         })
                         .then(() => specifics);
                 }])
+                .specific(RIUser.content_type, "", () => (resource : RIUser) => {
+                    return {
+                        userUrl: resource.path
+                    };
+                })
+                .default(RIBasicPool.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-show-hide-hide",
+                    content2Url: ""  // used on documentWorkbench
+                })
                 .default(RIBasicPool.content_type, "create_proposal", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"

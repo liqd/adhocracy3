@@ -69,125 +69,8 @@ States:
 ```
 */
 
-@mixin moving-column($from, $to, $gutter: 0, $total: 12) {
-    $column-width: (100% + $gutter) / $total;
-    right: $column-width * ($total - $to);
-    width: $column-width * ($to - $from) - $gutter;
-}
-
 .moving-columns {
     overflow: hidden;
-
-    // is-show-show-hide
-    .moving-column-structure {
-        @include moving-column(0, 6);
-    }
-
-    .moving-column-content {
-        @include moving-column(6, 12);
-    }
-
-    .moving-column-content2 {
-        @include moving-column(12, 13);
-    }
-
-    &.is-show-hide-hide {
-        .moving-column-structure {
-            @include moving-column(0, 12);
-        }
-
-        .moving-column-content {
-            @include moving-column(12, 13);
-        }
-
-        .moving-column-content2 {
-            @include moving-column(13, 14);
-        }
-    }
-
-    &.is-collapse-show-hide {
-        .moving-column-structure {
-            @include moving-column(0, 1);
-        }
-
-        .moving-column-content {
-            @include moving-column(1, 12);
-        }
-
-        .moving-column-content2 {
-            @include moving-column(12, 13);
-        }
-    }
-
-    &.is-collapse-show-collapse {
-        .moving-column-structure {
-            @include moving-column(0, 1);
-        }
-
-        .moving-column-content {
-            @include moving-column(1, 11);
-        }
-
-        .moving-column-content2 {
-            @include moving-column(11, 12);
-        }
-    }
-
-    &.is-collapse-collapse-show {
-        .moving-column-structure {
-            @include moving-column(0, 1);
-        }
-
-        .moving-column-content {
-            @include moving-column(1, 2);
-        }
-
-        .moving-column-content2 {
-            @include moving-column(2, 12);
-        }
-    }
-
-    &.is-show-collapse-collapse {
-        .moving-column-structure {
-            @include moving-column(0, 10);
-        }
-
-        .moving-column-content {
-            @include moving-column(10, 11);
-        }
-
-        .moving-column-content2 {
-            @include moving-column(11, 12);
-        }
-    }
-
-    &.is-collapse-show-show {
-        .moving-column-structure {
-            @include moving-column(0, 1);
-        }
-
-        .moving-column-content {
-            @include moving-column(1, 6.5);
-        }
-
-        .moving-column-content2 {
-            @include moving-column(6.5, 12);
-        }
-    }
-
-    &.is-show-show-collapse {
-        .moving-column-structure {
-            @include moving-column(0, 5.5);
-        }
-
-        .moving-column-content {
-            @include moving-column(5.5, 11);
-        }
-
-        .moving-column-content2 {
-            @include moving-column(11, 12);
-        }
-    }
 }
 
 /*doc
@@ -226,6 +109,16 @@ The menu should always have the same state as its columns.
 
     // look
     border-right: 1px solid $color-structure-border;
+
+    &.is-collapse, &.is-hide {
+        background-color: $color-structure-surface;
+
+        .moving-column-body,
+        .moving-column-menu,
+        .moving-column-sidebar {
+            display: none;
+        }
+    }
 }
 
 .moving-column-body {
