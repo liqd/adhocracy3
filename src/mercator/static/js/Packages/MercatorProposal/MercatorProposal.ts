@@ -158,6 +158,7 @@ export interface IControllerScope extends IScope {
     submitIfValid : () => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
+    $flow : any;
 }
 
 
@@ -1039,16 +1040,14 @@ export var register = (angular) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {
                 flowFactoryProvider.defaults = {};
             }
-
             flowFactoryProvider.factory = fustyFlowFactory;
             flowFactoryProvider.defaults.singleFile = true;
             flowFactoryProvider.defaults.maxChunkRetries = 1;
             flowFactoryProvider.defaults.chunkRetryInterval = 5000;
             flowFactoryProvider.defaults.simultaneousUploads = 4;
             flowFactoryProvider.defaults.permanentErrors = [404, 500, 501, 502, 503];
-
             flowFactoryProvider.on("catchAll", () => {
-                console.log(arguments);
+                // console.log(arguments);
             });
         }])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
@@ -1071,7 +1070,7 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope : IControllerScope, $element) => {
+        .controller("mercatorProposalFormController", ["$scope", "$element", "$window", ($scope : IControllerScope, $element, $window) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
                 "heard-from-website",
@@ -1118,6 +1117,20 @@ export var register = (angular) => {
             $scope.showLocationError = () : boolean => {
                 return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
             };
+
+            $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
+                flow.on( "fileAdded", (file, event) => {
+                    var img = new Image();
+                    img.onload = () => {
+                        var imageWidth = img.width;
+                        var imageHeight = img.height;
+                        console.log(imageWidth, imageHeight);
+                    };
+                    var _URL = window.URL || window.webkitURL;
+                    img.src = _URL.createObjectURL(file.file);
+
+                });
+            });
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
