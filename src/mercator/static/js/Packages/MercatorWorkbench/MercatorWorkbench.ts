@@ -15,6 +15,7 @@ import AdhUtil = require("../Util/Util");
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
+import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -156,6 +157,11 @@ export var register = (angular) => {
                         })
                         .then(() => specifics);
                 }])
+                .specific(RIUser.content_type, "", () => (resource : RIUser) => {
+                    return {
+                        userUrl: resource.path
+                    };
+                })
                 .default(RIBasicPool.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",

@@ -7,7 +7,7 @@ export var movingColumns = (
     $window
 ) => {
     return {
-        link: (scope, element, attrs) => {
+        link: (scope, element) => {
             var cls : string;
             var fontSize : number = parseInt(element.css("font-size"), 10);
 
@@ -93,13 +93,11 @@ export var movingColumns = (
             });
 
             var move = (newCls) => {
-                if (topLevelState.get("space") === attrs["space"]) {
-                    if (newCls !== cls) {
-                        element.removeClass(cls);
-                        element.addClass(newCls);
-                        cls = newCls;
-                        resize();
-                    }
+                if (newCls !== cls) {
+                    element.removeClass(cls);
+                    element.addClass(newCls);
+                    cls = newCls;
+                    resize();
                 }
             };
 
@@ -115,6 +113,9 @@ export var movingColumns = (
             });
             topLevelState.on("commentableUrl", (url : string) => {
                 scope.commentableUrl = url;
+            });
+            topLevelState.on("userUrl", (url : string) => {
+                scope.userUrl = url;
             });
 
             topLevelState.on("movingColumns", move);
