@@ -24,12 +24,6 @@ class TestProposal:
         assert proposal_details_are_in_listing(content_listing, 'test proposal')
 
 
-def add_proposal_to_content_listing(browser, name) -> WebDriverElement:
-    """Go to content listing and create proposal with title `test proposal`."""
-    proposal = create_proposal(listing, name)
-    return proposal
-
-
 def create_proposal(listing: WebDriverElement, title: str, description='',
                     paragraphs=[]):
     """Create a new Proposal."""
