@@ -115,6 +115,7 @@ export class MercatorWorkbench {
     }
 }
 
+
 export var moduleName = "adhMercatorWorkbench";
 
 export var register = (angular) => {

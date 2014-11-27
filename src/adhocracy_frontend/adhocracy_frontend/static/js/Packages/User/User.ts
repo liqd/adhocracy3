@@ -7,6 +7,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
+
 var pkgLocation = "/User";
 
 export interface IUserBasic {
