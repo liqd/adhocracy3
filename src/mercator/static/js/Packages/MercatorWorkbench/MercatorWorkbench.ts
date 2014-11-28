@@ -16,6 +16,7 @@ import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBa
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
+import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -157,15 +158,22 @@ export var register = (angular) => {
                         })
                         .then(() => specifics);
                 }])
+                .default(RIUser.content_type, "", {
+                    space: "user",
+                    movingColumns: "is-show-show-hide"
+                })
                 .specific(RIUser.content_type, "", () => (resource : RIUser) => {
                     return {
                         userUrl: resource.path
                     };
                 })
+                .default(RIUsersService.content_type, "", {
+                    space: "user",
+                    movingColumns: "is-show-show-hide"
+                })
                 .default(RIBasicPool.content_type, "", {
                     space: "content",
-                    movingColumns: "is-show-hide-hide",
-                    content2Url: ""  // used on documentWorkbench
+                    movingColumns: "is-show-hide-hide"
                 })
                 .default(RIBasicPool.content_type, "create_proposal", {
                     space: "content",
