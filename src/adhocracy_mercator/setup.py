@@ -12,6 +12,9 @@ requires = ['adhocracy_core',
 
 test_requires = ['adhocracy_core[test]',
                  ]
+debug_requires = ['adhocracy_core[debug]',
+                  ]
+
 
 setup(name='adhocracy_mercator',
       version='0.0',
@@ -31,7 +34,9 @@ setup(name='adhocracy_mercator',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      extras_require={'test': test_requires},
+      extras_require={'test': test_requires,
+                      'debug': debug_requires,
+                      },
       entry_points="""\
       [paste.app_factory]
       main = adhocracy_mercator:main
