@@ -25,3 +25,9 @@ def pytest_runtest_setup(item):
 def browser(browser_root, backend, frontend, frontend_url) -> Browser:
     """Return test browser, start application and go to `root.html`."""
     return browser_root
+
+
+@fixture
+def rest_url(settings) -> str:
+    """Return URL of REST API."""
+    return 'http://%s:%s/' % (settings['host'], settings['port'])
