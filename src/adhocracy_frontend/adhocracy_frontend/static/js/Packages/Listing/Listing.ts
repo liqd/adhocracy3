@@ -145,7 +145,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
 
-                        if ($scope.sort[0] === "-") {
+                        if ($scope.sort && $scope.sort[0] === "-") {
                             $scope.elements.reverse();
                         }
 
