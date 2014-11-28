@@ -22,7 +22,6 @@ import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
-import AdhDocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
 import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
@@ -69,7 +68,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "duScroll",
         "flow",
         AdhComment.moduleName,
-        AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
@@ -148,7 +146,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhComment.register(angular);
     AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);
     AdhDateTime.register(angular);
-    AdhDocumentWorkbench.register(angular);
     AdhDone.register(angular);
     AdhEmbed.register(angular);
     AdhEventHandler.register(angular);
