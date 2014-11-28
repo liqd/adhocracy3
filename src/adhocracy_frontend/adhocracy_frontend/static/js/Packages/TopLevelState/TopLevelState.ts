@@ -236,7 +236,8 @@ export class Service {
                 this.toLocation();
 
                 this.blockTemplate = false;
-            });
+            })
+            .catch((error) => console.log(error));
         }
     }
 
