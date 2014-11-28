@@ -483,16 +483,21 @@ class TestResources:
         request.root = context
         return request
 
-    def _make_one(self):
+    def _make_one(self, **kwargs):
         from adhocracy_core.schema import Resources
-        return Resources()
+        return Resources(**kwargs)
 
     def test_create(self):
         from adhocracy_core.schema import ResourceObject
         inst = self._make_one()
         assert isinstance(inst, colander.SequenceSchema)
+        assert inst.__class__.default != []
         assert inst.default == []
         assert inst['resource'].schema_type == ResourceObject
+
+    def test_create_with_custom_default(self):
+        inst = self._make_one(default=[1])
+        assert inst.default == [1]
 
     def test_serialize(self, request):
         inst = self._make_one().bind(request=request)
@@ -1048,6 +1053,7 @@ class TestRoles:
         assert inst.validator.min == 0
         assert inst.validator.max == 6
         assert inst.schema_type == colander.Sequence
+        assert inst.__class__.default != []
         assert inst.default == []
         assert isinstance(inst['role'], Role)
 

@@ -144,14 +144,13 @@ def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
     # in adhocracy_core.sheets.GenericResourceSheet.__init__ schema binding.
     if not IPermissions.providedBy(context) or request is None:
         return []
-    roles = context.roles
+    roles_and_group_roles = set(context.roles)
     permissions_sheet = get_sheet(context, IPermissions,
                                   registry=request.registry)
     groups = permissions_sheet.get()['groups']
     for group in groups:
-        roles.extend(group.roles)
-    roles_sorted = sorted(list(set(roles)))
-    return roles_sorted
+        roles_and_group_roles.update(group.roles)
+    return sorted(list(roles_and_group_roles))
 
 
 class PermissionsSchema(colander.MappingSchema):
