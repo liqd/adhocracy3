@@ -105,6 +105,8 @@ metadata_metadata = sheet_metadata_defaults._replace(
 def index_creator(resource, default):
     """Return creator userid value for the creator index."""
     creator = get_sheet_field(resource, IMetadata, 'creator')
+    if creator == '':  # FIXME the default value should be None
+        return creator
     userid = resource_path(creator)
     return userid
 
@@ -193,7 +195,7 @@ def includeme(config):
                          index_name='private_visibility',
                          context=IMetadata,
                          )
-    config.add_indexview(index_visibility,
+    config.add_indexview(index_creator,
                          catalog_name='adhocracy',
                          index_name='creator',
                          context=IMetadata,

@@ -81,11 +81,18 @@ class TestMetadataSheet:
         assert inst.meta.readable is True
 
 
-def test_index_creator(context, mock_metadata_sheet):
+def test_index_creator_creator_exists(context, mock_metadata_sheet):
     from .metadata import index_creator
     context['user1'] = testing.DummyResource()
     mock_metadata_sheet.get.return_value = {'creator': context['user1']}
     assert index_creator(context, 'default') == '/user1'
+
+
+def test_index_creator_creator_does_not_exists(context, mock_metadata_sheet):
+    from .metadata import index_creator
+    context['user1'] = testing.DummyResource()
+    mock_metadata_sheet.get.return_value = {'creator': ''}
+    assert index_creator(context, 'default') == ''
 
 
 @fixture
