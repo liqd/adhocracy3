@@ -15,6 +15,10 @@ test_requires = ['adhocracy_frontend[test]',
                  'adhocracy_core[test]',
                  ]
 
+debug_requires = ['adhocracy_frontend[debug]',
+                  'adhocracy_core[debug]',
+                  ]
+
 setup(name='{{project}}',
       version='0.0',
       description='Adhocracy meta package for backend/frontend customization.',
@@ -33,7 +37,8 @@ setup(name='{{project}}',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      extras_require={'test': test_requires},
+      extras_require={'test': test_requires,
+                      'debug': debug_requires},
       entry_points="""\
       [paste.app_factory]
       main = {{project}}:main

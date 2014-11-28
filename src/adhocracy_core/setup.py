@@ -67,7 +67,7 @@ setup(name='adhocracy_core',
       zip_safe=False,
       install_requires=requires,
       extras_require={'test': test_requires,
-                      'debug': debug_requires,
+                      'debug': test_requires + debug_requires,
                       },
       entry_points="""\
       [paste.app_factory]
