@@ -100,10 +100,10 @@ export class Listing<Container extends ResourcesBase.Resource> {
             scope: {
                 path: "@",
                 contentType: "@",
-                facets: "=",
-                sort: "=",
+                facets: "=?",
+                sort: "=?",
                 update: "=?",
-                noCreateForm: "="
+                noCreateForm: "=?"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
