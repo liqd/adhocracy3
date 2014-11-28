@@ -87,7 +87,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
                 $location.replace();
-                $location.path("/r/adhocracy/");
+                $location.path("/r/mercator/");
                 return {
                     skip: true
                 };
@@ -99,7 +99,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
             })
             // FIXME: should be full urls. (but seems to work)
             .space("user", {
-                resourceUrl: "/principals/users/0000000/"
+                resourceUrl: "/principals/users/"
             })
             .space("content", {
                 resourceUrl: "/mercator/"
