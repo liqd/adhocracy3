@@ -88,7 +88,7 @@ export class Provider implements ng.IServiceProvider {
  * possible. In those cases, search overwrites specifics overwrites meta overwrites defaults.
  */
 export class Service implements AdhTopLevelState.IAreaInput {
-    public template : string = "<adh-page-wrapper><adh-platform></adh-platform></adh-page-wrapper>";
+    public template : string = "<adh-page-wrapper><adh-mercator-workbench></adh-mercator-workbench></adh-page-wrapper>";
 
     constructor(
         private provider : Provider,
@@ -141,13 +141,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 var defaults : Dict = self.getDefaults(resource.content_type, view);
 
                 var meta : Dict = {
-                    platform: segs[1] === "principals" ? "mercator" : segs[1],
+                    platformUrl: self.adhConfig.rest_url + "/" + segs[1],
                     contentType: resource.content_type,
                     resourceUrl: resourceUrl,
                     view: view
                 };
-
-                meta["platformUrl"] = this.adhConfig.rest_url + "/" + meta["platform"];
 
                 return _.extend(defaults, meta, specifics, search);
             });
@@ -178,24 +176,6 @@ export class Service implements AdhTopLevelState.IAreaInput {
 }
 
 
-export var platformDirective = (adhTopLevelState : AdhTopLevelState.Service) => {
-    return {
-        template:
-            "<div data-ng-switch=\"platform\">" +
-            "<div data-ng-switch-when=\"adhocracy\"><adh-document-workbench></div>" +
-            // FIXME: move mercator specifics away
-            "<div data-ng-switch-when=\"mercator\"><adh-mercator-workbench></div>" +
-            "</div>",
-        restrict: "E",
-        link: (scope, element) => {
-            adhTopLevelState.on("platform", (value : string) => {
-                scope.platform = value;
-            });
-        }
-    };
-};
-
-
 export var resourceUrl = (adhConfig : AdhConfig.IService) => {
     return (path : string, view? : string) => {
         if (typeof path !== "undefined") {
@@ -224,7 +204,6 @@ export var register = (angular) => {
             adhTopLevelStateProvider
                 .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
         }])
-        .directive("adhPlatform", ["adhTopLevelState", platformDirective])
         .provider("adhResourceArea", Provider)
         .filter("adhResourceUrl", ["adhConfig", resourceUrl]);
 };
