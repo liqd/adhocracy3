@@ -1,7 +1,6 @@
 from pytest import mark
 
 from .shared import wait
-from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import login_god
 from adhocracy_frontend.tests.acceptance.test_comment import create_comment
@@ -10,37 +9,43 @@ from adhocracy_frontend.tests.acceptance.test_comment import create_top_level_co
 
 class TestRate:
 
-    def test_create(self, browser):
+    def test_create(self, browser, rest_url):
         login_god(browser)
-        comment = create_comment(browser, 'comment1')
+        comment = create_comment(browser, rest_url, 'comment1')
         assert comment is not None
 
     @mark.skipif(True, reason='pending weil schlechtes wetter')
     def test_upvote(self, browser):
-        rateable = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        rateable = browser.find_by_css('.comment').first
         button = rateable.find_by_css('.rate-pro').first
         button.click()
+
         def check_result():
             total = rateable.find_by_css('.rate-difference').first
             return total.text == '+1'
+
         assert wait(check_result)
 
     def test_downvote(self, browser):
-        rateable = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        rateable = browser.find_by_css('.comment').first
         button = rateable.find_by_css('.rate-contra').first
         button.click()
+
         def check_result():
             total = rateable.find_by_css('.rate-difference').first
             return total.text == '-1'
+
         assert wait(check_result)
 
     def test_neutralvote(self, browser):
-        rateable = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        rateable = browser.find_by_css('.comment').first
         button = rateable.find_by_css('.rate-neutral').first
         button.click()
+
         def check_result():
             total = rateable.find_by_css('.rate-difference').first
             return total.text == '0'
+
         assert wait(check_result)
 
     @mark.skipif(True, reason='pending weil schlechtes wetter')
@@ -50,7 +55,7 @@ class TestRate:
         # resistant.  since we don't have any clues as to why, we
         # postponed the investigations.
 
-        rateable = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        rateable = browser.find_by_css('.comment').first
         button = rateable.find_by_css('.rate-difference').first
         button.click()
 
@@ -65,12 +70,12 @@ class TestRate:
         assert wait(check_result)
 
     def test_multi_rateable(self, browser):
-        content2 = get_column_listing(browser, 'content2')
+        listing = browser.find_by_css('.listing')
 
-        rateable1 = get_list_element(content2, 'comment1', descendant='.comment-content')
+        rateable1 = get_list_element(listing, 'comment1', descendant='.comment-content')
         button1 = rateable1.find_by_css('.rate-pro').first
 
-        rateable2 = create_top_level_comment(content2,  'comment2')
+        rateable2 = create_top_level_comment(listing,  'comment2')
         button2 = rateable2.find_by_css('.rate-contra').first
 
         button2.click()
