@@ -125,7 +125,7 @@
         });
     };
 
-    adhocracy.getIframe = (widget : string, data : {}) => {
+    adhocracy.getIframe = (widget : string, data : any) => {
         var iframe = $("<iframe>");
 
         iframe.css("border", "none");
@@ -137,10 +137,21 @@
         } else {
             autoresize = Boolean(autoresize);
         }
+        if (!autoresize) {
+            iframe.css("height", "100%");
+        }
         iframe.data("autoresize", autoresize);
 
-        var url = origin + appUrl + widget + "?" + $.param(data, true);
-
+        var url;
+        if (widget === "plain") {
+            var initialUrl = data.initialUrl;
+            if (typeof initialUrl === "undefined") {
+                initialUrl = "/";
+            }
+            url = origin + initialUrl + "?" + $.param(data, true);
+        } else {
+            url = origin + appUrl + widget + "?" + $.param(data, true);
+        }
         iframe.attr("src", url);
         iframe.addClass("adhocracy-embed");
 
