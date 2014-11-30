@@ -60,8 +60,10 @@
     var handleMessage = (name: string, data, source: Window) : void => {
         switch (name) {
             case "resize":
-                var iframe = getIFrameByWindow(source);
-                $(iframe).height(data.height);
+                var iframe = $(getIFrameByWindow(source));
+                if (iframe.data("autoresize")) {
+                    iframe.height(data.height);
+                }
                 break;
             case "requestSetup":
                 adhocracy.postMessage(source, "setup", {embedderOrigin: embedderOrigin});
@@ -128,6 +130,14 @@
 
         iframe.css("border", "none");
         iframe.css("width", "100%");
+
+        var autoresize = data.autoresize;
+        if (typeof autoresize === "undefined") {
+            autoresize = true;
+        } else {
+            autoresize = Boolean(autoresize);
+        }
+        iframe.data("autoresize", autoresize);
 
         var url = origin + appUrl + widget + "?" + $.param(data, true);
 
