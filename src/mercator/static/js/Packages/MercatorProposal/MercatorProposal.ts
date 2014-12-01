@@ -1140,41 +1140,38 @@ export var register = (angular) => {
                 // validate image upload
                 flow.on( "fileAdded", (file, event) => {
                     var elem = (<any>$scope).mercatorProposalIntroductionForm["introduction-picture-upload"];
-                    if(file.size > flow.opts.maximumByteSize) {
-                        elem.$setValidity("tooBig",false);
+                    if (file.size > flow.opts.maximumByteSize) {
+                        elem.$setValidity("tooBig", false);
                     } else {
-                        elem.$setValidity("tooBig",true);
+                        elem.$setValidity("tooBig", true);
                     }
-                    if(flow.opts.acceptedFileTypes.indexOf(file.file.type.replace("image/", ""))==-1) {
-                        elem.$setValidity("wrongType",false);
+                    if (flow.opts.acceptedFileTypes.indexOf(file.file.type.replace("image/", "")) === -1) {
+                        elem.$setValidity("wrongType", false);
                     } else {
-                        elem.$setValidity("wrongType",true);
+                        elem.$setValidity("wrongType", true);
                     }
-                    if(elem.$error.wrongType || elem.$error.tooBig) {
+                    if (elem.$error.wrongType || elem.$error.tooBig) {
                         elem.$setViewValue(false);
                         // if we have errors do not bother to load the image
-                        //flow.removeFile(file);
+                        // flow.removeFile(file);
                         return false;
                     }
                     var img = new Image();
                     img.onload = () => {
                         var imageWidth = img.width;
-                        var imageHeight = img.height;
-                        if(imageWidth > flow.opts.maximumWidth) {
-                            elem.$setValidity("tooWide",false);
+                        if (imageWidth > flow.opts.maximumWidth) {
+                            elem.$setValidity("tooWide", false);
                         } else {
-                            elem.$setValidity("tooWide",true);
+                            elem.$setValidity("tooWide", true);
                         }
-                        if(imageWidth < flow.opts.minimumWidth) {
-                            elem.$setValidity("tooNarrow",false);
+                        if (imageWidth < flow.opts.minimumWidth) {
+                            elem.$setValidity("tooNarrow", false);
                         } else {
-                            elem.$setValidity("tooNarrow",true);
+                            elem.$setValidity("tooNarrow", true);
                         }
-                        if(elem.$invalid) {
+                        if (elem.$invalid) {
                             elem.$setViewValue(false);
-                            console.log(flow, event);
-                            flow.off(event);
-                            return false;
+                            flow.removeFile(file);
                         }
                     };
                     var _URL = (<any>window).URL || (<any>window).webkitURL;
