@@ -69,7 +69,35 @@
                 adhocracy.postMessage(source, "setup", {embedderOrigin: embedderOrigin});
         }
         if (messageHandlers.hasOwnProperty(name)) {
-            messageHandlers[name](data);
+            messageHandlers[name](data, source);
+        }
+    };
+
+    /**
+     * Check whether an existing embedded iframe to update URLs
+     */
+    var hasAutourl = () => {
+        var result = false;
+        $("iframe.adhocracy-embed").each((i, iframe) => {
+            if (iframe.data("autourl")) {
+                result = true;
+            }
+        });
+        return result;
+    };
+
+    var getUrlFromHash = () => {
+        var url = window.location.hash;
+        if (url.indexOf("#!") === 0) {
+            return url.substring(2);
+        }
+    };
+
+    var setHashFromUrl = (url : string) => {
+        if (url.indexOf(origin) === 0) {
+            window.location.hash = "!" + url.substring(origin.length);
+        } else {
+            throw "Embedded iframe got an src outside of origin.";
         }
     };
 
@@ -144,7 +172,23 @@
 
         var url;
         if (widget === "plain") {
-            var initialUrl = data.initialUrl;
+
+            var initialUrl;
+            if (data.autourl) {
+                if (hasAutourl()) {
+                    throw "There's already an embedded element with enabled autourl";
+                }
+                initialUrl = getUrlFromHash();
+
+                adhocracy.registerMessageHandler("urlchange", (data, source) => {
+                    if (getIFrameByWindow(source) === iframe[0]) {
+                        setHashFromUrl(data.url);
+                    }
+                });
+            }
+            if (typeof initialUrl === "undefined") {
+                initialUrl = data.initialUrl;
+            }
             if (typeof initialUrl === "undefined") {
                 initialUrl = "/";
             }
