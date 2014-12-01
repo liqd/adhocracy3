@@ -22,6 +22,7 @@ var embeddableDirectives = [
 ];
 
 var metaParams = [
+    "autoresize",
     "locale",
     "nocenter",
     "noheader"
