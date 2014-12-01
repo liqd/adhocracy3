@@ -242,3 +242,21 @@ def normalize_to_tuple(context) -> tuple:
         return tuple(context)
     else:
         return context,
+
+
+def nested_dict_set(d: dict, keys: list, value: object):
+    """
+    Set a nested key in a dictionary.
+
+    The following two expressions are equivalent, if ``d['key']['subkey']``
+    already exists::
+
+        nested_dict_set(d, ['key', 'subkey', 'subsubkey'], value)
+        d['key']['subkey']['subsubkey'] = value
+
+    If parent elements such as ``d['key']['subkey']`` or ``d['key']`` don't
+    yet exist, this function will initialize them as dictionaries.
+    """
+    for key in keys[:-1]:
+        d = d.setdefault(key, {})
+    d[keys[-1]] = value

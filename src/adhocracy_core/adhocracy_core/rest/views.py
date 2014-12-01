@@ -49,10 +49,11 @@ from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-from adhocracy_core.utils import strip_optional_prefix
-from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
+from adhocracy_core.utils import nested_dict_set
+from adhocracy_core.utils import strip_optional_prefix
+from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.pool
@@ -98,15 +99,23 @@ def validate_request_data(context: ILocation, request: Request,
     :raises _JSONError: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
-    # TODO request.content_type == 'multipart/form-data' requires special
-    # treatment
     schema_with_binding = schema.bind(context=context, request=request,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
+    if request.content_type == 'multipart/form-data':
+        body = _unflatten_multipart_request(request)
     validate_body_or_querystring(body, qs, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
     _raise_if_errors(request)
+
+
+def _unflatten_multipart_request(request: Request) -> dict:
+    result = {}
+    for key, value in request.POST.items():
+        keyparts = key.split(':')
+        nested_dict_set(result, keyparts, value)
+    return result
 
 
 def validate_body_or_querystring(body, qs, schema: MappingSchema,
@@ -202,11 +211,24 @@ def _raise_if_errors(request: Request):
     if not request.errors:
         return
     logger.warning('Found %i validation errors in request: <%s>',
-                   len(request.errors), request.body)
+                   len(request.errors), _show_request_body(request))
     for error in request.errors:
         logger.warning('  %s', error)
     request.validated = {}
     raise json_error(request.errors)
+
+
+def _show_request_body(request: Request) -> str:
+    """
+    Show the request body.
+
+    In case of multipart/form-data requests (file upload), only the 120
+    first characters of the body are shown.
+    """
+    result = request.body
+    if request.content_type == 'multipart/form-data' and len(result) > 120:
+        result = '{}...'.format(result[:120])
+    return result
 
 
 class RESTView:
