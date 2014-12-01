@@ -5,10 +5,10 @@ import colander
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.schema import FileStore
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import SingleLine
-from adhocracy_core.schema import Text
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
@@ -73,7 +73,7 @@ class AssetDataSchema(colander.MappingSchema):
 
     """Data structure storing for the actual asset data."""
 
-    data = Text(missing=colander.required)  # TODO set correct type
+    data = FileStore(missing=colander.required)
 
 
 asset_data_meta = sheet_metadata_defaults._replace(
