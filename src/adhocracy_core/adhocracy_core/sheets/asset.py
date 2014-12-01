@@ -11,6 +11,7 @@ from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets import AttributeStorageSheet
 from adhocracy_core.sheets import sheet_metadata_defaults
 
 
@@ -79,6 +80,7 @@ class AssetDataSchema(colander.MappingSchema):
 asset_data_meta = sheet_metadata_defaults._replace(
     isheet=IAssetData,
     schema_class=AssetDataSchema,
+    sheet_class=AttributeStorageSheet,
     readable=False,
 )
 
