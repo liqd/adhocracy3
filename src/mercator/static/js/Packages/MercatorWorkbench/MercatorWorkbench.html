@@ -97,19 +97,13 @@
                     data-value="{{userUrl}}">
                     <adh-user-profile
                         data-path="{{userUrl}}">
+                        <section class="mercator-user-profile-proposal-list">
+                            <h3>{{ "USERS_PROPOSALS" | translate:userBasic }}</h3>
+                            <adh-mercator-user-proposal-listing
+                                data-path="{{path}}">
+                            </adh-mercator-user-proposal-listing>
+                        </section>
                     </adh-user-profile>
-                    <section class="mercator-user-profile-proposal-list" ng-if="user.loggedIn || userBasic">
-                        <h3>{{ "USERS_PROPOSALS" | translate:userBasic }}</h3>
-                        <!-- FIXME: Filter only show selected users proposals -->
-                        <adh-mercator-proposal-listing
-                            data-path="{{path}}"
-                            data-content-type="{{contentType}}"
-                            data-update="proposalListingData.update"
-                            data-facets="proposalListingData.facets"
-                            data-sort="name"
-                        >
-                        </adh-mercator-proposal-listing>
-                    </section>
                 </adh-recompile-on-change>
             </div>
         </div>

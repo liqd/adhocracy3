@@ -408,6 +408,7 @@ export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
+        transclude: true,
         scope: {
             path: "@"
         },
