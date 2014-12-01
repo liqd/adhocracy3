@@ -985,6 +985,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             "duScroll",
+            "ngMessages",
             AdhHttp.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
@@ -1052,8 +1053,14 @@ export var register = (angular) => {
                 permanentErrors : [404, 500, 501, 502, 503],
                 // these are not native to flow but used by custom functions
                 maximumWidth : 900,
-                minimumWidth : 800,
-                maximumByteSize : 1000000
+                minimumWidth : 400,
+                maximumByteSize : 1000000,
+                acceptedFileTypes : [
+                    "gif",
+                    "jpeg",
+                    "jpg",
+                    "png"
+                ] // correspond to exact mime types EG image/png
             };
 
             flowFactoryProvider.on("catchAll", () => {
@@ -1129,13 +1136,24 @@ export var register = (angular) => {
             };
 
             $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
+                (<any>$scope).flowOptions = flow.opts;
+                // validate image upload
                 flow.on( "fileAdded", (file, event) => {
-                    (<any>$scope).flowOptions = flow.opts;
                     var elem = (<any>$scope).mercatorProposalIntroductionForm["introduction-picture-upload"];
                     if(file.size > flow.opts.maximumByteSize) {
-                        console.log(elem);
                         elem.$setValidity("tooBig",false);
+                    } else {
+                        elem.$setValidity("tooBig",true);
+                    }
+                    if(flow.opts.acceptedFileTypes.indexOf(file.file.type.replace("image/", ""))==-1) {
+                        elem.$setValidity("wrongType",false);
+                    } else {
+                        elem.$setValidity("wrongType",true);
+                    }
+                    if(elem.$error.wrongType || elem.$error.tooBig) {
                         elem.$setViewValue(false);
+                        // if we have errors do not bother to load the image
+                        //flow.removeFile(file);
                         return false;
                     }
                     var img = new Image();
@@ -1144,9 +1162,19 @@ export var register = (angular) => {
                         var imageHeight = img.height;
                         if(imageWidth > flow.opts.maximumWidth) {
                             elem.$setValidity("tooWide",false);
+                        } else {
+                            elem.$setValidity("tooWide",true);
                         }
-                        else if(imageWidth <= flow.opts.minimumWidth) {
+                        if(imageWidth < flow.opts.minimumWidth) {
                             elem.$setValidity("tooNarrow",false);
+                        } else {
+                            elem.$setValidity("tooNarrow",true);
+                        }
+                        if(elem.$invalid) {
+                            elem.$setViewValue(false);
+                            console.log(flow, event);
+                            flow.off(event);
+                            return false;
                         }
                     };
                     var _URL = (<any>window).URL || (<any>window).webkitURL;

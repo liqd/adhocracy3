@@ -20,6 +20,7 @@ require.config({
         angularElastic: "../lib/angular-elastic/elastic",
         angularScroll: "../lib/angular-scroll/angular-scroll.min",
         angularFlow: "../lib/ng-flow/dist/ng-flow",
+        angularMessages: "../lib/angular-messages/angular-messages.min",
         flow: "../lib/flow.js/dist/flow",
         fustyFlow: "../lib/fusty-flow.js/src/fusty-flow",
         fustyFlowFactory: "../lib/fusty-flow.js/src/fusty-flow-factory",
@@ -40,6 +41,9 @@ require.config({
             deps: ["angular"]
         },
         angularAria: {
+            deps: ["angular"]
+        },
+        angularMessages: {
             deps: ["angular"]
         },
         angularTranslate: {

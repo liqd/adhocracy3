@@ -264,7 +264,15 @@
 
             </section>
 
-            <section data-ng-form="" name="mercatorProposalIntroductionForm" id="mercator-proposal-introduction">
+        </div><!-- /.annotated-section-body -->
+
+    </div><!-- /.annotated-section -->
+
+    <section data-ng-form="" name="mercatorProposalIntroductionForm" id="mercator-proposal-introduction">
+
+        <div class="annotated-section">
+
+            <div class="annotated-section-body">
 
                 <h2>{{ "2. Introduction" | translate }}</h2>
 
@@ -300,6 +308,18 @@
                         {{ "Please enter a teaser" | translate }}</span>
                 </label>
 
+            </div><!-- /.annotated-section-body -->
+
+        </div><!-- /.annotated-section -->
+
+        <div class="annotated-section">
+            <div class="annotated-section-annotation">
+                {{"Image must be of type" | translate }} <span ng-repeat="fo in flowOptions.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>,
+                <br/>{{"no bigger than" | translate }} {{flowOptions.maximumByteSize/1000000}}MB,
+                <br/>{{"greater than" | translate }} {{flowOptions.maximumWidth}}px {{"wide" | translate}},
+                <br/>{{"less than" | translate }} {{flowOptions.minimumWidth}}px {{"wide" | translate}}
+            </div>
+            <div class="annotated-section-body">
                 <label>
                     {{ "Upload an image" | translate }}
                     <div
@@ -316,17 +336,30 @@
                             <span data-ng-if="$flow.files.length > 0">{{ "Change Image" | translate }}</span>
                             <span data-ng-if="!$flow.files.length || $flow.files.length == 0">{{ "Choose Image" | translate }}</span>
                         </button>
-                        <p>{{"Only PNG,GIF,JPG files allowed." | translate}}</p>
-                        <span
-                            class="input-error"
-                            data-ng-if="showError('mercatorProposalIntroductionForm.introduction-picture-upload', 'tooWide')">
-                            Image must be no more that {{flowOptions.maximumWidth}}px wide
-                        </span>
-                        <span
-                            class="input-error"
-                            data-ng-if="showError('mercatorProposalIntroductionForm.introduction-picture-upload', 'tooBig')">
-                            Image must be smaller than {{flowOptions.maximumByteSize/1000000}}MB
-                        </span>
+                        <div
+                            ng-messages="mercatorProposalIntroductionForm['introduction-picture-upload'].$error"
+                            ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty">
+                            <span
+                                class="input-error"
+                                ng-message="wrongType">
+                                {{"Image must be of type" | translate }} <span ng-repeat="fo in flowOptions.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>
+                            </span>
+                            <span
+                                class="input-error"
+                                ng-message="tooBig">
+                                {{"Image must be smaller than" | translate }} {{flowOptions.maximumByteSize/1000000}}MB
+                            </span>
+                            <span
+                                class="input-error"
+                                ng-message="tooWide">
+                                {{"Image must less than" | translate }} {{flowOptions.maximumWidth}}px {{"wide" | translate }}
+                            </span>
+                            <span
+                                class="input-error"
+                                ng-message="tooNarrow">
+                                {{"Image must be greater than" | translate }} {{flowOptions.minimumWidth}}px {{"wide" | translate }}
+                            </span>
+                        </div>
                         <button type="button" data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">{{ "Remove Image" | translate }}</button>
                         <p data-ng-if="$flow.files.length > 0" data-flow-directory=""></p>
                         <div class="picture-upload-file" data-ng-repeat="file in $flow.files">
@@ -334,11 +367,10 @@
                         </div>
                     </div>
                 </label>
-            </section>
+            </div><!-- /.annotated-section-body -->
+        </div><!-- /.annotated-section -->
+    </section>
 
-        </div><!-- /.form_body -->
-
-    </div><!-- /.annotated-section -->
 
     <section data-ng-form="" name="mercatorProposalDetailForm" id="mercator-proposal-detail">
 

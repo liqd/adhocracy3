@@ -9,6 +9,7 @@ import angular = require("angular");
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
 import angularAria = require("angularAria");  if (angularAria) { ; };
+import angularMessages = require("angularMessages");  if (angularMessages) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
@@ -62,6 +63,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "pascalprecht.translate",
         "ngAnimate",
         "ngAria",
+        "ngMessages",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
