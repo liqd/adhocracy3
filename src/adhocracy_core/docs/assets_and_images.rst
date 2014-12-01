@@ -168,9 +168,9 @@ request will typically have the following keys:
 
 :content_type: the type of the resource that shall be created, e.g.
     "adhocracy_core.resources.sample_proposal.IProposalIntroImage"
-:data.adhocracy_core.sheets.asset.IAssetMetadata.mime_type: the MIME type of
+:data\:adhocracy_core.sheets.asset.IAssetMetadata\:mime_type: the MIME type of
     the uploaded file, e.g. "image/jpeg"
-:data.adhocracy_core.sheets.asset.IAssetData.data: the binary data of the
+:data\:adhocracy_core.sheets.asset.IAssetData\:data: the binary data of the
     uploaded file, as per the HTML `<input type="file" name="asset">` tag.
 
 For example, lets upload a little picture and create a proposal version that
@@ -190,17 +190,14 @@ references it. But first we have to create a proposal::
     >>> prop_v0_path
     'http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000000/'
 
-TODO Switch to adhocracy_core.resources.asset.IImageMetadata and
-"multipart/form-data" syntax.
-
 Now we can upload a sample picture::
 
-    >>> upload_files = [('data.adhocracy_core.sheets.asset.IAssetData.data',
+    >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
     ...     'sample-pic-python-logo.png',
     ...     open('docs/source/_static/sample-pic-python-logo.png', 'rb').read())]
     >>> request_body = {
     ...    'content_type': 'adhocracy_core.resources.asset.IAsset',
-    ...    'data.adhocracy_core.sheets.asset.IAssetMetadata.mime_type': 'image/jpeg'}
+    ...    'data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type': 'image/jpeg'}
     >>> resp_data = testapp.post(asset_pool_path, request_body,
     ...             headers=god_header, upload_files=upload_files).json
     >>> pic_path = resp_data["path"]
@@ -223,11 +220,11 @@ To upload a new version of an asset, the frontend sends a PUT request with
 enctype="multipart/form-data" to the asset URL. The PUT request may contain
 the same keys as a POST request used to create a new asset.
 
-The `data.adhocracy_core.sheets.asset.IAssetData.data` key is required,
+The `data:adhocracy_core.sheets.asset.IAssetData:data` key is required,
 since the only use case for a PUT request is uploading a new version of the
 binary data (everything else is just metadata).
 
-The `data.adhocracy_core.sheets.asset.IAssetMetadata.mime_type` may be
+The `data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type` may be
 omitted if the new MIME type is the same as the old one.
 
 If the `content_type` key is given, is *must* be identical to the current
