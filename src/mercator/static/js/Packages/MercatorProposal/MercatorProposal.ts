@@ -624,7 +624,8 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             contentType: "@",
             update: "=?",
             facets: "=?",
-            sort: "=?"
+            sort: "=?",
+            params: "=?"
         }
     };
 };
