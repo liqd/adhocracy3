@@ -946,6 +946,7 @@ export var recompileOnChange = ($compile : ng.ICompileService) => {
 
             var contents = element.contents().remove();
             var compiledContents;
+            var innerScope : ng.IScope;
 
             return {
                 pre: (link && link.pre) ? link.pre : null,
@@ -954,11 +955,13 @@ export var recompileOnChange = ($compile : ng.ICompileService) => {
                         compiledContents = $compile(contents);
                     }
 
-                    var innerScope = scope.$new();
-
                     scope.$watch(() => attrs["value"], (value) => {
-                        element.html("");
+                        if (typeof innerScope !== "undefined") {
+                            innerScope.$destroy();
+                            element.contents().remove();
+                        }
 
+                        innerScope = scope.$new();
                         innerScope[attrs["key"]] = value;
 
                         compiledContents(innerScope, (clone) => {

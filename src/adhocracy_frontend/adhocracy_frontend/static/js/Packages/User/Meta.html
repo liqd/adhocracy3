@@ -1,2 +1,2 @@
 <span data-ng-if="isAnonymous">{{userBasic.name}}</span>
-<a href="mailto:{{userBasic.email}}" data-ng-if="!isAnonymous">{{userBasic.name}}</a>
+<a href="{{ path | adhResourceUrl }}" data-ng-if="!isAnonymous">{{userBasic.name}}</a>

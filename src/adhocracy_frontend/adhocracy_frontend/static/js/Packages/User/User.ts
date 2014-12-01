@@ -390,7 +390,8 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListItem.html",
         scope: {
-            path: "@"
+            path: "@",
+            me: "=?"
         },
         controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
             if ($scope.path) {

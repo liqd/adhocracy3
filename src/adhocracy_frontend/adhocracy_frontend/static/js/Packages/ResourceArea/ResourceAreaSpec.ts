@@ -57,13 +57,6 @@ export var register = () => {
                     });
                 });
 
-                it("sets platform field", (done) => {
-                    service.route("/platform/wlog/@blarg", {}).then((data) => {
-                        expect(data["platform"]).toBe("platform");
-                        done();
-                    });
-                });
-
                 it("sets contentType", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["contentType"]).toBe("content_type");
