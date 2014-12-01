@@ -99,7 +99,7 @@
                         data-path="{{userUrl}}">
                     </adh-user-profile>
                     <section class="mercator-user-profile-proposal-list" ng-if="user.loggedIn || userBasic">
-                        <h3>{{userBasic.name}}{{ "'s" | translate }} {{ "proposals" | translate }}</h3>
+                        <h3>{{ "USERS_PROPOSALS" | translate:userBasic }}</h3>
                         <!-- FIXME: Filter only show selected users proposals -->
                         <adh-mercator-proposal-listing
                             data-path="{{path}}"
