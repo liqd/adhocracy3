@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
@@ -51,7 +53,6 @@ export var movingColumns = (
 
                 var collapseCount : number = parts.filter((v) => v === "collapse").length;
                 var showCount : number = parts.filter((v) => v === "show").length;
-
                 var totalWidth : number = element.width();
                 var showWidth : number = (totalWidth - collapseCount * collapseWidth) / showCount;
                 showWidth = Math.min(showWidth, maxShowWidth);
@@ -83,14 +84,16 @@ export var movingColumns = (
                 }
             };
 
-            $($window).resize(() => {
+            var resizeNoTransition = () => {
                 var transition = element.children().css("transition");
                 element.children().css("transition", "none");
                 resize();
                 $timeout(() => {
                     element.children().css("transition", transition);
                 }, 1);
-            });
+            };
+
+            $($window).resize(resizeNoTransition);
 
             var move = (newCls) => {
                 if (newCls !== cls) {
@@ -119,6 +122,7 @@ export var movingColumns = (
             });
 
             topLevelState.on("movingColumns", move);
+            topLevelState.on("space", () => _.defer(resizeNoTransition));
         }
     };
 };
