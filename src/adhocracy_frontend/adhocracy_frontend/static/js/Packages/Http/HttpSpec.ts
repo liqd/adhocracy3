@@ -239,7 +239,7 @@ export var register = () => {
                 var noForkError = {
                     description: "No fork allowed",
                     location: "body",
-                    name: "data.adhocracy.sheets.versions.IVersionable.follows"
+                    name: "data.adhocracy_core.sheets.versions.IVersionable.follows"
                 };
 
                 it("posts to parent pool, adds IVersionable sheet with correct follows field", (done) => {

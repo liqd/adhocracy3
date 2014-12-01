@@ -8,6 +8,7 @@
 import angular = require("angular");
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
+import angularAria = require("angularAria");  if (angularAria) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
@@ -26,6 +27,7 @@ import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
 import AdhHttp = require("./Packages/Http/Http");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
+import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -33,6 +35,7 @@ import AdhRate = require("./Packages/Rate/Rate");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhSticky = require("./Packages/Sticky/Sticky");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
@@ -58,19 +61,22 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
+        "ngAria",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhResourceArea.moduleName,
-        AdhProposal.moduleName
+        AdhProposal.moduleName,
+        AdhSticky.moduleName
     ]);
 
-    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
+    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", "$ariaProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
         $translateProvider,
-        $locationProvider
+        $locationProvider,
+        $ariaProvider
     ) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
@@ -98,6 +104,10 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
+
+        $ariaProvider.config({
+            tabindex: false
+        });
     }]);
 
     app.value("angular", angular);
@@ -118,6 +128,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhHttp.register(angular, meta_api);
     AdhInject.register(angular);
     AdhListing.register(angular);
+    AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
     AdhProposal.register(angular);
@@ -125,6 +136,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhRecursionHelper.register(angular);
     AdhResourceArea.register(angular);
     AdhResourceWidgets.register(angular);
+    AdhSticky.register(angular);
     AdhTopLevelState.register(angular);
     AdhUser.register(angular);
     AdhWebSocket.register(angular);

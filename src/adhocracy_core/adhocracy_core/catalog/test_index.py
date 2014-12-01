@@ -4,6 +4,29 @@ from pytest import fixture
 from pytest import raises
 
 
+class TestField:
+
+    _marker = object()
+
+    @fixture
+    def inst(self):
+        from hypatia.field import FieldIndex
+        from BTrees import family64
+
+        def _discriminator(obj, default):
+            if obj is self._marker:
+                return default
+            return obj
+        return FieldIndex(_discriminator, family64)
+
+    def test_sort_integer_strings(self, inst):
+        inst.index_doc(0, '-1')
+        inst.index_doc(3, '10')
+        inst.index_doc(1, '1')
+        assert [x for x in inst.sort([0, 3, 1])] == [0, 1, 3]
+
+
+
 class TestReference:
 
     @fixture

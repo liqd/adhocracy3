@@ -15,8 +15,13 @@ test_requires = ['adhocracy_mercator[test]',
                  'adhocracy_frontend[test]',
                  ]
 
+debug_requires = ['adhocracy_mercator[debug]',
+                  'adhocracy_frontend[debug]',
+                  ]
+
+
 setup(name='mercator',
-      version='0.0.1',
+      version='0.0.2',
       description='Adhocracy backend/frontend server for Mercator.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=["Programming Language :: Python",
@@ -34,7 +39,9 @@ setup(name='mercator',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      extras_require={'test': test_requires},
+      extras_require={'test': test_requires,
+                      'debug': debug_requires,
+                      },
       entry_points="""\
       [paste.app_factory]
       main = mercator:main

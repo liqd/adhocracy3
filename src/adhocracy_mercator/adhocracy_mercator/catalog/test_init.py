@@ -9,7 +9,7 @@ def test_create_mercator_catalog_indexes():
     from substanced.catalog import Keyword
     from . import MercatorCatalogIndexes
     inst = MercatorCatalogIndexes()
-    assert isinstance(inst.mercator_budget, Keyword)
+    assert isinstance(inst.mercator_requested_funding, Keyword)
     assert isinstance(inst.mercator_location, Keyword)
 
 
@@ -34,6 +34,6 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     # default indexes
     assert 'tag' in catalogs['adhocracy']
     # mercator indexes
-    assert 'mercator_budget' in catalogs['adhocracy']
+    assert 'mercator_requested_funding' in catalogs['adhocracy']
     assert 'mercator_location' in catalogs['adhocracy']
 

@@ -1,0 +1,40 @@
+/*doc
+---
+title: User list item
+name: user-list-item
+category: Widgets
+---
+
+A user list item within a listing widget
+
+```html_example
+<div class="user-list-me">
+    <strong>ME</strong>
+    <button type="button" href="#FIXME">PROFILE</button>
+</div>
+<div class="listing">
+    <ol class="listing-elements">
+        <li class="listing-element">
+            <div class="user-list-item">
+                <strong>Dr. Who</strong>
+                <button type="button" class="user-profile-button">Profile</button>
+            </div>
+        </li>
+    </ol>
+</div>
+```
+*/
+
+.user-list-item {
+    border-bottom: 1px solid $color-structure-border;
+    overflow: hidden;
+    padding: 10px;
+
+    .user-profile-button {
+        float: right;
+    }
+
+    &.m-me {
+        background: $color-structure-surface;
+    }
+}

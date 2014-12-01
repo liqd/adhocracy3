@@ -1,4 +1,5 @@
 """User wants to create, edit and view proposal."""
+from pytest import mark
 from splinter.driver.webdriver import WebDriverElement
 
 from adhocracy_frontend.tests.acceptance.shared import wait
@@ -8,26 +9,20 @@ from adhocracy_frontend.tests.acceptance.shared import get_list_element
 from adhocracy_frontend.tests.acceptance.shared import login_god
 
 
+@mark.skipif(True, reason="FIXME: skip only when this is not in the UI")
 class TestProposal:
-
 
     def test_create(self, browser):
         login_god(browser)
+        browser.visit(browser.app_url + 'r/adhocracy/?movingColumns=is-show-show-hide')
         content = get_column_listing(browser, 'content')
         proposal = create_proposal(content, 'test proposal')
         assert proposal is not None
-
 
     def test_view(self, browser):
         content_listing = get_column_listing(browser, 'content')
         browser.click_link_by_partial_text('test proposal')
         assert proposal_details_are_in_listing(content_listing, 'test proposal')
-
-
-def add_proposal_to_content_listing(browser, name) -> WebDriverElement:
-    """Go to content listing and create proposal with title `test proposal`."""
-    proposal = create_proposal(listing, name)
-    return proposal
 
 
 def create_proposal(listing: WebDriverElement, title: str, description='',

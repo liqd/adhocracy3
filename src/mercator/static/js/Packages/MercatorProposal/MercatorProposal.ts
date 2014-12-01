@@ -1,3 +1,5 @@
+import fustyFlowFactory = require("fustyFlowFactory");
+
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
@@ -10,8 +12,10 @@ import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIMercatorDetails = require("../../Resources_/adhocracy_mercator/resources/mercator/IDetails");
-import RIMercatorDetailsVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IDetailsVersion");
+import RIMercatorDescription = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescription");
+import RIMercatorDescriptionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescriptionVersion");
+import RIMercatorLocation = require("../../Resources_/adhocracy_mercator/resources/mercator/ILocation");
+import RIMercatorLocationVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/ILocationVersion");
 import RIMercatorExperience = require("../../Resources_/adhocracy_mercator/resources/mercator/IExperience");
 import RIMercatorExperienceVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IExperienceVersion");
 import RIMercatorFinance = require("../../Resources_/adhocracy_mercator/resources/mercator/IFinance");
@@ -33,7 +37,9 @@ import RIMercatorStory = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IStoryVersion");
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
-import SIMercatorDetails = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDetails");
+import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
+import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
+import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
 import SIMercatorFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
 import SIMercatorHeardFrom = require("../../Resources_/adhocracy_mercator/sheets/mercator/IHeardFrom");
@@ -46,86 +52,146 @@ import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mer
 import SIMercatorSubResources = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMercatorSubResources");
 import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
+import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MercatorProposal";
 
 
-export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
-    poolPath : string;
-    showDetails() : void;
-    mercatorProposalForm?;
-    data : {
-        countries : any;
-        // 1. basic
-        user_info : {
-            first_name : string;
-            last_name : string;
-            country : string;
-        };
-        organization_info : {
-            status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
-            name : string;
-            country : string;
-            website : string;
-            date_of_foreseen_registration : string;
-            how_can_we_help_you : string;
-            status_other : string;
-        };
+export interface IScopeData {
+    commentCount : number;
+    commentCountTotal : number;
 
-        // 2. introduction
-        introduction : {
-            title : string;
-            teaser : string;
-        };
-
-        // 3. in detail
-        details : {
-            description : string;
-            location_is_specific : boolean;
-            location_specific_1 : string;
-            location_specific_2 : string;
-            location_specific_3 : string;
-            location_is_online : boolean;
-            location_is_linked_to_ruhr : boolean;
-        };
-        story : string;
-
-        // 4. motivation
-        outcome : string;
-        steps : string;
-        value : string;
-        partners : string;
-
-        // 5. financial planning
-        finance : {
-            budget : number;
-            requested_funding : number;
-            other_sources : string;
-            granted : boolean;
-        };
-
-        // 6. extra
-        experience : string;
-        heard_from : {
-            colleague : boolean;
-            website : boolean;
-            newsletter : boolean;
-            facebook : boolean;
-            other : boolean;
-            other_specify : string
-        };
-
-        accept_disclaimer : string;
+    // 1. basic
+    user_info : {
+        first_name : string;
+        last_name : string;
+        country : string;  // FIXME: should be number (see #265)
+        createtime : string;  // FIXME: should be Date (see #265)
+        path : string;
+        commentCount : number;
+    };
+    organization_info : {
+        status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
+        name : string;
+        country : number;
+        website : string;
+        date_of_foreseen_registration : string;  // FIXME: should be Date (see #265)
+        how_can_we_help_you : string;
+        status_other : string;
+        commentCount : number;
     };
 
+    // 2. introduction
+    introduction : {
+        title : string;
+        teaser : string;
+        imageUpload : Flow;
+        commentCount : number;
+        nickInstance : number;
+    };
+
+    // 3. in detail
+    description : {
+        description : string;
+        commentCount : number;
+    };
+
+    location : {
+        location_is_specific : boolean;
+        location_specific_1 : string;
+        location_specific_2 : string;
+        location_specific_3 : string;
+        location_is_online : boolean;
+        location_is_linked_to_ruhr : boolean;
+        commentCount : number;
+    };
+
+    story : string;
+    storyCommentCount : number;
+
+    // 4. motivation
+    outcome : string;
+    outcomeCommentCount : number;
+    steps : string;
+    stepsCommentCount : number;
+    value : string;
+    valueCommentCount : number;
+    partners : string;
+    partnersCommentCount : number;
+
+    // 5. financial planning
+    finance : {
+        budget : number;
+        requested_funding : number;
+        other_sources : string;
+        granted : boolean;
+        commentCount : number;
+    };
+
+    // 6. extra
+    experience : string;
+    experienceCommentCount : number;
+    heard_from : {
+        colleague : boolean;
+        website : boolean;
+        newsletter : boolean;
+        facebook : boolean;
+        other : boolean;
+        other_specify : string;
+        commentCount : number;
+    };
+    accept_disclaimer : string;
 }
+
+export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
+    poolPath : string;
+    mercatorProposalForm? : any;
+    data : IScopeData;
+}
+
+export interface IControllerScope extends IScope {
+    showError : (fieldName : string, errorType : string) => boolean;
+    showHeardFromError : () => boolean;
+    showLocationError : () => boolean;
+    submitIfValid : () => void;
+    mercatorProposalExtraForm? : any;
+    mercatorProposalDetailForm? : any;
+}
+
+
+/**
+ * upload mercator proposal image file.  this function can potentially
+ * be more flexible; for now it just handles the Flow object and
+ * promises the path of the image resource as a string.
+ *
+ * FIXME: implement this function!
+ */
+export var uploadImageFile = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    $q : ng.IQService,
+    flow : Flow
+) : ng.IPromise<string> => {
+
+    console.log("uploadImageFile: not fully implemented, but we already collect the file meta data locally in the browser:");
+
+    flow.opts.target = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+
+    console.log(JSON.stringify(flow.opts, null, 2));
+    _.forOwn(flow.files, (value, key) => {
+        console.log(JSON.stringify(value.file, null, 2));
+    });
+
+    flow.resume();
+    return (<any>$q.reject("blöp"));
+};
 
 
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
-        adhConfig : AdhConfig.IService,
+        public adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
@@ -141,14 +207,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return directive;
     }
 
-    public link(scope, element, attrs, wrapper) {
-        var instance = super.link(scope, element, attrs, wrapper);
-        instance.scope.showDetails = () => {
-            this.adhTopLevelState.set("content2Url", instance.scope.path);
-        };
-        return instance;
-    }
-
     public _handleDelete(
         instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
         path : string
@@ -156,9 +214,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
-    private initializeScope(scope) {
+    private initializeScope(scope : IScope) : IScopeData {
         if (!scope.hasOwnProperty("data")) {
-            scope.data = {};
+            scope.data = <IScopeData>{};
         }
 
         var data = scope.data;
@@ -166,7 +224,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info = data.user_info || <any>{};
         data.organization_info = data.organization_info || <any>{};
         data.introduction = data.introduction || <any>{};
-        data.details = data.details || <any>{};
+        data.description = data.description || <any>{};
+        data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
         data.heard_from = data.heard_from || <any>{};
 
@@ -184,6 +243,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
+        data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
+        data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
 
         data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
         data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website === "true";
@@ -192,11 +253,14 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.heard_from.other = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere !== "";
         data.heard_from.other_specify = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere;
 
+        data.commentCount = mercatorProposalVersion.data[SICommentable.nick].comments.length;
+
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([
             this.adhHttp.get(subResourcePaths.organization_info),
             this.adhHttp.get(subResourcePaths.introduction),
-            this.adhHttp.get(subResourcePaths.details),
+            this.adhHttp.get(subResourcePaths.description),
+            this.adhHttp.get(subResourcePaths.location),
             this.adhHttp.get(subResourcePaths.story),
             this.adhHttp.get(subResourcePaths.outcome),
             this.adhHttp.get(subResourcePaths.steps),
@@ -205,7 +269,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.adhHttp.get(subResourcePaths.finance),
             this.adhHttp.get(subResourcePaths.experience)]);
 
-        subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
+        return subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
             subResources.forEach((subResource : ResourcesBase.Resource) => {
                 switch (subResource.content_type) {
                     case RIMercatorOrganizationInfoVersion.content_type: (() => {
@@ -219,6 +283,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.date_of_foreseen_registration = res.planned_date;
                         scope.how_can_we_help_you = res.help_request;
                         scope.status_other = res.status_other;
+                        scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorIntroductionVersion.content_type: (() => {
@@ -227,44 +292,58 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
                         scope.title = res.title;
                         scope.teaser = res.teaser;
+                        scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
-                    case RIMercatorDetailsVersion.content_type: (() => {
-                        var scope = data.details;
-                        var res : SIMercatorDetails.Sheet = subResource.data[SIMercatorDetails.nick];
+                    case RIMercatorDescriptionVersion.content_type: (() => {
+                        var scope = data.description;
+                        var res : SIMercatorDescription.Sheet = subResource.data[SIMercatorDescription.nick];
 
                         scope.description = res.description;
+                        scope.commentCount = subResource.data[SICommentable.nick].comments.length;
+                    })();
+                    break;
+                    case RIMercatorLocationVersion.content_type: (() => {
+                        var scope = data.location;
+                        var res : SIMercatorLocation.Sheet = subResource.data[SIMercatorLocation.nick];
+
                         scope.location_is_specific = res.location_is_specific === "true";
                         scope.location_specific_1 = res.location_specific_1;
                         scope.location_specific_2 = res.location_specific_2;
                         scope.location_specific_3 = res.location_specific_3;
                         scope.location_is_online = res.location_is_online === "true";
                         scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr === "true";
+                        scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorStoryVersion.content_type: (() => {
                         var res : SIMercatorStory.Sheet = subResource.data[SIMercatorStory.nick];
                         data.story = res.story;
+                        data.storyCommentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorOutcomeVersion.content_type: (() => {
                         var res : SIMercatorOutcome.Sheet = subResource.data[SIMercatorOutcome.nick];
                         data.outcome = res.outcome;
+                        data.outcomeCommentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorStepsVersion.content_type: (() => {
                         var res : SIMercatorSteps.Sheet = subResource.data[SIMercatorSteps.nick];
                         data.steps = res.steps;
+                        data.stepsCommentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorValueVersion.content_type: (() => {
                         var res : SIMercatorValue.Sheet = subResource.data[SIMercatorValue.nick];
                         data.value = res.value;
+                        data.valueCommentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorPartnersVersion.content_type: (() => {
                         var res : SIMercatorPartners.Sheet = subResource.data[SIMercatorPartners.nick];
                         data.partners = res.partners;
+                        data.partnersCommentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorFinanceVersion.content_type: (() => {
@@ -274,12 +353,14 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.budget = parseInt(res.budget, 10);
                         scope.requested_funding = parseInt(res.requested_funding, 10);
                         scope.other_sources = res.other_sources;
-                        scope.granted = res.granted === "True";
+                        scope.granted = res.granted === "true";
+                        scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     case RIMercatorExperienceVersion.content_type: (() => {
                         var res : SIMercatorExperience.Sheet = subResource.data[SIMercatorExperience.nick];
                         data.experience = res.experience;
+                        data.experienceCommentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
                     default: {
@@ -287,9 +368,20 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     }
                 }
             });
-        });
 
-        return this.$q.when();
+            data.commentCountTotal =
+                data.commentCount +
+                data.introduction.commentCount +
+                data.description.commentCount +
+                data.finance.commentCount +
+                data.organization_info.commentCount +
+                data.location.commentCount +
+                data.outcomeCommentCount +
+                data.stepsCommentCount +
+                data.valueCommentCount +
+                data.partnersCommentCount +
+                data.experienceCommentCount;
+        });
     }
 
     private fill(data, resource) : void {
@@ -311,15 +403,19 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     teaser: data.introduction.teaser
                 });
                 break;
-            case RIMercatorDetailsVersion.content_type:
-                resource.data[SIMercatorDetails.nick] = new SIMercatorDetails.Sheet({
-                    description: data.details.description,
-                    location_is_specific: data.details.location_is_specific,
-                    location_specific_1: data.details.location_specific_1,
-                    location_specific_2: data.details.location_specific_2,
-                    location_specific_3: data.details.location_specific_3,
-                    location_is_online: data.details.location_is_online,
-                    location_is_linked_to_ruhr: data.details.location_is_linked_to_ruhr
+            case RIMercatorDescriptionVersion.content_type:
+                resource.data[SIMercatorDescription.nick] = new SIMercatorDescription.Sheet({
+                    description: data.description.description
+                });
+                break;
+            case RIMercatorLocationVersion.content_type:
+                resource.data[SIMercatorLocation.nick] = new SIMercatorLocation.Sheet({
+                    location_is_specific: data.location.location_is_specific,
+                    location_specific_1: data.location.location_specific_1,
+                    location_specific_2: data.location.location_specific_2,
+                    location_specific_3: data.location.location_specific_3,
+                    location_is_online: data.location.location_is_online,
+                    location_is_linked_to_ruhr: data.location.location_is_linked_to_ruhr
                 });
                 break;
             case RIMercatorStoryVersion.content_type:
@@ -378,16 +474,30 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         }
     }
 
-
-
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data = this.initializeScope(instance.scope);
+        var imagePathPromise = uploadImageFile(this.adhConfig, this.adhHttp, this.$q, data.introduction.imageUpload);
+
+        // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
+        // FIXME: handle file upload in _update.
+        // FIXME: We need to wait for this promise with everything
+        // else. Otherwise, the upload could be interrupted by a hard
+        // redirect or similar.
+        imagePathPromise.then(
+            (path) => {
+                console.log("upload successful:");
+                console.log(path);
+            },
+            () => {
+                console.log("upload error:");
+                console.log(arguments);
+            });
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
         mercatorProposal.data[SIName.nick] = new SIName.Sheet({
-            name: AdhUtil.normalizeName(data.introduction.title)
+            name: AdhUtil.normalizeName(data.introduction.title + data.introduction.nickInstance)
         });
 
         var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
@@ -401,7 +511,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var subresources = _.map([
             [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
             [RIMercatorIntroduction, RIMercatorIntroductionVersion, "introduction"],
-            [RIMercatorDetails, RIMercatorDetailsVersion, "details"],
+            [RIMercatorDescription, RIMercatorDescriptionVersion, "description"],
+            [RIMercatorLocation, RIMercatorLocationVersion, "location"],
             [RIMercatorStory, RIMercatorStoryVersion, "story"],
             [RIMercatorOutcome, RIMercatorOutcomeVersion, "outcome"],
             [RIMercatorSteps, RIMercatorStepsVersion, "steps"],
@@ -512,7 +623,8 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             path: "@",
             contentType: "@",
             update: "=",
-            facets: "="
+            facets: "=",
+            sort: "="
         }
     };
 };
@@ -810,6 +922,62 @@ export var countrySelect = () => {
     };
 };
 
+
+/**
+ * Recompiles children on every change of `value`. `value` is available in
+ * child scope as `key`.
+ *
+ * Example:
+ *
+ *     <adh-recompile-on-change data-value="{{proposalPath}}" data-key="path">
+ *         <adh-proposal path="{{path}}"></adh-proposal>
+ *     </adh-recompile-on-change>
+ *
+ * FIXME: move to different package
+ */
+export var recompileOnChange = ($compile : ng.ICompileService) => {
+    return {
+        restrict: "E",
+        compile: (element, link) => {
+            if (jQuery.isFunction(link)) {
+                link = {post: link};
+            }
+
+            var contents = element.contents().remove();
+            var compiledContents;
+            var innerScope : ng.IScope;
+
+            return {
+                pre: (link && link.pre) ? link.pre : null,
+                post: (scope : ng.IScope, element, attrs) => {
+                    if (!compiledContents) {
+                        compiledContents = $compile(contents);
+                    }
+
+                    scope.$watch(() => attrs["value"], (value) => {
+                        if (typeof innerScope !== "undefined") {
+                            innerScope.$destroy();
+                            element.contents().remove();
+                        }
+
+                        innerScope = scope.$new();
+                        innerScope[attrs["key"]] = value;
+
+                        compiledContents(innerScope, (clone) => {
+                            element.append(clone);
+                        });
+                    });
+
+                    if (link && link.post) {
+                        link.post.apply(null, arguments);
+                    }
+                }
+            };
+        }
+    };
+};
+
+
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -825,18 +993,68 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .when(RIMercatorProposal.content_type, {
-                     space: "content",
-                     movingColumns: "is-show-show-hide"
+                .default(RIMercatorProposalVersion.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide"
                 })
-                .when(RIMercatorProposalVersion.content_type, {
-                     space: "content",
-                     movingColumns: "is-show-show-hide"
+                .specific(RIMercatorProposalVersion.content_type, "", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        proposalUrl: resource.path
+                    };
                 })
-                .whenView(RIMercatorProposalVersion.content_type, "edit", {
-                     movingColumns: "is-collapse-show-hide"
+                .default(RIMercatorProposalVersion.content_type, "edit", {
+                    space: "content",
+                    movingColumns: "is-collapse-show-hide"
+                })
+                .specific(RIMercatorProposalVersion.content_type, "edit", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        proposalUrl: resource.path
+                    };
+                })
+                .default(RIMercatorProposalVersion.content_type, "comments", {
+                    space: "content",
+                    movingColumns: "is-collapse-show-show"
+                })
+                .specific(RIMercatorProposalVersion.content_type, "comments", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        proposalUrl: resource.path,
+                        commentableUrl: resource.path
+                    };
                 });
+
+            _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
+                adhResourceAreaProvider
+                    .default(RIMercatorProposalVersion.content_type, "comments:" + section, {
+                        space: "content",
+                        movingColumns: "is-collapse-show-show"
+                    })
+                    .specific(RIMercatorProposalVersion.content_type, "comments:" + section, () =>
+                        (resource : RIMercatorProposalVersion) => {
+                            return {
+                                proposalUrl: resource.path,
+                                commentableUrl: resource.data[SIMercatorSubResources.nick][section]
+                            };
+                        }
+                    );
+            });
         }])
+        .config(["flowFactoryProvider", (flowFactoryProvider) => {
+            if (typeof flowFactoryProvider.defaults === "undefined") {
+                flowFactoryProvider.defaults = {};
+            }
+
+            flowFactoryProvider.factory = fustyFlowFactory;
+            flowFactoryProvider.defaults.singleFile = true;
+            flowFactoryProvider.defaults.maxChunkRetries = 1;
+            flowFactoryProvider.defaults.chunkRetryInterval = 5000;
+            flowFactoryProvider.defaults.simultaneousUploads = 4;
+            flowFactoryProvider.defaults.permanentErrors = [404, 500, 501, 502, 503];
+
+            flowFactoryProvider.on("catchAll", () => {
+                console.log(arguments);
+            });
+        }])
+        .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
@@ -856,7 +1074,7 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope, $element) => {
+        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope : IControllerScope, $element) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
                 "heard-from-website",
@@ -865,10 +1083,10 @@ export var register = (angular) => {
                 "heard-from-other"
             ];
 
-            var detailsLocationCheckboxes = [
-                "details-location-is-specific",
-                "details-location-is-online",
-                "details-location-is-linked-to-ruhr"
+            var locationCheckboxes = [
+                "location-location-is-specific",
+                "location-location-is-online",
+                "location-location-is-linked-to-ruhr"
             ];
 
             var getFieldByName = (fieldName : string) => {
@@ -900,16 +1118,29 @@ export var register = (angular) => {
                 return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
             };
 
-            $scope.showDetailsLocationError = () : boolean => {
-                return showCheckboxGroupError($scope.mercatorProposalDetailForm, detailsLocationCheckboxes);
+            $scope.showLocationError = () : boolean => {
+                return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
             };
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
 
                 if ($scope.mercatorProposalForm.$valid) {
-                    $scope.submit().catch(() => {
-                        container.scrollTopAnimated(0);
+                    // pluck flow object from file upload scope, and
+                    // attach it to where ResourceWidgets can find it.
+                    $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
+
+                    // append a random number to the nick to allow duplicate titles
+                    $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
+                        Math.floor((Math.random() * 10000) + 1);
+
+                    $scope.submit().catch((error) => {
+                        if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
+                            $scope.data.introduction.nickInstance++;
+                            $scope.submitIfValid();
+                        } else {
+                            container.scrollTopAnimated(0);
+                        }
                     });
                 } else {
                     var element = $element.find(".ng-invalid");

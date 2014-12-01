@@ -11,7 +11,6 @@
 @import "third_party/normalize";
 @import "general/normalize";
 @import "general/variables";
-@import "general/util";
 
 @import "layout";
 
@@ -27,7 +26,9 @@
 @import "components/annotated_section";
 @import "components/commentable_section";
 @import "components/chapter";
+@import "components/jump_navigation";
 @import "components/mercator_proposal";
+@import "components/user_list";
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";

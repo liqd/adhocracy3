@@ -1,9 +1,9 @@
+from urllib.parse import urlencode
+
 from pytest import mark
 
 from adhocracy_core.testing import god_login
-from adhocracy_frontend.tests.acceptance.test_proposal import create_proposal
 from adhocracy_frontend.tests.acceptance.shared import wait
-from adhocracy_frontend.tests.acceptance.shared import get_column_listing
 from adhocracy_frontend.tests.acceptance.shared import get_list_element
 from adhocracy_frontend.tests.acceptance.shared import get_listing_create_form
 from adhocracy_frontend.tests.acceptance.shared import login_god
@@ -11,18 +11,18 @@ from adhocracy_frontend.tests.acceptance.shared import login_god
 
 class TestComment:
 
-    def test_create(self, browser):
+    def test_create(self, browser, rest_url):
         login_god(browser)
-        comment = create_comment(browser, 'comment1')
+        comment = create_comment(browser, rest_url, 'comment1')
         assert comment is not None
 
     def test_reply(self, browser):
-        comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        comment = browser.find_by_css('.comment').first
         reply = create_reply_comment(comment, 'somereply')
         assert reply is not None
 
     def test_edit(self, browser):
-        comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        comment = browser.find_by_css('.comment').first
         edit_comment(comment, 'edited')
         assert comment.find_by_css('.comment-content div').first.text == 'edited'
 
@@ -31,7 +31,7 @@ class TestComment:
         assert wait(lambda: browser.find_by_css('.comment-content').first.text == 'edited')
 
     def test_edit_twice(self, browser):
-        comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        comment = browser.find_by_css('.comment').first
         edit_comment(comment, 'edited 1')
         assert comment.find_by_css('.comment-content div').first.text == 'edited 1'
         edit_comment(comment, 'edited 2')
@@ -40,32 +40,29 @@ class TestComment:
     @mark.skipif(True, reason='FIXME Test needs to be updated since the '
                               'backend now throws a "No fork allowed" error')
     def test_multi_edits(self, browser):
-        parent = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        parent = browser.find_by_css('.comment').first
         reply = parent.find_by_css('.comment').first
         edit_comment(reply, 'somereply edited')
         edit_comment(parent, 'edited')
         assert parent.find_by_css('.comment-content').first.text == 'edited'
 
     def test_author(self, browser):
-        comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
-        actual = lambda element: element.find_by_css("adh-user-meta").first.text
+        comment = browser.find_by_css('.comment').first
+        actual = lambda element: element.find_by_css('adh-user-meta').first.text
         # the captialisation might be changed by CSS
         assert wait(lambda: actual(comment).lower() == god_login.lower())
 
 
-def create_comment(browser, name):
+def create_comment(browser, rest_url, name):
     """Go to content2 column and create comment with content 'comment1'."""
-    content = get_column_listing(browser, 'content')
-    proposal = create_proposal(content, 'test proposal with comments')
-    show_proposal_comments(proposal)
-    content2 = get_column_listing(browser, 'content2')
-    comment = create_top_level_comment(content2,  name)
+    query = urlencode({
+        'key': 'test',
+        'pool-path': rest_url + 'adhocracy/',
+    })
+    browser.visit(browser.app_url + 'embed/create-or-show-comment-listing?' + query)
+    listing = browser.find_by_css('.listing')
+    comment = create_top_level_comment(listing,  name)
     return comment
-
-
-def show_proposal_comments(proposal):
-    proposal.find_by_css('a').first.click()
-    proposal.find_by_css('button').last.click()
 
 
 def create_top_level_comment(listing, content):

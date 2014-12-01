@@ -260,3 +260,16 @@ def nested_dict_set(d: dict, keys: list, value: object):
     for key in keys[:-1]:
         d = d.setdefault(key, {})
     d[keys[-1]] = value
+
+
+def get_sheet_field(resource, isheet: ISheet, field_name: str,
+                    registry: Registry=None) -> object:
+    """Return value of `isheet` field `field_name` for `resource`.
+
+    :raise KeyError: if `field_name` does not exists for `isheet` sheets.
+    :raise zope.component.ComponentLookupError: if there is no sheet adapter
+                                               registered for `isheet`.
+    """
+    sheet = get_sheet(resource, isheet, registry=registry)
+    field = sheet.get()[field_name]
+    return field

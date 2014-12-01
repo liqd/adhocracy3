@@ -16,6 +16,8 @@ from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ILocalRolesModfied
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import ISheetBackReferenceAdded
+from adhocracy_core.interfaces import ISheetBackReferenceRemoved
 
 
 @implementer(IResourceCreatedAndAdded)
@@ -118,6 +120,50 @@ class SheetReferencedItemHasNewVersion:
         self.registry = registry
         self.creator = creator
         self.root_versions = root_versions
+
+
+@implementer(ISheetBackReferenceRemoved)
+class SheetBackReferenceRemoved:
+
+    """An event type sent when a back reference is removed."""
+
+    def __init__(self,
+                 object,
+                 isheet,
+                 reference,
+                 registry,
+                 ):
+        self.object = object
+        """:class:`adhocracy_core.interfaces.IResource`"""
+        self.isheet = isheet
+        """:class:`adhocracy_core.interfaces.ISheet`"""
+        self.reference = reference
+        """:class:`adhocracy_core.graph.Reference` that was targeting `object`.
+        """
+        self.registry = registry
+        """:class:`pyramid.registry.Registry`"""
+
+
+@implementer(ISheetBackReferenceAdded)
+class SheetBackReferenceAdded:
+
+    """An event type sent when a back reference is added."""
+
+    def __init__(self,
+                 object,
+                 isheet,
+                 reference,
+                 registry,
+                 ):
+        self.object = object
+        """:class:`adhocracy_core.interfaces.IResource`"""
+        self.isheet = isheet
+        """:class:`adhocracy_core.interfaces.ISheet`"""
+        self.reference = reference
+        """:class:`adhocracy_core.graph.Reference` that is targeting `object`.
+        """
+        self.registry = registry
+        """:class:`pyramid.registry.Registry`"""
 
 
 @implementer(ILocalRolesModfied)

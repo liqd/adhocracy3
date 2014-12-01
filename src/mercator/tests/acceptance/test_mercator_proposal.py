@@ -1,8 +1,10 @@
 from pytest import fixture
+from pytest import raises
 from pytest import mark
 from webtest import TestApp
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
+from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
 
 
 class TestMercatorForm:
@@ -54,17 +56,21 @@ class TestMercatorForm:
         assert is_valid(browser)
 
     def test_location_is_required(self, browser):
-        browser.uncheck('details-location-is-specific')
-        browser.uncheck('details-location-is-online')
-        browser.uncheck('details-location-is-linked-to-ruhr')
+        browser.uncheck('location-location-is-specific')
+        browser.uncheck('location-location-is-online')
+        browser.uncheck('location-location-is-linked-to-ruhr')
         assert not is_valid(browser)
-        browser.check('details-location-is-online')
+        browser.check('location-location-is-online')
         assert is_valid(browser)
 
     def test_field_name_is_required(self, browser):
         browser.find_by_name('user-info-first-name').first.fill('')
         assert not is_valid(browser)
 
+    @mark.xfail
+    def test_login_is_required(self, browser):
+        with raises(AssertionError):
+            create_proposals(user_token="", n=1)
 
 
 def is_valid(browser):
@@ -91,10 +97,10 @@ def fill_all(browser):
     browser.find_by_name('introduction-title').first.fill('title')
     browser.find_by_name('introduction-teaser').first.fill('teaser')
 
-    browser.find_by_name('details-description').first.fill('description')
-    browser.find_by_name('details-location-is-specific').first.check()
-    browser.find_by_name('details-location-specific-1').first.fill('Bonn')
-    browser.find_by_name('details-location-is-linked-to-ruhr').first.check()
+    browser.find_by_name('description-description').first.fill('description')
+    browser.find_by_name('location-location-is-specific').first.check()
+    browser.find_by_name('location-location-specific-1').first.fill('Bonn')
+    browser.find_by_name('location-location-is-linked-to-ruhr').first.check()
     browser.find_by_name('story').first.fill('story')
 
     browser.find_by_name('outcome').first.fill('success')

@@ -12,6 +12,12 @@
  * The application can interact with this service via the functions
  * get(), set(), and on().
  *
+ * There is a special key called "space" which can be used to create
+ * states that you can later jump back to.  The only perceivable
+ * difference is that you can set() a space which will load the
+ * complete state you left the space in (but without triggering on()
+ * callbacks). The default space is "".
+ *
  * This service very much resembles ngRoute, especially in the way
  * the areas are configured.  It differs from ngRoute in that it can
  * change paths without a reload and in being more flexibel.
@@ -66,6 +72,7 @@ export interface IArea {
 export class Provider {
     public areas : {[key : string]: any};
     public default : any;
+    public spaceDefaults : {[space : string]: {[key : string]: string}};
     public $get;
 
     constructor() {
@@ -77,6 +84,7 @@ export class Provider {
                 template: "<h1>404 Not Found</h1>"
             };
         };
+        this.spaceDefaults = {};
 
         this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
             (adhEventHandlerClass, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
@@ -87,15 +95,20 @@ export class Provider {
 
     public when(prefix : string, factory : (...args : any[]) => IAreaInput);
     public when(prefix : string, factory : any[]);
-    public when(prefix, factory) {
+    public when(prefix, factory) : Provider {
         this.areas[prefix] = factory;
         return this;
     }
 
     public otherwise(factory : (...args : any[]) => IAreaInput);
     public otherwise(factory : any[]);
-    public otherwise(factory) {
+    public otherwise(factory) : Provider {
         this.default = factory;
+        return this;
+    }
+
+    public space(space : string, data : {[key : string]: string}) : Provider {
+        this.spaceDefaults[space] = data;
         return this;
     }
 
@@ -103,16 +116,20 @@ export class Provider {
         return this.areas.hasOwnProperty(prefix) ? this.areas[prefix] : this.default;
     }
 
+    public getSpaceDefaults(name : string) : {[key : string]: string} {
+        return _.clone(this.spaceDefaults[name]);
+    }
 }
 
 
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
     private area : IArea;
+    private currentSpace : string;
     private blockTemplate : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
-    private data : {[key : string] : string};
+    private data : {[space : string]: {[key : string] : string}};
 
     constructor(
         private provider : Provider,
@@ -127,7 +144,8 @@ export class Service {
         var self : Service = this;
 
         this.eventHandler = new adhEventHandlerClass();
-        this.data = {};
+        this.currentSpace = "";
+        this.data = {"": <any>{}};
 
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
             self.fromLocation();
@@ -199,9 +217,12 @@ export class Service {
             return this.$q.when();
         } else {
             return area.route(path, search).then((data) => {
-                for (var key in this.data) {
+                this._set("space", data["space"] || "");
+                delete data["space"];
+
+                for (var key in this.data[this.currentSpace]) {
                     if (!data.hasOwnProperty(key)) {
-                        delete this.data[key];
+                        this._set(key, undefined);
                     }
                 }
                 for (var key2 in data) {
@@ -215,6 +236,10 @@ export class Service {
                 this.toLocation();
 
                 this.blockTemplate = false;
+            })
+            .catch((error) => {
+                console.log(error);
+                throw error;
             });
         }
     }
@@ -222,7 +247,7 @@ export class Service {
     private toLocation() : void {
         var area = this.getArea();
         var search = this.$location.search();
-        var ret = area.reverse(this.data);
+        var ret = area.reverse(this.data[this.currentSpace]);
 
         this.$location.path("/" + area.prefix + ret.path);
 
@@ -240,8 +265,18 @@ export class Service {
 
     private _set(key : string, value) : boolean {
         if (this.get(key) !== value) {
-            this.data[key] = value;
-            this.eventHandler.trigger(key, value);
+            if (key === "space") {
+                this.currentSpace = value;
+                this.data[this.currentSpace] = this.data[this.currentSpace] || this.provider.getSpaceDefaults(this.currentSpace) || {};
+                this.eventHandler.trigger(key, value);
+            } else {
+                if (typeof value === "undefined") {
+                    delete this.data[this.currentSpace][key];
+                } else {
+                    this.data[this.currentSpace][key] = value;
+                }
+                this.eventHandler.trigger(this.currentSpace + ":" + key, value);
+            }
             return true;
         } else {
             return false;
@@ -256,14 +291,26 @@ export class Service {
     }
 
     public get(key : string) {
-        return this.data[key];
+        if (key === "space") {
+            return this.currentSpace;
+        } else {
+            return this.data[this.currentSpace][key];
+        }
     }
 
     public on(key : string, fn) : void {
-        this.eventHandler.on(key, fn);
+        if (key === "space") {
+            this.eventHandler.on(key, fn);
+        } else {
+            this.eventHandler.on(this.currentSpace + ":" + key, fn);
+        }
 
         // initially trigger callback
         fn(this.get(key));
+    }
+
+    public isSpaceInitialized(space : string) : boolean {
+        return this.data.hasOwnProperty(space);
     }
 
     // FIXME: {set,get}CameFrom should be worked into the class
@@ -301,55 +348,11 @@ export class Service {
 }
 
 
-export var movingColumns = (
-    topLevelState : Service
-) => {
-    return {
-        link: (scope, element, attrs) => {
-            var cls;
-
-            var move = (newCls) => {
-                if (topLevelState.get("space") === attrs["space"]) {
-                    if (newCls !== cls) {
-                        element.removeClass(cls);
-                        element.addClass(newCls);
-                        cls = newCls;
-                    }
-                }
-            };
-
-            topLevelState.on("content2Url", (url : string) => {
-                scope.content2Url = url;
-            });
-
-            topLevelState.on("movingColumns", move);
-        }
-    };
-};
-
-
 /**
- * A simple focus switcher that can be used until we have a proper widget for this.
+ * Note that topLevelState.on() refers to the current space. So directives
+ * that call topLevelState.on() in their initialization should only be
+ * rendered when the space they are on is currently active.
  */
-export var adhFocusSwitch = (topLevelState : Service) => {
-    return {
-        restrict: "E",
-        template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
-        link: (scope) => {
-            scope.switchFocus = () => {
-                var currentState = topLevelState.get("movingColumns");
-
-                if (currentState.split("-")[1] === "show") {
-                    topLevelState.set("movingColumns", "is-collapse-show-show");
-                } else {
-                    topLevelState.set("movingColumns", "is-show-show-hide");
-                }
-            };
-        }
-    };
-};
-
-
 export var spaces = (
     topLevelState : Service
 ) => {
@@ -358,17 +361,10 @@ export var spaces = (
         transclude: true,
         template: "<adh-inject></adh-inject>",
         link: (scope) => {
-            // FIXME: also save content2Url
-            // IDEA: getAll/setAll on TLS (getAll needs to clone), maybe also clear
-            var movingColumns = {};
             topLevelState.on("space", (space : string) => {
-                movingColumns[scope.currentSpace] = topLevelState.get("movingColumns");
                 scope.currentSpace = space;
-                if (typeof movingColumns[space] !== "undefined") {
-                    topLevelState.set("movingColumns", movingColumns[space]);
-                }
             });
-            scope.currentSpace = topLevelState.get("space");
+            scope.isSpaceInitialized = (space : string) => topLevelState.isSpaceInitialized(space);
         }
     };
 };
@@ -421,8 +417,6 @@ export var register = (angular) => {
         ])
         .provider("adhTopLevelState", Provider)
         .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
-        .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
-        .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch])
         .directive("adhSpaces", ["adhTopLevelState", spaces])
         .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch])
         .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);

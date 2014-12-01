@@ -8,10 +8,12 @@
 import angular = require("angular");
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
+import angularAria = require("angularAria");  if (angularAria) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
@@ -20,7 +22,6 @@ import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
-import AdhDocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
 import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
@@ -29,6 +30,7 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
 import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
+import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -36,6 +38,7 @@ import AdhRate = require("./Packages/Rate/Rate");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhSticky = require("./Packages/Sticky/Sticky");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
@@ -61,27 +64,30 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
+        "ngAria",
         "duScroll",
+        "flow",
         AdhComment.moduleName,
-        AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhMercatorProposal.moduleName,
         AdhMercatorWorkbench.moduleName,
         AdhResourceArea.moduleName,
-        AdhProposal.moduleName
+        AdhProposal.moduleName,
+        AdhSticky.moduleName
     ]);
 
-    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
+    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", "$ariaProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
         $translateProvider,
-        $locationProvider
+        $locationProvider,
+        $ariaProvider
     ) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
                 $location.replace();
-                $location.path("/r/adhocracy/");
+                $location.path("/r/mercator/");
                 return {
                     skip: true
                 };
@@ -90,6 +96,13 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 return {
                     template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
                 };
+            })
+            // FIXME: should be full urls. (but seems to work)
+            .space("user", {
+                resourceUrl: "/principals/users/"
+            })
+            .space("content", {
+                resourceUrl: "/mercator/"
             });
 
         // Make sure HTML5 history API works.  (If support for older
@@ -104,6 +117,10 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
+
+        $ariaProvider.config({
+            tabindex: false
+        });
     }]);
 
     // update hash when using anchor scroll
@@ -129,7 +146,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhComment.register(angular);
     AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);
     AdhDateTime.register(angular);
-    AdhDocumentWorkbench.register(angular);
     AdhDone.register(angular);
     AdhEmbed.register(angular);
     AdhEventHandler.register(angular);
@@ -138,6 +154,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhMercatorProposal.register(angular);
     AdhMercatorWorkbench.register(angular);
+    AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
     AdhProposal.register(angular);
@@ -145,6 +162,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhRecursionHelper.register(angular);
     AdhResourceArea.register(angular);
     AdhResourceWidgets.register(angular);
+    AdhSticky.register(angular);
     AdhTopLevelState.register(angular);
     AdhUser.register(angular);
     AdhWebSocket.register(angular);

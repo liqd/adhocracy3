@@ -11,46 +11,30 @@ export var register = () => {
             var providerMock;
             var adhHttpMock;
             var adhConfigMock;
+            var $injectorMock;
             var service;
 
             beforeEach(() => {
-                providerMock = jasmine.createSpyObj("provider", ["get"]);
-                providerMock.get.and.returnValue({});
+                providerMock = {
+                    defaults: {},
+                    specifics: {}
+                };
 
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get"]);
                 adhHttpMock.get.and.returnValue(q.when({
                     content_type: "content_type"
                 }));
 
+                $injectorMock = jasmine.createSpyObj("$injector", ["invoke"]);
+
                 adhConfigMock = {
                     rest_url: "rest_url"
                 };
 
-                service = new AdhResourceArea.Service(providerMock, adhHttpMock, adhConfigMock);
+                service = new AdhResourceArea.Service(providerMock, q, $injectorMock, adhHttpMock, adhConfigMock);
             });
 
             describe("route", () => {
-                it("sets 'content2Url' to rest_url + path if path consists of more than the platform", (done) => {
-                    service.route("/platform/asd", {}).then((data) => {
-                        expect(data["content2Url"]).toBe("rest_url/platform/asd");
-                        done();
-                    });
-                });
-
-                it("does not set 'content2Url' if path consists ONLY of the platform", (done) => {
-                    service.route("/platform", {}).then((data) => {
-                        expect(data["content2Url"]).not.toBeDefined();
-                        done();
-                    });
-                });
-
-                it("does not set 'content2Url' if path consists ONLY of the platform plus trailing '/'", (done) => {
-                    service.route("/platform/", {}).then((data) => {
-                        expect(data["content2Url"]).not.toBeDefined();
-                        done();
-                    });
-                });
-
                 it("sets view field if specified", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["view"]).toBe("blarg");
@@ -72,12 +56,31 @@ export var register = () => {
                         done();
                     });
                 });
+
+                it("sets contentType", (done) => {
+                    service.route("/platform/wlog/@blarg", {}).then((data) => {
+                        expect(data["contentType"]).toBe("content_type");
+                        done();
+                    });
+                });
+
+                it("sets resourceUrl", (done) => {
+                    service.route("/platform/wlog/@blarg", {}).then((data) => {
+                        expect(data["resourceUrl"]).toBe("rest_url/platform/wlog");
+                        done();
+                    });
+                });
             });
 
             describe("reverse", () => {
                 it("renders view correctly if specified", () => {
-                    var answer = service.reverse({ content2Url: "/platform/wlog", view: "blarg" });
-                    expect(answer.path).toMatch(/@blarg$/);
+                    var answer = service.reverse({ resourceUrl: "rest_url/platform/wlog", view: "blarg" });
+                    expect(answer.path).toMatch(/\/@blarg$/);
+                });
+
+                it("uses resourceUrl for path, but without rest_url", () => {
+                    var answer = service.reverse({ resourceUrl: "rest_url/platform/wlog" });
+                    expect(answer.path).toBe("/platform/wlog/");
                 });
             });
         });

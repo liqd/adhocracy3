@@ -1,5 +1,7 @@
 """Shared acceptance test functions."""
 from time import sleep
+import requests
+import json
 
 from splinter.driver.webdriver import WebDriverElement
 
@@ -7,6 +9,10 @@ from adhocracy_core.testing import god_login
 from adhocracy_core.testing import god_password
 from adhocracy_core.testing import annotator_password
 from adhocracy_core.testing import annotator_login
+
+# FIXME: root_uri must be constructed from etc/*.ini, not hard-coded here!
+root_uri = 'http://localhost:6542'
+verbose = False
 
 
 def wait(condition, step=0.1, max_steps=10) -> bool:
@@ -30,8 +36,8 @@ def login(browser, name_or_email, password,
     fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
     fill_input(browser, '.login [name="password"]', password)
     click_button(browser, '.login [type="submit"]')
-    if expect_success:
-        browser.wait_for_condition(is_logged_in, 20)
+    if expect_success and not browser.wait_for_condition(is_logged_in, 20):
+        raise Exception('login failed.')
     if visit_root:
         browser.visit(browser.root_url)
 
@@ -106,3 +112,40 @@ def get_list_element(listing, text, descendant=None, max_steps=20):
             element_text = element.find_by_css(descendant).first.text
         if element_text == text:
             return element
+
+
+def api_login(name_or_email, password):
+    """Login user and return user token."""
+    uri = root_uri + '/login_username'
+    headers = {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Encoding': 'gzip,deflate',
+        'Connection': 'keep-alive',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36',
+        'Content-Length': '36'
+    }
+    body = json.dumps({
+        'name': name_or_email,
+        'password': password
+    })
+    response = requests.post(uri, headers=headers, data=body)
+    if verbose:
+        print('\n')
+        print(uri)
+        print(headers)
+        print(body)
+        print(response)
+        print(response.text)
+    assert response.status_code == 200
+
+    payload = json.loads(response.text)
+    assert payload['status'] == 'success'
+
+    return payload['user_token']
+
+
+def api_login_god():
+    """Login in as god."""
+    return api_login(god_login, god_password)

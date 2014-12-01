@@ -1,4 +1,5 @@
 """Cornice colander schemas und validators to validate request data."""
+from hypatia.interfaces import IIndexSort
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
 from substanced.util import find_catalog
@@ -297,13 +298,32 @@ def deferred_validate_aggregateby(node: colander.MappingSchema, kw):
     # sense, e.g. username or email. We should have a blacklist to prohibit
     # calling aggregateby on such indexes.
     context = kw['context']
-    adhocracy = find_catalog(context, 'adhocracy') or {}
-    adhocracy_index = [k for k, v in adhocracy.items()
-                       if 'unique_values' in v.__dir__()]
+    indexes = _get_indexes(context)
+    valid_indexes = [x.__name__ for x in indexes
+                     if 'unique_values' in x.__dir__()]
+    return colander.OneOf(valid_indexes)
+
+
+@colander.deferred
+def deferred_validate_sort(node: colander.MappingSchema, kw: dict):
+    """Validate if value is an index name that support sorting."""
+    context = kw['context']
+    indexes = _get_indexes(context)
+    # Check that the index has the IIndexSort interfaces or at least a sort
+    # method
+    valid_indexes = [x.__name__ for x in indexes
+                     if IIndexSort.providedBy(x)
+                     or 'sort' in x.__dir__()]
+    return colander.OneOf(valid_indexes)
+
+
+def _get_indexes(context) -> list:
+    indexes = []
     system = find_catalog(context, 'system') or {}
-    system_index = [k for k, v in system.items()
-                    if 'unique_values' in v.__dir__()]
-    return colander.OneOf(adhocracy_index + system_index)
+    indexes.extend(system.values())
+    adhocracy = find_catalog(context, 'adhocracy') or {}
+    indexes.extend(adhocracy.values())
+    return indexes
 
 
 class GETPoolRequestSchema(colander.MappingSchema):
@@ -333,6 +353,8 @@ class GETPoolRequestSchema(colander.MappingSchema):
     depth = PoolQueryDepth(missing=colander.drop)
     elements = PoolElementsForm(missing=colander.drop)
     count = colander.SchemaNode(colander.Boolean(), missing=colander.drop)
+    sort = colander.SchemaNode(colander.String(), missing=colander.drop,
+                               validator=deferred_validate_sort)
     aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop,
                                       validator=deferred_validate_aggregateby)
 

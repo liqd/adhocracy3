@@ -708,18 +708,20 @@ class MetaApiView(RESTView):
                 targetsheet = None
                 readonly = getattr(node, 'readonly', False)
 
-                # If the outer type is not a container and it's not
-                # just a generic SchemaNode, we use the outer type
-                # as "valuetype" since it provides most specific
-                # information (e.g. "adhocracy_core.schema.Identifier"
-                # instead of just "SingleLIne")
-                if valuetype is not SchemaNode:
-                    typ = to_dotted_name(valuetype)
-
                 if issubclass(valuetype, References):
                     empty_appstruct = node.default
                     containertype = empty_appstruct.__class__.__name__
                     typ = to_dotted_name(AbsolutePath)
+                elif isinstance(node, SequenceSchema):
+                    containertype = 'list'
+                    typ = to_dotted_name(type(node.children[0]))
+                elif valuetype is not SchemaNode:
+                    # If the outer type is not a container and it's not
+                    # just a generic SchemaNode, we use the outer type
+                    # as "valuetype" since it provides most specific
+                    # information (e.g. "adhocracy_core.schema.Identifier"
+                    # instead of just "SingleLine")
+                    typ = to_dotted_name(valuetype)
 
                 if hasattr(node, 'reftype'):
                     # set targetsheet

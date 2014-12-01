@@ -60,6 +60,7 @@ export interface IRateScope extends ng.IScope {
     isActiveClass : (value : number) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
     cast(value : number) : void;
+    toggle() : void;
     assureUserRateExists() : ng.IPromise<void>;
     postUpdate() : ng.IPromise<void>;
     optionsPostPool : AdhHttp.IOptions;
@@ -292,6 +293,14 @@ export var rateController = (
                     adapter.rate($scope.myRateResource, rate);
                     $scope.postUpdate();
                 });
+        }
+    };
+
+    $scope.toggle = () : void => {
+        if ($scope.isActive(1)) {
+            $scope.cast(0);
+        } else {
+            $scope.cast(1);
         }
     };
 

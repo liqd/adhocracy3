@@ -1195,6 +1195,26 @@ you'll get the number of children in the pool::
     >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
     >>> assert int(child_count) >= 10
 
+If you specify *sort* you can set a *<custom>* filter (see below) that supports
+sorting to sort the result::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sort': 'name'}).json
+    >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/', ...
+
+*Note* All resource in the result set must have a value in the chosen sort
+filter. For example if you use *rates* you have to limit the result to resources
+with :class:`adhocracy_core.sheet.rate.IRateable` sheet.
+
+Not supported filters cannot be used for sorting::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...                         params={'sort': 'path'},
+    ...                         status=400).json
+    >>> resp_data['errors'][0]['description']
+    '"path" is not one of content_type, name, text,...
+
 The *elements* parameter allows controlling how matching element are
 returned. By default, 'elements' in the IPool sheet contains a list of paths.
 This corresponds to setting *elements=paths*.
@@ -1228,7 +1248,7 @@ their paths::
     {'content_type': 'adhocracy_core.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
 
 
-*tag* is a custom filter that allows filtering only resources with a
+*tag* is a filter that allows filtering only resources with a
 specific tag. Often we are only interested in the newest versions of
 Versionables. We can get them by setting *tag=LAST*. Let's find the latest
 versions of all sections::
@@ -1240,8 +1260,27 @@ versions of all sections::
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
      'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
+*<custom>* filter: depending on the backend configuration there are additional
+custom filters:
 
-*package.sheets.sheet.ISheet:FieldName* filters: you can add arbitrary custom
+* *rate* the rate value of resources with :class:`adhocracy_core.sheet.rate.IRate`
+  sheet. This is mostly useful for the requests with the *aggregated* filter.
+  Supports sorting.
+
+* *rates* the aggregated value of all :class:`adhocracy_core.sheet.rate.IRate`
+  resources referencing a resource with :class:`adhocracy_core.sheet.rate.IRateable`.
+  Supports sorting.
+
+* *name* the identifier value of all resources (last part in the resource url).
+  This is the same value like the name in the :class:`adhocracy_core.sheet.name.IName`
+  sheet.
+  Supports sorting.
+
+* *creator* the :term:`userid` of the resource creator. This is the path of the
+  user resource url.
+  Supports sorting.
+
+*<package.sheets.sheet.ISheet:FieldName>* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
 the isheet plus the field name separated by ':' The value is the wanted
 reference target. ::

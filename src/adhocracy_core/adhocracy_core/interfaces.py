@@ -395,6 +395,29 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
     creator = Attribute('User resource object of the authenticated User')
 
 
+class ISheetReferenceModified(IObjectEvent):  # pragma: no cover
+
+    """An event type sent when a sheet back reference was added/removed.
+
+    See Subtypes for more detailed semantic.
+    """
+
+    object = Attribute('The referenced resource')
+    isheet = Attribute('The referenced sheet.')
+    reference = Attribute('The Reference with `object` as target.')
+    registry = Attribute('The pyramid registry')
+
+
+class ISheetBackReferenceAdded(ISheetReferenceModified):  # pragma: no cover
+
+    """An event type sent when a sheet back reference was added."""
+
+
+class ISheetBackReferenceRemoved(ISheetReferenceModified):  # pragma: no cover
+
+    """An event type sent when a sheet back reference was removed."""
+
+
 class ILocalRolesModfied(IObjectEvent):
 
     """An event type send when an resource`s :term:`local role` is modified."""
@@ -495,3 +518,8 @@ class IRateValidator(Interface):  # pragma: no cover
 
     def helpful_error_message(self) -> str:
         """Return a error message that explains which values are allowed."""
+
+
+class Reference(namedtuple('Reference', 'source isheet field target')):
+
+    """Fields: source isheet field target."""

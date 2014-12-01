@@ -2,6 +2,7 @@
 
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhProposal = require("../Proposal/Proposal");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhUser = require("../User/User");
@@ -52,27 +53,34 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhComment.moduleName,
+            AdhMovingColumns.moduleName,
             AdhProposal.moduleName,
             AdhResourceArea.moduleName,
             AdhUser.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .when(RIBasicPool.content_type, {
-                     space: "content",
-                     movingColumns: "is-show-show-hide"
+                .default(RIBasicPool.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    content2Url: ""
                 })
-                .when(RIProposalVersion.content_type, {
-                     space: "content",
-                     movingColumns: "is-collapsed-show-show"
+                .default(RIProposalVersion.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-collapse-show-show"
                 })
-                .when(RIUser.content_type, {
-                     space: "user",
-                     movingColumns: "is-show-show-hide"
+                .specific(RIProposalVersion.content_type, "", () => (resource : RIProposalVersion) => {
+                    return {
+                        content2Url: resource.path
+                    };
                 })
-                .when(RIUsersService.content_type, {
-                     space: "user",
-                     movingColumns: "is-show-show-hide"
+                .default(RIUser.content_type, "", {
+                    space: "user",
+                    movingColumns: "is-show-show-hide"
+                })
+                .default(RIUsersService.content_type, "", {
+                    space: "user",
+                    movingColumns: "is-show-show-hide"
                 });
         }])
         .directive("adhDocumentWorkbench", ["adhConfig", (adhConfig) =>

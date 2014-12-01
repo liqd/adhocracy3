@@ -66,7 +66,7 @@ var bindServerErrors = (
 
 
 export class Service {
-    public loggedIn : boolean = false;
+    public loggedIn : boolean;
     public data : IUserBasic;
     public token : string;
     public userPath : string;
@@ -99,6 +99,8 @@ export class Service {
                         _self.deleteToken();
                     }));
                 }
+            } else if (_self.loggedIn === undefined) {
+                _self.loggedIn = false;
             }
         };
 
@@ -346,7 +348,8 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
         scope: {
-            path: "@"
+            path: "@",
+            name: "@?"
         },
         controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service<any>, $translate, $scope) => {
             if ($scope.path) {
@@ -354,14 +357,68 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                         $scope.isAnonymous = false;
+
+                        if (typeof $scope.name !== "undefined") {
+                            $scope.userBasic.name = $scope.name;
+                        };
                     });
             } else {
                 $translate("guest").then((translated) => {
                     $scope.userBasic = {
                         name: translated
                     };
+
+                    if (typeof $scope.name !== "undefined") {
+                        $scope.userBasic.name = $scope.name;
+                    };
                 });
                 $scope.isAnonymous = true;
+            }
+        }]
+    };
+};
+
+export var userListDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html"
+    };
+};
+
+export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListItem.html",
+        scope: {
+            path: "@",
+            me: "=?"
+        },
+        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+            if ($scope.path) {
+                adhHttp.resolve($scope.path)
+                    .then((res) => {
+                        $scope.userBasic = res.data[SIUserBasic.nick];
+                    });
+            }
+        }]
+    };
+};
+
+export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
+        scope: {
+            path: "@"
+        },
+        controller: ["adhHttp", "adhUser", "$scope", "$rootScope", (adhHttp : AdhHttp.Service<any>, adhUser, $scope, $rootScope) => {
+            if ($scope.path) {
+                adhHttp.resolve($scope.path)
+                    .then((res) => {
+                        $scope.userBasic = $rootScope.userBasic = res.data[SIUserBasic.nick];
+                    });
+            } else {
+                $scope.userBasic = $rootScope.userBasic = adhUser.data;
             }
         }]
     };
@@ -406,6 +463,9 @@ export var register = (angular) => {
                 }]);
         }])
         .service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service])
+        .directive("adhListUsers", ["adhConfig", userListDirective])
+        .directive("adhUserListItem", ["adhConfig", userListItemDirective])
+        .directive("adhUserProfile", ["adhConfig", userProfileDirective])
         .directive("adhLogin", ["adhConfig", loginDirective])
         .directive("adhRegister", ["adhConfig", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])

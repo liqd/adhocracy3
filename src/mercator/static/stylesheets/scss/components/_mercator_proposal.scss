@@ -17,46 +17,35 @@
 
 .mercator-proposal-form-nav {
     @include span(first 2 of 12);
-    border: 1px solid $color-structure-border;
-    top: 0.5em;
-    z-index: 1;
-
-    a {
-        &.active {
-            font-weight: bold;
-        }
-    }
+    @extend .jump-navigation;
 }
 
 .mercator-proposal-detail-view {
     @include container;
 }
 
-.mercator-proposal-cover {
+.mercator-proposal-detail-meta,
+.mercator-propsal-list-item-meta {
+    // reset ul default styling
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include container;
+    margin-bottom: gutter(12);
+}
+
+.mercator-propsal-detail-meta-item {
+    @include gallery(2 of 12);
+}
+
+.mercator-propsal-list-item-meta-item {
+    @include gallery(3 of 12);
+}
+
+.mercator-proposal-detail-cover {
     @include span(full);
     border-bottom: 1px solid $color-structure-border;
-
-    .proposal-meta {
-        // reset ul default styling
-        margin: 0;
-        padding: 0;
-        list-style: none;
-
-        @include container;
-        margin-bottom: gutter(12);
-
-        .proposal-meta-column {
-            @include span(2 of 12);
-
-            &:first-child {
-                @include span(first 2 of 12);
-            }
-
-            &:last-child {
-                @include span(last 2 of 12);
-            }
-        }
-    }
 }
 
 .mercator-proposal-cover-show-comments {
@@ -65,8 +54,22 @@
 
 .mercator-proposal-detail-nav {
     @include span(first 2 of 12);
+    @extend .jump-navigation;
 }
 
 .mercator-proposal-chapters {
     @include span(last 10 of 12);
+}
+
+.mercator-proposal-list-item {
+    @include container;
+    border-bottom: 1px solid $color-structure-border;
+
+    .mercator-proposal-list-item-image {
+        @include span(3 of 12 first);
+    }
+
+    .m-has-image {
+        @include span(9 of 12 last);
+    }
 }

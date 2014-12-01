@@ -857,6 +857,31 @@ class TestMetaApiView:
         field_metadata = sheet_metadata['fields'][0]
         assert field_metadata['targetsheet'] == ISheetB.__identifier__
 
+    def test_get_sheets_with_field_non_generic_or_container(
+            self, request, context, sheet_meta):
+        from adhocracy_core.schema import Identifier
+        class SchemaF(colander.MappingSchema):
+            id = Identifier()
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
+        inst = self.make_one(request, context)
+        sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['valuetype'] == 'adhocracy_core.schema.Identifier'
+
+    def test_get_sheets_with_sequence_schema_as_node(self, request, context,
+                                                     sheet_meta):
+        from adhocracy_core.schema import Roles
+        class SchemaF(colander.MappingSchema):
+            roles = Roles()
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
+        inst = self.make_one(request, context)
+        sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['valuetype'] == 'adhocracy_core.schema.Role'
+        assert field_metadata['containertype'] == 'list'
+
     # FIXME test for single reference
 
 

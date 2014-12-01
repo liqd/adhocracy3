@@ -100,7 +100,7 @@ export var register = () => {
                         }
                     }));
 
-                    expect(adhUser.loggedIn).toBe(false);
+                    expect(adhUser.loggedIn).toBe(undefined);
                     expect(adhUser.data).not.toBeDefined();
                 });
 
@@ -197,7 +197,7 @@ export var register = () => {
 
                     it("rejects the login attempt", () => {
                         expect(_reason).toBe(logInErrorDetails);
-                        expect(adhUser.loggedIn).toBe(false);
+                        expect(adhUser.loggedIn).toBe(undefined);
                         expect(adhUser.data).not.toBeDefined();
                         expect(adhUser.token).not.toBeDefined();
                         expect(httpMock.defaults.headers.common["X-User-Token"]).not.toBeDefined();

@@ -1,9 +1,6 @@
 <div class="rate" data-ng-if="ready">
+    <a href="" class="{{isActiveClass(1)}}" data-ng-click="toggle()">{{ "Support" | translate }}</a>
     <span class="rate-difference">
-        <a href="">
-            {{rates.pro | signum}}
-        </a>
+        {{rates.pro | signum}}
     </span>
-    <a href="" class="rate-pro {{isActiveClass(1)}}" data-ng-click="cast(1)">{{ "pro" | translate }}: {{rates.pro}}</a>
-    <a href="" class="rate-neutral {{isActiveClass(0)}}" data-ng-click="cast(0)">{{ "neutral" | translate }}: {{rates.neutral}}</a>
 </div>

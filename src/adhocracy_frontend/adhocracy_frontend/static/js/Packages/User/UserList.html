@@ -1,0 +1,10 @@
+<adh-user-list-item data-path="{{user.userPath}}" data-me="true"></adh-user-list-item>
+
+<section class="user-list">
+    <adh-listing
+        data-path="/principals/users/"
+        data-no-create-form="true">
+        <adh-user-list-item
+            data-path="{{element}}"></adh-user-list-item>
+    </adh-listing>
+</section>

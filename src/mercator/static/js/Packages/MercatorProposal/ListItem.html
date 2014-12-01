@@ -1,13 +1,31 @@
-<div class="mercator-proposal-list-item">
-    <img src="" alt="" />
-    <div class="body">
-        <h3><a href="" data-ng-click="showDetails()">{{ data.introduction.title }}</a></h3>
-        <span>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</span>
-        <div class="meta">
-            <span>when: {{ data.basic.createtime }}</span>
-            <span>budget: {{ data.finance.funding }} / {{ data.finance.budget }}</span>
-            <span>comments: [#comments]</span>
-            <span>votes: [#votes]</span>
-        </div>
+<div class="mercator-proposal-list-item" >
+    <!-- FIXME: ng-if refers to non-existant 'image' object -->
+    <div class="mercator-proposal-list-item-image" data-ng-if="image"><img src="" alt="" /></div>
+    <div class="mercator-proposal-list-item-body" data-ng-class="{'m-has-image': image}">
+        <h3><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
+        <p class="proposal-username">
+            <adh-user-meta
+                data-ng-if="data.user_info"
+                data-path="{{data.user_info.path}}"
+                data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+            </adh-user-meta>,
+            {{data.organization_info.name}}
+        </p>
+        <ul class="mercator-propsal-list-item-meta">
+            <li class="mercator-propsal-list-item-meta-item">
+                {{ data.user_info.createtime }}
+            </li>
+            <li class="mercator-propsal-list-item-meta-item">
+                {{ data.finance.budget }} &euro;
+            </li>
+            <li class="mercator-propsal-list-item-meta-item">
+                <!-- FIXME: Dummy data -->12
+                {{ "votes" | translate }}
+            </li>
+            <li class="mercator-propsal-list-item-meta-item">
+                {{ data.commentCountTotal }}
+                {{ "comments" | translate }}
+            </li>
+        </ul>
     </div>
 </div>
