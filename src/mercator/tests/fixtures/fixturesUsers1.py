@@ -3,10 +3,13 @@
 # FIXME: Doesn't work as requests is missing. Use a Python with requests
 # installed.
 
-import os
+import glob
 import json
+import os
+import re
 import requests
 
+email_spool_path = os.environ['A3_ROOT'] + '/var/mail/new/'
 root_uri = 'http://lig:6541'
 verbose = True
 
@@ -16,29 +19,29 @@ true = True
 false = False
 
 def register_user(user_name):
-    uri = root_uri + "/principals/users/"
+    uri = root_uri + '/principals/users/'
     headers = {
-        "X-User-Token": "SECRET_GOD",
-        "X-User-Path": "/principals/users/0000000/",
-        "Content-Type": "application/json;charset=UTF-8",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip,deflate",
-        "Connection": "keep-alive",
-        "Accept-Language": "en-US,en;q=0.8",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
-        "Content-Length": "238"
+        'X-User-Token': 'SECRET_GOD',
+        'X-User-Path': '/principals/users/0000000/',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Encoding': 'gzip,deflate',
+        'Connection': 'keep-alive',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36',
+        'Content-Length': '238'
         }
     body = json.dumps({
-            "data": {
-                "adhocracy_core.sheets.principal.IPasswordAuthentication": {
-                    "password": "password"
+            'data': {
+                'adhocracy_core.sheets.principal.IPasswordAuthentication': {
+                    'password': 'password'
                 },
-                "adhocracy_core.sheets.principal.IUserBasic": {
-                "email": user_name + "@posteo.de",
-                "name": user_name
+                'adhocracy_core.sheets.principal.IUserBasic': {
+                'email': user_name + '@posteo.de',
+                'name': user_name
             }
         },
-        "content_type": "adhocracy_core.resources.principal.IUser"
+        'content_type': 'adhocracy_core.resources.principal.IUser'
     })
     response = requests.post(uri, headers=headers, data=body)
     if verbose:
@@ -52,5 +55,41 @@ def register_user(user_name):
     assert response.status_code == 200
 
 
-for n in ["carla","cindy","conrad","hanna","joe","kalle","nina","phillip","theo","zoe"]:
-    register_user(n + "3")
+def activate_account(path):
+    uri = root_uri + '/activate_account'
+    headers = {
+        'X-User-Token': 'SECRET_GOD',
+        'X-User-Path': '/principals/users/0000000/',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Encoding': 'gzip,deflate',
+        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36',
+        'Content-Length': '45'
+    }
+    body = json.dumps({
+        'path': path
+    })
+    response = requests.post(uri, headers=headers, data=body)
+    if verbose:
+        print('\n')
+        print(uri)
+        print(headers)
+        print(body)
+        print(response)
+        print(response.text)
+
+    #assert response.status_code == 200
+
+
+for n in ['carla','cindy','conrad','hanna','joe','kalle','nina','phillip','theo','zoe']:
+    register_user(n + "18")
+
+for file in glob.glob(email_spool_path + "*"):
+    file_contents = open(file, 'r').read()
+
+    m = re.search('http://.*(/activate/.*)', file_contents)
+    if m is not None:
+        activate_account(m.group(1))
+    else:
+        print("*** no match in file: " + file)
