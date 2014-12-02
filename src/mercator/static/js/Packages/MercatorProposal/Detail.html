@@ -18,11 +18,9 @@
                 </adh-user-meta>
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                {{ data.user_info.createtime }}
-                published
+                {{ data.user_info.createtime }} {{ "published" | translate }}
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                <!-- FIXME: Dummy data -->
                 <i class="icon-speachbubble-outline"></i> {{ data.commentCountTotal }}
             </li>
             <li class="mercator-propsal-detail-meta-item">
@@ -233,16 +231,14 @@
                 <span data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</span></p>
 
                 <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:experience'}}">
-                    <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> {{ data.experienceCommentCount }}
                 </a>
             </section><!-- /.commentable-section -->
         </section>
-        <!-- FIXME: dummy -->
-        <button type="button">Support</button>
-
-        <!-- FIXME: [here you should see a second manifestation of the
+        <!-- FIXME: dummy [here you should see a second manifestation of the
         support butten in the cover section.  obviously, if one of
         them is clicked, the other should change automatically.] -->
+        <button type="button">Support</button>
+
     </div><!-- /.mercator-detail-body -->
 </div><!-- /.mercator-proposal-detail-view -->
