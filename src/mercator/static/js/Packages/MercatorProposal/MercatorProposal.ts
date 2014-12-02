@@ -1079,7 +1079,6 @@ export var register = (angular) => {
                 acceptedFileTypes : [
                     "gif",
                     "jpeg",
-                    "jpg",
                     "png"
                 ] // correspond to exact mime types EG image/png
             };
