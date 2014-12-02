@@ -160,8 +160,7 @@ export interface IControllerScope extends IScope {
     mercatorProposalDetailForm? : any;
     mercatorProposalIntroductionForm? : any;
     $flow : any;
-    flowOptions : any;
-
+    currentUpload : any;
 }
 
 
@@ -1159,7 +1158,7 @@ export var register = (angular) => {
             };
 
             $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
-                $scope.flowOptions = flow.opts;
+                $scope.currentUpload = flow;
                 // validate image upload
                 flow.on( "fileAdded", (file, event) => {
                     var elem = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
@@ -1173,39 +1172,35 @@ export var register = (angular) => {
                     } else {
                         elem.$setValidity("wrongType", true);
                     }
-                    if (elem.$error.wrongType || elem.$error.tooBig) {
-                        elem.$setViewValue(false);
-                        // if we have errors do not bother to load the image
-                        return false;
-                    }
-                    var img = new Image();
-                    img.onload = () => {
-                        var imageWidth = img.width;
-
-                        if (imageWidth > flow.opts.maximumWidth) {
-                            elem.$setValidity("tooWide", false);
-                        } else {
-                            elem.$setValidity("tooWide", true);
-                        }
-                        if (imageWidth < flow.opts.minimumWidth) {
-                            elem.$setValidity("tooNarrow", false);
-                        } else {
-                            elem.$setValidity("tooNarrow", true);
-                        }
-                        if (elem.$invalid) {
-                            elem.$setViewValue(false);
-                            flow.removeFile(file);
-                            if ($scope.flowOptions.stashedImage) {
-                                if (file.file !== $scope.flowOptions.stashedImage) {
-                                    flow.addFile($scope.flowOptions.stashedImage);
-                                }
+                    if (!elem.$error.wrongType && !elem.$error.tooBig) {
+                        var img = new Image();
+                        var _URL = $window.URL || $window.webkitURL;
+                        img.src = _URL.createObjectURL(file.file);
+                        img.onload = () => {
+                            var imageWidth = img.width;
+                            if (imageWidth > flow.opts.maximumWidth) {
+                                elem.$setValidity("tooWide", false);
+                            } else {
+                                elem.$setValidity("tooWide", true);
                             }
-                        } else {
-                            $scope.flowOptions.stashedImage = file.file;
-                        }
-                    };
-                    var _URL = $window.URL || $window.webkitURL;
-                    img.src = _URL.createObjectURL(file.file);
+                            if (imageWidth < flow.opts.minimumWidth) {
+                                elem.$setValidity("tooNarrow", false);
+                            } else {
+                                elem.$setValidity("tooNarrow", true);
+                            }
+                            if (elem.$valid) {
+                                var currentFile = flow.files[0] ? flow.files[0].file : null;
+                                if (currentFile !== file.file) {
+                                    flow.files[0] = file;
+                                    $scope.$apply();
+                                }
+                            } else {
+                                elem.$setViewValue(false);
+                            }
+                        };
+                    }
+                    $scope.$apply();
+                    return false;
                 });
             });
 
