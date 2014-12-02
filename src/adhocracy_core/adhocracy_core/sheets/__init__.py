@@ -278,6 +278,7 @@ def includeme(config):  # pragma: no cover
     config.include('.comment')
     config.include('.rate')
     config.include('.asset')
+    config.include('.sample_image')
 
 
 class AttributeStorageSheet(GenericResourceSheet):
