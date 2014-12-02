@@ -1175,7 +1175,7 @@ export var register = (angular) => {
                             flow.removeFile(file);
                         }
                     };
-                    var _URL = (<any>window).URL || (<any>window).webkitURL;
+                    var _URL = $window.URL || $window.webkitURL;
                     img.src = _URL.createObjectURL(file.file);
                 });
             });
