@@ -79,57 +79,30 @@ We can ask the pool for the location of the asset pool::
     'http://localhost/adhocracy/ProposalPool/assets/'
 
 
-Asset Subtypes and MIME Type Validators
----------------------------------------
+Asset Subtypes, MIME Type Validators, and Images Size Mappers
+-------------------------------------------------------------
 
 Note: this section is mostly backend-specific.
 
 The generic `adhocracy_core.sheets.asset.IAssetMetadata` sheet doesn't limit
 the MIME type of assets. Since this is rarely desirable, it is considered
 abstract and cannot be instantiated -- only subclasses that provide a *MIME
-Type Validator* can. To do so, create a subclass of the sheet (empty marker
-interface) and register a `adhocracy_core.interfaces.IMimeTypeValidator`
-implementation for that subclass (same as with `IRateValidator` for rates).
+Type Validator* can. Check out the `adhocracy_core.sheets.sample_image` module
+for an example of how to do that.
 
-E.g. to create a spreadsheet asset type that only accepts OpenDocument and
-Excel spreadsheets::
+To prevent confusing the frontend, you should also define a subclass of the
+`adhocracy_core.resources.asset.IAsset` resource type that uses the subclassed
+sheet instead of the generic one. See `adhocracy_core.resources.sample_image`
+for an example.
 
-    class ISpreadsheetAsset(IAssetMetadata):
-        """Empty marker interface for spreadsheet assets."""
-
-    @implementer(IMimeTypeValidator)
-    class SpreadsheetMimeTypeValidator:
-
-        def validate(self, mime_type: str) -> bool:
-            return mime_type in (
-                'application/vnd.oasis.opendocument.spreadsheet',
-                'application/vnd.ms-excel')
-
-    config.registry.registerAdapter(SpreadsheetMimeTypeValidator,
-                                    (ISpreadsheetAsset,),
-                                    IMimeTypeValidator)
-
-For consistency, there should be a corresponding subtype of the asset
-resource defined for each subtype of the asset sheet.
-
-FIXME Adapt this section, as we actually extend the SheetMetadata instead
-of using an adapter (likewise for Size Mappers).
-
-
-Images and Size Mappers
------------------------
-
-Note: this section is mostly backend-specific.
-
-A predefined IAssetMetadata subtype is
-`adhocracy_core.resources.asset.IImageMetadata`. Its adapter allows MIME
-types that start with 'image/', i.e., arbitrary image files (subtypes of
-IImage can restrict that further, if desired).
+In the examples that follow, we will use the subclassed example resource type
+and sheet.
 
 The backend can resize and crop images to different target formats. To do
-this, define an IImageMetadata subtype and register a
-`adhocracy_core.interfaces.ImageSizeMapper` implementation for that
-subtype::
+this, add an `image_sizes` field to the metadata of your subclassed sheet.
+`adhocracy_core.sheets.sample_image` shows how to do that too.
+
+TODO continue adapting::
 
     class IProposalIntroImage(IImageMetadata):
         """Empty marker interface."""
@@ -164,14 +137,17 @@ Uploading Assets
 Assets are uploaded (POST) and updated (PUT) in a special way. Instead of
 sending a JSON document, the field names and values are flattened into
 key/value pairs that are sent as a "multipart/form-data" request. Hence, the
-request will typically have the following keys:
+request will have keys similar to the following:
 
 :content_type: the type of the resource that shall be created, e.g.
-    "adhocracy_core.resources.sample_proposal.IProposalIntroImage"
+    "adhocracy_core.resources.sample_image.ISampleImage"
 :data\:adhocracy_core.sheets.asset.IAssetMetadata\:mime_type: the MIME type of
     the uploaded file, e.g. "image/jpeg"
 :data\:adhocracy_core.sheets.asset.IAssetData\:data: the binary data of the
     uploaded file, as per the HTML `<input type="file" name="asset">` tag.
+
+But note that a concrete subsheet must be used instead of the generic
+IAssetMetadata sheet, matching the given resource type.
 
 For example, lets upload a little picture and create a proposal version that
 references it. But first we have to create a proposal::
@@ -196,8 +172,9 @@ Now we can upload a sample picture::
     ...     'sample-pic-python-logo.png',
     ...     open('docs/source/_static/sample-pic-python-logo.png', 'rb').read())]
     >>> request_body = {
-    ...    'content_type': 'adhocracy_core.resources.asset.IAsset',
-    ...    'data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type': 'image/jpeg'}
+    ...    'content_type': 'adhocracy_core.resources.sample_image.ISampleImage',
+    ...    'data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type':
+    ...        'image/png'}
     >>> resp_data = testapp.post(asset_pool_path, request_body,
     ...             headers=god_header, upload_files=upload_files).json
     >>> pic_path = resp_data["path"]
@@ -209,7 +186,7 @@ TODO Create proposal version referencing the image.
 In response, the backend sends a JSON document with the resource type and
 path of the new resource (just as with other resource types)::
 
-    {"content_type": "adhocracy_core.resources.sample_proposal.IProposalIntroImage",
+    {"content_type": "adhocracy_core.resources.sample_image.ISampleImage",
      "path": "http://localhost/adhocracy/proposals/myfirstproposal/assets/0000000"}
 
 
@@ -254,13 +231,14 @@ the asset::
 
     >>> resp_data = testapp.get(pic_path).json
     >>> resp_data['content_type']
-    'adhocracy_core.resources.asset.IAsset'
+    'adhocracy_core.resources.sample_image.ISampleImage'
     >>> resp_data['data']['adhocracy_core.sheets.metadata.IMetadata']['modification_date']
     '20...'
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.asset.IAssetMetadata'])
-    {'attached_to': [], 'filename': '', 'mime_type': 'image/jpeg', 'size': '0'}
-
-TODO filename and size should be auto-populated by the backend.
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.sample_image.ISampleImageMetadata'])
+    {'attached_to': [],
+     'filename': 'sample-pic-python-logo.png',
+     'mime_type': 'image/png',
+     'size': '14651'}
 
 The actual binary data is *not* part of that JSON document::
 
@@ -272,7 +250,9 @@ child of the asset::
 
     >>> resp_data = testapp.get(pic_path + 'raw').json
     >>> resp_data["content_type"]
-    'image/jpeg'
+    'image/png'
+    >>> len(resp_data.body)
+    14651
 
 In case of images, it can retrieve the image in one of the predefined
 cropped sizes by asking for one of the keys defined by the ImageSizeMapper as

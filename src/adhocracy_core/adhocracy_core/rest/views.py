@@ -20,13 +20,13 @@ from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
 
-from adhocracy_core.interfaces import IAsset
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
+from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
