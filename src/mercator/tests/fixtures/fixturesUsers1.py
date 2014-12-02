@@ -81,7 +81,7 @@ def activate_account(path):
 
     #assert response.status_code == 200
 
-def register_all():
+def activate_all():
     for file in glob.glob(email_spool_path + "*"):
         file_contents = open(file, 'r').read()
 
@@ -94,4 +94,4 @@ def register_all():
 if __name__ = "__main__":
     for n in ['carla','cindy','conrad','hanna','joe','kalle','nina','phillip','theo','zoe']:
         register_user(n + "18")
-    register_all()
+    activate_all()
