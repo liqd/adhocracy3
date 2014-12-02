@@ -1189,11 +1189,8 @@ export var register = (angular) => {
                                 elem.$setValidity("tooNarrow", true);
                             }
                             if (elem.$valid) {
-                                var currentFile = flow.files[0] ? flow.files[0].file : null;
-                                if (currentFile !== file.file) {
-                                    flow.files[0] = file;
-                                    $scope.$apply();
-                                }
+                                flow.files[0] = file;
+                                $scope.$apply();
                             } else {
                                 elem.$setViewValue(false);
                             }
