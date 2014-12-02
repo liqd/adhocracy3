@@ -4,7 +4,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
 export var movingColumns = (
-    topLevelState : AdhTopLevelState.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     $timeout,
     $window
 ) => {
@@ -26,23 +26,25 @@ export var movingColumns = (
             // if there is not enough space, collapse all but one column.
             var responsiveClass = (cls : string) : string => {
                 if ($($window).width() < 2 * minShowWidth + collapseWidth) {
-                    var s = "";
+                    var s = "is";
                     var parts = cls.split("-");
-                    var collapse = false;
 
-                    for (var i = 3; i > 0; i--) {
-                        if (collapse) {
-                            s = "-collapse" + s;
+                    var focus = parseInt(adhTopLevelState.get("focus"), 10);
+                    if (isNaN(focus)) {
+                        focus = parts.lastIndexOf("show") - 1;
+                    }
+
+                    for (var i = 0; i < 3; i++) {
+                        if (i > focus) {
+                            s += "-hide";
+                        } else if (i === focus) {
+                            s += "-show";
                         } else {
-                            s = "-" + parts[i] + s;
-                        }
-
-                        if (parts[i] === "show") {
-                            collapse = true;
+                            s += "-collapse";
                         }
                     }
 
-                    return "is" + s;
+                    return s;
                 } else {
                     return cls;
                 }
@@ -105,46 +107,25 @@ export var movingColumns = (
             };
 
             // FIXME: these do not really belong here
-            topLevelState.on("content2Url", (url : string) => {
+            adhTopLevelState.on("content2Url", (url : string) => {
                 scope.content2Url = url;
             });
-            topLevelState.on("platformUrl", (url : string) => {
+            adhTopLevelState.on("platformUrl", (url : string) => {
                 scope.platformUrl = url;
             });
-            topLevelState.on("proposalUrl", (url : string) => {
+            adhTopLevelState.on("proposalUrl", (url : string) => {
                 scope.proposalUrl = url;
             });
-            topLevelState.on("commentableUrl", (url : string) => {
+            adhTopLevelState.on("commentableUrl", (url : string) => {
                 scope.commentableUrl = url;
             });
-            topLevelState.on("userUrl", (url : string) => {
+            adhTopLevelState.on("userUrl", (url : string) => {
                 scope.userUrl = url;
             });
 
-            topLevelState.on("movingColumns", move);
-            topLevelState.on("space", () => _.defer(resizeNoTransition));
-        }
-    };
-};
-
-
-/**
- * A simple focus switcher that can be used until we have a proper widget for this.
- */
-export var adhFocusSwitch = (topLevelState : AdhTopLevelState.Service) => {
-    return {
-        restrict: "E",
-        template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
-        link: (scope) => {
-            scope.switchFocus = () => {
-                var currentState = topLevelState.get("movingColumns");
-
-                if (currentState.split("-")[1] === "show") {
-                    topLevelState.set("movingColumns", "is-collapse-show-show");
-                } else {
-                    topLevelState.set("movingColumns", "is-show-show-hide");
-                }
-            };
+            adhTopLevelState.on("movingColumns", move);
+            adhTopLevelState.on("focus", resize);
+            adhTopLevelState.on("space", () => _.defer(resizeNoTransition));
         }
     };
 };
@@ -157,6 +138,5 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhTopLevelState.moduleName
         ])
-        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns])
-        .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch]);
+        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
 };
