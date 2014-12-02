@@ -56,6 +56,8 @@ export interface ListingScope<Container> extends ng.IScope {
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
+    params? : any;
+    emptyText? : string;
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
@@ -100,10 +102,12 @@ export class Listing<Container extends ResourcesBase.Resource> {
             scope: {
                 path: "@",
                 contentType: "@",
-                facets: "=",
-                sort: "=",
+                facets: "=?",
+                sort: "=?",
+                params: "=?",
                 update: "=?",
-                noCreateForm: "="
+                noCreateForm: "=?",
+                emptyText: "@"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
@@ -120,7 +124,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
                 $scope.update = () : ng.IPromise<void> => {
-                    var params = <any>{};
+                    var params = <any>_.extend({}, $scope.params);
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
                         if (AdhUtil.endsWith($scope.contentType, "Version")) {

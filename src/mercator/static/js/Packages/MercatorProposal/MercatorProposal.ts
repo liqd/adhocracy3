@@ -622,9 +622,28 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         scope: {
             path: "@",
             contentType: "@",
-            update: "=",
-            facets: "=",
-            sort: "="
+            update: "=?",
+            facets: "=?",
+            sort: "=?",
+            params: "=?"
+        }
+    };
+};
+
+
+export var userListing = (adhConfig : AdhConfig.IService) => {
+    return {
+        scope: {
+            path: "@"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListing.html",
+        link: (scope) => {
+            scope.poolUrl = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+            scope.contentType = RIMercatorProposalVersion.content_type;
+            scope.params = {
+                creator: scope.path.replace(adhConfig.rest_url, "").replace(/\/+$/, ""),
+                depth: 2
+            };
         }
     };
 };
@@ -1071,6 +1090,7 @@ export var register = (angular) => {
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
+        .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])

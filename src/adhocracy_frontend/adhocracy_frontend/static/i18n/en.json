@@ -35,5 +35,6 @@
   "Show comments": "Show comments",
   "title": "title",
   "username": "username",
-  "CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can procede using {{siteName}}"
+  "CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can procede using {{siteName}}",
+  "USERS_PROPOSALS": "{{name}}'s proposals"
 }
