@@ -1237,5 +1237,3 @@ export var register = (angular) => {
             };
         }]);
 };
-
-
