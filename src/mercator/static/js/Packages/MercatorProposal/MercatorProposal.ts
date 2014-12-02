@@ -158,7 +158,10 @@ export interface IControllerScope extends IScope {
     submitIfValid : () => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
+    mercatorProposalIntroductionForm? : any;
     $flow : any;
+    flowOptions : any;
+
 }
 
 
@@ -1136,10 +1139,10 @@ export var register = (angular) => {
             };
 
             $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
-                (<any>$scope).flowOptions = flow.opts;
+                $scope.flowOptions = flow.opts;
                 // validate image upload
                 flow.on( "fileAdded", (file, event) => {
-                    var elem = (<any>$scope).mercatorProposalIntroductionForm["introduction-picture-upload"];
+                    var elem = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
                     if (file.size > flow.opts.maximumByteSize) {
                         elem.$setValidity("tooBig", false);
                     } else {
@@ -1158,10 +1161,10 @@ export var register = (angular) => {
                     }
                     var img = new Image();
                     img.onload = () => {
-                        // FIXME: This wipes your previous selection if you change for an image too wide/narrow
                         var imageWidth = img.width;
+
                         if (imageWidth > flow.opts.maximumWidth) {
-                            elem.$setValidity("totoWide", false);
+                            elem.$setValidity("tooWide", false);
                         } else {
                             elem.$setValidity("tooWide", true);
                         }
@@ -1173,9 +1176,16 @@ export var register = (angular) => {
                         if (elem.$invalid) {
                             elem.$setViewValue(false);
                             flow.removeFile(file);
+                            if ($scope.flowOptions.stashedImage) {
+                                if (file.file !== $scope.flowOptions.stashedImage) {
+                                    flow.addFile($scope.flowOptions.stashedImage);
+                                }
+                            }
+                        } else {
+                            $scope.flowOptions.stashedImage = file.file;
                         }
                     };
-                    var _URL = (<any>window).URL || (<any>window).webkitURL;
+                    var _URL = $window.URL || $window.webkitURL;
                     img.src = _URL.createObjectURL(file.file);
                 });
             });
