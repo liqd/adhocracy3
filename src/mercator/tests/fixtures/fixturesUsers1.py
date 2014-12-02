@@ -10,7 +10,7 @@ import re
 import requests
 
 email_spool_path = os.environ['A3_ROOT'] + '/var/mail/new/'
-root_uri = 'http://lig:6541'
+root_uri = 'http://localhost:6541'
 verbose = True
 
 # for more javascript-ish json representation:
@@ -37,7 +37,7 @@ def register_user(user_name):
                     'password': 'password'
                 },
                 'adhocracy_core.sheets.principal.IUserBasic': {
-                'email': user_name + '@posteo.de',
+                'email': user_name + '@someisp.de',
                 'name': user_name
             }
         },
@@ -81,15 +81,17 @@ def activate_account(path):
 
     #assert response.status_code == 200
 
+def register_all():
+    for file in glob.glob(email_spool_path + "*"):
+        file_contents = open(file, 'r').read()
 
-for n in ['carla','cindy','conrad','hanna','joe','kalle','nina','phillip','theo','zoe']:
-    register_user(n + "18")
+        m = re.search('http://.*(/activate/.*)', file_contents)
+        if m is not None:
+            activate_account(m.group(1))
+        else:
+            print("*** no match in file: " + file)
 
-for file in glob.glob(email_spool_path + "*"):
-    file_contents = open(file, 'r').read()
-
-    m = re.search('http://.*(/activate/.*)', file_contents)
-    if m is not None:
-        activate_account(m.group(1))
-    else:
-        print("*** no match in file: " + file)
+if __name__ = "__main__":
+    for n in ['carla','cindy','conrad','hanna','joe','kalle','nina','phillip','theo','zoe']:
+        register_user(n + "18")
+    register_all()
