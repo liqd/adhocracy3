@@ -1138,7 +1138,7 @@ export var register = (angular) => {
             $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
                 (<any>$scope).flowOptions = flow.opts;
                 // validate image upload
-                flow.on( "fileAdded", (file, event) => {
+                flow.on("fileAdded", (file, event) => {
                     var elem = (<any>$scope).mercatorProposalIntroductionForm["introduction-picture-upload"];
                     if (file.size > flow.opts.maximumByteSize) {
                         elem.$setValidity("tooBig", false);
@@ -1207,5 +1207,3 @@ export var register = (angular) => {
             };
         }]);
 };
-
-
