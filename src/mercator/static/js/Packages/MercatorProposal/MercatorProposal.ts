@@ -37,6 +37,7 @@ import RIMercatorStory = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IStoryVersion");
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
+import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
@@ -46,6 +47,7 @@ import SIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/she
 import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOrganizationInfo");
 import SIMercatorOutcome = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOutcome");
+import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorPartners = require("../../Resources_/adhocracy_mercator/sheets/mercator/IPartners");
 import SIMercatorSteps = require("../../Resources_/adhocracy_mercator/sheets/mercator/ISteps");
 import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mercator/IStory");
@@ -54,6 +56,8 @@ import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MercatorProposal";
@@ -62,6 +66,7 @@ var pkgLocation = "/MercatorProposal";
 export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
+    supporterCount : number;
 
     // 1. basic
     user_info : {
@@ -257,6 +262,21 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.heard_from.other_specify = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere;
 
         data.commentCount = mercatorProposalVersion.data[SICommentable.nick].comments.length;
+        data.supporterCount = 0;
+        (() => {
+            var query : any = {};
+            query.content_type = RIRateVersion.content_type;
+            query.depth = 2;
+            query.tag = "LAST";
+            query[SIRate.nick + ":object"] = mercatorProposalVersion.path;
+            query.count = "true";
+
+            this.adhHttp.get(mercatorProposalVersion.data[SILikeable.nick].post_pool, query)
+                .then((response) => {
+                    var pool : SIPool.Sheet = response.data[SIPool.nick];
+                    data.supporterCount = (<any>pool).count;  // see #261
+                });
+        })();
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([
