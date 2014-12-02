@@ -1176,7 +1176,6 @@ export var register = (angular) => {
                     if (elem.$error.wrongType || elem.$error.tooBig) {
                         elem.$setViewValue(false);
                         // if we have errors do not bother to load the image
-                        // flow.removeFile(file);
                         return false;
                     }
                     var img = new Image();
