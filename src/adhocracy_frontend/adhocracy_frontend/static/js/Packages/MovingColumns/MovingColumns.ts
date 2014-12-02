@@ -4,7 +4,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
 export var movingColumns = (
-    topLevelState : AdhTopLevelState.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     $timeout,
     $window
 ) => {
@@ -105,24 +105,24 @@ export var movingColumns = (
             };
 
             // FIXME: these do not really belong here
-            topLevelState.on("content2Url", (url : string) => {
+            adhTopLevelState.on("content2Url", (url : string) => {
                 scope.content2Url = url;
             });
-            topLevelState.on("platformUrl", (url : string) => {
+            adhTopLevelState.on("platformUrl", (url : string) => {
                 scope.platformUrl = url;
             });
-            topLevelState.on("proposalUrl", (url : string) => {
+            adhTopLevelState.on("proposalUrl", (url : string) => {
                 scope.proposalUrl = url;
             });
-            topLevelState.on("commentableUrl", (url : string) => {
+            adhTopLevelState.on("commentableUrl", (url : string) => {
                 scope.commentableUrl = url;
             });
-            topLevelState.on("userUrl", (url : string) => {
+            adhTopLevelState.on("userUrl", (url : string) => {
                 scope.userUrl = url;
             });
 
-            topLevelState.on("movingColumns", move);
-            topLevelState.on("space", () => _.defer(resizeNoTransition));
+            adhTopLevelState.on("movingColumns", move);
+            adhTopLevelState.on("space", () => _.defer(resizeNoTransition));
         }
     };
 };
@@ -131,18 +131,18 @@ export var movingColumns = (
 /**
  * A simple focus switcher that can be used until we have a proper widget for this.
  */
-export var adhFocusSwitch = (topLevelState : AdhTopLevelState.Service) => {
+export var adhFocusSwitch = (adhTopLevelState : AdhTopLevelState.Service) => {
     return {
         restrict: "E",
         template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
         link: (scope) => {
             scope.switchFocus = () => {
-                var currentState = topLevelState.get("movingColumns");
+                var currentState = adhTopLevelState.get("movingColumns");
 
                 if (currentState.split("-")[1] === "show") {
-                    topLevelState.set("movingColumns", "is-collapse-show-show");
+                    adhTopLevelState.set("movingColumns", "is-collapse-show-show");
                 } else {
-                    topLevelState.set("movingColumns", "is-show-show-hide");
+                    adhTopLevelState.set("movingColumns", "is-show-show-hide");
                 }
             };
         }
