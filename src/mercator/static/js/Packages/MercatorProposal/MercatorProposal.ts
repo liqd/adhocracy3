@@ -1158,9 +1158,10 @@ export var register = (angular) => {
                     }
                     var img = new Image();
                     img.onload = () => {
+                        // FIXME: This wipes your previous selection if you change for an image too wide/narrow
                         var imageWidth = img.width;
                         if (imageWidth > flow.opts.maximumWidth) {
-                            elem.$setValidity("tooWide", false);
+                            elem.$setValidity("totoWide", false);
                         } else {
                             elem.$setValidity("tooWide", true);
                         }
