@@ -1,22 +1,81 @@
 """Resources for managing assets."""
 
 from pyramid.registry import Registry
+from substanced.file import File
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
-from adhocracy_core.interfaces import IAsset
+from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.pool import basicpool_metadata
 from adhocracy_core.resources.service import service_metadata
 from adhocracy_core.resources.simple import simple_metadata
+from adhocracy_core.sheets.asset import IAssetData
+from adhocracy_core.sheets.asset import IAssetMetadata
+from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import raise_colander_style_error
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
 
 
-class IPoolWithAssets(IBasicPool):
+class IAsset(ISimple):
 
-    """A pool with an auto-created asset pool."""
+    """A generic asset (binary file)."""
+
+
+def validate_and_complete_asset(context: IAsset,
+                                registry: Registry,
+                                options: dict):
+    """Complete the initialization of an asset and ensure that it's valid."""
+    data_sheet = get_sheet(context, IAssetData, registry=registry)
+    data_appstruct = data_sheet.get()
+    metadata_sheet = get_sheet(context, IAssetMetadata, registry=registry)
+    metadata_appstruct = metadata_sheet.get()
+    file = data_appstruct['data']
+    _validate_mime_type(file, metadata_appstruct, metadata_sheet)
+    _store_size_and_filename_as_metadata(file,
+                                         metadata_appstruct,
+                                         metadata_sheet,
+                                         registry=registry)
+
+
+def _validate_mime_type(file: File,
+                        metadata_appstruct: dict,
+                        metadata_sheet: IAssetMetadata):
+    detected_mime_type = file.mimetype
+    claimed_mime_type = metadata_appstruct['mime_type']
+    if detected_mime_type != claimed_mime_type:
+        _raise_mime_type_error(
+            metadata_sheet,
+            'Claimed MIME type is {} but file content seems to be {}'.format(
+                claimed_mime_type, detected_mime_type))
+    mime_type_validator = metadata_sheet.meta.mime_type_validator
+    if mime_type_validator is None:
+        _raise_mime_type_error(
+            metadata_sheet,
+            'Sheet is abstract and does\'t allow storing data')
+    if not mime_type_validator(detected_mime_type):
+        _raise_mime_type_error(
+            metadata_sheet,
+            'Invalid MIME type for this sheet: {}'.format(detected_mime_type))
+
+
+def _raise_mime_type_error(metadata_sheet: IAssetMetadata, msg: str):
+        raise_colander_style_error(metadata_sheet.meta.isheet,
+                                   'mime_type',
+                                   msg)
+
+
+def _store_size_and_filename_as_metadata(file: File,
+                                         metadata_appstruct: dict,
+                                         metadata_sheet: IAssetMetadata,
+                                         registry: Registry):
+    metadata_appstruct['size'] = file.size
+    metadata_appstruct['filename'] = file.title
+    metadata_sheet.set(metadata_appstruct,
+                       registry=registry,
+                       omit_readonly=False)
 
 
 asset_meta = simple_metadata._replace(
@@ -29,6 +88,7 @@ asset_meta = simple_metadata._replace(
     ],
     use_autonaming=True,
     permission_add='add_asset',
+    after_creation=[validate_and_complete_asset],
 )
 
 
@@ -42,6 +102,11 @@ assets_service_meta = service_metadata._replace(
     content_name='assets',
     element_types=[IAsset],
 )
+
+
+class IPoolWithAssets(IBasicPool):
+
+    """A pool with an auto-created asset pool."""
 
 
 def add_assets_service(context: IPool, registry: Registry, options: dict):

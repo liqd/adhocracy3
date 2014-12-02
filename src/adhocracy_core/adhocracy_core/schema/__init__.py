@@ -3,6 +3,7 @@ from collections import Sequence
 from collections import OrderedDict
 from datetime import datetime
 import decimal
+import os
 import re
 
 from pyramid.path import DottedNameResolver
@@ -777,9 +778,13 @@ class FileStoreType(colander.SchemaType):
         if value == colander.null:
             return None
         try:
-            return File(stream=value.file,
-                        mimetype=USE_MAGIC,
-                        title=value.filename)
+            result = File(stream=value.file,
+                          mimetype=USE_MAGIC,
+                          title=value.filename)
+            # We add the size as an extra attribute since get_size() doesn't
+            # work before the transaction has been committed
+            result.size = os.fstat(value.file.fileno()).st_size
+            return result
         except Exception as err:
             raise colander.Invalid(node, msg=str(err), value=value)
 
