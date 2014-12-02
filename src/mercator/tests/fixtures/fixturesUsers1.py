@@ -91,7 +91,7 @@ def activate_all():
         else:
             print("*** no match in file: " + file)
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     for n in ['carla','cindy','conrad','hanna','joe','kalle','nina','phillip','theo','zoe']:
-        register_user(n + "18")
+        register_user(n + "19")
     activate_all()
