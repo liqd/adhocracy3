@@ -26,23 +26,25 @@ export var movingColumns = (
             // if there is not enough space, collapse all but one column.
             var responsiveClass = (cls : string) : string => {
                 if ($($window).width() < 2 * minShowWidth + collapseWidth) {
-                    var s = "";
+                    var s = "is";
                     var parts = cls.split("-");
-                    var collapse = false;
 
-                    for (var i = 3; i > 0; i--) {
-                        if (collapse) {
-                            s = "-collapse" + s;
+                    var focus = parseInt(adhTopLevelState.get("focus"), 10);
+                    if (isNaN(focus)) {
+                        focus = parts.lastIndexOf("show") - 1;
+                    }
+
+                    for (var i = 0; i < 3; i++) {
+                        if (i > focus) {
+                            s += "-hide";
+                        } else if (i === focus) {
+                            s += "-show";
                         } else {
-                            s = "-" + parts[i] + s;
-                        }
-
-                        if (parts[i] === "show") {
-                            collapse = true;
+                            s += "-collapse";
                         }
                     }
 
-                    return "is" + s;
+                    return s;
                 } else {
                     return cls;
                 }
@@ -122,6 +124,7 @@ export var movingColumns = (
             });
 
             adhTopLevelState.on("movingColumns", move);
+            adhTopLevelState.on("focus", resize);
             adhTopLevelState.on("space", () => _.defer(resizeNoTransition));
         }
     };
