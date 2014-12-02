@@ -408,17 +408,16 @@ export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
+        transclude: true,
         scope: {
             path: "@"
         },
-        controller: ["adhHttp", "adhUser", "$scope", "$rootScope", (adhHttp : AdhHttp.Service<any>, adhUser, $scope, $rootScope) => {
+        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = $rootScope.userBasic = res.data[SIUserBasic.nick];
+                        $scope.userBasic = res.data[SIUserBasic.nick];
                     });
-            } else {
-                $scope.userBasic = $rootScope.userBasic = adhUser.data;
             }
         }]
     };

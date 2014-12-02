@@ -3,8 +3,10 @@
     data-content-type="{{contentType}}"
     data-facets="facets"
     data-sort="sort"
+    data-params="params"
     data-update="update"
-    data-no-create-form="true">
+    data-no-create-form="true"
+    data-empty-text="{{ 'No proposals yet.' | translate }}">
     <div data-ng-switch="transclusionId">
         <adh-resource-wrapper
             data-ng-switch-when="element-id">
