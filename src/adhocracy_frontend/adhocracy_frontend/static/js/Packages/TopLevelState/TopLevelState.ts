@@ -405,6 +405,7 @@ export class Service {
 
     public redirectToLogin() : void {
         this.setCameFrom(this.$location.path());
+        this.$location.replace();
         this.$location.url("/login");
     }
 }
