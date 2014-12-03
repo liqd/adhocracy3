@@ -63,8 +63,7 @@
             </div>
             <div data-ng-if="view !== 'edit'">
                 <div class="moving-column-menu">
-                    <!-- FIXME: permission check -->
-                    <a href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
+                    <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
                     <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
                 </div>
                 <div class="moving-column-collapsed">
