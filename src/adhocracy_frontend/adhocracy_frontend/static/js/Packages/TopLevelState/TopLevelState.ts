@@ -225,7 +225,9 @@ export class Service {
         if (area.skip) {
             return this.$q.when();
         } else {
-            return area.route(path, search).then((data) => {
+            return area.route(path, search)
+            .catch((error) => this.handleRoutingError(error))
+            .then((data) => {
                 this._set("space", data["space"] || "");
                 delete data["space"];
 
@@ -240,21 +242,22 @@ export class Service {
                     }
                 }
 
-                // normalize location
-                this.$location.replace();
-                this.toLocation();
+                if (this.currentSpace !== "error") {
+                    // normalize location
+                    this.$location.replace();
+                    this.toLocation();
+                }
 
                 this.blockTemplate = false;
-            })
-            .catch((error) => this.handleRoutingError(error));
+            });
         }
     }
 
     /**
-     * take action on 'benevolent' routing errors like "not logged
-     * in".  this method alwasy re-throws, so return type is void.
+     * Take action on 'benevolent' routing errors like "not logged in".
+     * This method may return a state object or (re-)throw an exception.
      */
-    private handleRoutingError(error) : void {
+    private handleRoutingError(error) : {[key : string]: string} {
         error = this.fillRoutingError(error);
         console.log(error);
 
