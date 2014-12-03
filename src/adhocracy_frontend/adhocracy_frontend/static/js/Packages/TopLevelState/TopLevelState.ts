@@ -232,11 +232,12 @@ export class Service {
         var search = this.$location.search();
 
         this.locationHasChanged = false;
-        this.lock = true;
 
         if (area.skip) {
             return this.$q.when();
         } else {
+            this.lock = true;
+
             return area.route(path, search)
             .catch((error) => this.handleRoutingError(error))
             .then((data) => {
@@ -265,6 +266,8 @@ export class Service {
                 }
 
                 this.blockTemplate = false;
+            })
+            .finally(() => {
                 this.lock = false;
             });
         }
