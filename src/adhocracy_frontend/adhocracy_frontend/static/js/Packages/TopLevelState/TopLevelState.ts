@@ -290,8 +290,7 @@ export class Service {
                         message: error.message
                     });
                 } else {
-                    this.setCameFrom(this.$location.path());
-                    this.$location.path("/login");
+                    this.redirectToLogin();
                 }
                 break;
             default:
@@ -423,6 +422,12 @@ export class Service {
         } else if (typeof _default !== "undefined") {
             this.$location.url(_default);
         }
+    }
+
+    public redirectToLogin() : void {
+        this.setCameFrom(this.$location.path());
+        this.$location.replace();
+        this.$location.url("/login");
     }
 }
 
