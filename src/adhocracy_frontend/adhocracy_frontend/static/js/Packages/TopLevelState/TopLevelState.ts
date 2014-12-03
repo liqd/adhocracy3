@@ -27,6 +27,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhEventHandler = require("../EventHandler/EventHandler");
+import AdhUser = require("../User/User");
 
 var pkgLocation = "/TopLevelState";
 
@@ -93,9 +94,9 @@ export class Provider {
         };
         this.spaceDefaults = {};
 
-        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
-            (adhEventHandlerClass, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
-                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $injector,
+        this.$get = ["adhEventHandlerClass", "adhUser", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
+            (adhEventHandlerClass, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+                return new Service(self, adhEventHandlerClass, adhUser, $location, $rootScope, $http, $q, $injector,
                                    $templateRequest);
             }];
     }
@@ -141,6 +142,7 @@ export class Service {
     constructor(
         private provider : Provider,
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
+        private adhUser : AdhUser.Service,
         private $location : ng.ILocationService,
         private $rootScope : ng.IScope,
         private $http : ng.IHttpService,
@@ -258,8 +260,15 @@ export class Service {
 
         switch (error.code) {
             case 401:
-                this.setCameFrom(this.$location.path());
-                this.$location.path("/login");
+                if (this.adhUser.loggedIn) {
+                    throw {
+                        code: 403,
+                        message: error.message
+                    };
+                } else {
+                    this.setCameFrom(this.$location.path());
+                    this.$location.path("/login");
+                }
                 break;
         }
 
@@ -453,7 +462,8 @@ export var moduleName = "adhTopLevelState";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEventHandler.moduleName
+            AdhEventHandler.moduleName,
+            AdhUser.moduleName
         ])
         .provider("adhTopLevelState", Provider)
         .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
