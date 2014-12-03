@@ -1035,7 +1035,7 @@ export var register = (angular) => {
 
                         return adhHttp.options(poolPath).then((options : AdhHttp.IOptions) => {
                             if (!options.POST) {
-                                throw "401 Unauthorized";
+                                throw 401;
                             } else {
                                 return {
                                     proposalUrl: resource.path

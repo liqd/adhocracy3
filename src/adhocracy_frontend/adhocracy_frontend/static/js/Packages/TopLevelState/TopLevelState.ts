@@ -69,6 +69,13 @@ export interface IArea {
 }
 
 
+/** should be roughly equivalent to HTTP status codes, e.g. 404 Not Found */
+export interface IRoutingError {
+    code : number;
+    message? : string;
+}
+
+
 export class Provider {
     public areas : {[key : string]: any};
     public default : any;
@@ -246,19 +253,35 @@ export class Service {
      * in".  this method alwasy re-throws, so return type is void.
      */
     private handleRoutingError(error) : void {
-        var notLoggedIn = () => {
-            this.setCameFrom(this.$location.path());
-            this.$location.path("/login");
-        };
+        error = this.fillRoutingError(error);
+        console.log(error);
 
-        if (typeof error === "string") {
-            switch (error) {
-                case "NotLoggedIn": notLoggedIn(); throw error;
-            }
+        switch (error.code) {
+            case 401:
+                this.setCameFrom(this.$location.path());
+                this.$location.path("/login");
+                break;
         }
 
-        console.log(error);
         throw error;
+    }
+
+    private fillRoutingError(error : IRoutingError) : IRoutingError;
+    private fillRoutingError(error : number) : IRoutingError;
+    private fillRoutingError(error : string) : IRoutingError;
+    private fillRoutingError(error) {
+        if (error.hasOwnProperty("code")) {
+            return error;
+        } else if (typeof error === "number") {
+            return {
+                code: error
+            };
+        } else {
+            return {
+                code: 500,
+                message: error
+            };
+        }
     }
 
     private toLocation() : void {
