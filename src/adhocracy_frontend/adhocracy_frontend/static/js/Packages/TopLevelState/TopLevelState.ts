@@ -239,37 +239,37 @@ export class Service {
             this.lock = true;
 
             return area.route(path, search)
-            .catch((error) => this.handleRoutingError(error))
-            .then((data) => {
-                if (this.locationHasChanged) {
-                    return this.fromLocation();
-                }
-
-                this._set("space", data["space"] || "");
-                delete data["space"];
-
-                for (var key in this.data[this.currentSpace]) {
-                    if (!data.hasOwnProperty(key)) {
-                        this._set(key, undefined);
+                .catch((error) => this.handleRoutingError(error))
+                .then((data) => {
+                    if (this.locationHasChanged) {
+                        return this.fromLocation();
                     }
-                }
-                for (var key2 in data) {
-                    if (data.hasOwnProperty(key2)) {
-                        this._set(key2, data[key2]);
+
+                    this._set("space", data["space"] || "");
+                    delete data["space"];
+
+                    for (var key in this.data[this.currentSpace]) {
+                        if (!data.hasOwnProperty(key)) {
+                            this._set(key, undefined);
+                        }
                     }
-                }
+                    for (var key2 in data) {
+                        if (data.hasOwnProperty(key2)) {
+                            this._set(key2, data[key2]);
+                        }
+                    }
 
-                if (this.currentSpace !== "error") {
-                    // normalize location
-                    this.$location.replace();
-                    this.toLocation();
-                }
+                    if (this.currentSpace !== "error") {
+                        // normalize location
+                        this.$location.replace();
+                        this.toLocation();
+                    }
 
-                this.blockTemplate = false;
-            })
-            .finally(() => {
-                this.lock = false;
-            });
+                    this.blockTemplate = false;
+                })
+                .finally(() => {
+                    this.lock = false;
+                });
         }
     }
 
