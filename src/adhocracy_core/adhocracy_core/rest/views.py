@@ -27,6 +27,7 @@ from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
+from adhocracy_core.resources.asset import IAssetView
 from adhocracy_core.resources.asset import IAssetsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
@@ -47,6 +48,7 @@ from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
+from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.utils import get_sheet
@@ -595,7 +597,6 @@ class AssetsServiceRESTView(PoolRESTView):
                  permission='add_asset',
                  content_type='multipart/form-data')
     def post(self):
-        # TODO adapt as needed
         return super().post()
 
 
@@ -624,6 +625,36 @@ class AssetRESTView(SimpleRESTView):
                                         appstructs=appstructs,
                                         request=self.request)
         return self.build_post_response(resource)
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IAssetView,
+    http_cache=3600,  # FIXME how long should assets be cached?
+)
+class AssetViewRESTView(SimpleRESTView):
+
+    """
+    View for downloading assets as binary blobs.
+
+    Allows GET, but no POST or PUT.
+    """
+
+    @view_config(request_method='GET',
+                 permission='view')
+    def get(self) -> dict:
+        """Get asset data (unless deleted or hidden)."""
+        response_if_blocked = self.respond_if_blocked()
+        if response_if_blocked is not None:
+            return response_if_blocked
+        file = retrieve_asset_file(self.context, self.request.registry)
+        return file.get_response(self.context, self.request.registry)
+
+    def put(self) -> dict:
+        raise HTTPMethodNotAllowed()
+
+    def post(self) -> dict:
+        raise HTTPMethodNotAllowed()
 
 
 @view_defaults(
