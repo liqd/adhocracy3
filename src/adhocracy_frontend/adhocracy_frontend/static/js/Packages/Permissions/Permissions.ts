@@ -13,21 +13,30 @@ export class Service {
      * all-falses in order to avoid exceptions when scope.key is
      * accessed in javascript code (rather than ng templates).
      */
-    public bindScope(scope : ng.IScope, path : string, key = "options") : ng.IPromise<void> {
+    public bindScope(scope : ng.IScope, path : Function, key?) : void;
+    public bindScope(scope : ng.IScope, path : string, key?) : void;
+    public bindScope(scope, path, key = "options") {
         var self : Service = this;
+
+        var pathFn = typeof path === "string" ? () => path : path;
+        var pathString : string;
 
         scope[key] = AdhHttp.emptyOptions;
 
         var update = () => {
-            return self.adhHttp.options(path).then((options : AdhHttp.IOptions) => {
-                scope[key] = options;
-            });
+            if (pathString) {
+                return self.adhHttp.options(pathString).then((options : AdhHttp.IOptions) => {
+                    scope[key] = options;
+                });
+            }
         };
 
         // FIXME: It would be better if adhUser would notify us on change
         scope.$watch(() => self.adhUser.userPath, update);
-
-        return update();
+        scope.$watch(pathFn, (p : string) => {
+            pathString = p;
+            update();
+        });
     }
 }
 
