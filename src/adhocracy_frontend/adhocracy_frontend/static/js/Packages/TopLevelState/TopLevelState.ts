@@ -135,6 +135,7 @@ export class Service {
     private area : IArea;
     private currentSpace : string;
     private blockTemplate : boolean;
+    private locationHasChanged : boolean;
     private lock : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
@@ -157,9 +158,12 @@ export class Service {
         this.currentSpace = "";
         this.data = {"": <any>{}};
 
+        this.locationHasChanged = false;
         this.lock = false;
 
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
+            self.locationHasChanged = true;
+
             if (!self.lock) {
                 self.fromLocation();
             }
@@ -227,6 +231,7 @@ export class Service {
         var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
 
+        this.locationHasChanged = false;
         this.lock = true;
 
         if (area.skip) {
@@ -235,6 +240,10 @@ export class Service {
             return area.route(path, search)
             .catch((error) => this.handleRoutingError(error))
             .then((data) => {
+                if (this.locationHasChanged) {
+                    return this.fromLocation();
+                }
+
                 this._set("space", data["space"] || "");
                 delete data["space"];
 
