@@ -173,12 +173,12 @@ export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : AdhM
     // remove some fields from newobj.data[*] and empty sheets from
     // newobj.data.
     for (var sheetName in newobj.data) {
-        if (newobj.data.hasOwnProperty(sheetName)) {
+        if (newobj.data.hasOwnProperty(sheetName) && adhMetaApi.sheetExists(sheetName)) {
             var sheet : AdhMetaApi.ISheet = newobj.data[sheetName];
             var keepSheet : boolean = false;
 
             for (var fieldName in sheet) {
-                if (sheet.hasOwnProperty(fieldName)) {
+                if (sheet.hasOwnProperty(fieldName) && adhMetaApi.fieldExists(sheetName, fieldName)) {
                     var fieldMeta : AdhMetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
 
                     if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
