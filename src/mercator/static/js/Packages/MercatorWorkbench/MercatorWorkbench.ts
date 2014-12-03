@@ -170,7 +170,18 @@ export var register = (angular) => {
                 .default(RIBasicPool.content_type, "create_proposal", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
-                });
+                })
+                .specific(RIBasicPool.content_type, "create_proposal", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                    return (resource : RIBasicPool) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
+                        });
+                    };
+                }]);
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
             new MercatorWorkbench().createDirective(adhConfig)]);

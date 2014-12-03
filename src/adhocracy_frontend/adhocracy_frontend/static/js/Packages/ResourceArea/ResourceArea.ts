@@ -149,6 +149,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
                 return _.extend(defaults, meta, specifics, search);
             });
+        }, () => {
+            throw 404;
         });
     }
 
