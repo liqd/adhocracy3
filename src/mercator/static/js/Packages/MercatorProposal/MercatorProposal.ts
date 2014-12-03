@@ -37,15 +37,17 @@ import RIMercatorStory = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IStoryVersion");
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
+import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
-import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
 import SIMercatorFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
 import SIMercatorHeardFrom = require("../../Resources_/adhocracy_mercator/sheets/mercator/IHeardFrom");
 import SIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/sheets/mercator/IIntroduction");
+import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOrganizationInfo");
 import SIMercatorOutcome = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOutcome");
+import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorPartners = require("../../Resources_/adhocracy_mercator/sheets/mercator/IPartners");
 import SIMercatorSteps = require("../../Resources_/adhocracy_mercator/sheets/mercator/ISteps");
 import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mercator/IStory");
@@ -54,6 +56,8 @@ import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MercatorProposal";
@@ -62,6 +66,7 @@ var pkgLocation = "/MercatorProposal";
 export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
+    supporterCount : number;
 
     // 1. basic
     user_info : {
@@ -140,7 +145,6 @@ export interface IScopeData {
         facebook : boolean;
         other : boolean;
         other_specify : string;
-        commentCount : number;
     };
     accept_disclaimer : string;
 }
@@ -230,7 +234,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.description = data.description || <any>{};
         data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
-        data.heard_from = data.heard_from || <any>{};
+        data.heard_from = <any>false;
 
         return data;
     }
@@ -249,14 +253,35 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
 
-        data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
-        data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website === "true";
-        data.heard_from.newsletter = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_newsletter === "true";
-        data.heard_from.facebook = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_facebook === "true";
-        data.heard_from.other = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere !== "";
-        data.heard_from.other_specify = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere;
+        var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
+        if (typeof heardFrom !== "undefined") {
+            data.heard_from = {
+                colleague: heardFrom.heard_from_colleague === "true",
+                website: heardFrom.heard_from_website === "true",
+                newsletter: heardFrom.heard_from_newsletter === "true",
+                facebook: heardFrom.heard_from_facebook === "true",
+                other: heardFrom.heard_elsewhere !== "",
+                other_specify: heardFrom.heard_elsewhere
+            };
+        }
 
         data.commentCount = mercatorProposalVersion.data[SICommentable.nick].comments.length;
+        data.supporterCount = 0;
+        (() => {
+            var query : any = {};
+            query.content_type = RIRateVersion.content_type;
+            query.depth = 2;
+            query.tag = "LAST";
+            query[SIRate.nick + ":object"] = mercatorProposalVersion.path;
+            // query.rate = 1;  // FIXME: see #331, #335
+            query.count = "true";
+
+            this.adhHttp.get(mercatorProposalVersion.data[SILikeable.nick].post_pool, query)
+                .then((response) => {
+                    var pool : SIPool.Sheet = response.data[SIPool.nick];
+                    data.supporterCount = (<any>pool).count;  // see #261
+                });
+        })();
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([

@@ -18,16 +18,13 @@
                 </adh-user-meta>
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                {{ data.user_info.createtime }}
-                published
+                {{ data.user_info.createtime }} {{ "published" | translate }}
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                <!-- FIXME: Dummy data -->
                 <i class="icon-speachbubble-outline"></i> {{ data.commentCountTotal }}
             </li>
             <li class="mercator-propsal-detail-meta-item">
-                <!-- FIXME: Dummy data -->
-                231 supporters
+                {{ data.supporterCount }} {{ "supporters" | translate }}
             </li>
             <li class="mercator-propsal-detail-meta-item">
                 <adh-like data-refers-to="{{path}}"
@@ -90,11 +87,14 @@
 
             <section class="commentable-section">
                 <h3>{{ "Who is behind it?" | translate }}</h3>
-                <!-- FIXME: Link to creator profile -->
                 <div data-ng-switch="data.organization_info.status_enum">
                     <div data-ng-switch-when="registered_nonprofit">
                         <div>
-                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
+                            <adh-user-meta
+                                 data-ng-if="data.user_info"
+                                 data-path="{{data.user_info.path}}"
+                                 data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                            </adh-user-meta>
                         </div>
                         <div>
                             <div>
@@ -109,7 +109,11 @@
                     </div>
                     <div data-ng-switch-when="planned_nonprofit">
                         <div>
-                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
+                            <adh-user-meta
+                                 data-ng-if="data.user_info"
+                                 data-path="{{data.user_info.path}}"
+                                 data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                            </adh-user-meta>
                         </div>
                         <div>
                             <div>
@@ -127,7 +131,11 @@
                     </div>
                     <div data-ng-switch-when="support_needed">
                         <div>
-                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
+                            <adh-user-meta
+                                 data-ng-if="data.user_info"
+                                 data-path="{{data.user_info.path}}"
+                                 data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                            </adh-user-meta>
                         </div>
                         <div>
                             <div>
@@ -143,7 +151,11 @@
                     </div>
                     <div data-ng-switch-when="other">
                         <div>
-                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
+                            <adh-user-meta
+                                 data-ng-if="data.user_info"
+                                 data-path="{{data.user_info.path}}"
+                                 data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                            </adh-user-meta>
                         </div>
                         <div>
                             <p>{{ data.organisation_info.status_other }}</p>
@@ -221,28 +233,26 @@
                 <h3>{{ "Share your experience" | translate }}</h3>
                 <p>{{ data.experience }}</p>
 
-                <h3>{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
-                <!-- FIXME: This should only be displayed to mercator people. -->
-                <!-- FIXME: javascript data contains boolean fields that contain string
-                "false", which evaluate to true.  not sure what's
-                going on there, but it can't be very complicated. -->
-                <p><span data-ng-if="data.heard_from.colleague">colleague</span>
-                <span data-ng-if="data.heard_from.website">website</span>
-                <span data-ng-if="data.heard_from.newsletter">newsletter</span>
-                <span data-ng-if="data.heard_from.facebook">facebook</span>
-                <span data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</span></p>
+                <div data-ng-if="data.heard_from">
+                    <h3>{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
+                    <p>
+                        <span data-ng-if="data.heard_from.colleague">colleague</span>
+                        <span data-ng-if="data.heard_from.website">website</span>
+                        <span data-ng-if="data.heard_from.newsletter">newsletter</span>
+                        <span data-ng-if="data.heard_from.facebook">facebook</span>
+                        <span data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</span>
+                    </p>
+                </div><!-- /.if=data.heard_from -->
 
                 <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:experience'}}">
-                    <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> {{ data.experienceCommentCount }}
                 </a>
             </section><!-- /.commentable-section -->
         </section>
-        <!-- FIXME: dummy -->
-        <button type="button">Support</button>
-
-        <!-- FIXME: [here you should see a second manifestation of the
+        <!-- FIXME: dummy [here you should see a second manifestation of the
         support butten in the cover section.  obviously, if one of
         them is clicked, the other should change automatically.] -->
+        <button type="button">Support</button>
+
     </div><!-- /.mercator-detail-body -->
 </div><!-- /.mercator-proposal-detail-view -->
