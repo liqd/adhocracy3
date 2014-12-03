@@ -145,7 +145,6 @@ export interface IScopeData {
         facebook : boolean;
         other : boolean;
         other_specify : string;
-        commentCount : number;
     };
     accept_disclaimer : string;
 }
@@ -235,7 +234,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.description = data.description || <any>{};
         data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
-        data.heard_from = data.heard_from || <any>{};
+        data.heard_from = <any>false;
 
         return data;
     }
@@ -254,12 +253,17 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
 
-        data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
-        data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website === "true";
-        data.heard_from.newsletter = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_newsletter === "true";
-        data.heard_from.facebook = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_facebook === "true";
-        data.heard_from.other = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere !== "";
-        data.heard_from.other_specify = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere;
+        var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
+        if (typeof heardFrom !== "undefined") {
+            data.heard_from = {
+                colleague: heardFrom.heard_from_colleague === "true",
+                website: heardFrom.heard_from_website === "true",
+                newsletter: heardFrom.heard_from_newsletter === "true",
+                facebook: heardFrom.heard_from_facebook === "true",
+                other: heardFrom.heard_elsewhere !== "",
+                other_specify: heardFrom.heard_elsewhere
+            };
+        }
 
         data.commentCount = mercatorProposalVersion.data[SICommentable.nick].comments.length;
         data.supporterCount = 0;

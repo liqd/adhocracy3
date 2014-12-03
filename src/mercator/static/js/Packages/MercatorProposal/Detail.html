@@ -233,13 +233,16 @@
                 <h3>{{ "Share your experience" | translate }}</h3>
                 <p>{{ data.experience }}</p>
 
-                <h3>{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
-                <!-- FIXME: This should only be displayed to mercator people. -->
-                <p><span data-ng-if="data.heard_from.colleague">colleague</span>
-                <span data-ng-if="data.heard_from.website">website</span>
-                <span data-ng-if="data.heard_from.newsletter">newsletter</span>
-                <span data-ng-if="data.heard_from.facebook">facebook</span>
-                <span data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</span></p>
+                <div data-ng-if="data.heard_from">
+                    <h3>{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
+                    <p>
+                        <span data-ng-if="data.heard_from.colleague">colleague</span>
+                        <span data-ng-if="data.heard_from.website">website</span>
+                        <span data-ng-if="data.heard_from.newsletter">newsletter</span>
+                        <span data-ng-if="data.heard_from.facebook">facebook</span>
+                        <span data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</span>
+                    </p>
+                </div><!-- /.if=data.heard_from -->
 
                 <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:experience'}}">
                     <i class="icon-speachbubble-outline"></i> {{ data.experienceCommentCount }}
