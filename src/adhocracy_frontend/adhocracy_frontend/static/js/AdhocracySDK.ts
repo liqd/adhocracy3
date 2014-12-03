@@ -101,6 +101,16 @@
         }
     };
 
+    var addParamsToUrl = (url : string, params : {}) => {
+        if ($.isEmptyObject(params)) {
+            return url;
+        } else {
+            var splitHash = url.split("#");
+            var newQueryChar = splitHash.indexOf("?") === -1 ? "?" : "&";
+            return splitHash[0] + newQueryChar + $.param(params, true) + (splitHash.length > 1 ? "#" + splitHash[1] : "");
+        }
+    };
+
     /**
      * Initialize adhocracy SDK.  Must be called before using any other methods.
      *
@@ -192,10 +202,11 @@
             if (typeof initialUrl === "undefined") {
                 initialUrl = "/";
             }
-            url = origin + initialUrl + "?" + $.param(data, true);
+            url = origin + initialUrl;
         } else {
-            url = origin + appUrl + widget + "?" + $.param(data, true);
+            url = origin + appUrl + widget;
         }
+        url = addParamsToUrl(url, data);
         iframe.attr("src", url);
         iframe.addClass("adhocracy-embed");
 
