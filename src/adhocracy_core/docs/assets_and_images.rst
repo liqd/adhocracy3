@@ -231,10 +231,30 @@ Sheets can have fields that refer to assets of a specific type. This is done
 in the usual way be setting the type of the field to `Reference` (to refer
 to a single asset) or `UniqueReferences` (to refer to a list of assets) and
 defining a suitable `reftype` (e.g. with `target_isheet =
-IProposalIntroImage`).
+ISampleImageMetadata`).
 
-TODO Create proposal version referencing the image; show that the asset is
-now `attached_to` the proposal.
+Lets post a new proposal version that refers to the image::
+
+    >>> vers_data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalVersion',
+    ...              'data': {'adhocracy_core.sheets.document.IDocument': {
+    ...                     'title': 'We need more pics!',
+    ...                     'description': 'Or maybe just nicer ones?',
+    ...                     'picture': pic_path,
+    ...                     'elements': []},
+    ...                  'adhocracy_core.sheets.versions.IVersionable': {
+    ...                     'follows': [prop_v0_path]}},
+    ...          'root_versions': [prop_v0_path]}
+    >>> resp = testapp.post_json(prop_path, vers_data, headers=god_header)
+    >>> prop_v1_path = resp.json["path"]
+    >>> prop_v1_path
+    'http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/'
+
+If we re-download the image metadata, we see that it is now attached to the
+proposal version::
+
+    >>> resp_data = testapp.get(pic_path).json
+    >>> resp_data['data']['adhocracy_core.sheets.sample_image.ISampleImageMetadata']['attached_to']
+    ['http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/']
 
 
 Replacing Assets
