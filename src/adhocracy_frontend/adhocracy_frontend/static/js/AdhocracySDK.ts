@@ -206,6 +206,9 @@
         } else {
             url = origin + appUrl + widget;
         }
+        delete data.autourl;
+        delete data.autoresize;
+        delete data.initialUrl;
         url = addParamsToUrl(url, data);
         iframe.attr("src", url);
         iframe.addClass("adhocracy-embed");
