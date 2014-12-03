@@ -74,7 +74,7 @@
     };
 
     /**
-     * Check whether an existing embedded iframe to update URLs
+     * Check whether an existing embedded iframe has autourl set.
      */
     var hasAutourl = () => {
         var result = false;
