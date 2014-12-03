@@ -21,7 +21,7 @@ debug_requires = ['adhocracy_mercator[debug]',
 
 
 setup(name='mercator',
-      version='0.0.2',
+      version='0.0.3',
       description='Adhocracy backend/frontend server for Mercator.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=["Programming Language :: Python",

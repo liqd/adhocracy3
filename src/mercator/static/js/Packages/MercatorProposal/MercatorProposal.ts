@@ -37,15 +37,17 @@ import RIMercatorStory = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IStoryVersion");
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
+import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
-import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
 import SIMercatorFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
 import SIMercatorHeardFrom = require("../../Resources_/adhocracy_mercator/sheets/mercator/IHeardFrom");
 import SIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/sheets/mercator/IIntroduction");
+import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOrganizationInfo");
 import SIMercatorOutcome = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOutcome");
+import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorPartners = require("../../Resources_/adhocracy_mercator/sheets/mercator/IPartners");
 import SIMercatorSteps = require("../../Resources_/adhocracy_mercator/sheets/mercator/ISteps");
 import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mercator/IStory");
@@ -54,6 +56,8 @@ import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MercatorProposal";
@@ -62,6 +66,7 @@ var pkgLocation = "/MercatorProposal";
 export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
+    supporterCount : number;
 
     // 1. basic
     user_info : {
@@ -140,7 +145,6 @@ export interface IScopeData {
         facebook : boolean;
         other : boolean;
         other_specify : string;
-        commentCount : number;
     };
     accept_disclaimer : string;
 }
@@ -158,6 +162,9 @@ export interface IControllerScope extends IScope {
     submitIfValid : () => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
+    mercatorProposalIntroductionForm? : any;
+    $flow : any;
+    currentUpload : any;
 }
 
 
@@ -227,7 +234,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.description = data.description || <any>{};
         data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
-        data.heard_from = data.heard_from || <any>{};
+        data.heard_from = <any>false;
 
         return data;
     }
@@ -246,14 +253,35 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
 
-        data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
-        data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website === "true";
-        data.heard_from.newsletter = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_newsletter === "true";
-        data.heard_from.facebook = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_facebook === "true";
-        data.heard_from.other = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere !== "";
-        data.heard_from.other_specify = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere;
+        var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
+        if (typeof heardFrom !== "undefined") {
+            data.heard_from = {
+                colleague: heardFrom.heard_from_colleague === "true",
+                website: heardFrom.heard_from_website === "true",
+                newsletter: heardFrom.heard_from_newsletter === "true",
+                facebook: heardFrom.heard_from_facebook === "true",
+                other: heardFrom.heard_elsewhere !== "",
+                other_specify: heardFrom.heard_elsewhere
+            };
+        }
 
         data.commentCount = mercatorProposalVersion.data[SICommentable.nick].comments.length;
+        data.supporterCount = 0;
+        (() => {
+            var query : any = {};
+            query.content_type = RIRateVersion.content_type;
+            query.depth = 2;
+            query.tag = "LAST";
+            query[SIRate.nick + ":object"] = mercatorProposalVersion.path;
+            // query.rate = 1;  // FIXME: see #331, #335
+            query.count = "true";
+
+            this.adhHttp.get(mercatorProposalVersion.data[SILikeable.nick].post_pool, query)
+                .then((response) => {
+                    var pool : SIPool.Sheet = response.data[SIPool.nick];
+                    data.supporterCount = (<any>pool).count;  // see #261
+                });
+        })();
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -622,9 +650,28 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         scope: {
             path: "@",
             contentType: "@",
-            update: "=",
-            facets: "=",
-            sort: "="
+            update: "=?",
+            facets: "=?",
+            sort: "=?",
+            params: "=?"
+        }
+    };
+};
+
+
+export var userListing = (adhConfig : AdhConfig.IService) => {
+    return {
+        scope: {
+            path: "@"
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListing.html",
+        link: (scope) => {
+            scope.poolUrl = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+            scope.contentType = RIMercatorProposalVersion.content_type;
+            scope.params = {
+                creator: scope.path.replace(adhConfig.rest_url, "").replace(/\/+$/, ""),
+                depth: 2
+            };
         }
     };
 };
@@ -984,6 +1031,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             "duScroll",
+            "ngMessages",
             AdhHttp.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
@@ -1006,11 +1054,21 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-hide"
                 })
-                .specific(RIMercatorProposalVersion.content_type, "edit", () => (resource : RIMercatorProposalVersion) => {
-                    return {
-                        proposalUrl: resource.path
+                .specific(RIMercatorProposalVersion.content_type, "edit", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                    return (resource : RIMercatorProposalVersion) => {
+                        var poolPath = AdhUtil.parentPath(resource.path);
+
+                        return adhHttp.options(poolPath).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    proposalUrl: resource.path
+                                };
+                            }
+                        });
                     };
-                })
+                }])
                 .default(RIMercatorProposalVersion.content_type, "comments", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
@@ -1042,16 +1100,26 @@ export var register = (angular) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {
                 flowFactoryProvider.defaults = {};
             }
-
             flowFactoryProvider.factory = fustyFlowFactory;
-            flowFactoryProvider.defaults.singleFile = true;
-            flowFactoryProvider.defaults.maxChunkRetries = 1;
-            flowFactoryProvider.defaults.chunkRetryInterval = 5000;
-            flowFactoryProvider.defaults.simultaneousUploads = 4;
-            flowFactoryProvider.defaults.permanentErrors = [404, 500, 501, 502, 503];
+            flowFactoryProvider.defaults = {
+                singleFile : true,
+                maxChunkRetries : 1,
+                chunkRetryInterval : 5000,
+                simultaneousUploads : 4,
+                permanentErrors : [404, 500, 501, 502, 503],
+                // these are not native to flow but used by custom functions
+                maximumWidth : 900,
+                minimumWidth : 400,
+                maximumByteSize : 1000000,
+                acceptedFileTypes : [
+                    "gif",
+                    "jpeg",
+                    "png"
+                ] // correspond to exact mime types EG image/png
+            };
 
             flowFactoryProvider.on("catchAll", () => {
-                console.log(arguments);
+                // console.log(arguments);
             });
         }])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
@@ -1071,10 +1139,11 @@ export var register = (angular) => {
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
+        .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", "$element", ($scope : IControllerScope, $element) => {
+        .controller("mercatorProposalFormController", ["$scope", "$element", "$window", ($scope : IControllerScope, $element, $window) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
                 "heard-from-website",
@@ -1121,6 +1190,50 @@ export var register = (angular) => {
             $scope.showLocationError = () : boolean => {
                 return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
             };
+
+            $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
+                $scope.currentUpload = flow;
+                // validate image upload
+                flow.on( "fileAdded", (file, event) => {
+                    var elem = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+                    if (file.size > flow.opts.maximumByteSize) {
+                        elem.$setValidity("tooBig", false);
+                    } else {
+                        elem.$setValidity("tooBig", true);
+                    }
+                    if (flow.opts.acceptedFileTypes.indexOf(file.file.type.replace("image/", "")) === -1) {
+                        elem.$setValidity("wrongType", false);
+                    } else {
+                        elem.$setValidity("wrongType", true);
+                    }
+                    if (!elem.$error.wrongType && !elem.$error.tooBig) {
+                        var img = new Image();
+                        var _URL = $window.URL || $window.webkitURL;
+                        img.src = _URL.createObjectURL(file.file);
+                        img.onload = () => {
+                            var imageWidth = img.width;
+                            if (imageWidth > flow.opts.maximumWidth) {
+                                elem.$setValidity("tooWide", false);
+                            } else {
+                                elem.$setValidity("tooWide", true);
+                            }
+                            if (imageWidth < flow.opts.minimumWidth) {
+                                elem.$setValidity("tooNarrow", false);
+                            } else {
+                                elem.$setValidity("tooNarrow", true);
+                            }
+                            if (elem.$valid) {
+                                flow.files[0] = file;
+                                $scope.$apply();
+                            } else {
+                                elem.$setViewValue(false);
+                            }
+                        };
+                    }
+                    $scope.$apply();
+                    return false;
+                });
+            });
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");

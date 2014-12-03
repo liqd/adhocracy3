@@ -19,6 +19,9 @@
                 <div class="moving-column-menu">
                     <a href="" data-ng-click="proposalListingData.showFacets = !proposalListingData.showFacets">{{ "filters" | translate }}</a>
                 </div>
+                <div class="moving-column-collapsed">
+                    <a href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">O</a>
+                </div>
                 <div
                     class="moving-column-sidebar"
                     data-ng-class="{'is-visible': proposalListingData.showFacets}"
@@ -64,6 +67,9 @@
                     <a href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
                     <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
                 </div>
+                <div class="moving-column-collapsed">
+                    <a href="{{ proposalUrl | adhResourceUrl }}">O</a>
+                </div>
                 <div class="moving-column-body" data-du-scroll-container="">
                     <adh-recompile-on-change data-value="{{proposalUrl}}" data-key="proposalUrl">
                         <adh-resource-wrapper>
@@ -82,6 +88,7 @@
             </div>
         </div>
     </div>
+
     <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'user'" data-ng-if="isSpaceInitialized('user')">
         <div class="moving-column moving-column-structure">
             <div class="moving-column-menu placeholder"></div>
@@ -97,21 +104,19 @@
                     data-value="{{userUrl}}">
                     <adh-user-profile
                         data-path="{{userUrl}}">
+                        <section class="mercator-user-profile-proposal-list">
+                            <h3>{{ "USERS_PROPOSALS" | translate:userBasic }}</h3>
+                            <adh-mercator-user-proposal-listing
+                                data-path="{{path}}">
+                            </adh-mercator-user-proposal-listing>
+                        </section>
                     </adh-user-profile>
-                    <section class="mercator-user-profile-proposal-list" ng-if="user.loggedIn || userBasic">
-                        <h3>{{userBasic.name}}{{ "'s" | translate }} {{ "proposals" | translate }}</h3>
-                        <!-- FIXME: Filter only show selected users proposals -->
-                        <adh-mercator-proposal-listing
-                            data-path="{{path}}"
-                            data-content-type="{{contentType}}"
-                            data-update="proposalListingData.update"
-                            data-facets="proposalListingData.facets"
-                            data-sort="name"
-                        >
-                        </adh-mercator-proposal-listing>
-                    </section>
                 </adh-recompile-on-change>
             </div>
         </div>
+    </div>
+
+    <div data-ng-show="currentSpace === 'error'" data-ng-if="isSpaceInitialized('error')">
+        <adh-routing-error></adh-routing-error>
     </div>
 </adh-spaces>

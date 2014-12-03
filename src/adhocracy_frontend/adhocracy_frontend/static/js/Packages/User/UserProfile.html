@@ -1,8 +1,10 @@
 <section
     data-itemscope=""
     data-itemtype="http://schema.org/Person"
+    data-ng-if="path"
     class="user-profile">
 
     <h1 data-itemprop="name">{{userBasic.name}}</h1>
-    <a href="mailto:{{userBasic.email}}" data-itemprop="email">{{userBasic.email}}</a>
+
+    <adh-inject></adh-inject>
 </section>

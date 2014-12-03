@@ -7,4 +7,7 @@
             <adh-inject data-transclusion-id="element-id"></adh-inject>
         </li>
     </ol>
+    <div class="listing-empty-text" data-ng-if="elements.length === 0">
+        {{ emptyText }}
+    </div>
 </div>

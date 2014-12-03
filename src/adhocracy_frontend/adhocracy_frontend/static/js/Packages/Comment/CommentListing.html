@@ -1,4 +1,6 @@
-<adh-comment-listing-partial data-path="{{path}}">
+<adh-comment-listing-partial
+    data-path="{{path}}"
+    data-empty-text="{{ 'No comments yet' | translate }}">
     <div data-ng-switch="transclusionId">
         <adh-resource-wrapper
             data-on-submit="onCreate()"
@@ -8,6 +10,7 @@
                 data-path="{{createPath}}"
                 data-refers-to="{{path}}"
                 data-pool-path="{{poolPath}}"
+                data-hide-cancel="true"
                 data-mode="edit">
             </adh-comment-create>
         </adh-resource-wrapper>

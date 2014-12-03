@@ -1,16 +1,12 @@
 <header class="l-header main-header">
-    <a class="button" data-ng-click="addMercatorProposal()">
+    <a class="button"
+       href="/r/mercator/@create_proposal"
+       data-ng-if="mercatorProposalPostPoolOptions && mercatorProposalPostPoolOptions.POST">
         {{ "Add Proposal" | translate }}
     </a>
     <adh-space-switch></adh-space-switch>
     <adh-user-indicator></adh-user-indicator>
 </header>
-
-<nav class="l-nav main-nav placeholder">
-    main navigation
-    <!-- FIXME: remove this button as soon as there is some real way to change moving-columns state -->
-    <adh-focus-switch></adh-focus-switch>
-</nav>
 
 <div class="l-content" data-ng-transclude="">
 </div>

@@ -9,6 +9,7 @@ import angular = require("angular");
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
 import angularAria = require("angularAria");  if (angularAria) { ; };
+import angularMessages = require("angularMessages");  if (angularMessages) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
@@ -65,6 +66,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "pascalprecht.translate",
         "ngAnimate",
         "ngAria",
+        "ngMessages",
         "duScroll",
         "flow",
         AdhComment.moduleName,
@@ -122,18 +124,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
             tabindex: false
         });
     }]);
-
-    // update hash when using anchor scroll
-    app.run(($rootScope, $location) => {
-        $rootScope.$on("duScrollspy:becameActive", ($event, $element) => {
-          // Automaticly update location
-          var hash = $element.prop("hash");
-          if (hash) {
-            $location.hash(hash.substr(1)).replace();
-            $rootScope.$apply();
-          }
-        });
-    });
 
     app.value("angular", angular);
     app.value("Modernizr", modernizr);

@@ -7,11 +7,13 @@ import AdhCrossWindowMessaging = require("./CrossWindowMessaging");
 export var register = () => {
 
     describe("CrossWindowMessaging", () => {
+        var locationMock;
         var windowMock;
         var rootScopeMock;
         var adhUserMock;
 
         beforeEach(() => {
+            locationMock = <any>jasmine.createSpyObj("locationMock", ["absUrl"]);
             windowMock = <any>jasmine.createSpyObj("windowMock", ["addEventListener"]);
             rootScopeMock = <any>jasmine.createSpyObj("rootScopeMock", ["$watch"]);
             adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["loggedIn"]);
@@ -24,7 +26,7 @@ export var register = () => {
             beforeEach(() => {
                 postMessageMock = <any>jasmine.createSpy("postMessageMock");
                 service = new AdhCrossWindowMessaging.Service(
-                    postMessageMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhUserMock);
+                    postMessageMock, locationMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhUserMock);
             });
 
             describe("registerMessageHandler", () => {
@@ -172,18 +174,18 @@ export var register = () => {
             });
 
             it("returns a service instance", () => {
-                service = AdhCrossWindowMessaging.factory(config, windowMock, rootScopeMock);
+                service = AdhCrossWindowMessaging.factory(config, locationMock, windowMock, rootScopeMock);
                 expect(service).toBeDefined();
             });
             it("returns a dummy service when not embedded", () => {
                 config.embedded = false;
-                service = AdhCrossWindowMessaging.factory(config, windowMock, rootScopeMock);
+                service = AdhCrossWindowMessaging.factory(config, locationMock, windowMock, rootScopeMock);
                 expect(service.dummy).toBeDefined();
             });
             it("returns a service instance that uses $window.parent.postMessage", () => {
                 var name = "test";
                 var data = {x: "y"};
-                service = AdhCrossWindowMessaging.factory(config, windowMock, rootScopeMock);
+                service = AdhCrossWindowMessaging.factory(config, locationMock, windowMock, rootScopeMock);
                 service.postMessage(name, data);
                 expect(windowMock.parent.postMessage).toHaveBeenCalled();
             });

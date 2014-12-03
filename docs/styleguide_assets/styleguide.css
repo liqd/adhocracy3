@@ -54,3 +54,24 @@
 #footer {
     text-align: center;
 }
+
+.styleguide-navigation,
+.styleguide-navigation-toggle {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.styleguide-navigation {
+    top: 2em;
+    overflow-y: auto;
+
+    list-style: none;
+    padding: 1em;
+    margin: 0;
+
+    background: white;
+    text-align: right;
+}

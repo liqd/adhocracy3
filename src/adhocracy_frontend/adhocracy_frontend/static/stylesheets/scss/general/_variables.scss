@@ -1,94 +1,5 @@
-/*doc
----
-title: Colors
-name: colors
-category: Variables
----
+/* documentation is in variables_doc */
 
-<table class="styleguide-colors">
-    <tr>
-        <td><div class="example-color color-prime-normal"></div></td>
-        <td><code>color-prime-normal</code></td>
-        <td>Default color for running text</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-prime-extrovert"></div></td>
-        <td><code>color-prime-extrovert</code></td>
-        <td>Default color for headings</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-secondary-extrovert"></div></td>
-        <td><code>color-secondary-extrovert</code></td>
-        <td>For secondary text</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-secondary-introvert"></div></td>
-        <td><code>color-secondary-introvert</code></td>
-        <td>For secondary text</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-highlight-normal"></div></td>
-        <td><code>color-highlight-normal</code></td>
-        <td>For highlighted content such as links</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-highlight-introvert"></div></td>
-        <td><code>color-highlight-introvert</code></td>
-        <td>For highlighted content in a is-hover state</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-highlight-extrovert"></div></td>
-        <td><code>color-highlight-extrovert</code></td>
-        <td>For highlighted content in a has-focus state</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-highlight-reverse"></div></td>
-        <td><code>color-highlight-reverse</code></td>
-        <td>Used as either foreground or background with
-            <code>color-highlight-normal</code></td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-highlight-valid"></div></td>
-        <td><code>color-highlight-valid</code></td>
-        <td>For valid content</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-highlight-invalid"></div></td>
-        <td><code>color-highlight-invalid</code></td>
-        <td>For invalid content</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-background"></div></td>
-        <td><code>color-background</code></td>
-        <td>Default background color</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-surface"></div></td>
-        <td><code>color-structure-surface</code></td>
-        <td>Secondary background color</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-active"></div></td>
-        <td><code>color-structure-active</code></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-border"></div></td>
-        <td><code>color-structure-border</code></td>
-        <td>Default border color</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-border-introvert"></div></td>
-        <td><code>color-structure-border-introvert</code></td>
-        <td>Border color for inactive or disabled elements</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-border-extrovert"></div></td>
-        <td><code>color-structure-border-extrovert</code></td>
-        <td>border color for active or filled elements</td>
-    </tr>
-</table>
-*/
 $color-prime-normal: #575756;
 $color-prime-extrovert: #1c1c1b;
 $color-secondary-extrovert: #9d9c9c;
@@ -106,38 +17,6 @@ $color-structure-border: #9d9c9c;
 $color-structure-border-introvert: #dadad9;
 $color-structure-border-extrovert: #575756;
 
-.example-color {
-    @include inline-block;
-    height: 3em;
-    width: 3em;
-    border: 1px solid $color-structure-border;
-}
-
-.color-prime-normal {background-color: $color-prime-normal;}
-.color-prime-extrovert {background-color: $color-prime-extrovert;}
-.color-secondary-extrovert {background-color: $color-secondary-extrovert;}
-.color-secondary-introvert {background-color: $color-secondary-introvert;}
-.color-highlight-normal {background-color: $color-highlight-normal;}
-.color-highlight-introvert {background-color: $color-highlight-introvert;}
-.color-highlight-extrovert {background-color: $color-highlight-extrovert;}
-.color-highlight-reverse {background-color: $color-highlight-reverse;}
-.color-highlight-valid {background-color: $color-highlight-valid;}
-.color-highlight-invalid {background-color: $color-highlight-invalid;}
-.color-background {background-color: $color-background;}
-.color-structure-surface {background-color: $color-structure-surface;}
-.color-structure-active {background-color: $color-structure-active;}
-.color-structure-border {background-color: $color-structure-border;}
-.color-structure-border-introvert {background-color: $color-structure-border-introvert;}
-.color-structure-border-extrovert {background-color: $color-structure-border-extrovert;}
-
-// some static contrast checks for a11y
-@include check-contrast($color-prime-normal, $color-background);
-@include check-contrast($color-prime-normal, $color-structure-surface);
-@include check-contrast($color-prime-extrovert, $color-background);
-@include check-contrast($color-prime-extrovert, $color-structure-surface);
-@include check-contrast($color-highlight-normal, $color-highlight-reverse);
-@include check-contrast($color-highlight-normal, $color-background);
-@include check-contrast($color-highlight-normal, $color-structure-surface);
 
 $font-family-normal: "Open Sans", sans-serif;
 $font-weight-normal: normal;
@@ -161,44 +40,6 @@ $font-size-huge: 40px;
     }
 }
 
-/*doc
----
-title: Text mixin
-name: mixin-text
-category: Type
----
-
-The text mixin can be used to set the general text style. The following styles
-are available:
-
-<table class="styleguide-colors">
-    <tr>
-        <td><code>header</code></td>
-        <td class="text-header">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><code>running</code></td>
-        <td class="text-running">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td>For running text</td>
-    </tr>
-    <tr>
-        <td><code>functional</code></td>
-        <td class="text-functional">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><code>functional-introvert</code></td>
-        <td class="text-functional-introvert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><code>meta</code></td>
-        <td class="text-meta">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
-        <td></td>
-    </tr>
-</table>
-*/
 @mixin text($value) {
     @if $value == running {
         font-family: $font-family-normal;
@@ -240,11 +81,5 @@ are available:
         @warn "no such text-style: #{$value}";
     }
 }
-
-.text-header {@include text(header);}
-.text-running {@include text(running);}
-.text-functional {@include text(functional);}
-.text-functional-introvert {@include text(functional-introvert);}
-.text-meta {@include text(meta);}
 
 $width-action: 3em;
