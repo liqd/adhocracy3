@@ -88,6 +88,7 @@
             </div>
         </div>
     </div>
+
     <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'user'" data-ng-if="isSpaceInitialized('user')">
         <div class="moving-column moving-column-structure">
             <div class="moving-column-menu placeholder"></div>
@@ -113,5 +114,9 @@
                 </adh-recompile-on-change>
             </div>
         </div>
+    </div>
+
+    <div data-ng-show="currentSpace === 'error'" data-ng-if="isSpaceInitialized('error')">
+        <adh-routing-error></adh-routing-error>
     </div>
 </adh-spaces>

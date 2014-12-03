@@ -1029,11 +1029,21 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-hide"
                 })
-                .specific(RIMercatorProposalVersion.content_type, "edit", () => (resource : RIMercatorProposalVersion) => {
-                    return {
-                        proposalUrl: resource.path
+                .specific(RIMercatorProposalVersion.content_type, "edit", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                    return (resource : RIMercatorProposalVersion) => {
+                        var poolPath = AdhUtil.parentPath(resource.path);
+
+                        return adhHttp.options(poolPath).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    proposalUrl: resource.path
+                                };
+                            }
+                        });
                     };
-                })
+                }])
                 .default(RIMercatorProposalVersion.content_type, "comments", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"

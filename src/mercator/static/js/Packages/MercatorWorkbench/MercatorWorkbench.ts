@@ -39,7 +39,6 @@ interface IMercatorWorkbenchScope extends ng.IScope {
 
 interface IMercatorWorkbenchRootScope extends ng.IScope {
     mercatorProposalPostPoolOptions : AdhHttp.IOptions;
-    addMercatorProposal : () => void;
 }
 
 export class MercatorWorkbench {
@@ -91,15 +90,6 @@ export class MercatorWorkbench {
                 };
 
                 $rootScope.mercatorProposalPostPoolOptions = AdhHttp.emptyOptions;
-                $rootScope.addMercatorProposal = () => {
-                    if ($rootScope.mercatorProposalPostPoolOptions.POST) {
-                        $location.url("/r/mercator/@create_proposal");
-                    } else {
-                        adhTopLevelState.setCameFrom("/r/mercator/@create_proposal");
-                        $location.url("/login");
-                    }
-                };
-
                 adhPermissions.bindScope($rootScope, $scope.path, "mercatorProposalPostPoolOptions");
 
                 adhTopLevelState.on("view", (value : string) => {
@@ -180,7 +170,18 @@ export var register = (angular) => {
                 .default(RIBasicPool.content_type, "create_proposal", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
-                });
+                })
+                .specific(RIBasicPool.content_type, "create_proposal", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                    return (resource : RIBasicPool) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
+                        });
+                    };
+                }]);
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
             new MercatorWorkbench().createDirective(adhConfig)]);
