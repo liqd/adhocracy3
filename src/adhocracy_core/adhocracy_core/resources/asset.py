@@ -50,6 +50,8 @@ def validate_and_complete_asset(context: IAsset,
     metadata_sheet = get_sheet(context, metadata_isheet, registry=registry)
     metadata_appstruct = metadata_sheet.get()
     file = data_appstruct['data']
+    if not file:
+        return  # to facilitate testing
     _validate_mime_type(file, metadata_appstruct, metadata_sheet)
     _store_size_and_filename_as_metadata(file,
                                          metadata_appstruct,
