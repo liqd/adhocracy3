@@ -67,6 +67,11 @@ export class MetaApiQuery {
         }
     }
 
+    public resourceExists(name : string) : boolean {
+        var _self : MetaApiQuery = this;
+        return _self.data.resources.hasOwnProperty(name);
+    }
+
     public sheet(name : string) : ISheet {
         var _self : MetaApiQuery = this;
 
@@ -75,6 +80,11 @@ export class MetaApiQuery {
         } else {
             throw "MetaApiQuery: unknown sheet named " + name;
         }
+    }
+
+    public sheetExists(name : string) : boolean {
+        var _self : MetaApiQuery = this;
+        return _self.data.sheets.hasOwnProperty(name);
     }
 
     public field(sheetName : string, fieldName : string) : ISheetField {
@@ -86,5 +96,10 @@ export class MetaApiQuery {
         } else {
             throw "MetaApiQuery: unknown field named " + fieldName + " in sheet " + sheetName;
         }
+    }
+
+    public fieldExists(sheetName : string, fieldName : string) : boolean {
+        var _self : MetaApiQuery = this;
+        return this.sheetExists(sheetName) && _self.sheet(sheetName).fieldDict.hasOwnProperty(fieldName);
     }
 }
