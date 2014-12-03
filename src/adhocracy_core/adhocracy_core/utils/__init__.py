@@ -57,6 +57,20 @@ def get_isheets(context) -> [IInterface]:
     return [i for i in ifaces if i.isOrExtends(ISheet)]
 
 
+def get_matching_isheet(context, isheet: IInterface) -> IInterface:
+    """
+    Get `isheet` or a subclass of it if `context` provides it.
+
+    If `context` provides neither `isheet` nor any of its subclasses, None
+    is returned.
+    """
+    ifaces = list(providedBy(context))
+    for iface in ifaces:
+        if iface.isOrExtends(isheet):
+            return iface
+    return None
+
+
 def get_sheet(context, isheet: IInterface, registry: Registry=None)\
         -> IResourceSheet:
     """Get sheet adapter for the `isheet` interface.

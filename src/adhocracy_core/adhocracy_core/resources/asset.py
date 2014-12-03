@@ -3,6 +3,7 @@
 from pyramid.registry import Registry
 from substanced.file import File
 
+from adhocracy_core.interfaces import Dimensions
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import ISimple
@@ -11,12 +12,27 @@ from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.pool import basicpool_metadata
 from adhocracy_core.resources.service import service_metadata
 from adhocracy_core.resources.simple import simple_metadata
+from adhocracy_core.sheets.asset import AssetFileView
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
+from adhocracy_core.sheets.name import IName
+from adhocracy_core.utils import get_matching_isheet
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import raise_colander_style_error
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
+
+
+class IAssetView(IPool):
+
+    """View that makes an asset available for download."""
+
+
+asset_view_meta = simple_metadata._replace(
+    content_name='AssetView',
+    iresource=IAssetView,
+    basic_sheets=[IName, IAssetData],
+)
 
 
 class IAsset(ISimple):
@@ -30,7 +46,8 @@ def validate_and_complete_asset(context: IAsset,
     """Complete the initialization of an asset and ensure that it's valid."""
     data_sheet = get_sheet(context, IAssetData, registry=registry)
     data_appstruct = data_sheet.get()
-    metadata_sheet = get_sheet(context, IAssetMetadata, registry=registry)
+    metadata_isheet = get_matching_isheet(context, IAssetMetadata)
+    metadata_sheet = get_sheet(context, metadata_isheet, registry=registry)
     metadata_appstruct = metadata_sheet.get()
     file = data_appstruct['data']
     _validate_mime_type(file, metadata_appstruct, metadata_sheet)
@@ -38,6 +55,7 @@ def validate_and_complete_asset(context: IAsset,
                                          metadata_appstruct,
                                          metadata_sheet,
                                          registry=registry)
+    _add_views_as_children(context, metadata_sheet, registry)
 
 
 def _validate_mime_type(file: File,
@@ -78,7 +96,29 @@ def _store_size_and_filename_as_metadata(file: File,
                        omit_readonly=False)
 
 
-asset_meta = simple_metadata._replace(
+def _add_views_as_children(context: IAsset,
+                           metadata_sheet: IAssetMetadata,
+                           registry: Registry):
+    """Add raw view and possible resized views as children of an asset."""
+    _create_asset_view(context=context, name='raw', registry=registry)
+    if metadata_sheet.meta.image_sizes:
+        for name, dimensions in metadata_sheet.meta.image_sizes.items():
+            _create_asset_view(context=context, name=name, registry=registry,
+                               dimensions=dimensions)
+
+
+def _create_asset_view(context: IAsset, name: str, registry: Registry,
+                       dimensions: Dimensions=None) -> dict:
+    file_view = AssetFileView(dimensions)
+    appstructs = {IName.__identifier__: {'name': name},
+                  IAssetData.__identifier__: {'data': file_view}}
+    registry.content.create(IAssetView.__identifier__,
+                            parent=context,
+                            appstructs=appstructs,
+                            registry=registry)
+
+
+asset_meta = basicpool_metadata._replace(
     content_name='Asset',
     iresource=IAsset,
     basic_sheets=[
@@ -124,6 +164,7 @@ pool_with_assets_meta = basicpool_metadata._replace(
 
 def includeme(config):
     """Add resource type to registry."""
+    add_resource_type_to_registry(asset_view_meta, config)
     add_resource_type_to_registry(asset_meta, config)
     add_resource_type_to_registry(assets_service_meta, config)
     add_resource_type_to_registry(pool_with_assets_meta, config)

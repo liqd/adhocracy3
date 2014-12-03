@@ -15,6 +15,7 @@ class ISampleImage(IAsset):
 sample_image_meta = asset_meta._replace(
     content_name='SampleImage',
     iresource=ISampleImage,
+    is_implicit_addable=True,
     # replace IAssetMetadata sheet by ISampleImageMetadata
     basic_sheets=list(set(asset_meta.basic_sheets) - {IAssetMetadata, }
                       | {ISampleImageMetadata, }),
