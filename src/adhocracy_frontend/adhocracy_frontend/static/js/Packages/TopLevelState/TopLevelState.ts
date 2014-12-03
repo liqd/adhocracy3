@@ -135,6 +135,7 @@ export class Service {
     private area : IArea;
     private currentSpace : string;
     private blockTemplate : boolean;
+    private lock : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
     private data : {[space : string]: {[key : string] : string}};
@@ -156,8 +157,12 @@ export class Service {
         this.currentSpace = "";
         this.data = {"": <any>{}};
 
+        this.lock = false;
+
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
-            self.fromLocation();
+            if (!self.lock) {
+                self.fromLocation();
+            }
         });
     }
 
@@ -222,6 +227,8 @@ export class Service {
         var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
 
+        this.lock = true;
+
         if (area.skip) {
             return this.$q.when();
         } else {
@@ -249,6 +256,7 @@ export class Service {
                 }
 
                 this.blockTemplate = false;
+                this.lock = false;
             });
         }
     }
