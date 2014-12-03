@@ -1,13 +1,27 @@
 from urllib.parse import urlencode
 
 from pytest import mark
+from pytest import fixture
 
 from adhocracy_core.testing import god_login
 from adhocracy_frontend.tests.acceptance.shared import wait
 from adhocracy_frontend.tests.acceptance.shared import get_list_element
 from adhocracy_frontend.tests.acceptance.shared import get_listing_create_form
+from adhocracy_frontend.tests.acceptance.shared import get_random_string
 from adhocracy_frontend.tests.acceptance.shared import login_god
+from adhocracy_frontend.tests.fixtures.users import register_user
+from adhocracy_frontend.tests.fixtures.users import activate_all
+from adhocracy_frontend.tests.acceptance.shared import logout
+from adhocracy_frontend.tests.acceptance.shared import login
 
+
+@fixture(scope="module")
+def user():
+    name = get_random_string(n=5)
+    password = "password"
+    register_user(name, password)
+    activate_all()
+    return (name, password)
 
 class TestComment:
 
@@ -61,6 +75,19 @@ class TestComment:
         actual = lambda element: element.find_by_css('adh-user-meta').first.text
         # the captialisation might be changed by CSS
         assert wait(lambda: actual(comment).lower() == god_login.lower())
+
+    @mark.skipif(True, reason='FIXME Test does not work as long as it fails '
+                              'to activate users properly')
+    def test_edit_foreign_comments(self, browser, rest_url, user):
+        comment = create_comment(browser, rest_url, 'comment1')
+        assert comment is not None
+
+        logout(browser)
+        login(browser, user[0], user[1])
+        new_text = "this should not happend"
+        edit_comment(comment, new_text)
+        assert not comment.find_by_css('.comment-content div').\
+                   first.text == new_text
 
 
 def create_comment(browser, rest_url, name):
