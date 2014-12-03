@@ -16,10 +16,20 @@ class TestComment:
         comment = create_comment(browser, rest_url, 'comment1')
         assert comment is not None
 
+    def test_empty_comment(self, browser, rest_url):
+        comment = create_comment(browser, rest_url, '')
+        assert comment is None
+
     def test_reply(self, browser):
         comment = browser.find_by_css('.comment').first
         reply = create_reply_comment(comment, 'somereply')
         assert reply is not None
+
+    def test_multiple_replies(self, browser, n=10):
+        for i in range(n):
+            comment = browser.find_by_css('.comment').last
+            reply = create_reply_comment(comment, 'reply %d' % i)
+            assert reply is not None
 
     def test_edit(self, browser):
         comment = browser.find_by_css('.comment').first
