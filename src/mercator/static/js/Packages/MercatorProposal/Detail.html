@@ -221,9 +221,6 @@
 
                 <h3>{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
                 <!-- FIXME: This should only be displayed to mercator people. -->
-                <!-- FIXME: javascript data contains boolean fields that contain string
-                "false", which evaluate to true.  not sure what's
-                going on there, but it can't be very complicated. -->
                 <p><span data-ng-if="data.heard_from.colleague">colleague</span>
                 <span data-ng-if="data.heard_from.website">website</span>
                 <span data-ng-if="data.heard_from.newsletter">newsletter</span>
