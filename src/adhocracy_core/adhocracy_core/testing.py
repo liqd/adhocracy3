@@ -396,9 +396,7 @@ def app_settings(request) -> dict:
     # don't look for the websocket server
     settings['adhocracy.ws_url'] = ''
     # use in memory database without zeo
-    # TODO should be 'memory://' but that doesn't work for blobs
-    settings['zodbconn.uri'] = 'file://var/test_zeodata/Data.fs?' \
-                               'blobstorage_dir=var/test_zeodata/blobs'
+    settings['zodbconn.uri'] = 'memory://'
     # satisfy substanced
     settings['substanced.secret'] = 'secret'
     # extra dependenies
