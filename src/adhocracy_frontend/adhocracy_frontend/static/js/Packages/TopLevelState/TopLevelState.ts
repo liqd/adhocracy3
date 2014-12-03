@@ -264,15 +264,21 @@ export class Service {
         switch (error.code) {
             case 401:
                 if (this.adhUser.loggedIn) {
-                    throw {
+                    return this.handleRoutingError({
                         code: 403,
                         message: error.message
-                    };
+                    });
                 } else {
                     this.setCameFrom(this.$location.path());
                     this.$location.path("/login");
                 }
                 break;
+            default:
+                return {
+                    space: "error",
+                    code: error.code.toString(),
+                    message: error.message
+                };
         }
 
         throw error;
@@ -460,6 +466,23 @@ export var viewFactory = (adhTopLevelState : Service, $compile : ng.ICompileServ
 };
 
 
+export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Error.html",
+        scope: {},
+        controller: ["adhTopLevelState", "$scope", (adhTopLevelState : Service, $scope) => {
+            adhTopLevelState.on("code", (code) => {
+                $scope.code = code;
+            });
+            adhTopLevelState.on("message", (message) => {
+                $scope.message = message;
+            });
+        }]
+    };
+};
+
+
 export var moduleName = "adhTopLevelState";
 
 export var register = (angular) => {
@@ -470,6 +493,7 @@ export var register = (angular) => {
         ])
         .provider("adhTopLevelState", Provider)
         .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
+        .directive("adhRoutingError", ["adhConfig", routingErrorDirective])
         .directive("adhSpaces", ["adhTopLevelState", spaces])
         .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch])
         .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);
