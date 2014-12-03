@@ -4,6 +4,7 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -243,7 +244,8 @@ export var rateController = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhUser : AdhUser.Service,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) : ng.IPromise<void> => {
 
     $scope.isActive = (rate : number) : boolean =>
@@ -270,9 +272,7 @@ export var rateController = (
 
     $scope.cast = (rate : number) : void => {
         if (!$scope.optionsPostPool.POST) {
-            // if POST is not allowed on the Rateable's post_pool,
-            // rating silently refuses to work.
-            return;
+            adhTopLevelState.redirectToLogin();
         }
 
         if ($scope.isActive(rate)) {
@@ -370,9 +370,9 @@ export var createDirective = (
             postPoolField : "@"
         },
         controller:
-            ["$scope", "$q", "adhHttp", "adhPermissions", "adhUser", "adhPreliminaryNames",
-                ($scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames) =>
-                    rateController(adapter, $scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames)]
+            ["$scope", "$q", "adhHttp", "adhPermissions", "adhUser", "adhPreliminaryNames", "adhTopLevelState",
+                ($scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames, adhTopLevelState) =>
+                    rateController(adapter, $scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames, adhTopLevelState)]
     };
 };
 
@@ -385,6 +385,7 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
+            AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
         .directive("adhRate", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
