@@ -273,6 +273,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             query.depth = 2;
             query.tag = "LAST";
             query[SIRate.nick + ":object"] = mercatorProposalVersion.path;
+            // query.rate = 1;  // FIXME: see #331, #335
             query.count = "true";
 
             this.adhHttp.get(mercatorProposalVersion.data[SILikeable.nick].post_pool, query)
