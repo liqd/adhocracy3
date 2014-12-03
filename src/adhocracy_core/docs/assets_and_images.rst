@@ -12,8 +12,7 @@ from the backend. From the viewpoint of the backend, they are just "blobs"
 different target formats.
 
 To manage assets, the backend has the `adhocracy_core.resources.asset.IAsset`
-resource type, which is a special kind of *Simple.* (FIXME Or possibly it's a
-*Pool*? In any case, it's not versionable.)
+resource type, which is a special kind of *Pool.*
 
 Assets can be uploaded to an *asset pool.* Resources that provide an asset
 pool implement the `adhocracy_core.sheets.asset.IHasAssetPool` sheet, which
@@ -100,23 +99,11 @@ and sheet.
 
 The backend can resize and crop images to different target formats. To do
 this, add an `image_sizes` field to the metadata of your subclassed sheet.
-`adhocracy_core.sheets.sample_image` shows how to do that too.
+`adhocracy_core.sheets.sample_image` shows how to do that too. For example,
+if we have::
 
-TODO continue adapting::
-
-    class IProposalIntroImage(IImageMetadata):
-        """Empty marker interface."""
-
-    @implementer(ImageSizeMapper)
-    class IProposalIntroImageSizeMapper:
-
-        def sizemap -> dict:
-            return {
-                'thumbnail': Dimensions(width=100, height=50),
-                'detail': Dimensions(width=500, height=250),
-            }
-
-    # register adapter as above
+    image_sizes={'thumbnail': Dimensions(width=100, height=50),
+                 'detail': Dimensions(width=500, height=250)},
 
 This means that the image will be made available in 'thumbnail' and in
 'detail' size, each with the specified dimensions, as well as in its original
@@ -177,43 +164,15 @@ Now we can upload a sample picture::
     ...        'image/png'}
     >>> resp_data = testapp.post(asset_pool_path, request_body,
     ...             headers=god_header, upload_files=upload_files).json
-    >>> pic_path = resp_data["path"]
-    >>> pic_path
-    'http://localhost/adhocracy/ProposalPool/assets/0000000/'
-
-TODO Create proposal version referencing the image.
 
 In response, the backend sends a JSON document with the resource type and
 path of the new resource (just as with other resource types)::
 
-    {"content_type": "adhocracy_core.resources.sample_image.ISampleImage",
-     "path": "http://localhost/adhocracy/proposals/myfirstproposal/assets/0000000"}
-
-
-Replacing Assets
-----------------
-
-To upload a new version of an asset, the frontend sends a PUT request with
-enctype="multipart/form-data" to the asset URL. The PUT request may contain
-the same keys as a POST request used to create a new asset.
-
-The `data:adhocracy_core.sheets.asset.IAssetData:data` key is required,
-since the only use case for a PUT request is uploading a new version of the
-binary data (everything else is just metadata).
-
-The `data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type` may be
-omitted if the new MIME type is the same as the old one.
-
-If the `content_type` key is given, is *must* be identical to the current
-content type of the asset (changing the type of resources is generally not
-allowed).
-
-Only those who have *editor* rights for an asset can PUT a replacement asset.
-If an image is replaced, all its cropped sizes will be automatically
-updated as well.
-
-Since assets aren't versioned, the old binary "blob" will be physically and
-irreversibly discarded once a replacement blob is uploaded.
+    >>> resp_data["content_type"]
+    'adhocracy_core.resources.sample_image.ISampleImage'
+    >>> pic_path = resp_data["path"]
+    >>> pic_path
+    'http://localhost/adhocracy/ProposalPool/assets/0000000/'
 
 
 Downloading Assets
@@ -248,8 +207,8 @@ The actual binary data is *not* part of that JSON document::
 To retrieve the raw uploaded data, the frontend must instead GET the `raw`
 child of the asset::
 
-    >>> resp_data = testapp.get(pic_path + 'raw').json
-    >>> resp_data["content_type"]
+    >>> resp_data = testapp.get(pic_path + 'raw')
+    >>> resp_data.content_type
     'image/png'
     >>> len(resp_data.body)
     14651
@@ -258,17 +217,11 @@ In case of images, it can retrieve the image in one of the predefined
 cropped sizes by asking for one of the keys defined by the ImageSizeMapper as
 child element::
 
-    >> resp_data = testapp.get(
-    ...    'http://localhost/adhocracy/proposals/myfirstproposal/assets/0000000/thumbnail').json
-    >> resp_data["content_type"]
+    >>> resp_data = testapp.get(pic_path + 'detail')
+    >>> resp_data.content_type
     'image/jpeg'
-
-
-Deleting and Hiding Assets
---------------------------
-
-Assets can be deleted or censored ("hidden") in the usual way, see
-:ref:`deletion`.
+    >>> len(resp_data.body) > 10000
+    True
 
 
 Referring to Assets
@@ -280,5 +233,42 @@ to a single asset) or `UniqueReferences` (to refer to a list of assets) and
 defining a suitable `reftype` (e.g. with `target_isheet =
 IProposalIntroImage`).
 
-TODO Do for above example, show that the asset is now `attached_to` the
-proposal.
+TODO Create proposal version referencing the image; show that the asset is
+now `attached_to` the proposal.
+
+
+Replacing Assets
+----------------
+
+To upload a new version of an asset, the frontend sends a PUT request with
+enctype="multipart/form-data" to the asset URL. The PUT request may contain
+the same keys as a POST request used to create a new asset.
+
+The `data:adhocracy_core.sheets.asset.IAssetData:data` key is required,
+since the only use case for a PUT request is uploading a new version of the
+binary data (everything else is just metadata).
+
+The `data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type` may be
+omitted if the new MIME type is the same as the old one.
+
+If the `content_type` key is given, is *must* be identical to the current
+content type of the asset (changing the type of resources is generally not
+allowed).
+
+Only those who have *editor* rights for an asset can PUT a replacement asset.
+If an image is replaced, all its cropped sizes will be automatically
+updated as well.
+
+Since assets aren't versioned, the old binary "blob" will be physically and
+irreversibly discarded once a replacement blob is uploaded.
+
+TODO Add example testing this.
+
+
+Deleting and Hiding Assets
+--------------------------
+
+Assets can be deleted or censored ("hidden") in the usual way, see
+:ref:`deletion`.
+
+TODO Add example testing this.
