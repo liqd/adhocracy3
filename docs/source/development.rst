@@ -206,8 +206,9 @@ Then, to upgrade to version 0.0.3, carry out the following steps:
        release, or something like e.g. `Presentation <customer>
        <date>`.
 
-    6. `git push --tags` (`git push` ignores tags by default, even
-       though `git fetch` and `git pull` don't).
+    6. `git push --tags` (I think `git push` and `git fetch` treat
+       tags and commits separately these days; for the convoluted
+       details, consult the man pages).
 
 Browse existing tags and check out a specific release::
 
