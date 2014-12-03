@@ -42,6 +42,7 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhLi
 export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
     refersTo : string;
     poolPath : string;
+    hideCancel? : boolean;
     poolOptions : AdhHttp.IOptions;
     createPath : string;
     isCurrent : boolean;
@@ -194,6 +195,12 @@ export class CommentCreate<R extends ResourcesBase.Resource> extends CommentReso
     ) {
         super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
+    }
+
+    public createDirective() {
+        var directive = super.createDirective();
+        directive.scope["hideCancel"] = "=?";
+        return directive;
     }
 }
 
