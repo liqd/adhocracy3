@@ -37,7 +37,7 @@ def register_user(user_name):
                     'password': 'password'
                 },
                 'adhocracy_core.sheets.principal.IUserBasic': {
-                'email': user_name + '@someisp.de',
+                'email': user_name + '@example.org',
                 'name': user_name
             }
         },
