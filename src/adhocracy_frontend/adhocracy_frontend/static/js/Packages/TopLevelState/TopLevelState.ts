@@ -135,6 +135,8 @@ export class Service {
     private area : IArea;
     private currentSpace : string;
     private blockTemplate : boolean;
+    private locationHasChanged : boolean;
+    private lock : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
     private data : {[space : string]: {[key : string] : string}};
@@ -156,8 +158,15 @@ export class Service {
         this.currentSpace = "";
         this.data = {"": <any>{}};
 
+        this.locationHasChanged = false;
+        this.lock = false;
+
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
-            self.fromLocation();
+            self.locationHasChanged = true;
+
+            if (!self.lock) {
+                self.fromLocation();
+            }
         });
     }
 
@@ -222,34 +231,46 @@ export class Service {
         var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
 
+        this.locationHasChanged = false;
+
         if (area.skip) {
             return this.$q.when();
         } else {
-            return area.route(path, search)
-            .catch((error) => this.handleRoutingError(error))
-            .then((data) => {
-                this._set("space", data["space"] || "");
-                delete data["space"];
+            this.lock = true;
 
-                for (var key in this.data[this.currentSpace]) {
-                    if (!data.hasOwnProperty(key)) {
-                        this._set(key, undefined);
+            // FIXME: finally seems to be broken in DefinitlyTyped, so <any>
+            return <any>area.route(path, search)
+                .catch((error) => this.handleRoutingError(error))
+                .then((data) => {
+                    if (this.locationHasChanged) {
+                        return this.fromLocation();
                     }
-                }
-                for (var key2 in data) {
-                    if (data.hasOwnProperty(key2)) {
-                        this._set(key2, data[key2]);
+
+                    this._set("space", data["space"] || "");
+                    delete data["space"];
+
+                    for (var key in this.data[this.currentSpace]) {
+                        if (!data.hasOwnProperty(key)) {
+                            this._set(key, undefined);
+                        }
                     }
-                }
+                    for (var key2 in data) {
+                        if (data.hasOwnProperty(key2)) {
+                            this._set(key2, data[key2]);
+                        }
+                    }
 
-                if (this.currentSpace !== "error") {
-                    // normalize location
-                    this.$location.replace();
-                    this.toLocation();
-                }
+                    if (this.currentSpace !== "error") {
+                        // normalize location
+                        this.$location.replace();
+                        this.toLocation();
+                    }
 
-                this.blockTemplate = false;
-            });
+                    this.blockTemplate = false;
+                })
+                .finally(() => {
+                    this.lock = false;
+                });
         }
     }
 
