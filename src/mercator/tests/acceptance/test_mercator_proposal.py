@@ -2,7 +2,6 @@ from pytest import fixture
 from pytest import raises
 from pytest import mark
 from webtest import TestApp
-import time
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
@@ -30,6 +29,7 @@ class TestMercatorForm:
     def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
         #FIXME make this test shorter and more acceptance test like
+        import time
         time.sleep(1)
         app = TestApp(app)
         rest_url = 'http://localhost'
