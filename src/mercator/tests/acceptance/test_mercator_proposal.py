@@ -67,6 +67,9 @@ class TestMercatorForm:
         browser.find_by_name('user-info-first-name').first.fill('')
         assert not is_valid(browser)
 
+        browser.find_by_name('user-info-first-name').first.fill('user name')
+        assert is_valid(browser)
+
     def test_heard_of_is_required(self, browser):
         browser.find_by_name('heard-from-colleague').first.uncheck()
         assert not is_valid(browser)
