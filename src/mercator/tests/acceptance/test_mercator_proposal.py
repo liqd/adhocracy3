@@ -2,6 +2,7 @@ from pytest import fixture
 from pytest import raises
 from pytest import mark
 from webtest import TestApp
+import time
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
@@ -26,7 +27,6 @@ class TestMercatorForm:
     def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
         #FIXME make this test shorter and more acceptance test like
-        import time
         time.sleep(1)
         app = TestApp(app)
         rest_url = 'http://localhost'
@@ -67,6 +67,16 @@ class TestMercatorForm:
         browser.find_by_name('user-info-first-name').first.fill('')
         assert not is_valid(browser)
 
+    def test_heard_of_is_required(self, browser):
+        browser.find_by_name('heard-from-colleague').first.uncheck()
+        assert not is_valid(browser)
+
+        browser.find_by_name('heard-from-colleague').first.check()
+        assert is_valid(browser)
+
+        browser.find_by_css('input[type="submit"]').first.click()
+        assert get_url(browser).endswith("/r/mercator/@create_proposal")
+
     @mark.xfail
     def test_login_is_required(self, browser):
         with raises(AssertionError):
@@ -76,6 +86,11 @@ class TestMercatorForm:
 def is_valid(browser):
     form = browser.find_by_css('.mercator-proposal-form').first
     return not form.has_class('ng-invalid')
+
+
+def get_url(browser):
+    time.sleep(2)
+    return browser.url
 
 
 def fill_all(browser):
