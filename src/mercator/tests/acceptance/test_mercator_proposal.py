@@ -6,6 +6,9 @@ import time
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
+from adhocracy_frontend.tests.acceptance.shared import wait
+
+TITLE = 'title'
 
 
 class TestMercatorForm:
@@ -77,8 +80,15 @@ class TestMercatorForm:
         browser.find_by_name('heard-from-colleague').first.check()
         assert is_valid(browser)
 
+    def test_heard_of_is_not_changed_after_submission(self, browser):
         browser.find_by_css('input[type="submit"]').first.click()
-        assert get_url(browser).endswith("/r/mercator/@create_proposal")
+        wait(lambda: browser.url.endswith("/r/mercator/"))
+
+        browser.find_link_by_text(TITLE).first.click()
+        wait(lambda: not browser.url.endswith("/r/mercator/"))
+
+        heard_of = browser.find_by_xpath('//*[@id="mercator-detail-view-additional"]/section/div/p').first
+        assert not heard_of.text == ""
 
     @mark.xfail
     def test_login_is_required(self, browser):
@@ -89,11 +99,6 @@ class TestMercatorForm:
 def is_valid(browser):
     form = browser.find_by_css('.mercator-proposal-form').first
     return not form.has_class('ng-invalid')
-
-
-def get_url(browser):
-    time.sleep(2)
-    return browser.url
 
 
 def fill_all(browser):
@@ -112,7 +117,7 @@ def fill_all(browser):
     browser.find_by_name('organization-info-website').first.fill(
         'http://example.com')
 
-    browser.find_by_name('introduction-title').first.fill('title')
+    browser.find_by_name('introduction-title').first.fill(TITLE)
     browser.find_by_name('introduction-teaser').first.fill('teaser')
 
     browser.find_by_name('description-description').first.fill('description')
