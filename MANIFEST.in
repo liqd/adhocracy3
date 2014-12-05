@@ -1,7 +1,6 @@
 recursive-include src/mercator/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.ico *.json *.jpg *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
 global-exclude *Ig.js
-prune src/mercator/build/styleguide
 prune src/mercator/build/lib/DefinitelyTyped
 prune src/mercator/build/lib/q
 prune src/mercator/build/lib/jasmine
