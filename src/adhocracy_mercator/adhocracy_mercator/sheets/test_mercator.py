@@ -189,7 +189,7 @@ class TestOrganizationInfoSchema:
         with raises(Invalid) as error:
             inst.deserialize(cstruct)
         assert error.value.asdict() == {'status_other':
-                                        'Required if status == other'}
+                                        'Required iff status == other'}
 
     def test_deserialize_without_name(self, inst, cstruct_required):
         from colander import Invalid
