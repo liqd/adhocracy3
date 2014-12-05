@@ -72,8 +72,8 @@ export interface IScopeData {
     user_info : {
         first_name : string;
         last_name : string;
-        country : string;  // FIXME: should be number (see #265)
-        createtime : string;  // FIXME: should be Date (see #265)
+        country : number;
+        createtime : Date;
         path : string;
         commentCount : number;
     };
@@ -82,7 +82,7 @@ export interface IScopeData {
         name : string;
         country : number;
         website : string;
-        date_of_foreseen_registration : string;  // FIXME: should be Date (see #265)
+        date_of_foreseen_registration : Date;
         how_can_we_help_you : string;
         status_other : string;
         commentCount : number;
@@ -250,7 +250,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
-        data.user_info.createtime = AdhUtil.formatDate(mercatorProposalVersion.data[SIMetaData.nick].item_creation_date);
+        data.user_info.createtime = mercatorProposalVersion.data[SIMetaData.nick].item_creation_date;
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
 
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
