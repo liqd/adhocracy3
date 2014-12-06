@@ -69,6 +69,7 @@ export class Service implements IService {
      */
     constructor(
         private _postMessage : IPostMessageService,
+        private $location : ng.ILocationService,
         private $window : Window,
         private $rootScope,
         private trustedDomains : string[],
@@ -145,6 +146,13 @@ export class Service implements IService {
 
             _self.$rootScope.$watch(() => _self.adhUser.loggedIn, ((loggedIn) => _self.sendLoginState(loggedIn)));
             _self.sendLoginState(_self.adhUser.loggedIn);
+
+            _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl) => {
+                _self.postMessage(
+                    "urlchange",
+                    {url: absUrl}
+                );
+            });
         }
     }
 
@@ -194,10 +202,16 @@ export class Dummy implements IService {
 }
 
 
-export var factory = (adhConfig : AdhConfig.IService, $window : Window, $rootScope, adhUser ?: AdhUser.Service) : IService => {
+export var factory = (
+    adhConfig : AdhConfig.IService,
+    $location : ng.ILocationService,
+    $window : Window,
+    $rootScope,
+    adhUser ?: AdhUser.Service
+) : IService => {
     if (adhConfig.embedded) {
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
-        return new Service(postMessageToParent, $window, $rootScope, adhConfig.trusted_domains, adhUser);
+        return new Service(postMessageToParent, $location, $window, $rootScope, adhConfig.trusted_domains, adhUser);
     } else {
         console.log("Using dummy CrossWindowMessaging because we are not embedded.");
         return new Dummy();
@@ -214,8 +228,8 @@ export var register = (angular, trusted = false) => {
         ]);
 
     if (trusted) {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", factory]);
+        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", factory]);
     } else {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", "adhUser", factory]);
+        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", "adhUser", factory]);
     }
 };

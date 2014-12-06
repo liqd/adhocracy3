@@ -13,6 +13,7 @@ from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import ISOCountryCode
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
 from adhocracy_core.utils import get_sheet_field
@@ -224,7 +225,7 @@ class OrganizationInfoSchema(colander.MappingSchema):
     # FIXME status_other must be non-empty if status=other, otherwise it must
     # be empty or null
     website = URL()
-    planned_date = SingleLine()  # FIXME: use datetime? "month/year"
+    planned_date = DateTime(missing=colander.drop, default=None)
     help_request = Text(validator=colander.Length(max=500))
 
     def validator(self, node, value):

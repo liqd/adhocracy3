@@ -54,6 +54,9 @@ var mkAdhMetaApiMock = () => {
             }
         },
 
+        sheetExists: () => true,
+        fieldExists: () => true,
+
         // used by exportContent.
         field: (sheet, field) => {
             switch (sheet + "/" + field) {
@@ -69,6 +72,8 @@ var mkAdhMetaApiMock = () => {
         }
     };
 
+    spyOn(mock, "sheetExists").and.callThrough();
+    spyOn(mock, "fieldExists").and.callThrough();
     spyOn(mock, "field").and.callThrough();
 
     return mock;

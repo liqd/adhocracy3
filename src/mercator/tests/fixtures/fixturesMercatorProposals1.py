@@ -526,23 +526,24 @@ def create_proposals(user_token, n=5):
     proposals = []
 
     uri = root_uri + "/batch"
-    headers = {
-        "Content-Type": "application/json;charset=UTF-8",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip,deflate",
-        "Connection": "keep-alive",
-        "X-User-Token": user_token,
-        "X-User-Path": "" + root_uri + "/principals/users/0000000/",
-        "Accept-Language": "en-US,en;q=0.8",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
-        "Content-Length": "8206"
-    }
+    def headers(length):
+        return {
+            "Content-Type": "application/json;charset=UTF-8",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Encoding": "gzip,deflate",
+            "Connection": "keep-alive",
+            "X-User-Token": user_token,
+            "X-User-Path": "" + root_uri + "/principals/users/0000000/",
+            "Accept-Language": "en-US,en;q=0.8",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
+            "Content-Length": length
+        }
 
     for i in range(n):
         requested_proposal = _create_proposal()
 
         body = json.dumps(requested_proposal)
-        response = requests.post(uri, headers=headers, data=body)
+        response = requests.post(uri, headers=headers(str(len(body))), data=body)
         if verbose:
             print('\n')
             print(uri)

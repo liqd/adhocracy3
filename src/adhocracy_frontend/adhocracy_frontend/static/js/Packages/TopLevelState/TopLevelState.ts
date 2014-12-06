@@ -27,6 +27,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhEventHandler = require("../EventHandler/EventHandler");
+import AdhUser = require("../User/User");
 
 var pkgLocation = "/TopLevelState";
 
@@ -69,6 +70,13 @@ export interface IArea {
 }
 
 
+/** should be roughly equivalent to HTTP status codes, e.g. 404 Not Found */
+export interface IRoutingError {
+    code : number;
+    message? : string;
+}
+
+
 export class Provider {
     public areas : {[key : string]: any};
     public default : any;
@@ -86,9 +94,9 @@ export class Provider {
         };
         this.spaceDefaults = {};
 
-        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
-            (adhEventHandlerClass, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
-                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $injector,
+        this.$get = ["adhEventHandlerClass", "adhUser", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
+            (adhEventHandlerClass, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+                return new Service(self, adhEventHandlerClass, adhUser, $location, $rootScope, $http, $q, $injector,
                                    $templateRequest);
             }];
     }
@@ -127,6 +135,8 @@ export class Service {
     private area : IArea;
     private currentSpace : string;
     private blockTemplate : boolean;
+    private locationHasChanged : boolean;
+    private lock : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
     private data : {[space : string]: {[key : string] : string}};
@@ -134,6 +144,7 @@ export class Service {
     constructor(
         private provider : Provider,
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
+        private adhUser : AdhUser.Service,
         private $location : ng.ILocationService,
         private $rootScope : ng.IScope,
         private $http : ng.IHttpService,
@@ -147,8 +158,15 @@ export class Service {
         this.currentSpace = "";
         this.data = {"": <any>{}};
 
+        this.locationHasChanged = false;
+        this.lock = false;
+
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
-            self.fromLocation();
+            self.locationHasChanged = true;
+
+            if (!self.lock) {
+                self.fromLocation();
+            }
         });
     }
 
@@ -213,34 +231,94 @@ export class Service {
         var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
 
+        this.locationHasChanged = false;
+
         if (area.skip) {
             return this.$q.when();
         } else {
-            return area.route(path, search).then((data) => {
-                this._set("space", data["space"] || "");
-                delete data["space"];
+            this.lock = true;
 
-                for (var key in this.data[this.currentSpace]) {
-                    if (!data.hasOwnProperty(key)) {
-                        this._set(key, undefined);
+            // FIXME: finally seems to be broken in DefinitlyTyped, so <any>
+            return <any>area.route(path, search)
+                .catch((error) => this.handleRoutingError(error))
+                .then((data) => {
+                    if (this.locationHasChanged) {
+                        return this.fromLocation();
                     }
-                }
-                for (var key2 in data) {
-                    if (data.hasOwnProperty(key2)) {
-                        this._set(key2, data[key2]);
+
+                    this._set("space", data["space"] || "");
+                    delete data["space"];
+
+                    for (var key in this.data[this.currentSpace]) {
+                        if (!data.hasOwnProperty(key)) {
+                            this._set(key, undefined);
+                        }
                     }
+                    for (var key2 in data) {
+                        if (data.hasOwnProperty(key2)) {
+                            this._set(key2, data[key2]);
+                        }
+                    }
+
+                    if (this.currentSpace !== "error") {
+                        // normalize location
+                        this.$location.replace();
+                        this.toLocation();
+                    }
+
+                    this.blockTemplate = false;
+                })
+                .finally(() => {
+                    this.lock = false;
+                });
+        }
+    }
+
+    /**
+     * Take action on 'benevolent' routing errors like "not logged in".
+     * This method may return a state object or (re-)throw an exception.
+     */
+    private handleRoutingError(error) : {[key : string]: string} {
+        error = this.fillRoutingError(error);
+        console.log(error);
+
+        switch (error.code) {
+            case 401:
+                if (this.adhUser.loggedIn) {
+                    return this.handleRoutingError({
+                        code: 403,
+                        message: error.message
+                    });
+                } else {
+                    this.redirectToLogin();
                 }
+                break;
+            default:
+                return {
+                    space: "error",
+                    code: error.code.toString(),
+                    message: error.message
+                };
+        }
 
-                // normalize location
-                this.$location.replace();
-                this.toLocation();
+        throw error;
+    }
 
-                this.blockTemplate = false;
-            })
-            .catch((error) => {
-                console.log(error);
-                throw error;
-            });
+    private fillRoutingError(error : IRoutingError) : IRoutingError;
+    private fillRoutingError(error : number) : IRoutingError;
+    private fillRoutingError(error : string) : IRoutingError;
+    private fillRoutingError(error) {
+        if (error.hasOwnProperty("code")) {
+            return error;
+        } else if (typeof error === "number") {
+            return {
+                code: error
+            };
+        } else {
+            return {
+                code: 500,
+                message: error
+            };
         }
     }
 
@@ -345,6 +423,12 @@ export class Service {
             this.$location.url(_default);
         }
     }
+
+    public redirectToLogin() : void {
+        this.setCameFrom(this.$location.path());
+        this.$location.replace();
+        this.$location.url("/login");
+    }
 }
 
 
@@ -408,15 +492,34 @@ export var viewFactory = (adhTopLevelState : Service, $compile : ng.ICompileServ
 };
 
 
+export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Error.html",
+        scope: {},
+        controller: ["adhTopLevelState", "$scope", (adhTopLevelState : Service, $scope) => {
+            adhTopLevelState.on("code", (code) => {
+                $scope.code = code;
+            });
+            adhTopLevelState.on("message", (message) => {
+                $scope.message = message;
+            });
+        }]
+    };
+};
+
+
 export var moduleName = "adhTopLevelState";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEventHandler.moduleName
+            AdhEventHandler.moduleName,
+            AdhUser.moduleName
         ])
         .provider("adhTopLevelState", Provider)
         .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
+        .directive("adhRoutingError", ["adhConfig", routingErrorDirective])
         .directive("adhSpaces", ["adhTopLevelState", spaces])
         .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch])
         .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);

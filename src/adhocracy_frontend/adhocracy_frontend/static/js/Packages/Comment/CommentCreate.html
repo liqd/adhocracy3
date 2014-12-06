@@ -4,5 +4,5 @@
     </div>
     <textarea data-msd-elastic="" data-ng-model="data.content"></textarea>
     <input type="submit" value="{{ 'create' | translate }}" data-ng-click="submit()" />
-    <a href="" data-ng-click="cancel()">{{ "Cancel" | translate }}</a>
+    <a href="" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "Cancel" | translate }}</a>
 </form>

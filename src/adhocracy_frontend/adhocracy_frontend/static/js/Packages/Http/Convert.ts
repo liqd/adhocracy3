@@ -64,14 +64,16 @@ export var importContent = <Content extends ResourcesBase.Resource>(
         }
 
         var _sclass = Resources_.sheetRegistry[sheetName];
-        _obj.data[sheetName] = new _sclass({});
-        _.forOwn(jsonSheet, (val, key) => {
-            _obj.data[sheetName][key] = val;
-        });
+        _obj.data[sheetName] = new _sclass(jsonSheet);
 
         // the above four lines compile because we leave
         // typescript in the dark about the actual type of _class.
         // har!
+        //
+        // NOTE: passing the json sheet to the constructor rather than
+        // iterating through it and assigning the values to the sheet
+        // manually is important.  the constructor has to parse some
+        // field types (e.g. Date).
     });
 
     // return
@@ -171,12 +173,12 @@ export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : AdhM
     // remove some fields from newobj.data[*] and empty sheets from
     // newobj.data.
     for (var sheetName in newobj.data) {
-        if (newobj.data.hasOwnProperty(sheetName)) {
+        if (newobj.data.hasOwnProperty(sheetName) && adhMetaApi.sheetExists(sheetName)) {
             var sheet : AdhMetaApi.ISheet = newobj.data[sheetName];
             var keepSheet : boolean = false;
 
             for (var fieldName in sheet) {
-                if (sheet.hasOwnProperty(fieldName)) {
+                if (sheet.hasOwnProperty(fieldName) && adhMetaApi.fieldExists(sheetName, fieldName)) {
                     var fieldMeta : AdhMetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
 
                     if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
