@@ -125,7 +125,7 @@ export var movingColumns = (
             adhTopLevelState.on("userUrl", (url : string) => {
                 scope.userUrl = url;
             });
-            adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+            adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
             adhTopLevelState.on("movingColumns", move);
             adhTopLevelState.on("focus", resize);
