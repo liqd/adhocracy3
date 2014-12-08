@@ -72,7 +72,7 @@ export interface IScopeData {
     user_info : {
         first_name : string;
         last_name : string;
-        country : number;
+        country : string;
         createtime : Date;
         path : string;
         commentCount : number;
@@ -80,7 +80,7 @@ export interface IScopeData {
     organization_info : {
         status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
         name : string;
-        country : number;
+        country : string;
         website : string;
         date_of_foreseen_registration : Date;
         how_can_we_help_you : string;

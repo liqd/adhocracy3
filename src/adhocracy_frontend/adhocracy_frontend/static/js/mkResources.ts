@@ -776,8 +776,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         parser = stringToAny;
         break;
     case "adhocracy_core.schema.ISOCountryCode":
-        resultType = "number";
-        parser = stringToAny;
+        resultType = "string";
         break;
     case "adhocracy_mercator.sheets.mercator.StatusEnum":  // FIXME: this needs to go to the mercator package
         resultType = "string";
