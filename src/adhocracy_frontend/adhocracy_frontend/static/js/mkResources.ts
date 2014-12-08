@@ -711,12 +711,16 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     // parse dates
     var stringToDate : string = "(field : string) => new Date(field)";
 
+    // parse booleans
+    var stringToBoolean : string = "(field : string) => field === \"true\"";
+
     // let javascript's weak-dynamic type system figure it out.
     var stringToAny : string = "(field : string) => <any>field";
 
     switch (field.valuetype) {
     case "adhocracy_core.schema.Boolean":
-        resultType = "string";
+        resultType = "boolean";
+        parser = stringToBoolean;
         break;
     case "adhocracy_core.schema.AbsolutePath":
         resultType = "string";
@@ -768,7 +772,8 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         resultType = "string";
         break;
     case "adhocracy_core.schema.CurrencyAmount":
-        resultType = "string";
+        resultType = "number";
+        parser = stringToAny;
         break;
     case "adhocracy_core.schema.ISOCountryCode":
         resultType = "number";
