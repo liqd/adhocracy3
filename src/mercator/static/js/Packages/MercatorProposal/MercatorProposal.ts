@@ -72,7 +72,7 @@ export interface IScopeData {
     user_info : {
         first_name : string;
         last_name : string;
-        country : number;
+        country : string;
         createtime : Date;
         path : string;
         commentCount : number;
@@ -80,7 +80,7 @@ export interface IScopeData {
     organization_info : {
         status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
         name : string;
-        country : number;
+        country : string;
         website : string;
         date_of_foreseen_registration : Date;
         how_can_we_help_you : string;
@@ -256,10 +256,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
         if (typeof heardFrom !== "undefined") {
             data.heard_from = {
-                colleague: heardFrom.heard_from_colleague === "true",
-                website: heardFrom.heard_from_website === "true",
-                newsletter: heardFrom.heard_from_newsletter === "true",
-                facebook: heardFrom.heard_from_facebook === "true",
+                colleague: heardFrom.heard_from_colleague,
+                website: heardFrom.heard_from_website,
+                newsletter: heardFrom.heard_from_newsletter,
+                facebook: heardFrom.heard_from_facebook,
                 other: heardFrom.heard_elsewhere !== "",
                 other_specify: heardFrom.heard_elsewhere
             };
@@ -335,12 +335,12 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         var scope = data.location;
                         var res : SIMercatorLocation.Sheet = subResource.data[SIMercatorLocation.nick];
 
-                        scope.location_is_specific = res.location_is_specific === "true";
+                        scope.location_is_specific = res.location_is_specific;
                         scope.location_specific_1 = res.location_specific_1;
                         scope.location_specific_2 = res.location_specific_2;
                         scope.location_specific_3 = res.location_specific_3;
-                        scope.location_is_online = res.location_is_online === "true";
-                        scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr === "true";
+                        scope.location_is_online = res.location_is_online;
+                        scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
@@ -378,10 +378,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         var scope = data.finance;
                         var res : SIMercatorFinance.Sheet = subResource.data[SIMercatorFinance.nick];
 
-                        scope.budget = parseInt(res.budget, 10);
-                        scope.requested_funding = parseInt(res.requested_funding, 10);
+                        scope.budget = res.budget;
+                        scope.requested_funding = res.requested_funding;
                         scope.other_sources = res.other_sources;
-                        scope.granted = res.granted === "true";
+                        scope.granted = res.granted;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                     })();
                     break;
