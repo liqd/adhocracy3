@@ -64,7 +64,9 @@
             <div data-ng-if="view !== 'edit'">
                 <div class="moving-column-menu">
                     <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ "edit" | translate }}</a>
-                    <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
+                    <div class="moving-column-menu-nav">
+                        <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
+                    </div>
                 </div>
                 <div class="moving-column-collapsed">
                     <a href="{{ proposalUrl | adhResourceUrl }}">O</a>
@@ -80,7 +82,9 @@
         </div>
         <div class="moving-column moving-column-content2">
             <div class="moving-column-menu">
-                <a href="{{ proposalUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
+                <div class="moving-column-menu-nav">
+                    <a href="{{ proposalUrl | adhResourceUrl }}" title="{{ 'close' | translate }}">X</a>
+                </div>
             </div>
             <div class="moving-column-body" data-du-scroll-container="">
                 <adh-comment-listing data-ng-if="commentableUrl" data-path="{{commentableUrl}}">
