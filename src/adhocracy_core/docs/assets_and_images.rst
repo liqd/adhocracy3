@@ -156,12 +156,11 @@ references it. But first we have to create a proposal::
 Now we can upload a sample picture::
 
     >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
-    ...     'sample-pic-python-logo.png',
-    ...     open('docs/source/_static/sample-pic-python-logo.png', 'rb').read())]
+    ...     'python.jpg', open('docs/source/_static/python.jpg', 'rb').read())]
     >>> request_body = {
     ...    'content_type': 'adhocracy_core.resources.sample_image.ISampleImage',
     ...    'data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type':
-    ...        'image/png'}
+    ...        'image/jpeg'}
     >>> resp_data = testapp.post(asset_pool_path, request_body,
     ...             headers=god_header, upload_files=upload_files).json
 
@@ -195,9 +194,9 @@ the asset::
     '20...'
     >>> pprint(resp_data['data']['adhocracy_core.sheets.sample_image.ISampleImageMetadata'])
     {'attached_to': [],
-     'filename': 'sample-pic-python-logo.png',
-     'mime_type': 'image/png',
-     'size': '14651'}
+     'filename': 'python.jpg',
+     'mime_type': 'image/jpeg',
+     'size': '159041'}
 
 The actual binary data is *not* part of that JSON document::
 
@@ -209,9 +208,10 @@ child of the asset::
 
     >>> resp_data = testapp.get(pic_path + 'raw')
     >>> resp_data.content_type
-    'image/png'
-    >>> len(resp_data.body)
-    14651
+    'image/jpeg'
+    >>> original_size = len(resp_data.body)
+    >>> original_size
+    159041
 
 In case of images, it can retrieve the image in one of the predefined
 cropped sizes by asking for one of the keys defined by the ImageSizeMapper as
@@ -220,7 +220,8 @@ child element::
     >>> resp_data = testapp.get(pic_path + 'detail')
     >>> resp_data.content_type
     'image/jpeg'
-    >>> len(resp_data.body) > 10000
+    >>> detail_size = len(resp_data.body)
+    >>> detail_size < original_size
     True
 
 
@@ -282,7 +283,32 @@ updated as well.
 Since assets aren't versioned, the old binary "blob" will be physically and
 irreversibly discarded once a replacement blob is uploaded.
 
-TODO Add example testing this.
+Lets replace the uploaded python with another one::
+
+    >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
+    ...     'python2.jpg', open('docs/source/_static/python2.jpg', 'rb').read())]
+    >>> request_body = {
+    ...    'content_type': 'adhocracy_core.resources.sample_image.ISampleImage',
+    ...    'data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type':
+    ...        'image/jpeg'}
+    >>> resp_data = testapp.put(pic_path, request_body,
+    ...             headers=god_header, upload_files=upload_files).json
+
+If we download the image metadata again, we see that filename and size have
+changed accordingly::
+
+    >>> resp_data = testapp.get(pic_path).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.sample_image.ISampleImageMetadata'])
+    {'attached_to': ['http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/'],
+     'filename': 'python2.jpg',
+     'mime_type': 'image/jpeg',
+     'size': '112107'}
+
+Predefined scaled+cropped views are automatically updated as well::
+
+    >>> resp_data = testapp.get(pic_path + 'detail')
+    >>> len(resp_data.body) == detail_size
+    False
 
 
 Deleting and Hiding Assets
@@ -291,4 +317,4 @@ Deleting and Hiding Assets
 Assets can be deleted or censored ("hidden") in the usual way, see
 :ref:`deletion`.
 
-TODO Add example testing this.
+TODO Add example testing this using delete (also for children).
