@@ -221,6 +221,26 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
+    /**
+     * promise supporters count.
+     */
+    private countSupporters(postPoolPath : string, supporteePath : string) : ng.IPromise<number> {
+        var query : any = {};
+        query.content_type = RIRateVersion.content_type;
+        query.depth = 2;
+        query.tag = "LAST";
+        query[SIRate.nick + ":object"] = supporteePath;
+        // query.rate = 1;  // FIXME: see #331, #335
+        query.count = "true";
+
+        return this.adhHttp.get(postPoolPath, query)
+            .then((response) => {
+                var pool : SIPool.Sheet = response.data[SIPool.nick];
+                return parseInt((<any>pool).count, 10);  // see #261
+            });
+    }
+
+
     private initializeScope(scope : IScope) : IScopeData {
         if (!scope.hasOwnProperty("data")) {
             scope.data = <IScopeData>{};
@@ -266,21 +286,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         data.commentCount = mercatorProposalVersion.data[SICommentable.nick].comments.length;
         data.supporterCount = 0;
-        (() => {
-            var query : any = {};
-            query.content_type = RIRateVersion.content_type;
-            query.depth = 2;
-            query.tag = "LAST";
-            query[SIRate.nick + ":object"] = mercatorProposalVersion.path;
-            // query.rate = 1;  // FIXME: see #331, #335
-            query.count = "true";
-
-            this.adhHttp.get(mercatorProposalVersion.data[SILikeable.nick].post_pool, query)
-                .then((response) => {
-                    var pool : SIPool.Sheet = response.data[SIPool.nick];
-                    data.supporterCount = (<any>pool).count;  // see #261
-                });
-        })();
+        this.countSupporters(mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
+            .then((count : number) => { data.supporterCount = count; });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([
