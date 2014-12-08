@@ -27,6 +27,8 @@ $font-size-plus: 16px;
 $font-size-large: 21px;
 $font-size-huge: 40px;
 
+$moving-column-separation: 4px;
+
 @mixin font-tracking($value) {
     @if $value == narrow {
         word-spacing: 0.025em;
