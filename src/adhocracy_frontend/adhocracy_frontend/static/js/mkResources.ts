@@ -708,14 +708,11 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     var constructorType : string = "string";
     var parser : string;
 
-    // parse dates
+    // parsers
     var stringToDate : string = "(field : string) => new Date(field)";
-
-    // parse booleans
     var stringToBoolean : string = "(field : string) => field === \"true\"";
-
-    // let javascript's weak-dynamic type system figure it out.
-    var stringToAny : string = "(field : string) => <any>field";
+    var stringToInt : string = "(field : string) => parseInt(field)";
+    var stringToFloat : string = "(field : string) => parseFloat(field)";
 
     switch (field.valuetype) {
     case "adhocracy_core.schema.Boolean":
@@ -749,15 +746,15 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         break;
     case "Integer":
         resultType = "number";
-        parser = stringToAny;
+        parser = stringToInt;
         break;
     case "adhocracy_core.schema.Integer":
         resultType = "number";
-        parser = stringToAny;
+        parser = stringToInt;
         break;
     case "adhocracy_core.schema.Rate":
         resultType = "number";
-        parser = stringToAny;
+        parser = stringToInt;
         break;
     case "adhocracy_core.schema.TimeZoneName":
         resultType = "string";
@@ -773,7 +770,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         break;
     case "adhocracy_core.schema.CurrencyAmount":
         resultType = "number";
-        parser = stringToAny;
+        parser = stringToFloat;
         break;
     case "adhocracy_core.schema.ISOCountryCode":
         resultType = "string";
