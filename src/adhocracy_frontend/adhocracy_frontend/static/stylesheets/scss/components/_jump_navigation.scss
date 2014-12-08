@@ -18,8 +18,6 @@ A navigation list containing hash tag links
 ```
 */
 .jump-navigation {
-    padding: 0.5em;
-    border: 1px solid $color-structure-border;
     z-index: 1;
 
     ol {
@@ -29,8 +27,14 @@ A navigation list containing hash tag links
     }
 
     a {
+        display: block;
+        padding: 0.5em;
+        line-height: 1;
+        color: $color-secondary-extrovert;
+        text-decoration: none;
+
         &.active {
-            font-weight: bold;
+            color: $color-highlight-normal;
         }
     }
 }

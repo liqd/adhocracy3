@@ -141,7 +141,7 @@ export var register = () => {
                 rateVersion.data["adhocracy_core.sheets.rate.IRate"] = new SIRate.Sheet({
                     subject: "sub",
                     object: "obj",
-                    rate: 1
+                    rate: <any>1
                 });
             });
 
@@ -198,7 +198,7 @@ export var register = () => {
                 // only used in untested functions
                 adhPreliminaryNamesMock = undefined;
 
-                AdhRate.rateController(adapterMock, scopeMock, q, httpMock, adhPermissionsMock, userMock, adhPreliminaryNamesMock)
+                AdhRate.rateController(adapterMock, scopeMock, q, httpMock, adhPermissionsMock, userMock, adhPreliminaryNamesMock, null)
                     .then(done, (reason) => {
                         expect(reason).toBe(undefined);
                     });

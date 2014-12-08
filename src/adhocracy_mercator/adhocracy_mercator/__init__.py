@@ -25,7 +25,10 @@ def main(global_config, **settings):
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
     app = config.make_wsgi_app()
-    warm_up_database(app)
+    # warm_up_database(app)
+    # FIXME: disabled warm_up_database is temporary workaround to prevent
+    # ComponentLookupError: (<..interfaces.ICatalogFactory>, 'system')
+    # if you start adhocracy the first time
     return app
 
 

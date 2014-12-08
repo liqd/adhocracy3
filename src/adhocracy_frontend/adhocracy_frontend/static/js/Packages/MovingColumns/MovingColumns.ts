@@ -1,10 +1,13 @@
 import _ = require("lodash");
 
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUtil = require("../Util/Util");
 
 
 export var movingColumns = (
     adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
     $timeout,
     $window
 ) => {
@@ -122,6 +125,7 @@ export var movingColumns = (
             adhTopLevelState.on("userUrl", (url : string) => {
                 scope.userUrl = url;
             });
+            adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
             adhTopLevelState.on("movingColumns", move);
             adhTopLevelState.on("focus", resize);
@@ -136,7 +140,8 @@ export var moduleName = "adhMovingColumns";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhPermissions.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
+        .directive("adhMovingColumns", ["adhTopLevelState", "adhPermissions", "$timeout", "$window", movingColumns]);
 };

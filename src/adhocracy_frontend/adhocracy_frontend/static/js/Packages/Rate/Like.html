@@ -1,6 +1,6 @@
-<div class="rate" data-ng-if="ready">
-    <a href="" class="{{isActiveClass(1)}}" data-ng-click="toggle()">{{ "Support" | translate }}</a>
-    <span class="rate-difference">
+<div class="like" data-ng-if="ready">
+    <span class="like-difference">
         {{rates.pro | signum}}
     </span>
+    <a href="" class="{{isActiveClass(1)}} like-button" data-ng-click="toggle()">{{ "Support" | translate }}</a>
 </div>

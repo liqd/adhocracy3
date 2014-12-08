@@ -31,7 +31,7 @@ frontend unit tests:
 
     B.  In browser::
 
-            make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser
+            make -C ./parts/static/js/ compile_tests_browser
             xdg-open http://localhost:6551/static/test.html
 
         Make sure backend is running (or some means of delivering html
@@ -45,13 +45,13 @@ frontend unit tests:
            In the debugger, it helps to disable the script tag about
            blanket in test.html.  You can do this thusly::
 
-               make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser test-no-blanket
+               make -C ./parts/static/js/ compile_tests_browser test-no-blanket
                xdg-open http://localhost:6551/static/test-no-blanket.html
 
     C.  With node.js::
 
-            make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_node
-            bin/jasmine-node ./src/adhocracy_frontend/adhocracy_frontend/static/js/
+            make -C ./parts/static/js/ compile_tests_node
+            bin/jasmine-node ./parts/static/js/
 
         .. note::
 
@@ -68,7 +68,7 @@ frontend unit tests:
            In order for the javascript code to work in the browser, you
            need to revert to adm::
 
-               make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser
+               make -C ./parts/static/js/ compile_tests_browser
 
 frontend integration tests:
 
@@ -97,7 +97,7 @@ frontend integration tests:
 
     B.  In browser::
 
-            make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser
+            make -C ./parts/static/js/ compile_tests_browser
             xdg-open http://localhost:6551/static/igtest.html
 
         .. note::

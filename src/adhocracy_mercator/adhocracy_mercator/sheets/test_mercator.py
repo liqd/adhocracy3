@@ -148,7 +148,7 @@ class TestOrganizationInfoSheet:
         wanted = {'country': 'DE',
                   'help_request': '',
                   'name': '',
-                  'planned_date': '',
+                  'planned_date': None,
                   'status': 'other',
                   'status_other': '',
                   'website': '',
