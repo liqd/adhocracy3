@@ -54,7 +54,7 @@ For testing, we import the needed stuff and start the Adhocracy testapp::
     >>> from pprint import pprint
     >>> from adhocracy_core.testing import god_header
     >>> from webtest import TestApp
-    >>> app = getfixture('app')
+    >>> app = getfixture('app_with_filestorage')
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
 

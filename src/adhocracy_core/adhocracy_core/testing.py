@@ -1,6 +1,7 @@
 """Public py.test fixtures: http://pytest.org/latest/fixture.html. """
 from unittest.mock import Mock
 from configparser import ConfigParser
+from shutil import rmtree
 import json
 import os
 import subprocess
@@ -14,6 +15,7 @@ from pyramid.traversal import resource_path_tuple
 from pytest import fixture
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
+from ZODB import FileStorage
 from zope.interface.interfaces import IInterface
 import colander
 
@@ -586,11 +588,15 @@ def includeme_root_with_test_users(config):
 @fixture(scope='class')
 def app(app_settings):
     """Return the adhocracy test wsgi application."""
+    return _make_app(app_settings)
+
+
+def _make_app(app_config):
     import adhocracy_core
     import adhocracy_core.resources.sample_paragraph
     import adhocracy_core.resources.sample_section
     import adhocracy_core.resources.sample_proposal
-    configurator = Configurator(settings=app_settings,
+    configurator = Configurator(settings=app_config,
                                 root_factory=adhocracy_core.root_factory)
     configurator.include(adhocracy_core)
     configurator.include(adhocracy_core.resources.sample_paragraph)
@@ -602,6 +608,26 @@ def app(app_settings):
     configurator.include(includeme_root_with_test_users)
     app = configurator.make_wsgi_app()
     return app
+
+
+@fixture(scope='class')
+def app_with_filestorage(app_settings: dict):
+    """
+    Return the adhocracy test wsgi application using a DB with file storage.
+
+    Any DB contents are cleared by this fixture.
+    """
+    db_file = 'var/test_zeodata/Data.fs'
+    blob_dir = 'var/test_zeodata/blobs'
+    # Delete old content
+    storage = FileStorage.FileStorage(db_file, blob_dir=blob_dir)
+    storage.cleanup()
+    # This doesn't seem to clear the blob_dir, hence we do so manually
+    rmtree(blob_dir, ignore_errors=True)
+    our_settings = app_settings.copy()
+    our_settings['zodbconn.uri'] = 'file://{}?blobstorage_dir={}'.format(
+        db_file, blob_dir)
+    return _make_app(our_settings)
 
 
 @fixture(scope='class')
