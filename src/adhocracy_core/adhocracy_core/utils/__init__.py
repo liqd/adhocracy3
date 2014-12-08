@@ -287,3 +287,12 @@ def get_sheet_field(resource, isheet: ISheet, field_name: str,
     sheet = get_sheet(resource, isheet, registry=registry)
     field = sheet.get()[field_name]
     return field
+
+
+def unflatten_multipart_request(request: Request) -> dict:
+    """Convert a multipart/form-data request into the usual dict structure."""
+    result = {}
+    for key, value in request.POST.items():
+        keyparts = key.split(':')
+        nested_dict_set(result, keyparts, value)
+    return result

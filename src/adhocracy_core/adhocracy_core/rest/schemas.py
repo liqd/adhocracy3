@@ -23,6 +23,7 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
 from adhocracy_core.utils import raise_colander_style_error
+from adhocracy_core.utils import unflatten_multipart_request
 
 
 resolver = DottedNameResolver()
@@ -57,7 +58,11 @@ def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
     context = kw.get('context', None)
     request = kw.get('request', None)
     sheets = request.registry.content.get_sheets_edit(context, request)
-    data = request.json_body.get('data', {})
+    if request.content_type == 'multipart/form-data':
+        body = unflatten_multipart_request(request)
+    else:
+        body = request.json_body
+    data = body.get('data', {})
     for sheet in sheets:
         name = sheet.meta.isheet.__identifier__
         if name not in data:

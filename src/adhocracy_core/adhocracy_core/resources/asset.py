@@ -42,7 +42,7 @@ class IAsset(ISimple):
 
 def validate_and_complete_asset(context: IAsset,
                                 registry: Registry,
-                                options: dict):
+                                options: dict={}):
     """Complete the initialization of an asset and ensure that it's valid."""
     data_sheet = get_sheet(context, IAssetData, registry=registry)
     data_appstruct = data_sheet.get()
@@ -101,7 +101,12 @@ def _store_size_and_filename_as_metadata(file: File,
 def _add_views_as_children(context: IAsset,
                            metadata_sheet: IAssetMetadata,
                            registry: Registry):
-    """Add raw view and possible resized views as children of an asset."""
+    """
+    Add raw view and possible resized views as children of an asset.
+
+    If a child with the same name already exists, it will be deleted and
+    replaced.
+    """
     _create_asset_view(context=context, name='raw', registry=registry)
     if metadata_sheet.meta.image_sizes:
         for name, dimensions in metadata_sheet.meta.image_sizes.items():
@@ -112,6 +117,8 @@ def _add_views_as_children(context: IAsset,
 def _create_asset_view(context: IAsset, name: str, registry: Registry,
                        dimensions: Dimensions=None) -> dict:
     file_view = AssetFileView(dimensions)
+    if name in context:
+        del context[name]
     appstructs = {IName.__identifier__: {'name': name},
                   IAssetData.__identifier__: {'data': file_view}}
     registry.content.create(IAssetView.__identifier__,

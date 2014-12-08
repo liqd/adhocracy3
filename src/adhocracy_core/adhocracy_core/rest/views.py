@@ -29,6 +29,7 @@ from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetView
 from adhocracy_core.resources.asset import IAssetsService
+from adhocracy_core.resources.asset import validate_and_complete_asset
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
@@ -53,9 +54,9 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
-from adhocracy_core.utils import nested_dict_set
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
+from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.pool
@@ -105,19 +106,11 @@ def validate_request_data(context: ILocation, request: Request,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
     if request.content_type == 'multipart/form-data':
-        body = _unflatten_multipart_request(request)
+        body = unflatten_multipart_request(request)
     validate_body_or_querystring(body, qs, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
     _raise_if_errors(request)
-
-
-def _unflatten_multipart_request(request: Request) -> dict:
-    result = {}
-    for key, value in request.POST.items():
-        keyparts = key.split(':')
-        nested_dict_set(result, keyparts, value)
-    return result
 
 
 def validate_body_or_querystring(body, qs, schema: MappingSchema,
@@ -607,24 +600,15 @@ class AssetsServiceRESTView(PoolRESTView):
 )
 class AssetRESTView(SimpleRESTView):
 
-    """View for assets."""
+    """View for assets, allows PUTting new versions via multipart."""
 
-    # TODO actually, only PUT is required for IAsset!!
-    @view_config(request_method='POST',
+    @view_config(request_method='PUT',
                  permission='add_asset',
                  content_type='multipart/form-data')
-    def post(self) -> dict:
-        """Create new resource and get response data."""
-        iresource = self.request.validated['content_type']
-        resource_type = iresource.__identifier__
-        appstructs = self.request.validated.get('data', {})
-        creator = get_user(self.request)
-        resource = self.registry.create(resource_type,
-                                        self.context,
-                                        creator=creator,
-                                        appstructs=appstructs,
-                                        request=self.request)
-        return self.build_post_response(resource)
+    def put(self) -> dict:
+        result = super().put()
+        validate_and_complete_asset(self.context, self.request.registry)
+        return result
 
 
 @view_defaults(
