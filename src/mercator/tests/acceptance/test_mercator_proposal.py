@@ -80,6 +80,7 @@ class TestMercatorForm:
         browser.find_by_name('heard-from-colleague').first.check()
         assert is_valid(browser)
 
+    @mark.xfail
     def test_heard_of_is_not_changed_after_submission(self, browser):
         browser.find_by_css('input[type="submit"]').first.click()
         wait(lambda: browser.url.endswith("/r/mercator/"))
