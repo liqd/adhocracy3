@@ -21,13 +21,18 @@ $color-structure-border-extrovert: #575756;
 $font-family-normal: "Lato", sans-serif;
 $font-weight-normal: normal;
 $font-weight-extrovert: 900;
-$font-size-small: 12px;
-$font-size-normal: 14px;
-$font-size-plus: 16px;
-$font-size-large: 21px;
-$font-size-huge: 40px;
+$font-size-small: 0.8571em; //12px
+$font-size-normal: 1em; //14px
+$font-size-plus: 1.1428em; //16px
+$font-size-large: 1.5em; //21px
+$font-size-huge: 2.8571em; //40px
 
-$moving-column-separation: 4px;
+$moving-column-separation: 0.2857em; //4px
+
+$l-header-height: 2.8571em; //40px
+$l-header-padding-top: $font-size-normal / 2;
+
+$icon-size: 1.2857em; //18px
 
 @mixin font-tracking($value) {
     @if $value == narrow {

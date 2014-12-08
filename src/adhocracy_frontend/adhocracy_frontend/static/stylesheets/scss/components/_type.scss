@@ -72,6 +72,32 @@ a {
     color: $color-highlight-normal;
 }
 
+/*doc
+---
+title: cta-link
+name: cta-link
+category: Type
+---
+
+A call-to-action link
+
+```html_example
+<a class="cta" href="#">action stations!</a><br/>
+<a class="cta cta-add" href="#">Add a thing</a>
+```
+*/
+a.cta {
+    text-decoration: none;
+    text-transform: uppercase;
+    &:hover {
+        color: $color-highlight-introvert;
+    }
+    &.cta-add:before {
+        content: "+ ";
+        font-size: $font-size-normal;
+    }
+}
+
 // smaller headings
 blockquote,
 article,
