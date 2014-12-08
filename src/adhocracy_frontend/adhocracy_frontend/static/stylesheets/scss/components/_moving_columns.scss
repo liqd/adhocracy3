@@ -114,7 +114,7 @@ The menu should always have the same state as its columns.
         display: none;
     }
 
-    & + .moving-column {
+    + .moving-column {
         padding-left: $moving-column-separation;
     }
 
