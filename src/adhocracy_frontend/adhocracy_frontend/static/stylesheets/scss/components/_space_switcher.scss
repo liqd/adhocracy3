@@ -6,17 +6,20 @@
         color: $color-secondary-extrovert;
         font-size: $icon-size;
     }
+
     &.active {
         i {
             color: $color-highlight-normal;
         }
     }
+
     &:first-child:after {
         content: "|";
         color: $color-secondary-extrovert;
         font-size: $icon-size;
         margin: 0 ($font-size-small/2);
     }
+
     &:last-child {
         margin-right: ($font-size-small/2);
     }
