@@ -250,7 +250,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         var query : any = {};
         query.content_type = RICommentVersion.content_type;
-        query.depth = 2;
+        query.depth = "all";
         query.tag = "LAST";
         query.count = "true";
 
