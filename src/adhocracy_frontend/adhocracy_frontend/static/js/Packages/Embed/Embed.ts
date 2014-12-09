@@ -71,8 +71,9 @@ export var register = (angular) => {
 
                     if (!params.hasOwnProperty("noheader")) {
                         template = "<header class=\"l-header main-header\">" +
+                        "<div class=\"l-header-wrapper\"><div class=\"l-header-right\">" +
                         "<adh-user-indicator></adh-user-indicator>" +
-                        "</header>" + template;
+                        "</div></div></header>" + template;
                     }
                     return {
                         template: template

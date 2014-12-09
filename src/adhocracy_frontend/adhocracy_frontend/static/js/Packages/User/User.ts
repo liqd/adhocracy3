@@ -333,7 +333,6 @@ export var indicatorDirective = (adhConfig : AdhConfig.IService) => {
         scope: {},
         controller: ["adhUser", "$scope", (adhUser : Service, $scope) => {
             $scope.user = adhUser;
-            $scope.pkgUrl = adhConfig.pkg_path + pkgLocation;
 
             $scope.logOut = () => {
                 adhUser.logOut();

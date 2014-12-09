@@ -63,14 +63,19 @@ class TestMercatorFilter(object):
 
 
 def is_filtered(browser, proposals, location=None, requested_funding=None):
-    introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
-    title = lambda p: p[20]["body"]["data"][introduction_sheet]["title"]
-    expected_titles = [title(p) for p in proposals if _verify_location(location, p) and _verify_requested_funding(requested_funding, p)]
+    try:
+        introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
+        title = lambda p: p[20]["body"]["data"][introduction_sheet]["title"]
+        expected_titles = [title(p) for p in proposals if _verify_location(location, p) and _verify_requested_funding(requested_funding, p)]
 
-    proposal_list = browser.find_by_css(".moving-column-body").first.find_by_tag("ol").first
-    actual_titles = [a.text for a in proposal_list.find_by_css("h3 a")]
+        proposal_list = browser.find_by_css(".moving-column-body").first.find_by_tag("ol").first
+        actual_titles = [a.text for a in proposal_list.find_by_css("h3 a")]
 
-    return set(expected_titles) == set(actual_titles)
+        return set(expected_titles) == set(actual_titles)
+    except:
+        # If the DOM still changes there may be StaleElementReferenceExceptions.
+        # In that case, we should return False rather than crashing.
+        return False
 
 
 def _verify_location(location, proposal):

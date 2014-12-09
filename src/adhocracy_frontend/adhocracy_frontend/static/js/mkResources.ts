@@ -708,15 +708,16 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     var constructorType : string = "string";
     var parser : string;
 
-    // parse dates
+    // parsers
     var stringToDate : string = "(field : string) => new Date(field)";
-
-    // let javascript's weak-dynamic type system figure it out.
-    var stringToAny : string = "(field : string) => <any>field";
+    var stringToBoolean : string = "(field : string) => field === \"true\"";
+    var stringToInt : string = "(field : string) => parseInt(field)";
+    var stringToFloat : string = "(field : string) => parseFloat(field)";
 
     switch (field.valuetype) {
     case "adhocracy_core.schema.Boolean":
-        resultType = "string";
+        resultType = "boolean";
+        parser = stringToBoolean;
         break;
     case "adhocracy_core.schema.AbsolutePath":
         resultType = "string";
@@ -745,15 +746,15 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         break;
     case "Integer":
         resultType = "number";
-        parser = stringToAny;
+        parser = stringToInt;
         break;
     case "adhocracy_core.schema.Integer":
         resultType = "number";
-        parser = stringToAny;
+        parser = stringToInt;
         break;
     case "adhocracy_core.schema.Rate":
         resultType = "number";
-        parser = stringToAny;
+        parser = stringToInt;
         break;
     case "adhocracy_core.schema.TimeZoneName":
         resultType = "string";
@@ -768,11 +769,11 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         resultType = "string";
         break;
     case "adhocracy_core.schema.CurrencyAmount":
-        resultType = "string";
+        resultType = "number";
+        parser = stringToFloat;
         break;
     case "adhocracy_core.schema.ISOCountryCode":
-        resultType = "number";
-        parser = stringToAny;
+        resultType = "string";
         break;
     case "adhocracy_mercator.sheets.mercator.StatusEnum":  // FIXME: this needs to go to the mercator package
         resultType = "string";
