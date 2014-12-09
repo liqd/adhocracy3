@@ -27,7 +27,7 @@ from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
-from adhocracy_core.resources.asset import IAssetView
+from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.resources.asset import IAssetsService
 from adhocracy_core.resources.asset import validate_and_complete_asset
 from adhocracy_core.resources.principal import IUser
@@ -613,10 +613,10 @@ class AssetRESTView(SimpleRESTView):
 
 @view_defaults(
     renderer='simplejson',
-    context=IAssetView,
+    context=IAssetDownload,
     http_cache=3600,  # FIXME how long should assets be cached?
 )
-class AssetViewRESTView(SimpleRESTView):
+class AssetDownloadRESTView(SimpleRESTView):
 
     """
     View for downloading assets as binary blobs.

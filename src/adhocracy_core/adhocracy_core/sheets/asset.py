@@ -94,9 +94,9 @@ asset_data_meta = sheet_metadata_defaults._replace(
 )
 
 
-class AssetFileView(Persistent):
+class AssetFileDownload(Persistent):
 
-    """Wrapper for a File object that allows viewing the asset data."""
+    """Wrapper for a File object that allows downloading the asset data."""
 
     def __init__(self, dimensions: Dimensions=None):
         """

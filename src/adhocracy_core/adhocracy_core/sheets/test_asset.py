@@ -127,18 +127,18 @@ class TestIAssetMetadata:
                               'size': 890828}
 
 
-class TestAssetFileView:
+class TestAssetFileDownload:
 
     @fixture
     def inst(self):
-        from adhocracy_core.sheets.asset import AssetFileView
-        return AssetFileView()
+        from adhocracy_core.sheets.asset import AssetFileDownload
+        return AssetFileDownload()
 
     @fixture
     def inst_with_dimensions(self):
-        from adhocracy_core.sheets.asset import AssetFileView
+        from adhocracy_core.sheets.asset import AssetFileDownload
         from adhocracy_core.interfaces import Dimensions
-        return AssetFileView(Dimensions(width=200, height=100))
+        return AssetFileDownload(Dimensions(width=200, height=100))
 
     def test_get_response_without_dimensions_and_file(self, inst, context,
                                                       registry, monkeypatch):
@@ -159,13 +159,13 @@ class TestAssetFileView:
 
     def test_get_response_with_dimensions_and_without_file(
             self, inst_with_dimensions, context, registry, monkeypatch):
-        from adhocracy_core.sheets.asset import AssetFileView
+        from adhocracy_core.sheets.asset import AssetFileDownload
         from substanced.file import File
         file = Mock(spec=File)
         dummy_response = testing.DummyResource()
         file.get_response.return_value = dummy_response
         mock_crop_and_resize_image = Mock(
-            spec=AssetFileView._crop_and_resize_image, return_value=file)
+            spec=AssetFileDownload._crop_and_resize_image, return_value=file)
         monkeypatch.setattr(inst_with_dimensions, '_crop_and_resize_image',
                             mock_crop_and_resize_image)
         assert inst_with_dimensions.get_response(context,
