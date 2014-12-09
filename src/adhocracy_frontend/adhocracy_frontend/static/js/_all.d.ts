@@ -65,17 +65,26 @@ declare class Flow {
     preventEvent : (event : any) => any;
     support : boolean;
     supportDirectory : boolean;
+    upload : () => any;
     resume : () => any;
     pause : () => any;
     cancel : () => any;
 }
 
 declare class FlowFile {
-    webkitRelativePath : string;
-    lastModifiedDate : string;
-    name : string;
-    type : string;
-    size : number;
+    file : {
+        FilelastModifiedDate : Date;
+        name : string;
+        size : number;
+        type : string;
+        webkitRelativePath : string;
+        mozSlice? : any;
+        webkitSlice? : any;
+    };
+    chunks : FlowChunk[];
+}
+
+declare class FlowChunk {
 }
 
 declare class FlowOpts {
@@ -99,6 +108,7 @@ declare class FlowOpts {
     chunkRetryInterval : number;
     permanentErrors : number[];
     onDropStopPropagation : boolean;
+    maximumByteSize : number;
 }
 
 declare module "fustyFlow" {}
