@@ -1,5 +1,6 @@
 from pytest import fixture
 from pytest import mark
+from webtest import TestResponse
 
 
 def test_meractor_proposal_meta():
@@ -86,3 +87,32 @@ class TestIncludemeIntegration:
                                       parent=context,
                                       )
         assert IMercatorProposalVersion.providedBy(res)
+
+
+@fixture(scope='class')
+def app_contributor(app_contributor):
+    app_contributor.base_path = '/mercator'
+    return app_contributor
+
+
+def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
+    from adhocracy_mercator.resources.mercator import IMercatorProposal
+    from adhocracy_core.sheets.name import IName
+    iresource = IMercatorProposal
+    sheets_cstruct = {IName.__identifier__: {'name': name}}
+    resp = app_user.post(path, iresource, sheets_cstruct)
+    return resp
+
+
+@mark.functional
+class TestMercatorProposalPermissionsContributor:
+
+    def test_can_create_proposal_item(self, app_contributor):
+        resp = _post_proposal_item(app_contributor, path='/', name='proposal1')
+        assert resp.status_code == 200
+
+    def test_can_create_proposal_version(self, app_contributor):
+        from adhocracy_mercator.resources import mercator
+        possible_types = mercator.mercator_proposal_meta.element_types
+        postable_types = app_contributor.get_postable_types('/proposal1')
+        assert set(postable_types) == set(possible_types)
