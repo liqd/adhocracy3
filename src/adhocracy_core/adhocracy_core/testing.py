@@ -11,9 +11,12 @@ from cornice.errors import Errors
 from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.traversal import resource_path_tuple
+from pyramid.util import DottedNameResolver
 from pytest import fixture
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
+from webtest import TestApp
+from webtest import TestResponse
 from zope.interface.interfaces import IInterface
 import colander
 
@@ -652,3 +655,90 @@ def backend_with_ws(request, zeo, websocket, supervisor):
     request.addfinalizer(fin)
 
     return output
+
+
+class AppUser:
+
+    """:class:`webtest.TestApp` wrapper for backend functional testing."""
+
+    def __init__(self, app,
+                 rest_url: str='http://localhost',
+                 base_path: str='/',
+                 header: dict=None):
+        self.app = TestApp(app)
+        """:class:`webtest.TestApp`to send requests to the backend server."""
+        self.rest_url = rest_url
+        """backend server url to generate request urls."""
+        self.base_path = base_path
+        """path prefix to generate request urls."""
+        self.header = header or {}
+        """default header for requests, mostly for authentication."""
+        self._resolver = DottedNameResolver()
+
+    def post(self,
+             path: str, iresource: IInterface, cstruct: dict) -> TestResponse:
+        """Build and post request to the backend rest server."""
+        url = self.rest_url + self.base_path + path
+        props = self._build_post_body(iresource, cstruct)
+        resp = self.app.post_json(url, props, headers=self.header)
+        return resp
+
+    def _build_post_body(self, iresource: IInterface, cstruct: dict) -> dict:
+        return {'content_type': iresource.__identifier__,
+                'data': cstruct}
+
+    def get(self, path: str) -> TestResponse:
+        """Send get request to the backend rest server."""
+        url = self.rest_url + self.base_path + path
+        resp = self.app.get(url, headers=self.header)
+        return resp
+
+    def options(self, path: str) -> TestResponse:
+        """Send options request to the backend rest server."""
+        url = self.rest_url + self.base_path + path
+        resp = self.app.options(url, headers=self.header)
+        return resp
+
+    def get_postable_types(self, path: str) -> []:
+        """Send options request and return the postable content types."""
+        resp = self.options(path)
+        post_request_body = resp.json['POST']['request_body']
+        type_names = sorted([r['content_type'] for r in post_request_body])
+        iresources = [self._resolver.resolve(t) for t in type_names]
+        return iresources
+
+
+@fixture(scope='class')
+def app_reader(app) -> TestApp:
+    """Return backend test app wrapper with reader authentication."""
+    return AppUser(app, base_path='/adhocracy', header=reader_header)
+
+
+@fixture(scope='class')
+def app_annotator(app):
+    """Return backend test app wrapper with annotator authentication."""
+    return AppUser(app, base_path='/adhocracy', header=annotator_header)
+
+
+@fixture(scope='class')
+def app_contributor(app):
+    """Return backend test app wrapper with contributor authentication."""
+    return AppUser(app, base_path='/adhocracy', header=contributor_header)
+
+
+@fixture(scope='class')
+def app_editor(app):
+    """Return backend test app wrapper with editor authentication."""
+    return AppUser(app, base_path='/adhocracy', header=editor_header)
+
+
+@fixture(scope='class')
+def app_admin(app):
+    """Return backend test app wrapper with admin authentication."""
+    return AppUser(app, base_path='/adhocracy', header=admin_header)
+
+
+@fixture(scope='class')
+def app_god(app):
+    """Return backend test app wrapper with god authentication."""
+    return AppUser(app, base_path='/adhocracy', header=god_header)
