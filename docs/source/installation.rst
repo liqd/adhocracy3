@@ -38,7 +38,7 @@ checkout source code ::
     cd adhocracy3
     git submodule update --init
 
-compile python 3 and PIL ::
+compile python 3.4 and PIL ::
 
     cd python
     python ./bootstrap.py
@@ -48,7 +48,7 @@ compile python 3 and PIL ::
 
 install adhocracy ::
 
-    ./bin/python3.4 ./bootstrap.py
+    ./bin/python ./bootstrap.py
     ./bin/buildout
 
 update your shell environment::
