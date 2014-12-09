@@ -1,20 +1,18 @@
 .l-header {
-    height: $l-header-height;
-    padding-top: $l-header-padding-top;
+    line-height: $l-header-height;
 }
 
 .l-header-wrapper {
+    @include clearfix;
     @extend %moving-column-single-width;
     margin: 0 auto;
 }
 
-.l-header-left,
-.l-header-right {
+.l-header-left {
     float: left;
 }
 
 .l-header-right {
-    @include text-align(right);
     float: right;
 }
 
