@@ -492,7 +492,8 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_mercator.sheets.mercator.IHeardFrom": {
-                            "heard_elsewhere": ""
+                            "heard_from_colleague": true,
+                            "heard_elsewhere": "i'm not telling"
                         },
                         "adhocracy_mercator.sheets.mercator.IUserInfo": {
                             "country": "NR",

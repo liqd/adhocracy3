@@ -12,6 +12,7 @@ import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
+import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorDescription = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescription");
 import RIMercatorDescriptionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescriptionVersion");
 import RIMercatorLocation = require("../../Resources_/adhocracy_mercator/resources/mercator/ILocation");
@@ -72,7 +73,7 @@ export interface IScopeData {
     user_info : {
         first_name : string;
         last_name : string;
-        country : number;
+        country : string;
         createtime : Date;
         path : string;
         commentCount : number;
@@ -80,7 +81,7 @@ export interface IScopeData {
     organization_info : {
         status_enum : string;  // (allowed values: 'registered_nonprofit', 'planned_nonprofit', 'support_needed', 'other')
         name : string;
-        country : number;
+        country : string;
         website : string;
         date_of_foreseen_registration : Date;
         how_can_we_help_you : string;
@@ -221,6 +222,55 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
+    /**
+     * promise supporters count.
+     */
+    private countSupporters(postPoolPath : string, supporteePath : string) : ng.IPromise<number> {
+        var query : any = {};
+        query.content_type = RIRateVersion.content_type;
+        query.depth = 2;
+        query.tag = "LAST";
+        query[SIRate.nick + ":object"] = supporteePath;
+        // query.rate = 1;  // FIXME: see #331, #335
+        query.count = "true";
+
+        return this.adhHttp.get(postPoolPath, query)
+            .then((response) => {
+                var pool : SIPool.Sheet = response.data[SIPool.nick];
+                return parseInt((<any>pool).count, 10);  // see #261
+            });
+    }
+
+
+    /**
+     * promise recursive comments count.
+     */
+    private countComments(commentableVersion : any) : ng.IPromise<number> {
+        var sheet : SICommentable.Sheet = commentableVersion.data[SICommentable.nick];
+
+        var query : any = {};
+        query.content_type = RICommentVersion.content_type;
+        query.depth = "all";
+        query.tag = "LAST";
+        query.count = "true";
+
+        // NOTE (important for re-factorers): we could filter like this:
+        //
+        // | query[SIComment.nick + ":refers_to"] = commentableVersion.path;
+        //
+        // but that would only catch comments in one sub-tree level.
+        // so we must expect that each proposal has its own post pool,
+        // and just count all LAST versions in that pool, ignoring the
+        // refers_to.)
+
+        return this.adhHttp.get(sheet.post_pool, query)
+            .then((response) => {
+                var pool : SIPool.Sheet = response.data[SIPool.nick];
+                return parseInt((<any>pool).count, 10);  // see #261
+            });
+    }
+
+
     private initializeScope(scope : IScope) : IScopeData {
         if (!scope.hasOwnProperty("data")) {
             scope.data = <IScopeData>{};
@@ -234,7 +284,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.description = data.description || <any>{};
         data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
-        data.heard_from = <any>false;
 
         return data;
     }
@@ -256,32 +305,23 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
         if (typeof heardFrom !== "undefined") {
             data.heard_from = {
-                colleague: heardFrom.heard_from_colleague === "true",
-                website: heardFrom.heard_from_website === "true",
-                newsletter: heardFrom.heard_from_newsletter === "true",
-                facebook: heardFrom.heard_from_facebook === "true",
+                colleague: heardFrom.heard_from_colleague,
+                website: heardFrom.heard_from_website,
+                newsletter: heardFrom.heard_from_newsletter,
+                facebook: heardFrom.heard_from_facebook,
                 other: heardFrom.heard_elsewhere !== "",
                 other_specify: heardFrom.heard_elsewhere
             };
         }
 
+        data.commentCountTotal = 0;
         data.commentCount = mercatorProposalVersion.data[SICommentable.nick].comments.length;
-        data.supporterCount = 0;
-        (() => {
-            var query : any = {};
-            query.content_type = RIRateVersion.content_type;
-            query.depth = 2;
-            query.tag = "LAST";
-            query[SIRate.nick + ":object"] = mercatorProposalVersion.path;
-            // query.rate = 1;  // FIXME: see #331, #335
-            query.count = "true";
+        this.countComments(mercatorProposalVersion)
+            .then((count : number) => { data.commentCount = count; data.commentCountTotal += count; });
 
-            this.adhHttp.get(mercatorProposalVersion.data[SILikeable.nick].post_pool, query)
-                .then((response) => {
-                    var pool : SIPool.Sheet = response.data[SIPool.nick];
-                    data.supporterCount = (<any>pool).count;  // see #261
-                });
-        })();
+        data.supporterCount = 0;
+        this.countSupporters(mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
+            .then((count : number) => { data.supporterCount = count; });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -312,6 +352,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.how_can_we_help_you = res.help_request;
                         scope.status_other = res.status_other;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { scope.commentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorIntroductionVersion.content_type: (() => {
@@ -321,6 +362,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.title = res.title;
                         scope.teaser = res.teaser;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { scope.commentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorDescriptionVersion.content_type: (() => {
@@ -329,66 +371,75 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
                         scope.description = res.description;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { scope.commentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorLocationVersion.content_type: (() => {
                         var scope = data.location;
                         var res : SIMercatorLocation.Sheet = subResource.data[SIMercatorLocation.nick];
 
-                        scope.location_is_specific = res.location_is_specific === "true";
+                        scope.location_is_specific = res.location_is_specific;
                         scope.location_specific_1 = res.location_specific_1;
                         scope.location_specific_2 = res.location_specific_2;
                         scope.location_specific_3 = res.location_specific_3;
-                        scope.location_is_online = res.location_is_online === "true";
-                        scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr === "true";
+                        scope.location_is_online = res.location_is_online;
+                        scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { scope.commentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorStoryVersion.content_type: (() => {
                         var res : SIMercatorStory.Sheet = subResource.data[SIMercatorStory.nick];
                         data.story = res.story;
                         data.storyCommentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { data.storyCommentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorOutcomeVersion.content_type: (() => {
                         var res : SIMercatorOutcome.Sheet = subResource.data[SIMercatorOutcome.nick];
                         data.outcome = res.outcome;
                         data.outcomeCommentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { data.outcomeCommentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorStepsVersion.content_type: (() => {
                         var res : SIMercatorSteps.Sheet = subResource.data[SIMercatorSteps.nick];
                         data.steps = res.steps;
                         data.stepsCommentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { data.stepsCommentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorValueVersion.content_type: (() => {
                         var res : SIMercatorValue.Sheet = subResource.data[SIMercatorValue.nick];
                         data.value = res.value;
                         data.valueCommentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { data.valueCommentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorPartnersVersion.content_type: (() => {
                         var res : SIMercatorPartners.Sheet = subResource.data[SIMercatorPartners.nick];
                         data.partners = res.partners;
                         data.partnersCommentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { data.partnersCommentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorFinanceVersion.content_type: (() => {
                         var scope = data.finance;
                         var res : SIMercatorFinance.Sheet = subResource.data[SIMercatorFinance.nick];
 
-                        scope.budget = parseInt(res.budget, 10);
-                        scope.requested_funding = parseInt(res.requested_funding, 10);
+                        scope.budget = res.budget;
+                        scope.requested_funding = res.requested_funding;
                         scope.other_sources = res.other_sources;
-                        scope.granted = res.granted === "true";
+                        scope.granted = res.granted;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { scope.commentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     case RIMercatorExperienceVersion.content_type: (() => {
                         var res : SIMercatorExperience.Sheet = subResource.data[SIMercatorExperience.nick];
                         data.experience = res.experience;
                         data.experienceCommentCount = subResource.data[SICommentable.nick].comments.length;
+                        this.countComments(subResource).then((c) => { data.experienceCommentCount = c; data.commentCountTotal += c; });
                     })();
                     break;
                     default: {
@@ -396,19 +447,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     }
                 }
             });
-
-            data.commentCountTotal =
-                data.commentCount +
-                data.introduction.commentCount +
-                data.description.commentCount +
-                data.finance.commentCount +
-                data.organization_info.commentCount +
-                data.location.commentCount +
-                data.outcomeCommentCount +
-                data.stepsCommentCount +
-                data.valueCommentCount +
-                data.partnersCommentCount +
-                data.experienceCommentCount;
         });
     }
 

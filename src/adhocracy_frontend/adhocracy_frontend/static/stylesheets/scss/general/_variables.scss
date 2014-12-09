@@ -18,7 +18,7 @@ $color-structure-border-introvert: #dadad9;
 $color-structure-border-extrovert: #575756;
 
 
-$font-family-normal: "Open Sans", sans-serif;
+$font-family-normal: "Lato", sans-serif;
 $font-weight-normal: normal;
 $font-weight-extrovert: 900;
 $font-size-small: 12px;
@@ -26,6 +26,12 @@ $font-size-normal: 14px;
 $font-size-plus: 16px;
 $font-size-large: 21px;
 $font-size-huge: 40px;
+
+$moving-column-separation: 0.3em;
+
+$l-header-height: 3.5em;
+
+$padding-medium: 1em;
 
 @mixin font-tracking($value) {
     @if $value == narrow {
