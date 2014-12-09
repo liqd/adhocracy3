@@ -176,26 +176,39 @@ export interface IControllerScope extends IScope {
  * be more general; for now it just handles the Flow object and
  * promises the path of the image resource as a string.
  *
- * FIXME: implement this function!
+ * as the a3 asset protocol is much simpler than HTML5 file upload, we
+ * compose the multi-part mime post request manually.  The $flow
+ * object is just used for meta data retrieval and cleared before it
+ * can upload anything.
  */
 export var uploadImageFile = (
-    adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    $q : ng.IQService,
+    postPath : string,
     flow : Flow
 ) : ng.IPromise<string> => {
+    if (flow.files.length !== 1) {
+        throw "could not upload file: $flow.files.length !== 1";
+    }
+    var file : FlowFile = flow.files[0];
 
-    console.log("uploadImageFile: not fully implemented, but we already collect the file meta data locally in the browser:");
+    // ignore chunking and get the entire file from the file object.
+    var bytes = () : any => {
+        var func = (file.file.mozSlice ? "mozSlice" :
+                    (file.file.webkitSlice ? "webkitSlice" :
+                     "slice"));
+        var bytes = file.file[func](0, file.file.size, file.file.type);
+        return bytes;
+    };
 
-    flow.opts.target = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+    flow.files = [];
 
-    console.log(JSON.stringify(flow.opts, null, 2));
-    _.forOwn(flow.files, (value, key) => {
-        console.log(JSON.stringify(value.file, null, 2));
-    });
+    var formData = new FormData();
+    formData.append("content_type", "adhocracy_core.resources.sample_image.ISampleImage");
+    formData.append("data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type", file.file.type);
+    formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
-    flow.resume();
-    return (<any>$q.reject("blöp"));
+    return adhHttp.postRaw(postPath, formData)
+        .then((rsp) => { return rsp.data.path; });
 };
 
 
@@ -556,8 +569,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
-        var data = this.initializeScope(instance.scope);
-        var imagePathPromise = uploadImageFile(this.adhConfig, this.adhHttp, this.$q, data.imageUpload);
+        var data : IScopeData = this.initializeScope(instance.scope);
+        var imagePostPath : string = this.adhConfig.rest_url + this.adhConfig.custom["mercator_platform_path"];
+        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
 
         // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
         // FIXME: handle file upload in _update.
