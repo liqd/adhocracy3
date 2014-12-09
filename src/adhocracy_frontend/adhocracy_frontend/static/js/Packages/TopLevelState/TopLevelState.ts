@@ -462,9 +462,10 @@ export var spaceSwitch = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "SpaceSwitch.html",
         link: (scope) => {
-            scope.currentSpace = topLevelState.currentSpace;
+            topLevelState.on("space", (space) => {
+                 scope.currentSpace = space;
+            });
             scope.setSpace = (space : string) => {
-                scope.currentSpace = space;
                 topLevelState.set("space", space);
             };
         }
