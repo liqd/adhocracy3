@@ -11,12 +11,11 @@
 .l-header-left,
 .l-header-right {
     float: left;
-    width: 30%;
 }
 
 .l-header-right {
     @include text-align(right);
-    width: 70%;
+    float: right;
 }
 
 .l-content {
