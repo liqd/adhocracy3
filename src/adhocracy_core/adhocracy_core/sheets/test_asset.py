@@ -155,8 +155,6 @@ class TestAssetFileView:
         from adhocracy_core.interfaces import Dimensions
         from substanced.file import File
         inst = AssetFileView(Dimensions(width=200, height=100))
-        parent = testing.DummyResource()
-        context.__parent__ = parent
         file = Mock(spec=File)
         dummy_response = testing.DummyResource()
         file.get_response.return_value = dummy_response
@@ -172,8 +170,6 @@ class TestAssetFileView:
         from adhocracy_core.sheets.asset import AssetFileView
         from substanced.file import File
         inst = AssetFileView()
-        parent = testing.DummyResource()
-        context.__parent__ = parent
         file = Mock(spec=File)
         dummy_response = testing.DummyResource()
         file.get_response.return_value = dummy_response
