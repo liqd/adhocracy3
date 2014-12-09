@@ -1,4 +1,5 @@
 .set-space {
+    margin-right: $padding-medium;
     outline: 0;
     text-decoration: none;
 
@@ -13,14 +14,9 @@
         }
     }
 
-    &:first-child:after {
-        content: "|";
-        color: $color-secondary-extrovert;
-        font-size: $icon-size;
-        margin: 0 ($font-size-small/2);
+    &:last-child {
+        border-left: 2px solid $color-secondary-extrovert;
+        padding-left: $padding-medium;
     }
 
-    &:last-child {
-        margin-right: ($font-size-small/2);
-    }
 }
