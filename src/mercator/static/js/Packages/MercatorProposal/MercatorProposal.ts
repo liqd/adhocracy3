@@ -93,10 +93,11 @@ export interface IScopeData {
     introduction : {
         title : string;
         teaser : string;
-        imageUpload : Flow;
         commentCount : number;
         nickInstance : number;
     };
+
+    imageUpload : Flow;
 
     // 3. in detail
     description : {
@@ -556,7 +557,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data = this.initializeScope(instance.scope);
-        var imagePathPromise = uploadImageFile(this.adhConfig, this.adhHttp, this.$q, data.introduction.imageUpload);
+        var imagePathPromise = uploadImageFile(this.adhConfig, this.adhHttp, this.$q, data.imageUpload);
 
         // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
         // FIXME: handle file upload in _update.
@@ -1292,7 +1293,7 @@ export var register = (angular) => {
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
-                    $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
+                    $scope.data.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
 
                     // append a random number to the nick to allow duplicate titles
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
