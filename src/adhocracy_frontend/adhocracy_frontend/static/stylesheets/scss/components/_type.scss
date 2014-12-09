@@ -82,16 +82,18 @@ category: Type
 A call-to-action link
 
 ```html_example
-<a class="cta" href="#">action stations!</a><br/>
-<a class="cta cta-add" href="#">Add a thing</a>
+<a class="call-to-action" href="#">action stations!</a><br/>
+<a class="call-to-action m-add" href="#">Add a thing</a>
 ```
 */
-a.cta {
+a.call-to-action {
     text-decoration: none;
     text-transform: uppercase;
+
     &:hover {
         color: $color-highlight-introvert;
     }
+
     &.cta-add:before {
         content: "+ ";
         font-size: $font-size-normal;
