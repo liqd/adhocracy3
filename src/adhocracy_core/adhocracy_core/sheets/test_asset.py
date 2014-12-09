@@ -125,3 +125,57 @@ class TestIAssetMetadata:
                               'filename': 'dummy.jpg',
                               'mime_type': 'image/jpeg',
                               'size': 890828}
+
+
+class TestAssetFileView:
+
+    def test_get_response_without_dimensions_and_file(self, context,
+                                                      registry, monkeypatch):
+        from adhocracy_core.sheets.asset import AssetFileView
+        from adhocracy_core.sheets import asset
+        from substanced.file import File
+        inst = AssetFileView()
+        parent = testing.DummyResource()
+        context.__parent__ = parent
+        file = Mock(spec=File)
+        dummy_response = testing.DummyResource()
+        file.get_response.return_value = dummy_response
+        mock_retrieve_asset_file = Mock(spec=asset.retrieve_asset_file,
+                                        return_value=file)
+        monkeypatch.setattr(asset, 'retrieve_asset_file',
+                            mock_retrieve_asset_file)
+        assert inst.get_response(context, registry) == dummy_response
+        assert mock_retrieve_asset_file.called
+        assert mock_retrieve_asset_file.call_args[0] == (parent, registry)
+
+    def test_get_response_with_dimensions_and_without_file(self, context,
+                                                           registry,
+                                                           monkeypatch):
+        from adhocracy_core.sheets.asset import AssetFileView
+        from adhocracy_core.interfaces import Dimensions
+        from substanced.file import File
+        inst = AssetFileView(Dimensions(width=200, height=100))
+        parent = testing.DummyResource()
+        context.__parent__ = parent
+        file = Mock(spec=File)
+        dummy_response = testing.DummyResource()
+        file.get_response.return_value = dummy_response
+        mock_crop_and_resize_image = Mock(
+            spec=AssetFileView._crop_and_resize_image, return_value=file)
+        monkeypatch.setattr(inst, '_crop_and_resize_image',
+                            mock_crop_and_resize_image)
+        assert inst.get_response(context, registry) == dummy_response
+        assert mock_crop_and_resize_image.called
+        assert mock_crop_and_resize_image.call_args[0] == (context, registry)
+
+    def test_get_response_with_file(self, context, registry):
+        from adhocracy_core.sheets.asset import AssetFileView
+        from substanced.file import File
+        inst = AssetFileView()
+        parent = testing.DummyResource()
+        context.__parent__ = parent
+        file = Mock(spec=File)
+        dummy_response = testing.DummyResource()
+        file.get_response.return_value = dummy_response
+        inst.file = file
+        assert inst.get_response(context, registry) == dummy_response

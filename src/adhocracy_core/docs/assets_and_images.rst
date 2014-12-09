@@ -221,6 +221,8 @@ child element::
     >>> resp_data.content_type
     'image/jpeg'
     >>> detail_size = len(resp_data.body)
+    >>> detail_size > 10000
+    True
     >>> detail_size < original_size
     True
 
@@ -307,6 +309,8 @@ changed accordingly::
 Predefined scaled+cropped views are automatically updated as well::
 
     >>> resp_data = testapp.get(pic_path + 'detail')
+    >>> len(resp_data.body) > 10000
+    True
     >>> len(resp_data.body) == detail_size
     False
 
