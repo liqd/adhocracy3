@@ -474,6 +474,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert client2 in result
 
 
+@pytest.mark.websocket
 @pytest.mark.functional
 class TestFunctionalClientCommunicator:
 

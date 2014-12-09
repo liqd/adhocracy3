@@ -18,13 +18,13 @@ import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
 
 
-root_acl = [(Allow, 'system.Everyone', 'view'),
+root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
             (Allow, 'system.Everyone', 'add_user'),
             (Allow, 'system.Everyone', 'create_sheet_password'),
             (Allow, 'system.Everyone', 'create_sheet_userbasic'),
             (Allow, 'role:annotator', 'view'),
-            (Allow, 'role:annotator', 'add_resource'),
-            (Allow, 'role:annotator', 'create_sheet'),
+            (Allow, 'role:annotator', 'add_resource'),  # default permission
+            (Allow, 'role:annotator', 'create_sheet'),  # default permission
             (Allow, 'role:annotator', 'add_comment'),
             (Allow, 'role:annotator', 'add_rate'),
             (Allow, 'role:contributor', 'view'),
@@ -46,7 +46,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),
             (Allow, 'role:admin', 'add_group'),
             (Allow, 'role:admin', 'add_pool'),
             (Allow, 'role:admin', 'edit_group'),
-            (Allow, 'role:admin', 'edit_sheet'),
+            (Allow, 'role:admin', 'edit_sheet'),  # default permission
             (Allow, 'role:admin', 'manage_principals'),
             (Allow, 'role:god', ALL_PERMISSIONS),
             ]

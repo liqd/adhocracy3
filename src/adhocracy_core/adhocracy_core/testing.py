@@ -20,7 +20,8 @@ from webtest import TestResponse
 from zope.interface.interfaces import IInterface
 import colander
 
-from adhocracy_core.interfaces import SheetMetadata, ChangelogMetadata
+from adhocracy_core.interfaces import SheetMetadata
+from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
 
 
