@@ -433,40 +433,40 @@ export class Service {
 
 
 /**
- * Note that topLevelState.on() refers to the current space. So directives
- * that call topLevelState.on() in their initialization should only be
+ * Note that adhTopLevelState.on() refers to the current space. So directives
+ * that call adhTopLevelState.on() in their initialization should only be
  * rendered when the space they are on is currently active.
  */
 export var spaces = (
-    topLevelState : Service
+    adhTopLevelState : Service
 ) => {
     return {
         restrict: "E",
         transclude: true,
         template: "<adh-inject></adh-inject>",
         link: (scope) => {
-            topLevelState.on("space", (space : string) => {
+            adhTopLevelState.on("space", (space : string) => {
                 scope.currentSpace = space;
             });
-            scope.isSpaceInitialized = (space : string) => topLevelState.isSpaceInitialized(space);
+            scope.isSpaceInitialized = (space : string) => adhTopLevelState.isSpaceInitialized(space);
         }
     };
 };
 
 
 export var spaceSwitch = (
-    topLevelState : Service,
+    adhTopLevelState : Service,
     adhConfig  : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "SpaceSwitch.html",
         link: (scope) => {
-            topLevelState.on("space", (space) => {
+            adhTopLevelState.on("space", (space) => {
                  scope.currentSpace = space;
             });
             scope.setSpace = (space : string) => {
-                topLevelState.set("space", space);
+                adhTopLevelState.set("space", space);
             };
         }
     };
