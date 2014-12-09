@@ -172,7 +172,7 @@ export interface IControllerScope extends IScope {
 
 /**
  * upload mercator proposal image file.  this function can potentially
- * be more flexible; for now it just handles the Flow object and
+ * be more general; for now it just handles the Flow object and
  * promises the path of the image resource as a string.
  *
  * FIXME: implement this function!
