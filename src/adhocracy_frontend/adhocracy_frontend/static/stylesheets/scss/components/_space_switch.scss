@@ -1,0 +1,46 @@
+/*doc
+---
+title: Space Switch
+name: space-switch
+category: Widgets
+---
+
+Switch the space (content/user)
+
+```html_example
+<div class="space-switch">
+    <a class="is-active"><i
+        class="icon-documents" title="content"
+    ></i></a><span
+        class="separator"
+    ></span><a><i
+        class="icon-user" title="{{ 'user' | translate }}"
+    ></i></a>
+</div>
+```
+*/
+.space-switch {
+    @include inline-block;
+    margin: 0 1em;
+    vertical-align: baseline;
+
+    a {
+        text-decoration: none;
+
+        i {
+            color: $color-secondary-extrovert;
+            font-size: 130%;
+        }
+
+        &.is-active {
+            i {
+                color: $color-highlight-normal;
+            }
+        }
+    }
+
+    .separator {
+        margin: 0 1em;
+        border-left: 2px solid $color-secondary-extrovert;
+    }
+}

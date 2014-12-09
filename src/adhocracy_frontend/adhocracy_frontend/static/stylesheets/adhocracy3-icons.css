@@ -23,8 +23,10 @@
 [data-icon]:before { content: attr(data-icon); }
 
 [data-icon]:before,
+.icon-documents:before,
 .icon-speachbubble:before,
-.icon-speachbubble-outline:before {
+.icon-speachbubble-outline:before,
+.icon-user:before {
   display: inline-block;
   font-family: "adhocracy3-icons";
   font-style: normal;
@@ -39,5 +41,7 @@
   font-smoothing: antialiased;
 }
 
+.icon-documents:before { content: "\f103"; }
 .icon-speachbubble:before { content: "\f100"; }
 .icon-speachbubble-outline:before { content: "\f101"; }
+.icon-user:before { content: "\f102"; }

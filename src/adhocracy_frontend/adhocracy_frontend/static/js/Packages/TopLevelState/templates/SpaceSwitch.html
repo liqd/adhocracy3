@@ -1,0 +1,18 @@
+<div class="space-switch">
+    <a
+        href=""
+        data-ng-class="{'is-active': currentSpace === 'content'}"
+        data-ng-click="setSpace('content')"
+        ><i
+            class="icon-documents"
+            title="{{ 'Content' | translate }}"
+    ></i></a><span
+        class="separator"
+    ></span><a
+        href=""
+        data-ng-click="setSpace('user')"
+        data-ng-class="{'is-active': currentSpace === 'user'}"
+        ><i
+            class="icon-user" title="{{ 'User' | translate }}"
+    ></i></a>
+</div>

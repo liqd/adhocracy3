@@ -114,8 +114,13 @@ The menu should always have the same state as its columns.
         display: none;
     }
 
+    + .moving-column {
+        padding-left: $moving-column-separation;
+    }
+
     &.is-collapse, &.is-hide {
         background-color: $color-structure-surface;
+        padding-left: 0;
 
         .moving-column-body,
         .moving-column-menu,
@@ -129,11 +134,17 @@ The menu should always have the same state as its columns.
     }
 }
 
+%moving-column-single-width {
+    max-width: $font-size-normal * 55;
+    min-width: $font-size-normal * 35;
+}
+
 .moving-column-body {
     // layout
     position: absolute;
     top: $moving-column-menu-height;
     bottom: 0;
+    left: 0;
     width: 100%;
     overflow-y: auto;
 

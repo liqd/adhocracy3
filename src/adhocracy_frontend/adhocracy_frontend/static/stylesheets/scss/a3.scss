@@ -8,6 +8,8 @@
 @import "general/future";
 @import "general/a11y";
 
+@import "general/fonts";
+
 @import "third_party/normalize";
 @import "general/normalize";
 @import "general/variables";
@@ -28,6 +30,7 @@
 @import "components/commentable_section";
 @import "components/chapter";
 @import "components/jump_navigation";
+@import "components/space_switch";
 @import "components/user_list";
 @import "components/rate";
 
