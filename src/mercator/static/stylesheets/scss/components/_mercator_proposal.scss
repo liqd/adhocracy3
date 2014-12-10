@@ -41,6 +41,7 @@
 
 .mercator-propsal-list-item-meta-item {
     @include gallery(3 of 12);
+    @include text(introvert);
 }
 
 .mercator-proposal-detail-cover {
@@ -82,6 +83,18 @@
         @include text(introvert);
         a {
             text-decoration: none;
+        }
+    }
+
+    .mercator-proposal-list-item-title {
+        @include text(functional);
+        a {
+            color: $color-prime-extrovert;
+            text-decoration: none;
+
+            &:hover {
+                color: $color-highlight-normal;
+            }
         }
     }
 }
