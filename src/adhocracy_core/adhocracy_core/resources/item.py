@@ -46,6 +46,7 @@ item_metadata = pool_metadata._replace(
     after_creation=[create_initial_content_for_item] +
     pool_metadata.after_creation,
     item_type=IItemVersion,
+    permission_add='add_resource',
 )
 
 
