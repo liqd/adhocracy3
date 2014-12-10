@@ -20,6 +20,7 @@ $color-structure-border-extrovert: #575756;
 
 $font-family-normal: "Lato", sans-serif;
 $font-weight-normal: normal;
+$font-weight-introvert: 300;
 $font-weight-extrovert: 900;
 $font-size-small: 12px;
 $font-size-normal: 14px;
@@ -66,7 +67,7 @@ $padding-medium: 1em;
         color: $color-prime-normal;
     } @else if $value == functional-introvert {
         font-family: $font-family-normal;
-        font-weight: $font-weight-normal;
+        font-weight: $font-weight-introvert;
         font-size: $font-size-small;
         @include font-tracking(narrow);
         line-height: 1.5;
