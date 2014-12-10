@@ -64,13 +64,14 @@ export var movingColumns = (
                 var totalSpacingWidth : number = (collapseCount + showCount - 1) * spacing;
                 var showWidth : number = (totalWidth - totalCollapseWidth - totalSpacingWidth) / showCount;
                 showWidth = Math.min(showWidth, maxShowWidth);
-                var totalShowWidth : number = showCount * showWidth;
 
-                var offset : number = (totalWidth - totalShowWidth - totalCollapseWidth - totalSpacingWidth) / 2;
+                var totalShowWidthWithSpacing = showCount * showWidth + (showCount - 1) * spacing;
+                var offset : number = (totalWidth - totalShowWidthWithSpacing) / 2 - collapseCount * (collapseWidth + spacing);
+                offset = Math.max(offset, 0);
 
-                for (var i = 2; i >= 0; i--) {
+                for (var i = 0; i < 3; i++) {
                     var child = element.children().eq(i);
-                    child.css({right: offset});
+                    child.css({left: offset});
                     clearStates(child);
                     switch (parts[i + 1]) {
                         case "show":
