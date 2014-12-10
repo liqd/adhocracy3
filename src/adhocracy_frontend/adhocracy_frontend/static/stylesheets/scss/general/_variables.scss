@@ -70,7 +70,7 @@ $padding-medium: 1em;
         color: $color-secondary-extrovert;
     } @else if $value == introvert {
         font-family: $font-family-normal;
-        font-weight: $font-weight-normal;
+        font-weight: $font-weight-introvert;
         font-size: $font-size-normal;
         @include font-tracking(narrow);
         line-height: 1.5;
