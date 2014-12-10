@@ -41,7 +41,7 @@ class TestComment:
             assert reply is not None
 
     def test_multiple_replies(self, browser, n=30):
-        comment = browser.find_by_css('.comment').last
+        comment = browser.find_by_css('.comment').first
         for i in range(n):
             reply = create_reply_comment(browser, comment, 'multiple reply %d' % i)
             assert reply is not None
@@ -131,7 +131,8 @@ def edit_comment(browser, comment, content):
     browser.is_text_present(content, wait_time=10)
 
 def get_comment_create_form(comment):
-    button = comment.find_by_css('.comment-meta a')[-1]
+    main = comment.find_by_css(".comment-main").first
+    button = main.find_by_css('.comment-meta a').last
     button.click()
     return comment.find_by_css('.comment-create-form').first
 
