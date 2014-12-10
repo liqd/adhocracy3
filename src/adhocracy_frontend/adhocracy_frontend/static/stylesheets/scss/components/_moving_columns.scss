@@ -195,14 +195,14 @@ States:
             color: $color-prime-normal;
         }
     }
+}
 
-    i {
-        float: left;
-        font-size: 150%;
-        line-height: 1.4;
-        margin-right: $padding-medium;
-        vertical-align: middle;
-    }
+.moving-column-icon {
+    float: left;
+    font-size: 150%;
+    line-height: 1.4;
+    margin-right: $padding-medium;
+    vertical-align: middle;
 }
 
 .moving-column-menu-nav {
