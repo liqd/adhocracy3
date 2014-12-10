@@ -548,7 +548,7 @@ def create_proposals(user_token, n=5):
         if verbose:
             print('\n')
             print(uri)
-            print(headers)
+            print(headers(str(len(body))))
             print(body)
             print(response)
             print(response.text)
