@@ -29,6 +29,7 @@ class TestMercatorForm:
 
         return browser
 
+    @mark.xfail
     def test_resubmitting_proposal(self, browser):
         browser.find_by_name('accept-disclaimer').first.check()
         browser.find_by_css('input[type="submit"]').first.click()
