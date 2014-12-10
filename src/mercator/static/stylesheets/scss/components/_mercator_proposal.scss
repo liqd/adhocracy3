@@ -72,6 +72,18 @@
     .m-has-image {
         @include span(9 of 12 last);
     }
+
+    .mercator-proposal-list-item-username,
+    .mercator-proposal-list-item-title {
+        margin: 0;
+    }
+
+    .mercator-proposal-list-item-username {
+        @include text(functional-introvert);
+        a {
+            text-decoration: none;
+        }
+    }
 }
 
 .picture-upload-file img {

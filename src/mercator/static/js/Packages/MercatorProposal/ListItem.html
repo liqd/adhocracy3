@@ -2,7 +2,7 @@
     <!-- FIXME: ng-if refers to non-existant 'image' object -->
     <div class="mercator-proposal-list-item-image" data-ng-if="image"><img src="" alt="" /></div>
     <div class="mercator-proposal-list-item-body" data-ng-class="{'m-has-image': image}">
-        <p class="proposal-username">
+        <p class="mercator-proposal-list-item-username">
         <!-- FIXME: link to user -->
             <a href="#">
             <adh-user-meta
@@ -12,7 +12,7 @@
             </adh-user-meta></a>,
             {{data.organization_info.name}}
         </p>
-        <h3><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
+        <h3 class="mercator-proposal-list-item-title"><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
         <ul class="mercator-propsal-list-item-meta">
             <li class="mercator-propsal-list-item-meta-item">
                 {{ data.user_info.createtime }}
