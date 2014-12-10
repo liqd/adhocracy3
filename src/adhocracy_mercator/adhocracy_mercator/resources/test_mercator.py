@@ -3,7 +3,7 @@ from pytest import mark
 from webtest import TestResponse
 
 
-def test_meractor_proposal_meta():
+def test_mercator_proposal_meta():
     from .mercator import mercator_proposal_meta
     from .mercator import IMercatorProposal
     from .mercator import IMercatorProposalVersion
@@ -41,7 +41,7 @@ def test_meractor_proposal_meta():
     assert add_commentsservice in meta.after_creation
 
 
-def test_meractor_proposal_version_meta():
+def test_mercator_proposal_version_meta():
     from .mercator import mercator_proposal_version_meta
     from .mercator import IMercatorProposalVersion
     meta = mercator_proposal_version_meta
