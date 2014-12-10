@@ -81,6 +81,9 @@ admin_login = 'admin'
 admin_password = 'password'
 admin_roles = ['admin']
 
+broken_header = {'X-User-Path': '/principals/users/0000001',
+                 'X-User-Token': ''}
+
 batch_url = '/batch'
 
 
@@ -742,6 +745,18 @@ class AppUser:
         type_names = sorted([r['content_type'] for r in post_request_body])
         iresources = [self._resolver.resolve(t) for t in type_names]
         return iresources
+
+
+@fixture(scope='class')
+def app_anonymous(app) -> TestApp:
+    """Return backend test app wrapper with reader authentication."""
+    return AppUser(app, base_path='/adhocracy')
+
+
+@fixture(scope='class')
+def app_broken_token(app) -> TestApp:
+    """Return backend test app wrapper with reader authentication."""
+    return AppUser(app, base_path='/adhocracy', header=broken_header)
 
 
 @fixture(scope='class')
