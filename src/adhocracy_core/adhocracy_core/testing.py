@@ -81,6 +81,8 @@ admin_login = 'admin'
 admin_password = 'password'
 admin_roles = ['admin']
 
+batch_url = '/batch'
+
 
 class DummyPool(testing.DummyResource):
 
@@ -714,6 +716,12 @@ class AppUser:
     def _build_post_body(self, iresource: IInterface, cstruct: dict) -> dict:
         return {'content_type': iresource.__identifier__,
                 'data': cstruct}
+
+    def batch(self, subrequests: list):
+        """Build and post batch request to the backend rest server."""
+        resp = self.app.post_json(batch_url, subrequests, headers=self.header,
+                                  expect_errors=True)
+        return resp
 
     def get(self, path: str) -> TestResponse:
         """Send get request to the backend rest server."""
