@@ -109,10 +109,6 @@ The menu should always have the same state as its columns.
         display: none;
     }
 
-    + .moving-column {
-        border-left: $moving-column-separation solid transparent;
-    }
-
     &.is-collapse, &.is-hide {
         background-color: $color-structure-surface;
         border: 0;
