@@ -15,7 +15,7 @@
         <h3 class="mercator-proposal-list-item-title"><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
         <ul class="mercator-propsal-list-item-meta">
             <li class="mercator-propsal-list-item-meta-item">
-                {{ data.user_info.createtime }}
+                {{ data.user_info.createtime | date :'d/M/yyyy'}}
             </li>
             <li class="mercator-propsal-list-item-meta-item">
                 {{ data.finance.budget }} &euro;
