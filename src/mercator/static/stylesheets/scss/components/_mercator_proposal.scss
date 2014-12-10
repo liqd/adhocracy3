@@ -79,7 +79,7 @@
     }
 
     .mercator-proposal-list-item-username {
-        @include text(functional-introvert);
+        @include text(introvert);
         a {
             text-decoration: none;
         }
