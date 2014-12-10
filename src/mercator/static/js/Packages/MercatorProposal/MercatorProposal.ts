@@ -570,7 +570,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
-        var imagePostPath : string = this.adhConfig.rest_url + this.adhConfig.custom["mercator_platform_path"];
+        var imagePostPath : string = "/mercator/proposals/assets";
+            // FIXME: imagePostPath should be retrieved from HasAssetPool sheet of the proposal pool.
         var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
 
         // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
