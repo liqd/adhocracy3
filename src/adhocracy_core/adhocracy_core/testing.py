@@ -707,7 +707,8 @@ class AppUser:
         """Build and post request to the backend rest server."""
         url = self.rest_url + self.base_path + path
         props = self._build_post_body(iresource, cstruct)
-        resp = self.app.post_json(url, props, headers=self.header)
+        resp = self.app.post_json(url, props, headers=self.header,
+                                  expect_errors=True)
         return resp
 
     def _build_post_body(self, iresource: IInterface, cstruct: dict) -> dict:
@@ -717,13 +718,13 @@ class AppUser:
     def get(self, path: str) -> TestResponse:
         """Send get request to the backend rest server."""
         url = self.rest_url + self.base_path + path
-        resp = self.app.get(url, headers=self.header)
+        resp = self.app.get(url, headers=self.header, expect_errors=True)
         return resp
 
     def options(self, path: str) -> TestResponse:
         """Send options request to the backend rest server."""
         url = self.rest_url + self.base_path + path
-        resp = self.app.options(url, headers=self.header)
+        resp = self.app.options(url, headers=self.header, expect_errors=True)
         return resp
 
     def get_postable_types(self, path: str) -> []:
