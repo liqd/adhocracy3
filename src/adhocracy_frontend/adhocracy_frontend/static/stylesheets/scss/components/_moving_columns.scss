@@ -105,7 +105,7 @@ The menu should always have the same state as its columns.
     top: 0;
     bottom: 0;
     overflow: hidden;
-    @include transition(width 0.5s, right 0.5s);
+    @include transition(width 0.5s, left 0.5s);
 
     // look
     border-right: 1px solid $color-structure-border;
