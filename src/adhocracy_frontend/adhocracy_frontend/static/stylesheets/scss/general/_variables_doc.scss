@@ -145,6 +145,11 @@ are available:
         <td>For running text</td>
     </tr>
     <tr>
+        <td><code>introvert</code></td>
+        <td class="text-introvert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td>For introverted text</td>
+    </tr>
+    <tr>
         <td><code>functional</code></td>
         <td class="text-functional">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
         <td></td>
@@ -163,6 +168,7 @@ are available:
 */
 .text-header {@include text(header);}
 .text-running {@include text(running);}
+.text-introvert {@include text(introvert);}
 .text-functional {@include text(functional);}
 .text-functional-introvert {@include text(functional-introvert);}
 .text-meta {@include text(meta);}
