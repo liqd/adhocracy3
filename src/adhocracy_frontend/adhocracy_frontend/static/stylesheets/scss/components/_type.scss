@@ -70,6 +70,10 @@ A hyperlink. It may have the following states:
 */
 a {
     color: $color-highlight-normal;
+
+    &:hover {
+        color: $color-highlight-introvert;
+    }
 }
 
 /*doc
