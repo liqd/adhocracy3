@@ -192,16 +192,16 @@ States:
     a {
         @include inline-block;
         color: $color-secondary-extrovert;
-        float: left;
         text-decoration: none;
 
-        a, i {
-            line-height: 1.8em;
+        &, i {
+            float: left;
+            line-height: 1.8;
         }
 
         i {
-            font-size: 1.8em;
-            line-height: 1em;
+            font-size: 150%;
+            line-height: 1.4;
             margin-right: $padding-medium;
             vertical-align: middle;
         }
