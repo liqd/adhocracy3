@@ -64,7 +64,10 @@
             <div data-ng-if="view !== 'edit'">
                 <div class="moving-column-menu">
                     <i class="icon-document"></i>
-                    <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}" class="moving-column-action-collapse"><i class="icon-x"></i></a>
+
+                    <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}" class="moving-column-action-collapse"><i class="icon-minus"></i>
+
+                    <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ 'edit' | translate }}</a>
                 </div>
                 <div class="moving-column-collapsed">
                     <a href="{{ proposalUrl | adhResourceUrl }}">O</a>

@@ -192,11 +192,8 @@ States:
     a {
         @include inline-block;
         color: $color-secondary-extrovert;
+        float: left;
         text-decoration: none;
-
-        &, i {
-            float: left;
-        }
 
         &:hover {
             color: $color-prime-normal;
@@ -219,6 +216,7 @@ States:
     }
 
     i {
+        float: left;
         font-size: 150%;
         line-height: 1.4;
         margin-right: $padding-medium;
