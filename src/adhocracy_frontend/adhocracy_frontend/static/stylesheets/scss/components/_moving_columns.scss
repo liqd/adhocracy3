@@ -194,21 +194,6 @@ States:
         &:hover {
             color: $color-prime-normal;
         }
-
-        &.moving-column-action-collapse {
-            background-color: $color-structure-surface;
-            color: white;
-            float: right;
-
-            &:hover {
-                background-color: darken($color-structure-surface, 10%);
-            }
-
-            i {
-                margin: 0;
-                padding: 0 0.7em;
-            }
-        }
     }
 
     i {
@@ -231,10 +216,11 @@ States:
         vertical-align: baseline;
         text-decoration: none;
         color: $color-background;
-        background-color: $color-secondary-introvert;
+        background-color: $color-structure-surface;
 
         &:hover, &:focus {
-            background-color: $color-secondary-extrovert;
+            color: $color-background;
+            background-color: darken($color-structure-surface, 10%);
         }
     }
 }
