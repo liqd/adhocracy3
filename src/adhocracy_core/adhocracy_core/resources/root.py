@@ -25,6 +25,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
             (Allow, 'role:annotator', 'view'),
             (Allow, 'role:annotator', 'add_resource'),  # default permission
             (Allow, 'role:annotator', 'create_sheet'),  # default permission
+            (Allow, 'role:annotator', 'add_asset'),
             (Allow, 'role:annotator', 'add_comment'),
             (Allow, 'role:annotator', 'add_rate'),
             (Allow, 'role:contributor', 'view'),
