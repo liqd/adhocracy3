@@ -523,7 +523,7 @@ def _create_proposal():
                 "result_first_version_path": "@pn44"
             }]
 
-def create_proposals(user_token, n=5):
+def create_proposals(user_token, n=5, expect_error=False):
     proposals = []
 
     uri = root_uri + "/batch"
@@ -552,7 +552,8 @@ def create_proposals(user_token, n=5):
             print(body)
             print(response)
             print(response.text)
-        assert response.status_code == 200
+        if not expect_error:
+            assert response.status_code == 200
 
         proposals.append(requested_proposal)
 
