@@ -182,7 +182,7 @@ States:
     @include clearfix;
     background: $color-secondary-introvert;
     font-size: $font-size-small;
-    line-height: $moving-column-menu-height;
+    line-height: $moving-column-menu-height /1em;
     padding: 0 0 0 $padding-small;
 
     &, a {
@@ -196,14 +196,6 @@ States:
 
         &, i {
             float: left;
-            line-height: 1.8;
-        }
-
-        i {
-            font-size: 150%;
-            line-height: 1.4;
-            margin-right: $padding-medium;
-            vertical-align: middle;
         }
 
         &:hover {
@@ -212,7 +204,7 @@ States:
 
         &.moving-column-action-collapse {
             background-color: $color-structure-surface;
-            color: #fff;
+            color: white;
             float: right;
 
             &:hover {
@@ -224,6 +216,13 @@ States:
                 padding: 0 0.7em;
             }
         }
+    }
+
+    i {
+        font-size: 150%;
+        line-height: 1.4;
+        margin-right: $padding-medium;
+        vertical-align: middle;
     }
 }
 
