@@ -34,6 +34,7 @@ class TestComment:
         comment = create_comment(browser, rest_url, '')
         assert comment is None
 
+    @mark.xfail
     def test_nested_replies(self, browser, n=10):
         for i in range(n):
             comment = browser.find_by_css('.comment').last
