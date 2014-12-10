@@ -39,9 +39,15 @@ class TestComment:
         reply = create_reply_comment(comment, 'somereply')
         assert reply is not None
 
-    def test_multiple_replies(self, browser, n=10):
+    def test_nested_replies(self, browser, n=10):
         for i in range(n):
             comment = browser.find_by_css('.comment').last
+            reply = create_reply_comment(comment, 'reply %d' % i)
+            assert reply is not None
+
+    def test_multiple_replies(self, browser, n=30):
+        comment = browser.find_by_css('.comment').last
+        for i in range(n):
             reply = create_reply_comment(comment, 'reply %d' % i)
             assert reply is not None
 
