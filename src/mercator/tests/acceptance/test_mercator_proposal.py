@@ -94,7 +94,7 @@ class TestMercatorForm:
         assert not heard_of.text == ""
 
     @mark.xfail
-    def test_login_is_required(self, browser):
+    def test_login_is_required(self):
         with raises(AssertionError):
             create_proposals(user_token="", n=1)
 
