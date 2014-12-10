@@ -5,7 +5,7 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Wed Dec 10 12:15:11 2014
+Created by FontForge 20120731 at Wed Dec 10 18:09:55 2014
  By Caroline Clifford,,,
 Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -32,8 +32,8 @@ d="M386 300v24h-266v-24h266zM410 349v-73h-314v73h314zM48 300v24h-24v-24h24zM72 3
 v-24h266zM386 228h24v-72h-314v72h290z" />
     <glyph glyph-name="uniF102" unicode="&#xf102;" horiz-adv-x="441" 
 d="M220 448c35 0 113 -2 116 -78s-2 -227 -110 -227h-6c-108 0 -113 151 -110 227s81 78 116 78h-6zM221 96c0 0 220 9 220 -160h-221h-220c0 171 220 160 220 160h1z" />
-    <glyph glyph-name="uniF107" unicode="&#xf107;" horiz-adv-x="407" 
-d="M41 -11c-10 0 -21 4 -29 12c-16 16 -16 41 0 57l325 325c16 16 42 16 58 0s16 -41 0 -57l-326 -325c-8 -8 -18 -12 -28 -12zM366 -11c-10 0 -21 4 -29 12l-325 325c-16 16 -16 41 0 57s41 16 57 0l326 -325c16 -16 16 -41 0 -57c-8 -8 -19 -12 -29 -12z" />
+    <glyph glyph-name="uniF107" unicode="&#xf107;" horiz-adv-x="293" 
+d="M29 46c-7 0 -14 2 -20 8c-11 11 -11 31 0 42l234 234c11 11 30 11 41 0s11 -31 0 -42l-234 -234c-6 -6 -14 -8 -21 -8zM263 46c-8 0 -14 2 -20 8l-234 234c-11 11 -11 31 0 42s30 11 41 0l234 -234c11 -11 11 -31 0 -42c-6 -6 -14 -8 -21 -8z" />
     <glyph glyph-name="uniF100" unicode="&#xf100;" horiz-adv-x="474" 
 d="M238 394c65 0 123 -15 165 -40s71 -59 71 -100s-29 -76 -72 -101s-102 -40 -167 -40c-24 0 -47 2 -68 5h-1c1 0 -1 0 -4 -2s-7 -5 -12 -10c-10 -9 -22 -23 -33 -36c-22 -27 -39 -54 -39 -54l-27 -39l3 47s2 34 3 70v50c0 7 -1 12 -1 16c0 1 -1 1 -1 2v1
 c-32 24 -55 54 -55 91c0 41 29 75 72 100s101 40 166 40z" />

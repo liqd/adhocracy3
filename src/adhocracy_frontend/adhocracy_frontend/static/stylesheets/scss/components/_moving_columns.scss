@@ -103,7 +103,7 @@ The menu should always have the same state as its columns.
     top: 0;
     bottom: 0;
     overflow: hidden;
-    @include transition(width 0.5s, right 0.5s);
+    @include transition(width 0.5s, left 0.5s);
 
     .moving-column-collapsed {
         display: none;
@@ -176,7 +176,7 @@ States:
 .moving-column-menu {
     @include clearfix;
     background: $color-secondary-introvert;
-    line-height: $moving-column-menu-height;
+    line-height: $moving-column-menu-height /1em;
     padding: 0 0 0 $padding-small;
 
     &, a {
@@ -186,39 +186,21 @@ States:
     a {
         @include inline-block;
         color: $color-secondary-extrovert;
+        float: left;
         text-decoration: none;
-
-        &, i {
-            float: left;
-            line-height: 1.8;
-        }
-
-        i {
-            font-size: 150%;
-            line-height: 1.4;
-            margin-right: $padding-medium;
-            vertical-align: middle;
-        }
 
         &:hover {
             color: $color-prime-normal;
         }
-
-        &.moving-column-action-collapse {
-            background-color: $color-structure-surface;
-            color: #fff;
-            float: right;
-
-            &:hover {
-                background-color: darken($color-structure-surface, 10%);
-            }
-
-            i {
-                margin: 0;
-                padding: 0 0.7em;
-            }
-        }
     }
+}
+
+.moving-column-icon {
+    float: left;
+    font-size: 150%;
+    line-height: 1.4;
+    margin-right: $padding-medium;
+    vertical-align: middle;
 }
 
 .moving-column-menu-nav {
@@ -232,10 +214,11 @@ States:
         vertical-align: baseline;
         text-decoration: none;
         color: $color-background;
-        background-color: $color-secondary-introvert;
+        background-color: $color-structure-surface;
 
         &:hover, &:focus {
-            background-color: $color-secondary-extrovert;
+            color: $color-background;
+            background-color: darken($color-structure-surface, 10%);
         }
     }
 }
