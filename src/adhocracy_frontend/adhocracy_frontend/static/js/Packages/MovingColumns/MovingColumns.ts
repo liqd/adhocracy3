@@ -19,6 +19,7 @@ export var movingColumns = (
             var maxShowWidth = 55 * fontSize;
             var minShowWidth = 35 * fontSize;
             var collapseWidth = 3 * fontSize;
+            var spacing = Math.ceil(0.3 * fontSize);
 
             var clearStates = (element) => {
                 element.removeClass("is-show");
@@ -59,14 +60,18 @@ export var movingColumns = (
                 var collapseCount : number = parts.filter((v) => v === "collapse").length;
                 var showCount : number = parts.filter((v) => v === "show").length;
                 var totalWidth : number = element.outerWidth();
-                var showWidth : number = (totalWidth - collapseCount * collapseWidth) / showCount;
+                var totalCollapseWidth : number = collapseCount * collapseWidth;
+                var totalSpacingWidth : number = (collapseCount + showCount - 1) * spacing;
+                var showWidth : number = (totalWidth - totalCollapseWidth - totalSpacingWidth) / showCount;
                 showWidth = Math.min(showWidth, maxShowWidth);
 
-                var offset : number = (totalWidth - collapseCount * collapseWidth - showCount * showWidth) / 2;
+                var totalShowWidthWithSpacing = showCount * showWidth + (showCount - 1) * spacing;
+                var offset : number = (totalWidth - totalShowWidthWithSpacing) / 2 - collapseCount * (collapseWidth + spacing);
+                offset = Math.max(offset, 0);
 
-                for (var i = 2; i >= 0; i--) {
+                for (var i = 0; i < 3; i++) {
                     var child = element.children().eq(i);
-                    child.css({right: offset});
+                    child.css({left: offset});
                     clearStates(child);
                     switch (parts[i + 1]) {
                         case "show":
@@ -85,6 +90,9 @@ export var movingColumns = (
                             child.addClass("is-hide");
                             child.attr("aria-visible", "false");
                             child.width(0);
+                    }
+                    if (parts[i] !== "hide" && parts[i + 1] !== "hide") {
+                        offset += spacing;
                     }
                 }
             };
