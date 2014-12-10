@@ -34,11 +34,6 @@ class TestComment:
         comment = create_comment(browser, rest_url, '')
         assert comment is None
 
-    def test_reply(self, browser):
-        comment = browser.find_by_css('.comment').first
-        reply = create_reply_comment(comment, 'somereply')
-        assert reply is not None
-
     def test_nested_replies(self, browser, n=10):
         for i in range(n):
             comment = browser.find_by_css('.comment').last
