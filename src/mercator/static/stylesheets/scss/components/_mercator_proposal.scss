@@ -85,7 +85,7 @@ selected. If no proposal is selected, no state is applied.
     }
 
     .mercator-proposal-list-item-username {
-        @include text(functional-introvert);
+        @include text(introvert);
         a {
             text-decoration: none;
         }
