@@ -53,7 +53,8 @@ class TestComment:
 
         browser.reload()
 
-        assert wait(lambda: browser.find_by_css('.comment-content').first.text == 'edited')
+        assert wait(lambda: browser.find_by_css('.comment-content')\
+                                   .first.text == 'edited')
 
     def test_edit_twice(self, browser):
         comment = browser.find_by_css('.comment').first
