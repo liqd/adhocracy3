@@ -1,4 +1,5 @@
 """Shared acceptance test functions."""
+from random import choice
 from time import sleep
 import requests
 import json
@@ -14,6 +15,11 @@ from adhocracy_core.testing import annotator_login
 root_uri = 'http://localhost:6542'
 verbose = False
 
+ALPHABET = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789"
+WHITESPACE = " "
+def get_random_string(n=10, whitespace=False):
+    alphabet = ALPHABET + WHITESPACE if whitespace else ALPHABET
+    return "".join(choice(alphabet) for i in range(n));
 
 def wait(condition, step=0.1, max_steps=10) -> bool:
     """Wait for a condition to become true."""
