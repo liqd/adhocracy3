@@ -18,12 +18,12 @@ null = None
 true = True
 false = False
 
-def register_user(user_name):
+def register_user(user_name, password="password"):
     uri = root_uri + '/principals/users/'
     body = json.dumps({
             'data': {
                 'adhocracy_core.sheets.principal.IPasswordAuthentication': {
-                    'password': 'password'
+                    'password': password
                 },
                 'adhocracy_core.sheets.principal.IUserBasic': {
                 'email': user_name + '@example.org',

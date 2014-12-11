@@ -9,15 +9,11 @@ import requests
 from random import choice
 from random import randint
 
+from adhocracy_frontend.tests.acceptance.shared import get_random_string
+
 # FIXME: root_uri must be constructed from etc/*.ini, not hard-coded here!
 root_uri = 'http://localhost:6542'
 verbose = True
-
-ALPHABET = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789"
-WHITESPACE = " "
-def get_random_string(n=10, whitespace=False):
-    alphabet = ALPHABET + WHITESPACE if whitespace else ALPHABET
-    return "".join(choice(alphabet) for i in range(n));
 
 # for more javascript-ish json representation:
 null = None
