@@ -143,7 +143,7 @@ The menu should always have the same state as its columns.
     // look
     border: 0 solid $color-secondary-introvert;
     border-width: 0 0 $moving-column-border-width $moving-column-border-width;
-    padding: 0.5em;
+    font-size: $font-size-small;
 }
 
 /*doc
