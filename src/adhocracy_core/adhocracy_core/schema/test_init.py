@@ -72,6 +72,10 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
         inst = self._make_one(colander.Integer(), readonly=True)
         assert inst.serialize(1) == '1'
 
+    def test_serialize_default_none(self):
+        inst = self._make_one(colander.Integer(), default=None)
+        assert inst.serialize(None) is None
+
     def test_deserialize_non_readonly(self):
         inst = self._make_one(colander.Integer())
         assert inst.deserialize('1') == 1

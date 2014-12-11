@@ -95,6 +95,12 @@ def app_contributor(app_contributor):
     return app_contributor
 
 
+@fixture(scope='class')
+def app_god(app_god):
+    app_god.base_path = '/mercator'
+    return app_god
+
+
 def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
     from adhocracy_mercator.resources.mercator import IMercatorProposal
     from adhocracy_core.sheets.name import IName
@@ -107,12 +113,34 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
 @mark.functional
 class TestMercatorProposalPermissionsContributor:
 
-    def test_can_create_proposal_item(self, app_contributor):
+    def test_contributor_can_create_proposal_item(self, app_contributor):
         resp = _post_proposal_item(app_contributor, path='/', name='proposal1')
         assert resp.status_code == 200
 
-    def test_can_create_proposal_version(self, app_contributor):
+    def test_contributor_can_create_proposal_version(self, app_contributor):
         from adhocracy_mercator.resources import mercator
         possible_types = mercator.mercator_proposal_meta.element_types
         postable_types = app_contributor.get_postable_types('/proposal1')
         assert set(postable_types) == set(possible_types)
+
+    def test_non_god_creator_is_set(self, app_contributor):
+        """Regression test issue #362"""
+        from adhocracy_core.sheets.metadata import IMetadata
+        resp = app_contributor.get('/proposal1')
+        creator = resp.json['data'][IMetadata.__identifier__]['creator']
+        assert '0000003' in creator
+
+    def test_god_can_create_proposal_item(self, app_god):
+        """Regression test issue #362"""
+        resp = _post_proposal_item(app_god, path='/', name='god1')
+        assert resp.status_code == 200
+
+    def test_god_creator_is_set(self, app_god):
+        """Regression test issue #362"""
+        from adhocracy_core.sheets.metadata import IMetadata
+        resp = app_god.get('/god1')
+        creator = resp.json['data'][IMetadata.__identifier__]['creator']
+        assert '0000000' in creator
+
+
+
