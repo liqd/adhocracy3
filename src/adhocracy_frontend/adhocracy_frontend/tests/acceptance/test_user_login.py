@@ -9,17 +9,25 @@ from adhocracy_frontend.tests.acceptance.shared import click_button
 from adhocracy_frontend.tests.acceptance.shared import login
 from adhocracy_frontend.tests.acceptance.shared import logout
 from adhocracy_frontend.tests.acceptance.shared import is_logged_in
+from adhocracy_frontend.tests.acceptance.shared import get_random_string
+
+USER = get_random_string(n=5)
+MAIL = "%s@mail.info" % USER
+PASSWORD = "password"
 
 
 class TestUserLogin:
 
     def test_register(self, browser):
-        register(browser, 'user2', 'email2@example.com', 'password2',
-                 expect_success=False)
+        register(browser, USER, MAIL, PASSWORD, expect_success=False)
         assert is_not_yet_activated(browser)
 
-    def test_register_error_wrong_password_repeat(self, browser):
+    def test_no_login_without_activation(self, browser):
+        login(browser, USER, PASSWORD, expect_success=False, visit_root=False)
+        assert browser.is_text_present("User account not yet activated")
+        assert not is_logged_in(browser)
 
+    def test_register_error_wrong_password_repeat(self, browser):
         register(browser, 'user4', 'email4@example.com', 'password4',
                  'wrong_repeated_password', expect_success=False)
         assert browser.browser.is_element_present_by_css(
