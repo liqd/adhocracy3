@@ -154,6 +154,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
     mercatorProposalForm? : any;
     data : IScopeData;
+    selectedState : string;
 }
 
 export interface IControllerScope extends IScope {
@@ -212,6 +213,17 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public createDirective() : ng.IDirective {
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
+        directive.controller = ["adhTopLevelState", "$scope", (adhTopLevelState : AdhTopLevelState.Service, $scope : IScope) => {
+            adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    $scope.selectedState = "";
+                } else if (proposalVersionUrl === $scope.path) {
+                    $scope.selectedState = "is-selected";
+                } else {
+                    $scope.selectedState = "is-not-selected";
+                }
+            });
+        }];
         return directive;
     }
 

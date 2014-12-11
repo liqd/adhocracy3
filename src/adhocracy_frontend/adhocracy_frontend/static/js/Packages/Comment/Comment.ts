@@ -45,7 +45,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     hideCancel? : boolean;
     poolOptions : AdhHttp.IOptions;
     createPath : string;
-    isCurrent : boolean;
+    selectedState : string;
     show : {
         createForm : boolean;
     };
@@ -114,9 +114,11 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         ) => {
             adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
                 if (!commentVersionUrl) {
-                    $scope.isCurrent = false;
+                    $scope.selectedState = "";
+                } else if (AdhUtil.parentPath(commentVersionUrl) === $scope.path) {
+                    $scope.selectedState = "is-selected";
                 } else {
-                    $scope.isCurrent = (AdhUtil.parentPath(commentVersionUrl) === $scope.path);
+                    $scope.selectedState = "is-not-selected";
                 }
             });
         }];
