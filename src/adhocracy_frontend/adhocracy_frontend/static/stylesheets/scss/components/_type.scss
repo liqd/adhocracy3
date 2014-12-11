@@ -71,7 +71,10 @@ A hyperlink. It may have the following states:
 a {
     color: $color-highlight-normal;
 
-    &:hover {
+    &:hover,
+    &.is-hover,
+    &:focus,
+    &.has-focus {
         color: $color-highlight-introvert;
     }
 }
