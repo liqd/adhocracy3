@@ -45,23 +45,20 @@ selected. If no proposal is selected, no state is applied.
     margin-bottom: gutter(12);
 }
 
+.mercator-propsal-list-item-meta-item,
 .mercator-propsal-detail-meta-item {
-    @include gallery(2 of 12);
-}
-
-.mercator-propsal-list-item-meta-item {
     @include text(functional-introvert);
     float: left;
     margin-right: 2em;
 
     i {
+        font-size: 140%;
         line-height: 1;
         margin-right: 0.1666em;
+        vertical-align: middle;
 
         &.icon-speech-bubbles {
             color: $color-brand-accent1;
-            font-size: 140%;
-            vertical-align: middle;
         }
 
         &.icon-pointy-rectangle-left {
