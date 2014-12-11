@@ -48,7 +48,16 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-propsal-list-item-meta-item {
     @include gallery(3 of 12);
-    @include text(introvert);
+    @include text(functional-introvert);
+    i {
+        font-size: 120%;
+        line-height: 1;
+        vertical-align: middle;
+
+        &.icon-pointy-rectangle-left {
+            font-size: 140%;
+        }
+    }
 }
 
 .mercator-proposal-detail-cover {
