@@ -3,13 +3,11 @@
     <div class="mercator-proposal-list-item-image" data-ng-if="image"><img src="" alt="" /></div>
     <div class="mercator-proposal-list-item-body" data-ng-class="{'m-has-image': image}">
         <p class="mercator-proposal-list-item-username">
-        <!-- FIXME: link to user -->
-            <a href="#">
             <adh-user-meta
                 data-ng-if="data.user_info"
                 data-path="{{data.user_info.path}}"
                 data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-            </adh-user-meta></a>,
+            </adh-user-meta>,
             {{data.organization_info.name}}
         </p>
         <h3 class="mercator-proposal-list-item-title"><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
