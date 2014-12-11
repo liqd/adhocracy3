@@ -7,7 +7,7 @@
                 data-ng-if="data.user_info"
                 data-path="{{data.user_info.path}}"
                 data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-            </adh-user-meta>,
+            </adh-user-meta><span data-ng-if="data.organization_info.name">,</span>
             {{data.organization_info.name}}
         </p>
         <h3 class="mercator-proposal-list-item-title"><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
