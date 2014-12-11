@@ -33,6 +33,9 @@
 
     @include container;
     @include text(functional-introvert);
+}
+
+.mercator-proposal-detail-meta {
     margin-bottom: gutter(12);
 }
 
@@ -45,6 +48,7 @@
     @include text(functional-introvert);
     i {
         line-height: 1;
+        margin-right: 0.1666em;
 
         &.icon-speech-bubbles {
             color: $color-brand-accent1;
@@ -80,10 +84,15 @@
 
 .mercator-proposal-list-item {
     @include container;
-    border-bottom: 1px solid $color-structure-border;
+    border-bottom: 0.1666em solid $color-secondary-introvert;
+    padding: 1.2em;
 
     .mercator-proposal-list-item-image {
         @include span(3 of 12 first);
+        img {
+            float: left;
+            max-width: 100%;
+        }
     }
 
     .m-has-image {
@@ -97,6 +106,8 @@
 
     .mercator-proposal-list-item-username {
         @include text(functional-introvert);
+        padding-bottom: 0.1em;
+
         a {
             text-decoration: none;
         }
@@ -104,6 +115,8 @@
 
     .mercator-proposal-list-item-title {
         @include text(functional);
+        padding-bottom: 0.5em;
+
         a {
             color: $color-prime-extrovert;
             text-decoration: none;
