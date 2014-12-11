@@ -47,6 +47,16 @@ class AdhocracySchemaNode(colander.SchemaNode):
             raise colander.Invalid(self, 'This field is ``readonly``.')
         return super().deserialize(cstruct)
 
+    def serialize(self, appstruct=colander.null):
+        """ Serialize the :term:`appstruct` to a :term:`cstruct`.
+
+        If the appstruct is None and None is the default value, serialize
+        to None instead of :class:`colander.null`.
+        """
+        if appstruct is None and self.default is None:
+            return None
+        return super().serialize(appstruct)
+
 
 def raise_attribute_error_if_not_location_aware(context) -> None:
     """Ensure that the argument is location-aware.
