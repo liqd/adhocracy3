@@ -132,7 +132,7 @@ selected. If no proposal is selected, no state is applied.
             color: $color-prime-extrovert;
             text-decoration: none;
 
-            &:hover {
+            &:hover, &:focus {
                 color: $color-highlight-normal;
             }
         }
