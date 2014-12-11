@@ -50,8 +50,9 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-propsal-list-item-meta-item {
-    @include gallery(3 of 12);
     @include text(functional-introvert);
+    float: left;
+    margin-right: 2em;
 
     i {
         line-height: 1;
@@ -71,7 +72,9 @@ selected. If no proposal is selected, no state is applied.
     }
 
     &.mercator-propsal-list-item-meta-item-budget {
+        float: right;
         font-size: $font-size-plus;
+        margin-right: 0;
     }
 }
 
