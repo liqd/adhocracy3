@@ -68,8 +68,11 @@ selected. If no proposal is selected, no state is applied.
         }
     }
 
-    &.mercator-propsal-list-item-meta-item-budget {
+    &:last-child {
         float: right;
+    }
+
+    &.mercator-propsal-list-item-meta-item-budget {
         font-size: $font-size-plus;
         margin-right: 0;
     }
