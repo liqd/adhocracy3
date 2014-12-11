@@ -18,15 +18,15 @@
                 {{ data.user_info.createtime | date :'d/M/yyyy'}}
             </li>
             <li class="mercator-propsal-list-item-meta-item">
-                {{ data.finance.budget }} &euro;
+                {{ data.commentCountTotal }}
+                {{ "comments" | translate }}
             </li>
             <li class="mercator-propsal-list-item-meta-item">
                 {{ data.supporterCount }}
-                {{ "votes" | translate }}
+                {{ "supporters" | translate }}
             </li>
             <li class="mercator-propsal-list-item-meta-item">
-                {{ data.commentCountTotal }}
-                {{ "comments" | translate }}
+                {{ data.finance.budget }} &euro;
             </li>
         </ul>
     </div>

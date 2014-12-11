@@ -38,6 +38,7 @@ selected. If no proposal is selected, no state is applied.
     list-style: none;
 
     @include container;
+    @include text(meta);
     margin-bottom: gutter(12);
 }
 
