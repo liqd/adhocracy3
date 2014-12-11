@@ -1,5 +1,12 @@
+from unittest.mock import Mock
+
 from pytest import fixture
 from pytest import mark
+from pytest import raises
+import colander
+
+from adhocracy_core.sheets.sample_image import ISampleImageMetadata
+from adhocracy_core.resources.sample_image import ISampleImage
 
 
 def test_asset_meta():
@@ -42,13 +49,13 @@ def integration(config):
     config.include('adhocracy_core.registry')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.asset')
-    config.include('adhocracy_core.sheets.metadata')
+    config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.resources.asset')
+    config.include('adhocracy_core.resources.sample_image')
 
 
 @mark.usefixtures('integration')
-class TestRoot:
+class TestAsset:
 
     @fixture
     def context(self, pool):
@@ -77,3 +84,67 @@ class TestRoot:
         res = registry.content.create(IAssetsService.__identifier__, context)
         assert IAssetsService.providedBy(res)
         assert find_service(context, 'assets')
+
+
+@mark.usefixtures('integration')
+class TestValidateAndCompleteAsset:
+
+    def _make_asset(self, pool, registry,
+                    mime_type='image/png',
+                    mime_type_in_file='image/png',
+                    resource_type=ISampleImage,
+                    asset_metadata_sheet=ISampleImageMetadata):
+        from adhocracy_core.sheets.asset import IAssetData
+        mock_file = Mock()
+        mock_file.mimetype = mime_type_in_file
+        appstructs = {IAssetData.__identifier__: {
+                          'data': mock_file},
+                      asset_metadata_sheet.__identifier__: {
+                          'mime_type': mime_type}}
+        return registry.content.create(resource_type.__identifier__,
+                                       appstructs=appstructs,
+                                       parent=pool,
+                                       run_after_creation=False)
+
+    def test_valid(self, pool, registry):
+        from adhocracy_core.resources.asset import validate_and_complete_asset
+        asset = self._make_asset(pool, registry)
+        validate_and_complete_asset(asset, registry)
+        assert 'raw' in asset
+        assert 'thumbnail' in asset
+
+    def test_valid_call_twice(self, pool, registry):
+        """Calling it twice should delete and re-create the child nodes."""
+        from adhocracy_core.resources.asset import validate_and_complete_asset
+        asset = self._make_asset(pool, registry)
+        validate_and_complete_asset(asset, registry)
+        old_raw = asset['raw']
+        validate_and_complete_asset(asset, registry)
+        assert asset['raw'] != old_raw
+
+    def test_mime_type_mismatch(self, pool, registry):
+        from adhocracy_core.resources.asset import validate_and_complete_asset
+        asset = self._make_asset(pool, registry, mime_type='image/jpg')
+        with raises(colander.Invalid) as err_info:
+            validate_and_complete_asset(asset, registry)
+        assert 'Claimed MIME type' in err_info.value.msg
+
+    def test_invalid_mime_type(self, pool, registry):
+        from adhocracy_core.resources.asset import validate_and_complete_asset
+        asset = self._make_asset(pool, registry,
+                                 mime_type='text/plain',
+                                 mime_type_in_file='text/plain')
+        with raises(colander.Invalid) as err_info:
+            validate_and_complete_asset(asset, registry)
+        assert 'Invalid MIME type' in err_info.value.msg
+
+    def test_abstract_sheet(self, pool, registry):
+        from adhocracy_core.resources.asset import IAsset
+        from adhocracy_core.resources.asset import validate_and_complete_asset
+        from adhocracy_core.sheets.asset import IAssetMetadata
+        asset = self._make_asset(pool, registry,
+                                 resource_type=IAsset,
+                                 asset_metadata_sheet=IAssetMetadata)
+        with raises(colander.Invalid) as err_info:
+            validate_and_complete_asset(asset, registry)
+        assert 'Sheet is abstract' in err_info.value.msg

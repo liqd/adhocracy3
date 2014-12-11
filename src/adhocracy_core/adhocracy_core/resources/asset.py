@@ -108,7 +108,7 @@ def _add_downloads_as_children(context: IAsset,
     replaced.
     """
     _create_asset_download(context=context, name='raw', registry=registry)
-    if metadata_sheet.meta.image_sizes:
+    if metadata_sheet.meta.image_sizes:  # pragma: no branch
         for name, dimensions in metadata_sheet.meta.image_sizes.items():
             _create_asset_download(context=context, name=name,
                                    registry=registry, dimensions=dimensions)
