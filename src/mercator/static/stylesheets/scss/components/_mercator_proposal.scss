@@ -1,3 +1,9 @@
+/*
+The mercator proposal list item may have the states `is-selected` or
+`is-not-selected` where the latter one is used if a different proposal is
+selected. If no proposal is selected, no state is applied.
+*/
+
 .mercator-proposal-form {
     @include span(last 10 of 12);
     position: relative;

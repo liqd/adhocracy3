@@ -9,6 +9,10 @@ A comment widget consists of a comment-main widget and a list of child
 comments (replies). There is a form for creating new replies.
 Top-level comments also contain a discussion-header widget at the top.
 
+The comment may have the states `is-selected` or `is-not-selected` where
+the latter one is used if a different comment is selected. If no comment
+is selected, no state is applied.
+
 ```html_example
 <div class="comment">
     <div class="discussion-header placeholder">Discussion Header</div>
