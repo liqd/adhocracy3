@@ -78,6 +78,14 @@ selected. If no proposal is selected, no state is applied.
     .m-has-image {
         @include span(9 of 12 last);
     }
+
+    &.is-not-selected {
+        background: $color-structure-active;
+
+        i[class*=icon-] {
+            color: $color-highlight-extrovert;
+        }
+    }
 }
 
 .picture-upload-file img {
