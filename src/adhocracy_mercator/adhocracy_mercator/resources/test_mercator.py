@@ -3,7 +3,13 @@ from pytest import mark
 from webtest import TestResponse
 
 
-def test_meractor_proposal_meta():
+# FIXME: move _create_proposal to somewhere in backend fixtures as the
+# natural dependency ordering is "frontend depends on backend"
+from mercator.tests.fixtures.fixturesMercatorProposals1 \
+        import _create_proposal
+
+
+def test_mercator_proposal_meta():
     from .mercator import mercator_proposal_meta
     from .mercator import IMercatorProposal
     from .mercator import IMercatorProposalVersion
@@ -41,7 +47,7 @@ def test_meractor_proposal_meta():
     assert add_commentsservice in meta.after_creation
 
 
-def test_meractor_proposal_version_meta():
+def test_mercator_proposal_version_meta():
     from .mercator import mercator_proposal_version_meta
     from .mercator import IMercatorProposalVersion
     meta = mercator_proposal_version_meta
@@ -110,6 +116,33 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
     return resp
 
 
+def _batch_post_full_sample_proposal(app_user) -> TestResponse:
+    from adhocracy_mercator.resources.mercator import IMercatorProposal
+    from adhocracy_core.sheets.name import IName
+
+    subrequests = _create_proposal()
+
+    resp = app_user.batch(subrequests)
+    return resp
+
+
+@mark.functional
+class TestMercatorProposalPermissionsAnonymous:
+
+    def test_cannot_create_proposal_item(self, app_anonymous):
+        resp = _post_proposal_item(app_anonymous, path='/', name='proposal1')
+        assert resp.status_code == 403
+
+    def test_cannot_create_proposal_per_batch(self, app_anonymous):
+        resp = _batch_post_full_sample_proposal(app_anonymous)
+        assert resp.status_code == 403
+
+    def test_cannot_create_proposal_per_batch_broken_token(
+            self, app_broken_token):
+        resp = _batch_post_full_sample_proposal(app_broken_token)
+        assert resp.status_code == 403
+
+
 @mark.functional
 class TestMercatorProposalPermissionsContributor:
 
@@ -122,6 +155,10 @@ class TestMercatorProposalPermissionsContributor:
         possible_types = mercator.mercator_proposal_meta.element_types
         postable_types = app_contributor.get_postable_types('/proposal1')
         assert set(postable_types) == set(possible_types)
+
+    def test_can_create_proposal_per_batch(self, app_contributor):
+        resp = _batch_post_full_sample_proposal(app_contributor)
+        assert resp.status_code == 200
 
     def test_non_god_creator_is_set(self, app_contributor):
         """Regression test issue #362"""
@@ -141,6 +178,3 @@ class TestMercatorProposalPermissionsContributor:
         resp = app_god.get('/god1')
         creator = resp.json['data'][IMetadata.__identifier__]['creator']
         assert '0000000' in creator
-
-
-
