@@ -27,6 +27,9 @@
 .icon-documents:before,
 .icon-list:before,
 .icon-minus:before,
+.icon-pointy-rectangle-left:before,
+.icon-pointy-rectangle-right:before,
+.icon-speech-bubbles:before,
 .icon-speechbubble:before,
 .icon-speechbubble-outline:before,
 .icon-user:before,
@@ -49,6 +52,9 @@
 .icon-documents:before { content: "\f101"; }
 .icon-list:before { content: "\f102"; }
 .icon-minus:before { content: "\f103"; }
+.icon-pointy-rectangle-left:before { content: "\f108"; }
+.icon-pointy-rectangle-right:before { content: "\f109"; }
+.icon-speech-bubbles:before { content: "\f10a"; }
 .icon-speechbubble:before { content: "\f104"; }
 .icon-speechbubble-outline:before { content: "\f105"; }
 .icon-user:before { content: "\f106"; }
