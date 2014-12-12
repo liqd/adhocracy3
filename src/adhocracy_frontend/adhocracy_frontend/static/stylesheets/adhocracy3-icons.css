@@ -31,10 +31,10 @@
 .icon-pig:before,
 .icon-pointy-rectangle-left:before,
 .icon-pointy-rectangle-right:before,
-.icon-speech-bubbles:before,
 .icon-speechbubble:before,
 .icon-speechbubble-document:before,
 .icon-speechbubble-outline:before,
+.icon-speechbubbles:before,
 .icon-user:before,
 .icon-x:before {
   display: inline-block;
@@ -59,9 +59,9 @@
 .icon-pig:before { content: "\f105"; }
 .icon-pointy-rectangle-left:before { content: "\f106"; }
 .icon-pointy-rectangle-right:before { content: "\f107"; }
-.icon-speech-bubbles:before { content: "\f108"; }
-.icon-speechbubble:before { content: "\f109"; }
-.icon-speechbubble-document:before { content: "\f10d"; }
+.icon-speechbubble:before { content: "\f108"; }
+.icon-speechbubble-document:before { content: "\f109"; }
 .icon-speechbubble-outline:before { content: "\f10a"; }
-.icon-user:before { content: "\f10b"; }
-.icon-x:before { content: "\f10c"; }
+.icon-speechbubbles:before { content: "\f10b"; }
+.icon-user:before { content: "\f10c"; }
+.icon-x:before { content: "\f10d"; }
