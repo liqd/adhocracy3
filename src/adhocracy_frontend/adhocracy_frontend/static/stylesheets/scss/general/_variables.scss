@@ -2,9 +2,9 @@
 
 $color-prime-normal: #575756;
 $color-prime-extrovert: #1c1c1b;
-$color-secondary-extrovert: #9d9c9c;
-$color-secondary-introvert: #dadad9;
-$color-highlight-normal: #009ee3;
+$color-secondary-extrovert: #4d4d4d;
+$color-secondary-introvert: #e6e6e6;
+$color-highlight-normal: #00aae5;
 $color-highlight-introvert: #3eb7ea;
 $color-highlight-extrovert: #0088b9;
 $color-highlight-reverse: white;
@@ -21,6 +21,7 @@ $color-structure-border-extrovert: #575756;
 $font-family-normal: "Lato", sans-serif;
 $font-weight-introvert: 400;
 $font-weight-normal: normal;
+$font-weight-introvert: 400;
 $font-weight-extrovert: 900;
 $font-size-small: 12px;
 $font-size-normal: 14px;
@@ -30,7 +31,6 @@ $font-size-huge: 40px;
 
 $moving-column-menu-height: 2em;
 $moving-column-border-width: 0.4166em;
-
 $l-header-height: 2.8571em;
 
 $padding-small: 0.5em;
@@ -66,7 +66,7 @@ $padding-medium: 1em;
         color: $color-prime-normal;
     } @else if $value == functional-introvert {
         font-family: $font-family-normal;
-        font-weight: $font-weight-normal;
+        font-weight: $font-weight-introvert;
         font-size: $font-size-small;
         @include font-tracking(narrow);
         line-height: 1.5;

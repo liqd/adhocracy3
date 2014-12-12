@@ -26,6 +26,8 @@ class TestMercatorForm:
     # FIXME: this should work, but: (1) it may alter state and confuse
     # subsequent tests; and (2) i'm not sure if it does even work
     # itself.
+    # Testing submit is very imporant part of the user user story, please
+    # reanable [joka]
     def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
         #FIXME make this test shorter and more acceptance test like
