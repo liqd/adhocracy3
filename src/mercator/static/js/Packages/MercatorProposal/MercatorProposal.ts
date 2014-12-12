@@ -571,23 +571,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
         var imagePostPath : string = "/mercator/proposals/assets";
-            // FIXME: imagePostPath should be retrieved from HasAssetPool sheet of the proposal pool.
         var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
 
-        // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
-        // FIXME: handle file upload in _update.
-        // FIXME: We need to wait for this promise with everything
-        // else. Otherwise, the upload could be interrupted by a hard
-        // redirect or similar.
-        imagePathPromise.then(
-            (path) => {
-                console.log("upload successful:");
-                console.log(path);
-            },
-            () => {
-                console.log("upload error:");
-                console.log(arguments);
-            });
+        // FIXME: imagePostPath should be retrieved from HasAssetPool
+        // sheet of the proposal pool.  for now, you can create the
+        // above pool with the following script:
+        //
+        // /src/adhocracy_frontend/adhocracy_frontend/tests/fixtures/workaroundMissingAssetPool.py
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -602,6 +592,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         });
 
         this.fill(data, mercatorProposalVersion);
+
+        var introduction;  // we need to especially in order to inject
+                           // the image before posting version 1.
 
         var subresources = _.map([
             [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
@@ -635,10 +628,29 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.fill(data, version);
             mercatorProposalVersion.data[SIMercatorSubResources.nick][subresourceKey] = version.path;
 
+            if (subresourceKey === "introduction") {
+                introduction = version;
+            }
+
             return [item, version];
         });
 
-        return this.$q.when(_.flatten([mercatorProposal, mercatorProposalVersion, subresources]));
+        return imagePathPromise.then((imagePath : string) => {
+            introduction.data[SIMercatorIntroduction.nick].picture = imagePath;
+
+            console.log(introduction.data[SIMercatorIntroduction.nick].picture);
+            debugger;
+
+            /* FIXME: next line will trigger 400 response (see #386):
+
+              description: "This Resource does not provide interface adhocracy_mercator.sheets.mercator.IIntroImageMetadata"
+              location: "body"
+              name: "data.adhocracy_mercator.sheets.mercator.IIntroduction.picture"
+
+             */
+
+            return _.flatten([mercatorProposal, mercatorProposalVersion, subresources]);
+        })
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
