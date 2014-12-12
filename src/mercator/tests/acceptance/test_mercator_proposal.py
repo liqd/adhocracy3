@@ -22,26 +22,6 @@ class TestMercatorForm:
         fill_all(browser)
         assert is_valid(browser)
 
-    @mark.skipif(True, reason="pending")
-    # FIXME: this should work, but: (1) it may alter state and confuse
-    # subsequent tests; and (2) i'm not sure if it does even work
-    # itself.
-    # Testing submit is very imporant part of the user user story, please
-    # reanable [joka]
-    def test_submitting_creates_a_new_proposal(self, browser, app):
-        browser.find_by_css('input[type="submit"]').first.click()
-        #FIXME make this test shorter and more acceptance test like
-        import time
-        time.sleep(1)
-        app = TestApp(app)
-        rest_url = 'http://localhost'
-        post_pool = '/adhocracy'
-
-        resp = app.get(rest_url + post_pool)
-        assert resp.status_code == 200
-        elements = resp.json['data']['adhocracy_core.sheets.pool.IPool']['elements']
-        assert len(elements) == 1
-
     def test_field_extra_exprerience_is_optional(self, browser):
         browser.find_by_name('experience').first.fill('')
         assert is_valid(browser)
@@ -82,14 +62,15 @@ class TestMercatorForm:
         browser.find_by_name('heard-from-colleague').first.check()
         assert is_valid(browser)
 
-    @mark.xfail
-    def test_heard_of_is_not_changed_after_submission(self, browser):
+    def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
-        wait(lambda: browser.url.endswith("/r/mercator/"))
+        assert wait(lambda: browser.url.endswith("/r/mercator/"))
 
         browser.find_link_by_text(TITLE).first.click()
-        wait(lambda: not browser.url.endswith("/r/mercator/"))
+        assert wait(lambda: not browser.url.endswith("/r/mercator/"))
 
+    @mark.xfail
+    def test_heard_of_is_not_changed_after_submission(self, browser):
         heard_of = browser.find_by_xpath('//*[@id="mercator-detail-view-additional"]/section/div/p').first
         assert not heard_of.text == ""
 
