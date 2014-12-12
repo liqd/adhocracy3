@@ -41,10 +41,6 @@ selected. If no proposal is selected, no state is applied.
     @include text(functional-introvert);
 }
 
-.mercator-proposal-detail-meta {
-    margin-bottom: gutter(12);
-}
-
 .mercator-propsal-list-item-meta-item,
 .mercator-propsal-detail-meta-item {
     @include text(functional-introvert);
@@ -70,17 +66,28 @@ selected. If no proposal is selected, no state is applied.
 
     &:last-child {
         float: right;
+        margin-right: 0;
     }
 
     &.mercator-propsal-list-item-meta-item-budget {
         font-size: $font-size-plus;
-        margin-right: 0;
+    }
+}
+
+.mercator-proposal-detail-meta {
+    i.icon-speech-bubbles {
+        color: $color-highlight-extrovert;
     }
 }
 
 .mercator-proposal-detail-cover {
     @include span(full);
     border-bottom: 1px solid $color-structure-border;
+    padding: 1.2em;
+
+    .chapter-heading {
+        font-size: $font-size-large;
+    }
 }
 
 .mercator-proposal-cover-show-comments {
