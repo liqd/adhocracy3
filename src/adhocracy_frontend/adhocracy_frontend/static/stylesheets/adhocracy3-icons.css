@@ -27,8 +27,8 @@
 .icon-documents:before,
 .icon-list:before,
 .icon-minus:before,
-.icon-speachbubble:before,
-.icon-speachbubble-outline:before,
+.icon-speechbubble-document:before,
+.icon-speechbubble-outline:before,
 .icon-user:before,
 .icon-x:before {
   display: inline-block;
@@ -45,11 +45,11 @@
   font-smoothing: antialiased;
 }
 
-.icon-document:before { content: "\f105"; }
-.icon-documents:before { content: "\f103"; }
-.icon-list:before { content: "\f104"; }
-.icon-minus:before { content: "\f106"; }
-.icon-speachbubble:before { content: "\f100"; }
-.icon-speachbubble-outline:before { content: "\f101"; }
-.icon-user:before { content: "\f102"; }
+.icon-document:before { content: "\f100"; }
+.icon-documents:before { content: "\f101"; }
+.icon-list:before { content: "\f102"; }
+.icon-minus:before { content: "\f103"; }
+.icon-speechbubble-document:before { content: "\f104"; }
+.icon-speechbubble-outline:before { content: "\f105"; }
+.icon-user:before { content: "\f106"; }
 .icon-x:before { content: "\f107"; }
