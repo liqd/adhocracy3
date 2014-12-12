@@ -129,7 +129,8 @@ def test_default_changelog_metadata():
 class TestReferenceHasNewVersionSubscriberUnitTest:
 
     @fixture
-    def registry(self, config, registry, mock_resource_registry, transaction_changelog):
+    def registry(
+            self, config, registry, mock_resource_registry, transaction_changelog):
         registry.content = mock_resource_registry
         registry._transaction_changelog = transaction_changelog
         return registry
@@ -138,7 +139,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         from adhocracy_core.resources.subscriber import reference_has_new_version_subscriber
         return reference_has_new_version_subscriber(*args)
 
-    def _create_new_version_event_for_autoupdate_sheet(self, context, registry, mock_sheet):
+    def _create_new_version_event_for_autoupdate_sheet(
+            self, context, registry, mock_sheet):
         from copy import deepcopy
         from adhocracy_core.sheets.versions import IVersionable
         event = _create_new_version_event_with_isheet(context, IDummySheetAutoUpdate, registry)
@@ -155,7 +157,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
                                                         sheet_versionable]
         return event
 
-    def test_call_versionable_with_autoupdate_sheet_once(self, itemversion, registry, mock_sheet):
+    def test_call_versionable_with_autoupdate_sheet_once(
+            self, itemversion, registry, mock_sheet):
         from adhocracy_core.sheets.versions import IVersionable
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
         event.creator = object()
@@ -172,7 +175,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         creator = factory.call_args[1]['creator']
         assert creator == event.creator
 
-    def test_call_versionable_with_autoupdate_sheet_with_single_reference(self, itemversion, registry, mock_sheet):
+    def test_call_versionable_with_autoupdate_sheet_with_single_reference(
+            self, itemversion, registry, mock_sheet):
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
         event.creator = object()
         event.isheet_field = 'element'
@@ -182,7 +186,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         factory = registry.content.create
         assert factory.call_count == 1
 
-    def test_call_versionable_with_autoupdate_sheet_twice(self, itemversion, registry, mock_sheet, transaction_changelog):
+    def test_call_versionable_with_autoupdate_sheet_twice(
+            self, itemversion, registry, mock_sheet, transaction_changelog):
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
         self._make_one(event)
 
@@ -195,7 +200,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         factory = registry.content.create
         assert factory.call_count == 1
 
-    def test_call_versionable_with_autoupdate_sheet_twice_without_transaction_changelog(self, itemversion, registry, mock_sheet):
+    def test_call_versionable_with_autoupdate_sheet_twice_without_transaction_changelog(
+            self, itemversion, registry, mock_sheet):
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
         self._make_one(event)
 
@@ -206,8 +212,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         factory = registry.content.create
         assert factory.call_count == 2
 
-    def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(self,
-            itemversion, mock_graph, registry, mock_sheet):
+    def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(
+            self, itemversion, mock_graph, registry, mock_sheet):
         mock_graph.is_in_subtree.return_value = False
         itemversion.__parent__=testing.DummyResource()
         itemversion.__graph__ = mock_graph
@@ -218,7 +224,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
 
         assert not registry.content.create.called
 
-    def test_call_versionable_with_autoupdate_sheet_but_readonly(self, itemversion, registry, mock_sheet):
+    def test_call_versionable_with_autoupdate_sheet_but_readonly(
+            self, itemversion, registry, mock_sheet):
         isheet = IDummySheetAutoUpdate
         event = _create_new_version_event_with_isheet(itemversion, isheet, registry)
         mock_sheet.meta = mock_sheet.meta._replace(editable=False,
@@ -255,7 +262,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
 
         assert not registry.content.create.called
 
-    def test_call_nonversionable_with_autoupdate_sheet(self, context, registry, mock_sheet):
+    def test_call_nonversionable_with_autoupdate_sheet(
+            self, context, registry, mock_sheet):
         isheet = IDummySheetAutoUpdate
         event = _create_new_version_event_with_isheet(context, isheet, registry)
         mock_sheet.meta = mock_sheet.meta._replace(isheet=isheet)
@@ -266,7 +274,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
 
         assert mock_sheet.set.call_args[0][0] == {'elements': [event.new_version]}
 
-    def test_call_nonversionable_with_autoupdate_readonly(self, context, registry, mock_sheet):
+    def test_call_nonversionable_with_autoupdate_readonly(
+            self, context, registry, mock_sheet):
         isheet = IDummySheetAutoUpdate
         event = _create_new_version_event_with_isheet(context, isheet, registry)
         mock_sheet.meta = mock_sheet.meta._replace(editable=False,
