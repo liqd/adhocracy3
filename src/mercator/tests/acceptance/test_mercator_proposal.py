@@ -85,10 +85,10 @@ class TestMercatorForm:
     @mark.xfail
     def test_heard_of_is_not_changed_after_submission(self, browser):
         browser.find_by_css('input[type="submit"]').first.click()
-        wait(lambda: browser.url.endswith("/r/mercator/"))
+        assert wait(lambda: browser.url.endswith("/r/mercator/"))
 
         browser.find_link_by_text(TITLE).first.click()
-        wait(lambda: not browser.url.endswith("/r/mercator/"))
+        assert wait(lambda: not browser.url.endswith("/r/mercator/"))
 
         heard_of = browser.find_by_xpath('//*[@id="mercator-detail-view-additional"]/section/div/p').first
         assert not heard_of.text == ""
