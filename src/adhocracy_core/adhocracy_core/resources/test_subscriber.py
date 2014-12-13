@@ -149,6 +149,7 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         sheet_autoupdate.get.return_value = {'elements': [event.old_version],
                                              'element': event.old_version}
         add_and_register_sheet(context, sheet_autoupdate, registry)
+        add_and_register_sheet(event.new_version, sheet_autoupdate, registry)
         sheet_versionable = deepcopy(mock_sheet)
         sheet_versionable.meta = mock_sheet.meta._replace(isheet=IVersionable)
         sheet_versionable.get.return_value = {'follows': []}

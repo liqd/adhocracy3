@@ -27,7 +27,7 @@ class ResourceUnitTest(unittest.TestCase):
         non_iresource = object()
         wanted_str = '{0} oid: {1} name: {2}'.format(to_dotted_name(non_iresource.__class__),
                                                      'None',
-                                                     '')
+                                                     'None')
         assert wanted_str == inst_class.__repr__(non_iresource)
 
     def test_to_string_with_oid_and_name(self):

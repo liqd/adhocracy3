@@ -20,7 +20,7 @@ class Base(Persistent):
         iface = get_iresource(self) or self.__class__
         iface_dotted = to_dotted_name(iface)
         oid = getattr(self, '__oid__', None)
-        name = str(self.__name__)
+        name = getattr(self, '__name__', None)
         identifier = str(oid)
         return '{0} oid: {1} name: {2}'.format(iface_dotted, identifier, name)
 
