@@ -17,11 +17,12 @@ class Base(Persistent):
     __name__ = None
 
     def __repr__(self):
-        interface = get_iresource(self) or self.__class__
-        interface_dotted = to_dotted_name(interface)
+        iface = get_iresource(self) or self.__class__
+        iface_dotted = to_dotted_name(iface)
         oid = getattr(self, '__oid__', None)
+        name = str(self.__name__)
         identifier = str(oid)
-        return '{0} oid: {1}'.format(interface_dotted, identifier)
+        return '{0} oid: {1} name: {2}'.format(iface_dotted, identifier, name)
 
 
 resource_metadata_defaults = resource_metadata._replace(
