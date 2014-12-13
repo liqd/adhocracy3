@@ -134,9 +134,16 @@ def reference_has_new_version_subscriber(event):
             appstruct[event.isheet_field] = event.new_version
         new_version = _get_new_version_created_in_this_transaction(registry,
                                                                    resource)
+        # versionable without new version: create a new version store appstruct
         if IItemVersion.providedBy(resource) and new_version is None:
             _update_versionable(resource, isheet, appstruct, root_versions,
                                 registry, creator)
+        # versionable with new version: use new version to store appstruct
+        elif IItemVersion.providedBy(resource) and new_version is not None:
+            new_version_sheet = get_sheet(new_version, isheet,
+                                          registry=registry)
+            new_version_sheet.set(appstruct)
+        # on versionable: store appstruct directly
         else:
             sheet.set(appstruct)
 
@@ -147,7 +154,10 @@ def _get_new_version_created_in_this_transaction(registry,
             return
         path = resource_path(resource)
         changelog_metadata = registry._transaction_changelog[path]
-        return changelog_metadata.followed_by
+        if changelog_metadata.created:
+            return resource
+        else:
+            return changelog_metadata.followed_by
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,
