@@ -92,6 +92,8 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
                                               new one.
 
     """
+    # FIXME we would not need this code at all if we use the
+    # SheetReferenceAutoUpdateMarker for the LAST Tag
     parent_item = find_interface(context, IItem)
     if parent_item is None:
         return
@@ -105,6 +107,9 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
             data = sheet.get()
             old_last_tagged_versions = data['elements']
             if IForkableVersionable.providedBy(context):
+                # FIXME the last Tag should only reference the last version.
+                # For forkable resources we should add a HEAD tag, referenceing
+                # the "heads"
                 updated_references = _determine_elements_for_forkable_last_tag(
                     context, old_last_tagged_versions, old_versions)
             else:
@@ -136,6 +141,9 @@ def _determine_elements_for_linear_last_tag(context: IResource,
     if len(predecessors) == 1 and old_last_tagged_versions == predecessors:
         return [context]
     else:
+        # FIXME this is causing an internal error. The better place to
+        # validate input data would be the colander schema for the versionable
+        # sheet.
         raise_colander_style_error(IVersionable, 'follows', 'No fork allowed')
 
 
