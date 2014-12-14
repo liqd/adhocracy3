@@ -56,6 +56,7 @@ class BatchView(RESTView):
         """Create new resource and get response data."""
         response_list = []
         path_map = {}
+        self.request.registry.__is_batchmode__ = True
         for item in self.request.validated:
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)

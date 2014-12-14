@@ -456,7 +456,8 @@ class ITokenManger(Interface):  # pragma: no cover
 
 class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                    ['modified', 'created', 'followed_by',
-                                    'resource'])):
+                                    'resource',
+                                    'last_version'])):
 
     """Metadata to track modified resources during one transaction.
 
@@ -473,6 +474,9 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
         this resource
     resource (None or IResource):
         The resource that is modified/created.
+    last_version_in_transaction (None or IResource):
+        The last Version created in this transaction
+        (only for :class:`adhocracy_core.interfaces.IItem`)
     """
 
 

@@ -547,17 +547,27 @@ class ItemRESTView(PoolRESTView):
                  content_type='application/json')
     def post(self):
         """Create new resource and get response data."""
-        iresource = self.request.validated['content_type']
+        validated = self.request.validated
+        iresource = validated['content_type']
         resource_type = iresource.__identifier__
-        appstructs = self.request.validated.get('data', {})
+        appstructs = validated.get('data', {})
         creator = get_user(self.request)
-        root_versions = self.request.validated.get('root_versions', [])
-        resource = self.registry.create(resource_type,
-                                        self.context,
-                                        appstructs=appstructs,
-                                        creator=creator,
-                                        root_versions=root_versions,
-                                        request=self.request)
+        root_versions = validated.get('root_versions', [])
+        last_version = None
+        if IItemVersion.isOrExtends(resource_type):
+            path = resource_path(self.context)
+            changelog = self.request.registry._transaction_changelog
+            last_version = changelog[path].last_version
+        if last_version is not None:
+            self.context = last_version
+            self.put()  # FIXME Is it safe to just call put?
+        else:
+            resource = self.registry.create(resource_type,
+                                            self.context,
+                                            appstructs=appstructs,
+                                            creator=creator,
+                                            root_versions=root_versions,
+                                            request=self.request)
         return self.build_post_response(resource)
 
 

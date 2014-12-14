@@ -32,7 +32,7 @@ import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.rate
 
 
-changelog_metadata = ChangelogMetadata(False, False, None, None)
+changelog_metadata = ChangelogMetadata(False, False, None, None, None)
 logger = getLogger(__name__)
 
 
@@ -160,11 +160,17 @@ def _get_new_version_created_in_this_transaction(registry,
             return
         path = resource_path(resource)
         changelog_metadata = registry._transaction_changelog[path]
-        # FIXME check first followed_by then created (maybe both happend)
+        new_version = None
         if changelog_metadata.created:
-            return resource
-        else:
-            return changelog_metadata.followed_by
+            new_version = resource
+        elif changelog_metadata.followed_by is not None:
+            new_version = changelog_metadata.followed_by
+        elif getattr(registry, '__is_batchmode__', False):
+            # FIXME why do wee need to do this?
+            # Is the changelog metadata resource not yet updated?
+            last = get_last_version(resource, registry)
+            new_version = last
+        return new_version
 
 
 def _assert_we_are_not_forking(resource, registry):
@@ -172,7 +178,7 @@ def _assert_we_are_not_forking(resource, registry):
     last = get_last_version(resource, registry)
     if last is None:
         return
-    assert resource == last
+    assert resource is last
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,
