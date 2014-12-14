@@ -210,10 +210,10 @@ pointing to other ISection's:
      'targetsheet': 'adhocracy_core.sheets.document.ISection',
      'valuetype': 'adhocracy_core.schema.AbsolutePath'}
 
-The 'follows' field of IVersionable is an unordered set pointing to other
-IVersionable's:
+The 'follows' field of IForkableVersionable is an unordered set pointing to other
+IForkableVersionable's:
 
-...    >>> verfields = resp_data['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
+...    >>> verfields = resp_data['sheets']['adhocracy_core.sheets.versions.IForkableVersionable']['fields']
 ...    >>> for field in verfields:
 ...    ...     if field['name'] == 'follows':
 ...    ...         pprint(field)
@@ -224,7 +224,7 @@ IVersionable's:
 ...     'name': 'follows',
 ...     'editable': True,
 ...     'readable': True,
-...     'targetsheet': 'adhocracy_core.sheets.versions.IVersionable',
+...     'targetsheet': 'adhocracy_core.sheets.versions.IForkableVersionable',
 ...     'valuetype': 'adhocracy_core.schema.AbsolutePath'}
 
 OPTIONS
@@ -512,7 +512,7 @@ Fetch the first Proposal version, it is empty ::
     >>> pprint(resp.json['data']['adhocracy_core.sheets.document.IDocument'])
     {'description': '', 'elements': [], 'picture': '', 'title': ''}
 
-    >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IForkableVersionable'])
     {'followed_by': [], 'follows': []}
 
 Create a new version of the proposal that follows the first version ::
@@ -522,7 +522,7 @@ Create a new version of the proposal that follows the first version ::
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
     ...                     'elements': []},
-    ...                  'adhocracy_core.sheets.versions.IVersionable': {
+    ...                  'adhocracy_core.sheets.versions.IForkableVersionable': {
     ...                     'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
     >>> resp = testapp.post_json(pdag_path, pvrs, headers=god_header)
@@ -538,7 +538,7 @@ We expect certain Versionable fields for the rest of this test suite
 to work ::
 
     >>> resp = testapp.get('/meta_api')
-    >>> vers_fields = resp.json['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
+    >>> vers_fields = resp.json['sheets']['adhocracy_core.sheets.versions.IForkableVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
     [{'containertype': 'list',
       'creatable': False,
@@ -587,7 +587,7 @@ initial versions ::
     >>> pvrs = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalVersion',
     ...         'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'elements': [svrs0_path, s2vrs0_path]},
-    ...                  'adhocracy_core.sheets.versions.IVersionable': {
+    ...                  'adhocracy_core.sheets.versions.IForkableVersionable': {
     ...                     'follows': [pvrs1_path],}
     ...                 },
     ...          'root_versions': [pvrs1_path]}
@@ -601,7 +601,7 @@ If we create a second version of kapitel1 ::
     ...              'adhocracy_core.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
     ...                  'elements': []},
-    ...               'adhocracy_core.sheets.versions.IVersionable': {
+    ...               'adhocracy_core.sheets.versions.IForkableVersionable': {
     ...                  'follows': [svrs0_path]
     ...                  }
     ...          },
@@ -612,7 +612,7 @@ If we create a second version of kapitel1 ::
     >>> svrs1_path != svrs0_path
     True
 
-Whenever a IVersionable contains 'follows' link(s) to preceding versions,
+Whenever a IForkableVersionable contains 'follows' link(s) to preceding versions,
 there should be a top-level 'root_versions' element listing the version of
 their root elements. 'root_versions' is a set, which means that order
 doesn't matter and duplicates are ignored. In this case, it points to the
@@ -639,7 +639,7 @@ More interestingly, if we then create a second version of kapitel2::
     ...              'adhocracy_core.sheets.document.ISection': {
     ...                  'title': 'on the hardness of version control',
     ...                  'elements': []},
-    ...               'adhocracy_core.sheets.versions.IVersionable': {
+    ...               'adhocracy_core.sheets.versions.IForkableVersionable': {
     ...                  'follows': [s2vrs0_path]
     ...                  }
     ...          },
@@ -664,14 +664,14 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
     >>> pvrs4_path = resp.json['path']
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000002')
-    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
+    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IForkableVersionable']['followed_by'])
     1
 
-    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
+    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IForkableVersionable']['followed_by'])
     1
 
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
-    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
+    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IForkableVersionable']['followed_by'])
     0
 
 FIXME: If two frontends post competing sections simultaneously,
@@ -809,7 +809,7 @@ version (no longer head) as predecessor, we get an error::
 
     >>> resp_data = testapp.post_json(comment_path, commvers, status=400, headers=god_header).json
     >>> pprint(resp_data)
-    {'errors': [{'description': 'No fork allowed',
+    {'errors': [{'description': 'No fork allowed ...
                  'location': 'body',
                  'name': 'data.adhocracy_core.sheets.versions.IVersionable.follows'}],
      'status': 'error'}
@@ -819,7 +819,7 @@ distinguishing this error from other kinds of errors.
 
 Only resources that implement the
 `adhocracy_core.sheets.versions.IForkableVersionable` sheet (instead of
-`adhocracy_core.sheets.versions.IVersionable`) allow forking (multiple heads).
+`adhocracy_core.sheets.versions.IForkableVersionable`) allow forking (multiple heads).
 For now, none of our standard resource types does this.
 
 
@@ -1020,7 +1020,7 @@ Let's add some more paragraphs to the second section above ::
     ...             'body': {
     ...                 'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
     ...                 'data': {
-    ...                     'adhocracy_core.sheets.versions.IVersionable': {
+    ...                     'adhocracy_core.sheets.versions.IForkableVersionable': {
     ...                         'follows': ['@par1_item/v1']
     ...                     },
     ...                     'adhocracy_core.sheets.document.IParagraph': {
@@ -1059,7 +1059,7 @@ Let's add some more paragraphs to the second section above ::
 Now the first, empty paragraph version should contain the newly
 created paragraph version as its only successor ::
 
-    .. >>> v1 = batch_resp[2]['body']['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by']
+    .. >>> v1 = batch_resp[2]['body']['data']['adhocracy_core.sheets.versions.IForkableVersionable']['followed_by']
     .. >>> v2 = [batch_resp[1]['path']]
     .. >>> v1 == v2
     .. True
@@ -1092,7 +1092,7 @@ the paragraph will not be present in the database ::
     ...             'body': {
     ...                 'content_type': 'NOT_A_CONTENT_TYPE_AT_ALL',
     ...                 'data': {
-    ...                     'adhocracy_core.sheets.versions.IVersionable': {
+    ...                     'adhocracy_core.sheets.versions.IForkableVersionable': {
     ...                         'follows': ['@par2_item/v1']
     ...                     },
     ...                     'adhocracy_core.sheets.document.IParagraph': {

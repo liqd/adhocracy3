@@ -12,7 +12,6 @@ from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
@@ -24,9 +23,11 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
+from adhocracy_core.utils import get_last_version
 from adhocracy_core.utils import raise_colander_style_error
 
-import adhocracy_core.sheets.versions
+from adhocracy_core.sheets.versions import IVersionable
+from adhocracy_core.sheets.versions import IForkableVersionable
 import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.rate
 
@@ -134,12 +135,17 @@ def reference_has_new_version_subscriber(event):
             appstruct[event.isheet_field] = event.new_version
         new_version = _get_new_version_created_in_this_transaction(registry,
                                                                    resource)
+        is_versionable = IVersionable.providedBy(resource)
+        is_forkable = IForkableVersionable.providedBy(resource)
         # versionable without new version: create a new version store appstruct
-        if IItemVersion.providedBy(resource) and new_version is None:
+        if is_versionable and new_version is None:
+            if not is_forkable:
+                # FIXME should we do to something to allow forking?
+                _assert_we_are_not_forking(resource, registry)
             _update_versionable(resource, isheet, appstruct, root_versions,
                                 registry, creator)
         # versionable with new version: use new version to store appstruct
-        elif IItemVersion.providedBy(resource) and new_version is not None:
+        elif is_versionable and new_version is not None:
             new_version_sheet = get_sheet(new_version, isheet,
                                           registry=registry)
             new_version_sheet.set(appstruct)
@@ -154,10 +160,19 @@ def _get_new_version_created_in_this_transaction(registry,
             return
         path = resource_path(resource)
         changelog_metadata = registry._transaction_changelog[path]
+        # FIXME check first followed_by then created (maybe both happend)
         if changelog_metadata.created:
             return resource
         else:
             return changelog_metadata.followed_by
+
+
+def _assert_we_are_not_forking(resource, registry):
+    """Assert that the last tag == resource to prevent forking."""
+    last = get_last_version(resource, registry)
+    if last is None:
+        return
+    assert resource == last
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,
@@ -167,8 +182,10 @@ def _update_versionable(resource, isheet, appstruct, root_versions, registry,
         return resource
     else:
         appstructs = _get_writable_appstructs(resource, registry)
-        versionable_sheet = adhocracy_core.sheets.versions.IVersionable
-        appstructs[versionable_sheet.__identifier__]['follows'] = [resource]
+        # FIXME the need to switch between forkable and non forkable his bad
+        is_forkable = IForkableVersionable.providedBy(resource)
+        iversionable = IForkableVersionable if is_forkable else IVersionable
+        appstructs[iversionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_iresource(resource)
         new_resource = registry.content.create(iresource.__identifier__,

@@ -11,6 +11,7 @@ from pyramid.compat import is_nonstr_iter
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.traversal import find_interface
 from pyramid.threadlocal import get_current_registry
 from substanced.util import get_dotted_name
 from substanced.util import acquire
@@ -21,6 +22,8 @@ from zope.interface.interfaces import IInterface
 import colander
 
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 
@@ -296,3 +299,18 @@ def unflatten_multipart_request(request: Request) -> dict:
         keyparts = key.split(':')
         nested_dict_set(result, keyparts, value)
     return result
+
+
+def get_last_version(resource: IItemVersion,
+                     registry: Registry) -> IItemVersion:
+    """Get last version of  resource' according to the last tag."""
+    # FIXME better just add tag backreferences fields to resources
+    from adhocracy_core.sheets.tags import ITag  # prevent circle imports
+    item = find_interface(resource, IItem)
+    if item is None:
+        return
+    last_tag = item['LAST']
+    last_versions = get_sheet_field(last_tag, ITag, 'elements',
+                                    registry=registry)
+    last_version = last_versions[0]
+    return last_version

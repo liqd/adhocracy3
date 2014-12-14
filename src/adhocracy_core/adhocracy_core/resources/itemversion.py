@@ -14,7 +14,6 @@ from adhocracy_core.sheets.versions import IForkableVersionable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import find_graph
-from adhocracy_core.utils import raise_colander_style_error
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.versions
 
@@ -113,8 +112,7 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
                 updated_references = _determine_elements_for_forkable_last_tag(
                     context, old_last_tagged_versions, old_versions)
             else:
-                updated_references = _determine_elements_for_linear_last_tag(
-                    context, old_last_tagged_versions, old_versions)
+                updated_references = [context]
             data['elements'] = updated_references
             sheet.set(data)
             break
@@ -131,20 +129,6 @@ def _determine_elements_for_forkable_last_tag(context: IResource,
     # Append new version to end of list
     updated_references.append(context)
     return updated_references
-
-
-def _determine_elements_for_linear_last_tag(context: IResource,
-                                            old_last_tagged_versions: list,
-                                            predecessors: list) -> list:
-    # Linear version history means that the last tag has a single value
-    # and there is a single predecessor and both must be the same
-    if len(predecessors) == 1 and old_last_tagged_versions == predecessors:
-        return [context]
-    else:
-        # FIXME this is causing an internal error. The better place to
-        # validate input data would be the colander schema for the versionable
-        # sheet.
-        raise_colander_style_error(IVersionable, 'follows', 'No fork allowed')
 
 
 itemversion_metadata = resource_metadata_defaults._replace(

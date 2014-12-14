@@ -44,10 +44,31 @@ def _create_new_version_event_with_isheet(context, isheet, registry, creator=Non
                                  root_versions=[])
 
 @fixture
+def item(itemversion):
+    from adhocracy_core.interfaces import IItem
+    item = testing.DummyResource(__provides__=IItem)
+    item['version1'] = itemversion
+    return item
+
+
+@fixture
+def mock_tag_sheet(item, mock_sheet, registry):
+    from copy import deepcopy
+    from adhocracy_core.testing import add_and_register_sheet
+    from adhocracy_core.sheets.tags import ITag
+    item['LAST'] = testing.DummyResource()
+    mock_copy = deepcopy(mock_sheet)
+    mock_copy.meta = mock_copy.meta._replace(isheet=ITag)
+    add_and_register_sheet(item['LAST'], mock_copy, registry)
+    return mock_copy
+
+
+@fixture
 def itemversion():
     """Return dummy resource with IItemVersion interfaces."""
     from adhocracy_core.interfaces import IItemVersion
-    return testing.DummyResource(__provides__=IItemVersion)
+    version = testing.DummyResource(__provides__=IItemVersion)
+    return version
 
 
 @fixture
@@ -175,6 +196,14 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         assert appstructs[IVersionable.__identifier__] == {'follows': [itemversion]}
         creator = factory.call_args[1]['creator']
         assert creator == event.creator
+
+    def test_call_versionable_with_autoupdate_sheet_once_fork(
+            self, itemversion, registry, mock_sheet, mock_tag_sheet):
+        forked_item_version = testing.DummyResource()
+        mock_tag_sheet.get.return_value = {'elements': [forked_item_version]}
+        event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
+        with raises(AssertionError):
+            self._make_one(event)
 
     def test_call_versionable_with_autoupdate_sheet_with_single_reference(
             self, itemversion, registry, mock_sheet):
