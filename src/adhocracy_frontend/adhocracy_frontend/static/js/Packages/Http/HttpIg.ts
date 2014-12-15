@@ -13,7 +13,7 @@ import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sam
 import RITag = require("../../Resources_/adhocracy_core/interfaces/ITag");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SIForkableVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IForkableVersionable");
 
 import AdhHttp = require("./Http");
 import AdhMetaApi = require("./MetaApi");
@@ -90,8 +90,8 @@ export var register = (angular, config, meta_api) => {
                         picture: undefined,
                         elements: [sectionVersion.path]
                     });
-                proposalVersionResource.data[SIVersionable.nick] =
-                    new SIVersionable.Sheet({
+                proposalVersionResource.data[SIForkableVersionable.nick] =
+                    new SIForkableVersionable.Sheet({
                         follows: [proposal.first_version_path]
                     });
                 transaction.post(proposal.path, proposalVersionResource);
@@ -133,7 +133,13 @@ export var register = (angular, config, meta_api) => {
 
         var adhPreliminaryNames = new AdhPreliminaryNames.Service();
 
-        it("Identifies backend 'no fork allowed' error message properly.", (done) => {
+        xit("Identifies backend 'no fork allowed' error message properly.", (done) => {
+
+            // FIXME: this test does not work any more, because
+            // RIProposal has forkable versions now.  we should more
+            // this test to mercator, where there are unforkable
+            // proposals.
+
             var firstVersionPath = "/adhocracy/" + proposalName + "/VERSION_0000000/";
             var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
             proposalVersionResource.data[SIDocument.nick] = new SIDocument.Sheet({
@@ -149,7 +155,7 @@ export var register = (angular, config, meta_api) => {
                     done();
                 },
                 (error) => {
-                    expect("this should not happen.").toBe(false);
+                    expect(error).toBe(false);
                     done();
                 }
             );
