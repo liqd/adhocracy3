@@ -26,12 +26,11 @@ The button has the is-rate-button-active state.
     position: relative;
     @include inline-block;
     margin-left: $arrow-width;
-    padding: 0 0.6em;
+    padding: 0 0.5em;
     line-height: 2;
     background-color: $color-brand-accent2;
     color: white;
     text-decoration: none;
-    text-transform: uppercase;
 
     &:before {
         content: "";
