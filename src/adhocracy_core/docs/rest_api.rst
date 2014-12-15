@@ -942,9 +942,14 @@ request is a success response, or any one of them fails, the database
 state is rolled back to the beginning of the request, and the response
 is an error, explaining which request failed for which reason.
 
-
 Things that are different in individual requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Forks and multiple versions*
+
+During one Batch request you can create only one new version.
+The first version created (with an explicit post request or auto updated)
+is used to store all modifications.
 
 *Preliminary resource paths: motivation and general idea.*
 
