@@ -777,6 +777,8 @@ class FileStoreType(colander.SchemaType):
 
     """Accepts raw file data as per as 'multipart/form-data' upload."""
 
+    SIZE_LIMIT = 16 * 1024 ** 2  # 16 MB
+
     def serialize(self, node, value):
         """Serialization is not supported."""
         raise colander.Invalid(node,
@@ -794,9 +796,12 @@ class FileStoreType(colander.SchemaType):
             # We add the size as an extra attribute since get_size() doesn't
             # work before the transaction has been committed
             result.size = os.fstat(value.file.fileno()).st_size
-            return result
         except Exception as err:
             raise colander.Invalid(node, msg=str(err), value=value)
+        if result.size > self.SIZE_LIMIT:
+            msg = 'Asset too large: {} bytes'.format(result.size)
+            raise colander.Invalid(node, msg=msg, value=value)
+        return result
 
 
 class FileStore(AdhocracySchemaNode):
