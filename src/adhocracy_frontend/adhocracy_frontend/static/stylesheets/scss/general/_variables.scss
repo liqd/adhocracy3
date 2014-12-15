@@ -19,7 +19,6 @@ $color-structure-border-extrovert: #575756;
 $color-brand-accent1: #ce128b;
 $color-brand-accent2: #fcb813;
 
-
 $font-family-normal: "Lato", sans-serif;
 $font-weight-introvert: 400;
 $font-weight-normal: normal;
@@ -57,7 +56,7 @@ $padding-medium: 1em;
         font-weight: $font-weight-normal;
         font-size: $font-size-normal;
         @include font-tracking(normal);
-        line-height: 1.5;
+        line-height: 1.2;
         color: $color-prime-normal;
     } @else if $value == functional {
         font-family: $font-family-normal;

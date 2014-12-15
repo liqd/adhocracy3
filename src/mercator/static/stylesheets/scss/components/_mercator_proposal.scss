@@ -62,6 +62,10 @@ selected. If no proposal is selected, no state is applied.
             font-size: 200%;
             vertical-align: text-top;
         }
+
+        &.icon-pig {
+            font-size: 160%;
+        }
     }
 
     &:last-child {
@@ -75,6 +79,8 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-detail-meta {
+    padding-bottom: 1em;
+
     i.icon-speechbubbles {
         color: $color-highlight-extrovert;
     }
@@ -85,7 +91,8 @@ selected. If no proposal is selected, no state is applied.
     border-bottom: 1px solid $color-structure-border;
     padding: 1.2em 1.2em 1em;
 
-    .chapter-heading {
+    .chapter-header {
+        margin: 0;
         font-size: $font-size-large;
     }
 }
