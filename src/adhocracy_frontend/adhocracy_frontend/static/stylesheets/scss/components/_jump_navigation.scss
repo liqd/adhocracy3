@@ -41,6 +41,12 @@ A navigation list containing hash tag links
                 color: $color-highlight-normal;
             }
         }
+
+        &.active {
+            &, a {
+                color: $color-highlight-normal;
+            }
+        }
     }
 
     &.m-unnumbered {
