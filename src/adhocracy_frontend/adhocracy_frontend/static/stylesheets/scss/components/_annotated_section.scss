@@ -34,5 +34,9 @@ A section with a additional annotation, typically displayed in a second column.
         float: right;
         padding-bottom: 2em;
         width: $annotation-width;
+
+        &.active {
+            text-decoration: underline;
+        }
     }
 }

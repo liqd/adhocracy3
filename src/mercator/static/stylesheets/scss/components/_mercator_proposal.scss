@@ -7,6 +7,7 @@ selected. If no proposal is selected, no state is applied.
 .mercator-proposal-form {
     @include span(last 10 of 12);
     background: white;
+    float: left;
 
     label {
         display: block;
@@ -40,8 +41,21 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-form-nav {
-    @include span(first 2 of 12);
+    @include span(first 2 of 12 no-gutters);
     @extend .jump-navigation;
+    font-size: $font-size-small;
+    padding-right: 0.1666em;
+
+    li {
+        background: $color-structure-active;
+        line-height: 2;
+        margin-bottom: 0.1666em;
+    }
+
+    a {
+        color: $color-highlight-normal;
+        text-decoration: none;
+    }
 }
 
 .mercator-proposal-detail-view {
