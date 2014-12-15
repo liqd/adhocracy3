@@ -68,12 +68,20 @@
                 </section><!-- /.commentable-section -->
 
                 <section class="commentable-section">
-                    <p class="text-functional"><strong>{{ data.finance.budget }} &euro;</strong> {{ "total project budget" | translate }}</p>
-                    <p class="text-functional"><strong>{{ data.finance.requested_funding }} &euro;</strong> {{ "requested" | translate }}</p>
+                    <div class="mercator-proposal-budget-col">
+                        <strong>{{ data.finance.requested_funding | number }} &euro;</strong>
+                        {{ "requested" | translate }}
+                    </div>
+                    <div class="mercator-proposal-budget-col budget">
+                        <strong>{{ data.finance.budget | number }} &euro;</strong>
+                        {{ "budget" | translate }}
+                    </div>
                     <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">{{ "project is granted" | translate }}</strong></p>
 
-                    <h4>{{ "Other sources of income" | translate }}</h4>
-                    <p class="functional-introvert">{{ data.finance.other_sources }}</p>
+                    <div data-ng-if="data.finance.other_sources" class="mercator-proposal-other-sources">
+                        <h4>{{ "Other sources of income" | translate }}</h4>
+                        <p class="functional-introvert">{{ data.finance.other_sources }}</p>
+                    </div>
 
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:finance'}}">
                         <i class="icon-speechbubble"></i> {{ data.finance.commentCount }}
