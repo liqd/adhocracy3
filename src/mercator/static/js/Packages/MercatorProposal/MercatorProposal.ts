@@ -41,6 +41,7 @@ import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
+import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
 import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
@@ -574,14 +575,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
-        var imagePostPath : string = "/mercator/proposals/assets";
-        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
-
-        // FIXME: imagePostPath should be retrieved from HasAssetPool
-        // sheet of the proposal pool.  for now, you can create the
-        // above pool with the following script:
-        //
-        // /src/adhocracy_frontend/adhocracy_frontend/tests/fixtures/workaroundMissingAssetPool.py
+        var imagePathPromise : ng.IPromise<string> = this.adhHttp.get("/mercator")
+            .then((mercatorPool) => {
+                var imagePostPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
+                return uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
+            });
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
