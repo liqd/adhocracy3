@@ -566,7 +566,7 @@ class ItemRESTView(PoolRESTView):
         creator = get_user(self.request)
         root_versions = validated.get('root_versions', [])
         last_version = None
-        is_itemversion = IItemVersion.isOrExtends(iresource)
+        is_itemversion = iresource.isOrExtends(IItemVersion)
         if is_batchmode(self.request.registry) and is_itemversion:
             changelog = get_changelog_metadata(self.context,
                                                self.request.registry)
