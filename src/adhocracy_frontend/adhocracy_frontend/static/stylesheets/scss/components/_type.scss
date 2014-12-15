@@ -8,6 +8,7 @@ category: Type
 
 body {
     @include text(running);
+    line-height: 1;
 }
 
 /*doc
