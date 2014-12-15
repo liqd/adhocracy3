@@ -27,12 +27,12 @@ A section with a additional annotation, typically displayed in a second column.
 
     .annotated-section-body {
         float: left;
-        width: 63%;
+        width: 100 - $annotation-width;
     }
 
     .annotated-section-annotation {
         float: right;
         padding-bottom: 2em;
-        width: 31%;
+        width: $annotation-width;
     }
 }
