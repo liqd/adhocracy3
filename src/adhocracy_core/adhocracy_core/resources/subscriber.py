@@ -148,7 +148,7 @@ def reference_has_new_version_subscriber(event):
         is_forkable = IForkableVersionable.providedBy(resource)
         # versionable without new version: create a new version store appstruct
         if is_versionable and new_version is None:
-            if not is_forkable:
+            if not is_forkable:  # pragma: no branch
                 _assert_we_are_not_forking(resource, registry)
             _update_versionable(resource, isheet, appstruct, root_versions,
                                 registry, creator)

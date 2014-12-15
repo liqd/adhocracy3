@@ -212,8 +212,23 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         self._make_one(event)
 
         event_second = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
-        changelog['/'] = changelog['/']._replace(
-            followed_by=event_second.new_version)
+        changelog['/'] = changelog['/']._replace(followed_by=event_second.new_version)
+        registry._transaction_changelog = changelog
+        self._make_one(event_second)
+
+        factory = registry.content.create
+        assert factory.call_count == 1
+
+    def test_call_versionable_with_autoupdate_sheet_twice_with_batchmode(
+            self, itemversion, registry, mock_sheet, mock_tag_sheet, changelog):
+        from adhocracy_core.utils import set_batchmode
+        set_batchmode(registry)
+        event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
+        mock_tag_sheet.get.return_value = {'elements': [itemversion]}
+        self._make_one(event)
+
+        event_second = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
+        changelog['/'] = changelog['/']._replace(last_version=event_second.new_version)
         registry._transaction_changelog = changelog
         self._make_one(event_second)
 

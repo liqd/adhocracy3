@@ -89,6 +89,20 @@ class TestValidateLinearHistoryNoFork:
         assert err.value.msg == 'No fork allowed - valid follows resources '\
                                 'are: /last_version'
 
+    def test_batchmode_value_last_version_is_last_version(
+            self, node, last_version, mock_tag_sheet, registry):
+        from adhocracy_core.utils import set_batchmode
+        set_batchmode(registry)
+        mock_tag_sheet.get.return_value = {'elements': [last_version]}
+        assert self._call_fut(node, [last_version]) is None
+
+    def test_batchmode_value_last_versions_is_not_last_version(
+            self, node, last_version, mock_tag_sheet, registry):
+        from adhocracy_core.utils import set_batchmode
+        set_batchmode(registry)
+        mock_tag_sheet.get.return_value = {'elements': [last_version]}
+        assert self._call_fut(node, [object()]) is None
+
 
 class TestVersionsSchema:
 
