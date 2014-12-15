@@ -58,11 +58,8 @@ export var register = (angular) => {
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
-                .when("embed", ["$translate", "$location", ($translate, $location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
+                .when("embed", ["$location", ($location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
                     var params = $location.search();
-                    if (params.hasOwnProperty("locale")) {
-                        $translate.use(params.locale);
-                    }
                     var template = location2template($location);
 
                     if (!params.hasOwnProperty("nocenter")) {
@@ -79,5 +76,11 @@ export var register = (angular) => {
                         template: template
                     };
                 }]);
+        }])
+        .run(["$location", "$translate", ($location, $translate) => {
+            var params = $location.search();
+            if (params.hasOwnProperty("locale")) {
+                $translate.use(params.locale);
+            }
         }]);
 };
