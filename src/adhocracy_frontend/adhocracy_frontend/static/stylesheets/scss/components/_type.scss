@@ -109,7 +109,7 @@ a.call-to-action {
 
 /*doc
 ---
-title: Disguised link
+title: Disguised link mixin
 name: disguised-link
 category: Type
 ---
@@ -121,7 +121,7 @@ A link that looks like a regular piece of text
 When is a <a href="#" class="disguised-link">Link</a> not a link?
 ```
 */
-a.disguised-link {
+@mixin disguised-link {
     color: $color-highlight-extrovert;
     text-decoration: none;
 
@@ -129,6 +129,10 @@ a.disguised-link {
     &:focus {
         color: $color-highlight-normal;
     }
+}
+
+.disguised-link {
+    @include disguised-link;
 }
 
 // smaller headings
