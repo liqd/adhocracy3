@@ -641,18 +641,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         return imagePathPromise.then((imagePath : string) => {
             introduction.data[SIMercatorIntroduction.nick].picture = imagePath;
-
-            console.log(introduction.data[SIMercatorIntroduction.nick].picture);
-            debugger;
-
-            /* FIXME: next line will trigger 400 response (see #386):
-
-              description: "This Resource does not provide interface adhocracy_mercator.sheets.mercator.IIntroImageMetadata"
-              location: "body"
-              name: "data.adhocracy_mercator.sheets.mercator.IIntroduction.picture"
-
-             */
-
             return _.flatten([mercatorProposal, mercatorProposalVersion, subresources]);
         })
     }
