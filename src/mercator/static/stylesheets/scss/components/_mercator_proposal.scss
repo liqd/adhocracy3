@@ -50,10 +50,18 @@ selected. If no proposal is selected, no state is applied.
         background: $color-structure-active;
         line-height: 2;
         margin-bottom: 0.1666em;
+
+        &, a {
+            color: $color-highlight-normal;
+        }
+
+        &.active {
+            background: white;
+            text-decoration: underline;
+        }
     }
 
     a {
-        color: $color-highlight-normal;
         text-decoration: none;
     }
 }
