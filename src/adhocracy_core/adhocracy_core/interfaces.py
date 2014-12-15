@@ -477,6 +477,7 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     last_version_in_transaction (None or IResource):
         The last Version created in this transaction
         (only for :class:`adhocracy_core.interfaces.IItem`)
+        FIXME: we assume linear history here
     """
 
 

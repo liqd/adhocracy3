@@ -20,16 +20,6 @@ class IDummySheetNoAutoUpdate(ISheet):
     pass
 
 
-def add_and_register_sheet(context, mock_sheet, registry):
-    from zope.interface import alsoProvides
-    from adhocracy_core.interfaces import IResourceSheet
-    isheet = mock_sheet.meta.isheet
-    alsoProvides(context, isheet)
-    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
-
-
 def _create_new_version_event_with_isheet(context, isheet, registry, creator=None):
     from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
     return testing.DummyResource(__provides__=
@@ -72,9 +62,9 @@ def itemversion():
 
 
 @fixture
-def event(transaction_changelog, context):
+def event(changelog, context):
     registry = testing.DummyResource()
-    registry._transaction_changelog = transaction_changelog
+    registry._transaction_changelog = changelog
     event = testing.DummyResource(object=context, registry=registry)
     return event
 
@@ -85,9 +75,9 @@ class TestResourceCreatedAndAddedSubscriber:
         from adhocracy_core.resources.subscriber import resource_created_and_added_subscriber
         return resource_created_and_added_subscriber(event)
 
-    def test_call(self, event, transaction_changelog):
+    def test_call(self, event, changelog):
         self._call_fut(event)
-        assert transaction_changelog['/'].created is True
+        assert changelog['/'].created is True
 
 
 class TestItemVersionCreated:
@@ -96,15 +86,15 @@ class TestItemVersionCreated:
         from adhocracy_core.resources.subscriber import itemversion_created_subscriber
         return itemversion_created_subscriber(event)
 
-    def test_call_with_version_has_no_follows(self, event, transaction_changelog):
+    def test_call_with_version_has_no_follows(self, event, changelog):
         event.new_version = None
         self._call_fut(event)
-        assert transaction_changelog['/'].followed_by is None
+        assert changelog['/'].followed_by is None
 
-    def test_call_with_version_has_follows(self, event, transaction_changelog):
+    def test_call_with_version_has_follows(self, event, changelog):
         event.new_version = testing.DummyResource()
         self._call_fut(event)
-        assert transaction_changelog['/'].followed_by is event.new_version
+        assert changelog['/'].followed_by is event.new_version
 
 
 class TestResourceModifiedSubscriber:
@@ -113,9 +103,9 @@ class TestResourceModifiedSubscriber:
         from adhocracy_core.resources.subscriber import resource_modified_subscriber
         return resource_modified_subscriber(event)
 
-    def test_call(self, event, transaction_changelog):
+    def test_call(self, event, changelog):
         self._call_fut(event)
-        assert transaction_changelog['/'].modified is True
+        assert changelog['/'].modified is True
 
 
 def test_create_transaction_changelog():
@@ -126,10 +116,10 @@ def test_create_transaction_changelog():
     assert isinstance(changelog_metadata, ChangelogMetadata)
 
 
-def test_clear_transaction_changelog_exists(registry, transaction_changelog):
+def test_clear_transaction_changelog_exists(registry, changelog):
     from adhocracy_core.resources.subscriber import clear_transaction_changelog_after_commit_hook
-    registry._transaction_changelog = transaction_changelog
-    transaction_changelog['/'] = object()
+    registry._transaction_changelog = changelog
+    changelog['/'] = object()
     clear_transaction_changelog_after_commit_hook(True, registry)
     assert len(registry._transaction_changelog) == 0
 
@@ -151,9 +141,9 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
 
     @fixture
     def registry(
-            self, config, registry, mock_resource_registry, transaction_changelog):
+            self, config, registry, mock_resource_registry, changelog):
         registry.content = mock_resource_registry
-        registry._transaction_changelog = transaction_changelog
+        registry._transaction_changelog = changelog
         return registry
 
     def _make_one(self, *args):
@@ -217,19 +207,18 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         assert factory.call_count == 1
 
     def test_call_versionable_with_autoupdate_sheet_twice(
-            self, itemversion, registry, mock_sheet, transaction_changelog):
+            self, itemversion, registry, mock_sheet, changelog):
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
         self._make_one(event)
 
         event_second = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
-        transaction_changelog['/'] = transaction_changelog['/']._replace(
+        changelog['/'] = changelog['/']._replace(
             followed_by=event_second.new_version)
-        registry._transaction_changelog = transaction_changelog
+        registry._transaction_changelog = changelog
         self._make_one(event_second)
 
         factory = registry.content.create
         assert factory.call_count == 1
-
 
     def test_call_versionable_with_autoupdate_sheet_twice_without_transaction_changelog(
             self, itemversion, registry, mock_sheet):
@@ -237,18 +226,17 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         self._make_one(event)
 
         event_second = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
-        delattr(registry, '_transaction_changelog')
         self._make_one(event_second)
 
         factory = registry.content.create
         assert factory.call_count == 2
 
     def test_call_versionable_with_autoupdate_sheet_resource_was_just_created(
-            self, itemversion, registry, mock_sheet, transaction_changelog):
+            self, itemversion, registry, mock_sheet, changelog):
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
         event.creator = object()
-        transaction_changelog['/'] = transaction_changelog['/']._replace(created=True)
-        registry._transaction_changelog = transaction_changelog
+        changelog['/'] = changelog['/']._replace(created=True)
+        registry._transaction_changelog = changelog
 
         self._make_one(event)
 
