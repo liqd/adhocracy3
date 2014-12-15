@@ -23,6 +23,7 @@ import RIMercatorFinance = require("../../Resources_/adhocracy_mercator/resource
 import RIMercatorFinanceVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IFinanceVersion");
 import RIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroduction");
 import RIMercatorIntroductionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroductionVersion");
+import RIMercatorIntroImage = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroImage");
 import RIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfo");
 import RIMercatorOrganizationInfoVersion =
     require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion");
@@ -45,6 +46,7 @@ import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheet
 import SIMercatorFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
 import SIMercatorHeardFrom = require("../../Resources_/adhocracy_mercator/sheets/mercator/IHeardFrom");
 import SIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/sheets/mercator/IIntroduction");
+import SIMercatorIntroImageMetadata = require("../../Resources_/adhocracy_mercator/sheets/mercator/IIntroImageMetadata");
 import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOrganizationInfo");
 import SIMercatorOutcome = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOutcome");
@@ -203,8 +205,8 @@ export var uploadImageFile = (
     flow.files = [];
 
     var formData = new FormData();
-    formData.append("content_type", "adhocracy_core.resources.sample_image.ISampleImage");
-    formData.append("data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type", file.file.type);
+    formData.append("content_type", RIMercatorIntroImage.content_type);
+    formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
     return adhHttp.postRaw(postPath, formData)
