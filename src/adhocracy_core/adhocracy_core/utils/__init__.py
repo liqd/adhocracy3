@@ -12,6 +12,7 @@ from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.traversal import find_interface
+from pyramid.traversal import resource_path
 from pyramid.threadlocal import get_current_registry
 from substanced.util import get_dotted_name
 from substanced.util import acquire
@@ -21,6 +22,7 @@ from zope.interface import providedBy
 from zope.interface.interfaces import IInterface
 import colander
 
+from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -314,3 +316,24 @@ def get_last_version(resource: IItemVersion,
                                     registry=registry)
     last_version = last_versions[0]
     return last_version
+
+
+def get_changelog_metadata(resource, registry) -> ChangelogMetadata:
+    """Return transaction changelog for `resource`."""
+    path = resource_path(resource)
+    changelog = registry._transaction_changelog[path]
+    return changelog
+
+
+def set_batchmode(registry: Registry):
+    """Set 'batchmode' marker for the current request.
+
+    This is called by :class:`adhocracy_core.rest.batchview.BatchView`.
+    Other code can check :func:`is_batchmode` to modify behavior.
+    """
+    registry.__is_batchmode__ = True
+
+
+def is_batchmode(registry: Registry) -> bool:
+    """Get 'batchmode' marker for the current request."""
+    return getattr(registry, '__is_batchmode__', False)

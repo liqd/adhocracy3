@@ -5,11 +5,13 @@ from logging import getLogger
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
+from pyramid.traversal import find_interface
 from substanced.util import find_catalog
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
@@ -24,7 +26,9 @@ from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_last_version
+from adhocracy_core.utils import get_changelog_metadata
 from adhocracy_core.utils import raise_colander_style_error
+from adhocracy_core.utils import is_batchmode
 
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.versions import IForkableVersionable
@@ -64,11 +68,14 @@ def rate_backreference_modified_subscriber(event):
 
 
 def itemversion_created_subscriber(event):
-    """Add new follwed_by version to the transaction_changelog."""
+    """Add new `follwed_by` and `last_version` to the transaction_changelog."""
     if event.new_version is None:
         return
     _add_changelog_metadata(event.registry, event.object,
                             followed_by=event.new_version)
+    item = find_interface(event.object, IItem)
+    _add_changelog_metadata(event.registry, item,
+                            last_version=event.new_version)
 
 
 def _add_changelog_metadata(registry: Registry, resource: IResource, **kwargs):
@@ -133,14 +140,15 @@ def reference_has_new_version_subscriber(event):
             field.insert(old_version_index, event.new_version)
         else:
             appstruct[event.isheet_field] = event.new_version
-        new_version = _get_new_version_created_in_this_transaction(registry,
-                                                                   resource)
+        if is_batchmode(registry):
+            new_version = _get_last_new_version(registry, resource)
+        else:
+            new_version = _get_following_new_version(registry, resource)
         is_versionable = IVersionable.providedBy(resource)
         is_forkable = IForkableVersionable.providedBy(resource)
         # versionable without new version: create a new version store appstruct
         if is_versionable and new_version is None:
             if not is_forkable:
-                # FIXME should we do to something to allow forking?
                 _assert_we_are_not_forking(resource, registry)
             _update_versionable(resource, isheet, appstruct, root_versions,
                                 registry, creator)
@@ -149,28 +157,26 @@ def reference_has_new_version_subscriber(event):
             new_version_sheet = get_sheet(new_version, isheet,
                                           registry=registry)
             new_version_sheet.set(appstruct)
-        # on versionable: store appstruct directly
+        # non versionable: store appstruct directly
         else:
             sheet.set(appstruct)
 
 
-def _get_new_version_created_in_this_transaction(registry,
-                                                 resource) -> IResource:
-        if not hasattr(registry, '_transaction_changelog'):
-            return
-        path = resource_path(resource)
-        changelog_metadata = registry._transaction_changelog[path]
-        new_version = None
-        if changelog_metadata.created:
-            new_version = resource
-        elif changelog_metadata.followed_by is not None:
-            new_version = changelog_metadata.followed_by
-        elif getattr(registry, '__is_batchmode__', False):
-            # FIXME why do wee need to do this?
-            # Is the changelog metadata resource not yet updated?
-            last = get_last_version(resource, registry)
-            new_version = last
-        return new_version
+def _get_following_new_version(registry, resource) -> IResource:
+    """Return the following version created in this transaction."""
+    changelog = get_changelog_metadata(resource, registry)
+    if changelog.created:
+        new_version = resource
+    else:
+        new_version = changelog.followed_by
+    return new_version
+
+
+def _get_last_new_version(registry, resource) -> IResource:
+    """Return last new version created in this transaction."""
+    item = find_interface(resource, IItem)
+    item_changelog = get_changelog_metadata(item, registry)
+    return item_changelog.last_version
 
 
 def _assert_we_are_not_forking(resource, registry):

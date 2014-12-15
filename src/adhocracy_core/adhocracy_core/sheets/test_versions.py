@@ -89,24 +89,6 @@ class TestValidateLinearHistoryNoFork:
         assert err.value.msg == 'No fork allowed - valid follows resources '\
                                 'are: /last_version'
 
-    def test_value_last_version_in_transaction_created(
-            self, node, last_version, mock_tag_sheet, changelog):
-        """The last version created is equal to the last tag version."""
-        changelog['/last_version'] = changelog['/last_version']._replace(created=True)
-        mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        self._call_fut(node, [last_version])
-        assert request.validated['__last_version_in_transaction__'] is last_version
-
-    def test_value_last_version_in_transaction_followed_by(
-            self, node, last_version, mock_tag_sheet, changelog):
-        """The last version this transaction follows the last tag last version."""
-        newer_version = testing.DummyResource()
-        changelog['/last_version'] =\
-            changelog['/last_version']._replace(followed_by=newer_version)
-        mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        self._call_fut(node, [last_version])
-        assert request.validated['__last_version_in_transaction__'] is newer_version
-
 
 class TestVersionsSchema:
 

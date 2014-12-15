@@ -57,6 +57,8 @@ from adhocracy_core.utils import get_user
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.utils import get_changelog_metadata
+from adhocracy_core.utils import is_batchmode
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.pool
@@ -546,7 +548,17 @@ class ItemRESTView(PoolRESTView):
                  permission='add_resource',
                  content_type='application/json')
     def post(self):
-        """Create new resource and get response data."""
+        """Create new resource and get response data.
+
+        For :class:`adhocracy_core.interfaces.IItemVersion`:
+
+        If a `new version` is already created in this transaction we don't want
+        to create a new one. Instead we modify the existing one.
+
+        This is needed to make :class:`adhocray_core.rest.batchview.BatchView`
+        work. If this view is called the
+        :func:`adhocracy_core.util.is_batchmode` returns true.
+        """
         validated = self.request.validated
         iresource = validated['content_type']
         resource_type = iresource.__identifier__
@@ -554,11 +566,13 @@ class ItemRESTView(PoolRESTView):
         creator = get_user(self.request)
         root_versions = validated.get('root_versions', [])
         last_version = None
-        if IItemVersion.isOrExtends(resource_type):
-            path = resource_path(self.context)
-            changelog = self.request.registry._transaction_changelog
-            last_version = changelog[path].last_version
+        is_itemversion = IItemVersion.isOrExtends(resource_type)
+        if is_batchmode(self.request.registry) and is_itemversion:
+            changelog = get_changelog_metadata(self.context,
+                                               self.request.registry)
+            last_version = changelog.last_version
         if last_version is not None:
+            resource = last_version
             self.context = last_version
             self.put()  # FIXME Is it safe to just call put?
         else:

@@ -10,6 +10,7 @@ from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets.pool import PoolSheet
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.utils import get_last_version
+from adhocracy_core.utils import is_batchmode
 
 
 class IVersionable(ISheet):
@@ -42,29 +43,14 @@ def validate_linear_history_no_fork(node: colander.SchemaNode, value: list):
     :param:'value': list of one 'follows' resource.
 
     :raises colander.Invalid: if value does not reference the last version.
-
-    If a `new version` is already created in this transaction we don't want
-    to create a new one. To do so we store the version in
-    `registry._transaction_changelog[resource_path].last_version`.
-    Other code can look for this value and modify this last version instead of
-    creating a new one.
-
-    This is needed to make the :class:`adhocray_core.rest.batchview.BatchView`
-    work.
-
     """
     context = node.bindings['context']
     request = node.bindings['request']
-    path = resource_path(context)
-    changelog = request.registry._transaction_changelog
-    metadata = changelog[path]
-    if getattr(request.registry, '__is_batchmode__', False):
-        # FIXME add usefull validation also in batch mode
-        return
     last = get_last_version(context, request.registry)
+    if is_batchmode(request.registry):
+        # FIXME add usefull validation in batchmode?
+        return
     _assert_follows_eq_last_version(node, value, last)
-    last_in_transaction = _get_last_version_in_transaction(request, last)
-    changelog[path] = metadata._replace(last_version=last_in_transaction)
 
 
 def _assert_follows_eq_last_version(node: colander.SchemaNode, value: list,
@@ -75,19 +61,6 @@ def _assert_follows_eq_last_version(node: colander.SchemaNode, value: list,
             msg = 'No fork allowed - valid follows resources are: {0}'
             msg = msg.format(str(last_path))
             raise colander.Invalid(node, msg, value=value)
-
-
-def _get_last_version_in_transaction(request, last):
-        last_path = resource_path(last)
-        changelog = request.registry._transaction_changelog[last_path]
-        last_version_in_transaction = None
-        # The last version created in this transaction follows the last tag
-        if changelog.followed_by is not None:
-            last_version_in_transaction = changelog.followed_by
-        # The last version created in this transaction is equal to the last tag
-        elif changelog.created:
-            last_version_in_transaction = last
-        return last_version_in_transaction
 
 
 @colander.deferred
