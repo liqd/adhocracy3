@@ -122,6 +122,13 @@ class TestValidateRequest:
         self._make_one(context, request, schema=PreservingQueryStringSchema())
         assert request.validated == {'count': 1, 'extraflag': 'extra value'}
 
+    def test_valid_multipart_formdata(self, context, request):
+        request.content_type = 'multipart/form-data'
+        request.method = 'POST'
+        request.POST['count'] = '1'
+        self._make_one(context, request, schema=CountSchema())
+        assert request.validated == {'count': 1}
+
     def test_non_valid_with_schema_wrong_data(self, context, request):
         from cornice.util import _JSONError
         request.body = '{"count": "wrong_value"}'
@@ -173,16 +180,6 @@ class TestValidateRequest:
         self._make_one(context, request, schema=TestListSchema())
         # since this doesn't make much sense, the validator is just a no-op
         assert request.validated == {}
-
-    def test_valid_with_schema_with_data_in_querystring(self, context,
-                                                        request):
-        class QueryStringSchema(colander.MappingSchema):
-            count = colander.SchemaNode(colander.Int())
-        request.GET = {'count': 1}
-        self._make_one(context, request, schema=QueryStringSchema())
-        assert request.validated == {'count': 1}
-
-
 
     def test_with_invalid_sequence_schema(self, context, request):
         class TestListSchema(colander.SequenceSchema):
@@ -526,7 +523,6 @@ class TestUsersRESTView:
         return UsersRESTView(context, request)
 
     def test_create(self, request, context):
-        from adhocracy_core.rest.views import validate_post_root_versions
         from adhocracy_core.rest.views import PoolRESTView
         inst = self.make_one(context, request)
         assert issubclass(inst.__class__, PoolRESTView)
@@ -1183,6 +1179,113 @@ class TestReportAbuseView:
         assert inst.options() == {}
 
 
+class TestAssetsServiceRESTView:
+
+    @fixture
+    def request(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
+
+    def make_one(self, context, request):
+        from adhocracy_core.rest.views import AssetsServiceRESTView
+        return AssetsServiceRESTView(context, request)
+
+    def test_post_valid(self, request, context):
+        request.root = context
+        child = testing.DummyResource(__provides__=IResourceX)
+        child.__parent__ = context
+        child.__name__ = 'child'
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type': IResourceX, 'data': {}}
+        inst = self.make_one(context, request)
+        response = inst.post()
+        wanted = {'path': request.application_url + '/child/',
+                  'content_type': IResourceX.__identifier__}
+        assert wanted == response
+
+
+class TestAssetRESTView:
+
+    @fixture
+    def request_(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
+
+    def make_one(self, context, request_):
+        from adhocracy_core.rest.views import AssetRESTView
+        return AssetRESTView(context, request_)
+
+    def test_put_valid_no_sheets(self, monkeypatch, request_, context,
+                                 mock_sheet):
+        from adhocracy_core.rest import views
+        mock_validate = Mock(spec=views.validate_and_complete_asset)
+        monkeypatch.setattr(views, 'validate_and_complete_asset',
+                            mock_validate)
+        request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        request_.validated = {"content_type": "X", "data": {}}
+        inst = self.make_one(context, request_)
+        response = inst.put()
+        wanted = {'path': request_.application_url + '/',
+                  'content_type': IResource.__identifier__}
+        assert wanted == response
+        assert mock_validate.called
+
+
+class TestAssetDownloadRESTView:
+
+    @fixture
+    def request_(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
+
+    def make_one(self, context, request_):
+        from adhocracy_core.rest.views import AssetDownloadRESTView
+        return AssetDownloadRESTView(context, request_)
+
+    def test_get_valid_with_sheets(self, monkeypatch, request_, context):
+        from adhocracy_core.rest import views
+        mock_file = Mock()
+        mock_retrieve = Mock(spec=views.retrieve_asset_file,
+                             return_value=mock_file)
+        mock_response = Mock()
+        mock_file.get_response = Mock(return_value=mock_response)
+        monkeypatch.setattr(views, 'retrieve_asset_file', mock_retrieve)
+        inst = self.make_one(context, request_)
+        assert inst.get() == mock_response
+
+    def test_get_blocked(self, config, request_):
+        config.include('adhocracy_core.catalog')
+        config.include('adhocracy_core.events')
+        config.include('adhocracy_core.sheets.metadata')
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import IMetadata
+        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
+        resource.hidden = True
+        inst = self.make_one(resource, request_)
+        response = inst.get()
+        assert response['reason'] == 'hidden'
+        assert set(response.keys()) == {'reason',
+                                        'modification_date',
+                                        'modified_by'}
+
+
+class TestShowRequestBody:
+
+    def test_normal(self, cornice_request):
+        from adhocracy_core.rest.views import _show_request_body
+        cornice_request.body = "hello"
+        assert _show_request_body(cornice_request) == "hello"
+
+    def test_long_multipart_formdata_body_is_abbreviated(self,
+                                                         cornice_request):
+        from adhocracy_core.rest.views import _show_request_body
+        cornice_request.content_type = 'multipart/form-data'
+        cornice_request.body = "hello" * 30
+        result = _show_request_body(cornice_request)
+        assert len(result) < len(cornice_request.body)
+        assert result.endswith('...')
+
+
 @fixture()
 def integration(config):
     config.include('cornice')
@@ -1200,3 +1303,4 @@ class TestIntegrationIncludeme:
         from adhocracy_core.rest.views import add_cors_headers_subscriber
         handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
         assert add_cors_headers_subscriber.__name__ in handlers
+

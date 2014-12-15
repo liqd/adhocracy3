@@ -261,3 +261,31 @@ class TestNormalizeToTuple:
 
     def test_with_dict(self):
         assert self._call_fut({1: 2}) == ({1: 2},)
+
+
+class TestGetMatchingIsheet:
+
+    def _call_fut(self, context, isheet):
+        from adhocracy_core.utils import get_matching_isheet
+        return get_matching_isheet(context, isheet)
+
+    def test_provides_no_sheet(self):
+        from adhocracy_core.interfaces import ISheet
+        context = testing.DummyResource()
+        assert self._call_fut(context, ISheet) is None
+
+    def test_provides_sheet(self):
+        from adhocracy_core.interfaces import ISheet
+        context = testing.DummyResource(__provides__=ISheet)
+        assert self._call_fut(context, ISheet) is ISheet
+
+    def test_provides_subclass_of_sheet(self):
+        from adhocracy_core.interfaces import IPredicateSheet, ISheet
+        context = testing.DummyResource(__provides__=IPredicateSheet)
+        assert self._call_fut(context, ISheet) is IPredicateSheet
+
+    def test_provides_wrong_sheet(self):
+        from adhocracy_core.interfaces import IPredicateSheet, ISheet
+        context = testing.DummyResource(__provides__=ISheet)
+        assert self._call_fut(context, IPredicateSheet) is None
+
