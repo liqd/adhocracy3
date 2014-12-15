@@ -54,15 +54,13 @@ export var moduleName = "adhEmbed";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            "pascalprecht.translate",
             AdhTopLevelState.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
-                .when("embed", ["$translate", "$location", ($translate, $location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
+                .when("embed", ["$location", ($location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
                     var params = $location.search();
-                    if (params.hasOwnProperty("locale")) {
-                        $translate.use(params.locale);
-                    }
                     var template = location2template($location);
 
                     if (!params.hasOwnProperty("nocenter")) {
@@ -79,5 +77,13 @@ export var register = (angular) => {
                         template: template
                     };
                 }]);
+        }])
+        .run(["$location", "$translate", ($location, $translate) => {
+            // Note: This works despite the routing removing the locale search
+            // parameter immediately after. This is a bit awkward though.
+            var params = $location.search();
+            if (params.hasOwnProperty("locale")) {
+                $translate.use(params.locale);
+            }
         }]);
 };

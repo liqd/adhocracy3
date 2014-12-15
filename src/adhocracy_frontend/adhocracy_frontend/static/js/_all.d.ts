@@ -65,40 +65,50 @@ declare class Flow {
     preventEvent : (event : any) => any;
     support : boolean;
     supportDirectory : boolean;
+    upload : () => any;
     resume : () => any;
     pause : () => any;
     cancel : () => any;
 }
 
 declare class FlowFile {
-    webkitRelativePath : string;
-    lastModifiedDate : string;
-    name : string;
-    type : string;
-    size : number;
+    file : {
+        FilelastModifiedDate : Date;
+        name : string;
+        size : number;
+        type : string;
+        webkitRelativePath : string;
+        mozSlice? : any;
+        webkitSlice? : any;
+    };
+    chunks : FlowChunk[];
+}
+
+declare class FlowChunk {
 }
 
 declare class FlowOpts {
+    chunkRetryInterval : number;
     chunkSize : number;
+    fileParameterName : string;
     forceChunkSize : boolean;
+    generateUniqueIdentifier : any;
+    headers : any;
+    maxChunkRetries : number;
+    maximumByteSize : number;
+    method : string;
+    onDropStopPropagation : boolean;
+    permanentErrors : number[];
+    preprocess : any;
+    prioritizeFirstAndLastChunk : boolean;
+    progressCallbacksInterval : number;
+    query : any;
     simultaneousUploads : number;
     singleFile : boolean;
-    fileParameterName : string;
-    progressCallbacksInterval : number;
     speedSmoothingFactor : number;
-    query : any;
-    headers : any;
-    withCredentials : boolean;
-    preprocess : any;
-    method : string;
-    prioritizeFirstAndLastChunk : boolean;
     target : string;
     testChunks : boolean;
-    generateUniqueIdentifier : any;
-    maxChunkRetries : number;
-    chunkRetryInterval : number;
-    permanentErrors : number[];
-    onDropStopPropagation : boolean;
+    withCredentials : boolean;
 }
 
 declare module "fustyFlow" {}

@@ -75,7 +75,7 @@ class TestRate:
         rateable1 = get_list_element(listing, 'comment1', descendant='.comment-content')
         button1 = rateable1.find_by_css('.rate-pro').first
 
-        rateable2 = create_top_level_comment(listing,  'comment2')
+        rateable2 = create_top_level_comment(browser, listing, 'comment2')
         button2 = rateable2.find_by_css('.rate-contra').first
 
         button2.click()

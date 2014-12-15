@@ -173,6 +173,10 @@ path of the new resource (just as with other resource types)::
     >>> pic_path
     'http://localhost/adhocracy/ProposalPool/assets/0000000/'
 
+If the frontend tries to upload an asset that is overly large (more than 16
+MB), the backend responds with an error. Stricter size limits may be
+appropriate for some asset types, but they are left to the frontend.
+
 
 Downloading Assets
 ------------------
@@ -320,5 +324,3 @@ Deleting and Hiding Assets
 
 Assets can be deleted or censored ("hidden") in the usual way, see
 :ref:`deletion`.
-
-TODO Add example testing this using delete (also for children).

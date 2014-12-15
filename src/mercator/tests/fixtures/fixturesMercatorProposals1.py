@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
-# [call this script from a3 root with ./bin/python3.4 as interpreter.]
-# FIXME: Doesn't work as requests is missing. Use a Python with requests
-# installed.
+# you can execute this module from $A3_ROOT with ./bin/ipython as interpreter.
 
 import os
 import json
@@ -523,7 +521,7 @@ def _create_proposal():
                 "result_first_version_path": "@pn44"
             }]
 
-def create_proposals(user_token, n=5):
+def create_proposals(user_token, n=5, expect_error=False):
     proposals = []
 
     uri = root_uri + "/batch"
@@ -548,12 +546,17 @@ def create_proposals(user_token, n=5):
         if verbose:
             print('\n')
             print(uri)
-            print(headers)
+            print(headers(str(len(body))))
             print(body)
             print(response)
             print(response.text)
-        assert response.status_code == 200
+        if not expect_error:
+            assert response.status_code == 200
 
         proposals.append(requested_proposal)
 
     return proposals
+
+
+if __name__ == "__main__":
+    create_proposals("GOD_SECRET")

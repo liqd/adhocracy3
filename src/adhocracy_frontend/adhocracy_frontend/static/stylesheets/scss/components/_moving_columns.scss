@@ -143,7 +143,7 @@ The menu should always have the same state as its columns.
     // look
     border: 0 solid $color-secondary-introvert;
     border-width: 0 0 $moving-column-border-width $moving-column-border-width;
-    font-size: $font-size-small;
+    font-size: $font-size-normal;
 }
 
 /*doc
@@ -176,7 +176,6 @@ States:
 .moving-column-menu {
     @include clearfix;
     background: $color-secondary-introvert;
-    font-size: $font-size-small;
     line-height: $moving-column-menu-height /1em;
     padding: 0 0 0 $padding-small;
 
@@ -225,6 +224,7 @@ States:
 }
 
 .moving-column-sidebar {
+    display: none;
     position: absolute;
     top: $moving-column-menu-height;
     bottom: 0;
@@ -238,5 +238,11 @@ States:
 
     &.is-visible {
         left: 0;
+    }
+
+    &.is-visible,
+    &.is-visible-add,
+    &.is-visible-remove {
+        display: block;
     }
 }

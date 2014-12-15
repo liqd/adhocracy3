@@ -38,46 +38,181 @@ selected. If no proposal is selected, no state is applied.
     list-style: none;
 
     @include container;
-    margin-bottom: gutter(12);
+    @include text(functional-introvert);
 }
 
+.mercator-propsal-list-item-meta-item,
 .mercator-propsal-detail-meta-item {
-    @include gallery(2 of 12);
+    @include text(functional-introvert);
+    float: left;
+    margin-right: 2em;
+
+    i {
+        font-size: 140%;
+        line-height: 1;
+        margin-right: 0.1666em;
+        vertical-align: middle;
+
+        &.icon-speechbubbles {
+            color: $color-brand-accent1;
+        }
+
+        &.icon-pointy-rectangle-left {
+            color: $color-brand-accent2;
+            font-size: 200%;
+            vertical-align: text-top;
+        }
+
+        &.icon-pig {
+            font-size: 160%;
+        }
+    }
+
+    &:last-child {
+        float: right;
+        margin-right: 0;
+    }
+
+    &.mercator-propsal-list-item-meta-item-budget {
+        font-size: $font-size-plus;
+    }
 }
 
-.mercator-propsal-list-item-meta-item {
-    @include gallery(3 of 12);
+.mercator-proposal-detail-meta {
+    padding-bottom: 1em;
+
+    i.icon-speechbubbles {
+        color: $color-highlight-extrovert;
+    }
 }
 
 .mercator-proposal-detail-cover {
     @include span(full);
     border-bottom: 1px solid $color-structure-border;
+    padding: 1.2em 1.2em 1em;
+
+    .chapter-header {
+        margin: 0;
+        font-size: $font-size-large;
+    }
 }
 
 .mercator-proposal-cover-show-comments {
+    @include disguised-link;
     float: right;
 }
 
+.mercator-proposal-detail-container {
+    background-color: $color-structure-active;
+    clear: left;
+    overflow: hidden;
+}
+
 .mercator-proposal-detail-nav {
-    @include span(first 2 of 12);
+    @include span(1 of 12 inside);
     @extend .jump-navigation;
+    text-align: center;
+
+    a {
+        padding: 0 0 1em;
+    }
 }
 
 .mercator-proposal-chapters {
-    @include span(last 10 of 12);
+    @include span(11 of 12 inside);
+    background-color: white;
+    border-left: 0.1666em solid $color-secondary-introvert;
+    padding-left: 1em;
+
+    .chapter-header {
+        background: transparent;
+        font-size: $font-size-normal;
+        margin: 0;
+        padding: 0;
+    }
+
+    h3 {
+        margin-top: 0;
+    }
+}
+
+.mercator-proposal-detail-nav,
+.mercator-proposal-chapters {
+    padding-top: 1em;
 }
 
 .mercator-proposal-list-item {
     @include container;
-    border-bottom: 1px solid $color-structure-border;
+    border-bottom: 0.1666em solid $color-secondary-introvert;
+    padding: 1.2em;
 
     .mercator-proposal-list-item-image {
         @include span(3 of 12 first);
+        img {
+            float: left;
+            max-width: 100%;
+        }
     }
 
     .m-has-image {
         @include span(9 of 12 last);
     }
+
+    &.is-not-selected {
+        background: $color-structure-active;
+
+        i[class*=icon-] {
+            color: $color-highlight-extrovert;
+        }
+    }
+
+    .mercator-proposal-list-item-username,
+    .mercator-proposal-list-item-title {
+        margin: 0;
+    }
+
+    .mercator-proposal-list-item-username {
+        @include text(functional-introvert);
+        padding-bottom: 0.1em;
+
+        a {
+            text-decoration: none;
+        }
+    }
+
+    .mercator-proposal-list-item-title {
+        @include text(functional);
+        padding-bottom: 0.5em;
+
+        a {
+            color: $color-prime-extrovert;
+            text-decoration: none;
+
+            &:hover, &:focus {
+                color: $color-highlight-normal;
+            }
+        }
+    }
+}
+
+.mercator-proposal-budget-col {
+    float: left;
+    padding-right: 2em;
+
+    &.budget {
+        color: $color-secondary-extrovert;
+    }
+
+    strong {
+        display: block;
+        font-size: $font-size-large;
+        font-weight: normal;
+    }
+}
+
+.mercator-proposal-other-sources {
+    clear: left;
+    padding-top: 1em;
 }
 
 .picture-upload-file img {

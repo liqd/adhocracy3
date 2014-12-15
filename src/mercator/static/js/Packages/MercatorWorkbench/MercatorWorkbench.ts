@@ -154,7 +154,7 @@ export var register = (angular) => {
                 })
                 .default(RIUsersService.content_type, "", {
                     space: "user",
-                    movingColumns: "is-show-show-hide"
+                    movingColumns: "is-show-hide-hide"
                 })
                 .default(RIBasicPool.content_type, "", {
                     space: "content",

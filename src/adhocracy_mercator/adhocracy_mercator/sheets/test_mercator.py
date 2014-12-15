@@ -573,3 +573,19 @@ class TestExperienceSheet:
         wanted = {'experience': '',
                   }
         assert inst.get() == wanted
+
+
+class TestIntroImageMimeTypeValidator:
+
+    def test_valid(self):
+        from adhocracy_mercator.sheets.mercator import _intro_image_mime_type_validator
+        assert _intro_image_mime_type_validator('image/jpeg') is True
+
+    def test_invalid(self):
+        from adhocracy_mercator.sheets.mercator import _intro_image_mime_type_validator
+        assert _intro_image_mime_type_validator('text/plain') is False
+
+    def test_empty(self):
+        from adhocracy_mercator.sheets.mercator import _intro_image_mime_type_validator
+        assert _intro_image_mime_type_validator('') is False
+

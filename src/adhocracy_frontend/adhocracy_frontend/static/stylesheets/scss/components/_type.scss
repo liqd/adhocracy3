@@ -107,6 +107,34 @@ a.call-to-action {
     }
 }
 
+/*doc
+---
+title: Disguised link mixin
+name: disguised-link
+category: Type
+---
+
+A link that looks like a regular piece of text
+
+```html_example
+<a class="disguised-link" href="#"><i class="icon-speechbubble"></i> Comments</a><br/>
+When is a <a href="#" class="disguised-link">Link</a> not a link?
+```
+*/
+@mixin disguised-link {
+    color: $color-highlight-extrovert;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        color: $color-highlight-normal;
+    }
+}
+
+.disguised-link {
+    @include disguised-link;
+}
+
 // smaller headings
 blockquote,
 article,
@@ -122,6 +150,44 @@ section {
 
     h2 {
         font-size: 1.1em;
+    }
+}
+
+/*doc
+---
+title: Inline boxes mixin
+name: inline-box
+category: Type
+---
+
+```html_example
+<span class="inline-box">Inline box 1</span>
+<span class="inline-box">Inline box 2</span>
+
+<ul class="inline-boxes">
+    <li>Inline box 1</li>
+    <li>Inline box 2</li>
+</ul>
+```
+*/
+
+@mixin inline-box {
+    @include inline-block;
+    color: $color-highlight-extrovert;
+    border: 1px solid $color-highlight-extrovert;
+    font-size: $font-size-small;
+    padding: 0 1em;
+}
+
+.inline-box {
+    @include inline-box;
+}
+
+.inline-boxes {
+    padding: 0;
+
+    li {
+        @include inline-box;
     }
 }
 

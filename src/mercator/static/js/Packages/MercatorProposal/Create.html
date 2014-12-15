@@ -323,7 +323,6 @@
                 <label>
                     {{ "Upload an image" | translate }}
                     <div
-                        data-flow-files-submitted="$flow.upload()"
                         data-flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
                         data-flow-init=""
                         data-ng-model="data.introduction.imageUpload"

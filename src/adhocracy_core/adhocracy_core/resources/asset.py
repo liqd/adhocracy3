@@ -12,7 +12,7 @@ from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.pool import basicpool_metadata
 from adhocracy_core.resources.service import service_metadata
 from adhocracy_core.resources.simple import simple_metadata
-from adhocracy_core.sheets.asset import AssetFileView
+from adhocracy_core.sheets.asset import AssetFileDownload
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.name import IName
@@ -23,14 +23,14 @@ import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
 
 
-class IAssetView(IPool):
+class IAssetDownload(IPool):
 
     """View that makes an asset available for download."""
 
 
-asset_view_meta = simple_metadata._replace(
-    content_name='AssetView',
-    iresource=IAssetView,
+asset_download_meta = simple_metadata._replace(
+    content_name='AssetDownload',
+    iresource=IAssetDownload,
     basic_sheets=[IName, IAssetData],
 )
 
@@ -57,7 +57,7 @@ def validate_and_complete_asset(context: IAsset,
                                          metadata_appstruct,
                                          metadata_sheet,
                                          registry=registry)
-    _add_views_as_children(context, metadata_sheet, registry)
+    _add_downloads_as_children(context, metadata_sheet, registry)
 
 
 def _validate_mime_type(file: File,
@@ -98,30 +98,30 @@ def _store_size_and_filename_as_metadata(file: File,
                        omit_readonly=False)
 
 
-def _add_views_as_children(context: IAsset,
-                           metadata_sheet: IAssetMetadata,
-                           registry: Registry):
+def _add_downloads_as_children(context: IAsset,
+                               metadata_sheet: IAssetMetadata,
+                               registry: Registry):
     """
-    Add raw view and possible resized views as children of an asset.
+    Add raw and possible resized download objects as children of an asset.
 
     If a child with the same name already exists, it will be deleted and
     replaced.
     """
-    _create_asset_view(context=context, name='raw', registry=registry)
-    if metadata_sheet.meta.image_sizes:
+    _create_asset_download(context=context, name='raw', registry=registry)
+    if metadata_sheet.meta.image_sizes:  # pragma: no branch
         for name, dimensions in metadata_sheet.meta.image_sizes.items():
-            _create_asset_view(context=context, name=name, registry=registry,
-                               dimensions=dimensions)
+            _create_asset_download(context=context, name=name,
+                                   registry=registry, dimensions=dimensions)
 
 
-def _create_asset_view(context: IAsset, name: str, registry: Registry,
-                       dimensions: Dimensions=None) -> dict:
-    file_view = AssetFileView(dimensions)
+def _create_asset_download(context: IAsset, name: str, registry: Registry,
+                           dimensions: Dimensions=None) -> dict:
+    file_download = AssetFileDownload(dimensions)
     if name in context:
         del context[name]
     appstructs = {IName.__identifier__: {'name': name},
-                  IAssetData.__identifier__: {'data': file_view}}
-    registry.content.create(IAssetView.__identifier__,
+                  IAssetData.__identifier__: {'data': file_download}}
+    registry.content.create(IAssetDownload.__identifier__,
                             parent=context,
                             appstructs=appstructs,
                             registry=registry)
@@ -173,7 +173,7 @@ pool_with_assets_meta = basicpool_metadata._replace(
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(asset_view_meta, config)
+    add_resource_type_to_registry(asset_download_meta, config)
     add_resource_type_to_registry(asset_meta, config)
     add_resource_type_to_registry(assets_service_meta, config)
     add_resource_type_to_registry(pool_with_assets_meta, config)
