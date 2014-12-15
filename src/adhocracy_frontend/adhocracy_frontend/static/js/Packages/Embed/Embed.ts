@@ -54,6 +54,7 @@ export var moduleName = "adhEmbed";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            "pascalprecht.translate",
             AdhTopLevelState.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
