@@ -78,6 +78,8 @@ export var register = (angular) => {
                 }]);
         }])
         .run(["$location", "$translate", ($location, $translate) => {
+            // Note: This works despite the routing removing the locale search
+            // parameter immediately after. This is a bit awkward though.
             var params = $location.search();
             if (params.hasOwnProperty("locale")) {
                 $translate.use(params.locale);
