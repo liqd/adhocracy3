@@ -83,21 +83,16 @@
                         <p class="functional-introvert">{{ data.finance.other_sources }}</p>
                     </div>
 
-                    <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:finance'}}">
-                        <i class="icon-speechbubble"></i> {{ data.finance.commentCount }}
-                    </a>
-                </section><!-- /.commentable-section -->
-
-                <section class="commentable-section">
-                    <ul>
+                    <ul class="inline-boxes">
                         <li data-ng-if="data.location.location_is_online">{{ "ONLINE" | translate }}</li>
                         <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
                         <li data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</li>
                         <li data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</li>
                         <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
                     </ul>
-                    <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:location'}}">
-                        <i class="icon-speechbubble"></i> {{ data.location.commentCount }}
+
+                    <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:finance'}}">
+                        <i class="icon-speechbubble"></i> {{ data.finance.commentCount }}
                     </a>
                 </section><!-- /.commentable-section -->
 

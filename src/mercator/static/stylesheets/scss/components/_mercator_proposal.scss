@@ -122,6 +122,7 @@ selected. If no proposal is selected, no state is applied.
     @include span(11 of 12 inside);
     background-color: white;
     border-left: 0.1666em solid $color-secondary-introvert;
+    padding-left: 1em;
 
     .chapter-header {
         background: transparent;
