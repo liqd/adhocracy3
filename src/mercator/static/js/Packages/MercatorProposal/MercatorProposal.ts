@@ -23,6 +23,7 @@ import RIMercatorFinance = require("../../Resources_/adhocracy_mercator/resource
 import RIMercatorFinanceVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IFinanceVersion");
 import RIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroduction");
 import RIMercatorIntroductionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroductionVersion");
+import RIMercatorIntroImage = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroImage");
 import RIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfo");
 import RIMercatorOrganizationInfoVersion =
     require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion");
@@ -40,15 +41,16 @@ import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
+import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
 import SIMercatorFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
 import SIMercatorHeardFrom = require("../../Resources_/adhocracy_mercator/sheets/mercator/IHeardFrom");
 import SIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/sheets/mercator/IIntroduction");
+import SIMercatorIntroImageMetadata = require("../../Resources_/adhocracy_mercator/sheets/mercator/IIntroImageMetadata");
 import SIMercatorLocation = require("../../Resources_/adhocracy_mercator/sheets/mercator/ILocation");
 import SIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOrganizationInfo");
 import SIMercatorOutcome = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOutcome");
-import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorPartners = require("../../Resources_/adhocracy_mercator/sheets/mercator/IPartners");
 import SIMercatorSteps = require("../../Resources_/adhocracy_mercator/sheets/mercator/ISteps");
 import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mercator/IStory");
@@ -93,10 +95,12 @@ export interface IScopeData {
     introduction : {
         title : string;
         teaser : string;
-        imageUpload : Flow;
+        picture : string;
         commentCount : number;
         nickInstance : number;
     };
+
+    imageUpload : Flow;
 
     // 3. in detail
     description : {
@@ -172,29 +176,42 @@ export interface IControllerScope extends IScope {
 
 /**
  * upload mercator proposal image file.  this function can potentially
- * be more flexible; for now it just handles the Flow object and
+ * be more general; for now it just handles the Flow object and
  * promises the path of the image resource as a string.
  *
- * FIXME: implement this function!
+ * as the a3 asset protocol is much simpler than HTML5 file upload, we
+ * compose the multi-part mime post request manually.  The $flow
+ * object is just used for meta data retrieval and cleared before it
+ * can upload anything.
  */
 export var uploadImageFile = (
-    adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    $q : ng.IQService,
+    postPath : string,
     flow : Flow
 ) : ng.IPromise<string> => {
+    if (flow.files.length !== 1) {
+        throw "could not upload file: $flow.files.length !== 1";
+    }
+    var file : FlowFile = flow.files[0];
 
-    console.log("uploadImageFile: not fully implemented, but we already collect the file meta data locally in the browser:");
+    // ignore chunking and get the entire file from the file object.
+    var bytes = () : any => {
+        var func = (file.file.mozSlice ? "mozSlice" :
+                    (file.file.webkitSlice ? "webkitSlice" :
+                     "slice"));
+        var bytes = file.file[func](0, file.file.size, file.file.type);
+        return bytes;
+    };
 
-    flow.opts.target = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+    flow.files = [];
 
-    console.log(JSON.stringify(flow.opts, null, 2));
-    _.forOwn(flow.files, (value, key) => {
-        console.log(JSON.stringify(value.file, null, 2));
-    });
+    var formData = new FormData();
+    formData.append("content_type", RIMercatorIntroImage.content_type);
+    formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
+    formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
-    flow.resume();
-    return (<any>$q.reject("blöp"));
+    return adhHttp.postRaw(postPath, formData)
+        .then((rsp) => { return rsp.data.path; });
 };
 
 
@@ -373,6 +390,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
                         scope.title = res.title;
                         scope.teaser = res.teaser;
+                        scope.picture = res.picture;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                         this.countComments(subResource).then((c) => { scope.commentCount = c; data.commentCountTotal += c; });
                     })();
@@ -479,7 +497,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 resource.data[SIMercatorIntroduction.nick] = new SIMercatorIntroduction.Sheet({
                     title: data.introduction.title,
                     teaser: data.introduction.teaser,
-                    picture: undefined
+                    picture: data.introduction.picture
                 });
                 break;
             case RIMercatorDescriptionVersion.content_type:
@@ -555,23 +573,15 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
-        var data = this.initializeScope(instance.scope);
-        var imagePathPromise = uploadImageFile(this.adhConfig, this.adhHttp, this.$q, data.introduction.imageUpload);
+        var data : IScopeData = this.initializeScope(instance.scope);
+        var imagePostPath : string = "/mercator/proposals/assets";
+        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
 
-        // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
-        // FIXME: handle file upload in _update.
-        // FIXME: We need to wait for this promise with everything
-        // else. Otherwise, the upload could be interrupted by a hard
-        // redirect or similar.
-        imagePathPromise.then(
-            (path) => {
-                console.log("upload successful:");
-                console.log(path);
-            },
-            () => {
-                console.log("upload error:");
-                console.log(arguments);
-            });
+        // FIXME: imagePostPath should be retrieved from HasAssetPool
+        // sheet of the proposal pool.  for now, you can create the
+        // above pool with the following script:
+        //
+        // /src/adhocracy_frontend/adhocracy_frontend/tests/fixtures/workaroundMissingAssetPool.py
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -586,6 +596,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         });
 
         this.fill(data, mercatorProposalVersion);
+
+        var introduction;  // we need to especially in order to inject
+                           // the image before posting version 1.
 
         var subresources = _.map([
             [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
@@ -619,15 +632,27 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.fill(data, version);
             mercatorProposalVersion.data[SIMercatorSubResources.nick][subresourceKey] = version.path;
 
+            if (subresourceKey === "introduction") {
+                introduction = version;
+            }
+
             return [item, version];
         });
 
-        return this.$q.when(_.flatten([mercatorProposal, mercatorProposalVersion, subresources]));
+        return imagePathPromise.then((imagePath : string) => {
+            introduction.data[SIMercatorIntroduction.nick].picture = imagePath;
+            return _.flatten([mercatorProposal, mercatorProposalVersion, subresources]);
+        })
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
         var self : Widget<R> = this;
         var data = this.initializeScope(instance.scope);
+
+        // FIXME: if the user changes the image in edit mode, the new
+        // image will not be uploaded, but the old path will remain in
+        // place.  before this can be implemented and tested, #386,
+        // #368, #324 need to be fixed.
 
         var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
         mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
@@ -1292,7 +1317,7 @@ export var register = (angular) => {
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
-                    $scope.data.introduction.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
+                    $scope.data.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
 
                     // append a random number to the nick to allow duplicate titles
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
