@@ -558,3 +558,7 @@ def create_proposals(user_token, n=5, expect_error=False):
         proposals.append(requested_proposal)
 
     return proposals
+
+
+if __name__ == "__main__":
+    create_proposals("GOD_SECRET")
