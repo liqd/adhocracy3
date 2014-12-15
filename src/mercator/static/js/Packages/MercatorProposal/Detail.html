@@ -13,7 +13,7 @@
             </li>
             <li class="mercator-propsal-detail-meta-item">
                 <i class="icon-pig"></i>
-                <strong>{{data.finance.requested_funding | number}} &euro;</strong>
+                {{data.finance.requested_funding | number}} &euro;
             </li>
             <li class="mercator-propsal-detail-meta-item">
                 <adh-like data-refers-to="{{path}}"
@@ -24,7 +24,7 @@
         </ul>
         <h2 class="chapter-header">{{ data.introduction.title }}
             <a class="mercator-proposal-cover-show-comments" href="{{ path | adhResourceUrl:'comments' }}">
-                <i class="icon-speechbubble-outline"></i> {{ data.commentCount }}
+                <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>
         </h2>
     </div><!-- /.cover -->
@@ -58,10 +58,8 @@
 
         <div class="mercator-proposal-chapters">
             <section class="chapter" id="mercator-detail-view-brief-proposal">
-                <h2 class="chapter-header">{{ "Brief Proposal" | translate }}</h2>
-
                 <section class="commentable-section">
-                    <h3>{{ "Pitch (Teaser)" | translate }}</h3>
+                    <h3>{{ "Proposal pitch" | translate }}</h3>
                     <p>{{ data.introduction.teaser }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:introduction'}}">
                         <i class="icon-speechbubble-outline"></i> {{ data.introduction.commentCount }}
@@ -69,22 +67,6 @@
                 </section><!-- /.commentable-section -->
 
                 <section class="commentable-section">
-                    <h3>{{ "Where will this project take place?" | translate }}</h3>
-                    <ul>
-                        <li data-ng-if="data.location.location_is_online">{{ "ONLINE" | translate }}</li>
-                        <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
-                        <li data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</li>
-                        <li data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</li>
-                        <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
-                    </ul>
-                    <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:location'}}">
-                        <i class="icon-speechbubble-outline"></i> {{ data.location.commentCount }}
-                    </a>
-                </section><!-- /.commentable-section -->
-
-                <section class="commentable-section">
-                    <h3>{{ "Finance" | translate }}</h3>
-
                     <p class="text-functional"><strong>{{ data.finance.budget }} &euro;</strong> {{ "total project budget" | translate }}</p>
                     <p class="text-functional"><strong>{{ data.finance.requested_funding }} &euro;</strong> {{ "requested" | translate }}</p>
                     <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">{{ "project is granted" | translate }}</strong></p>
@@ -94,6 +76,19 @@
 
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:finance'}}">
                         <i class="icon-speechbubble-outline"></i> {{ data.finance.commentCount }}
+                    </a>
+                </section><!-- /.commentable-section -->
+
+                <section class="commentable-section">
+                    <ul>
+                        <li data-ng-if="data.location.location_is_online">{{ "ONLINE" | translate }}</li>
+                        <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
+                        <li data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</li>
+                        <li data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</li>
+                        <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
+                    </ul>
+                    <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:location'}}">
+                        <i class="icon-speechbubble-outline"></i> {{ data.location.commentCount }}
                     </a>
                 </section><!-- /.commentable-section -->
 
