@@ -1,3 +1,4 @@
+from unittest.mock import Mock
 import json
 
 from pyramid import testing
@@ -697,6 +698,27 @@ class TestAddGetPoolRequestExtraFields:
         cstruct = {index_name: 'keyword'}
         schema_extended = self._call_fut(cstruct, schema, context, None)
         assert isinstance(schema_extended[index_name], SingleLine)
+
+    def test_call_with_extra_filter_with_empty_unique_values(self, schema,
+                                                             context):
+        from adhocracy_core.schema import SingleLine
+        index_name = 'index1'
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=[])
+        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
+        cstruct = {index_name: 'keyword'}
+        schema_extended = self._call_fut(cstruct, schema, context, None)
+        assert isinstance(schema_extended[index_name], SingleLine)
+
+    def test_call_with_extra_integer_filter(self, schema, context):
+        from adhocracy_core.schema import Integer
+        index_name = 'int_index'
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=[1, 2, 3])
+        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
+        cstruct = {index_name: '7'}
+        schema_extended = self._call_fut(cstruct, schema, context, None)
+        assert isinstance(schema_extended[index_name], Integer)
 
     def test_call_with_extra_reference_name(self, schema, registry):
         from adhocracy_core.schema import Resource
