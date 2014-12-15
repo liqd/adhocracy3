@@ -122,6 +122,7 @@ selected. If no proposal is selected, no state is applied.
     @include span(11 of 12 inside);
     background-color: white;
     border-left: 0.1666em solid $color-secondary-introvert;
+    padding-left: 1em;
 
     .chapter-header {
         background: transparent;
@@ -192,6 +193,26 @@ selected. If no proposal is selected, no state is applied.
             }
         }
     }
+}
+
+.mercator-proposal-budget-col {
+    float: left;
+    padding-right: 2em;
+
+    &.budget {
+        color: $color-secondary-extrovert;
+    }
+
+    strong {
+        display: block;
+        font-size: $font-size-large;
+        font-weight: normal;
+    }
+}
+
+.mercator-proposal-other-sources {
+    clear: left;
+    padding-top: 1em;
 }
 
 .picture-upload-file img {
