@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
-# [call this script from a3 root with ./bin/python3.4 as interpreter.]
-# FIXME: Doesn't work as requests is missing. Use a Python with requests
-# installed.
+# you can execute this module from $A3_ROOT with ./bin/ipython as interpreter.
 
 import os
 import json
@@ -558,3 +556,7 @@ def create_proposals(user_token, n=5, expect_error=False):
         proposals.append(requested_proposal)
 
     return proposals
+
+
+if __name__ == "__main__":
+    create_proposals("GOD_SECRET")

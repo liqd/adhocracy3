@@ -54,7 +54,11 @@ export var movingColumns = (
                 }
             };
 
-            var resize = () => {
+            var resize = () : void => {
+                if (typeof cls === "undefined") {
+                    return;
+                }
+
                 var parts = responsiveClass(cls).split("-");
 
                 var collapseCount : number = parts.filter((v) => v === "collapse").length;
