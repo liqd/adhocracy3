@@ -224,6 +224,7 @@ States:
 }
 
 .moving-column-sidebar {
+    display: none;
     position: absolute;
     top: $moving-column-menu-height;
     bottom: 0;
@@ -237,5 +238,11 @@ States:
 
     &.is-visible {
         left: 0;
+    }
+
+    &.is-visible,
+    &.is-visible-add,
+    &.is-visible-remove {
+        display: block;
     }
 }
