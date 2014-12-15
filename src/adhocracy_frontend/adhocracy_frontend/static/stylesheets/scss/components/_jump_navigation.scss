@@ -20,21 +20,30 @@ A navigation list containing hash tag links
 .jump-navigation {
     z-index: 1;
 
-    ol {
-        margin: 0;
-        padding: 0;
-        list-style: none;
+    padding: 0.5em;
+
+    &, a {
+        color: $color-secondary-extrovert;
     }
 
-    a {
-        display: block;
-        padding: 0.5em;
-        line-height: 1;
-        color: $color-secondary-extrovert;
-        text-decoration: none;
+    li {
 
-        &.active {
-            color: $color-highlight-normal;
+        a {
+            display: block;
+            line-height: 1;
+            text-decoration: none;
+
+            &.active {
+                color: $color-highlight-normal;
+            }
+        }
+    }
+
+    &.m-unnumbered {
+        ol {
+            margin: 0;
+            padding: 0;
+            list-style: none;
         }
     }
 }
