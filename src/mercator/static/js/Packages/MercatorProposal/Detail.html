@@ -22,11 +22,11 @@
                 </adh-like>
             </li>
         </ul>
-        <h2 class="chapter-header">{{ data.introduction.title }}
+        <h1>{{ data.introduction.title }}
             <a class="mercator-proposal-cover-show-comments" href="{{ path | adhResourceUrl:'comments' }}">
                 <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>
-        </h2>
+        </h1>
     </div><!-- /.cover -->
 
     <div class="mercator-proposal-detail-container">
@@ -58,8 +58,9 @@
 
         <div class="mercator-proposal-chapters">
             <section class="chapter" id="mercator-detail-view-brief-proposal">
+                <h2 class="chapter-header">{{ "Proposal pitch" | translate }}</h2>
+
                 <section class="commentable-section">
-                    <h3>{{ "Proposal pitch" | translate }}</h3>
                     <p>{{ data.introduction.teaser }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:introduction'}}">
                         <i class="icon-speechbubble"></i> {{ data.introduction.commentCount }}
@@ -236,6 +237,7 @@
 
             <section class="chapter" id="mercator-detail-view-additional">
                 <h2 class="chapter-header">{{ "Additional" | translate }}</h2>
+
                 <section class="commentable-section">
                     <h3>{{ "Share your experience" | translate }}</h3>
                     <p>{{ data.experience }}</p>
