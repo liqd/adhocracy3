@@ -107,6 +107,30 @@ a.call-to-action {
     }
 }
 
+/*doc
+---
+title: Disguised link
+name: disguised-link
+category: Type
+---
+
+A link that looks like a regular piece of text
+
+```html_example
+<a class="disguised-link" href="#"><i class="icon-speechbubble"></i> Comments</a><br/>
+When is a <a href="#" class="disguised-link">Link</a> not a link?
+```
+*/
+a.disguised-link {
+    color: $color-highlight-extrovert;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        color: $color-highlight-normal;
+    }
+}
+
 // smaller headings
 blockquote,
 article,
