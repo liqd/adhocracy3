@@ -193,6 +193,21 @@ class TestAddPostRequestSubSchemas:
         assert node.children[0].name == ISheet.__identifier__
         assert node.children[0].bindings == {'context': context, 'request': request}
 
+    def test_multipart_formdata_request(self, node, request, context,
+                                        mock_sheet):
+        request.content_type = 'multipart/form-data'
+        mock_sheet.meta = mock_sheet.meta._replace(create_mandatory=True)
+        request.registry.content.get_sheets_create.return_value = [mock_sheet]
+        request.POST['content_type'] = IResource.__identifier__
+        request.POST['data:' + ISheet.__identifier__] = {}
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children[0].name == ISheet.__identifier__
+
+    def test_invalid_request_content_type(self, node, request, context,):
+        request.content_type = 'text/plain'
+        with raises(RuntimeError):
+            self._call_fut(node, {'context': context, 'request': request})
+
 
 class TestPOSTItemRequestSchemaUnitTest:
 
@@ -282,6 +297,16 @@ class TestAddPutRequestSubSchemasUnitTest:
         self._call_fut(node, {'context': context, 'request': request})
         assert node.children[0].name == ISheet.__identifier__
         assert node.children[0].bindings == {'context': context, 'request': request}
+
+    def test_multipart_formdata_request(self, node, context, request,
+                                        mock_sheet):
+        request.content_type = 'multipart/form-data'
+        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        request.POST['data:' + ISheet.__identifier__] = {}
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children[0].name == ISheet.__identifier__
+        assert node.children[0].bindings == {'context': context,
+                                             'request': request}
 
 
 class TestBatchRequestPath:

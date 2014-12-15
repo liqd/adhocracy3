@@ -1083,3 +1083,40 @@ class TestRoles:
     def test_serialize_with_role(self, inst):
         assert inst.serialize(['reader']) == ['reader']
 
+
+class TestFileStoreType:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.schema import FileStoreType
+        return FileStoreType()
+
+    def test_serialize_raises_exception(self, inst):
+        with raises(colander.Invalid):
+            inst.serialize(None, colander.null)
+
+    def test_deserialize_null(self, inst):
+        assert inst.deserialize(None, colander.null) is None
+
+    def test_deserialize_valid(self, inst, monkeypatch):
+        from adhocracy_core import schema
+        import os
+        mock_response = Mock()
+        mock_file_constructor = Mock(spec=schema.File,
+                                     return_value=mock_response)
+        monkeypatch.setattr(schema, 'File', mock_file_constructor)
+        mock_fstat_result = Mock()
+        mock_fstat_result.st_size = 777
+        mock_fstat = Mock(spec=os.fstat, return_value=mock_fstat_result)
+        monkeypatch.setattr(os, 'fstat', mock_fstat)
+        value = Mock()
+        assert inst.deserialize(None, value) == mock_response
+        assert mock_response.size == mock_fstat_result.st_size
+
+    def test_deserialize_exception(self, inst, monkeypatch):
+        from adhocracy_core import schema
+        mock_file_constructor = Mock(spec=schema.File, side_effect=IOError)
+        monkeypatch.setattr(schema, 'File', mock_file_constructor)
+        value = Mock()
+        with raises(colander.Invalid):
+            inst.deserialize(None, value)
