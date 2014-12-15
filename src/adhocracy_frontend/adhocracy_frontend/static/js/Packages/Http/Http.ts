@@ -140,8 +140,19 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-post preliminary path: " + path;
         }
         path = this.formatUrl(path);
-        return _self.$http
-            .post(path, obj);
+
+        if (FormData.prototype.isPrototypeOf(obj)) {
+            return _self.$http({
+                method: "POST",
+                url: path,
+                data: obj,
+                headers: {"Content-Type": undefined},
+                transformRequest: undefined
+            });
+        } else {
+            return _self.$http
+                .post(path, obj);
+        }
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
