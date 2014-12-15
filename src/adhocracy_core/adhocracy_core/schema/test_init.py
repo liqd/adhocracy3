@@ -1120,3 +1120,19 @@ class TestFileStoreType:
         value = Mock()
         with raises(colander.Invalid):
             inst.deserialize(None, value)
+
+    def test_deserialize_too_large(self, inst, monkeypatch):
+        from adhocracy_core import schema
+        import os
+        mock_response = Mock()
+        mock_file_constructor = Mock(spec=schema.File,
+                                     return_value=mock_response)
+        monkeypatch.setattr(schema, 'File', mock_file_constructor)
+        mock_fstat_result = Mock()
+        mock_fstat_result.st_size = 20000000
+        mock_fstat = Mock(spec=os.fstat, return_value=mock_fstat_result)
+        monkeypatch.setattr(os, 'fstat', mock_fstat)
+        value = Mock()
+        with raises(colander.Invalid) as err_info:
+            inst.deserialize(None, value)
+        assert 'too large' in err_info.value.msg

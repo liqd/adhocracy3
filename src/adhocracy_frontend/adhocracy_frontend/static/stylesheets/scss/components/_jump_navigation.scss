@@ -31,29 +31,27 @@ A navigation list containing hash tag links
     }
 
     li {
-
         a {
             display: block;
-            line-height: 1;
+            font-size: $font-size-small;
+            padding: 0 0.5em;
+            line-height: 1.333;
+            color: $color-secondary-extrovert;
             text-decoration: none;
 
             &.active {
-                color: $color-highlight-normal;
+                &, a {
+                    color: $color-highlight-normal;
+                }
             }
         }
 
-        &.active {
-            &, a {
-                color: $color-highlight-normal;
+        &.m-unnumbered {
+            ol {
+                margin: 0;
+                padding: 0;
+                list-style: none;
             }
-        }
-    }
-
-    &.m-unnumbered {
-        ol {
-            margin: 0;
-            padding: 0;
-            list-style: none;
         }
     }
 }
