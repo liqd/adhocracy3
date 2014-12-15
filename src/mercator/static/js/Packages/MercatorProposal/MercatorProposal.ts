@@ -260,7 +260,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         query.depth = 2;
         query.tag = "LAST";
         query[SIRate.nick + ":object"] = supporteePath;
-        // query.rate = 1;  // FIXME: see #331, #335
+        query.rate = 1;
         query.count = "true";
 
         return this.adhHttp.get(postPoolPath, query)

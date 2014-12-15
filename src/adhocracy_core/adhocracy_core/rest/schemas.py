@@ -2,6 +2,7 @@
 from hypatia.interfaces import IIndexSort
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
+from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
 import colander
 
@@ -11,6 +12,7 @@ from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import ContentType
 from adhocracy_core.schema import DateTime
+from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Interface
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import Resource
@@ -376,8 +378,10 @@ def add_get_pool_request_extra_fields(cstruct: dict,
     for name in extra_fields:
         if _maybe_reference_filter_node(name, registry):
             _add_reference_filter_node(name, schema_extra)
-        elif _maybe_arbitrary_filter_node(name, context):
-            _add_arbitrary_filter_node(name, schema_extra)
+        else:
+            index = _find_index_if_arbitrary_filter_node(name, context)
+            if index is not None:
+                _add_arbitrary_filter_node(name, index, schema_extra)
     return schema_extra
 
 
@@ -410,18 +414,31 @@ def _add_reference_filter_node(name, schema):
     schema.add(node)
 
 
-def _maybe_arbitrary_filter_node(name: str, context: IResource) -> bool:
+def _find_index_if_arbitrary_filter_node(name: str,
+                                         context: IResource) -> SDIndex:
+    """
+    Find the referenced index if `name' refers to an arbitrary catalog index.
+
+    Throws an exception otherwise.
+    If there are no catalogs, `None` is returned to facilitate testing.
+    """
     catalog = find_catalog(context, 'adhocracy')
     if not catalog:
-        return False
+        return None
     if name in catalog and not name.startswith('private_'):
-        return True
+        return catalog[name]
     else:
         raise_colander_style_error(None, name, 'No such catalog')
 
 
-def _add_arbitrary_filter_node(name, schema):
-    node = SingleLine(name=name).bind(**schema.bindings)
+def _add_arbitrary_filter_node(name, index: SDIndex, schema):
+    int_index = False
+    if 'unique_values' in index.__dir__():
+        indexed_values = index.unique_values()
+        if indexed_values and isinstance(indexed_values[0], int):
+            int_index = True
+    node = Integer(name=name) if int_index else SingleLine(name=name)
+    node = node.bind(**schema.bindings)
     schema.add(node)
 
 
