@@ -6,7 +6,7 @@
                     <a href="{{ platformUrl | adhResourceUrl }}">{{ "Cancel" | translate }}</a>
                 </div>
                 <div class="moving-column-body" data-du-scroll-container="">
-                    <adh-resource-wrapper data-on-submit="goToListing()" data-on-cancel="goToListing()">
+                    <adh-resource-wrapper data-on-submit="goToListing(result)" data-on-cancel="goToListing()">
                         <adh-mercator-proposal-create
                             data-path="@preliminary"
                             data-mode="edit"
