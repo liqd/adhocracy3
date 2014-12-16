@@ -337,3 +337,20 @@ def set_batchmode(registry: Registry):
 def is_batchmode(registry: Registry) -> bool:
     """Get 'batchmode' marker for the current request."""
     return getattr(registry, '__is_batchmode__', False)
+
+
+def get_following_new_version(registry, resource) -> IResource:
+    """Return the following version created in this transaction."""
+    changelog = get_changelog_metadata(resource, registry)
+    if changelog.created:
+        new_version = resource
+    else:
+        new_version = changelog.followed_by
+    return new_version
+
+
+def get_last_new_version(registry, resource) -> IResource:
+    """Return last new version created in this transaction."""
+    item = find_interface(resource, IItem)
+    item_changelog = get_changelog_metadata(item, registry)
+    return item_changelog.last_version

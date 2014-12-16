@@ -10,6 +10,7 @@ from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets.pool import PoolSheet
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.utils import get_last_version
+from adhocracy_core.utils import get_last_new_version
 from adhocracy_core.utils import is_batchmode
 
 
@@ -46,10 +47,16 @@ def validate_linear_history_no_fork(node: colander.SchemaNode, value: list):
     """
     context = node.bindings['context']
     request = node.bindings['request']
-    last = get_last_version(context, request.registry)
     if is_batchmode(request.registry):
-        # FIXME add usefull validation in batchmode?
-        return
+        last_new_version = get_last_new_version(request.registry, context)
+        if last_new_version is not None:
+            # Store ths last new version created in this transaction
+            # so :func:`adhocracy_core.rest.views.ItemPoolView.post`
+            # can do an put instead of post action in batch requests.
+            request.validated['_last_new_version_in_transaction'] =\
+                last_new_version
+            return
+    last = get_last_version(context, request.registry)
     _assert_follows_eq_last_version(node, value, last)
 
 
