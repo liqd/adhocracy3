@@ -393,10 +393,6 @@ export class Service {
         });
     }
 
-    public isSpaceInitialized(space : string) : boolean {
-        return this.data.hasOwnProperty(space);
-    }
-
     // FIXME: {set,get}CameFrom should be worked into the class
     // doc-comment, but I don't feel I understand that comment well
     // enough to edit it.  (also, the entire toplevelstate thingy will
@@ -452,7 +448,6 @@ export var spaces = (
         template: "<adh-inject></adh-inject>",
         link: (scope) => {
             adhTopLevelState.bind("space", scope, "currentSpace");
-            scope.isSpaceInitialized = (space : string) => adhTopLevelState.isSpaceInitialized(space);
         }
     };
 };
