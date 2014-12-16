@@ -73,7 +73,7 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $timeout)
                         // set href to canonical url while preserving click behavior
                         if (orig.lastIndexOf("/", 0) === 0) {
                             element.attr("href", adhConfig.canonical_url + orig);
-                            element.on("click", (event) => {
+                            element.click((event) => {
                                 $location.path(orig);
                                 event.preventDefault();
                             });
