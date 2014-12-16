@@ -52,7 +52,7 @@ export var location2template = ($location : ng.ILocationService) => {
 
 export var moduleName = "adhEmbed";
 
-export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScope, $timeout) => {
+export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $timeout) => {
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
@@ -74,9 +74,7 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
                         if (orig.lastIndexOf("/", 0) === 0) {
                             element.attr("href", adhConfig.canonical_url + orig);
                             element.on("click", (event) => {
-                                _.defer(() => $rootScope.$apply(() => {
-                                    $location.path(orig);
-                                }));
+                                $location.path(orig);
                                 event.preventDefault();
                             });
                         }
@@ -122,5 +120,5 @@ export var register = (angular) => {
                 $translate.use(params.locale);
             }
         }])
-        .directive("href", ["adhConfig", "$location", "$rootScope", "$timeout", hrefDirective]);
+        .directive("href", ["adhConfig", "$location", "$timeout", hrefDirective]);
 };
