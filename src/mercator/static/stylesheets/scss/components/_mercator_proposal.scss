@@ -160,8 +160,10 @@ $mercator-proposal-detail-nav-width: 3.3%;
     text-align: center;
     width: $mercator-proposal-detail-nav-width;
 
-    a {
-        padding: 0 0 1em;
+    li {
+        a {
+            padding: 0 0 1em;
+        }
     }
 }
 
@@ -174,7 +176,7 @@ $mercator-proposal-detail-nav-width: 3.3%;
     .chapter-header {
         background: transparent;
         font-size: $font-size-normal;
-        margin: 0;
+        margin: 0 0 1em;
         padding: 0;
     }
 
