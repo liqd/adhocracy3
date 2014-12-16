@@ -3,7 +3,7 @@
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
-import AdhRecursionHelper = require("../RecursionHelper/RecursionHelper");
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
@@ -378,7 +378,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName,
             AdhPreliminaryNames.moduleName,
-            AdhRecursionHelper.moduleName,
+            AdhAngularHelpers.moduleName,
             AdhTopLevelState.moduleName,
             AdhWebSocket.moduleName
         ])

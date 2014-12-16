@@ -1,5 +1,6 @@
 import fustyFlowFactory = require("fustyFlowFactory");
 
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
@@ -41,6 +42,7 @@ import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
+import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
 import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
@@ -574,14 +576,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
-        var imagePostPath : string = "/mercator/proposals/assets";
-        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
-
-        // FIXME: imagePostPath should be retrieved from HasAssetPool
-        // sheet of the proposal pool.  for now, you can create the
-        // above pool with the following script:
-        //
-        // /src/adhocracy_frontend/adhocracy_frontend/tests/fixtures/workaroundMissingAssetPool.py
+        var imagePathPromise : ng.IPromise<string> = this.adhHttp.get("/mercator")
+            .then((mercatorPool) => {
+                var imagePostPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
+                return uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
+            });
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -771,26 +770,6 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
     };
 };
 
-
-export var lastVersion = (
-    $compile : ng.ICompileService,
-    adhHttp : AdhHttp.Service<any>
-) => {
-    return {
-        restrict: "E",
-        scope: {
-            itemPath: "@"
-        },
-        transclude: true,
-        template: "<adh-inject></adh-inject>",
-        link: (scope) => {
-            adhHttp.getNewestVersionPathNoFork(scope.itemPath).then(
-                (versionPath) => {
-                    scope.versionPath = versionPath;
-                });
-        }
-    };
-};
 
 export var countrySelect = () => {
 
@@ -1065,61 +1044,6 @@ export var countrySelect = () => {
 };
 
 
-/**
- * Recompiles children on every change of `value`. `value` is available in
- * child scope as `key`.
- *
- * Example:
- *
- *     <adh-recompile-on-change data-value="{{proposalPath}}" data-key="path">
- *         <adh-proposal path="{{path}}"></adh-proposal>
- *     </adh-recompile-on-change>
- *
- * FIXME: move to different package
- */
-export var recompileOnChange = ($compile : ng.ICompileService) => {
-    return {
-        restrict: "E",
-        compile: (element, link) => {
-            if (jQuery.isFunction(link)) {
-                link = {post: link};
-            }
-
-            var contents = element.contents().remove();
-            var compiledContents;
-            var innerScope : ng.IScope;
-
-            return {
-                pre: (link && link.pre) ? link.pre : null,
-                post: (scope : ng.IScope, element, attrs) => {
-                    if (!compiledContents) {
-                        compiledContents = $compile(contents);
-                    }
-
-                    scope.$watch(() => attrs["value"], (value) => {
-                        if (typeof innerScope !== "undefined") {
-                            innerScope.$destroy();
-                            element.contents().remove();
-                        }
-
-                        innerScope = scope.$new();
-                        innerScope[attrs["key"]] = value;
-
-                        compiledContents(innerScope, (clone) => {
-                            element.append(clone);
-                        });
-                    });
-
-                    if (link && link.post) {
-                        link.post.apply(null, arguments);
-                    }
-                }
-            };
-        }
-    };
-};
-
-
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -1127,6 +1051,7 @@ export var register = (angular) => {
         .module(moduleName, [
             "duScroll",
             "ngMessages",
+            AdhAngularHelpers.moduleName,
             AdhHttp.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
@@ -1217,7 +1142,6 @@ export var register = (angular) => {
                 // console.log(arguments);
             });
         }])
-        .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
@@ -1235,9 +1159,8 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
-        // FIXME: These should both be moved to ..core ?
+        // FIXME: This should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
-        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .controller("mercatorProposalFormController", ["$scope", "$element", "$window", ($scope : IControllerScope, $element, $window) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",

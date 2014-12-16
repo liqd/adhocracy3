@@ -710,9 +710,14 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
 
     // parsers
     var stringToDate : string = "(field : string) => new Date(field)";
-    var stringToBoolean : string = "(field : string) => field === \"true\"";
     var stringToInt : string = "(field : string) => parseInt(field)";
     var stringToFloat : string = "(field : string) => parseFloat(field)";
+
+    // booleans are more interesting: in order to be able to actually
+    // pass booleans, we do a type check that should actually never
+    // succeed.  (it would probably be reasonable to open a tsc bug
+    // report about this, escpecially on the calling side.)
+    var stringToBoolean : string = "(field : string) => typeof field === \"string\" ? field === \"true\" : <any>field";
 
     switch (field.valuetype) {
     case "adhocracy_core.schema.Boolean":
