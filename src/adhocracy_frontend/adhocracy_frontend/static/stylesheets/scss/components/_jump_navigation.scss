@@ -20,22 +20,40 @@ A navigation list containing hash tag links
 .jump-navigation {
     z-index: 1;
 
-    ol {
-        margin: 0;
-        padding: 0;
-        list-style: none;
+    &, a {
+        color: $color-secondary-extrovert;
     }
 
-    a {
-        display: block;
-        font-size: $font-size-small;
-        padding: 0.5em;
-        line-height: 1.333;
-        color: $color-secondary-extrovert;
-        text-decoration: none;
+    ul, ol {
+        list-style-position: inside;
+        margin: 0;
+        padding: 0;
+    }
 
-        &.active {
-            color: $color-highlight-normal;
+    li {
+        a {
+            display: block;
+            font-size: $font-size-small;
+            padding: 0 0.5em 1.5em;
+            line-height: 1.333;
+            color: $color-secondary-extrovert;
+            text-decoration: none;
+
+            // active class automaticall added by du-scrollspy plugin
+            // https://www.npmjs.com/package/angular-scroll#-du-scrollspy-
+            &.active {
+                &, a {
+                    color: $color-highlight-normal;
+                }
+            }
+        }
+    }
+
+    &.m-unnumbered {
+        ol {
+            margin: 0;
+            padding: 0;
+            list-style: none;
         }
     }
 }
