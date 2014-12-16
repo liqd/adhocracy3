@@ -6,9 +6,9 @@ from logging import getLogger
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
+
 from substanced.util import find_catalog
 from substanced.util import find_service
-
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
@@ -23,13 +23,13 @@ from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import find_graph
+from adhocracy_core.utils import get_following_new_version
+from adhocracy_core.utils import get_last_new_version
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_last_version
-from adhocracy_core.utils import get_changelog_metadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import is_batchmode
-
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.versions import IForkableVersionable
 import adhocracy_core.sheets.tags
@@ -141,9 +141,9 @@ def reference_has_new_version_subscriber(event):
         else:
             appstruct[event.isheet_field] = event.new_version
         if is_batchmode(registry):
-            new_version = _get_last_new_version(registry, resource)
+            new_version = get_last_new_version(registry, resource)
         else:
-            new_version = _get_following_new_version(registry, resource)
+            new_version = get_following_new_version(registry, resource)
         is_versionable = IVersionable.providedBy(resource)
         is_forkable = IForkableVersionable.providedBy(resource)
         # versionable without new version: create a new version store appstruct
@@ -160,23 +160,6 @@ def reference_has_new_version_subscriber(event):
         # non versionable: store appstruct directly
         else:
             sheet.set(appstruct)
-
-
-def _get_following_new_version(registry, resource) -> IResource:
-    """Return the following version created in this transaction."""
-    changelog = get_changelog_metadata(resource, registry)
-    if changelog.created:
-        new_version = resource
-    else:
-        new_version = changelog.followed_by
-    return new_version
-
-
-def _get_last_new_version(registry, resource) -> IResource:
-    """Return last new version created in this transaction."""
-    item = find_interface(resource, IItem)
-    item_changelog = get_changelog_metadata(item, registry)
-    return item_changelog.last_version
 
 
 def _assert_we_are_not_forking(resource, registry):

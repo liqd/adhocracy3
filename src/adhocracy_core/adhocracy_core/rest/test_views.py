@@ -677,23 +677,22 @@ class TestItemRESTView:
         assert wanted == response
 
     def test_post_valid_itemversion_batchmode_last_version_in_transaction_exists(
-            self, request, context, changelog):
+            self, request, context):
         from adhocracy_core.interfaces import IItemVersion
-        from adhocracy_core.utils import set_batchmode
-        set_batchmode(request.registry)
-        last_version = testing.DummyResource(__provides__=IItemVersion)
-        context['last_version'] = last_version
-        changelog['/'] = changelog['/']._replace(last_version=last_version)
+        context['last_new_version'] = testing.DummyResource(__provides__=
+                                                            IItemVersion)
         request.root = context
         request.validated = {'content_type': IItemVersion,
                              'data': {},
-                             'root_versions': []}
+                             'root_versions': [],
+                             '_last_new_version_in_transaction':\
+                                 context['last_new_version']}
         inst = self.make_one(context, request)
         inst.put = Mock()
         response = inst.post()
 
         assert inst.put.call_count == 1
-        wanted = {'path': request.application_url + '/last_version/',
+        wanted = {'path': request.application_url + '/last_new_version/',
                   'content_type': IItemVersion.__identifier__}
         assert wanted == response
 

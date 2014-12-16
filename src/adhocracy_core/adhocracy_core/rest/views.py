@@ -57,8 +57,6 @@ from adhocracy_core.utils import get_user
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
-from adhocracy_core.utils import get_changelog_metadata
-from adhocracy_core.utils import is_batchmode
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.pool
@@ -565,15 +563,11 @@ class ItemRESTView(PoolRESTView):
         appstructs = validated.get('data', {})
         creator = get_user(self.request)
         root_versions = validated.get('root_versions', [])
-        last_version = None
-        is_itemversion = iresource.isOrExtends(IItemVersion)
-        if is_batchmode(self.request.registry) and is_itemversion:
-            changelog = get_changelog_metadata(self.context,
-                                               self.request.registry)
-            last_version = changelog.last_version
-        if last_version is not None:
-            resource = last_version
-            self.context = last_version
+        last_new_version = validated.get('_last_new_version_in_transaction',
+                                         None)
+        if last_new_version is not None:
+            resource = last_new_version
+            self.context = last_new_version
             self.put()  # FIXME Is it safe to just call put?
         else:
             resource = self.registry.create(resource_type,
