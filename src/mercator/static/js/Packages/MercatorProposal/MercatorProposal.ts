@@ -1323,14 +1323,15 @@ export var register = (angular) => {
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
                         Math.floor((Math.random() * 10000) + 1);
 
-                    $scope.submit().catch((error) => {
-                        if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
-                            $scope.data.introduction.nickInstance++;
-                            $scope.submitIfValid();
-                        } else {
-                            container.scrollTopAnimated(0);
-                        }
-                    });
+                    $scope.submit()
+                        .catch((error) => {
+                            if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
+                                $scope.data.introduction.nickInstance++;
+                                $scope.submitIfValid();
+                            } else {
+                                container.scrollTopAnimated(0);
+                            }
+                        });
                 } else {
                     var element = $element.find(".ng-invalid");
                     container.scrollToElementAnimated(element);
