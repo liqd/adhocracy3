@@ -1,5 +1,6 @@
 <div class="rate" data-ng-if="ready">
-    <span class="rate-difference">
+    <span
+        class="rate-difference {{differenceClass()}}">
         <a href="" data-ng-click="toggleShowDetails()">
             {{rates.pro - rates.contra | signum}}
         </a>

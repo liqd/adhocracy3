@@ -76,10 +76,12 @@ rate-difference has the is-positive state. Can be is-negative.
 */
 
 .rate {
-    &.is-rate-button-active,
-    &:hover,
-    &:focus {
-        color: $color-highlight-normal;
+    a {
+        &.is-rate-button-active,
+        &:hover,
+        &:focus {
+            color: $color-highlight-normal;
+        }
     }
 
     .rate-difference {
