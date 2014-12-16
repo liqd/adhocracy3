@@ -642,7 +642,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return imagePathPromise.then((imagePath : string) => {
             introduction.data[SIMercatorIntroduction.nick].picture = imagePath;
             return _.flatten([mercatorProposal, mercatorProposalVersion, subresources]);
-        })
+        });
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
