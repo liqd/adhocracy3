@@ -2,7 +2,7 @@
     <div class="form-error" data-ng-repeat="error in errors">
         <p>{{ error | translate }}</p>
     </div>
-    <textarea data-msd-elastic="" data-ng-model="data.content"></textarea>
-    <input type="submit" value="{{ 'create' | translate }}" data-ng-click="submit()" />
+    <textarea class="comment-create-form-text" data-msd-elastic="" data-ng-model="data.content"></textarea>
+    <input class="comment-create-form-button-submit" type="submit" value="{{ 'create' | translate }}" data-ng-click="submit()" />
     <a href="" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "Cancel" | translate }}</a>
 </form>
