@@ -39,6 +39,8 @@ A navigation list containing hash tag links
             color: $color-secondary-extrovert;
             text-decoration: none;
 
+            // active class automaticall added by du-scrollspy plugin
+            // https://www.npmjs.com/package/angular-scroll#-du-scrollspy-
             &.active {
                 &, a {
                     color: $color-highlight-normal;
