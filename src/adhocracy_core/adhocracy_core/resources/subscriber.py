@@ -202,7 +202,10 @@ def _get_writable_appstructs(resource, registry) -> dict:
 
 
 def metadata_modified_subscriber(event):
-    """Invoked after PUTting modified metadata fields."""
+    """Invoked after PUTting modified metadata fields.
+
+    :raises colander.Invalid: if
+    """
     is_deleted = event.new_appstruct['deleted']
     is_hidden = event.new_appstruct['hidden']
     was_deleted = event.old_appstruct['deleted']
@@ -215,11 +218,14 @@ def metadata_modified_subscriber(event):
                            is_hidden)
             return
         if not event.request.has_permission('hide_resource', event.object):
+            # FIXME a better place to validate is inside the IMetadata schema.
             raise_colander_style_error(IMetadata,
                                        'hidden',
                                        'Changing this field is not allowed')
 
     # Store hidden/deleted status in object for efficient access
+    # FIXME a better place to do attribute storage is inside a custom metadata
+    # sheet class or just use AttributeStorageSheet sheet class.
     event.object.deleted = is_deleted
     event.object.hidden = is_hidden
 

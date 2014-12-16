@@ -199,6 +199,9 @@ def raise_colander_style_error(sheet: Interface, field_name: str,
     :param field_name: the error will be located within this field in the sheet
     :param description: the description of the error
     :raises colander.Invalid: constructed from the given parameters
+
+    NOTE: You should always prefer to use the colander schemas to validate
+    request data.
     """
     if sheet is not None:
         name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
