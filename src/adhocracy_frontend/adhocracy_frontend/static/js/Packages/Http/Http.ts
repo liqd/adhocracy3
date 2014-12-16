@@ -279,7 +279,7 @@ export class Service<Content extends ResourcesBase.Resource> {
 
             var handleConflict = (msg) => {
                 // re-throw all exception lists other than ["no-fork"].
-                if (typeof msg === 'object' && msg.hasOwnProperty("length") &&
+                if (typeof msg === "object" && msg.hasOwnProperty("length") &&
                     msg.length === 1 &&
                     ( msg[0].name === "data." + SIVersionable.nick + ".follows" || msg[0].name === "root_version" ) &&
                     msg[0].location === "body" &&
