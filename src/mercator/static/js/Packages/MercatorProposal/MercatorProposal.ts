@@ -662,24 +662,23 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
             data.introduction.picture = imagePath;
 
-        var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
-        this.fill(data, mercatorProposalVersion);
+            var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
+            mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
+            this.fill(data, mercatorProposalVersion);
 
-        return this.$q
-            .all(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
-                return self.adhHttp.get(path).then((oldSubresource) => {
-                    var subresource = AdhResourceUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
-                    subresource.parent = AdhUtil.parentPath(oldSubresource.path);
-                    self.fill(data, subresource);
-                    mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
+            return this.$q
+                .all(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
+                    return self.adhHttp.get(path).then((oldSubresource) => {
+                        var subresource = AdhResourceUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
+                        subresource.parent = AdhUtil.parentPath(oldSubresource.path);
+                        self.fill(data, subresource);
+                        mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
                     return subresource;
-                });
-            }))
-            .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
+                    });
+                }))
+                .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
 
         });
-
     }
 
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
