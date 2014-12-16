@@ -75,7 +75,7 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
             if (element[0].nodeName === "A" && adhConfig.canonical_url) {
                 $timeout(() => {
                     var orig = element.attr("href");
-                    if (orig) {
+                    if (orig && orig[0] !== "#") {
                         orig = normalizeInternalUrl(orig, $location);
 
                         if (isInternalUrl(orig, $location)) {
