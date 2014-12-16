@@ -50,9 +50,25 @@ export var location2template = ($location : ng.ILocationService) => {
 };
 
 
-export var moduleName = "adhEmbed";
+export var normalizeInternalUrl = (url : string, $location : ng.ILocationService) => {
+    var host = $location.protocol() + "://" + $location.host();
+    var port = $location.port();
+    if (port && (port !== 80) && (port !== 443)) {
+        host = host + ":" + port;
+    }
+    if (url.lastIndexOf(host, 0) === 0) {
+        url = url.substring(host.length);
+    }
+    return url;
+};
 
-export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $timeout) => {
+
+export var isInternalUrl = (url : string, $location : ng.ILocationService) => {
+    return normalizeInternalUrl(url, $location)[0] === "/";
+};
+
+
+export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScope, $timeout) => {
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
@@ -60,21 +76,15 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $timeout)
                 $timeout(() => {
                     var orig = element.attr("href");
                     if (orig) {
-                        // normalize original href
-                        var host = $location.protocol() + "://" + $location.host();
-                        var port = $location.port();
-                        if ((port !== 80) && (port !== 443)) {
-                            host = host + ":" + port;
-                        }
-                        if (orig.lastIndexOf(host, 0) === 0) {
-                            orig = orig.substring(host.length);
-                        }
+                        orig = normalizeInternalUrl(orig, $location);
 
-                        // set href to canonical url while preserving click behavior
-                        if (orig.lastIndexOf("/", 0) === 0) {
+                        if (isInternalUrl(orig, $location)) {
+                            // set href to canonical url while preserving click behavior
                             element.attr("href", adhConfig.canonical_url + orig);
                             element.click((event) => {
-                                $location.path(orig);
+                                _.defer(() => $rootScope.$apply(() => {
+                                    $location.path(orig);
+                                }));
                                 event.preventDefault();
                             });
                         }
@@ -84,6 +94,9 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $timeout)
         }
     };
 };
+
+
+export var moduleName = "adhEmbed";
 
 export var register = (angular) => {
     angular
@@ -120,5 +133,5 @@ export var register = (angular) => {
                 $translate.use(params.locale);
             }
         }])
-        .directive("href", ["adhConfig", "$location", "$timeout", hrefDirective]);
+        .directive("href", ["adhConfig", "$location", "$rootScope", "$timeout", hrefDirective]);
 };
