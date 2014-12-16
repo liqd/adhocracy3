@@ -8,7 +8,7 @@ import AdhListing = require("../Listing/Listing");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../Rate/Rate");
-import AdhRecursionHelper = require("../RecursionHelper/RecursionHelper");
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
@@ -301,7 +301,7 @@ export var register = (angular) => {
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhRate.moduleName,
-            AdhRecursionHelper.moduleName,
+            AdhAngularHelpers.moduleName,
             AdhResourceWidgets.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
