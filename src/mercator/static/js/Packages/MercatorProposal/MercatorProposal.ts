@@ -652,15 +652,24 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         // FIXME: image upload depends on #386, #368, #324, #403.
         //
         // FIXME: check whether the new image is different from the
-        // old one before uploading.  currently, every edit+save
-        // creates one new physical image blob.
+        // old one before uploading?
 
         var imagePostPath : string = "/mercator/proposals/assets";
-        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
+        var imagePathPromise : ng.IPromise<string>;
+        try {
+            imagePathPromise = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
+        } catch (e) {
+            imagePathPromise = this.$q.when(undefined);
+        }
 
         return imagePathPromise.then((imagePath : string) => {
 
-            data.introduction.picture = imagePath;
+            console.log(imagePathPromise);
+            debugger;
+
+            if (imagePathPromise !== undefined) {
+                data.introduction.picture = imagePath;
+            }
 
             var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
             mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
