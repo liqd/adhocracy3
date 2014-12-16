@@ -322,6 +322,12 @@
             <div class="annotated-section-body">
                 <label>
                     {{ "Upload an image" | translate }}
+                    <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
+                        current image:
+                        <img class="mercator-proposal-detail-view-image"
+                             src="{{ data.introduction.picture }}/detail"
+                             style="width: 100%; height: 203px"/>
+                    </div>
                     <div
                         data-flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
                         data-flow-init=""

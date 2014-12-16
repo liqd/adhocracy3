@@ -642,33 +642,43 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return imagePathPromise.then((imagePath : string) => {
             introduction.data[SIMercatorIntroduction.nick].picture = imagePath;
             return _.flatten([mercatorProposal, mercatorProposalVersion, subresources]);
-        })
+        });
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
         var self : Widget<R> = this;
         var data = this.initializeScope(instance.scope);
 
-        // FIXME: if the user changes the image in edit mode, the new
-        // image will not be uploaded, but the old path will remain in
-        // place.  before this can be implemented and tested, #386,
-        // #368, #324 need to be fixed.
+        // FIXME: image upload depends on #386, #368, #324, #403.
+        //
+        // FIXME: check whether the new image is different from the
+        // old one before uploading.  currently, every edit+save
+        // creates one new physical image blob.
 
-        var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
-        this.fill(data, mercatorProposalVersion);
+        var imagePostPath : string = "/mercator/proposals/assets";
+        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
 
-        return this.$q
-            .all(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
-                return self.adhHttp.get(path).then((oldSubresource) => {
-                    var subresource = AdhResourceUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
-                    subresource.parent = AdhUtil.parentPath(oldSubresource.path);
-                    self.fill(data, subresource);
-                    mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
+        return imagePathPromise.then((imagePath : string) => {
+
+            data.introduction.picture = imagePath;
+
+            var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
+            mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
+            this.fill(data, mercatorProposalVersion);
+
+            return this.$q
+                .all(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
+                    return self.adhHttp.get(path).then((oldSubresource) => {
+                        var subresource = AdhResourceUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
+                        subresource.parent = AdhUtil.parentPath(oldSubresource.path);
+                        self.fill(data, subresource);
+                        mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
                     return subresource;
-                });
-            }))
-            .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
+                    });
+                }))
+                .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
+
+        });
     }
 
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
