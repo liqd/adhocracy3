@@ -3,6 +3,7 @@ import unittest
 from pyramid import testing
 from pytest import raises
 from pytest import mark
+from pytest import fixture
 
 
 def test_find_graph_graph_exists():
@@ -288,4 +289,46 @@ class TestGetMatchingIsheet:
         from adhocracy_core.interfaces import IPredicateSheet, ISheet
         context = testing.DummyResource(__provides__=ISheet)
         assert self._call_fut(context, IPredicateSheet) is None
+
+
+class TestRaiseColanderStyleError:
+
+    def _call_fut(self, *args):
+        from . import raise_colander_style_error
+        return raise_colander_style_error(*args)
+
+    @fixture
+    def integration(self, config):
+        import adhocracy_core.rest
+        config.include(adhocracy_core.rest)
+
+    @fixture
+    def dummy_view(self):
+        from adhocracy_core.interfaces import ISheet
+
+        def dummy_view(request):
+            self._call_fut(ISheet, 'fieldname', 'description')
+            raise Exception()
+
+        return dummy_view
+
+    @fixture
+    def app_user(self, config, dummy_view):
+        config.add_view(dummy_view, name='dummy_view', request_method='GET')
+        config.add_route('dummy_view', '/dummy_view}')
+        from webtest import TestApp
+        app = config.make_wsgi_app()
+        return TestApp(app)
+
+    @mark.usefixtures('integration')
+    def test_raise_in_view(self, app_user):
+        # actually we are also testing
+        # adhocracy_core.rest.exceptions.handle_error_400_colander_invalid here.
+        resp = app_user.get('/dummy_view', status=400)
+        assert resp.json == \
+               {"status": "error",
+                "errors": [{"description": "description",
+                            "name": "data.adhocracy_core.interfaces.ISheet.fieldname",
+                            "location": "body"}]}
+
 
