@@ -1,3 +1,9 @@
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../_all.d.ts"/>
+
+import AdhHttp = require("../Http/Http");
+
+
 export var recursionHelper = ($compile) => {
     return {
         /**
@@ -41,10 +47,88 @@ export var recursionHelper = ($compile) => {
 };
 
 
+export var lastVersion = (
+    $compile : ng.ICompileService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            itemPath: "@"
+        },
+        transclude: true,
+        template: "<adh-inject></adh-inject>",
+        link: (scope) => {
+            adhHttp.getNewestVersionPathNoFork(scope.itemPath).then(
+                (versionPath) => {
+                    scope.versionPath = versionPath;
+                });
+        }
+    };
+};
+
+
+/**
+ * Recompiles children on every change of `value`. `value` is available in
+ * child scope as `key`.
+ *
+ * Example:
+ *
+ *     <adh-recompile-on-change data-value="{{proposalPath}}" data-key="path">
+ *         <adh-proposal path="{{path}}"></adh-proposal>
+ *     </adh-recompile-on-change>
+ */
+export var recompileOnChange = ($compile : ng.ICompileService) => {
+    return {
+        restrict: "E",
+        compile: (element, link) => {
+            if (jQuery.isFunction(link)) {
+                link = {post: link};
+            }
+
+            var contents = element.contents().remove();
+            var compiledContents;
+            var innerScope : ng.IScope;
+
+            return {
+                pre: (link && link.pre) ? link.pre : null,
+                post: (scope : ng.IScope, element, attrs) => {
+                    if (!compiledContents) {
+                        compiledContents = $compile(contents);
+                    }
+
+                    scope.$watch(() => attrs["value"], (value) => {
+                        if (typeof innerScope !== "undefined") {
+                            innerScope.$destroy();
+                            element.contents().remove();
+                        }
+
+                        innerScope = scope.$new();
+                        innerScope[attrs["key"]] = value;
+
+                        compiledContents(innerScope, (clone) => {
+                            element.append(clone);
+                        });
+                    });
+
+                    if (link && link.post) {
+                        link.post.apply(null, arguments);
+                    }
+                }
+            };
+        }
+    };
+};
+
+
 export var moduleName = "adhAngularHelpers";
 
 export var register = (angular) => {
     angular
-        .module(moduleName, [])
-        .factory("adhRecursionHelper", ["$compile", recursionHelper]);
+        .module(moduleName, [
+            AdhHttp.moduleName
+        ])
+        .factory("adhRecursionHelper", ["$compile", recursionHelper])
+        .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
+        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion]);
 };
