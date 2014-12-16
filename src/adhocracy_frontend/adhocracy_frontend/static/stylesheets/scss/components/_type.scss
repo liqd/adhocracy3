@@ -1,0 +1,468 @@
+/*doc
+---
+title: Inline
+name: inline
+category: Type
+---
+*/
+
+body {
+    @include text(running);
+}
+
+/*doc
+---
+title: Headings
+name: headings
+category: Type
+---
+
+```html_example
+<h1>Heading 1</h1>
+<h2>Heading 2</h2>
+<h3>Heading 3</h3>
+<h4>Heading 4</h4>
+<h5>Heading 5</h5>
+<h6>Heading 6</h6>
+```
+*/
+h1, h2, h3, h4, h5, h6 {
+    // better kerning (char spacing)
+    text-rendering: optimizelegibility;
+    color: $color-prime-extrovert;
+}
+
+/*doc
+---
+title: Paragraph
+name: p
+category: Type
+---
+
+```html_example
+<p>Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<p>
+<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+```
+*/
+p {
+    // break very long words
+    word-wrap: break-word;
+    hyphens: auto;
+    margin: 0 0 1em;
+}
+
+/*doc
+---
+title: link
+name: link
+category: Type
+---
+
+A hyperlink. It may have the following states:
+
+-   has-focus
+-   is-hover
+
+```html_example
+<a href="#">internal link</a>
+<a href="#" rel="external">external link</a>
+<a href="#" class="m-unobtrusive">unobtrusive link</a>
+```
+*/
+a {
+    color: $color-highlight-normal;
+
+    &:hover,
+    &.is-hover,
+    &:focus,
+    &.has-focus {
+        color: $color-highlight-introvert;
+    }
+}
+
+/*doc
+---
+title: cta-link
+name: cta-link
+category: Type
+---
+
+A call-to-action link
+
+```html_example
+<a class="call-to-action" href="#">action stations!</a><br/>
+<a class="call-to-action m-add" href="#">Add a thing</a>
+```
+*/
+a.call-to-action {
+    text-decoration: none;
+    text-transform: uppercase;
+
+    &:hover {
+        color: $color-highlight-introvert;
+    }
+
+    &.m-add:before {
+        content: "+ ";
+        font-size: $font-size-normal;
+    }
+}
+
+/*doc
+---
+title: Disguised link mixin
+name: disguised-link
+category: Type
+---
+
+A link that looks like a regular piece of text
+
+```html_example
+<a class="disguised-link" href="#"><i class="icon-speechbubble"></i> Comments</a><br/>
+When is a <a href="#" class="disguised-link">Link</a> not a link?
+```
+*/
+@mixin disguised-link {
+    color: $color-highlight-extrovert;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        color: $color-highlight-normal;
+    }
+}
+
+.disguised-link {
+    @include disguised-link;
+}
+
+// smaller headings
+blockquote,
+article,
+section {
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 1em;
+        margin: 10px 0;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+
+    h2 {
+        font-size: 1.1em;
+    }
+}
+
+/*doc
+---
+title: Inline boxes mixin
+name: inline-box
+category: Type
+---
+
+```html_example
+<span class="inline-box">Inline box 1</span>
+<span class="inline-box">Inline box 2</span>
+
+<ul class="inline-boxes">
+    <li>Inline box 1</li>
+    <li>Inline box 2</li>
+</ul>
+```
+*/
+
+@mixin inline-box {
+    @include inline-block;
+    color: $color-highlight-extrovert;
+    border: 1px solid $color-highlight-extrovert;
+    font-size: $font-size-small;
+    padding: 0 1em;
+}
+
+.inline-box {
+    @include inline-box;
+}
+
+.inline-boxes {
+    padding: 0;
+
+    li {
+        @include inline-box;
+    }
+}
+
+/*doc
+---
+title: Table
+name: table
+category: Type
+---
+
+```html_example
+<table>
+    <caption>This is a table caption, made with caption</caption>
+    <thead>
+        <tr>
+            <th>Table Header 1</th>
+            <th>Table Header 2</th>
+            <th>Table Header 3</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Table Footer 1</th>
+            <td>Table Footer 2</td>
+            <td>Table Footer 3</td>
+        </tr>
+    </tfoot>
+    <tbody>
+        <tr>
+            <th>TD 1.1</th>
+            <td>TD 1.2</td>
+            <td>TD 1.3</td>
+        </tr>
+        <tr>
+            <th>TD 2.1</th>
+            <td>TD 2.2</td>
+            <td>TD 2.3</td>
+        </tr>
+    </tbody>
+</table>
+```
+*/
+table {
+    td, th {
+        @include text-align(start);
+        padding: 0.5em;
+        border-top: 1px solid $color-structure-border;
+        vertical-align: top;
+    }
+
+    thead, tfoot {
+        th {
+            @include text-align(center);
+        }
+    }
+
+    caption {
+        font-size: small;
+    }
+}
+
+/*doc
+---
+title: Lists
+name: lists
+category: Type
+---
+*/
+
+/*doc
+---
+title: Ordered List
+name: ol
+parent: lists
+---
+
+```html_example
+<ol>
+    <li>larry</li>
+    <li>moe</li>
+    <li>curly</li>
+</ol>
+```
+*/
+/*doc
+---
+title: Unordered List
+name: ul
+parent: lists
+---
+
+```html_example
+<ul>
+    <li>larry</li>
+    <li>moe</li>
+    <li>curly</li>
+</ul>
+```
+*/
+/*doc
+---
+title: Definition List
+name: dl
+parent: lists
+---
+
+```html_example
+<dl>
+    <dt>Defintion Term</dt><dd>Definition data defining the previous term</dd>
+    <dt>Another Definition Term</dt><dd>Definition data defining the previous term</dd>
+</dl>
+```
+*/
+ul, ol {
+    padding-left: 1.5em;
+}
+
+li {
+    line-height: 1.5;
+    margin-left: 0;
+}
+
+dt {
+    font-weight: bold;
+}
+
+/*doc
+---
+title: Deleted
+name: del
+parent: inline
+---
+
+```html_example
+<del>Example Text</del>
+```
+*/
+del {
+    text-decoration: line-through;
+    color: $color-highlight-invalid;
+}
+
+/*doc
+---
+title: Inserted
+name: ins
+parent: inline
+---
+
+```html_example
+<ins>Example Text</ins>
+```
+*/
+ins {
+    text-decoration: underline;
+    color: $color-highlight-valid;
+}
+
+/*doc
+---
+title: Blockquote
+name: blockqoute
+category: Type
+---
+
+```html_example
+<blockquote>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<p>
+    <cite>James T. Kirk</cite>
+</blockquote>
+```
+*/
+blockquote {
+    position: relative;
+    font-style: italic;
+    border-left: 0.4em solid $color-highlight-normal;
+    padding-left: 0.5em;
+    margin: 1.5em;
+
+    cite {
+        float: right;
+    }
+}
+
+// figure
+figure {
+    margin: 1em 0;
+}
+
+figcaption {
+    font-size: small;
+}
+
+/*doc
+---
+title: Code
+name: code
+parent: inline
+---
+
+```html_example
+<code>Example Text</code>
+```
+*/
+code {
+    font-size: 0.9em;
+    background-color: $color-structure-surface;
+}
+
+/*doc
+---
+title: Preformated
+name: pre
+category: Type
+---
+
+```html_example
+<pre>def hello_world(name):
+    s = "Hello %s!" % name
+    print s</pre>
+```
+*/
+pre {
+    margin: 1em 0;
+    display: block;
+    padding: 0.7em;
+    font-size: 0.9em;
+    background-color: $color-structure-surface;
+    border: 1px solid $color-structure-border;
+    max-height: 18em;
+    overflow: auto;
+
+    code {
+        background-color: transparent;
+    }
+}
+
+/*doc
+---
+title: Emphasis
+name: em
+parent: inline
+---
+
+```html_example
+<em>Example Text</em>
+<strong>Example Text</strong>
+```
+*/
+
+/*doc
+---
+title: Address
+name: address
+category: Type
+---
+
+```html_example
+<address>
+    John Q. Public<br />
+    123 Main Street<br />
+    Anywhere, ST 12345
+</address>
+```
+*/
+
+/*doc
+---
+title: Time
+name: time
+parent: inline
+---
+
+```html_example
+<time datetime="2013-04-18T13:50:47+02:00">18. April 2013 13:50</time>
+```
+*/
