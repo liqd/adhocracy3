@@ -387,6 +387,12 @@ export class Service {
         fn(this.get(key));
     }
 
+    public bind(key : string, context : {[k : string]: any}, keyInContext? : string) {
+        this.on(key, (value : string) => {
+            context[keyInContext || key] = value;
+        });
+    }
+
     public isSpaceInitialized(space : string) : boolean {
         return this.data.hasOwnProperty(space);
     }
@@ -445,9 +451,7 @@ export var spaces = (
         transclude: true,
         template: "<adh-inject></adh-inject>",
         link: (scope) => {
-            adhTopLevelState.on("space", (space : string) => {
-                scope.currentSpace = space;
-            });
+            adhTopLevelState.bind("space", scope, "currentSpace");
             scope.isSpaceInitialized = (space : string) => adhTopLevelState.isSpaceInitialized(space);
         }
     };
@@ -462,9 +466,7 @@ export var spaceSwitch = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "SpaceSwitch.html",
         link: (scope) => {
-            adhTopLevelState.on("space", (space) => {
-                 scope.currentSpace = space;
-            });
+            adhTopLevelState.bind("space", scope, "currentSpace");
             scope.setSpace = (space : string) => {
                 adhTopLevelState.set("space", space);
             };
@@ -501,12 +503,8 @@ export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Error.html",
         scope: {},
         controller: ["adhTopLevelState", "$scope", (adhTopLevelState : Service, $scope) => {
-            adhTopLevelState.on("code", (code) => {
-                $scope.code = code;
-            });
-            adhTopLevelState.on("message", (message) => {
-                $scope.message = message;
-            });
+            adhTopLevelState.bind("code", $scope);
+            adhTopLevelState.bind("message", $scope);
         }]
     };
 };
