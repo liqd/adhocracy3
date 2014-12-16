@@ -625,7 +625,7 @@ class TestItemRESTView:
                                       __name__='child')
         request.registry.content.create.return_value = child
         request.validated = {'content_type': IResourceX,
-                                  'data': {}}
+                             'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
 
@@ -648,7 +648,7 @@ class TestItemRESTView:
         child['first'] = first
         request.registry.content.create.return_value = child
         request.validated = {'content_type': IItemVersion,
-                                  'data': {}}
+                             'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
 
@@ -695,7 +695,6 @@ class TestItemRESTView:
         wanted = {'path': request.application_url + '/last_new_version/',
                   'content_type': IItemVersion.__identifier__}
         assert wanted == response
-
 
     def test_put_valid_no_sheets(self, request, context, mock_sheet):
         request.registry.content.get_sheets_edit.return_value = [mock_sheet]

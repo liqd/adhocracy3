@@ -554,8 +554,7 @@ class ItemRESTView(PoolRESTView):
         to create a new one. Instead we modify the existing one.
 
         This is needed to make :class:`adhocray_core.rest.batchview.BatchView`
-        work. If this view is called the
-        :func:`adhocracy_core.util.is_batchmode` returns true.
+        work.
         """
         validated = self.request.validated
         iresource = validated['content_type']
@@ -563,11 +562,10 @@ class ItemRESTView(PoolRESTView):
         appstructs = validated.get('data', {})
         creator = get_user(self.request)
         root_versions = validated.get('root_versions', [])
-        last_new_version = validated.get('_last_new_version_in_transaction',
-                                         None)
-        if last_new_version is not None:
-            resource = last_new_version
-            self.context = last_new_version
+        new_version = validated.get('_last_new_version_in_transaction', None)
+        if new_version is not None:
+            resource = new_version
+            self.context = new_version
             self.put()  # FIXME Is it safe to just call put?
         else:
             resource = self.registry.create(resource_type,
