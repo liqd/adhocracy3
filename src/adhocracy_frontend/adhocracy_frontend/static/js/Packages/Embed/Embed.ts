@@ -2,6 +2,7 @@
 
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -49,6 +50,52 @@ export var location2template = ($location : ng.ILocationService) => {
 };
 
 
+export var normalizeInternalUrl = (url : string, $location : ng.ILocationService) => {
+    var host = $location.protocol() + "://" + $location.host();
+    var port = $location.port();
+    if (port && (port !== 80) && (port !== 443)) {
+        host = host + ":" + port;
+    }
+    if (url.lastIndexOf(host, 0) === 0) {
+        url = url.substring(host.length);
+    }
+    return url;
+};
+
+
+export var isInternalUrl = (url : string, $location : ng.ILocationService) => {
+    return normalizeInternalUrl(url, $location)[0] === "/";
+};
+
+
+export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScope, $timeout) => {
+    return {
+        restrict: "A",
+        link: (scope, element, attrs) => {
+            if (element[0].nodeName === "A" && adhConfig.canonical_url) {
+                $timeout(() => {
+                    var orig = element.attr("href");
+                    if (orig) {
+                        orig = normalizeInternalUrl(orig, $location);
+
+                        if (isInternalUrl(orig, $location)) {
+                            // set href to canonical url while preserving click behavior
+                            element.attr("href", adhConfig.canonical_url + orig);
+                            element.click((event) => {
+                                _.defer(() => $rootScope.$apply(() => {
+                                    $location.path(orig);
+                                }));
+                                event.preventDefault();
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    };
+};
+
+
 export var moduleName = "adhEmbed";
 
 export var register = (angular) => {
@@ -85,5 +132,6 @@ export var register = (angular) => {
             if (params.hasOwnProperty("locale")) {
                 $translate.use(params.locale);
             }
-        }]);
+        }])
+        .directive("href", ["adhConfig", "$location", "$rootScope", "$timeout", hrefDirective]);
 };
