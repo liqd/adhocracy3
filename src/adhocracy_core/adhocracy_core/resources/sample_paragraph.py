@@ -17,7 +17,7 @@ class IParagraphVersion(IItemVersion):
 paragraphversion_meta = itemversion_metadata._replace(
     content_name='ParagraphVersion',
     iresource=IParagraphVersion,
-    basic_sheets=[adhocracy_core.sheets.versions.IForkableVersionable,
+    basic_sheets=[adhocracy_core.sheets.versions.IVersionable,
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
     extended_sheets=[adhocracy_core.sheets.document.IParagraph,

@@ -248,7 +248,7 @@ Lets post a new proposal version that refers to the image::
     ...                     'description': 'Or maybe just nicer ones?',
     ...                     'picture': pic_path,
     ...                     'elements': []},
-    ...                  'adhocracy_core.sheets.versions.IForkableVersionable': {
+    ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [prop_v0_path]}},
     ...          'root_versions': [prop_v0_path]}
     >>> resp = testapp.post_json(prop_path, vers_data, headers=god_header)

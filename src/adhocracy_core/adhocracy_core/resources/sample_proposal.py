@@ -22,7 +22,7 @@ class IProposalVersion(IItemVersion):
 proposalversion_meta = itemversion_metadata._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
-    basic_sheets=[adhocracy_core.sheets.versions.IForkableVersionable,
+    basic_sheets=[adhocracy_core.sheets.versions.IVersionable,
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
     extended_sheets=[adhocracy_core.sheets.document.IDocument,

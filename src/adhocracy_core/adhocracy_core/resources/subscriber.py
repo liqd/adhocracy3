@@ -130,7 +130,9 @@ def reference_has_new_version_subscriber(event):
     sheet = get_sheet(resource, isheet, registry=registry)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
     editable = sheet.meta.editable
-
+    graph = find_graph(resource)
+    if root_versions and not graph.is_in_subtree(resource, root_versions):
+        return
     if autoupdate and editable:
         appstruct = sheet.get()
         field = appstruct[event.isheet_field]
@@ -172,24 +174,20 @@ def _assert_we_are_not_forking(resource, registry):
 
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,
                         creator) -> IResource:
-    graph = find_graph(resource)
-    if root_versions and not graph.is_in_subtree(resource, root_versions):
-        return resource
-    else:
-        appstructs = _get_writable_appstructs(resource, registry)
-        # FIXME the need to switch between forkable and non forkable his bad
-        is_forkable = IForkableVersionable.providedBy(resource)
-        iversionable = IForkableVersionable if is_forkable else IVersionable
-        appstructs[iversionable.__identifier__]['follows'] = [resource]
-        appstructs[isheet.__identifier__] = appstruct
-        iresource = get_iresource(resource)
-        new_resource = registry.content.create(iresource.__identifier__,
-                                               parent=resource.__parent__,
-                                               appstructs=appstructs,
-                                               creator=creator,
-                                               registry=registry,
-                                               options=root_versions)
-        return new_resource
+    appstructs = _get_writable_appstructs(resource, registry)
+    # FIXME the need to switch between forkable and non forkable his bad
+    is_forkable = IForkableVersionable.providedBy(resource)
+    iversionable = IForkableVersionable if is_forkable else IVersionable
+    appstructs[iversionable.__identifier__]['follows'] = [resource]
+    appstructs[isheet.__identifier__] = appstruct
+    iresource = get_iresource(resource)
+    new_resource = registry.content.create(iresource.__identifier__,
+                                           parent=resource.__parent__,
+                                           appstructs=appstructs,
+                                           creator=creator,
+                                           registry=registry,
+                                           options=root_versions)
+    return new_resource
 
 
 def _get_writable_appstructs(resource, registry) -> dict:
