@@ -186,7 +186,7 @@ def to_dotted_name(context) -> str:
         return get_dotted_name(context)
 
 
-_named_object = namedtuple('NamedObject', ['name'])
+named_object = namedtuple('NamedObject', ['name'])
 """An object that has a name (and nothing else)."""
 
 
@@ -207,7 +207,7 @@ def raise_colander_style_error(sheet: Interface, field_name: str,
         name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
     else:
         name = field_name
-    raise colander.Invalid(_named_object(name), description)
+    raise colander.Invalid(named_object(name), description)
 
 
 def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:

@@ -60,3 +60,36 @@ class TestHandleError500Exception:
             'Exception: arg1; time: ')
         assert message['errors'][0]['location'] == 'internal'
         assert message['errors'][0]['name'] == ''
+
+
+class TestHandleAutoUpdateNoForkAllowed400Exception:
+
+    def make_one(self, error, request):
+        from adhocracy_core.rest.exceptions import \
+            handle_error_400_auto_update_no_fork_allowed
+        return handle_error_400_auto_update_no_fork_allowed(error, request)
+
+    def test_render_exception_error(self, request):
+        from cornice.util import _JSONError
+        from adhocracy_core.interfaces import ISheet
+        event = testing.DummyResource(object=object,
+                                      isheet=ISheet,
+                                      isheet_field='elements',
+                                      new_version=testing.DummyResource(__name__='referenced_new_version'),
+                                      old_version=testing.DummyResource(__name__='referenced_old_version'))
+        error = testing.DummyResource(resource=testing.DummyResource(__name__='resource'),
+                                      event=event)
+        inst = self.make_one(error, request)
+        assert isinstance(inst, _JSONError)
+        assert inst.status == '400 Bad Request'
+        wanted = \
+            {'errors': [{'description': 'No fork allowed - The auto update tried to '
+                                        'create a fork for object caused by isheet: '
+                                        'adhocracy_core.interfaces.ISheet field: '
+                                        'elements with old_reference: '
+                                        'referenced_old_version and new reference: '
+                                        'referenced_new_version.',
+                         'location': 'body',
+                         'name': 'root_versions'}],
+             'status': 'error'}
+        assert inst.json == wanted

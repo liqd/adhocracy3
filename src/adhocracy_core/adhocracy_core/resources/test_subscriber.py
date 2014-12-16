@@ -189,11 +189,14 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
 
     def test_call_versionable_with_autoupdate_sheet_once_fork(
             self, itemversion, registry, mock_sheet, mock_tag_sheet):
+        from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
         forked_item_version = testing.DummyResource()
         mock_tag_sheet.get.return_value = {'elements': [forked_item_version]}
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
-        with raises(AssertionError):
+        with raises(AutoUpdateNoForkAllowedError) as err:
             self._make_one(event)
+        assert err.value.resource is itemversion
+        assert err.value.event is event
 
     def test_call_versionable_with_autoupdate_sheet_with_single_reference(
             self, itemversion, registry, mock_sheet):

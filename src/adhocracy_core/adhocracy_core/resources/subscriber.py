@@ -22,6 +22,7 @@ from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_following_new_version
 from adhocracy_core.utils import get_last_new_version
@@ -121,7 +122,10 @@ def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
 
 
 def reference_has_new_version_subscriber(event):
-    """Auto updated resource if a referenced Item has a new version."""
+    """Auto updated resource if a referenced Item has a new version.
+
+    :raises AutoUpdateNoForkAllowedError: if a fork is created but not allowed
+    """
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
@@ -151,7 +155,7 @@ def reference_has_new_version_subscriber(event):
         # versionable without new version: create a new version store appstruct
         if is_versionable and new_version is None:
             if not is_forkable:  # pragma: no branch
-                _assert_we_are_not_forking(resource, registry)
+                _assert_we_are_not_forking(resource, registry, event)
             _update_versionable(resource, isheet, appstruct, root_versions,
                                 registry, creator)
         # versionable with new version: use new version to store appstruct
@@ -164,12 +168,13 @@ def reference_has_new_version_subscriber(event):
             sheet.set(appstruct)
 
 
-def _assert_we_are_not_forking(resource, registry):
+def _assert_we_are_not_forking(resource, registry, event):
     """Assert that the last tag == resource to prevent forking."""
     last = get_last_version(resource, registry)
     if last is None:
         return
-    assert resource is last
+    if resource is not last:
+        raise AutoUpdateNoForkAllowedError(resource, event)
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,

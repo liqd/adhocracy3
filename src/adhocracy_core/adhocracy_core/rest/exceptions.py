@@ -4,10 +4,13 @@ import logging
 from cornice.util import _JSONError
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
+from pyramid.traversal import resource_path
 import colander
 
+from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.utils import log_compatible_datetime
+from adhocracy_core.utils import named_object
 
 
 logger = logging.getLogger(__name__)
@@ -28,6 +31,30 @@ def handle_error_400_colander_invalid(error, request):
 
 def _build_error_dict(location, name, description):
     return {'location': location, 'name': name, 'description': description}
+
+
+@view_config(
+    context=AutoUpdateNoForkAllowedError,
+    permission=NO_PERMISSION_REQUIRED,
+    http_cache=0,
+)
+def handle_error_400_auto_update_no_fork_allowed(error, request):
+    """Return 400 JSON error for the internal "No Fork allowed" error.
+
+    Assuming there was a post request with wrong values for 'root_versions'.
+    """
+    event = error.event
+    msg = 'No fork allowed'
+    description = ' - The auto update tried to create a fork for {0} caused '\
+                  'by isheet: {1} field: {2} with old_reference: {3} and new '\
+                  'reference: {4}.'.format(resource_path(event.object),
+                                           event.isheet.__identifier__,
+                                           event.isheet_field,
+                                           resource_path(event.old_version),
+                                           resource_path(event.new_version))
+    dummy_node = named_object('root_versions')
+    error_colander = colander.Invalid(dummy_node, msg + description)
+    return handle_error_400_colander_invalid(error_colander, request)
 
 
 @view_config(
