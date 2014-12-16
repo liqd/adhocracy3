@@ -83,11 +83,7 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
                             element.attr("href", adhConfig.canonical_url + orig);
                             element.click((event) => {
                                 _.defer(() => $rootScope.$apply(() => {
-                                    var origSplit = orig.split("?");
-                                    $location.path(origSplit[0]);
-                                    if (origSplit.length === 2) {
-                                        $location.search(origSplit[1]);
-                                    }
+                                    $location.url(orig);
                                 }));
                                 event.preventDefault();
                             });
