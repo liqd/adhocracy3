@@ -50,8 +50,6 @@ export var location2template = ($location : ng.ILocationService) => {
 };
 
 
-export var moduleName = "adhEmbed";
-
 export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScope, $timeout) => {
     return {
         restrict: "A",
@@ -70,8 +68,8 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
                             orig = orig.substring(host.length);
                         }
 
-                        // set href to canonical url while preserving click behavior
-                        if (orig.lastIndexOf("/", 0) === 0) {
+                        if (orig[0] === "/") {
+                            // set href to canonical url while preserving click behavior
                             element.attr("href", adhConfig.canonical_url + orig);
                             element.click((event) => {
                                 _.defer(() => $rootScope.$apply(() => {
@@ -86,6 +84,9 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
         }
     };
 };
+
+
+export var moduleName = "adhEmbed";
 
 export var register = (angular) => {
     angular
