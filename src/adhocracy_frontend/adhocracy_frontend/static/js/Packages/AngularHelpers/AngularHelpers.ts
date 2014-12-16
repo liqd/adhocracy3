@@ -1,4 +1,4 @@
-export var factory = ($compile) => {
+export var recursionHelper = ($compile) => {
     return {
         /**
          * Manually compiles the element, fixing the recursion loop.
@@ -41,10 +41,10 @@ export var factory = ($compile) => {
 };
 
 
-export var moduleName = "adhRecursionHelper";
+export var moduleName = "adhAngularHelpers";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [])
-        .factory("adhRecursionHelper", ["$compile", factory]);
+        .factory("adhRecursionHelper", ["$compile", recursionHelper]);
 };

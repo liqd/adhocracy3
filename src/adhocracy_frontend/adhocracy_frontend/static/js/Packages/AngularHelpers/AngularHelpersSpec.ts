@@ -1,11 +1,11 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhRecursionHelper = require("./RecursionHelper");
+import AdhAngularHelpers = require("./AngularHelpers");
 
 export var register = () => {
-    describe("RecursionHelper", () => {
+    describe("AngularHelpers", () => {
         xit("dummy", () => {
-            expect(AdhRecursionHelper).toBeDefined();
+            expect(AdhAngularHelpers).toBeDefined();
         });
     });
 };
