@@ -1,0 +1,26 @@
+.button,
+button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"] {
+    @include button-base;
+
+    border: 0;
+    font-weight: $font-weight-normal;
+    line-height: 1.7857;
+    height: 1.7857em;
+
+    @include button-color($color-highlight-reverse, $color-highlight-normal);
+
+    &.has-focus, &:focus,
+    &.is-hover, &:hover {
+        @include button-color($color-highlight-reverse, $color-highlight-extrovert);
+    }
+
+    &:disabled,
+    &.is-disabled,
+    &.ng-disabled {
+        @include opacity(0.5);
+        cursor: default;
+    }
+}
