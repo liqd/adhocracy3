@@ -34,7 +34,7 @@ A navigation list containing hash tag links
         a {
             display: block;
             font-size: $font-size-small;
-            padding: 0 0.5em;
+            padding: 0 0.5em 1.5em;
             line-height: 1.333;
             color: $color-secondary-extrovert;
             text-decoration: none;
@@ -47,13 +47,13 @@ A navigation list containing hash tag links
                 }
             }
         }
+    }
 
-        &.m-unnumbered {
-            ol {
-                margin: 0;
-                padding: 0;
-                list-style: none;
-            }
+    &.m-unnumbered {
+        ol {
+            margin: 0;
+            padding: 0;
+            list-style: none;
         }
     }
 }
