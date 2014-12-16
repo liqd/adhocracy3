@@ -50,6 +50,24 @@ export var location2template = ($location : ng.ILocationService) => {
 };
 
 
+export var normalizeInternalUrl = (url : string, $location : ng.ILocationService) => {
+    var host = $location.protocol() + "://" + $location.host();
+    var port = $location.port();
+    if ((port !== 80) && (port !== 443)) {
+        host = host + ":" + port;
+    }
+    if (url.lastIndexOf(host, 0) === 0) {
+        url = url.substring(host.length);
+    }
+    return url;
+};
+
+
+export var isInternalUrl = (url : string, $location : ng.ILocationService) => {
+    return normalizeInternalUrl(url, $location)[0] === "/";
+};
+
+
 export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScope, $timeout) => {
     return {
         restrict: "A",
@@ -58,17 +76,9 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
                 $timeout(() => {
                     var orig = element.attr("href");
                     if (orig) {
-                        // normalize original href
-                        var host = $location.protocol() + "://" + $location.host();
-                        var port = $location.port();
-                        if ((port !== 80) && (port !== 443)) {
-                            host = host + ":" + port;
-                        }
-                        if (orig.lastIndexOf(host, 0) === 0) {
-                            orig = orig.substring(host.length);
-                        }
+                        orig = normalizeInternalUrl(orig, $location);
 
-                        if (orig[0] === "/") {
+                        if (isInternalUrl(orig, $location)) {
                             // set href to canonical url while preserving click behavior
                             element.attr("href", adhConfig.canonical_url + orig);
                             element.click((event) => {
