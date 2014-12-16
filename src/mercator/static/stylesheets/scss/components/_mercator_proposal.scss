@@ -153,12 +153,17 @@ selected. If no proposal is selected, no state is applied.
     overflow: hidden;
 }
 
-$mercator-proposal-detail-nav-width: 3.3%;
+$mercator-proposal-detail-nav-width: 4%;
+
+.mercator-proposal-detail-nav-container {
+    position: relative;
+    width: $mercator-proposal-detail-nav-width;
+}
 
 .mercator-proposal-detail-nav {
     @extend .jump-navigation;
+    overflow: hidden;
     text-align: center;
-    width: $mercator-proposal-detail-nav-width;
 
     li {
         a {
@@ -185,7 +190,7 @@ $mercator-proposal-detail-nav-width: 3.3%;
     }
 }
 
-.mercator-proposal-detail-nav,
+.mercator-proposal-detail-nav-container,
 .mercator-proposal-chapters {
     float: left;
     padding-top: 1em;
