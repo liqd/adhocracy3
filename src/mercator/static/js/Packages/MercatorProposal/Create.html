@@ -314,6 +314,7 @@
 
         <div class="annotated-section">
             <div class="annotated-section-annotation">
+                {{ "Are you sure you are allowed to use this picture?" | translate }}
                 {{"Image must be of type" | translate }} <span ng-repeat="fo in currentUpload.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>,
                 <br/>{{"no bigger than" | translate }} {{currentUpload.opts.maximumByteSize/1000000}}MB,
                 <br/>{{"greater than" | translate }} {{currentUpload.opts.maximumWidth}}px {{"wide" | translate}},

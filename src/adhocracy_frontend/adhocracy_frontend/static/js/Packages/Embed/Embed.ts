@@ -2,6 +2,7 @@
 
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -51,6 +52,39 @@ export var location2template = ($location : ng.ILocationService) => {
 
 export var moduleName = "adhEmbed";
 
+export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $timeout) => {
+    return {
+        restrict: "A",
+        link: (scope, element, attrs) => {
+            if (element[0].nodeName === "A" && adhConfig.canonical_url) {
+                $timeout(() => {
+                    var orig = element.attr("href");
+                    if (orig) {
+                        // normalize original href
+                        var host = $location.protocol() + "://" + $location.host();
+                        var port = $location.port();
+                        if ((port !== 80) && (port !== 443)) {
+                            host = host + ":" + port;
+                        }
+                        if (orig.lastIndexOf(host, 0) === 0) {
+                            orig = orig.substring(host.length);
+                        }
+
+                        // set href to canonical url while preserving click behavior
+                        if (orig.lastIndexOf("/", 0) === 0) {
+                            element.attr("href", adhConfig.canonical_url + orig);
+                            element.click((event) => {
+                                $location.path(orig);
+                                event.preventDefault();
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    };
+};
+
 export var register = (angular) => {
     angular
         .module(moduleName, [
@@ -85,5 +119,6 @@ export var register = (angular) => {
             if (params.hasOwnProperty("locale")) {
                 $translate.use(params.locale);
             }
-        }]);
+        }])
+        .directive("href", ["adhConfig", "$location", "$timeout", hrefDirective]);
 };
