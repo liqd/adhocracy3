@@ -1,5 +1,5 @@
 <adh-spaces>
-    <adh-wait condition="currentSpace === 'content'">
+    <adh-wait data-condition="currentSpace === 'content'">
         <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'content'">
             <div class="moving-column moving-column-structure">
                 <div data-ng-if="view === 'create_proposal'">
@@ -97,7 +97,7 @@
         </div>
     </adh-wait>
 
-    <adh-wait condition="currentSpace === 'user'">
+    <adh-wait data-condition="currentSpace === 'user'">
         <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'user'">
             <div class="moving-column moving-column-structure">
                 <div class="moving-column-menu placeholder"></div>
@@ -126,7 +126,7 @@
         </div>
     </adh-wait>
 
-    <adh-wait condition="currentSpace === 'error'">
+    <adh-wait data-condition="currentSpace === 'error'">
         <div data-ng-show="currentSpace === 'error'">
             <adh-routing-error></adh-routing-error>
         </div>
