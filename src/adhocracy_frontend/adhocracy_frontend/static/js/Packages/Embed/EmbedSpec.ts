@@ -8,7 +8,10 @@ export var register = () => {
         var $compileMock;
 
         beforeEach(() => {
-            $locationMock = jasmine.createSpyObj("$location", ["path", "search"]);
+            $locationMock = jasmine.createSpyObj("$location", ["path", "search", "host", "port", "protocol"]);
+            $locationMock.host.and.returnValue("example.com");
+            $locationMock.port.and.returnValue("");
+            $locationMock.protocol.and.returnValue("http");
             $locationMock.path.and.returnValue("/embed/document-workbench");
             $locationMock.search.and.returnValue({
                 path: "/this/is/a/path",
@@ -46,6 +49,54 @@ export var register = () => {
             it("throws if the requested widget is not available for embedding", () => {
                 $locationMock.path.and.returnValue("/embed/do-not-embed");
                 expect(() => AdhEmbed.location2template($locationMock)).toThrow();
+            });
+        });
+
+        describe("normalizeInternalUrl", () => {
+            it("does not change relative URLs", () => {
+                var url = "/foo/bar";
+                var actual = AdhEmbed.normalizeInternalUrl(url, $locationMock);
+                expect(actual).toEqual(url);
+            });
+            it("removes the host from absolute URLs", () => {
+                var url = "http://example.com/foo/bar";
+                var actual = AdhEmbed.normalizeInternalUrl(url, $locationMock);
+                expect(actual).toEqual("/foo/bar");
+            });
+            it("removes the host from absolute URLs if host has a non-standard port", () => {
+                $locationMock.port.and.returnValue("1234");
+                var url = "http://example.com:1234/foo/bar";
+                var actual = AdhEmbed.normalizeInternalUrl(url, $locationMock);
+                expect(actual).toEqual("/foo/bar");
+            });
+            it("does not change external URLs", () => {
+                var url = "http://external.com/foo/bar";
+                var actual = AdhEmbed.normalizeInternalUrl(url, $locationMock);
+                expect(actual).toEqual(url);
+            });
+        });
+
+        describe("isInternalUrl", () => {
+            it("returns True for relative URLs", () => {
+                var url = "/foo/bar";
+                var actual = AdhEmbed.isInternalUrl(url, $locationMock);
+                expect(actual).toBe(true);
+            });
+            it("returns true for internal absolute URLs", () => {
+                var url = "http://example.com/foo/bar";
+                var actual = AdhEmbed.isInternalUrl(url, $locationMock);
+                expect(actual).toBe(true);
+            });
+            it("returns true for internal absolute URLs if host has a non-standard port", () => {
+                $locationMock.port.and.returnValue("1234");
+                var url = "http://example.com:1234/foo/bar";
+                var actual = AdhEmbed.isInternalUrl(url, $locationMock);
+                expect(actual).toBe(true);
+            });
+            it("return false for external URLs", () => {
+                var url = "http://external.com/foo/bar";
+                var actual = AdhEmbed.isInternalUrl(url, $locationMock);
+                expect(actual).toBe(false);
             });
         });
     });

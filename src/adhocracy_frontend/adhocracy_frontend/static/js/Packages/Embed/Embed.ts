@@ -53,7 +53,7 @@ export var location2template = ($location : ng.ILocationService) => {
 export var normalizeInternalUrl = (url : string, $location : ng.ILocationService) => {
     var host = $location.protocol() + "://" + $location.host();
     var port = $location.port();
-    if ((port !== 80) && (port !== 443)) {
+    if (port && (port !== 80) && (port !== 443)) {
         host = host + ":" + port;
     }
     if (url.lastIndexOf(host, 0) === 0) {
