@@ -153,10 +153,12 @@ selected. If no proposal is selected, no state is applied.
     overflow: hidden;
 }
 
+$mercator-proposal-detail-nav-width: 3.3%;
+
 .mercator-proposal-detail-nav {
-    @include span(1 of 12 inside);
     @extend .jump-navigation;
     text-align: center;
+    width: $mercator-proposal-detail-nav-width;
 
     a {
         padding: 0 0 1em;
@@ -164,10 +166,10 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-chapters {
-    @include span(11 of 12 inside);
     background-color: white;
     border-left: 0.1666em solid $color-secondary-introvert;
-    padding-left: 1em;
+    padding: 0 0.8em;
+    width: 100% - $mercator-proposal-detail-nav-width;
 
     .chapter-header {
         background: transparent;
@@ -183,6 +185,7 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-proposal-detail-nav,
 .mercator-proposal-chapters {
+    float: left;
     padding-top: 1em;
 }
 
