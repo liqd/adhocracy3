@@ -149,7 +149,7 @@ export var register = (angular, config, meta_api) => {
                     done();
                 },
                 (error) => {
-                    expect("this should not happen.").toBe(false);
+                    expect(error).toBe(false);
                     done();
                 }
             );
