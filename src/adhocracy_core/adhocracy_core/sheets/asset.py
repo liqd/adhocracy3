@@ -141,7 +141,7 @@ class AssetFileDownload(Persistent):
             resized_image = cropped_image.resize(self.dimensions,
                                                  Image.ANTIALIAS)
             bytestream = io.BytesIO()
-            resized_image.save(bytestream, mimetype.split('/')[1])
+            resized_image.save(bytestream, image.format)
             bytestream.seek(0)
         # Store as substanced File and return
         self.file = File(stream=bytestream, mimetype=mimetype)
