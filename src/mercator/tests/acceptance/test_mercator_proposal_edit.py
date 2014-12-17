@@ -48,6 +48,7 @@ class TestMercatorForm:
         browser.find_by_css('input[type="submit"]').first.click()
         assert success(browser)
 
+    @mark.xfail
     def test_editing_foreign_proposals(self, browser, user):
         login(browser, user[0], user[1])
         select_proposal(browser)
