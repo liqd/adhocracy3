@@ -14,8 +14,8 @@ from adhocracy_frontend.tests.acceptance.shared import wait
 
 @fixture(scope='module')
 def proposals():
-    return create_proposals(user_token=api_login_god(), n=1)
-
+    creds = api_login_god()
+    return create_proposals(creds['user_path'], creds['user_token'], n=1)
 
 @fixture(scope='module')
 def user():
