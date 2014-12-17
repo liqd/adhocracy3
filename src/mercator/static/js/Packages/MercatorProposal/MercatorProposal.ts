@@ -188,7 +188,7 @@ export interface IControllerScope extends IScope {
  */
 export var uploadImageFile = (
     adhHttp : AdhHttp.Service<any>,
-    postPath : string,
+    poolPath : string,
     flow : Flow
 ) : ng.IPromise<string> => {
     if (flow.files.length !== 1) {
@@ -212,8 +212,12 @@ export var uploadImageFile = (
     formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
-    return adhHttp.postRaw(postPath, formData)
-        .then((rsp) => { return rsp.data.path; });
+
+    return this.adhHttp.get(poolPath)
+        .then((mercatorPool) => {
+            var postPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
+            return adhHttp.postRaw(postPath, formData).then((rsp) => { return rsp.data.path; });
+        });
 };
 
 
@@ -576,11 +580,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
-        var imagePathPromise : ng.IPromise<string> = this.adhHttp.get("/mercator")
-            .then((mercatorPool) => {
-                var imagePostPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
-                return uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
-            });
+        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, "/mercator", data.imageUpload);
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
