@@ -85,7 +85,7 @@ $padding-medium: 1em;
         font-weight: $font-weight-normal;
         font-size: $font-size-large;
         @include font-tracking(narrow);
-        line-height: 1.5;
+        line-height: 1.2;
         color: $color-prime-extrovert;
     } @else if $value == meta {
         font-family: $font-family-normal;

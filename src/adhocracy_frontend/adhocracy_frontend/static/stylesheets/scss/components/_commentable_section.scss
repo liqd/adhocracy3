@@ -1,5 +1,35 @@
 /*doc
 ---
+title: Show comments mixin
+name: show-comments-mixin
+category: Widgets
+---
+
+A mixin to show comments somewhere
+
+```html_example
+<a class="show-comments"><i class="icon-speechbubble"></i>12</a>
+```
+*/
+
+@mixin show-comments {
+    @include disguised-link;
+    @include inline-block;
+    font-size: $font-size-small;
+    text-align: center;
+
+    i {
+        display: block;
+        font-size: 120%;
+    }
+}
+
+.show-comments {
+    @include show-comments;
+}
+
+/*doc
+---
 title: Commentable section
 name: commentable-section
 category: Widgets
@@ -11,10 +41,11 @@ displayed as a button in a second column.
 ```html_example
 <div class="commentable-section">
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</p>
-    <a class="commentable-section-show-comments">Comments</a>
+    <a class="commentable-section-show-comments"><i class="icon-speechbubble"></i>Comments</a>
 </div>
 ```
 */
+
 .commentable-section {
     margin-bottom: 1em;
     padding-bottom: 1em;
@@ -22,7 +53,7 @@ displayed as a button in a second column.
     position: relative;
 
     .commentable-section-show-comments {
-        @include disguised-link;
+        @include show-comments;
         max-width: 30%;
         position: absolute;
         right: 0;

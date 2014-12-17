@@ -187,10 +187,25 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         from pyramid.security import Authenticated
         def groupfinder(userid, request):
             return ['group']
-        inst = self._make_one('', groupfinder=groupfinder)
         self.request.headers = self.token_and_user_id_headers
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.return_value = self.userid
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager,
+                              groupfinder=groupfinder)
         result = inst.effective_principals(self.request)
         assert result == [Everyone, Authenticated, self.userid, 'group']
+
+    def test_effective_principals_with_only_user_header_and_groupfinder_returns_groups(self):
+        from pyramid.security import Everyone
+        def groupfinder(userid, request):
+            return ['group']
+        self.request.headers = {'X-User-Path': self.user_url}
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.return_value = None
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager,
+                              groupfinder=groupfinder)
+        result = inst.effective_principals(self.request)
+        assert result == [Everyone]
 
     def test_effective_principals_called_twice_during_one_request(self):
         """The result is cached for one request!"""
