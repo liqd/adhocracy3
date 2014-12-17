@@ -290,10 +290,6 @@ export var rateController = (
      */
     /*
     var castSimple = (rate : number) : void => {
-        if (!$scope.optionsPostPool.POST) {
-            adhTopLevelState.redirectToLogin();
-        }
-
         if (!$scope.isActive(rate)) {
             $scope.assureUserRateExists()
                 .then(() => {
@@ -324,7 +320,13 @@ export var rateController = (
             });
     };
 
-    $scope.cast = castToggle;
+    $scope.cast = (rate : number) : void => {
+        if (!$scope.optionsPostPool.POST) {
+            adhTopLevelState.redirectToLogin();
+        }
+        castToggle(rate);
+    };
+
 
     $scope.toggle = () : void => {
         if ($scope.isActive(1)) {
