@@ -116,22 +116,6 @@ class TestItem:
         last_targets = context.__graph__.get_references_for_isheet(last_tag, ITagS)['elements']
         assert last_targets == [version1]
 
-    def test_update_last_tag_two_versions(self, context, registry):
-        """Test that an error is thrown if we try to branch off two versions
-        from the same version (since items have a linear history).
-        """
-        from adhocracy_core.sheets.tags import ITag as ITagS
-        item = self.make_one(context, registry)
-        version0 = item['VERSION_0000000']
-
-        version1 = make_itemversion(parent=item, follows=[version0])
-        with raises(colander.Invalid):
-            make_itemversion(parent=item, follows=[version0])
-
-        last_tag = item['LAST']
-        last_targets = context.__graph__.get_references_for_isheet(last_tag, ITagS)['elements']
-        assert last_targets == [version1]
-
     def test_update_last_tag_two_versions_with_forkable(self, context, registry):
         """Test branching off two versions from the same version,
         using forkable versionables.

@@ -283,7 +283,7 @@ def node() -> colander.MappingSchema:
 
 
 @fixture
-def transaction_changelog(changelog_meta):
+def changelog(changelog_meta):
     """Return transaction_changelog dictionary."""
     from collections import defaultdict
     metadata = lambda: changelog_meta

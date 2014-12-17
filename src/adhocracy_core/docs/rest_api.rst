@@ -632,8 +632,30 @@ version is automatically created along with the updated Section version::
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000003')
     >>> pvrs3_path = resp.json['path']
 
-More interestingly, if we then create a second version of kapitel2::
+    >>> s2vrs1_path = resp.json['path']
+    >>> s2vrs1_path != s2vrs0_path
+    True
 
+More interestingly, if we try to create a second version of kapitel2 we
+get an error because this would automatically create two new version for pvrs3
+and pvrs2 (both contain s2vrs0_path)::
+
+    >>> svrs = {'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...         'data': {
+    ...              'adhocracy_core.sheets.document.ISection': {
+    ...                  'title': 'on the hardness of version control',
+    ...                  'elements': []},
+    ...               'adhocracy_core.sheets.versions.IVersionable': {
+    ...                  'follows': [s2vrs0_path]
+    ...                  }
+    ...          },
+    ...          'root_versions': []
+    ...         }
+    >>> resp = testapp.post_json(s2dag_path, svrs, headers=god_header, status=400)
+    >>> pprint(resp.json['errors'][0])
+    {'description': 'No fork allowed - The auto update ...
+
+But if we set the `root_version` to the last  Proposal version (pvrs3)::
     >>> svrs = {'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy_core.sheets.document.ISection': {
@@ -646,12 +668,8 @@ More interestingly, if we then create a second version of kapitel2::
     ...          'root_versions': [pvrs3_path]
     ...         }
     >>> resp = testapp.post_json(s2dag_path, svrs, headers=god_header)
-    >>> s2vrs1_path = resp.json['path']
-    >>> s2vrs1_path != s2vrs0_path
-    True
 
-a Proposal version is automatically created only for pvrs3, not for
-pvrs2 (which also contains s2vrs0_path) ::
+a new version is automatically created only for pvrs3, not for pvrs2::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
@@ -673,6 +691,8 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
     >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     0
+
+
 
 FIXME: If two frontends post competing sections simultaneously,
 neither knows which proposal version belongs to whom.  Proposed
@@ -809,7 +829,7 @@ version (no longer head) as predecessor, we get an error::
 
     >>> resp_data = testapp.post_json(comment_path, commvers, status=400, headers=god_header).json
     >>> pprint(resp_data)
-    {'errors': [{'description': 'No fork allowed',
+    {'errors': [{'description': 'No fork allowed ...
                  'location': 'body',
                  'name': 'data.adhocracy_core.sheets.versions.IVersionable.follows'}],
      'status': 'error'}
@@ -942,9 +962,14 @@ request is a success response, or any one of them fails, the database
 state is rolled back to the beginning of the request, and the response
 is an error, explaining which request failed for which reason.
 
-
 Things that are different in individual requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Forks and multiple versions*
+
+During one Batch request you can create only one new version.
+The first version created (with an explicit post request or auto updated)
+is used to store all modifications.
 
 *Preliminary resource paths: motivation and general idea.*
 

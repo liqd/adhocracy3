@@ -279,11 +279,11 @@ export class Service<Content extends ResourcesBase.Resource> {
 
             var handleConflict = (msg) => {
                 // re-throw all exception lists other than ["no-fork"].
-                if (msg.hasOwnProperty("length") &&
+                if (typeof msg === "object" && msg.hasOwnProperty("length") &&
                     msg.length === 1 &&
-                    msg[0].name === "data." + SIVersionable.nick + ".follows" &&
+                    ( msg[0].name === "data." + SIVersionable.nick + ".follows" || msg[0].name === "root_version" ) &&
                     msg[0].location === "body" &&
-                    msg[0].description === "No fork allowed"
+                    msg[0].description.search("^No fork allowed.*") === 0
                    ) {
                     // double waitms (fuzzed for avoiding network congestion).
                     waitms *= 2 * (1 + (Math.random() / 2 - 0.25));

@@ -17,6 +17,9 @@ class ISectionVersion(IItemVersion):
 sectionversion_meta = itemversion_metadata._replace(
     content_name='SectionVersion',
     iresource=ISectionVersion,
+    basic_sheets=[adhocracy_core.sheets.versions.IVersionable,
+                  adhocracy_core.sheets.metadata.IMetadata,
+                  ],
     extended_sheets=[adhocracy_core.sheets.document.ISection,
                      ],
     permission_add='add_sectionversion',

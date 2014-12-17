@@ -64,7 +64,7 @@ class TestMercatorForm:
 
     def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
-        assert wait(lambda: browser.url.endswith("/r/mercator/"))
+        assert wait(lambda: browser.url.endswith("/r/mercator/"), max_steps=20)
 
         browser.find_link_by_text(TITLE).first.click()
         assert wait(lambda: not browser.url.endswith("/r/mercator/"))
