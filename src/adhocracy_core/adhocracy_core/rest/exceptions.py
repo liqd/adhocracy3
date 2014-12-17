@@ -43,15 +43,15 @@ def handle_error_400_auto_update_no_fork_allowed(error, request):
 
     Assuming there was a post request with wrong values for 'root_versions'.
     """
-    event = error.event
     msg = 'No fork allowed'
-    description = ' - The auto update tried to create a fork for {0} caused '\
+    args = (resource_path(error.resource),
+            error.event.isheet.__identifier__,
+            error.event.isheet_field,
+            resource_path(error.event.old_version),
+            resource_path(error.event.new_version))
+    description = ' - The auto update tried to create a fork for: {0} caused '\
                   'by isheet: {1} field: {2} with old_reference: {3} and new '\
-                  'reference: {4}.'.format(resource_path(event.object),
-                                           event.isheet.__identifier__,
-                                           event.isheet_field,
-                                           resource_path(event.old_version),
-                                           resource_path(event.new_version))
+                  'reference: {4}. Try another root_version.'.format(*args)
     dummy_node = named_object('root_versions')
     error_colander = colander.Invalid(dummy_node, msg + description)
     return handle_error_400_colander_invalid(error_colander, request)
