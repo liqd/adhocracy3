@@ -204,8 +204,6 @@ export var uploadImageFile = (
         return bytes;
     };
 
-    flow.files = [];
-
     var formData = new FormData();
     formData.append("content_type", RIMercatorIntroImage.content_type);
     formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
