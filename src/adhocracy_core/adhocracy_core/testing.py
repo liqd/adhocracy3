@@ -404,6 +404,8 @@ def app_settings(request) -> dict:
     # disable creating a default group, this causes
     # ZODB.POSException.InvalidObjectReference
     settings['adhocracy.add_default_group'] = False
+    # enable create test user for every :term:`role`
+    settings['adhocracy.add_test_users'] = True
     # don't look for the websocket server
     settings['adhocracy.ws_url'] = ''
     # use in memory database without zeo
@@ -589,6 +591,7 @@ def includeme_root_with_test_users(config):
     """Override IRootPool to create initial test users."""
     from adhocracy_core.resources import add_resource_type_to_registry
     from adhocracy_core.resources.root import root_metadata
+    config.commit()
     after_creation = root_metadata.after_creation + [add_test_users]
     root_metadata = root_metadata._replace(after_creation=after_creation)
     add_resource_type_to_registry(root_metadata, config)
@@ -613,8 +616,6 @@ def _make_app(app_config):
     configurator.include(adhocracy_core.resources.sample_section)
     configurator.include(adhocracy_core.resources.comment)
     configurator.include(adhocracy_core.resources.rate)
-    configurator.commit()
-    configurator.include(includeme_root_with_test_users)
     app = configurator.make_wsgi_app()
     return app
 
