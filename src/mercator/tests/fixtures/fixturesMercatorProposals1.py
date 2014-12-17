@@ -546,7 +546,7 @@ def _create_proposal():
                 "result_first_version_path": "@pn44"
             }]
 
-def create_proposals(user_path, user_token, n=5, expect_error=False):
+def create_proposals(user_path="", user_token="", n=5, expect_error=False):
     proposals = []
 
     uri = root_uri + "/batch"
