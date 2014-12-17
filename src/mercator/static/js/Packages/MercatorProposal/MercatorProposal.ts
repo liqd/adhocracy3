@@ -211,7 +211,7 @@ export var uploadImageFile = (
     formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
-    return this.adhHttp.get(poolPath)
+    return adhHttp.get(poolPath)
         .then((mercatorPool) => {
             var postPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
             return adhHttp.postRaw(postPath, formData).then((rsp) => { return rsp.data.path; });
