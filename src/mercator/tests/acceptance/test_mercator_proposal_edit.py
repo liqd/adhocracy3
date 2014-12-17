@@ -46,7 +46,7 @@ class TestMercatorForm:
 
         browser.find_by_name('accept-disclaimer').first.check()
         browser.find_by_css('input[type="submit"]').first.click()
-        assert not internal_error(browser)
+        assert success(browser)
 
     def test_editing_foreign_proposals(self, browser, user):
         login(browser, user[0], user[1])
@@ -55,8 +55,9 @@ class TestMercatorForm:
         assert not browser.is_text_present("edit", wait_time=1)
 
 
-def internal_error(browser):
-    return browser.is_text_present("Internal Error", wait_time=10)
+def success(browser):
+    return (not browser.is_text_present("Internal Error", wait_time=1) and
+            wait(lambda: browser.url.endswith("/r/mercator/")))
 
 
 def select_proposal(browser):
