@@ -12,7 +12,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
-import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
+import RIPoolWithAssets = require("../../Resources_/adhocracy_core/resources/asset/IPoolWithAssets");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
@@ -87,9 +87,7 @@ export class MercatorWorkbench {
                     sort: "-rates"
                 };
 
-                adhTopLevelState.on("view", (value : string) => {
-                    $scope.view = value;
-                });
+                adhTopLevelState.bind("view", $scope);
                 $scope.goToListing = (result? : { path : string }[]) => {
                     var proposalVersionPath : string = result.slice(-1)[0].path.replace(/https?:\/\/.*:\d+\//, "/r/");
                     $location.url(proposalVersionPath);
@@ -157,18 +155,18 @@ export var register = (angular) => {
                     space: "user",
                     movingColumns: "is-show-hide-hide"
                 })
-                .default(RIBasicPool.content_type, "", {
+                .default(RIPoolWithAssets.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
                     proposalUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIBasicPool.content_type, "create_proposal", {
+                .default(RIPoolWithAssets.content_type, "create_proposal", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIBasicPool.content_type, "create_proposal", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
-                    return (resource : RIBasicPool) => {
+                .specific(RIPoolWithAssets.content_type, "create_proposal", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                    return (resource : RIPoolWithAssets) => {
                         return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                             if (!options.POST) {
                                 throw 401;

@@ -8,6 +8,7 @@ from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid.traversal import resource_path
+from pyramid.security import Everyone
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
@@ -223,6 +224,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         cached_principals = getattr(request, '__cached_principals__', None)
         if cached_principals:
             return cached_principals
+        if self.authenticated_userid(request) is None:
+            return [Everyone]
         principals = super().effective_principals(request)
         request.__cached_principals__ = principals
         return principals

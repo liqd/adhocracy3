@@ -11,6 +11,8 @@ from pyramid.compat import is_nonstr_iter
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.traversal import find_interface
+from pyramid.traversal import resource_path
 from pyramid.threadlocal import get_current_registry
 from substanced.util import get_dotted_name
 from substanced.util import acquire
@@ -20,7 +22,10 @@ from zope.interface import providedBy
 from zope.interface.interfaces import IInterface
 import colander
 
+from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 
@@ -181,7 +186,7 @@ def to_dotted_name(context) -> str:
         return get_dotted_name(context)
 
 
-_named_object = namedtuple('NamedObject', ['name'])
+named_object = namedtuple('NamedObject', ['name'])
 """An object that has a name (and nothing else)."""
 
 
@@ -194,12 +199,15 @@ def raise_colander_style_error(sheet: Interface, field_name: str,
     :param field_name: the error will be located within this field in the sheet
     :param description: the description of the error
     :raises colander.Invalid: constructed from the given parameters
+
+    NOTE: You should always prefer to use the colander schemas to validate
+    request data.
     """
     if sheet is not None:
         name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
     else:
         name = field_name
-    raise colander.Invalid(_named_object(name), description)
+    raise colander.Invalid(named_object(name), description)
 
 
 def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
@@ -296,3 +304,56 @@ def unflatten_multipart_request(request: Request) -> dict:
         keyparts = key.split(':')
         nested_dict_set(result, keyparts, value)
     return result
+
+
+def get_last_version(resource: IItemVersion,
+                     registry: Registry) -> IItemVersion:
+    """Get last version of  resource' according to the last tag."""
+    # FIXME better just add tag backreferences fields to resources
+    from adhocracy_core.sheets.tags import ITag  # prevent circle imports
+    item = find_interface(resource, IItem)
+    if item is None:
+        return
+    last_tag = item['LAST']
+    last_versions = get_sheet_field(last_tag, ITag, 'elements',
+                                    registry=registry)
+    last_version = last_versions[0]
+    return last_version
+
+
+def get_changelog_metadata(resource, registry) -> ChangelogMetadata:
+    """Return transaction changelog for `resource`."""
+    path = resource_path(resource)
+    changelog = registry._transaction_changelog[path]
+    return changelog
+
+
+def set_batchmode(registry: Registry):
+    """Set 'batchmode' marker for the current request.
+
+    This is called by :class:`adhocracy_core.rest.batchview.BatchView`.
+    Other code can check :func:`is_batchmode` to modify behavior.
+    """
+    registry.__is_batchmode__ = True
+
+
+def is_batchmode(registry: Registry) -> bool:
+    """Get 'batchmode' marker for the current request."""
+    return getattr(registry, '__is_batchmode__', False)
+
+
+def get_following_new_version(registry, resource) -> IResource:
+    """Return the following version created in this transaction."""
+    changelog = get_changelog_metadata(resource, registry)
+    if changelog.created:
+        new_version = resource
+    else:
+        new_version = changelog.followed_by
+    return new_version
+
+
+def get_last_new_version(registry, resource) -> IResource:
+    """Return last new version created in this transaction."""
+    item = find_interface(resource, IItem)
+    item_changelog = get_changelog_metadata(item, registry)
+    return item_changelog.last_version

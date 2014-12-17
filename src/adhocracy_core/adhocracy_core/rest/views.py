@@ -546,18 +546,35 @@ class ItemRESTView(PoolRESTView):
                  permission='add_resource',
                  content_type='application/json')
     def post(self):
-        """Create new resource and get response data."""
-        iresource = self.request.validated['content_type']
+        """Create new resource and get response data.
+
+        For :class:`adhocracy_core.interfaces.IItemVersion`:
+
+        If a `new version` is already created in this transaction we don't want
+        to create a new one. Instead we modify the existing one.
+
+        This is needed to make :class:`adhocray_core.rest.batchview.BatchView`
+        work.
+        """
+        validated = self.request.validated
+        iresource = validated['content_type']
         resource_type = iresource.__identifier__
-        appstructs = self.request.validated.get('data', {})
+        appstructs = validated.get('data', {})
         creator = get_user(self.request)
-        root_versions = self.request.validated.get('root_versions', [])
-        resource = self.registry.create(resource_type,
-                                        self.context,
-                                        appstructs=appstructs,
-                                        creator=creator,
-                                        root_versions=root_versions,
-                                        request=self.request)
+        root_versions = validated.get('root_versions', [])
+        last_new_version = validated.get('_last_new_version_in_transaction',
+                                         None)
+        if last_new_version is not None:
+            resource = last_new_version
+            self.context = last_new_version
+            self.put()  # FIXME Is it safe to just call put?
+        else:
+            resource = self.registry.create(resource_type,
+                                            self.context,
+                                            appstructs=appstructs,
+                                            creator=creator,
+                                            root_versions=root_versions,
+                                            request=self.request)
         return self.build_post_response(resource)
 
 

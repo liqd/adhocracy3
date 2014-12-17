@@ -440,7 +440,10 @@ class HeardFromSchema(colander.MappingSchema):
 
 
 heardfrom_meta = sheet_metadata_defaults._replace(
-    isheet=IHeardFrom, schema_class=HeardFromSchema)
+    isheet=IHeardFrom,
+    schema_class=HeardFromSchema,
+    permission_view='view_sensitive',
+)
 
 
 def includeme(config):

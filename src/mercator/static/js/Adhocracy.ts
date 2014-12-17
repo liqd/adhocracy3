@@ -36,7 +36,7 @@ import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
 import AdhRate = require("./Packages/Rate/Rate");
-import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
+import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 import AdhSticky = require("./Packages/Sticky/Sticky");
@@ -149,7 +149,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhPreliminaryNames.register(angular);
     AdhProposal.register(angular);
     AdhRate.register(angular);
-    AdhRecursionHelper.register(angular);
+    AdhAngularHelpers.register(angular);
     AdhResourceArea.register(angular);
     AdhResourceWidgets.register(angular);
     AdhSticky.register(angular);

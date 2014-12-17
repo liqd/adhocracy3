@@ -1,7 +1,6 @@
 from pytest import fixture
 from pytest import raises
 from pytest import mark
-from webtest import TestApp
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
@@ -64,7 +63,7 @@ class TestMercatorForm:
 
     def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
-        assert wait(lambda: browser.url.endswith("/r/mercator/"))
+        assert wait(lambda: browser.url.endswith("/r/mercator/"), max_steps=20)
 
         browser.find_link_by_text(TITLE).first.click()
         assert wait(lambda: not browser.url.endswith("/r/mercator/"))
@@ -76,8 +75,10 @@ class TestMercatorForm:
 
     @mark.xfail
     def test_login_is_required(self):
+        # FIXME this is broken. Can we just remove this test?
+        # There are many permissions test now in src/adhocracy_mercator [joka]
         with raises(AssertionError):
-            create_proposals(user_token="", n=1)
+            create_proposals(n=1)
 
 
 def is_valid(browser):
