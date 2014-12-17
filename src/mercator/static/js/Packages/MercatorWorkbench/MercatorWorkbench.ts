@@ -89,7 +89,7 @@ export class MercatorWorkbench {
 
                 adhTopLevelState.bind("view", $scope);
                 $scope.goToListing = (result? : { path : string }[]) => {
-                    var proposalVersionPath : string = result.slice(-1)[0].path.replace(/https?:\/\/.*:\d+\//, "/r/");
+                    var proposalVersionPath : string = AdhResourceArea.resourceUrl(adhConfig)(result.slice(-1)[0].path);
                     $location.url(proposalVersionPath);
                 };
                 $scope.goToProposal = (path) => {
