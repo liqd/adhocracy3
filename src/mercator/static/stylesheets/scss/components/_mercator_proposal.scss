@@ -40,6 +40,14 @@ selected. If no proposal is selected, no state is applied.
     z-index: 1;
 }
 
+.mercator-proposal-form-heading {
+    @include text(functional);
+    border-bottom: 1px solid $color-structure-border-introvert;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 0;
+}
+
 .mercator-proposal-form-nav {
     @include span(first 2 of 12 no-gutters);
     @extend .jump-navigation;
@@ -53,6 +61,11 @@ selected. If no proposal is selected, no state is applied.
 
         &, a {
             color: $color-highlight-normal;
+            padding-bottom: 0;
+        }
+
+        a {
+            padding-left: 1em;
         }
 
         &.active {
