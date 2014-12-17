@@ -31,7 +31,7 @@ class TestMercatorForm:
 
     @fixture(scope='class')
     def browser(self, browser, proposals):
-        wait(lambda: browser.is_text_present("filters"))
+        assert browser.is_text_present("supporters", wait_time=1)
         return browser
 
     @fixture(scope='class')
@@ -43,10 +43,10 @@ class TestMercatorForm:
     @mark.xfail
     def test_resubmitting_proposal(self, browser, proposal):
         login_god(browser)
-        wait(lambda: browser.find_link_by_text("edit"))
+        assert wait(lambda: browser.find_link_by_text("edit"))
 
         browser.find_link_by_text("edit").first.click()
-        wait(lambda: browser.find_by_name('accept-disclaimer'))
+        assert wait(lambda: browser.find_by_name('accept-disclaimer'))
 
         browser.find_by_name('accept-disclaimer').first.check()
         browser.find_by_css('input[type="submit"]').first.click()
