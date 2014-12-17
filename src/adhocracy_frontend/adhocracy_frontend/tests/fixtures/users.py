@@ -7,8 +7,8 @@ import re
 import requests
 
 email_spool_path = os.environ['A3_ROOT'] + '/var/mail/new/'
-root_uri = 'http://localhost:6541'
 LOG_PATH = os.environ['A3_ROOT'] + '/var/log/test_adhocracy_backend.log'
+root_uri = 'http://localhost:6542'
 verbose = True
 
 # for more javascript-ish json representation:
