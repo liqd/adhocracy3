@@ -288,6 +288,7 @@ export var rateController = (
      * something "neutral".  an alternative behavior is cast_toggle
      * defined below.
      */
+    /*
     var cast_simple = (rate : number) : void => {
         if (!$scope.optionsPostPool.POST) {
             adhTopLevelState.redirectToLogin();
@@ -301,6 +302,7 @@ export var rateController = (
                 });
         }
     };
+    */
 
     /**
      * if the design has no neutral button, un-upping can be
@@ -310,10 +312,19 @@ export var rateController = (
      * but it works.
      */
     var cast_toggle = (rate : number) : void => {
-        throw "not implemented."
+        $scope.assureUserRateExists()
+            .then(() => {
+                var oldRate : number = $scope.myRateResource.data[SIRate.nick].rate;
+
+                if (rate !== 0 && oldRate === rate) {
+                    rate = 0;
+                }
+                adapter.rate($scope.myRateResource, rate);
+                $scope.postUpdate();
+            });
     };
 
-    $scope.cast = cast_simple;
+    $scope.cast = cast_toggle;
 
     $scope.toggle = () : void => {
         if ($scope.isActive(1)) {
