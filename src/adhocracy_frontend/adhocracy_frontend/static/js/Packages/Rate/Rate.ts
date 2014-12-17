@@ -289,7 +289,7 @@ export var rateController = (
      * defined below.
      */
     /*
-    var cast_simple = (rate : number) : void => {
+    var castSimple = (rate : number) : void => {
         if (!$scope.optionsPostPool.POST) {
             adhTopLevelState.redirectToLogin();
         }
@@ -311,7 +311,7 @@ export var rateController = (
      * query, and has negative implications on backend performance,
      * but it works.
      */
-    var cast_toggle = (rate : number) : void => {
+    var castToggle = (rate : number) : void => {
         $scope.assureUserRateExists()
             .then(() => {
                 var oldRate : number = $scope.myRateResource.data[SIRate.nick].rate;
@@ -324,7 +324,7 @@ export var rateController = (
             });
     };
 
-    $scope.cast = cast_toggle;
+    $scope.cast = castToggle;
 
     $scope.toggle = () : void => {
         if ($scope.isActive(1)) {
