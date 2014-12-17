@@ -44,12 +44,12 @@ selected. If no proposal is selected, no state is applied.
     @include span(first 2 of 12 no-gutters);
     @extend .jump-navigation;
     font-size: $font-size-small;
-    padding-right: 0.1666em;
+    padding-right: 1px;
 
     li {
         background: $color-structure-active;
         line-height: 2;
-        margin-bottom: 0.1666em;
+        margin-bottom: 1px;
 
         &, a {
             color: $color-highlight-normal;
@@ -90,7 +90,7 @@ selected. If no proposal is selected, no state is applied.
     i {
         font-size: 140%;
         line-height: 1;
-        margin-right: 0.1666em;
+        margin-right: 1px;
         vertical-align: middle;
 
         &.icon-speechbubbles {
@@ -128,8 +128,8 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-proposal-detail-cover {
     @include span(full);
-    border-bottom: 1px solid $color-structure-border;
-    padding: 1.2em 1.2em 1em;
+    border-bottom: 1px solid $color-secondary-introvert;
+    padding: 0.8em 0.8em 0.5em;
 
     .chapter-header {
         margin: 0;
@@ -138,8 +138,17 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-cover-show-comments {
-    @include disguised-link;
+    @include show-comments;
     float: right;
+
+    i {
+        font-size: 200%;
+    }
+}
+
+.mercator-proposal-cover-header {
+    @include text(header);
+    margin: 0;
 }
 
 .mercator-proposal-detail-container {
@@ -148,26 +157,30 @@ selected. If no proposal is selected, no state is applied.
     overflow: hidden;
 }
 
+$mercator-proposal-detail-nav-width: 3.3%;
+
 .mercator-proposal-detail-nav {
-    @include span(1 of 12 inside);
     @extend .jump-navigation;
     text-align: center;
+    width: $mercator-proposal-detail-nav-width;
 
-    a {
-        padding: 0 0 1em;
+    li {
+        a {
+            padding: 0 0 1em;
+        }
     }
 }
 
 .mercator-proposal-chapters {
-    @include span(11 of 12 inside);
     background-color: white;
-    border-left: 0.1666em solid $color-secondary-introvert;
-    padding-left: 1em;
+    border-left: 1px solid $color-secondary-introvert;
+    padding: 0 0.8em;
+    width: 100% - $mercator-proposal-detail-nav-width;
 
     .chapter-header {
         background: transparent;
         font-size: $font-size-normal;
-        margin: 0;
+        margin: 0 0 1em;
         padding: 0;
     }
 
@@ -178,12 +191,13 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-proposal-detail-nav,
 .mercator-proposal-chapters {
+    float: left;
     padding-top: 1em;
 }
 
 .mercator-proposal-list-item {
     @include container;
-    border-bottom: 0.1666em solid $color-secondary-introvert;
+    border-bottom: 1px solid $color-secondary-introvert;
     padding: 1.2em;
 
     .mercator-proposal-list-item-image {
