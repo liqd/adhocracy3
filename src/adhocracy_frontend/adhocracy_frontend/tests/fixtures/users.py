@@ -96,7 +96,6 @@ def create_user(name, password='password'):
     path = get_activation_path(name)
     activate_account(path)
 
-if __name__ == "__main__":
-    for n in ['carla','cindy','conrad','hanna','joe','kalle','nina','phillip','theo','zoe']:
-        register_user(n + "")
-    activate_all()
+if __name__ == '__main__':
+    for n in ['carla']:
+        create_user(n)
