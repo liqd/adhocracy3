@@ -89,8 +89,12 @@ export class MercatorWorkbench {
 
                 adhTopLevelState.bind("view", $scope);
                 $scope.redirectAfterCreate = (result? : { path : string }[]) => {
-                    var proposalVersionPath : string = AdhResourceArea.resourceUrl(adhConfig)(result.slice(-1)[0].path);
-                    $location.url(proposalVersionPath);
+                    if (typeof result !== "undefined") {
+                        var proposalVersionPath : string = AdhResourceArea.resourceUrl(adhConfig)(result.slice(-1)[0].path);
+                        $location.url(proposalVersionPath);
+                    } else {
+                        $location.url("/r/mercator");
+                    }
                 };
                 $scope.goToProposal = (path) => {
                     $location.url(resourceUrl(path));
