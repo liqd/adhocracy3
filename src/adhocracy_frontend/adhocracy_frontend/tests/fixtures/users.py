@@ -16,7 +16,8 @@ null = None
 true = True
 false = False
 
-def register_user(user_name, password="password"):
+
+def register_user(user_name, password='password'):
     uri = root_uri + '/principals/users/'
     body = json.dumps({
             'data': {
@@ -26,9 +27,9 @@ def register_user(user_name, password="password"):
                 'adhocracy_core.sheets.principal.IUserBasic': {
                 'email': user_name + '@example.org',
                 'name': user_name
-            }
-        },
-        'content_type': 'adhocracy_core.resources.principal.IUser'
+                }
+            },
+            'content_type': 'adhocracy_core.resources.principal.IUser'
     })
     headers = {
         'Content-Type': 'application/json;charset=UTF-8',
