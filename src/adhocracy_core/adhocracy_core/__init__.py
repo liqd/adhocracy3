@@ -83,6 +83,9 @@ def includeme(config):
     config.include('.resources.sample_image')
     config.include('.websockets')
     config.include('.rest')
+    if settings.get('adhocracy.add_test_users', False):
+        from adhocracy_core.testing import includeme_root_with_test_users
+        config.include(includeme_root_with_test_users)
 
 
 def main(global_config, **settings):
