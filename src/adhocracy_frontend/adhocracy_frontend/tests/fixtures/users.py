@@ -7,7 +7,7 @@ import os
 import re
 import requests
 
-email_spool_path = os.environ['A3_ROOT'] + '/var/mail/new/'
+email_spool_path = os.environ.get('A3_ROOT', '.') + '/var/mail/new/'
 root_uri = 'http://localhost:6541'
 verbose = True
 
@@ -31,8 +31,6 @@ def register_user(user_name, password="password"):
         'content_type': 'adhocracy_core.resources.principal.IUser'
     })
     headers = {
-        'X-User-Token': 'SECRET_GOD',
-        'X-User-Path': '/principals/users/0000000/',
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip,deflate',
@@ -59,8 +57,6 @@ def activate_account(path):
         'path': path
     })
     headers = {
-        'X-User-Token': 'SECRET_GOD',
-        'X-User-Path': '/principals/users/0000000/',
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip,deflate',
@@ -76,8 +72,7 @@ def activate_account(path):
         print(body)
         print(response)
         print(response.text)
-
-    #assert response.status_code == 200
+    assert response.status_code == 200
 
 def activate_all():
     for file in glob.glob(email_spool_path + "*"):

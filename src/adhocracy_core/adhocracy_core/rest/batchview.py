@@ -13,6 +13,8 @@ from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.rest.exceptions import internal_exception_to_dict
 from adhocracy_core.rest.schemas import POSTBatchRequestSchema
 from adhocracy_core.rest.views import RESTView
+from adhocracy_core.utils import set_batchmode
+
 
 logger = getLogger(__name__)
 
@@ -56,6 +58,7 @@ class BatchView(RESTView):
         """Create new resource and get response data."""
         response_list = []
         path_map = {}
+        set_batchmode(self.request.registry)
         for item in self.request.validated:
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
