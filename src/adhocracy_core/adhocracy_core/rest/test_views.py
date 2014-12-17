@@ -556,8 +556,9 @@ class TestUsersRESTView:
 class TestItemRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry):
+    def request(self, cornice_request, mock_resource_registry, changelog):
         cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry._transaction_changelog = changelog
         return cornice_request
 
     def make_one(self, context, request):
@@ -624,7 +625,7 @@ class TestItemRESTView:
                                       __name__='child')
         request.registry.content.create.return_value = child
         request.validated = {'content_type': IResourceX,
-                                  'data': {}}
+                             'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
 
@@ -647,7 +648,7 @@ class TestItemRESTView:
         child['first'] = first
         request.registry.content.create.return_value = child
         request.validated = {'content_type': IItemVersion,
-                                  'data': {}}
+                             'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
 
@@ -664,16 +665,35 @@ class TestItemRESTView:
                                       __name__='child')
         root = testing.DummyResource(__provides__=IItemVersion)
         request.registry.content.create.return_value = child
-        request.validated = {'content_type':
-                                      IItemVersion,
-                                  'data': {},
-                                  'root_versions': [root]}
+        request.validated = {'content_type': IItemVersion,
+                             'data': {},
+                             'root_versions': [root]}
         inst = self.make_one(context, request)
         response = inst.post()
 
         wanted = {'path': request.application_url + '/child/',
                   'content_type': IItemVersion.__identifier__}
         assert request.registry.content.create.call_args[1]['root_versions'] == [root]
+        assert wanted == response
+
+    def test_post_valid_itemversion_batchmode_last_version_in_transaction_exists(
+            self, request, context):
+        from adhocracy_core.interfaces import IItemVersion
+        context['last_new_version'] = testing.DummyResource(__provides__=
+                                                            IItemVersion)
+        request.root = context
+        request.validated = {'content_type': IItemVersion,
+                             'data': {},
+                             'root_versions': [],
+                             '_last_new_version_in_transaction':\
+                                 context['last_new_version']}
+        inst = self.make_one(context, request)
+        inst.put = Mock()
+        response = inst.post()
+
+        assert inst.put.call_count == 1
+        wanted = {'path': request.application_url + '/last_new_version/',
+                  'content_type': IItemVersion.__identifier__}
         assert wanted == response
 
     def test_put_valid_no_sheets(self, request, context, mock_sheet):

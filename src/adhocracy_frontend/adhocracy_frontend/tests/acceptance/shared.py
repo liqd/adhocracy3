@@ -120,8 +120,8 @@ def get_list_element(listing, text, descendant=None, max_steps=20):
             return element
 
 
-def api_login(name_or_email, password):
-    """Login user and return user token."""
+def api_login(name_or_email: str, password: str) -> dict:
+    """Login user and return user token and path"""
     uri = root_uri + '/login_username'
     headers = {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -129,7 +129,7 @@ def api_login(name_or_email, password):
         'Accept-Encoding': 'gzip,deflate',
         'Connection': 'keep-alive',
         'Accept-Language': 'en-US,en;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)',
         'Content-Length': '36'
     }
     body = json.dumps({
@@ -146,12 +146,13 @@ def api_login(name_or_email, password):
         print(response.text)
     assert response.status_code == 200
 
-    payload = json.loads(response.text)
-    assert payload['status'] == 'success'
+    data = response.json()
+    assert data['status'] == 'success'
 
-    return payload['user_token']
+    return {'user_token': data['user_token'],
+            'user_path': data['user_path']}
 
 
-def api_login_god():
-    """Login in as god."""
+def api_login_god() -> dict:
+    """Login in as god and return user token and path."""
     return api_login(god_login, god_password)

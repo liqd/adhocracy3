@@ -5,14 +5,15 @@ from logging import getLogger
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
+from pyramid.traversal import find_interface
+
 from substanced.util import find_catalog
 from substanced.util import find_service
-
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
@@ -21,17 +22,22 @@ from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
+from adhocracy_core.utils import get_following_new_version
+from adhocracy_core.utils import get_last_new_version
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
+from adhocracy_core.utils import get_last_version
 from adhocracy_core.utils import raise_colander_style_error
-
-import adhocracy_core.sheets.versions
+from adhocracy_core.utils import is_batchmode
+from adhocracy_core.sheets.versions import IVersionable
+from adhocracy_core.sheets.versions import IForkableVersionable
 import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.rate
 
 
-changelog_metadata = ChangelogMetadata(False, False, None, None)
+changelog_metadata = ChangelogMetadata(False, False, None, None, None)
 logger = getLogger(__name__)
 
 
@@ -63,11 +69,14 @@ def rate_backreference_modified_subscriber(event):
 
 
 def itemversion_created_subscriber(event):
-    """Add new follwed_by version to the transaction_changelog."""
+    """Add new `follwed_by` and `last_version` to the transaction_changelog."""
     if event.new_version is None:
         return
     _add_changelog_metadata(event.registry, event.object,
                             followed_by=event.new_version)
+    item = find_interface(event.object, IItem)
+    _add_changelog_metadata(event.registry, item,
+                            last_version=event.new_version)
 
 
 def _add_changelog_metadata(registry: Registry, resource: IResource, **kwargs):
@@ -113,7 +122,10 @@ def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
 
 
 def reference_has_new_version_subscriber(event):
-    """Auto updated resource if a referenced Item has a new version."""
+    """Auto updated resource if a referenced Item has a new version.
+
+    :raises AutoUpdateNoForkAllowedError: if a fork is created but not allowed
+    """
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
@@ -122,7 +134,9 @@ def reference_has_new_version_subscriber(event):
     sheet = get_sheet(resource, isheet, registry=registry)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
     editable = sheet.meta.editable
-
+    graph = find_graph(resource)
+    if root_versions and not graph.is_in_subtree(resource, root_versions):
+        return
     if autoupdate and editable:
         appstruct = sheet.get()
         field = appstruct[event.isheet_field]
@@ -132,42 +146,53 @@ def reference_has_new_version_subscriber(event):
             field.insert(old_version_index, event.new_version)
         else:
             appstruct[event.isheet_field] = event.new_version
-        new_version = _get_new_version_created_in_this_transaction(registry,
-                                                                   resource)
-        if IItemVersion.providedBy(resource) and new_version is None:
+        if is_batchmode(registry):
+            new_version = get_last_new_version(registry, resource)
+        else:
+            new_version = get_following_new_version(registry, resource)
+        is_versionable = IVersionable.providedBy(resource)
+        is_forkable = IForkableVersionable.providedBy(resource)
+        # versionable without new version: create a new version store appstruct
+        if is_versionable and new_version is None:
+            if not is_forkable:  # pragma: no branch
+                _assert_we_are_not_forking(resource, registry, event)
             _update_versionable(resource, isheet, appstruct, root_versions,
                                 registry, creator)
+        # versionable with new version: use new version to store appstruct
+        elif is_versionable and new_version is not None:
+            new_version_sheet = get_sheet(new_version, isheet,
+                                          registry=registry)
+            new_version_sheet.set(appstruct)
+        # non versionable: store appstruct directly
         else:
             sheet.set(appstruct)
 
 
-def _get_new_version_created_in_this_transaction(registry,
-                                                 resource) -> IResource:
-        if not hasattr(registry, '_transaction_changelog'):
-            return
-        path = resource_path(resource)
-        changelog_metadata = registry._transaction_changelog[path]
-        return changelog_metadata.followed_by
+def _assert_we_are_not_forking(resource, registry, event):
+    """Assert that the last tag == resource to prevent forking."""
+    last = get_last_version(resource, registry)
+    if last is None:
+        return
+    if resource is not last:
+        raise AutoUpdateNoForkAllowedError(resource, event)
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,
                         creator) -> IResource:
-    graph = find_graph(resource)
-    if root_versions and not graph.is_in_subtree(resource, root_versions):
-        return resource
-    else:
-        appstructs = _get_writable_appstructs(resource, registry)
-        versionable_sheet = adhocracy_core.sheets.versions.IVersionable
-        appstructs[versionable_sheet.__identifier__]['follows'] = [resource]
-        appstructs[isheet.__identifier__] = appstruct
-        iresource = get_iresource(resource)
-        new_resource = registry.content.create(iresource.__identifier__,
-                                               parent=resource.__parent__,
-                                               appstructs=appstructs,
-                                               creator=creator,
-                                               registry=registry,
-                                               options=root_versions)
-        return new_resource
+    appstructs = _get_writable_appstructs(resource, registry)
+    # FIXME the need to switch between forkable and non forkable his bad
+    is_forkable = IForkableVersionable.providedBy(resource)
+    iversionable = IForkableVersionable if is_forkable else IVersionable
+    appstructs[iversionable.__identifier__]['follows'] = [resource]
+    appstructs[isheet.__identifier__] = appstruct
+    iresource = get_iresource(resource)
+    new_resource = registry.content.create(iresource.__identifier__,
+                                           parent=resource.__parent__,
+                                           appstructs=appstructs,
+                                           creator=creator,
+                                           registry=registry,
+                                           options=root_versions)
+    return new_resource
 
 
 def _get_writable_appstructs(resource, registry) -> dict:
@@ -182,7 +207,10 @@ def _get_writable_appstructs(resource, registry) -> dict:
 
 
 def metadata_modified_subscriber(event):
-    """Invoked after PUTting modified metadata fields."""
+    """Invoked after PUTting modified metadata fields.
+
+    :raises colander.Invalid: if
+    """
     is_deleted = event.new_appstruct['deleted']
     is_hidden = event.new_appstruct['hidden']
     was_deleted = event.old_appstruct['deleted']
@@ -195,11 +223,14 @@ def metadata_modified_subscriber(event):
                            is_hidden)
             return
         if not event.request.has_permission('hide_resource', event.object):
+            # FIXME a better place to validate is inside the IMetadata schema.
             raise_colander_style_error(IMetadata,
                                        'hidden',
                                        'Changing this field is not allowed')
 
     # Store hidden/deleted status in object for efficient access
+    # FIXME a better place to do attribute storage is inside a custom metadata
+    # sheet class or just use AttributeStorageSheet sheet class.
     event.object.deleted = is_deleted
     event.object.hidden = is_hidden
 

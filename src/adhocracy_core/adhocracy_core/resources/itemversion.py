@@ -14,7 +14,6 @@ from adhocracy_core.sheets.versions import IForkableVersionable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import find_graph
-from adhocracy_core.utils import raise_colander_style_error
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.versions
 
@@ -92,6 +91,8 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
                                               new one.
 
     """
+    # FIXME we would not need this code at all if we use the
+    # SheetReferenceAutoUpdateMarker for the LAST Tag
     parent_item = find_interface(context, IItem)
     if parent_item is None:
         return
@@ -105,11 +106,13 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
             data = sheet.get()
             old_last_tagged_versions = data['elements']
             if IForkableVersionable.providedBy(context):
+                # FIXME the last Tag should only reference the last version.
+                # For forkable resources we should add a HEAD tag, referenceing
+                # the "heads"
                 updated_references = _determine_elements_for_forkable_last_tag(
                     context, old_last_tagged_versions, old_versions)
             else:
-                updated_references = _determine_elements_for_linear_last_tag(
-                    context, old_last_tagged_versions, old_versions)
+                updated_references = [context]
             data['elements'] = updated_references
             sheet.set(data)
             break
@@ -126,17 +129,6 @@ def _determine_elements_for_forkable_last_tag(context: IResource,
     # Append new version to end of list
     updated_references.append(context)
     return updated_references
-
-
-def _determine_elements_for_linear_last_tag(context: IResource,
-                                            old_last_tagged_versions: list,
-                                            predecessors: list) -> list:
-    # Linear version history means that the last tag has a single value
-    # and there is a single predecessor and both must be the same
-    if len(predecessors) == 1 and old_last_tagged_versions == predecessors:
-        return [context]
-    else:
-        raise_colander_style_error(IVersionable, 'follows', 'No fork allowed')
 
 
 itemversion_metadata = resource_metadata_defaults._replace(
