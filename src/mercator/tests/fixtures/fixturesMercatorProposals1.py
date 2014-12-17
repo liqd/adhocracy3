@@ -18,6 +18,31 @@ null = None
 true = True
 false = False
 
+def login():
+    uri = root_uri + "/login_username"
+    headers = {
+        "Content-Type": "application/json;charset=UTF-8",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip,deflate",
+        "Connection": "keep-alive",
+        "Accept-Language": "en-US,en;q=0.8",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
+        "Content-Length": "36"
+    }
+    body = json.dumps({
+        "name": "god",
+        "password": "password"
+    })
+    response = requests.post(uri, headers=headers, data=body)
+    if verbose:
+        print('\n')
+        print(uri)
+        print(headers)
+        print(body)
+        print(response)
+        print(response.text)
+        assert response.status_code == 200
+    return response.json()
 
 def _create_proposal():
     name = get_random_string()
@@ -521,7 +546,7 @@ def _create_proposal():
                 "result_first_version_path": "@pn44"
             }]
 
-def create_proposals(user_token, n=5, expect_error=False):
+def create_proposals(user_path, user_token, n=5, expect_error=False):
     proposals = []
 
     uri = root_uri + "/batch"
@@ -532,7 +557,7 @@ def create_proposals(user_token, n=5, expect_error=False):
             "Accept-Encoding": "gzip,deflate",
             "Connection": "keep-alive",
             "X-User-Token": user_token,
-            "X-User-Path": "" + root_uri + "/principals/users/0000000/",
+            "X-User-Path": user_path,
             "Accept-Language": "en-US,en;q=0.8",
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
             "Content-Length": length
@@ -559,4 +584,5 @@ def create_proposals(user_token, n=5, expect_error=False):
 
 
 if __name__ == "__main__":
-    create_proposals("GOD_SECRET")
+    credentials = login()
+    create_proposals(credentials['user_path'], credentials['user_token'])
