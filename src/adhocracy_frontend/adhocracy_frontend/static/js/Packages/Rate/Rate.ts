@@ -281,24 +281,16 @@ export var rateController = (
         }
     };
 
-    $scope.cast = (rate : number) : void => {
-        if (!$scope.optionsPostPool.POST) {
-            adhTopLevelState.redirectToLogin();
-        }
-
-        if ($scope.isActive(rate)) {
-            // click on active button to un-rate
-
-            // (the current implementation does not allow withdrawing
-            // of rates, so if you click on "pro" twice in a row, the
-            // second time will have no effect.  the work-around is for
-            // the user to rate something "neutral".  a proper fixed
-            // will be provided later.)
-            //
-            // adapter.rate($scope.myRateResource, <any>false);
-            // $scope.postUpdate();
-        } else {
-            // click on inactive button to (re-)rate
+    /**
+     * the current implementation does not allow withdrawing of
+     * rates, so if you click on "pro" twice in a row, the second time
+     * will have no effect.  the work-around is for the user to rate
+     * something "neutral".  an alternative behavior is cast_toggle
+     * defined below.
+     */
+    /*
+    var castSimple = (rate : number) : void => {
+        if (!$scope.isActive(rate)) {
             $scope.assureUserRateExists()
                 .then(() => {
                     adapter.rate($scope.myRateResource, rate);
@@ -306,6 +298,35 @@ export var rateController = (
                 });
         }
     };
+    */
+
+    /**
+     * if the design has no neutral button, un-upping can be
+     * implemented as changeing the vote to 'neutral'.  this requires
+     * the total votes count to disregard neutral votes in its filter
+     * query, and has negative implications on backend performance,
+     * but it works.
+     */
+    var castToggle = (rate : number) : void => {
+        $scope.assureUserRateExists()
+            .then(() => {
+                var oldRate : number = $scope.myRateResource.data[SIRate.nick].rate;
+
+                if (rate !== 0 && oldRate === rate) {
+                    rate = 0;
+                }
+                adapter.rate($scope.myRateResource, rate);
+                $scope.postUpdate();
+            });
+    };
+
+    $scope.cast = (rate : number) : void => {
+        if (!$scope.optionsPostPool.POST) {
+            adhTopLevelState.redirectToLogin();
+        }
+        castToggle(rate);
+    };
+
 
     $scope.toggle = () : void => {
         if ($scope.isActive(1)) {
