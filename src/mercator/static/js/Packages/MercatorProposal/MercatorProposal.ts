@@ -648,25 +648,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var self : Widget<R> = this;
         var data = this.initializeScope(instance.scope);
 
-        // FIXME: image upload depends on #386, #368, #324, #403.
-        //
-        // FIXME: check whether the new image is different from the
-        // old one before uploading?
-
-        var imagePostPath : string = "/mercator/proposals/assets";
-        var imagePathPromise : ng.IPromise<string>;
-        try {
-            imagePathPromise = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
-        } catch (e) {
-            imagePathPromise = this.$q.when(undefined);
-        }
-
-        return imagePathPromise.then((imagePath : string) => {
-
-            console.log(imagePathPromise);
-            debugger;
-
-            if (imagePathPromise !== undefined) {
+        var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
+            if (typeof imagePath !== 'undefined') {
                 data.introduction.picture = imagePath;
             }
 
@@ -686,7 +669,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 }))
                 .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
 
-        });
+        };
+
+        if (data.imageUpload.files.length > 0) {
+            return uploadImageFile(this.adhHttp, "/mercator", data.imageUpload).then((imagePath) => postProposal(imagePath));
+        } else {
+            return postProposal();
+        }
     }
 
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
