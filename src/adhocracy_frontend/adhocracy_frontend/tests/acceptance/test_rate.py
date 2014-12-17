@@ -37,6 +37,7 @@ class TestRate:
 
         assert wait(check_result)
 
+    @mark.skipif(True, reason='not currently in the UI')
     def test_neutralvote(self, browser):
         rateable = browser.find_by_css('.comment').first
         button = rateable.find_by_css('.rate-neutral').first
