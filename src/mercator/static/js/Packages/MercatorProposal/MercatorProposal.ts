@@ -182,9 +182,9 @@ export interface IControllerScope extends IScope {
  * promises the path of the image resource as a string.
  *
  * as the a3 asset protocol is much simpler than HTML5 file upload, we
- * compose the multi-part mime post request manually.  The $flow
- * object is just used for meta data retrieval and cleared before it
- * can upload anything.
+ * compose the multi-part mime post request manually (no chunking).
+ * The $flow object is just used for meta data retrieval and cleared
+ * before it can upload anything.
  */
 export var uploadImageFile = (
     adhHttp : AdhHttp.Service<any>,
@@ -196,7 +196,6 @@ export var uploadImageFile = (
     }
     var file : FlowFile = flow.files[0];
 
-    // ignore chunking and get the entire file from the file object.
     var bytes = () : any => {
         var func = (file.file.mozSlice ? "mozSlice" :
                     (file.file.webkitSlice ? "webkitSlice" :
@@ -211,7 +210,6 @@ export var uploadImageFile = (
     formData.append("content_type", RIMercatorIntroImage.content_type);
     formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
-
 
     return this.adhHttp.get(poolPath)
         .then((mercatorPool) => {
