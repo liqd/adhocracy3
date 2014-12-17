@@ -8,12 +8,6 @@ category: Widgets
 A mixin to show comments somewhere
 
 ```html_example
-<style>
-.show-comments {
-    @include show-comments;
-}
-</style>
-
 <a class="show-comments"><i class="icon-speechbubble"></i>12</a>
 ```
 */
