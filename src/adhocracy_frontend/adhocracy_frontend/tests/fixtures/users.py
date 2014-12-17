@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 # you can execute this module from $A3_ROOT with ./bin/ipython as interpreter.
 
-import glob
 import json
 import os
 import re
@@ -31,8 +30,6 @@ def register_user(user_name, password="password"):
         'content_type': 'adhocracy_core.resources.principal.IUser'
     })
     headers = {
-        'X-User-Token': 'SECRET_GOD',
-        'X-User-Path': '/principals/users/0000000/',
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip,deflate',
