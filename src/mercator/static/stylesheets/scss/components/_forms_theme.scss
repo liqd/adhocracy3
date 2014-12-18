@@ -1,3 +1,6 @@
+$input-margin-bottom: 24px;
+$error-line-height: $font-size-normal;
+
 input[type="text"],
 input[type="url"],
 input[type="password"],
@@ -9,5 +12,32 @@ select,
 textarea {
     background: $color-structure-border-introvert;
     color: $color-highlight-extrovert;
-    margin-bottom: 1.75em;
+    margin-bottom: $input-margin-bottom;
+}
+
+.ng-submitted {
+    input[type="text"],
+    input[type="url"],
+    input[type="password"],
+    input[type="email"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    label,
+    div,
+    select,
+    textarea {
+        &.ng-invalid, &:invalid, &.is-invalid {
+            @extend .error-state;
+            margin-bottom: 0;
+
+            + .input-error {
+                margin-bottom: $input-margin-bottom - $error-line-height;
+            }
+        }
+    }
+}
+
+.input-error {
+    line-height: $error-line-height;
 }
