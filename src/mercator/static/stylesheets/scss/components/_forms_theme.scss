@@ -8,6 +8,6 @@ input[type="number"],
 select,
 textarea {
     background: $color-structure-border-introvert;
-    border: 0;
     color: $color-highlight-extrovert;
+    margin-bottom: 1.75em;
 }

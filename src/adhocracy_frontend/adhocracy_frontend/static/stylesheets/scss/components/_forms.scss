@@ -95,7 +95,7 @@ select,
 textarea {
     display: block;
     width: 100%;
-    margin-bottom: 1.75em;
+    margin-bottom: 0.5em;
     padding: 0.25em $font-size-normal;
     border: 1px solid $color-structure-border;
     color: $color-prime-normal;
@@ -144,11 +144,6 @@ textarea {
     textarea {
         &.ng-invalid, &:invalid, &.is-invalid {
             @extend .error-state;
-            margin-bottom: 0;
-
-            + .input-error {
-                padding-bottom: 0.85em;
-            }
         }
     }
 }
@@ -196,7 +191,9 @@ checked.
 */
 
 .input-error {
+    @include inline-block;
     color: $color-highlight-invalid;
+    font-size: $font-size-small;
 }
 
 /*doc
@@ -318,7 +315,3 @@ This error concerns a single input.
 </div>
 ```
 */
-.input-error {
-    @include inline-block;
-    font-size: $font-size-small;
-}
