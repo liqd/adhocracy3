@@ -191,6 +191,7 @@ class TestAssetFileDownload:
         file = Mock(spec=File)
         file.blob = Mock()
         file.blob.open.return_value = io.BytesIO(b'dummy blob')
+        file.mimetype = 'image/png'
         mock_retrieve_asset_file = Mock(spec=asset.retrieve_asset_file,
                                         return_value=file)
         monkeypatch.setattr(asset, 'retrieve_asset_file',
@@ -209,6 +210,7 @@ class TestAssetFileDownload:
         assert mock_crop_image.resize.call_args[0] == (dimensions,
                                                        Image.ANTIALIAS)
         assert result == inst_with_dimensions.file
+        assert result.mimetype == file.mimetype
 
     def test_crop_if_needed_crop_height(self, inst_with_dimensions):
         mock_image = Mock()

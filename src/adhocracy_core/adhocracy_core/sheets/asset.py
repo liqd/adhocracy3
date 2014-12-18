@@ -135,15 +135,16 @@ class AssetFileDownload(Persistent):
         parent_file = retrieve_asset_file(context.__parent__, registry)
         # Crop and resize image via PIL
         with parent_file.blob.open('r') as blobdata:
+            mimetype = parent_file.mimetype
             image = Image.open(blobdata)
             cropped_image = self._crop_if_needed(image)
             resized_image = cropped_image.resize(self.dimensions,
                                                  Image.ANTIALIAS)
             bytestream = io.BytesIO()
-            resized_image.save(bytestream, 'JPEG')
+            resized_image.save(bytestream, image.format)
             bytestream.seek(0)
         # Store as substanced File and return
-        self.file = File(stream=bytestream, mimetype='image/jpeg')
+        self.file = File(stream=bytestream, mimetype=mimetype)
         transaction.commit()  # to avoid BlobError: Uncommitted changes
         return self.file
 
