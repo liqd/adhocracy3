@@ -9,8 +9,7 @@ from adhocracy_frontend.tests.acceptance.shared import get_list_element
 from adhocracy_frontend.tests.acceptance.shared import get_listing_create_form
 from adhocracy_frontend.tests.acceptance.shared import get_random_string
 from adhocracy_frontend.tests.acceptance.shared import login_god
-from adhocracy_frontend.tests.fixtures.users import register_user
-from adhocracy_frontend.tests.fixtures.users import activate_all
+from adhocracy_frontend.tests.fixtures.users import create_user
 from adhocracy_frontend.tests.acceptance.shared import logout
 from adhocracy_frontend.tests.acceptance.shared import login
 
@@ -18,10 +17,12 @@ from adhocracy_frontend.tests.acceptance.shared import login
 @fixture(scope="module")
 def user():
     name = get_random_string(n=5)
-    password = "password"
-    register_user(name, password)
-    activate_all()
-    return (name, password)
+    password = 'password'
+    create_user(name, password)
+    import time
+    time.sleep(1)
+    return name, password
+
 
 class TestComment:
 

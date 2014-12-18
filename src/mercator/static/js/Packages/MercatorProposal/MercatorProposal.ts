@@ -182,13 +182,13 @@ export interface IControllerScope extends IScope {
  * promises the path of the image resource as a string.
  *
  * as the a3 asset protocol is much simpler than HTML5 file upload, we
- * compose the multi-part mime post request manually.  The $flow
- * object is just used for meta data retrieval and cleared before it
- * can upload anything.
+ * compose the multi-part mime post request manually (no chunking).
+ * The $flow object is just used for meta data retrieval and cleared
+ * before it can upload anything.
  */
 export var uploadImageFile = (
     adhHttp : AdhHttp.Service<any>,
-    postPath : string,
+    poolPath : string,
     flow : Flow
 ) : ng.IPromise<string> => {
     if (flow.files.length !== 1) {
@@ -196,7 +196,6 @@ export var uploadImageFile = (
     }
     var file : FlowFile = flow.files[0];
 
-    // ignore chunking and get the entire file from the file object.
     var bytes = () : any => {
         var func = (file.file.mozSlice ? "mozSlice" :
                     (file.file.webkitSlice ? "webkitSlice" :
@@ -205,15 +204,16 @@ export var uploadImageFile = (
         return bytes;
     };
 
-    flow.files = [];
-
     var formData = new FormData();
     formData.append("content_type", RIMercatorIntroImage.content_type);
     formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
-    return adhHttp.postRaw(postPath, formData)
-        .then((rsp) => { return rsp.data.path; });
+    return adhHttp.get(poolPath)
+        .then((mercatorPool) => {
+            var postPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
+            return adhHttp.postRaw(postPath, formData).then((rsp) => { return rsp.data.path; });
+        });
 };
 
 
@@ -576,11 +576,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
-        var imagePathPromise : ng.IPromise<string> = this.adhHttp.get("/mercator")
-            .then((mercatorPool) => {
-                var imagePostPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
-                return uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
-            });
+        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, "/mercator", data.imageUpload);
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -648,25 +644,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var self : Widget<R> = this;
         var data = this.initializeScope(instance.scope);
 
-        // FIXME: image upload depends on #386, #368, #324, #403.
-        //
-        // FIXME: check whether the new image is different from the
-        // old one before uploading?
-
-        var imagePostPath : string = "/mercator/proposals/assets";
-        var imagePathPromise : ng.IPromise<string>;
-        try {
-            imagePathPromise = uploadImageFile(this.adhHttp, imagePostPath, data.imageUpload);
-        } catch (e) {
-            imagePathPromise = this.$q.when(undefined);
-        }
-
-        return imagePathPromise.then((imagePath : string) => {
-
-            console.log(imagePathPromise);
-            debugger;
-
-            if (imagePathPromise !== undefined) {
+        var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
+            if (typeof imagePath !== 'undefined') {
                 data.introduction.picture = imagePath;
             }
 
@@ -686,7 +665,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 }))
                 .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
 
-        });
+        };
+
+        if (data.imageUpload.files.length > 0) {
+            return uploadImageFile(this.adhHttp, "/mercator", data.imageUpload).then((imagePath) => postProposal(imagePath));
+        } else {
+            return postProposal();
+        }
     }
 
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
@@ -1265,14 +1250,15 @@ export var register = (angular) => {
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
                         Math.floor((Math.random() * 10000) + 1);
 
-                    $scope.submit().catch((error) => {
-                        if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
-                            $scope.data.introduction.nickInstance++;
-                            $scope.submitIfValid();
-                        } else {
-                            container.scrollTopAnimated(0);
-                        }
-                    });
+                    $scope.submit()
+                        .catch((error) => {
+                            if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
+                                $scope.data.introduction.nickInstance++;
+                                $scope.submitIfValid();
+                            } else {
+                                container.scrollTopAnimated(0);
+                            }
+                        });
                 } else {
                     var element = $element.find(".ng-invalid");
                     container.scrollToElementAnimated(element);

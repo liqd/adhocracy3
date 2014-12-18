@@ -330,7 +330,7 @@
                         <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
                             current image:
                             <img class="mercator-proposal-detail-view-image"
-                                 src="{{ data.introduction.picture }}/detail"
+                                 data-ng-src="{{ data.introduction.picture }}/detail"
                                  style="width: 100%; height: 203px"/>
                         </div>
                         <div
