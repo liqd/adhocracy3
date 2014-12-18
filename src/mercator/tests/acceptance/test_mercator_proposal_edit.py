@@ -57,8 +57,7 @@ class TestMercatorForm:
 
 
 def success(browser):
-    return (not browser.is_text_present("Internal Error", wait_time=1) and
-            wait(lambda: browser.url.endswith("/r/mercator/")))
+    return wait(lambda: browser.url.endswith("/r/mercator/"))
 
 
 def select_proposal(browser):
