@@ -27,7 +27,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     websocketTestPaths : string;
     contentType : string;
     view : string;
-    goToListing() : void;
+    redirectAfterCreate(result? : { path : string }[]) : void;
     goToProposal(path : string) : void;
     proposalListingData : {
         facets : AdhListing.IFacet[];
@@ -88,8 +88,13 @@ export class MercatorWorkbench {
                 };
 
                 adhTopLevelState.bind("view", $scope);
-                $scope.goToListing = () => {
-                    $location.url("/r/mercator");
+                $scope.redirectAfterCreate = (result? : { path : string }[]) => {
+                    if (typeof result !== "undefined") {
+                        var proposalVersionPath : string = AdhResourceArea.resourceUrl(adhConfig)(result.slice(-1)[0].path);
+                        $location.url(proposalVersionPath);
+                    } else {
+                        $location.url("/r/mercator");
+                    }
                 };
                 $scope.goToProposal = (path) => {
                     $location.url(resourceUrl(path));

@@ -107,10 +107,10 @@ export var resourceWrapper = () => {
                 return arg;
             };
 
-            var triggerCallback = (key : string) : void => {
+            var triggerCallback = (key : string, result? : any) : void => {
                 if (typeof $attrs[key] !== "undefined") {
                     var fn = $parse($attrs[key]);
-                    fn($scope.$parent);
+                    fn($scope.$parent, { result: result });
                 }
             };
 
@@ -146,11 +146,15 @@ export var resourceWrapper = () => {
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
                     .then((resources) => adhHttp.deepPost(resources))
-                    .then(() => displayOrClear(), (errors : AdhHttp.IBackendErrorItem[]) => {
-                        self.triggerSetMode(Mode.edit);
-                        throw errors;
-                    })
-                    .then(() => triggerCallback("onSubmit"));
+                    .then(
+                        (result : any) => {
+                            displayOrClear();
+                            triggerCallback("onSubmit", result);
+                        },
+                        (errors : AdhHttp.IBackendErrorItem[]) => {
+                            self.triggerSetMode(Mode.edit);
+                            throw errors;
+                        });
             };
 
             self.triggerClear = () => {
