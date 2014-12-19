@@ -8,11 +8,20 @@ category: Widgets
 A navigation list containing hash tag links
 
 ```html_example
+<strong>Numbered</strong>
 <nav class="jump-navigation">
     <ol>
-        <li><a>1. Element</a></li>
-        <li><a>2. Element</a></li>
-        <li><a class="active">3. Element (active)</a></li>
+        <li><a>Element</a></li>
+        <li class="active"><a>Element (LI Active)</a></li>
+        <li><a class="active">Element (A active)</a></li>
+    </ol>
+</nav>
+<strong>Unumbered</strong>
+<nav class="jump-navigation m-unnumbered">
+    <ol>
+        <li><a>Element</a></li>
+        <li class="active"><a>Element (LI Active)</a></li>
+        <li><a class="active">Element (A active)</a></li>
     </ol>
 </nav>
 ```
@@ -31,21 +40,23 @@ A navigation list containing hash tag links
     }
 
     li {
+        font-size: $font-size-small;
+        line-height: 1.333;
+
+        &, a {
+            color: $color-secondary-extrovert;
+        }
+
         a {
             display: block;
-            font-size: $font-size-small;
             padding: 0 0.5em 1.5em;
-            line-height: 1.333;
-            color: $color-secondary-extrovert;
             text-decoration: none;
+        }
 
-            // active class automaticall added by du-scrollspy plugin
-            // https://www.npmjs.com/package/angular-scroll#-du-scrollspy-
-            &.active {
-                &, a {
-                    color: $color-highlight-normal;
-                }
-            }
+        // active class automaticall added by du-scrollspy plugin
+        // https://www.npmjs.com/package/angular-scroll#-du-scrollspy-
+        &.active, &.active a, .active {
+            color: $color-highlight-normal;
         }
     }
 
