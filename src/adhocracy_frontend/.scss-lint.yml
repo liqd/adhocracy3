@@ -20,3 +20,5 @@
             force_nesting: false
         PlaceholderInExtend:
             enabled: false
+        QualifyingElement:
+            allow_element_with_attribute: true

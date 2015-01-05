@@ -189,19 +189,19 @@ about it.
 ```
 */
 .discussion-header {
+    @include clearfix;
+    @include text(meta);
     background: $color-structure-surface;
     margin-bottom: 1em;
     padding: 0.5em;
-    @include clearfix;
-    @include text(meta);
 
     .discussion-header-icon {
+        @include border-radius(50%);
         float: left;
         font-size: 150%;
         line-height: 1.333;
         width: 1.333em;
         text-align: center;
-        @include border-radius(50%);
         background: white;
     }
 
@@ -219,8 +219,8 @@ about it.
 
     .discussion-header-column1,
     .discussion-header-column2 {
-        float: right;
         @include text-align(right);
+        float: right;
         margin-left: 0.5em;
     }
 }

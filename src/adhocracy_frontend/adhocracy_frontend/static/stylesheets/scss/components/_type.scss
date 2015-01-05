@@ -94,11 +94,11 @@ A call-to-action link
 <a class="call-to-action m-add" href="#">Add a thing</a>
 ```
 */
-a.call-to-action {
+.call-to-action {
     text-decoration: none;
     text-transform: uppercase;
 
-    &:hover {
+    &:hover, &:focus {
         color: $color-highlight-introvert;
     }
 

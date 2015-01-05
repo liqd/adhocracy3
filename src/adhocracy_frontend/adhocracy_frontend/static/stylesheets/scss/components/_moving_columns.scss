@@ -99,11 +99,11 @@ The menu should always have the same state as its columns.
 */
 .moving-column {
     // layout
+    @include transition(width 0.5s, left 0.5s);
     position: absolute;
     top: 0;
     bottom: 0;
     overflow: hidden;
-    @include transition(width 0.5s, left 0.5s);
 
     .moving-column-collapsed {
         display: none;
@@ -224,6 +224,7 @@ States:
 }
 
 .moving-column-sidebar {
+    @include transition(left 0.5s);
     display: none;
     position: absolute;
     top: $moving-column-menu-height;
@@ -231,7 +232,6 @@ States:
     overflow-y: auto;
     left: -30%;
     width: 30%;
-    @include transition(left 0.5s);
     z-index: 1;
     background-color: $color-structure-surface;
     padding: 0.5em;

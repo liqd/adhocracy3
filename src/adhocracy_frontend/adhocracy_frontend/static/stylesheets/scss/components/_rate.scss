@@ -23,8 +23,8 @@ The button has the is-rate-button-active state.
 .like-button {
     $arrow-width: 1em;
 
-    position: relative;
     @include inline-block;
+    position: relative;
     margin-left: $arrow-width;
     padding: 0 0.5em;
     line-height: 2;

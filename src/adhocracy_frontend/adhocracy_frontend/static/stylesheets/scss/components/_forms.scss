@@ -102,8 +102,8 @@ textarea {
     background-color: $color-background;
 
     @include placeholder {
-        color: $color-secondary-extrovert;
         @include opacity(1);
+        color: $color-secondary-extrovert;
     }
 
     &.m-title {

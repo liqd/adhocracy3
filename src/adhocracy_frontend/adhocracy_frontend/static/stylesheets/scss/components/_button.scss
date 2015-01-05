@@ -68,6 +68,7 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
+    @include button-color($color-highlight-normal, $color-highlight-reverse);
 
     $border-width: 0.25em;
 
@@ -79,8 +80,6 @@ input[type="button"] {
     line-height: 2em;
     height: 2em + 2 * $border-width;  // fix height in firefox
     padding: 0 0.5em;
-
-    @include button-color($color-highlight-normal, $color-highlight-reverse);
 
     &:active,
     &:focus {
@@ -98,7 +97,7 @@ input[type="button"] {
     &:disabled,
     &.is-disabled,
     &.ng-disabled {
-        cursor: default;
         @include button-color($color-secondary-extrovert, $color-structure-surface);
+        cursor: default;
     }
 }
