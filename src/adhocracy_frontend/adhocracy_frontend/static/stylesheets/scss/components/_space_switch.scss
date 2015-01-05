@@ -32,10 +32,8 @@ Switch the space (content/user)
             font-size: 130%;
         }
 
-        &.is-active {
-            i {
-                color: $color-highlight-normal;
-            }
+        &.is-active i {
+            color: $color-highlight-normal;
         }
     }
 
