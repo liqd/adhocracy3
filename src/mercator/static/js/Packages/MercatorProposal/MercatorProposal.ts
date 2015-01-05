@@ -645,7 +645,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var data = this.initializeScope(instance.scope);
 
         var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
-            if (typeof imagePath !== 'undefined') {
+            if (typeof imagePath !== "undefined") {
                 data.introduction.picture = imagePath;
             }
 
