@@ -198,7 +198,15 @@ export var register = () => {
                 // only used in untested functions
                 adhPreliminaryNamesMock = undefined;
 
-                AdhRate.rateController(adapterMock, scopeMock, q, httpMock, adhPermissionsMock, userMock, adhPreliminaryNamesMock, null)
+                AdhRate.rateController(
+                    adapterMock,
+                    scopeMock,
+                    <any>q,
+                    httpMock,
+                    adhPermissionsMock,
+                    userMock,
+                    adhPreliminaryNamesMock,
+                    null)
                     .then(done, (reason) => {
                         expect(reason).toBe(undefined);
                     });

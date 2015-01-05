@@ -31,7 +31,7 @@ export var register = () => {
                     rest_url: "rest_url"
                 };
 
-                service = new AdhResourceArea.Service(providerMock, q, $injectorMock, adhHttpMock, adhConfigMock);
+                service = new AdhResourceArea.Service(providerMock, <any>q, $injectorMock, adhHttpMock, adhConfigMock);
             });
 
             describe("route", () => {

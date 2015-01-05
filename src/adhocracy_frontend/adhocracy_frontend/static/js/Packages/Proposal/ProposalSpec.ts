@@ -24,7 +24,7 @@ export var register = () => {
 
             beforeEach(() => {
                 adhHttpMock = createAdhHttpMock();
-                adhProposal = new AdhProposal.Service(adhHttpMock, new AdhPreliminaryNames.Service(), q);
+                adhProposal = new AdhProposal.Service(adhHttpMock, new AdhPreliminaryNames.Service(), <any>q);
             });
         });
     });

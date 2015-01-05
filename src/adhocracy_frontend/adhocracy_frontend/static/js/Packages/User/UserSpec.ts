@@ -52,7 +52,7 @@ export var register = () => {
                     localstorage: true
                 };
 
-                adhUser = new AdhUser.Service(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+                adhUser = new AdhUser.Service(adhHttpMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {
