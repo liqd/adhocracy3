@@ -182,7 +182,7 @@ ruby
 ````
 ::
 
-    bin/gem1.9.1 outdated
+    bin/gem outdated  # binary may also be called bin/gem1.9.1 or bin/gem2.1
 
 node.js
 ```````
