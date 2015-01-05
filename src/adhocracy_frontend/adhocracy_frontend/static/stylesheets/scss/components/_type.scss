@@ -98,7 +98,7 @@ A call-to-action link
     text-decoration: none;
     text-transform: uppercase;
 
-    &:hover {
+    &:hover, &:focus {
         color: $color-highlight-introvert;
     }
 
