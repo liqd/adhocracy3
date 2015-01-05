@@ -165,8 +165,11 @@ Create scaffold for extension packages
 
     bin/pcreate -s adocracy_extension adhocracy_XX
 
-Update Python packages
-----------------------
+Update packages
+---------------
+
+python
+``````
 
 Check whether new Python versions exist::
 
@@ -174,6 +177,23 @@ Check whether new Python versions exist::
 
 You may then update the pinned Python versions in `versions.cfg` if
 appropriate.
+
+ruby
+````
+::
+
+    bin/gem outdated  # binary may also be called bin/gem1.9.1 or bin/gem2.1
+
+node.js
+```````
+::
+
+    bin/npm --prefix parts/nodejs/lib/ outdated
+
+bower
+`````
+
+not available
 
 Adhocracy Releases
 ------------------
