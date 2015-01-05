@@ -3,8 +3,8 @@
 }
 
 .l-header-wrapper {
-    @include clearfix;
     @extend %moving-column-single-width;
+    @include clearfix;
     margin: 0 auto;
 }
 

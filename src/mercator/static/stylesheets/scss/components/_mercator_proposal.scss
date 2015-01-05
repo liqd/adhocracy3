@@ -71,8 +71,8 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-form-nav {
-    @include span(first 2 of 12 no-gutters);
     @extend .jump-navigation;
+    @include span(first 2 of 12 no-gutters);
     font-size: $font-size-small;
     padding-right: 1px;
 
@@ -111,13 +111,13 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-proposal-detail-meta,
 .mercator-propsal-list-item-meta {
+    @include container;
+    @include text(functional-introvert);
+
     // reset ul default styling
     margin: 0;
     padding: 0;
     list-style: none;
-
-    @include container;
-    @include text(functional-introvert);
 }
 
 .mercator-propsal-list-item-meta-item,

@@ -4,13 +4,12 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
+    @include button-color($color-highlight-reverse, $color-highlight-normal);
 
     border: 0;
     font-weight: $font-weight-normal;
     line-height: 2;
     height: 2em;
-
-    @include button-color($color-highlight-reverse, $color-highlight-normal);
 
     &.has-focus, &:focus,
     &.is-hover, &:hover {
