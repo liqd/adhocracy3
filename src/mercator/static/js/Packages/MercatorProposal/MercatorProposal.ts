@@ -1199,6 +1199,7 @@ export var register = (angular) => {
                 // validate image upload
                 flow.on( "fileAdded", (file, event) => {
                     var elem = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+                    elem.$setValidity("required", true);
                     if (file.size > flow.opts.maximumByteSize) {
                         elem.$setValidity("tooBig", false);
                     } else {
@@ -1240,6 +1241,10 @@ export var register = (angular) => {
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
+
+                var flow = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
+                var elem = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+                elem.$setValidity("required", flow.files.length === 1);
 
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
