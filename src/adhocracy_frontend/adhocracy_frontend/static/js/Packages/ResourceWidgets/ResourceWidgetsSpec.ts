@@ -117,7 +117,7 @@ export var register = () => {
                 instanceMock.wrapper.eventHandler = jasmine.createSpyObj("eventHandler", ["on", "off", "trigger"]);
                 instanceMock.wrapper.triggerSubmit.and.returnValue(q.when());
 
-                resourceWidget = new AdhResourceWidgets.ResourceWidget(adhHttpMock, adhPreliminaryNamesMock, q);
+                resourceWidget = new AdhResourceWidgets.ResourceWidget(adhHttpMock, adhPreliminaryNamesMock, <any>q);
             });
 
             describe("createDirective", () => {
