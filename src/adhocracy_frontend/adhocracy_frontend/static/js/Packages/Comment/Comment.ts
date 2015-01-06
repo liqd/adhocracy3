@@ -59,6 +59,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
         modificationDate : string;
         commentCount : number;
         comments : string[];
+        path : string;
         replyPoolPath : string;
     };
 }
@@ -149,6 +150,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                     replyPoolPath: this.adapter.poolPath(resource)
                 };
                 this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
+                this.adhPermissions.bindScope(scope, AdhUtil.parentPath(scope.data.path), "commentItemOptions");
             });
     }
 
