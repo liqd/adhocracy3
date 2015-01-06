@@ -150,6 +150,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                     replyPoolPath: this.adapter.poolPath(resource)
                 };
                 this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
+                this.adhPermissions.bindScope(scope, AdhUtil.parentPath(scope.data.path), "commentItemOptions");
             });
     }
 
