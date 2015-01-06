@@ -348,7 +348,7 @@
                             </button>
                             <div
                                 data-ng-messages="mercatorProposalIntroductionForm['introduction-picture-upload'].$error"
-                                data-ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty">
+                                data-ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty || mercatorProposalForm.$submitted">
                                 <span
                                     class="input-error"
                                     data-ng-message="wrongType">
