@@ -375,8 +375,6 @@
                                     {{"Image is required" | translate }}
                                 </span>
                             </div>
-                            <button type="button" data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">{{ "Remove Image" | translate }}</button>
-                            <p data-ng-if="$flow.files.length > 0" data-flow-directory=""></p>
                             <div class="picture-upload-file" ng-if="$flow.files.length > 0" data-ng-repeat="file in $flow.files">
                                 <img data-flow-img="file" height="120" /><br/>{{file.name}}
                             </div>
