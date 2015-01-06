@@ -154,6 +154,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName
         ])
+        .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])

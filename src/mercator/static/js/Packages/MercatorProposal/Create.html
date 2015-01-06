@@ -352,22 +352,22 @@
                                 <span
                                     class="input-error"
                                     data-ng-message="wrongType">
-                                    {{"Image must be of type" | translate }} <span data-ng-repeat="for in currentUpload.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>
+                                    {{"IMAGE_ERROR_TYPE" | translate:currentUpload.opts }}
                                 </span>
                                 <span
                                     class="input-error"
                                     data-ng-message="tooBig">
-                                    {{"Image must be smaller than" | translate }} {{currentUpload.opts.maximumByteSize/1000000}}MB
+                                    {{"IMAGE_ERROR_BIG" | translate:currentUpload.opts }}
                                 </span>
                                 <span
                                     class="input-error"
                                     data-ng-message="tooWide">
-                                    {{"Image must be less than" | translate }} {{currentUpload.opts.maximumWidth}}px {{"wide" | translate }}
+                                    {{"IMAGE_ERROR_WIDE" | translate:currentUpload.opts}}
                                 </span>
                                 <span
                                     class="input-error"
                                     data-ng-message="tooNarrow">
-                                    {{"Image must be greater than" | translate }} {{currentUpload.opts.minimumWidth}}px {{"wide" | translate }}
+                                    {{"IMAGE_ERROR_NARROW" | translate:currentUpload.opts }}
                                 </span>
                                 <span
                                     class="input-error"
