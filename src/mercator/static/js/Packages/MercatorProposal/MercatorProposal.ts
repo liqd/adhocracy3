@@ -1197,6 +1197,8 @@ export var register = (angular) => {
             var imgUploadElement = $element.find("[name=introduction-picture-upload]");
 
             $scope.$watch(() => imgUploadElement.scope().$flow, (flow) => {
+                var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+
                 $scope.currentUpload = flow;
 
                 // validate image upload
@@ -1206,33 +1208,28 @@ export var register = (angular) => {
                     // order to keep flow.js from adding the image and then add
                     // it manually after successful validation.
 
-                    var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+                    // FIXME: possible compatibility issue
+                    var _URL = $window.URL || $window.webkitURL;
 
-                    imgUploadController.$setValidity("required", true);
+                    var img = new Image();
+                    img.src = _URL.createObjectURL(file.file);
+                    img.onload = () => {
+                        imgUploadController.$setDirty();
+                        imgUploadController.$setValidity("required", true);
+                        imgUploadController.$setValidity("tooBig", file.size <= flow.opts.maximumByteSize);
+                        imgUploadController.$setValidity("wrongType", flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
+                        imgUploadController.$setValidity("tooWide", img.width <= flow.opts.maximumWidth);
+                        imgUploadController.$setValidity("tooNarrow", img.width >= flow.opts.minimumWidth);
 
-                    imgUploadController.$setValidity("tooBig", file.size <= flow.opts.maximumByteSize);
-                    imgUploadController.$setValidity("wrongType", flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
+                        if (imgUploadController.$valid) {
+                            flow.files[0] = file;
+                        } else {
+                            imgUploadController.$setValidity("required", flow.files.length === 1);
+                        }
 
-                    if (!imgUploadController.$error.wrongType && !imgUploadController.$error.tooBig) {
-                        var img = new Image();
+                        $scope.$apply();
+                    };
 
-                        // FIXME: possible compatibility issue
-                        var _URL = $window.URL || $window.webkitURL;
-
-                        img.src = _URL.createObjectURL(file.file);
-                        img.onload = () => {
-                            var imageWidth = img.width;
-                            imgUploadController.$setValidity("tooWide", imageWidth <= flow.opts.maximumWidth);
-                            imgUploadController.$setValidity("tooNarrow", imageWidth >= flow.opts.minimumWidth);
-
-                            if (imgUploadController.$valid) {
-                                flow.files[0] = file;
-                                $scope.$apply();
-                            } else {
-                                imgUploadController.$setViewValue(false);
-                            }
-                        };
-                    }
                     $scope.$apply();
                     return false;
                 });
