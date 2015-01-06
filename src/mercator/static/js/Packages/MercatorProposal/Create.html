@@ -369,6 +369,11 @@
                                     data-ng-message="tooNarrow">
                                     {{"Image must be greater than" | translate }} {{currentUpload.opts.minimumWidth}}px {{"wide" | translate }}
                                 </span>
+                                <span
+                                    class="input-error"
+                                    data-ng-message="required">
+                                    {{"Image is required" | translate }}
+                                </span>
                             </div>
                             <button type="button" data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">{{ "Remove Image" | translate }}</button>
                             <p data-ng-if="$flow.files.length > 0" data-flow-directory=""></p>
