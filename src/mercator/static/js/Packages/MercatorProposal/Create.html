@@ -342,31 +342,31 @@
                             <button
                                 type="button"
                                 data-flow-btn=""
-                                flow-attrs="{accept:'image/*'}">
+                                data-flow-attrs="{accept:'image/*'}">
                                 <span data-ng-if="$flow.files.length > 0">{{ "Change Image" | translate }}</span>
                                 <span data-ng-if="!$flow.files.length || $flow.files.length == 0">{{ "Choose Image" | translate }}</span>
                             </button>
                             <div
-                                ng-messages="mercatorProposalIntroductionForm['introduction-picture-upload'].$error"
-                                ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty">
+                                data-ng-messages="mercatorProposalIntroductionForm['introduction-picture-upload'].$error"
+                                data-ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty">
                                 <span
                                     class="input-error"
-                                    ng-message="wrongType">
-                                    {{"Image must be of type" | translate }} <span ng-repeat="fo in currentUpload.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>
+                                    data-ng-message="wrongType">
+                                    {{"Image must be of type" | translate }} <span data-ng-repeat="for in currentUpload.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>
                                 </span>
                                 <span
                                     class="input-error"
-                                    ng-message="tooBig">
+                                    data-ng-message="tooBig">
                                     {{"Image must be smaller than" | translate }} {{currentUpload.opts.maximumByteSize/1000000}}MB
                                 </span>
                                 <span
                                     class="input-error"
-                                    ng-message="tooWide">
+                                    data-ng-message="tooWide">
                                     {{"Image must be less than" | translate }} {{currentUpload.opts.maximumWidth}}px {{"wide" | translate }}
                                 </span>
                                 <span
                                     class="input-error"
-                                    ng-message="tooNarrow">
+                                    data-ng-message="tooNarrow">
                                     {{"Image must be greater than" | translate }} {{currentUpload.opts.minimumWidth}}px {{"wide" | translate }}
                                 </span>
                             </div>
