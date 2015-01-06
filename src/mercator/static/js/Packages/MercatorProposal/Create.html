@@ -342,36 +342,39 @@
                             <button
                                 type="button"
                                 data-flow-btn=""
-                                flow-attrs="{accept:'image/*'}">
+                                data-flow-attrs="{accept:'image/*'}">
                                 <span data-ng-if="$flow.files.length > 0">{{ "Change Image" | translate }}</span>
                                 <span data-ng-if="!$flow.files.length || $flow.files.length == 0">{{ "Choose Image" | translate }}</span>
                             </button>
                             <div
-                                ng-messages="mercatorProposalIntroductionForm['introduction-picture-upload'].$error"
-                                ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty">
+                                data-ng-messages="mercatorProposalIntroductionForm['introduction-picture-upload'].$error"
+                                data-ng-if="mercatorProposalIntroductionForm['introduction-picture-upload'].$dirty || mercatorProposalForm.$submitted">
                                 <span
                                     class="input-error"
-                                    ng-message="wrongType">
-                                    {{"Image must be of type" | translate }} <span ng-repeat="fo in currentUpload.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>
+                                    data-ng-message="wrongType">
+                                    {{"IMAGE_ERROR_TYPE" | translate:currentUpload.opts }}
                                 </span>
                                 <span
                                     class="input-error"
-                                    ng-message="tooBig">
-                                    {{"Image must be smaller than" | translate }} {{currentUpload.opts.maximumByteSize/1000000}}MB
+                                    data-ng-message="tooBig">
+                                    {{"IMAGE_ERROR_BIG" | translate:currentUpload.opts }}
                                 </span>
                                 <span
                                     class="input-error"
-                                    ng-message="tooWide">
-                                    {{"Image must be less than" | translate }} {{currentUpload.opts.maximumWidth}}px {{"wide" | translate }}
+                                    data-ng-message="tooWide">
+                                    {{"IMAGE_ERROR_WIDE" | translate:currentUpload.opts}}
                                 </span>
                                 <span
                                     class="input-error"
-                                    ng-message="tooNarrow">
-                                    {{"Image must be greater than" | translate }} {{currentUpload.opts.minimumWidth}}px {{"wide" | translate }}
+                                    data-ng-message="tooNarrow">
+                                    {{"IMAGE_ERROR_NARROW" | translate:currentUpload.opts }}
+                                </span>
+                                <span
+                                    class="input-error"
+                                    data-ng-message="required">
+                                    {{"Image is required" | translate }}
                                 </span>
                             </div>
-                            <button type="button" data-ng-show="$flow.files.length" data-ng-click="$flow.cancel()">{{ "Remove Image" | translate }}</button>
-                            <p data-ng-if="$flow.files.length > 0" data-flow-directory=""></p>
                             <div class="picture-upload-file" ng-if="$flow.files.length > 0" data-ng-repeat="file in $flow.files">
                                 <img data-flow-img="file" height="120" /><br/>{{file.name}}
                             </div>

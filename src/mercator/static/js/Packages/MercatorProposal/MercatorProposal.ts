@@ -1194,45 +1194,43 @@ export var register = (angular) => {
                 return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
             };
 
-            $scope.$watch(() => angular.element($("[name=introduction-picture-upload]")).scope().$flow, (flow) => {
+            var imgUploadElement = $element.find("[name=introduction-picture-upload]");
+
+            $scope.$watch(() => imgUploadElement.scope().$flow, (flow) => {
+                var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+
                 $scope.currentUpload = flow;
+
                 // validate image upload
-                flow.on( "fileAdded", (file, event) => {
-                    var elem = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
-                    if (file.size > flow.opts.maximumByteSize) {
-                        elem.$setValidity("tooBig", false);
-                    } else {
-                        elem.$setValidity("tooBig", true);
-                    }
-                    if (flow.opts.acceptedFileTypes.indexOf(file.file.type.replace("image/", "")) === -1) {
-                        elem.$setValidity("wrongType", false);
-                    } else {
-                        elem.$setValidity("wrongType", true);
-                    }
-                    if (!elem.$error.wrongType && !elem.$error.tooBig) {
-                        var img = new Image();
-                        var _URL = $window.URL || $window.webkitURL;
-                        img.src = _URL.createObjectURL(file.file);
-                        img.onload = () => {
-                            var imageWidth = img.width;
-                            if (imageWidth > flow.opts.maximumWidth) {
-                                elem.$setValidity("tooWide", false);
-                            } else {
-                                elem.$setValidity("tooWide", true);
-                            }
-                            if (imageWidth < flow.opts.minimumWidth) {
-                                elem.$setValidity("tooNarrow", false);
-                            } else {
-                                elem.$setValidity("tooNarrow", true);
-                            }
-                            if (elem.$valid) {
-                                flow.files[0] = file;
-                                $scope.$apply();
-                            } else {
-                                elem.$setViewValue(false);
-                            }
-                        };
-                    }
+                flow.on("fileAdded", (file, event) => {
+                    // We can only check some constraints after the image has
+                    // been loaded asynchronously.  So we always return false in
+                    // order to keep flow.js from adding the image and then add
+                    // it manually after successful validation.
+
+                    // FIXME: possible compatibility issue
+                    var _URL = $window.URL || $window.webkitURL;
+
+                    var img = new Image();
+                    img.src = _URL.createObjectURL(file.file);
+                    img.onload = () => {
+                        imgUploadController.$setDirty();
+                        imgUploadController.$setValidity("required", true);
+                        imgUploadController.$setValidity("tooBig", file.size <= flow.opts.maximumByteSize);
+                        imgUploadController.$setValidity("wrongType", flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
+                        imgUploadController.$setValidity("tooWide", img.width <= flow.opts.maximumWidth);
+                        imgUploadController.$setValidity("tooNarrow", img.width >= flow.opts.minimumWidth);
+
+                        if (imgUploadController.$valid) {
+                            flow.files[0] = file;
+                        } else {
+                            flow.cancel();
+                            imgUploadController.$setValidity("required", flow.files.length === 1);
+                        }
+
+                        $scope.$apply();
+                    };
+
                     $scope.$apply();
                     return false;
                 });
@@ -1240,6 +1238,9 @@ export var register = (angular) => {
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
+
+                var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+                imgUploadController.$setValidity("required", $scope.currentUpload.files.length === 1);
 
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
