@@ -1240,7 +1240,7 @@ export var register = (angular) => {
                 var container = $element.parents("[data-du-scroll-container]");
 
                 var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
-                imgUploadController.$setValidity("required", $scope.currentUpload.files.length === 1);
+                imgUploadController.$setValidity("required", imageExists());
 
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
