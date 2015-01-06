@@ -29,7 +29,7 @@ TODO Make test case work, preferably using manager instead of god::
     >> a = {'recipient': 'http://localhost/principals/users/0000000',
     ...      'title': 'Important notice regarding your Adhocracy account',
     ...      'text': '''Everything is fine.
-    ... Thanks you for your attention and have a nice day.'''}
+    ... Thank you for your attention and have a nice day.'''}
     >> resp_data = testapp.post_json(rest_url + "/message_user", a)
     >> resp_data.status_code
     200
@@ -40,9 +40,9 @@ The fields are all required and have the following semantics:
 
 :recipient: the name of a principal, i.e. a user (`.../principals/users/...`)
     or a group of users (`.../principals/groups/...`).
-:title: the title (subject) of the message. An installation-depended prefix or
+:title: the title (subject) of the message. An installation dependent prefix or
     suffix may be added to the subject (e.g. "Adhocracy Notification: ...").
-:text: the plain-text body of the message. An installation-depended prefix
+:text: the plain-text body of the message. An installation dependent prefix
     and/or suffix may be added to the text.
 
 The backend checks that the user has sufficient permissions to send the
@@ -52,7 +52,7 @@ e-mail to the specified user, or to every user in the specified group.
 
 On success, the backend just sends an empty string back to the frontend.
 Otherwise (e.g. if the user is not allowed to send messages), an error
-message is send back.
+message is sent back.
 
 TODO Add test case with insufficient permissions (using a normal user).
 
