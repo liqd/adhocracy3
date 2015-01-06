@@ -1224,6 +1224,7 @@ export var register = (angular) => {
                         if (imgUploadController.$valid) {
                             flow.files[0] = file;
                         } else {
+                            flow.cancel();
                             imgUploadController.$setValidity("required", flow.files.length === 1);
                         }
 
