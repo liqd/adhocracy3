@@ -1196,6 +1196,10 @@ export var register = (angular) => {
 
             var imgUploadElement = $element.find("[name=introduction-picture-upload]");
 
+            var imageExists = () => {
+                return ($scope.data.introduction && $scope.data.introduction.picture) || $scope.currentUpload.files.length > 0;
+            };
+
             $scope.$watch(() => imgUploadElement.scope().$flow, (flow) => {
                 var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
 
@@ -1225,7 +1229,7 @@ export var register = (angular) => {
                             flow.files[0] = file;
                         } else {
                             flow.cancel();
-                            imgUploadController.$setValidity("required", flow.files.length === 1);
+                            imgUploadController.$setValidity("required", imageExists());
                         }
 
                         $scope.$apply();
@@ -1245,7 +1249,7 @@ export var register = (angular) => {
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
                     // attach it to where ResourceWidgets can find it.
-                    $scope.data.imageUpload = angular.element($("[name=introduction-picture-upload]")).scope().$flow;
+                    $scope.data.imageUpload = imgUploadElement.scope().$flow;
 
                     // append a random number to the nick to allow duplicate titles
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
