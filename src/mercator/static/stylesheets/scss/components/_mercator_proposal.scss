@@ -25,20 +25,9 @@ selected. If no proposal is selected, no state is applied.
     }
 }
 
-.mercator-proposal-form-faux-column {
-    background: $color-structure-border-introvert;
-    height: 10000px;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: $annotation-width;
-    z-index: 0;
-}
-
 .mercator-proposal-form-container {
     background: $color-structure-border-introvert;
     overflow: hidden;
-    position: relative;
 }
 
 .mercator-proposal-form-annotation {
