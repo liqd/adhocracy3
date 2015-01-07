@@ -5,14 +5,6 @@ from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
 from adhocracy_frontend.tests.acceptance.shared import api_login_god
 from adhocracy_frontend.tests.acceptance.shared import wait
 
-@fixture(scope='module')
-def proposals():
-    credentials = api_login_god()
-    return create_proposals(user_token=credentials['user_token'],
-                            user_path=credentials['user_path'],
-                            n=10)
-
-
 class TestMercatorFilter(object):
 
     @fixture(scope='class')

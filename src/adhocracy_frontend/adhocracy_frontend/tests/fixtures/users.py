@@ -20,16 +20,16 @@ false = False
 def register_user(user_name, password='password'):
     uri = root_uri + '/principals/users/'
     body = json.dumps({
-            'data': {
-                'adhocracy_core.sheets.principal.IPasswordAuthentication': {
-                    'password': password
-                },
-                'adhocracy_core.sheets.principal.IUserBasic': {
+        'data': {
+            'adhocracy_core.sheets.principal.IPasswordAuthentication': {
+                'password': password
+            },
+            'adhocracy_core.sheets.principal.IUserBasic': {
                 'email': user_name + '@example.org',
                 'name': user_name
-                }
-            },
-            'content_type': 'adhocracy_core.resources.principal.IUser'
+            }
+        },
+        'content_type': 'adhocracy_core.resources.principal.IUser'
     })
     headers = {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -76,6 +76,7 @@ def activate_account(path):
 
     return response.status_code == 200
 
+
 def get_activation_path(name):
     with open(LOG_PATH, 'r') as f:
         file_contents = f.read()[-256:]
@@ -88,11 +89,13 @@ def get_activation_path(name):
     print('*** no match in file: ' + LOG_PATH)
     return None
 
+
 def create_user(name, password='password'):
     if not register_user(name, password):
         print('*** failed to register user')
     path = get_activation_path(name)
     activate_account(path)
+
 
 if __name__ == '__main__':
     for n in ['carla']:
