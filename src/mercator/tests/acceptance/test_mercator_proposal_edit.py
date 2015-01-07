@@ -31,8 +31,20 @@ class TestMercatorForm:
 
     @fixture(scope='class')
     def browser(self, browser, proposals):
-        assert browser.is_text_present("supporters", wait_time=1)
+        browser.reload()  # make sure proposals are loaded
+        assert browser.is_text_present("supporters", wait_time=2)
         return browser
+
+    def test_edit_proposal_no_user(self, browser):
+        select_proposal(browser)
+        assert not browser.is_text_present("edit")
+
+    @mark.xfail
+    def test_edit_proposal_other_user(self, browser, user):
+        login(browser, user[0], user[1])
+        select_proposal(browser)
+
+        assert not browser.is_text_present("edit")
 
     @mark.xfail
     def test_resubmitting_proposal(self, browser):
@@ -47,13 +59,6 @@ class TestMercatorForm:
         browser.find_by_name('accept-disclaimer').first.check()
         browser.find_by_css('input[type="submit"]').first.click()
         assert success(browser)
-
-    @mark.xfail
-    def test_editing_foreign_proposals(self, browser, user):
-        login(browser, user[0], user[1])
-        select_proposal(browser)
-
-        assert not browser.is_text_present("edit", wait_time=1)
 
 
 def success(browser):
