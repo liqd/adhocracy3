@@ -92,13 +92,17 @@ class TestComment:
                    first.text == new_text
 
 
-def create_comment(browser, rest_url, name):
-    """Go to content2 column and create comment with content 'comment1'."""
+def _visit_url(browser, rest_url):
     query = urlencode({
         'key': 'test',
         'pool-path': rest_url + 'adhocracy/',
     })
     browser.visit(browser.app_url + 'embed/create-or-show-comment-listing?' + query)
+
+
+def create_comment(browser, rest_url, name):
+    """Go to content2 column and create comment with content 'comment1'."""
+    _visit_url(browser, rest_url)
     listing = browser.find_by_css('.listing')
     comment = create_top_level_comment(browser, listing,  name)
     return comment
