@@ -64,8 +64,7 @@ class TestComment:
         edit_comment(browser, comment, 'edited 2')
         assert comment.find_by_css('.comment-content div').first.text == 'edited 2'
 
-    @mark.skipif(True, reason='FIXME Test needs to be updated since the '
-                              'backend now throws a "No fork allowed" error')
+    @mark.xfail
     def test_multi_edits(self, browser):
         parent = browser.find_by_css('.comment').first
         reply = parent.find_by_css('.comment').first
