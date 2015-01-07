@@ -32,7 +32,7 @@ class TestMercatorForm:
     @fixture(scope='class')
     def browser(self, browser, proposals):
         browser.reload()  # make sure proposals are loaded
-        assert browser.is_text_present("supporters", wait_time=1)
+        assert browser.is_text_present("supporters", wait_time=2)
         return browser
 
     def test_edit_proposal_no_user(self, browser):
