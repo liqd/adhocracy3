@@ -1,53 +1,31 @@
-from pytest import fixture
-from pytest import raises
-from webtest import TestApp
 from pytest import mark
 
-from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
-from adhocracy_frontend.tests.acceptance.shared import get_random_string
-from adhocracy_frontend.tests.acceptance.shared import api_login_god
 from adhocracy_frontend.tests.acceptance.shared import login_god
-from adhocracy_frontend.tests.fixtures.users import create_user
 from adhocracy_frontend.tests.acceptance.shared import login
 from adhocracy_frontend.tests.acceptance.shared import wait
 
 
-@fixture(scope='module')
-def proposals():
-    creds = api_login_god()
-    return create_proposals(creds['user_path'], creds['user_token'], n=1)
-
-@fixture(scope='module')
-def user():
-    name = get_random_string(n=5)
-    password = 'password'
-    create_user(name, password)
-    import time
-    time.sleep(1)
-    return name, password
-
-
 class TestMercatorForm:
 
-    @fixture(scope='class')
-    def browser(self, browser, proposals):
-        browser.reload()  # make sure proposals are loaded
-        assert browser.is_text_present("supporters", wait_time=2)
-        return browser
+    def test_edit_proposal_no_user(self, browser_with_proposal):
+        browser = browser_with_proposal
 
-    def test_edit_proposal_no_user(self, browser):
         select_proposal(browser)
         assert not browser.is_text_present("edit")
 
     @mark.xfail
-    def test_edit_proposal_other_user(self, browser, user):
+    def test_edit_proposal_other_user(self, browser_with_proposal, user):
+        browser = browser_with_proposal
+
         login(browser, user[0], user[1])
         select_proposal(browser)
 
         assert not browser.is_text_present("edit")
 
     @mark.xfail
-    def test_resubmitting_proposal(self, browser):
+    def test_resubmitting_proposal(self, browser_with_proposal):
+        browser = browser_with_proposal
+
         login_god(browser)
         select_proposal(browser)
 
