@@ -227,6 +227,15 @@ class POSTReportAbuseViewRequestSchema(colander.Schema):
     remark = Text(missing='')
 
 
+class POSTMessageUserViewRequestSchema(colander.Schema):
+
+    """Schema for messages to a user."""
+
+    recipient = Resource(missing=colander.required)
+    title = SingleLine(missing=colander.required)
+    text = Text(missing=colander.required)
+
+
 class BatchHTTPMethod(colander.SchemaNode):
 
     """An HTTP method in a batch request."""

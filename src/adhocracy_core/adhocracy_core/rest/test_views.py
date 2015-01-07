@@ -1199,6 +1199,32 @@ class TestReportAbuseView:
         assert inst.options() == {}
 
 
+class TestMessageUserView:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        from adhocracy_core.messaging import Messenger
+        registry.messenger = Mock(spec=Messenger)
+        cornice_request.registry = registry
+        cornice_request.validated['recipient'] = testing.DummyResource()
+        cornice_request.validated['title'] = 'Important Adhocracy notice'
+        cornice_request.validated['text'] = 'Surprisingly enough, all is well.'
+        return cornice_request
+
+    def _make_one(self, context, request):
+        from adhocracy_core.rest.views import MessageUserView
+        return MessageUserView(context, request)
+
+    def test_post(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.post() == ''
+        assert request.registry.messenger.send_message_to_user.called
+
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
+
+
 class TestAssetsServiceRESTView:
 
     @fixture

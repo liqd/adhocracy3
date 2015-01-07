@@ -422,6 +422,7 @@ def app_settings(request) -> dict:
     settings['mail.default_sender'] = 'substanced_demo@example.com'
     settings['adhocracy.abuse_handler_mail'] \
         = 'abuse_handler@unconfigured.domain'
+    settings['adhocracy.message_user_subject'] = 'Adhocracy Info: {}'
     return settings
 
 
@@ -510,8 +511,8 @@ def add_user_token(root, userid: str, token: str, registry):
     token_manager.token_to_user_id_timestamp[token] = (userid, timestamp)
 
 
-def add_user(root, login: str=None, password: str=None, roles=None,
-             registry=None) -> str:
+def add_user(root, login: str=None, password: str=None, email: str=None,
+             roles=None, registry=None) -> str:
     """Add user to :app:`Pyramid`."""
     from substanced.util import find_service
     from adhocracy_core.resources.principal import IUser
@@ -521,7 +522,7 @@ def add_user(root, login: str=None, password: str=None, roles=None,
     passwd_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
     appstructs =\
         {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
-         {'name': login},
+         {'name': login, 'email': email},
          adhocracy_core.sheets.principal.IPermissions.__identifier__:
          {'roles': roles},
          passwd_sheet.__identifier__:
@@ -544,43 +545,46 @@ def add_test_users(root, registry, options):
                    god_header['X-User-Token'],
                    registry)
     add_user(root, login=reader_login, password=reader_password,
-             roles=['reader'], registry=registry)
+             email='reader@example.org', roles=['reader'], registry=registry)
     add_user_token(root,
                    reader_header['X-User-Path'],
                    reader_header['X-User-Token'],
                    registry)
     add_user(root, login=annotator_login, password=annotator_password,
-             roles=['annotator'], registry=registry)
+             email='annotator@example.org', roles=['annotator'],
+             registry=registry)
     add_user_token(root,
                    annotator_header['X-User-Path'],
                    annotator_header['X-User-Token'],
                    registry)
     add_user(root, login=contributor_login, password=contributor_password,
-             roles=['contributor'], registry=registry)
+             email='contributor@example.org', roles=['contributor'],
+             registry=registry)
     add_user_token(root,
                    contributor_header['X-User-Path'],
                    contributor_header['X-User-Token'],
                    registry)
     add_user(root, login=editor_login, password=editor_password,
-             roles=['editor'], registry=registry)
+             email='editor@example.org', roles=['editor'], registry=registry)
     add_user_token(root,
                    editor_header['X-User-Path'],
                    editor_header['X-User-Token'],
                    registry)
-    add_user(root, login=reader_login, password=reader_password,
-             roles=['reviewer'], registry=registry)
+    add_user(root, login=reviewer_login, password=reviewer_password,
+             email='reviewer@example.org', roles=['reviewer'],
+             registry=registry)
     add_user_token(root,
                    reviewer_header['X-User-Path'],
                    reviewer_header['X-User-Token'],
                    registry)
     add_user(root, login=manager_login, password=manager_password,
-             roles=['manager'], registry=registry)
+             email='manager@example.org', roles=['manager'], registry=registry)
     add_user_token(root,
                    manager_header['X-User-Path'],
                    manager_header['X-User-Token'],
                    registry)
     add_user(root, login=admin_login, password=admin_password,
-             roles=['admin'], registry=registry)
+             email='admin@example.org', roles=['admin'], registry=registry)
     add_user_token(root,
                    admin_header['X-User-Path'],
                    admin_header['X-User-Token'],

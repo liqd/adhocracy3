@@ -9,9 +9,12 @@ from pyramid.settings import asbool
 from pyramid_mailer.interfaces import IMailer
 from pyramid_mailer.message import Message
 from pyramid.traversal import resource_path
+from zope.component import ComponentLookupError
 
 from adhocracy_core.interfaces import IResource
-
+from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import raise_colander_style_error
 
 logger = getLogger(__name__)
 
@@ -31,6 +34,8 @@ class Messenger():
         logger.debug('Messenger will use mail queue: %s', self.use_mail_queue)
         self.abuse_handler_mail = registry.settings.get(
             'adhocracy.abuse_handler_mail')
+        self.message_user_subject = registry.settings.get(
+            'adhocracy.message_user_subject')
 
     def send_mail(self,
                   subject: str,
@@ -151,6 +156,29 @@ class Messenger():
             recipients=[self.abuse_handler_mail],
             template_asset_base='adhocracy_core:templates/abuse_complaint',
             args=args)
+
+    def send_message_to_user(self,
+                             recipient: IResource,
+                             title: str,
+                             text: str,
+                             from_user: IResource):
+        """Send a message to a specific user."""
+        from_email = self._get_user_email(from_user)
+        try:
+            recipient_email = self._get_user_email(recipient)
+        except ComponentLookupError:
+            raise_colander_style_error(None, 'recipient', 'Not a user')
+        logger.debug('Sending message entitled "%s" from %s to %s', title,
+                     from_email, recipient_email)
+        self.render_and_send_mail(
+            subject=self.message_user_subject.format(title),
+            recipients=[recipient_email],
+            template_asset_base='adhocracy_core:templates/message_user',
+            args={'text': text},
+            sender=from_email)
+
+    def _get_user_email(self, user: IResource) -> str:
+        return get_sheet_field(user, IUserBasic, 'email', self.registry)
 
 
 def includeme(config):

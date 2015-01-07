@@ -39,6 +39,7 @@ from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
 from adhocracy_core.rest.schemas import POSTItemRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginUsernameRequestSchema
+from adhocracy_core.rest.schemas import POSTMessageUserViewRequestSchema
 from adhocracy_core.rest.schemas import POSTReportAbuseViewRequestSchema
 from adhocracy_core.rest.schemas import POSTResourceRequestSchema
 from adhocracy_core.rest.schemas import PUTResourceRequestSchema
@@ -1031,6 +1032,37 @@ class ReportAbuseView(RESTView):
         messenger.send_abuse_complaint(url=self.request.validated['url'],
                                        remark=self.request.validated['remark'],
                                        user=get_user(self.request))
+        return ''
+
+
+@view_defaults(
+    renderer='string',
+    context=IRootPool,
+    http_cache=0,
+    name='message_user',
+)
+class MessageUserView(RESTView):
+
+    """Send a message to another user."""
+
+    validation_POST = (POSTMessageUserViewRequestSchema, [])
+
+    @view_config(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return super().options()
+
+    @view_config(request_method='POST',
+                 permission='message_to_user',
+                 content_type='application/json')
+    def post(self) -> dict:
+        """Send a message to another user."""
+        messenger = self.request.registry.messenger
+        data = self.request.validated
+        messenger.send_message_to_user(recipient=data['recipient'],
+                                       title=data['title'],
+                                       text=data['text'],
+                                       from_user=get_user(self.request))
         return ''
 
 

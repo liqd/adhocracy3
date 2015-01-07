@@ -37,6 +37,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
             (Allow, 'role:contributor', 'add_section'),
             (Allow, 'role:contributor', 'add_paragraph'),
             (Allow, 'role:contributor', 'add_externalresource'),
+            (Allow, 'role:contributor', 'message_to_user'),
             (Allow, 'role:creator', 'add_commentversion'),
             (Allow, 'role:creator', 'add_rateversion'),
             (Allow, 'role:creator', 'add_proposalversion'),

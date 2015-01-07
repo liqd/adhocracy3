@@ -130,6 +130,16 @@ class TestRenderAndSendMail:
         assert not mock_render.called
 
 
+def _msg_to_str(msg):
+    """Convert an email message into a string."""
+    # The DummyMailer is too stupid to use a default sender, hence we add
+    # one manually, if necessary
+    if msg.sender is None:
+        msg.sender = 'support@unconfigured.domain'
+    msgtext = str(msg.to_message())
+    # Undo quoted-printable encoding of spaces for convenient testing
+    return msgtext.replace('=20', ' ')
+
 @mark.usefixtures('integration')
 class TestSendAbuseComplaint():
 
@@ -144,19 +154,11 @@ class TestSendAbuseComplaint():
         remark = 'Too much blah!'
         messenger.send_abuse_complaint(url=url, remark=remark, user=user)
         assert len(mailer.outbox) == 1
-        msgtext = self._msg_to_str(mailer.outbox[0])
+        msgtext = _msg_to_str(mailer.outbox[0])
         assert messenger.abuse_handler_mail in msgtext
         assert url in msgtext
         assert remark in msgtext
         assert 'sent by user' in msgtext
-
-    def _msg_to_str(self, msg):
-        # The DummyMailer is too stupid to use a default sender, hence we add
-        # one manually
-        msg.sender = 'support@unconfigured.domain'
-        msgtext = str(msg.to_message())
-        # Undo quoted-printable encoding of spaces for convenient testing
-        return msgtext.replace('=20', ' ')
 
     def test_send_abuse_complaint_without_user(self, registry):
         mailer = registry.messenger._get_mailer()
@@ -167,5 +169,58 @@ class TestSendAbuseComplaint():
         remark = 'Too much blah!'
         messenger.send_abuse_complaint(url=url, remark=remark, user=None)
         assert len(mailer.outbox) == 1
-        msgtext = self._msg_to_str(mailer.outbox[0])
+        msgtext = _msg_to_str(mailer.outbox[0])
         assert 'sent by an anonymous user' in msgtext
+
+@mark.usefixtures('integration')
+class TestSendMessageToUser():
+
+    def _mock_get_sheet_field(self, context, sheet, field_name, registry):
+        result = getattr(context, field_name)
+        if result == 'raise':
+            from zope.component import ComponentLookupError
+            raise ComponentLookupError('Bad luck!')
+        return result
+
+    def test_send_message_to_user(self, monkeypatch, registry):
+        from adhocracy_core import messaging
+        from adhocracy_core.resources.principal import IUser
+        recipient = Mock(spec=IUser)
+        recipient.email = 'recipient@example.org'
+        sender = Mock(spec=IUser)
+        sender.email = 'sender@example.org'
+        monkeypatch.setattr(messaging, 'get_sheet_field',
+                            self._mock_get_sheet_field)
+        mailer = registry.messenger._get_mailer()
+        assert len(mailer.outbox) == 0
+        messenger = registry.messenger
+        messenger.message_user_subject = 'Adhocracy Info: {}'
+        messenger.send_message_to_user(
+            recipient=recipient,
+            title='Important Adhocracy notice',
+            text='Surprisingly enough, all is well.',
+            from_user=sender)
+        assert len(mailer.outbox) == 1
+        msgtext = _msg_to_str(mailer.outbox[0])
+        assert 'From: sender@example.org' in msgtext
+        assert 'Subject: Adhocracy Info: Important Adhocracy notice' in msgtext
+        assert 'To: recipient@example.org' in msgtext
+
+    def test_send_message_recipient_is_not_a_user(self, monkeypatch, registry):
+        from adhocracy_core import messaging
+        from adhocracy_core.resources.principal import IUser
+        import colander
+        recipient = Mock()
+        recipient.email = 'raise'
+        sender = Mock(spec=IUser)
+        sender.email = 'sender@example.org'
+        monkeypatch.setattr(messaging, 'get_sheet_field',
+                            self._mock_get_sheet_field)
+        messenger = registry.messenger
+        messenger.message_user_subject = 'Adhocracy Info: {}'
+        with raises(colander.Invalid):
+            messenger.send_message_to_user(
+                recipient=recipient,
+                title='Important Adhocracy notice',
+                text='Surprisingly enough, all is well.',
+                from_user=sender)
