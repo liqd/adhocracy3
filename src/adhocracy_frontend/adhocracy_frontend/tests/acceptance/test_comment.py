@@ -80,7 +80,6 @@ class TestComment:
 
     def test_edit_no_user(self, browser, rest_url, user):
         logout(browser)
-        _visit_url(browser, rest_url)
         comment = browser.find_by_css('.comment').first
         assert not _get_edit_button(browser, comment)
 
