@@ -129,8 +129,22 @@ def create_reply_comment(browser, parent, content):
     return reply
 
 
+def _get_edit_button(browser, comment):
+    actions = comment.find_by_css('.comment-actions a')
+
+    for a in actions:
+        if a.text == 'edit':
+            return a
+    else:
+        return None
+
+
 def edit_comment(browser, comment, content):
-    comment.find_by_css('.comment-meta a')[0].click()
+    actions = comment.find_by_css('.comment-actions a')
+    edit = _get_edit_button(browser, comment)
+    assert edit
+    edit.click()
+
     comment.find_by_css('textarea').first.fill(content)
     comment.find_by_css('.comment-meta a')[0].click()
     browser.is_text_present(content, wait_time=10)
