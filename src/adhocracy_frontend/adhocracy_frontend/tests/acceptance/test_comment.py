@@ -78,18 +78,17 @@ class TestComment:
         # the captialisation might be changed by CSS
         assert wait(lambda: actual(comment).lower() == god_login.lower())
 
-    @mark.skipif(True, reason='FIXME: This test does not work as long as user '
-                              'activation does not work more reliably.')
-    def test_edit_foreign_comments(self, browser, rest_url, user):
-        comment = create_comment(browser, rest_url, 'comment1')
-        assert comment is not None
-
+    def test_edit_no_user(self, browser, rest_url, user):
         logout(browser)
+        _visit_url(browser, rest_url)
+        comment = browser.find_by_css('.comment').first
+        assert not _get_edit_button(browser, comment)
+
+    def test_edit_other_user(self, browser, rest_url, user):
         login(browser, user[0], user[1])
-        new_text = "changing comment to this text should not have worked."
-        edit_comment(browser, comment, new_text)
-        assert not comment.find_by_css('.comment-content div').\
-                   first.text == new_text
+        _visit_url(browser, rest_url)
+        comment = browser.find_by_css('.comment').first
+        assert not _get_edit_button(browser, comment)
 
 
 def _visit_url(browser, rest_url):
