@@ -41,18 +41,6 @@ class TestComment:
             reply = create_reply_comment(browser, comment, 'nested reply %d' % i)
             assert reply is not None
 
-    # comment depth > 7 fails (increase n if you have trouble
-    # reproducing this).  still need to look into why and how, then
-    # decide if it's a feature.  (FIXME: this duplicates the above
-    # test.  depending on how this failure is handled, one of the two
-    # tests may have to be removed.)
-    @mark.xfail
-    def test_nested_replies(self, browser, n=8):
-        for i in range(n):
-            comment = browser.find_by_css('.comment').last
-            reply = create_reply_comment(browser, comment, 'nested reply %d' % i)
-            assert reply is not None
-
     def test_multiple_replies(self, browser, n=10):
         comment = browser.find_by_css('.comment').first
         for i in range(n):
