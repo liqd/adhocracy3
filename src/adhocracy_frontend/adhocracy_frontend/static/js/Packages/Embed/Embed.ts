@@ -74,13 +74,16 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
         link: (scope, element, attrs) => {
             if (element[0].nodeName === "A" && adhConfig.canonical_url) {
                 scope.$watch(() => attrs.href, (orig) => {
+                    // remove any handlers that were registered in previous runs
+                    element.off("click.adh_href");
+
                     if (orig && orig[0] !== "#") {
                         orig = normalizeInternalUrl(orig, $location);
 
                         if (isInternalUrl(orig, $location)) {
                             // set href to canonical url while preserving click behavior
                             element.attr("href", adhConfig.canonical_url + orig);
-                            element.click((event) => {
+                            element.on("click.adh_href", (event) => {
                                 _.defer(() => $rootScope.$apply(() => {
                                     $location.url(orig);
                                 }));
