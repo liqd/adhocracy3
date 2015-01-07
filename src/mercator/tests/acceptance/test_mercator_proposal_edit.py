@@ -49,11 +49,11 @@ def select_proposal(browser):
     proposal loading, check for the detail's commentary link to contain the
     correct proposal title."""
     proposal_list = browser.find_by_css(".moving-column-body").\
-                            first.find_by_tag("ol").first
+        first.find_by_tag("ol").first
     proposal_title = proposal_list.find_by_css("h3 a").first
     assert wait(lambda: proposal_title.html)
     proposal_title.click()
 
     link = browser.find_by_css(".moving-column-content").first.\
-                   find_by_css(".mercator-proposal-detail-cover h1 a")
+        find_by_css(".mercator-proposal-detail-cover h1 a")
     assert wait(lambda: proposal_title.html in link["href"])
