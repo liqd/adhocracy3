@@ -48,7 +48,7 @@ A navigation list containing hash tag links
         }
 
         a {
-            display: block;
+            @include inline-block;
             padding: 0 0.5em 1.5em;
             text-decoration: none;
         }
