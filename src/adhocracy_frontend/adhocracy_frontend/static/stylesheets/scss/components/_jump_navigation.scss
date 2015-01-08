@@ -42,6 +42,7 @@ A navigation list containing hash tag links
     li {
         font-size: $font-size-small;
         line-height: 1.333;
+        padding: 0 0.5em 1.5em;
 
         &, a {
             color: $color-secondary-extrovert;
@@ -49,7 +50,6 @@ A navigation list containing hash tag links
 
         a {
             @include inline-block;
-            padding: 0 0.5em 1.5em;
             text-decoration: none;
         }
 
