@@ -32,7 +32,7 @@ A section with a additional annotation, typically displayed in a second column.
 
     .annotated-section-annotation {
         float: right;
-        padding-bottom: 2em;
+        margin-bottom: 2em;
         width: $annotation-width;
     }
 }
