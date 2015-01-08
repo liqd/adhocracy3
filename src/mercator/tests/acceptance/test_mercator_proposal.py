@@ -83,7 +83,6 @@ class TestMercatorForm:
         heard_of = browser.find_by_xpath('//*[@id="mercator-detail-view-additional"]/section/div/p').first
         assert not heard_of.text == ""
 
-    @mark.xfail
     def test_login_is_required(self):
         # FIXME this is broken. Can we just remove this test?
         # There are many permissions test now in src/adhocracy_mercator [joka]
