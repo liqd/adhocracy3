@@ -219,7 +219,7 @@
                                 placeholder="{{ 'Website' | translate }}" />
 
                             <label>
-                                {{ "How can we help you? Please specify:" | translate }}
+                                <span class="label-text">{{ "How can we help you? Please specify:" | translate }}</span>
                                 <input
                                     type="text"
                                     data-ng-model="data.organization_info.how_can_we_help_you"
@@ -285,7 +285,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "Title:" | translate }}
+                        <span class="label-text">{{ "Title:" | translate }}</span>
                         <input
                             type="text"
                             data-ng-model="data.introduction.title"
@@ -301,7 +301,7 @@
                     </label>
 
                     <label>
-                        {{ "Teaser:" | translate }}
+                        <span class="label-text">{{ "Teaser:" | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.introduction.teaser"
@@ -330,7 +330,7 @@
                 </div>
                 <div class="annotated-section-body">
                     <label>
-                        {{ "Upload an image" | translate }}
+                        <span class="label-text">{{ "Upload an image" | translate }}</span>
                         <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
                             current image:
                             <img class="mercator-proposal-detail-view-image"
@@ -436,7 +436,7 @@
                 </div>
                 <div class="annotated-section-body">
 
-                    {{ "Where will your project, initiative or activity mainly take place?" | translate }}
+                    <span class="label-text">{{ "Where will your project, initiative or activity mainly take place?" | translate }}</span>
 
                     <!-- FIXME: red border should show on dirty -->
                     <div
@@ -505,7 +505,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "What is the story behind your idea?" | translate }}
+                        <span class="label-text">{{ "What is the story behind your idea?" | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.story"
@@ -546,8 +546,8 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "What would be a successful outcome of your project or initiative?
-                        What is the aim you want to reach?" | translate }}
+                        <span class="label-text">{{ "What would be a successful outcome of your project or initiative?
+                        What is the aim you want to reach?" | translate }}</span>
 
                         <textarea
                             data-msd-elastic=""
@@ -580,7 +580,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "How do you want to get there?" | translate }}
+                        <span class="label-text">{{ "How do you want to get there?" | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.steps"
@@ -610,7 +610,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "Why does Europe need your idea?" | translate }}
+                        <span class="label-text">{{ "Why does Europe need your idea?" | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.value"
@@ -641,8 +641,8 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "Please list your partner organisations and team members with their relevant
-                        experiences/skills." | translate }}
+                        <span class="label-text">{{ "Please list your partner organisations and team members with their relevant
+                        experiences/skills." | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.partners"
@@ -675,7 +675,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "Total budget:" | translate }}
+                        <span class="label-text">{{ "Total budget:" | translate }}</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.budget"
@@ -700,7 +700,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "Requested Funding:" | translate }}
+                        <span class="label-text">{{ "Requested Funding:" | translate }}</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.requested_funding"
@@ -715,11 +715,11 @@
                     </label>
 
                     <label>
-                        {{ "Other source of income" | translate }}
+                        <span class="label-text">{{ "Other source of income" | translate }}</span>
                         <input type="text" data-ng-model="data.finance.other_sources" name="finance-other-sources" />
                     </label>
 
-                    {{ "Granted?" | translate }}
+                    <span class="label-text">{{ "Granted?" | translate }}</span>
 
                     <div data-ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
                         mercatorProposalForm.$submitted }">
@@ -786,7 +786,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "Share Experience (Optional)." | translate }}
+                        <span class="label-text">{{ "Share Experience (Optional)." | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.experience"
