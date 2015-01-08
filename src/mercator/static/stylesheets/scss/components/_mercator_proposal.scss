@@ -51,7 +51,8 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-form-heading {
-    border-bottom: 1px solid $color-structure-border-introvert;
+    border: 1px solid $color-structure-border-introvert;
+    border-width: 1px 0;
     font-weight: bold;
     line-height: 1.5;
     margin: 0 -1em 0.8em;
@@ -101,6 +102,12 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-proposal-form-section {
     padding: 0 1em;
+
+    &:first-child {
+        .mercator-proposal-form-heading {
+            border-top: 0;
+        }
+    }
 }
 
 .mercator-proposal-detail-view {
