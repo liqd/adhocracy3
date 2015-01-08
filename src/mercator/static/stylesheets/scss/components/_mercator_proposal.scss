@@ -77,7 +77,7 @@ selected. If no proposal is selected, no state is applied.
     float: left;
     width: 100% / 12 * 2;
     font-size: $font-size-small;
-    padding-right: 1px;
+    padding: 1px 1px 0;
 
     li {
         background: $color-structure-active;
@@ -106,12 +106,6 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-proposal-form-section {
     padding: 0 1em;
-
-    &:first-child {
-        .mercator-proposal-form-heading {
-            border-top: 0;
-        }
-    }
 }
 
 .mercator-proposal-detail-view {
