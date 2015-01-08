@@ -3,11 +3,11 @@
     <nav class="mercator-proposal-form-nav" data-adh-sticky="">
         <ol>
             <li data-du-scrollspy="mercator-proposal-basic"><a href="#mercator-proposal-basic" data-du-smooth-scroll="">{{ "Basic"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-introduction"><a href="#mercator-proposal-introduction" data-du-smooth-scroll="">{{ "Introduction"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-detail"><a href="#mercator-proposal-detail" data-du-smooth-scroll="">{{ "In Detail"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-motivation"><a href="#mercator-proposal-motivation" data-du-smooth-scroll="">{{ "Motivation"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-finance"><a href="#mercator-proposal-finance" data-du-smooth-scroll="">{{ "Finance"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-extra"><a href="#mercator-proposal-extra" data-offset="250" data-du-smooth-scroll="">{{ "Extra"}}</a></li>
+            <li data-du-scrollspy="mercator-proposal-introduction" data-offset="50"><a href="#mercator-proposal-introduction" data-du-smooth-scroll="">{{ "Introduction"}}</a></li>
+            <li data-du-scrollspy="mercator-proposal-detail" data-offset="50"><a href="#mercator-proposal-detail" data-du-smooth-scroll="">{{ "In Detail"}}</a></li>
+            <li data-du-scrollspy="mercator-proposal-motivation" data-offset="50"><a href="#mercator-proposal-motivation" data-du-smooth-scroll="">{{ "Motivation"}}</a></li>
+            <li data-du-scrollspy="mercator-proposal-finance" data-offset="50"><a href="#mercator-proposal-finance" data-du-smooth-scroll="">{{ "Finance"}}</a></li>
+            <li data-du-scrollspy="mercator-proposal-extra" data-offset="50"><a href="#mercator-proposal-extra" data-offset="250" data-du-smooth-scroll="">{{ "Extra"}}</a></li>
         </ol>
     </nav>
 
@@ -17,7 +17,8 @@
             name="mercatorProposalForm"
             data-ng-controller="mercatorProposalFormController as form"
             data-ng-submit="submitIfValid()"
-            data-ng-init="setFormDefaults()">
+            data-ng-init="setFormDefaults()"
+            data-du-spy-context="">
 
         <div class="annotated-section">
 
@@ -29,7 +30,7 @@
 
                 <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalBasicForm" id="mercator-proposal-basic">
 
-                    <h2 class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
+                    <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
 
                     <h3 class="mercator-proposal-form-subheading">{{ "User Info:" | translate }}</h3>
 
@@ -274,7 +275,10 @@
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalIntroductionForm" id="mercator-proposal-introduction">
 
-            <h2 class="mercator-proposal-form-heading">{{ "2. Introduction" | translate }}</h2>
+            <h2
+                data-du-scrollspy="mercator-proposal-introduction"
+                class="mercator-proposal-form-heading"
+                data-offset="50">{{ "2. Introduction" | translate }}</h2>
 
             <div class="annotated-section">
 
@@ -387,16 +391,10 @@
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalDetailForm" id="mercator-proposal-detail">
 
-
-            <div class="annotated-section">
-
-                <div class="annotated-section-body">
-
-                    <h2>{{ "3. In Detail" | translate }}</h2>
-
-                </div>
-
-            </div>
+            <h2
+                data-du-scrollspy="mercator-proposal-detail"
+                class="mercator-proposal-form-heading"
+                data-offset="50">{{ "3. In Detail" | translate }}</h2>
 
             <div class="annotated-section">
 
@@ -529,15 +527,10 @@
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalMotivationForm" id="mercator-proposal-motivation">
 
-            <div class="annotated-section">
-
-                <div class="annotated-section-body">
-
-                    <h2>{{ "4. Motivation" | translate }}</h2>
-
-                </div><!-- /.annotated-section-body -->
-
-            </div><!-- /.annotated-section -->
+            <h2
+                data-du-scrollspy="mercator-proposal-motivation"
+                class="mercator-proposal-form-heading"
+                data-offset="50">{{ "4. Motivation" | translate }}</h2>
 
             <div class="annotated-section">
 
@@ -672,11 +665,14 @@
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalFinanceForm" id="mercator-proposal-finance">
 
+            <h2
+                data-du-scrollspy="mercator-proposal-finance"
+                class="mercator-proposal-form-heading"
+                data-offset="50">{{ "5. Financial Planning" | translate }}</h2>
+
             <div class="annotated-section">
 
                 <div class="annotated-section-body">
-
-                    <h2>{{ "5. Financial Planning" | translate }}</h2>
 
                     <label>
                         {{ "Total budget:" | translate }}
@@ -773,12 +769,11 @@
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalExtraForm" id="mercator-proposal-extra">
 
-            <div class="annotated-section">
-                <div class="annotated-section-body">
-                    <h2>{{ "6. Extra" | translate }}</h2>
-                </div><!--/.annotated-section-body -->
+            <h2
+                data-du-scrollspy="mercator-proposal-extra"
+                class="mercator-proposal-form-heading"
+                data-offset="50">{{ "6. Extra" | translate }}</h2>
 
-            </div><!--/.annotated-section -->
             <div class="annotated-section">
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
