@@ -25,7 +25,11 @@ selected. If no proposal is selected, no state is applied.
     }
 
     .annotated-section {
-        width: 100% * 1 / 0.65;
+        width: 100% * 1 / 0.6289;
+
+        .annotated-section-annotation {
+            background-color: $color-structure-active;
+        }
     }
 }
 
