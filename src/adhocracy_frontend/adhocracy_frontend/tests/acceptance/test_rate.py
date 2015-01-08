@@ -14,7 +14,6 @@ class TestRate:
         comment = create_comment(browser, rest_url, 'comment1')
         assert comment is not None
 
-    @mark.skipif(True, reason='pending weil schlechtes wetter')
     def test_upvote(self, browser):
         rateable = browser.find_by_css('.comment').first
         button = rateable.find_by_css('.rate-pro').first
@@ -37,7 +36,6 @@ class TestRate:
 
         assert wait(check_result)
 
-    @mark.skipif(True, reason='not currently in the UI')
     def test_neutralvote(self, browser):
         rateable = browser.find_by_css('.comment').first
         button = rateable.find_by_css('.rate-contra').first
@@ -49,7 +47,8 @@ class TestRate:
 
         assert wait(check_result)
 
-    @mark.skipif(True, reason='pending weil schlechtes wetter')
+    @mark.skipif(True, reason='Functionality tested here is currently not in '\
+                              'the front end.')
     def test_detaillist(self, browser):
 
         # FIXME: the button appears to be surprisingly click
