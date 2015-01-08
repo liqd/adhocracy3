@@ -38,7 +38,7 @@ class TestRate:
 
     def test_neutralvote(self, browser):
         rateable = browser.find_by_css('.comment').first
-        button = rateable.find_by_css('.rate-contra').first
+        button = rateable.find_by_css('.is-rate-button-active').first
         button.click()
 
         def check_result():
