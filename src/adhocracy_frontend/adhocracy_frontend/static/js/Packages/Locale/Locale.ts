@@ -1,3 +1,6 @@
+import _ = require("lodash");
+
+
 export var countries : {
     name: string;
     code: string;
@@ -271,10 +274,17 @@ export var countrySelect = () => {
 };
 
 
+export var countryName = () => (code) => {
+    var candidates = _.filter(countries, (i) => i.code === code);
+    return candidates.length !== 0 ? candidates[0].name : code;
+};
+
+
 export var moduleName = "adhLocale";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [])
+        .filter("adhCountryName", countryName)
         .directive("countrySelect", ["adhConfig", countrySelect]);
 };

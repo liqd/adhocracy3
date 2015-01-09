@@ -112,7 +112,7 @@
                                 <p>{{ "We are a registered non-profit" | translate }}</p>
                             </div>
                             <div>
-                                {{ data.organization_info.country }}
+                                {{ data.organization_info.country | adhCountryName | translate }}
                             </div>
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
@@ -125,7 +125,7 @@
                                 </p>
                             </div>
                             <div>
-                                {{ data.organization_info.country }}
+                                {{ data.organization_info.country | adhCountryName | translate }}
                             </div>
                         </div>
                         <div data-ng-switch-when="support_needed">
@@ -136,7 +136,7 @@
                                 <p>{{ data.organization_info.how_can_we_help_you }}</p>
                             </div>
                             <div>
-                                {{ data.organization_info.country }}
+                                {{ data.organization_info.country | adhCountryName | translate }}
                             </div>
                         </div>
                         <div data-ng-switch-when="other">
