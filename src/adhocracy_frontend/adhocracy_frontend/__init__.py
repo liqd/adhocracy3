@@ -1,5 +1,5 @@
 """Frontend view and simple pyramid app configurations."""
-import os
+import pkg_resources
 
 from pyramid.config import Configurator
 from pyramid.events import NewResponse
@@ -42,8 +42,8 @@ def config_view(request):
 
 def root_view(request):
     """Return the embeddee HTML."""
-    here = os.path.dirname(__file__)
-    path = os.path.join(here, 'static', 'root.html')
+    path = pkg_resources.resource_filename('adhocracy_frontend',
+                                           'build/root.html')
     return FileResponse(path, request=request)
 
 
