@@ -97,15 +97,15 @@
 
                 <section class="commentable-section">
                     <h3>{{ "Who is behind it?" | translate }}</h3>
+
+                    <adh-user-meta
+                         data-ng-if="data.user_info"
+                         data-path="{{data.user_info.path}}"
+                         data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                    </adh-user-meta>
+
                     <div data-ng-switch="data.organization_info.status_enum">
                         <div data-ng-switch-when="registered_nonprofit">
-                            <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
-                            </div>
                             <div>
                                 <div>
                                     <p>{{ data.organization_info.name }}</p>
@@ -118,13 +118,6 @@
                             </div>
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
-                            <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
-                            </div>
                             <div>
                                 <div>
                                     <p>{{ data.organization_info.name }}</p>
@@ -141,13 +134,6 @@
                         </div>
                         <div data-ng-switch-when="support_needed">
                             <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
-                            </div>
-                            <div>
                                 <div>
                                     <p>{{ data.organization_info.name }}</p>
                                     <p>{{ data.organization_info.website }}</p>
@@ -160,13 +146,6 @@
                             </div>
                         </div>
                         <div data-ng-switch-when="other">
-                            <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
-                            </div>
                             <div>
                                 <p>{{ data.organization_info.status_other }}</p>
                             </div>
