@@ -28,6 +28,7 @@ import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
 import AdhHttp = require("./Packages/Http/Http");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
+import AdhLocale = require("./Packages/Locale/Locale");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
@@ -130,6 +131,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhHttp.register(angular, meta_api);
     AdhInject.register(angular);
     AdhListing.register(angular);
+    AdhLocale.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
