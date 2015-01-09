@@ -27,8 +27,8 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     websocketTestPaths : string;
     contentType : string;
     view : string;
-    redirectAfterCreate(result? : { path : string }[]) : void;
-    goToProposal(path : string) : void;
+    redirectAfterProposalSubmit(result : {path : string }[]) : void;
+    redirectAfterProposalCancel(resourcePath : string) : void;
     proposalListingData : {
         facets : AdhListing.IFacet[];
         showFacets : boolean;
@@ -47,7 +47,7 @@ export class MercatorWorkbench {
         var _class = (<any>_self).constructor;
 
         // FIXME: use dependency injection instead
-        var resourceUrl = AdhResourceArea.resourceUrl(adhConfig);
+        var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
 
         return {
             restrict: "E",
@@ -88,16 +88,14 @@ export class MercatorWorkbench {
                 };
 
                 adhTopLevelState.bind("view", $scope);
-                $scope.redirectAfterCreate = (result? : { path : string }[]) => {
-                    if (typeof result !== "undefined") {
-                        var proposalVersionPath : string = AdhResourceArea.resourceUrl(adhConfig)(result.slice(-1)[0].path);
-                        $location.url(proposalVersionPath);
-                    } else {
-                        $location.url("/r/mercator");
-                    }
+
+                $scope.redirectAfterProposalCancel = (resourcePath : string) => {
+                    // FIXME: use adhTopLevelState.redirectToCameFrom
+                    $location.url(adhResourceUrl(resourcePath));
                 };
-                $scope.goToProposal = (path) => {
-                    $location.url(resourceUrl(path));
+                $scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
+                    var proposalVersionPath = result.slice(-1)[0].path;
+                    $location.url(adhResourceUrl(proposalVersionPath));
                 };
             }]
         };

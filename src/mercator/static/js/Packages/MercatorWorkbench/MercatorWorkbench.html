@@ -7,7 +7,9 @@
                         <a href="{{ platformUrl | adhResourceUrl }}">{{ "Cancel" | translate }}</a>
                     </div>
                     <div class="moving-column-body" data-du-scroll-container="">
-                        <adh-resource-wrapper data-on-submit="redirectAfterCreate(result)" data-on-cancel="redirectAfterCreate()">
+                        <adh-resource-wrapper
+                            data-on-submit="redirectAfterProposalSubmit(result)"
+                            data-on-cancel="redirectAfterProposalCancel(platformUrl)">
                             <adh-mercator-proposal-create
                                 data-path="@preliminary"
                                 data-mode="edit"
@@ -52,8 +54,8 @@
                     </div>
                     <div class="moving-column-body" data-du-scroll-container="">
                         <adh-resource-wrapper
-                            data-on-submit="goToProposal(proposalUrl)"
-                            data-on-cancel="goToProposal(proposalUrl)">
+                            data-on-submit="redirectAfterProposalSubmit(result)"
+                            data-on-cancel="redirectAfterProposalCancel(proposalUrl)">
                             <adh-mercator-proposal-create
                                 data-ng-if="proposalUrl"
                                 data-path="{{proposalUrl}}"
