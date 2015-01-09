@@ -107,48 +107,40 @@
                     <div data-ng-switch="data.organization_info.status_enum">
                         <div data-ng-switch-when="registered_nonprofit">
                             <div>
-                                <div>
-                                    <p>{{ data.organization_info.name }}</p>
-                                    <p>{{ data.organization_info.website }}</p>
-                                    <p>{{ "We are a registered non-profit" | translate }}</p>
-                                </div>
-                                <div>
-                                    {{ data.organization_info.country }}
-                                </div>
+                                <p>{{ data.organization_info.name }}</p>
+                                <p>{{ data.organization_info.website }}</p>
+                                <p>{{ "We are a registered non-profit" | translate }}</p>
+                            </div>
+                            <div>
+                                {{ data.organization_info.country }}
                             </div>
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
                             <div>
-                                <div>
-                                    <p>{{ data.organization_info.name }}</p>
-                                    <p>{{ data.organization_info.website }}</p>
-                                    <p>
-                                        {{ "NGO registration is planned or in process " | translate }}
-                                        {{ data.organization_info.date_of_foreseen_registration }}
-                                    </p>
-                                </div>
-                                <div>
-                                    {{ data.organization_info.country }}
-                                </div>
+                                <p>{{ data.organization_info.name }}</p>
+                                <p>{{ data.organization_info.website }}</p>
+                                <p>
+                                    {{ "NGO registration is planned or in process " | translate }}
+                                    {{ data.organization_info.date_of_foreseen_registration }}
+                                </p>
+                            </div>
+                            <div>
+                                {{ data.organization_info.country }}
                             </div>
                         </div>
                         <div data-ng-switch-when="support_needed">
                             <div>
-                                <div>
-                                    <p>{{ data.organization_info.name }}</p>
-                                    <p>{{ data.organization_info.website }}</p>
-                                    <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
-                                    <p>{{ data.organization_info.how_can_we_help_you }}</p>
-                                </div>
-                                <div>
-                                    {{ data.organization_info.country }}
-                                </div>
+                                <p>{{ data.organization_info.name }}</p>
+                                <p>{{ data.organization_info.website }}</p>
+                                <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
+                                <p>{{ data.organization_info.how_can_we_help_you }}</p>
+                            </div>
+                            <div>
+                                {{ data.organization_info.country }}
                             </div>
                         </div>
                         <div data-ng-switch-when="other">
-                            <div>
-                                <p>{{ data.organization_info.status_other }}</p>
-                            </div>
+                            <p>{{ data.organization_info.status_other }}</p>
                         </div>
                     </div>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:organization_info'}}">
