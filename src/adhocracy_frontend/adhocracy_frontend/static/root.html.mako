@@ -11,10 +11,6 @@
     <body>
 
         <adh-view></adh-view>
-        % for url in css:
-            <link rel="stylesheet" href="${url}"/>
-        % endfor
-
         % for url in js:
             <script type="text/javascript" src="${url}"></script>
         % endfor
