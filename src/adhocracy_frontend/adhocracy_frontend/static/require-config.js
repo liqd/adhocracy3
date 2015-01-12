@@ -29,7 +29,7 @@ require.config({
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
         moment: "../lib/moment/min/moment-with-locales",
         sticky: "../lib/sticky-kit/jquery.sticky-kit",
-        socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min"
+        socialSharePrivacy: "../lib/SocialSharePrivacy/build/javascripts/jquery.socialshareprivacy.min"
     },
     shim: {
         jquery: {
