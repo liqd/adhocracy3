@@ -113,3 +113,5 @@ declare class FlowOpts {
 
 declare module "fustyFlow" {}
 declare module "fustyFlowFactory" {}
+
+declare module "socialSharePrivacy" {}
