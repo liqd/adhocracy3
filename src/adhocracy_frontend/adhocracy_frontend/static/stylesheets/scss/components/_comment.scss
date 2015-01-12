@@ -128,7 +128,7 @@ parent: comment
         </div>
     </div>
     <div class="comment-content">
-        <textarea>Lorem ipsum Non nulla ullamco magna tempor adipisicing nisi eu deserunt sit deserunt ut culpa velit ea proident.</textarea>
+        <textarea class="comment-content-edit-text">Lorem ipsum Non nulla ullamco magna tempor adipisicing nisi eu deserunt sit deserunt ut culpa velit ea proident.</textarea>
     </div>
     <div class="comment-meta">
         <div class="comment-actions">
@@ -139,6 +139,11 @@ parent: comment
 </div>
 ```
 */
+
+.comment-main {
+    padding-bottom: 1em;
+}
+
 .comment-title,
 .comment-meta {
     @include text(meta);
@@ -149,6 +154,10 @@ parent: comment
         color: inherit;
         text-decoration: inherit;
     }
+}
+
+.comment-content-edit-text {
+    margin-bottom: 0.5em;
 }
 
 .comment-meta {
@@ -238,6 +247,11 @@ parent: comment
     .rate {
         @include inline-block;
     }
+}
+
+.comment-create-form {
+    @include clearfix;
+    padding-bottom: 1em;
 }
 
 .comment-create-form-text {
