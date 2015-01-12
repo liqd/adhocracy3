@@ -10,9 +10,9 @@ export var socialShare = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         link: (scope, element, attrs) => {
             element.socialSharePrivacy({
-                "css_path": PATH + "socialshareprivacy.css",
-                "lang_path": PATH + "lang/",
-                "language": adhConfig.locale  // FIXME: does not watch adhConfig.locale
+                css_path: PATH + "socialshareprivacy.css",
+                lang_path: PATH + "lang/",
+                language: adhConfig.locale  // FIXME: does not watch adhConfig.locale
             });
 
             element.find(".help_info").each(function() {
