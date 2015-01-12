@@ -12,7 +12,18 @@ export var socialShare = (adhConfig : AdhConfig.IService) => {
             element.socialSharePrivacy({
                 css_path: PATH + "socialshareprivacy.css",
                 lang_path: PATH + "lang/",
-                language: adhConfig.locale  // FIXME: does not watch adhConfig.locale
+                language: adhConfig.locale,  // FIXME: does not watch adhConfig.locale
+                services : {
+                    facebook : {
+                        perma_option: "off"
+                    },
+                    twitter : {
+                        perma_option: "off"
+                    },
+                    gplus : {
+                        perma_option: "off"
+                    }
+                }
             });
 
             element.find(".help_info").each(function() {
