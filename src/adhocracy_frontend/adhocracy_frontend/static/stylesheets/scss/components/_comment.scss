@@ -7,7 +7,6 @@ category: Widgets
 
 A comment widget consists of a comment-main widget and a list of child
 comments (replies). There is a form for creating new replies.
-Top-level comments also contain a comment-header widget at the top.
 
 The comment may have the states `is-selected` or `is-not-selected` where
 the latter one is used if a different comment is selected. If no comment
@@ -15,8 +14,6 @@ is selected, no state is applied.
 
 ```html_example
 <div class="comment">
-    <div class="comment-header placeholder">Discussion Header</div>
-
     <div class="comment-main placeholder">Comment Main</div>
 
     <div class="comment-children-create-form placeholder">
@@ -26,16 +23,12 @@ is selected, no state is applied.
 
     <div class="comment-children">
         <div class="comment">
-            <div class="comment-header placeholder">Discussion Header</div>
-
             <div class="comment-main placeholder">Comment Main</div>
 
             <div class="comment-children">
             </div>
         </div>
         <div class="comment">
-            <div class="comment-header placeholder">Discussion Header</div>
-
             <div class="comment-main placeholder">Comment Main</div>
 
             <div class="comment-children-create-form placeholder">
@@ -47,8 +40,6 @@ is selected, no state is applied.
     </div>
 </div>
 <div class="comment">
-    <div class="comment-header placeholder">Discussion Header</div>
-
     <div class="comment-main placeholder">Comment Main</div>
 
     <div class="comment-children"></div>
@@ -86,19 +77,63 @@ parent: comment
 
 ```html_example
 <div class="comment-main">
-    <div class="comment-title">Willy Wonka</div>
+    <div class="comment-header">
+        <div class="comment-header-column1">
+            <span class="comment-header-creator">
+                <a href="#">god</a>
+            </span>
+            <span class="comment-header-date">
+                12/03/15
+            </span>
+        </div>
+        <div class="comment-header-column2">
+            <span class="comment-header-links">
+                <a href="#"><i class="icon-reply"></i> Reply</a>
+                <a href="#">Bearbeiten</a>
+                <a href="#"><i class="icon-ban-circle"></i> Report</a>
+            </span>
+            <div class="rate">
+                <span class="rate-difference">0</span>
+                <a href="" class="rate-pro"><i class="icon-triangle-inverse-up" title="Vote up"></i></a>
+                <a href="" class="rate-contra"><i class="icon-triangle-inverse-down" title="Vote down"></i></a>
+            </div>
+        </div>
+    </div>
     <div class="comment-content">
-        I like chocolate. I want more chocolate. Chocolate.
+        Nunc nulla. Vivamus quis mi. Fusce vulputate eleifend sapien. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus. Donec vitae orci sed dolor rutrum auctor.
+    </div>
+</div>
+
+<div class="comment-main">
+    <div class="comment-header">
+        <div class="comment-header-column1">
+            <span class="comment-header-creator">
+                <a href="#">god</a>
+            </span>
+            <span class="comment-header-date">
+                12/03/15
+            </span>
+        </div>
+        <div class="comment-header-column2">
+            <span class="comment-header-links">
+                <a href="#"><i class="icon-reply"></i> Reply</a>
+                <a href="#">Bearbeiten</a>
+                <a href="#"><i class="icon-ban-circle"></i> Report</a>
+            </span>
+            <div class="rate">
+                <span class="rate-difference">0</span>
+                <a href="" class="rate-pro"><i class="icon-triangle-inverse-up" title="Vote up"></i></a>
+                <a href="" class="rate-contra"><i class="icon-triangle-inverse-down" title="Vote down"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="comment-content">
+        <textarea>Lorem ipsum Non nulla ullamco magna tempor adipisicing nisi eu deserunt sit deserunt ut culpa velit ea proident.</textarea>
     </div>
     <div class="comment-meta">
-        5 minutes ago
         <div class="comment-actions">
-            <a href="" class="comment-action">Delete</a>
-            <a href="" class="comment-action">Edit</a>
-            <a href="" class="comment-action m-comment-reply">Add Comment</a>
-            <span class="comment-count">
-                <i class="icon-speechbubble-outline"></i> 3
-            </span>
+            <a href="#" class="comment-action">Speichern</a>
+            <a href="#" class="comment-action">Abbrechen</a>
         </div>
     </div>
 </div>
@@ -148,31 +183,6 @@ parent: comment
     float: right;
 }
 
-/*doc
----
-title: Discussion Header
-name: comment-header
-parent: comment
----
-
-This widget appears at the top of a discussion and contains the main meta data
-about it.
-
-```html_example
-<div class="comment-header">
-    <span class="comment-header-icon">
-        <i class="icon-speechbubble-outline"></i>
-    </span>
-    <div class="comment-header-column2">
-        <i class="icon-speechbubble-outline"></i> 4
-    </div>
-    <div class="comment-header-column1">
-        <div class="comment-header-creator">guest</div>
-        <div class="comment-header-date">5 minutes ago</div>
-    </div>
-</div>
-```
-*/
 .comment-header {
     @include clearfix;
     @include text(introvert);
