@@ -13,6 +13,14 @@ export var socialShare = (adhConfig : AdhConfig.IService) => {
                 lang_path: "javascrips/",
                 language: adhConfig.locale  // FIXME: does not watch adhConfig.locale
             });
+
+            element.find(".help_info").each(function() {
+                var e = $(this);
+                var info = e.find(".info");
+
+                e.attr("title", info.text());
+                info.remove();
+            });
         }
     };
 };
