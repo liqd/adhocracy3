@@ -1,15 +1,15 @@
 <div class="comment {{ selectedState }}" data-ng-switch="mode" data-ng-if="data">
-    <div class="discussion-header">
-        <div class="discussion-header-column1">
-            <span class="discussion-header-creator">
+    <div class="comment-header">
+        <div class="comment-header-column1">
+            <span class="comment-header-creator">
                 <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
             </span>
-            <span class="discussion-header-date">
+            <span class="comment-header-date">
                 <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
             </span>
         </div>
-        <div class="discussion-header-column2">
-            <span class="discussion-header-links">
+        <div class="comment-header-column2">
+            <span class="comment-header-links">
                 <a href=""
                     data-ng-if="commentItemOptions.POST"
                     data-ng-click="createComment()">

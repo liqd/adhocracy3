@@ -7,7 +7,7 @@ category: Widgets
 
 A comment widget consists of a comment-main widget and a list of child
 comments (replies). There is a form for creating new replies.
-Top-level comments also contain a discussion-header widget at the top.
+Top-level comments also contain a comment-header widget at the top.
 
 The comment may have the states `is-selected` or `is-not-selected` where
 the latter one is used if a different comment is selected. If no comment
@@ -15,7 +15,7 @@ is selected, no state is applied.
 
 ```html_example
 <div class="comment">
-    <div class="discussion-header placeholder">Discussion Header</div>
+    <div class="comment-header placeholder">Discussion Header</div>
 
     <div class="comment-main placeholder">Comment Main</div>
 
@@ -26,7 +26,7 @@ is selected, no state is applied.
 
     <div class="comment-children">
         <div class="comment">
-            <div class="discussion-header placeholder">Discussion Header</div>
+            <div class="comment-header placeholder">Discussion Header</div>
 
             <div class="comment-main placeholder">Comment Main</div>
 
@@ -34,7 +34,7 @@ is selected, no state is applied.
             </div>
         </div>
         <div class="comment">
-            <div class="discussion-header placeholder">Discussion Header</div>
+            <div class="comment-header placeholder">Discussion Header</div>
 
             <div class="comment-main placeholder">Comment Main</div>
 
@@ -47,7 +47,7 @@ is selected, no state is applied.
     </div>
 </div>
 <div class="comment">
-    <div class="discussion-header placeholder">Discussion Header</div>
+    <div class="comment-header placeholder">Discussion Header</div>
 
     <div class="comment-main placeholder">Comment Main</div>
 
@@ -151,7 +151,7 @@ parent: comment
 /*doc
 ---
 title: Discussion Header
-name: discussion-header
+name: comment-header
 parent: comment
 ---
 
@@ -159,26 +159,26 @@ This widget appears at the top of a discussion and contains the main meta data
 about it.
 
 ```html_example
-<div class="discussion-header">
-    <span class="discussion-header-icon">
+<div class="comment-header">
+    <span class="comment-header-icon">
         <i class="icon-speechbubble-outline"></i>
     </span>
-    <div class="discussion-header-column2">
+    <div class="comment-header-column2">
         <i class="icon-speechbubble-outline"></i> 4
     </div>
-    <div class="discussion-header-column1">
-        <div class="discussion-header-creator">guest</div>
-        <div class="discussion-header-date">5 minutes ago</div>
+    <div class="comment-header-column1">
+        <div class="comment-header-creator">guest</div>
+        <div class="comment-header-date">5 minutes ago</div>
     </div>
 </div>
 ```
 */
-.discussion-header {
+.comment-header {
     @include clearfix;
     @include text(introvert);
     margin-bottom: 0.3em;
 
-    .discussion-header-icon {
+    .comment-header-icon {
         @include border-radius(50%);
         float: left;
         font-size: 150%;
@@ -188,16 +188,16 @@ about it.
         background: white;
     }
 
-    .discussion-header-creator,
-    .discussion-header-date,
-    .discussion-header-links,
+    .comment-header-creator,
+    .comment-header-date,
+    .comment-header-links,
     .rate {
         a, a:hover, a:focus, a:active {
             @include disguised-link;
         }
     }
 
-    .discussion-header-creator {
+    .comment-header-creator {
         &:after {
             content: "|";
         }
@@ -207,7 +207,7 @@ about it.
         }
     }
 
-    .discussion-header-links {
+    .comment-header-links {
         padding-right: 2em;
 
         a {
@@ -215,13 +215,13 @@ about it.
         }
     }
 
-    .discussion-header-column1,
-    .discussion-header-column2 {
+    .comment-header-column1,
+    .comment-header-column2 {
         @include text-align(right);
         float: right;
     }
 
-    .discussion-header-column1 {
+    .comment-header-column1 {
         float: left;
     }
 
