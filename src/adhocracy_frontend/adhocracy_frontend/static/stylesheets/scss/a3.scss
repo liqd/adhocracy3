@@ -34,6 +34,8 @@
 @import "components/user_list";
 @import "components/rate";
 
+@import "third_party/social_share";
+
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";
 
