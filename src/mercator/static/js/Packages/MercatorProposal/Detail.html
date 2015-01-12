@@ -1,6 +1,5 @@
 <div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
-    <!-- FIXME: DUMMY IMG styling! -->
-    <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture }}/detail" style="width: 100%; height: 203px"/>
+    <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture }}/detail"/>
     <div class="mercator-proposal-detail-cover">
         <ul class="mercator-proposal-detail-meta">
             <li class="mercator-propsal-detail-meta-item">
@@ -98,79 +97,50 @@
 
                 <section class="commentable-section">
                     <h3>{{ "Who is behind it?" | translate }}</h3>
+
+                    <adh-user-meta
+                         data-ng-if="data.user_info"
+                         data-path="{{data.user_info.path}}"
+                         data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                    </adh-user-meta>
+
                     <div data-ng-switch="data.organization_info.status_enum">
                         <div data-ng-switch-when="registered_nonprofit">
                             <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
+                                <p>{{ data.organization_info.name }}</p>
+                                <p>{{ data.organization_info.website }}</p>
+                                <p>{{ "We are a registered non-profit" | translate }}</p>
                             </div>
                             <div>
-                                <div>
-                                    <p>{{ data.organisation_info.name }}</p>
-                                    <p>{{ data.organisation_info.website }}</p>
-                                    <p>{{ "We are a registered non-profil" | translate }}</p>
-                                </div>
-                                <div>
-                                    {{ data.organisation_info.country }}
-                                </div>
+                                {{ data.organization_info.country | adhCountryName | translate }}
                             </div>
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
                             <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
+                                <p>{{ data.organization_info.name }}</p>
+                                <p>{{ data.organization_info.website }}</p>
+                                <p>
+                                    {{ "NGO registration is planned or in process " | translate }}
+                                    {{ data.organization_info.date_of_foreseen_registration }}
+                                </p>
                             </div>
                             <div>
-                                <div>
-                                    <p>{{ data.organisation_info.name }}</p>
-                                    <p>{{ data.organisation_info.website }}</p>
-                                    <p>
-                                        {{ "NGO registration is planned or in process " | translate }}
-                                        {{ data.organisation_info.date_of_foreseen_registration }}
-                                    </p>
-                                </div>
-                                <div>
-                                    {{ data.organisation_info.country }}
-                                </div>
+                                {{ data.organization_info.country | adhCountryName | translate }}
                             </div>
                         </div>
                         <div data-ng-switch-when="support_needed">
                             <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
+                                <p>{{ data.organization_info.name }}</p>
+                                <p>{{ data.organization_info.website }}</p>
+                                <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
+                                <p>{{ data.organization_info.how_can_we_help_you }}</p>
                             </div>
                             <div>
-                                <div>
-                                    <p>{{ data.organisation_info.name }}</p>
-                                    <p>{{ data.organisation_info.website }}</p>
-                                    <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
-                                    <p>{{ data.organisation_info.how_can_we_help_you }}</p>
-                                </div>
-                                <div>
-                                    {{ data.organisation_info.country }}
-                                </div>
+                                {{ data.organization_info.country | adhCountryName | translate }}
                             </div>
                         </div>
                         <div data-ng-switch-when="other">
-                            <div>
-                                <adh-user-meta
-                                     data-ng-if="data.user_info"
-                                     data-path="{{data.user_info.path}}"
-                                     data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                                </adh-user-meta>
-                            </div>
-                            <div>
-                                <p>{{ data.organisation_info.status_other }}</p>
-                            </div>
+                            <p>{{ data.organization_info.status_other }}</p>
                         </div>
                     </div>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:organization_info'}}">
