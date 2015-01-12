@@ -13,6 +13,7 @@ export var socialShare = (adhConfig : AdhConfig.IService) => {
                 css_path: PATH + "socialshareprivacy.css",
                 lang_path: PATH + "lang/",
                 language: adhConfig.locale,  // FIXME: does not watch adhConfig.locale
+                info_link: "http://www.heise.de/ct/artikel/2-Klicks-fuer-mehr-Datenschutz-1333879.html",
                 services : {
                     facebook : {
                         perma_option: "off"
