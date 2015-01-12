@@ -1,0 +1,28 @@
+import socialSharePrivacy = require("socialSharePrivacy");  if (socialSharePrivacy) { ; }
+
+import AdhConfig = require("../Config/Config");
+
+export var PATH = "/static/lib/jquery.socialshareprivacy/socialshareprivacy/";
+
+
+export var socialShare = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        link: (scope, element, attrs) => {
+            element.socialSharePrivacy({
+                "css_path": PATH + "socialshareprivacy.css",
+                "lang_path": PATH + "lang/",
+                "language": adhConfig.locale  // FIXME: does not watch adhConfig.locale
+            });
+        }
+    };
+};
+
+
+export var moduleName = "adhSocialShare";
+
+export var register = (angular) => {
+    return angular
+        .module(moduleName, [])
+        .directive("adhSocialShare", socialShare);
+};
