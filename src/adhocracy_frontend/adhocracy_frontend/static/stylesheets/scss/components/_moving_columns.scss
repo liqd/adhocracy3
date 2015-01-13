@@ -248,7 +248,7 @@ States:
 }
 
 .moving-column-mask {
-    @include opacity(.5);
+    @include opacity(0.5);
     background-color: black;
     height: 100%;
     left: 0;
