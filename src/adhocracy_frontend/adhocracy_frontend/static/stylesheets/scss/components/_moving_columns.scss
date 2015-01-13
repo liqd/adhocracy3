@@ -246,3 +246,13 @@ States:
         display: block;
     }
 }
+
+.moving-column-mask {
+    @include opacity(.5);
+    background-color: black;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
