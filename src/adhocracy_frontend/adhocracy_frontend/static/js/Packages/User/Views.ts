@@ -239,6 +239,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
     };
 };
 
+
 export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
