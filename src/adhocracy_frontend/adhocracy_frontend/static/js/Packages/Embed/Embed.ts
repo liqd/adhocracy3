@@ -97,8 +97,8 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
     };
 };
 
-export var canonicalUrl = (adhConfig) => {
-    return (internalUrl) => {
+export var canonicalUrl = (adhConfig : AdhConfig.IService) => {
+    return (internalUrl : string) : string => {
         return adhConfig.canonical_url + internalUrl;
     };
 };
