@@ -250,14 +250,9 @@ States:
 .moving-column-mask {
     @include opacity(0.5);
     background-color: black;
-    display: none;
     height: 100%;
     left: 0;
     position: absolute;
     top: 0;
     width: 100%;
-
-    &.m-show {
-        display: block;
-    }
 }

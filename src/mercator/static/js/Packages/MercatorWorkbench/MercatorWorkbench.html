@@ -128,8 +128,8 @@
                             </section>
                         </adh-user-profile>
                     </adh-recompile-on-change>
-                    <adh-user-message></adh-user-message>
-                    <div class="moving-column-mask m-show"></div>
+                    <adh-user-message data-ng-if="show.messaging"></adh-user-message>
+                    <div class="moving-column-mask" data-ng-show="show.messaging"></div>
                 </div>
             </div>
         </div>
