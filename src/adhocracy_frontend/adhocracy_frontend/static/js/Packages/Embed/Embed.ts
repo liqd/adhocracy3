@@ -97,6 +97,12 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
     };
 };
 
+export var canonicalUrl = (adhConfig) => {
+    return (internalUrl) => {
+        return adhConfig.canonical_url + internalUrl;
+    };
+};
+
 
 export var moduleName = "adhEmbed";
 
@@ -135,5 +141,6 @@ export var register = (angular) => {
                 $translate.use(params.locale);
             }
         }])
-        .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective]);
+        .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective])
+        .filter("adhCanonicalUrl", ["adhConfig", canonicalUrl]);
 };
