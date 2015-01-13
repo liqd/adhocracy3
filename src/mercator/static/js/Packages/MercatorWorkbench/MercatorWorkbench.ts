@@ -10,6 +10,7 @@ import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
+import AdhUserViews = require("../User/Views");
 import AdhUtil = require("../Util/Util");
 
 import RIPoolWithAssets = require("../../Resources_/adhocracy_core/resources/asset/IPoolWithAssets");
@@ -116,7 +117,8 @@ export var register = (angular) => {
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName,
-            AdhUser.moduleName
+            AdhUser.moduleName,
+            AdhUserViews.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider

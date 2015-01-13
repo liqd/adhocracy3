@@ -9,6 +9,7 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
+import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -771,6 +772,7 @@ export var register = (angular) => {
             AdhPreliminaryNames.moduleName,
             AdhResourceArea.moduleName,
             AdhResourceWidgets.moduleName,
+            AdhSticky.moduleName,
             AdhTopLevelState.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {

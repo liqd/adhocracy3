@@ -34,7 +34,8 @@ A navigation list containing hash tag links
     }
 
     ul, ol {
-        list-style-position: inside;
+        counter-reset: jump-counter;
+        list-style: none;
         margin: 0;
         padding: 0;
     }
@@ -42,6 +43,7 @@ A navigation list containing hash tag links
     li {
         font-size: $font-size-small;
         line-height: 1.333;
+        padding: 0 0.5em;
 
         &, a {
             color: $color-secondary-extrovert;
@@ -49,8 +51,12 @@ A navigation list containing hash tag links
 
         a {
             display: block;
-            padding: 0 0.5em 1.5em;
             text-decoration: none;
+        }
+
+        a:before {
+            content: counter(jump-counter) ". ";
+            counter-increment: jump-counter;
         }
 
         // active class automaticall added by du-scrollspy plugin
@@ -61,10 +67,8 @@ A navigation list containing hash tag links
     }
 
     &.m-unnumbered {
-        ol {
-            margin: 0;
-            padding: 0;
-            list-style: none;
+        ol a:before {
+            content: "";
         }
     }
 }

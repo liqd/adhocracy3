@@ -72,7 +72,7 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
-            if (element[0].nodeName === "A" && adhConfig.canonical_url) {
+            if (element[0].nodeName === "A") {
                 scope.$watch(() => attrs.href, (orig) => {
                     // remove any handlers that were registered in previous runs
                     element.off("click.adh_href");
@@ -94,6 +94,12 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
                 });
             }
         }
+    };
+};
+
+export var canonicalUrl = (adhConfig : AdhConfig.IService) => {
+    return (internalUrl : string) : string => {
+        return adhConfig.canonical_url + internalUrl;
     };
 };
 
@@ -135,5 +141,6 @@ export var register = (angular) => {
                 $translate.use(params.locale);
             }
         }])
-        .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective]);
+        .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective])
+        .filter("adhCanonicalUrl", ["adhConfig", canonicalUrl]);
 };
