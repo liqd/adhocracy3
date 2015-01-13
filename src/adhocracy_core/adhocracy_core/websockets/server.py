@@ -266,6 +266,8 @@ class ClientCommunicator(WebSocketServerProtocol):
             self._dispatch_modified_event(resource)
         elif event == 'deleted':
             self._dispatch_deleted_event(resource)
+        elif event == 'changed_descendant':
+            self._dispatch_changed_descendant_event(resource)
         else:
             details = 'unknown event: {}'.format(event)
             raise WebSocketError('invalid_json', details)
@@ -340,6 +342,10 @@ class ClientCommunicator(WebSocketServerProtocol):
         # That's currently not part of the API.
         self._notify_removed_child(resource.__parent__, resource)
 
+    def _dispatch_changed_descendant_event(self, resource: IResource):
+        for client in self._tracker.iterate_subscribers(resource):
+            client.send_notification(resource, 'changed_descendant')
+
     def _notify_new_version(self, parent: IResource,
                             new_version: IItemVersion):
         """Notify subscribers if a new version has been added to an item."""
@@ -354,7 +360,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _notify_resource_modified(self, resource: IResource):
         """Notify subscribers if a resource has been modified."""
         for client in self._tracker.iterate_subscribers(resource):
-            client.send_modified_notification(resource)
+            client.send_notification(resource, 'modified')
 
     def _notify_modified_child(self, parent: IResource, child: IResource):
         """Notify subscribers if a child in a pool has been modified."""
@@ -366,10 +372,10 @@ class ClientCommunicator(WebSocketServerProtocol):
         for client in self._tracker.iterate_subscribers(parent):
             client.send_child_notification('removed', parent, child)
 
-    def send_modified_notification(self, resource: IResource):
-        """Send notification about a modified resource."""
+    def send_notification(self, resource: IResource, event_type: str):
+        """Send notification about an event affecting a resource."""
         schema = self._create_schema(Notification)
-        data = schema.serialize({'event': 'modified', 'resource': resource})
+        data = schema.serialize({'event': event_type, 'resource': resource})
         self._send_json_message(data)
 
     def send_child_notification(self, status: str, resource: IResource,

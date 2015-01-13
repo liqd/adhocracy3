@@ -4,14 +4,17 @@ import json
 import logging
 import time
 
+from pyramid.location import lineage
 from websocket import ABNF
 from websocket import create_connection
 from websocket import WebSocketException
 from websocket import WebSocketConnectionClosedException
 from websocket import WebSocketTimeoutException
 
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.websockets.schemas import ServerNotification
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +33,9 @@ class Client:
         """Set with :class:`adhocracy_core.resources.subscriber.ChangelogMetadata`
         that will be send to the websocket server with
         :func:`Client.send_messages`."""
+        self.affected_ancestors = set()
+        """Set of pools whose descendants have changed;
+        a "changed_descendant" event will be sent for each of them."""
         self._ws_url = ws_url
         self._ws_connection = None
         self._is_running = False
@@ -135,17 +141,29 @@ class Client:
             if meta.resource is None:
                 continue
             elif meta.created:
-                self._send_resource_event(meta, 'created')
+                self._send_resource_event(meta.resource, 'created')
             elif meta.modified:
-                self._send_resource_event(meta, 'modified')
+                self._send_resource_event(meta.resource, 'modified')
+            self._collect_ancestors(meta.resource)
+        while self.affected_ancestors:
+            ancestor = self.affected_ancestors.pop()
+            self._send_resource_event(ancestor, 'changed_descendant')
 
-    def _send_resource_event(self, changelog_meta, event_type: str):
-        schema = ServerNotification().bind(context=changelog_meta.resource)
-        message = schema.serialize({'event': event_type,
-                                    'resource': changelog_meta.resource})
+    def _send_resource_event(self, resource: IResource, event_type: str):
+        schema = ServerNotification().bind(context=resource)
+        message = schema.serialize({'event': event_type, 'resource': resource})
         message_text = json.dumps(message)
         logger.debug('Sending message to Websocket server: %s', message_text)
         self._ws_connection.send(message_text)
+
+    def _collect_ancestors(self, resource: IResource):
+        ancestors = lineage(resource)
+        next(ancestors)  # skip the resource itself
+        for ancestor in ancestors:
+            if ancestor in self.affected_ancestors:
+                break  # no need to add ancestors twice
+            else:
+                self.affected_ancestors.add(ancestor)
 
     def stop(self):
         self._is_stopped = True

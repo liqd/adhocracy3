@@ -42,7 +42,8 @@ class Event(colander.SchemaNode):
     """The type of event notifications sent to the client."""
 
     schema_type = colander.String
-    validator = colander.OneOf(['modified',  # Used internally / for the client
+    validator = colander.OneOf(['modified',            # Used internally and
+                                'changed_descendant',  # for the client
                                 'new_child',
                                 'removed_child',
                                 'modified_child',

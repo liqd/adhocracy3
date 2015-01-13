@@ -180,7 +180,7 @@ def _assert_we_are_not_forking(resource, registry, event):
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,
                         creator) -> IResource:
     appstructs = _get_writable_appstructs(resource, registry)
-    # FIXME the need to switch between forkable and non forkable his bad
+    # FIXME the need to switch between forkable and non-forkable is bad
     is_forkable = IForkableVersionable.providedBy(resource)
     iversionable = IForkableVersionable if is_forkable else IVersionable
     appstructs[iversionable.__identifier__]['follows'] = [resource]
