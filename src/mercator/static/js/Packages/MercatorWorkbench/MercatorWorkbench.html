@@ -102,13 +102,17 @@
     <adh-wait data-condition="currentSpace === 'user'">
         <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'user'">
             <div class="moving-column moving-column-structure">
-                <div class="moving-column-menu placeholder"></div>
+                <div class="moving-column-menu">
+                    <i class="icon-users moving-column-icon"></i>
+                </div>
                 <div class="moving-column-body" data-du-scroll-container="">
                     <adh-list-users></adh-list-users>
                 </div>
             </div>
             <div class="moving-column moving-column-content">
-                <div class="moving-column-menu placeholder"></div>
+                <div class="moving-column-menu">
+                    <i class="icon-user-unfilled moving-column-icon"></i>
+                </div>
                 <div class="moving-column-body" data-du-scroll-container="">
                     <adh-recompile-on-change
                         data-key="userUrl"
