@@ -263,7 +263,13 @@ export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
 export var userMessageDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html",
+        link: (scope)  => {
+            scope.messageSend = () => {
+                // FIXME: Send a message code required
+                console.log("One day I hope to send a message");
+            };
+        }
     };
 };
 
