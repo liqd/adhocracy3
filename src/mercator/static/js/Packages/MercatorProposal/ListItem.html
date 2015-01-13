@@ -1,5 +1,5 @@
 <div class="mercator-proposal-list-item {{ selectedState }}" >
-    <div class="mercator-proposal-list-item-image"><img data-ng-src="{{ data.introduction.picture }}/thumbnail"></div>
+    <div class="mercator-proposal-list-item-image" data-ng-if="data.introduction.picture"><img data-ng-src="{{ data.introduction.picture }}/thumbnail"></div>
     <div class="mercator-proposal-list-item-body" data-ng-class="{'m-has-image': image}">
         <p class="mercator-proposal-list-item-username">
             <adh-user-meta

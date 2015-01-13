@@ -127,7 +127,7 @@ selected. If no proposal is selected, no state is applied.
 .mercator-propsal-detail-meta-item {
     @include text(functional-introvert);
     float: left;
-    margin-right: 2em;
+    margin-right: 1.66666666em;
 
     i {
         font-size: 140%;
@@ -156,6 +156,7 @@ selected. If no proposal is selected, no state is applied.
     }
 
     &.mercator-propsal-list-item-meta-item-budget {
+        color: $color-highlight-normal;
         font-size: $font-size-plus;
     }
 }
@@ -240,27 +241,32 @@ $mercator-proposal-detail-nav-width: 3.3%;
 .mercator-proposal-list-item {
     @include container;
     border-bottom: 1px solid $color-secondary-introvert;
-    padding: 1.2em;
+    font-size: $font-size-plus;
+    line-height: 1;
+    padding: 1em 1.25em 1.125em 0.875em;
 
     .m-has-image {
-        @include span(9 of 12 last);
+        float: left;
     }
 
     &.is-not-selected {
         background: $color-structure-active;
 
-        i[class*=icon-] {
+        i[class*=icon-],
+        .mercator-propsal-list-item-meta-item-budget {
             color: $color-highlight-extrovert;
         }
     }
 }
 
 .mercator-proposal-list-item-image {
-    @include span(3 of 12 first);
+    float: left;
+    margin-right: 0.6875em;
 
     img {
         float: left;
-        max-width: 100%;
+        height: auto;
+        width: 6.5625em;
     }
 }
 
@@ -270,20 +276,24 @@ $mercator-proposal-detail-nav-width: 3.3%;
 }
 
 .mercator-proposal-list-item-username {
-    @include text(functional-introvert);
-    padding-bottom: 0.1em;
+    font-size: $font-size-small;
 
     a {
         text-decoration: none;
+
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
     }
 }
 
 .mercator-proposal-list-item-title {
-    @include text(functional);
-    padding-bottom: 0.5em;
+    font-size: $font-size-plus;
+    font-weight: $font-weight-normal;
+    padding: 0.9375em 0;
 
     a {
-        color: $color-prime-extrovert;
+        color: $color-prime-normal;
         text-decoration: none;
 
         &:hover, &:focus {
