@@ -132,6 +132,9 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "child": "CHILD_RESOURCE_PATH" }
 
+    In practice this usually means that the resource has been marked as deleted
+    or hidden (see :ref:`deletion`).
+
   * If a child (sub-Pool or Item) in the Pool is modified::
 
         { "event": "modified_child",
@@ -141,6 +144,17 @@ that has been subscribed.
     (Rationale for modify: a pool is probably rendered as a table of
     contents, and if the title of an object changes, the table of contents
     must be re-rendered.)
+
+  * If anything that lies below the pool (children, grandchildren etc.) has
+    been added, removed, or modified:
+
+        { "event": "changed_descendant", "resource": "RESOURCE_PATH" }
+
+    This event is sent only once per transaction and pool, even if multiple
+    of its descendants have been modified. It tells the frontend that any
+    *queries* previously sent to the pool should now be considered outdated,
+    as query results can refer to grandchildren and other resources that lie
+    below the pool, but aren't its direct children.
 
 * If resource is an Item (e.g. a Proposal):
 
@@ -158,13 +172,10 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "version": "VERSION_RESOURCE_PATH" }
 
-  * NO explicit notifications are sent if one of the sub-Items is changed,
-    e.g. if a new sub-Section or SectionVersion is added to a Section
-    within this Item. However, this should hardly matter since the
-    top-level Item (e.g. a Proposal) will usually be changed every time a
-    sub-Item is changed (changes result in a new version which is added to
-    the top-level Item). Only if the frontend wants to keep track of
-    isolated changes in a sub-Item, it needs to subscribe to it explicitly.
+  * The other events sent as the same as for Pools, since all Items are also
+    pools: "modified", "removed_child", "modified_child", "changed_descendant".
+    The "modified_child" and "removed_child" events don't distinguish between
+    sub-Items and ItemVersions -- both are considered children.
 
 * If resource is an ItemVersion: subscriptions to ItemVersions are
   currently unsupported. This may change in the future if we see the need
