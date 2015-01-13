@@ -37,7 +37,11 @@
         </div>
         <div class="comment-content">
             <textarea class="comment-content-edit-text" data-msd-elastic="" data-ng-switch-when="1" data-ng-model="data.content"></textarea>
-            <div data-ng-switch-default="">{{data.content}}</div>
+            <div data-ng-switch-default="">
+                {{data.content}}
+                <!-- FIXME: URL needs to be absolute and canonical (embed host) -->
+                <adh-social-share data-uri="{{data.path | adhResourceUrl}}" data-tweet-text="huhu"></adh-social-share>
+            </div>
         </div>
         <div class="comment-meta">
             <div class="comment-actions">
