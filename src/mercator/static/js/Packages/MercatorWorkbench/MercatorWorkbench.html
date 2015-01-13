@@ -111,7 +111,7 @@
             </div>
             <div class="moving-column moving-column-content">
                 <div class="moving-column-menu">
-                    <i class="icon-user-unfilled moving-column-icon"></i>1
+                    <i class="icon-user-unfilled moving-column-icon"></i>
                     <a href="#">{{ "Messaging" | translate }}</a>
                 </div>
                 <div class="moving-column-body" data-du-scroll-container="">
@@ -128,7 +128,8 @@
                             </section>
                         </adh-user-profile>
                     </adh-recompile-on-change>
-                    <div class="moving-column-mask"></div>
+                    <adh-user-message></adh-user-message>
+                    <div class="moving-column-mask m-show"></div>
                 </div>
             </div>
         </div>
