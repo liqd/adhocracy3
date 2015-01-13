@@ -331,18 +331,18 @@
                 <div class="annotated-section-body">
                     <label>
                         <span class="label-text">{{ "Upload an image" | translate }}</span>
-                        <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
-                            current image:
-                            <img class="mercator-proposal-detail-view-image"
-                                 data-ng-src="{{ data.introduction.picture }}/detail"
-                                 style="width: 100%; height: 203px"/>
-                        </div>
                         <div
                             data-flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
                             data-flow-init=""
                             data-ng-model="data.introduction.imageUpload"
                             data-ng-class="{ 'is-invalid': mercatorProposalIntroductionForm['introduction-picture-upload'].$invalid }"
                             name="introduction-picture-upload">
+                            <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
+                                current image:
+                                <img class="mercator-proposal-detail-view-image"
+                                     data-ng-src="{{ data.introduction.picture }}/detail"
+                                     style="width: 100%; height: 203px"/>
+                            </div>
                             <button
                                 type="button"
                                 data-flow-btn=""
