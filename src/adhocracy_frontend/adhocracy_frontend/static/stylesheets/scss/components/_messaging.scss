@@ -1,0 +1,19 @@
+.user-message {
+    background: $color-structure-border-introvert;
+    border-top: 1px solid $color-structure-border;
+    left: 0;
+    top: 0;
+    padding: 1em;
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+
+    .user-message-subject,
+    .user-message-text {
+        background-color: white;
+    }
+
+    .user-message-button-submit {
+        float: right;
+    }
+}

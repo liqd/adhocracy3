@@ -260,6 +260,14 @@ export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var userMessageDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html"
+    };
+};
+
+
 export var moduleName = "adhUserViews";
 
 export var register = (angular) => {
@@ -303,5 +311,6 @@ export var register = (angular) => {
         .directive("adhLogin", ["adhConfig", loginDirective])
         .directive("adhRegister", ["adhConfig", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
-        .directive("adhUserMeta", ["adhConfig", metaDirective]);
+        .directive("adhUserMeta", ["adhConfig", metaDirective])
+        .directive("adhUserMessage", ["adhConfig", userMessageDirective]);
 };

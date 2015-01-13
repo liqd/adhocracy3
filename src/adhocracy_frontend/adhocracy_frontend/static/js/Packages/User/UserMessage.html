@@ -1,0 +1,18 @@
+<div class="user-message">
+    <form novalidate="novalidate" name="messageForm">
+        <p>{{ "Message to" | translate }} Username</p>
+        <input
+            class="user-message-subject"
+            type="text"
+            name="subject"
+            placeholder="{{ 'Subject' | translate }}:"
+            required="required" />
+        <textarea
+            class="user-message-text"
+            name="content"
+            placeholder="{{ 'Content' | translate }}:"
+            required="required"></textarea>
+        <input class="user-message-button-submit" type="submit" value="{{ 'Send' | translate }}" data-ng-click="submit()" />
+        <a href="" data-ng-click="cancel()" >{{ "Cancel" | translate }}</a>
+    </form>
+</div>
