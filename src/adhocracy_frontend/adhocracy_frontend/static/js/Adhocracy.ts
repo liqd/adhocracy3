@@ -41,6 +41,7 @@ import AdhSocialShare = require("./Packages/SocialShare/SocialShare");
 import AdhSticky = require("./Packages/Sticky/Sticky");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
+import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
 
 
@@ -145,6 +146,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhSticky.register(angular);
     AdhTopLevelState.register(angular);
     AdhUser.register(angular);
+    AdhUserViews.register(angular);
     AdhWebSocket.register(angular);
 
     // force-load some services
