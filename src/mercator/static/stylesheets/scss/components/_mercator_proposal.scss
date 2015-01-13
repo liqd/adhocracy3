@@ -272,7 +272,7 @@ $mercator-proposal-detail-nav-width: 3.3%;
     a {
         text-decoration: none;
 
-        &.hover {
+        &:hover, &:focus {
             text-decoration: underline;
         }
     }
