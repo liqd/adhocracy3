@@ -9,7 +9,7 @@
 export interface IService {
     rest_url : string;
     rest_platform_path : string;
-    canonical_url? : string;
+    canonical_url : string;
     pkg_path : string;
     ws_url : string;
     embedded : boolean;

@@ -72,7 +72,7 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
-            if (element[0].nodeName === "A" && adhConfig.canonical_url) {
+            if (element[0].nodeName === "A") {
                 scope.$watch(() => attrs.href, (orig) => {
                     // remove any handlers that were registered in previous runs
                     element.off("click.adh_href");
