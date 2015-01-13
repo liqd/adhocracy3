@@ -40,6 +40,8 @@
 .icon-triangle-inverse-down:before,
 .icon-triangle-inverse-up:before,
 .icon-user:before,
+.icon-user-unfilled:before,
+.icon-users:before,
 .icon-x:before {
   display: inline-block;
   font-family: "adhocracy3-icons";
@@ -72,4 +74,6 @@
 .icon-triangle-inverse-down:before { content: "\f10e"; }
 .icon-triangle-inverse-up:before { content: "\f10f"; }
 .icon-user:before { content: "\f10c"; }
+.icon-user-unfilled:before { content: "\f112"; }
+.icon-users:before { content: "\f113"; }
 .icon-x:before { content: "\f10d"; }
