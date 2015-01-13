@@ -109,10 +109,10 @@
                     <adh-list-users></adh-list-users>
                 </div>
             </div>
-            <div class="moving-column moving-column-content">
+            <div class="moving-column moving-column-content" data-ng-init="show = {messaging: false}">
                 <div class="moving-column-menu">
                     <i class="icon-user-unfilled moving-column-icon"></i>
-                    <a href="#">{{ "Messaging" | translate }}</a>
+                    <a data-ng-click="show.messaging = !show.messaging" href="">{{ "Messaging" | translate }}</a>
                 </div>
                 <div class="moving-column-body" data-du-scroll-container="">
                     <adh-recompile-on-change
