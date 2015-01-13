@@ -3,6 +3,7 @@ import _ = require("lodash");
 import AdhConfig = require("../Config/Config");
 import AdhDateTime = require("../DateTime/DateTime");
 import AdhDone = require("../Done/Done");
+import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
 import AdhPermissions = require("../Permissions/Permissions");
@@ -299,6 +300,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhDateTime.moduleName,
             AdhDone.moduleName,
+            AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhListing.moduleName,
             AdhPermissions.moduleName,
