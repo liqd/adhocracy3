@@ -1,0 +1,307 @@
+import AdhConfig = require("../Config/Config");
+import AdhHttp = require("../Http/Http");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+
+import AdhUser = require("./User");
+
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+
+var pkgLocation = "/User";
+
+
+export interface IScopeLogin {
+    user : AdhUser.Service;
+    credentials : {
+        nameOrEmail : string;
+        password : string;
+    };
+    errors : string[];
+    supportEmail : string;
+
+    resetCredentials : () => void;
+    logIn : () => ng.IPromise<void>;
+}
+
+
+export interface IScopeRegister {
+    input : {
+        username : string;
+        email : string;
+        password : string;
+        passwordRepeat : string;
+    };
+    siteName : string;
+    errors : string[];
+    supportEmail : string;
+    success : boolean;
+
+    register : () => ng.IPromise<void>;
+}
+
+
+var bindServerErrors = (
+    $scope : {errors : string[]},
+    errors : AdhHttp.IBackendErrorItem[]
+) => {
+    $scope.errors = [];
+    if (!errors.length) {
+        $scope.errors.push("Unknown error from server (no details provided)");
+    } else {
+        errors.forEach((e) => {
+            $scope.errors.push(e.description);
+        });
+    }
+};
+
+
+export var activateController = (
+    adhUser : AdhUser.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhDone,
+    $location : ng.ILocationService
+) : void => {
+    var key = $location.path().split("/")[2];
+    var path = "/activate/" + key;
+
+    var success = () => {
+        // FIXME show success message in UI
+        // FIXME extract cameFrom from activation key (involves BE)
+        adhTopLevelState.redirectToCameFrom("/");
+    };
+
+    var error = () => {
+        $location.url("activation_error");
+    };
+
+    adhUser.activate(path)
+        .then(success, error)
+        .then(adhDone);
+};
+
+
+export var loginController = (
+    adhUser : AdhUser.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService,
+    $scope : IScopeLogin
+) : void => {
+    $scope.errors = [];
+    $scope.supportEmail = adhConfig.support_email;
+
+    $scope.credentials = {
+        nameOrEmail: "",
+        password: ""
+    };
+
+    $scope.resetCredentials = () => {
+        $scope.credentials.nameOrEmail = "";
+        $scope.credentials.password = "";
+    };
+
+    $scope.logIn = () => {
+        return adhUser.logIn(
+            $scope.credentials.nameOrEmail,
+            $scope.credentials.password
+        ).then(() => {
+            adhTopLevelState.redirectToCameFrom("/");
+        }, (errors) => {
+            bindServerErrors($scope, errors);
+            $scope.credentials.password = "";
+        });
+    };
+};
+
+
+export var loginDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
+        scope: {},
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", loginController]
+    };
+};
+
+
+export var registerController = (
+    adhUser : AdhUser.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService,
+    $scope : IScopeRegister
+) => {
+    $scope.siteName = adhConfig.site_name;
+
+    $scope.input = {
+        username: "",
+        email: "",
+        password: "",
+        passwordRepeat: ""
+    };
+
+    $scope.errors = [];
+    $scope.supportEmail = adhConfig.support_email;
+
+    $scope.register = () : ng.IPromise<void> => {
+        return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
+            .then((response) => {
+                $scope.errors = [];
+                $scope.success = true;
+            }, (errors) => bindServerErrors($scope, errors));
+    };
+};
+
+
+export var registerDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
+        scope: {},
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", registerController]
+    };
+};
+
+
+export var indicatorDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
+        scope: {},
+        controller: ["adhUser", "$scope", (adhUser : AdhUser.Service, $scope) => {
+            $scope.user = adhUser;
+
+            $scope.logOut = () => {
+                adhUser.logOut();
+            };
+        }]
+    };
+};
+
+
+export var metaDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
+        scope: {
+            path: "@",
+            name: "@?"
+        },
+        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service<any>, $translate, $scope) => {
+            if ($scope.path) {
+                adhHttp.resolve($scope.path)
+                    .then((res) => {
+                        $scope.userBasic = res.data[SIUserBasic.nick];
+                        $scope.isAnonymous = false;
+
+                        if (typeof $scope.name !== "undefined") {
+                            $scope.userBasic.name = $scope.name;
+                        };
+                    });
+            } else {
+                $translate("guest").then((translated) => {
+                    $scope.userBasic = {
+                        name: translated
+                    };
+
+                    if (typeof $scope.name !== "undefined") {
+                        $scope.userBasic.name = $scope.name;
+                    };
+                });
+                $scope.isAnonymous = true;
+            }
+        }]
+    };
+};
+
+
+export var userListDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html"
+    };
+};
+
+
+export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListItem.html",
+        scope: {
+            path: "@",
+            me: "=?"
+        },
+        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+            if ($scope.path) {
+                adhHttp.resolve($scope.path)
+                    .then((res) => {
+                        $scope.userBasic = res.data[SIUserBasic.nick];
+                    });
+            }
+        }]
+    };
+};
+
+
+export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
+        transclude: true,
+        scope: {
+            path: "@"
+        },
+        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+            if ($scope.path) {
+                adhHttp.resolve($scope.path)
+                    .then((res) => {
+                        $scope.userBasic = res.data[SIUserBasic.nick];
+                    });
+            }
+        }]
+    };
+};
+
+
+export var moduleName = "adhUserViews";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhTopLevelState.moduleName,
+            AdhUser.moduleName
+        ])
+        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
+            adhTopLevelStateProvider
+                .when("login", () : AdhTopLevelState.IAreaInput => {
+                    return {
+                        templateUrl: "/static/js/templates/Login.html"
+                    };
+                })
+                .when("register", () : AdhTopLevelState.IAreaInput => {
+                    return {
+                        templateUrl: "/static/js/templates/Register.html"
+                    };
+                })
+                .when("activate", ["adhUser", "adhTopLevelState", "adhDone", "$location",
+                    (adhUser, adhTopLevelState, adhDone, $location) : AdhTopLevelState.IAreaInput => {
+                        activateController(adhUser, adhTopLevelState, adhDone, $location);
+                        return {
+                            skip: true
+                        };
+                    }
+                ])
+                .when("activation_error", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
+                    $scope.translationData = {
+                        supportEmail: adhConfig.support_email
+                    };
+                    return {
+                        templateUrl: "/static/js/templates/ActivationError.html"
+                    };
+                }]);
+        }])
+        .directive("adhListUsers", ["adhConfig", userListDirective])
+        .directive("adhUserListItem", ["adhConfig", userListItemDirective])
+        .directive("adhUserProfile", ["adhConfig", userProfileDirective])
+        .directive("adhLogin", ["adhConfig", loginDirective])
+        .directive("adhRegister", ["adhConfig", registerDirective])
+        .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
+        .directive("adhUserMeta", ["adhConfig", metaDirective]);
+};
