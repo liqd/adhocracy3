@@ -16,20 +16,28 @@ export var createDirective = (config : AdhConfig.IService, moment : MomentStatic
         },
         link: (scope) => {
             (<any>moment).locale(config.locale);
-            var dt = moment(scope.datetime);
 
-            scope.datetimeString = dt.format();
+            var intervalPromise;
 
-            if (typeof scope.format !== "undefined") {
-                scope.text = dt.format(scope.format);
-            } else {
-                scope.text = dt.fromNow();
+            scope.$watch("datetime", (datetime) => {
+                if (typeof intervalPromise !== "undefined") {
+                    $interval.cancel(intervalPromise);
+                }
 
-                $interval(() => {
+                var dt = moment(datetime);
+
+                scope.datetimeString = dt.format();
+
+                if (typeof scope.format !== "undefined") {
+                    scope.text = dt.format(scope.format);
+                } else {
                     scope.text = dt.fromNow();
-                }, 5000);
-            }
 
+                    intervalPromise = $interval(() => {
+                        scope.text = dt.fromNow();
+                    }, 5000);
+                }
+            });
         }
     };
 };
