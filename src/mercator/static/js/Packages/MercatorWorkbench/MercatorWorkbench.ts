@@ -133,11 +133,20 @@ var mercatorProposalCreateColumnDirective = (
 };
 
 
-var mercatorProposalDetailColumnDirective = (adhConfig : AdhConfig.IService) => {
+var mercatorProposalDetailColumnDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhConfig : AdhConfig.IService
+) => {
     return {
         restrict: "E",
-        scope: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalDetailColumn.html"
+        scope: {},
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalDetailColumn.html",
+        link: (scope) => {
+            adhTopLevelState.bind("platformUrl", scope);
+            adhTopLevelState.bind("proposalUrl", scope);
+            adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+        }
     };
 };
 
@@ -259,7 +268,8 @@ export var register = (angular) => {
             new MercatorWorkbench().createDirective(adhConfig)])
         .directive("adhCommentColumn", ["adhTopLevelState", "adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalCreateColumnDirective])
-        .directive("adhMercatorProposalDetailColumn", ["adhConfig", mercatorProposalDetailColumnDirective])
+        .directive("adhMercatorProposalDetailColumn", ["adhTopLevelState", "adhPermissions", "adhConfig",
+            mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhConfig", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhConfig", mercatorProposalListingColumnDirective])
         .directive("adhUserDetailColumn", ["adhConfig", userDetailColumnDirective])
