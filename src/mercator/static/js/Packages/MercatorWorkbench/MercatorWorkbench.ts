@@ -104,11 +104,15 @@ export class MercatorWorkbench {
 }
 
 
-var commentColumnDirective = (adhConfig : AdhConfig.IService) => {
+var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        scope: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html"
+        scope: {},
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
+        link: (scope) => {
+            adhTopLevelState.bind("proposalUrl", scope);
+            adhTopLevelState.bind("commentableUrl", scope);
+        }
     };
 };
 
@@ -246,7 +250,7 @@ export var register = (angular) => {
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
             new MercatorWorkbench().createDirective(adhConfig)])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
+        .directive("adhCommentColumn", ["adhTopLevelState", "adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", ["adhConfig", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", ["adhConfig", mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhConfig", mercatorProposalEditColumnDirective])
