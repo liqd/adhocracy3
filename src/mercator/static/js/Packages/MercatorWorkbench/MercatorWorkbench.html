@@ -1,6 +1,6 @@
 <adh-spaces>
-    <adh-wait data-condition="currentSpace === 'content'">
-        <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'content'">
+    <adh-wait data-condition="currentSpace === 'content'" data-ng-show="currentSpace === 'content'">
+        <div data-adh-moving-columns="" class="moving-columns">
             <div class="moving-column moving-column-structure">
                 <adh-mercator-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mercator-proposal-create-column>
                 <adh-mercator-proposal-listing-column data-ng-if="view !== 'create_proposal'"><adh-mercator-proposal-listing-column>
@@ -15,8 +15,8 @@
         </div>
     </adh-wait>
 
-    <adh-wait data-condition="currentSpace === 'user'">
-        <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'user'">
+    <adh-wait data-condition="currentSpace === 'user'" data-ng-show="currentSpace === 'user'">
+        <div data-adh-moving-columns="" class="moving-columns">
             <div class="moving-column moving-column-structure">
                 <adh-user-listing-column></adh-user-listing-column>
             </div>
@@ -26,9 +26,7 @@
         </div>
     </adh-wait>
 
-    <adh-wait data-condition="currentSpace === 'error'">
-        <div data-ng-show="currentSpace === 'error'">
-            <adh-routing-error></adh-routing-error>
-        </div>
+    <adh-wait data-condition="currentSpace === 'error'" data-ng-show="currentSpace === 'error'">
+        <adh-routing-error></adh-routing-error>
     </adh-wait>
 </adh-spaces>
