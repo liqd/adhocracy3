@@ -11,7 +11,7 @@ export var createDirective = (config : AdhConfig.IService, moment : MomentStatic
         restrict: "E",
         template: "<time datetime=\"{{datetimeString}}\">{{text}}</time>",
         scope: {
-            datetime: "@"
+            datetime: "="
         },
         link: (scope) => {
             (<any>moment).locale(config.locale);
