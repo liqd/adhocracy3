@@ -1,30 +1,30 @@
-    <adh-space data-key="content">
-        <div data-adh-moving-columns="" class="moving-columns">
-            <div class="moving-column moving-column-structure">
-                <adh-mercator-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mercator-proposal-create-column>
-                <adh-mercator-proposal-listing-column data-ng-if="view !== 'create_proposal'"><adh-mercator-proposal-listing-column>
-            </div>
-            <div class="moving-column moving-column-content">
-                <adh-mercator-proposal-edit-column data-ng-if="view === 'edit'"></adh-mercator-proposal-edit-column>
-                <adh-mercator-proposal-detail-column data-ng-if="view !== 'edit'"></adh-mercator-proposal-detail-column>
-            </div>
-            <div class="moving-column moving-column-content2">
-                <adh-comment-column></adh-comment-column>
-            </div>
+<adh-space data-key="content">
+    <div data-adh-moving-columns="" class="moving-columns">
+        <div class="moving-column moving-column-structure">
+            <adh-mercator-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mercator-proposal-create-column>
+            <adh-mercator-proposal-listing-column data-ng-if="view !== 'create_proposal'"><adh-mercator-proposal-listing-column>
         </div>
-    </adh-space>
-
-    <adh-space data-key="user">
-        <div data-adh-moving-columns="" class="moving-columns">
-            <div class="moving-column moving-column-structure">
-                <adh-user-listing-column></adh-user-listing-column>
-            </div>
-            <div class="moving-column moving-column-content">
-                <adh-user-detail-column></adh-user-detail-column>
-            </div>
+        <div class="moving-column moving-column-content">
+            <adh-mercator-proposal-edit-column data-ng-if="view === 'edit'"></adh-mercator-proposal-edit-column>
+            <adh-mercator-proposal-detail-column data-ng-if="view !== 'edit'"></adh-mercator-proposal-detail-column>
         </div>
-    </adh-space>
+        <div class="moving-column moving-column-content2">
+            <adh-comment-column></adh-comment-column>
+        </div>
+    </div>
+</adh-space>
 
-    <adh-space data-key="error">
-        <adh-routing-error></adh-routing-error>
-    </adh-space>
+<adh-space data-key="user">
+    <div data-adh-moving-columns="" class="moving-columns">
+        <div class="moving-column moving-column-structure">
+            <adh-user-listing-column></adh-user-listing-column>
+        </div>
+        <div class="moving-column moving-column-content">
+            <adh-user-detail-column></adh-user-detail-column>
+        </div>
+    </div>
+</adh-space>
+
+<adh-space data-key="error">
+    <adh-routing-error></adh-routing-error>
+</adh-space>
