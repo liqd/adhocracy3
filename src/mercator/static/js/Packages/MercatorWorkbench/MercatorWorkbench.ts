@@ -204,7 +204,7 @@ var userDetailColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, ad
 var userListingColumnDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        scope: true,
+        scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html"
     };
 };
