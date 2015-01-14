@@ -151,11 +151,31 @@ var mercatorProposalDetailColumnDirective = (
 };
 
 
-var mercatorProposalEditColumnDirective = (adhConfig : AdhConfig.IService) => {
+var mercatorProposalEditColumnDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService,
+    $location : ng.ILocationService
+) => {
     return {
         restrict: "E",
-        scope: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalEditColumn.html"
+        scope: {},
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalEditColumn.html",
+        link: (scope) => {
+            // FIXME: use dependency injection instead
+            var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
+
+            adhTopLevelState.bind("platformUrl", scope);
+            adhTopLevelState.bind("proposalUrl", scope);
+
+            scope.redirectAfterProposalCancel = (resourcePath : string) => {
+                // FIXME: use adhTopLevelState.redirectToCameFrom
+                $location.url(adhResourceUrl(resourcePath));
+            };
+            scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
+                var proposalVersionPath = result.slice(-1)[0].path;
+                $location.url(adhResourceUrl(proposalVersionPath));
+            };
+        }
     };
 };
 
@@ -270,7 +290,7 @@ export var register = (angular) => {
         .directive("adhMercatorProposalCreateColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", ["adhTopLevelState", "adhPermissions", "adhConfig",
             mercatorProposalDetailColumnDirective])
-        .directive("adhMercatorProposalEditColumn", ["adhConfig", mercatorProposalEditColumnDirective])
+        .directive("adhMercatorProposalEditColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhConfig", mercatorProposalListingColumnDirective])
         .directive("adhUserDetailColumn", ["adhConfig", userDetailColumnDirective])
         .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
