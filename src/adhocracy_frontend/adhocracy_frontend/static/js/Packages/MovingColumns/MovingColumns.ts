@@ -118,13 +118,6 @@ export var movingColumns = (
                 }
             };
 
-            // FIXME: these do not really belong here
-            adhTopLevelState.bind("content2Url", scope);
-            adhTopLevelState.bind("platformUrl", scope);
-            adhTopLevelState.bind("proposalUrl", scope);
-            adhTopLevelState.bind("commentableUrl", scope);
-            adhTopLevelState.bind("userUrl", scope);
-
             adhTopLevelState.on("movingColumns", move);
             adhTopLevelState.on("focus", resize);
             adhTopLevelState.on("space", () => _.defer(resizeNoTransition));
