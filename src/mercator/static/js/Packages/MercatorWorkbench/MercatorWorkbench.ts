@@ -34,6 +34,21 @@ export var mercatorWorkbenchDirective = (adhTopLevelState : AdhTopLevelState.Ser
 };
 
 
+var bindRedirectsToScope = (scope, adhConfig, $location) => {
+    // FIXME: use dependency injection instead
+    var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
+
+    scope.redirectAfterProposalCancel = (resourcePath : string) => {
+        // FIXME: use adhTopLevelState.redirectToCameFrom
+        $location.url(adhResourceUrl(resourcePath));
+    };
+    scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
+        var proposalVersionPath = result.slice(-1)[0].path;
+        $location.url(adhResourceUrl(proposalVersionPath));
+    };
+};
+
+
 export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
@@ -57,19 +72,8 @@ export var mercatorProposalCreateColumnDirective = (
         scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreateColumn.html",
         link: (scope) => {
-            // FIXME: use dependency injection instead
-            var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
-
             adhTopLevelState.bind("platformUrl", scope);
-
-            scope.redirectAfterProposalCancel = (resourcePath : string) => {
-                // FIXME: use adhTopLevelState.redirectToCameFrom
-                $location.url(adhResourceUrl(resourcePath));
-            };
-            scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
-                var proposalVersionPath = result.slice(-1)[0].path;
-                $location.url(adhResourceUrl(proposalVersionPath));
-            };
+            bindRedirectsToScope(scope, adhConfig, $location);
         }
     };
 };
@@ -103,20 +107,9 @@ export var mercatorProposalEditColumnDirective = (
         scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalEditColumn.html",
         link: (scope) => {
-            // FIXME: use dependency injection instead
-            var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
-
             adhTopLevelState.bind("platformUrl", scope);
             adhTopLevelState.bind("proposalUrl", scope);
-
-            scope.redirectAfterProposalCancel = (resourcePath : string) => {
-                // FIXME: use adhTopLevelState.redirectToCameFrom
-                $location.url(adhResourceUrl(resourcePath));
-            };
-            scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
-                var proposalVersionPath = result.slice(-1)[0].path;
-                $location.url(adhResourceUrl(proposalVersionPath));
-            };
+            bindRedirectsToScope(scope, adhConfig, $location);
         }
     };
 };
