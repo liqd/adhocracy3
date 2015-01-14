@@ -23,7 +23,7 @@ import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComm
 var pkgLocation = "/MercatorWorkbench";
 
 
-var mercatorWorkbenchDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
+export var mercatorWorkbenchDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorWorkbench.html",
@@ -34,7 +34,7 @@ var mercatorWorkbenchDirective = (adhTopLevelState : AdhTopLevelState.Service, a
 };
 
 
-var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
+export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         scope: {},
@@ -47,7 +47,7 @@ var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhCo
 };
 
 
-var mercatorProposalCreateColumnDirective = (
+export var mercatorProposalCreateColumnDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     $location : ng.ILocationService
@@ -75,7 +75,7 @@ var mercatorProposalCreateColumnDirective = (
 };
 
 
-var mercatorProposalDetailColumnDirective = (
+export var mercatorProposalDetailColumnDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
     adhConfig : AdhConfig.IService
@@ -93,7 +93,7 @@ var mercatorProposalDetailColumnDirective = (
 };
 
 
-var mercatorProposalEditColumnDirective = (
+export var mercatorProposalEditColumnDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     $location : ng.ILocationService
@@ -122,7 +122,7 @@ var mercatorProposalEditColumnDirective = (
 };
 
 
-var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
+export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         scope: {},
@@ -158,7 +158,7 @@ var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLevelStat
 };
 
 
-var userDetailColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
+export var userDetailColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         scope: {},
@@ -173,7 +173,7 @@ var userDetailColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, ad
 };
 
 
-var userListingColumnDirective = (adhConfig : AdhConfig.IService) => {
+export var userListingColumnDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         scope: {},
