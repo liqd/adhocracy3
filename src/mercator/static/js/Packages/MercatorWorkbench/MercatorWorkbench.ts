@@ -186,11 +186,17 @@ var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLevelStat
 };
 
 
-var userDetailColumnDirective = (adhConfig : AdhConfig.IService) => {
+var userDetailColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        scope: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html"
+        scope: {},
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
+        link: (scope) => {
+            adhTopLevelState.bind("userUrl", scope);
+            scope.data = {
+                showMessaging: false
+            };
+        }
     };
 };
 
@@ -289,6 +295,6 @@ export var register = (angular) => {
             mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhTopLevelState", "adhConfig", mercatorProposalListingColumnDirective])
-        .directive("adhUserDetailColumn", ["adhConfig", userDetailColumnDirective])
+        .directive("adhUserDetailColumn", ["adhTopLevelState", "adhConfig", userDetailColumnDirective])
         .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
 };
