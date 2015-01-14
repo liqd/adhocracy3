@@ -104,6 +104,17 @@ export class MercatorWorkbench {
 }
 
 
+var createColumn = (name) => {
+    return (adhConfig) => {
+        return {
+            restrict: "E",
+            scope: true,
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/" + name + ".html"
+        };
+    };
+};
+
+
 export var moduleName = "adhMercatorWorkbench";
 
 export var register = (angular) => {
@@ -183,4 +194,17 @@ export var register = (angular) => {
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
             new MercatorWorkbench().createDirective(adhConfig)]);
+
+        var l = [
+            "CommentColumn",
+            "MercatorProposalCreateColumn",
+            "MercatorProposalDetailColumn",
+            "MercatorProposalEditColumn",
+            "MercatorProposalListingColumn",
+            "UserDetailColumn",
+            "UserListingColumn"
+        ];
+        for (var i = 0; i < l.length; i++) {
+            angular.module(moduleName).directive("adh" + l[i], ["adhConfig", createColumn(l[i])]);
+        }
 };

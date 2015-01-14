@@ -1,0 +1,26 @@
+<div class="moving-column-menu">
+    <i class="icon-list moving-column-icon"></i>
+    <a href="" data-ng-click="proposalListingData.showFacets = !proposalListingData.showFacets">{{ "filters" | translate }}</a>
+</div>
+<div class="moving-column-collapsed">
+    <a href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">O</a>
+</div>
+<div
+    class="moving-column-sidebar"
+    data-ng-class="{'is-visible': proposalListingData.showFacets}"
+    aria-visible="{{proposalListingData.showFacets}}">
+    <adh-facets
+        data-update="proposalListingData.update"
+        data-facets="proposalListingData.facets">
+    </adh-facets>
+</div>
+<div class="moving-column-body" data-du-scroll-container="">
+    <adh-mercator-proposal-listing
+        data-path="{{path}}"
+        data-content-type="{{contentType}}"
+        data-update="proposalListingData.update"
+        data-facets="proposalListingData.facets"
+        data-sort="proposalListingData.sort"
+    >
+    </adh-mercator-proposal-listing>
+</div>
