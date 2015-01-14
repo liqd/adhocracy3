@@ -65,3 +65,4 @@ src/substanced/
 src/pyramid_cachebust/
 /package.json
 /node_modules
+/Gruntfile.js
