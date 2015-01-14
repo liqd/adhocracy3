@@ -26,16 +26,9 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     path : string;
     user : AdhUser.Service;
     websocketTestPaths : string;
-    contentType : string;
     view : string;
     redirectAfterProposalSubmit(result : {path : string }[]) : void;
     redirectAfterProposalCancel(resourcePath : string) : void;
-    proposalListingData : {
-        facets : AdhListing.IFacet[];
-        showFacets : boolean;
-        sort : string;
-        update?;
-    };
 }
 
 interface IMercatorWorkbenchRootScope extends ng.IScope {}
@@ -59,31 +52,8 @@ export class MercatorWorkbench {
                 $location : ng.ILocationService
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
-                $scope.contentType = RIMercatorProposalVersion.content_type;
                 $scope.user = adhUser;
                 $scope.websocketTestPaths = JSON.stringify([$scope.path]);
-                $scope.proposalListingData = {
-                    facets: [{
-                        key: "mercator_location",
-                        name: "Location",
-                        items: [
-                            {key: "specific", name: "Specific"},
-                            {key: "online", name: "Online"},
-                            {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
-                        ]
-                    }, {
-                        key: "mercator_requested_funding",
-                        name: "Requested funding",
-                        items: [
-                            {key: "5000", name: "0 - 5000 €"},
-                            {key: "10000", name: "5000 - 10000 €"},
-                            {key: "20000", name: "10000 - 20000 €"},
-                            {key: "50000", name: "20000 - 50000 €"}
-                        ]
-                    }],
-                    showFacets: false,
-                    sort: "-rates"
-                };
 
                 adhTopLevelState.bind("view", $scope);
             }]
@@ -180,11 +150,38 @@ var mercatorProposalEditColumnDirective = (
 };
 
 
-var mercatorProposalListingColumnDirective = (adhConfig : AdhConfig.IService) => {
+var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        scope: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalListingColumn.html"
+        scope: {},
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalListingColumn.html",
+        link: (scope) => {
+            adhTopLevelState.bind("platformUrl", scope);
+            adhTopLevelState.bind("proposalUrl", scope);
+            scope.contentType = RIMercatorProposalVersion.content_type;
+            scope.data = {
+                facets: [{
+                    key: "mercator_location",
+                    name: "Location",
+                    items: [
+                        {key: "specific", name: "Specific"},
+                        {key: "online", name: "Online"},
+                        {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
+                    ]
+                }, {
+                    key: "mercator_requested_funding",
+                    name: "Requested funding",
+                    items: [
+                        {key: "5000", name: "0 - 5000 €"},
+                        {key: "10000", name: "5000 - 10000 €"},
+                        {key: "20000", name: "10000 - 20000 €"},
+                        {key: "50000", name: "20000 - 50000 €"}
+                    ]
+                }],
+                showFacets: false,
+                sort: "-rates"
+            };
+        }
     };
 };
 
@@ -291,7 +288,7 @@ export var register = (angular) => {
         .directive("adhMercatorProposalDetailColumn", ["adhTopLevelState", "adhPermissions", "adhConfig",
             mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalEditColumnDirective])
-        .directive("adhMercatorProposalListingColumn", ["adhConfig", mercatorProposalListingColumnDirective])
+        .directive("adhMercatorProposalListingColumn", ["adhTopLevelState", "adhConfig", mercatorProposalListingColumnDirective])
         .directive("adhUserDetailColumn", ["adhConfig", userDetailColumnDirective])
         .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
 };
