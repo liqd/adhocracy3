@@ -368,29 +368,33 @@ export class Service {
         }
     }
 
-    public get(key : string) {
+    public get(key : string, space? : string) {
         if (key === "space") {
             return this.currentSpace;
+        } else if (typeof space !== "undefined") {
+            return this.data[space][key];
         } else {
             return this.data[this.currentSpace][key];
         }
     }
 
-    public on(key : string, fn) : void {
+    public on(key : string, fn, space? : string) : void {
         if (key === "space") {
             this.eventHandler.on(key, fn);
+        } else if (typeof space !== "undefined") {
+            this.eventHandler.on(space + ":" + key, fn);
         } else {
             this.eventHandler.on(this.currentSpace + ":" + key, fn);
         }
 
         // initially trigger callback
-        fn(this.get(key));
+        fn(this.get(key, space));
     }
 
-    public bind(key : string, context : {[k : string]: any}, keyInContext? : string) {
+    public bind(key : string, context : {[k : string]: any}, keyInContext? : string, space? : string) {
         this.on(key, (value : string) => {
             context[keyInContext || key] = value;
-        });
+        }, space);
     }
 
     // FIXME: {set,get}CameFrom should be worked into the class
