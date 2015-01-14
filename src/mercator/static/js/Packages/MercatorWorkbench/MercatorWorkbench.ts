@@ -47,9 +47,6 @@ export class MercatorWorkbench {
         var _self = this;
         var _class = (<any>_self).constructor;
 
-        // FIXME: use dependency injection instead
-        var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
-
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
@@ -89,15 +86,6 @@ export class MercatorWorkbench {
                 };
 
                 adhTopLevelState.bind("view", $scope);
-
-                $scope.redirectAfterProposalCancel = (resourcePath : string) => {
-                    // FIXME: use adhTopLevelState.redirectToCameFrom
-                    $location.url(adhResourceUrl(resourcePath));
-                };
-                $scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
-                    var proposalVersionPath = result.slice(-1)[0].path;
-                    $location.url(adhResourceUrl(proposalVersionPath));
-                };
             }]
         };
     }
@@ -117,11 +105,30 @@ var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhCo
 };
 
 
-var mercatorProposalCreateColumnDirective = (adhConfig : AdhConfig.IService) => {
+var mercatorProposalCreateColumnDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService,
+    $location : ng.ILocationService
+) => {
     return {
         restrict: "E",
-        scope: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreateColumn.html"
+        scope: {},
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreateColumn.html",
+        link: (scope) => {
+            // FIXME: use dependency injection instead
+            var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
+
+            adhTopLevelState.bind("platformUrl", scope);
+
+            scope.redirectAfterProposalCancel = (resourcePath : string) => {
+                // FIXME: use adhTopLevelState.redirectToCameFrom
+                $location.url(adhResourceUrl(resourcePath));
+            };
+            scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
+                var proposalVersionPath = result.slice(-1)[0].path;
+                $location.url(adhResourceUrl(proposalVersionPath));
+            };
+        }
     };
 };
 
@@ -251,7 +258,7 @@ export var register = (angular) => {
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
             new MercatorWorkbench().createDirective(adhConfig)])
         .directive("adhCommentColumn", ["adhTopLevelState", "adhConfig", commentColumnDirective])
-        .directive("adhMercatorProposalCreateColumn", ["adhConfig", mercatorProposalCreateColumnDirective])
+        .directive("adhMercatorProposalCreateColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", ["adhConfig", mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhConfig", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhConfig", mercatorProposalListingColumnDirective])
