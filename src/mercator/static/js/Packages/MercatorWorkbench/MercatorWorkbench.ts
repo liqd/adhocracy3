@@ -104,13 +104,65 @@ export class MercatorWorkbench {
 }
 
 
-var createColumn = (name) => {
-    return (adhConfig) => {
-        return {
-            restrict: "E",
-            scope: true,
-            templateUrl: adhConfig.pkg_path + pkgLocation + "/" + name + ".html"
-        };
+var commentColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html"
+    };
+};
+
+
+var mercatorProposalCreateColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreateColumn.html"
+    };
+};
+
+
+var mercatorProposalDetailColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalDetailColumn.html"
+    };
+};
+
+
+var mercatorProposalEditColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalEditColumn.html"
+    };
+};
+
+
+var mercatorProposalListingColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalListingColumn.html"
+    };
+};
+
+
+var userDetailColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html"
+    };
+};
+
+
+var userListingColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html"
     };
 };
 
@@ -193,18 +245,12 @@ export var register = (angular) => {
                 }]);
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
-            new MercatorWorkbench().createDirective(adhConfig)]);
-
-        var l = [
-            "CommentColumn",
-            "MercatorProposalCreateColumn",
-            "MercatorProposalDetailColumn",
-            "MercatorProposalEditColumn",
-            "MercatorProposalListingColumn",
-            "UserDetailColumn",
-            "UserListingColumn"
-        ];
-        for (var i = 0; i < l.length; i++) {
-            angular.module(moduleName).directive("adh" + l[i], ["adhConfig", createColumn(l[i])]);
-        }
+            new MercatorWorkbench().createDirective(adhConfig)])
+        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
+        .directive("adhMercatorProposalCreateColumn", ["adhConfig", mercatorProposalCreateColumnDirective])
+        .directive("adhMercatorProposalDetailColumn", ["adhConfig", mercatorProposalDetailColumnDirective])
+        .directive("adhMercatorProposalEditColumn", ["adhConfig", mercatorProposalEditColumnDirective])
+        .directive("adhMercatorProposalListingColumn", ["adhConfig", mercatorProposalListingColumnDirective])
+        .directive("adhUserDetailColumn", ["adhConfig", userDetailColumnDirective])
+        .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
 };
