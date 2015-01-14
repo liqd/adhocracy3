@@ -452,6 +452,7 @@ export var spaceDirective = (adhTopLevelState : Service) => {
         },
         link: (scope) => {
             adhTopLevelState.bind("space", scope, "currentSpace");
+            adhTopLevelState.bind("view", scope, "view", scope.key);
         },
         template: "<adh-wait data-condition=\"currentSpace === key\" data-ng-show=\"currentSpace === key\">" +
             "    <adh-inject></adh-inject>" +
