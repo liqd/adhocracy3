@@ -135,7 +135,7 @@ def create_reply_comment(browser, parent, content):
     form = get_comment_create_form(browser, parent)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
-    if not browser.is_text_present(content, wait_time=5):
+    if not browser.is_text_present(content, wait_time=15):
         return None
     reply = get_reply(parent, content)
     return reply
