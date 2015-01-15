@@ -187,6 +187,9 @@ export interface IControllerScope extends IScope {
  * compose the multi-part mime post request manually (no chunking).
  * The $flow object is just used for meta data retrieval and cleared
  * before it can upload anything.
+ *
+ * NOTE: this uses several HTML5 APIs so you need to check for
+ * compability before using it.
  */
 export var uploadImageFile = (
     adhHttp : AdhHttp.Service<any>,
