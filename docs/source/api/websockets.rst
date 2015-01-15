@@ -110,11 +110,24 @@ that has been subscribed.
 
         { "event": "modified", "resource": "RESOURCE_PATH" }
 
+  * If the Simple has been removed::
+
+        { "event": "removed", "resource": "RESOURCE_PATH" }
+
+    In practice this usually means that the resource has been marked as deleted
+    or hidden (see :ref:`deletion`).
+
 * If resource is a Pool:
 
   * If some of the Pool's metadata has changed (e.g. its title)::
 
         { "event": "modified", "resource": "RESOURCE_PATH" }
+
+    (Same as with Simples.)
+
+  * If the Pool has been removed::
+
+        { "event": "removed", "resource": "RESOURCE_PATH" }
 
     (Same as with Simples.)
 
@@ -171,9 +184,10 @@ that has been subscribed.
           "version": "VERSION_RESOURCE_PATH" }
 
   * The other events sent as the same as for Pools, since all Items are also
-    pools: "modified", "removed_child", "modified_child", "changed_descendant".
-    The "modified_child" and "removed_child" events don't distinguish between
-    sub-Items and ItemVersions -- both are considered children.
+    pools: "modified", "removed", "removed_child", "modified_child",
+    "changed_descendant". The "modified_child" and "removed_child" events
+    don't distinguish between sub-Items and ItemVersions -- both are
+    considered children.
 
 * If resource is an ItemVersion:
 
@@ -187,6 +201,13 @@ that has been subscribed.
     Otherwise, versions are immutable, so updated backreferences (the
     reverse direction for a reference from another resource to this one) are
     the only thing that can trigger a "modified" event.
+
+A note about resource removal: if a resource is removed (deleted or hidden),
+any subscribers to it will automatically be unsubscribed, so they won't
+receive further updates about this resource, even if it later "revealed"
+(unhidden or undeleted) again. Subscribers to the parent pool will receive a
+"new_child" or "new_version" message notifying them about the revealed
+resource just as if it had been newly created.
 
 
 Re-Connects
