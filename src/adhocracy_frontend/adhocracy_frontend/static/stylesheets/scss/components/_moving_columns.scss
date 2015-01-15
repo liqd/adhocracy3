@@ -186,15 +186,15 @@ States:
 
     a {
         @include inline-block;
-        color: $color-secondary-extrovert;
+        color: $color-highlight-extrovert;
         font-size: $font-size-small;
         font-weight: $font-weight-introvert;
         float: left;
         padding-left: 2.5em;
         text-decoration: none;
 
-        &:hover, &:focus, &:active {
-            font-weight: $font-weight-extrovert;
+        &:hover, &:focus {
+            color: $color-secondary-normal;
         }
 
         &:active {
@@ -229,11 +229,11 @@ States:
         }
 
         &:active {
-            color: #333;
+            color: $color-secondary-normal;
         }
 
         .moving-column-menu-nav-icon {
-            font-size: 200%;
+            font-size: 145%;
             line-height: (2 * 0.145);
         }
 
