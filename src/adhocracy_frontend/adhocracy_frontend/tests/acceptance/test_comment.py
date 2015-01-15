@@ -98,7 +98,6 @@ class TestComment:
         comment = browser.find_by_css('.comment').first
         assert not _get_button(browser, comment, EDIT)
 
-    @mark.xfail
     def test_reply_other_user(self, browser):
         comment = browser.find_by_css('.comment').first
         reply = create_reply_comment(browser, comment, 'other user reply')
