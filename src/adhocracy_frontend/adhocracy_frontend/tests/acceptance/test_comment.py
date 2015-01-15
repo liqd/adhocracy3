@@ -14,6 +14,10 @@ from adhocracy_frontend.tests.acceptance.shared import logout
 from adhocracy_frontend.tests.acceptance.shared import login
 
 
+EDIT = 'Edit'
+REPLY = 'Reply'
+SAVE = 'save'
+
 @fixture(scope="module")
 def user():
     name = get_random_string(n=5)
@@ -81,13 +85,13 @@ class TestComment:
     def test_edit_no_user(self, browser, rest_url, user):
         logout(browser)
         comment = browser.find_by_css('.comment').first
-        assert not _get_edit_button(browser, comment)
+        assert not _get_button(browser, comment, EDIT)
 
     def test_edit_other_user(self, browser, rest_url, user):
         login(browser, user[0], user[1])
         _visit_url(browser, rest_url)
         comment = browser.find_by_css('.comment').first
-        assert not _get_edit_button(browser, comment)
+        assert not _get_button(browser, comment, EDIT)
 
 
 def _visit_url(browser, rest_url):
@@ -118,7 +122,7 @@ def create_top_level_comment(browser, listing, content):
 
 def create_reply_comment(browser, parent, content):
     """Create a new reply to an existing comment."""
-    form = get_comment_create_form(parent)
+    form = get_comment_create_form(browser, parent)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
     if not browser.is_text_present(content, wait_time=5):
@@ -127,30 +131,33 @@ def create_reply_comment(browser, parent, content):
     return reply
 
 
-def _get_edit_button(browser, comment):
-    actions = comment.find_by_css('.comment-actions a')
+def _get_button(browser, comment, text):
+    actions = comment.find_by_css('.comment-header-links a')\
+              + comment.find_by_css('.comment-actions a')
 
     for a in actions:
-        if a.text == 'edit':
+        if a.text == text:
             return a
     else:
         return None
 
 
 def edit_comment(browser, comment, content):
-    actions = comment.find_by_css('.comment-actions a')
-    edit = _get_edit_button(browser, comment)
+    edit = _get_button(browser, comment, EDIT)
     assert edit
     edit.click()
 
     comment.find_by_css('textarea').first.fill(content)
-    comment.find_by_css('.comment-meta a')[0].click()
+    save = _get_button(browser, comment, SAVE)
+    assert save
+    save.click()
     browser.is_text_present(content, wait_time=10)
 
-def get_comment_create_form(comment):
-    main = comment.find_by_css(".comment-main").first
-    button = main.find_by_css('.comment-meta a').last
-    button.click()
+
+def get_comment_create_form(browser, comment):
+    reply = _get_button(browser, comment, REPLY)
+    assert reply
+    reply.click()
     return comment.find_by_css('.comment-create-form').first
 
 
