@@ -85,8 +85,6 @@ class TestMercatorForm:
         assert not heard_of.text == ""
 
     def test_login_is_required(self):
-        # FIXME this is broken. Can we just remove this test?
-        # There are many permissions test now in src/adhocracy_mercator [joka]
         with raises(AssertionError):
             create_proposals(n=1)
 
