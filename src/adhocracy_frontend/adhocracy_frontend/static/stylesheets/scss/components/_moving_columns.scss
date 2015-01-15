@@ -197,7 +197,7 @@ States:
             color: $color-secondary-normal;
         }
 
-        &:active {
+        &:active, &.is-active {
             color: $color-highlight-normal;
          }
     }
