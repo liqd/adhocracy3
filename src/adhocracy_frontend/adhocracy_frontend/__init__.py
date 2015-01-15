@@ -1,8 +1,11 @@
 """Frontend view and simple pyramid app configurations."""
+import pkg_resources
+
 from pyramid.renderers import render
 from pyramid.config import Configurator
 from pyramid.events import NewResponse
 from pyramid.request import Request
+from pyramid.response import FileResponse
 from pyramid.response import Response
 from pyramid.settings import aslist
 
@@ -83,6 +86,13 @@ def _build_ws_url(request: Request) -> str:
     return '{}://{}:{}'.format(ws_scheme, ws_domain, ws_port)
 
 
+def adhocracy_sdk_view(request):
+    """Return AdhocracySDK.js."""
+    path = pkg_resources.resource_filename('adhocracy_frontend',
+                                           'build/js/AdhocracySDK.js')
+    return FileResponse(path, request=request)
+
+
 def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config.include('pyramid_cachebust')
@@ -98,6 +108,9 @@ def includeme(config):
     add_frontend_route(config, 'resource', 'r/*path')
     config.add_route('require_config', 'static/require-config.js')
     config.add_view(require_config_view, route_name='require_config')
+    # AdhocracySDK shall not be cached the way other static files are cached
+    config.add_route('adhocracy_sdk', 'AdhocracySDK.js')
+    config.add_view(adhocracy_sdk_view, route_name='adhocracy_sdk')
     config.add_static_view('static', 'adhocracy_frontend:build/',
                            cache_max_age=36000)
     config.add_subscriber(add_cors_headers_subscriber, NewResponse)
