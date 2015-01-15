@@ -86,8 +86,6 @@ ERROR_CODE will be one of the following:
   the expected information (for example, if it's a JSON array instead of a JSON
   object or if "action" or "resource" keys are missing or their values aren't
   strings). DETAILS contains a short description of the problem.
-* "subscribe_not_supported" if the client tried to subscribe to an ItemVersion.
-  DETAILS contains the path of resource that doesn't allow subscriptions.
 * "internal_error" if an internal error occurred at the server. DETAILS
   contains a short description of the problem. In an ideal world,
   this will never happen.
@@ -177,23 +175,18 @@ that has been subscribed.
     The "modified_child" and "removed_child" events don't distinguish between
     sub-Items and ItemVersions -- both are considered children.
 
-* If resource is an ItemVersion: subscriptions to ItemVersions are
-  currently unsupported. This may change in the future if we see the need
-  for it.
+* If resource is an ItemVersion:
 
-  (POSSIBLE FUTURE WORK:
+  * If a backreference in the version has changed::
 
-  * If a direct successor version is created (whose "follows" link points to
-    this version)::
+        { "event": "modified", "resource": "RESOURCE_PATH" }
 
-        { "event": "new_successor",
-          "resource": "RESOURCE_PATH",
-          "successor": "SUCCESSOR_RESOURCE_PATH" }
+    This happens e.g. if a successor version has been created that refers to
+    the subscribed version as its predecessor.
 
-  * NO notification is sent if an indirect successor is created (a
-    successor of a successor).
-
-  )
+    Otherwise, versions are immutable, so updated backreferences (the
+    reverse direction for a reference from another resource to this one) are
+    the only thing that can trigger a "modified" event.
 
 
 Re-Connects
