@@ -196,25 +196,31 @@ export var uploadImageFile = (
     if (flow.files.length !== 1) {
         throw "could not upload file: $flow.files.length !== 1";
     }
-    var file : FlowFile = flow.files[0];
+    var file : FlowFile = flow.files[0].file;
 
     var bytes = () : any => {
-        var func = (file.file.mozSlice ? "mozSlice" :
-                    (file.file.webkitSlice ? "webkitSlice" :
-                     "slice"));
-        var bytes = file.file[func](0, file.file.size, file.file.type);
-        return bytes;
+        var func;
+        if (file.mozSlice) {
+            func = "mozSlice";
+        } else if (file.webkitSlice) {
+            func = "webkitSlice";
+        } else {
+            func = "slice";
+        }
+
+        return file[func](0, file.size, file.type);
     };
 
     var formData = new FormData();
     formData.append("content_type", RIMercatorIntroImage.content_type);
-    formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
+    formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
     return adhHttp.get(poolPath)
         .then((mercatorPool) => {
             var postPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
-            return adhHttp.postRaw(postPath, formData).then((rsp) => { return rsp.data.path; });
+            return adhHttp.postRaw(postPath, formData)
+                .then((rsp) => rsp.data.path);
         });
 };
 
