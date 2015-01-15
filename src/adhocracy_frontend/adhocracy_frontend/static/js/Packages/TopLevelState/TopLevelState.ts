@@ -368,29 +368,33 @@ export class Service {
         }
     }
 
-    public get(key : string) {
+    public get(key : string, space? : string) {
         if (key === "space") {
             return this.currentSpace;
+        } else if (typeof space !== "undefined") {
+            return this.data[space][key];
         } else {
             return this.data[this.currentSpace][key];
         }
     }
 
-    public on(key : string, fn) : void {
+    public on(key : string, fn, space? : string) : void {
         if (key === "space") {
             this.eventHandler.on(key, fn);
+        } else if (typeof space !== "undefined") {
+            this.eventHandler.on(space + ":" + key, fn);
         } else {
             this.eventHandler.on(this.currentSpace + ":" + key, fn);
         }
 
         // initially trigger callback
-        fn(this.get(key));
+        fn(this.get(key, space));
     }
 
-    public bind(key : string, context : {[k : string]: any}, keyInContext? : string) {
+    public bind(key : string, context : {[k : string]: any}, keyInContext? : string, space? : string) {
         this.on(key, (value : string) => {
             context[keyInContext || key] = value;
-        });
+        }, space);
     }
 
     // FIXME: {set,get}CameFrom should be worked into the class
@@ -435,20 +439,24 @@ export class Service {
 
 
 /**
- * Note that adhTopLevelState.on() refers to the current space. So directives
+ * adhTopLevelState.on() refers to the current space. So directives
  * that call adhTopLevelState.on() in their initialization should only be
  * rendered when the space they are on is currently active.
  */
-export var spaces = (
-    adhTopLevelState : Service
-) => {
+export var spaceDirective = (adhTopLevelState : Service) => {
     return {
         restrict: "E",
         transclude: true,
-        template: "<adh-inject></adh-inject>",
+        scope: {
+            key: "@"
+        },
         link: (scope) => {
             adhTopLevelState.bind("space", scope, "currentSpace");
-        }
+            adhTopLevelState.bind("view", scope, "view", scope.key);
+        },
+        template: "<adh-wait data-condition=\"currentSpace === key\" data-ng-show=\"currentSpace === key\">" +
+            "    <adh-inject></adh-inject>" +
+            "</adh-wait>"
     };
 };
 
@@ -516,7 +524,7 @@ export var register = (angular) => {
         .provider("adhTopLevelState", Provider)
         .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
         .directive("adhRoutingError", ["adhConfig", routingErrorDirective])
-        .directive("adhSpaces", ["adhTopLevelState", spaces])
+        .directive("adhSpace", ["adhTopLevelState", spaceDirective])
         .directive("adhSpaceSwitch", ["adhTopLevelState", "adhConfig", spaceSwitch])
         .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);
 };

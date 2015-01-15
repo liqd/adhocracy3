@@ -212,10 +212,13 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var userListDirective = (adhConfig : AdhConfig.IService) => {
+export var userListDirective = (adhUser : AdhUser.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html",
+        link: (scope) => {
+            scope.user = adhUser;
+        }
     };
 };
 
@@ -311,7 +314,7 @@ export var register = (angular) => {
                     };
                 }]);
         }])
-        .directive("adhListUsers", ["adhConfig", userListDirective])
+        .directive("adhListUsers", ["adhUser", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", userProfileDirective])
         .directive("adhLogin", ["adhConfig", loginDirective])

@@ -1,0 +1,21 @@
+<div class="moving-column-menu">
+    <i class="icon-user-unfilled moving-column-icon"></i>
+    <a data-ng-click="data.showMessaging = !data.showMessaging" href="">{{ "Messaging" | translate }}</a>
+</div>
+<div class="moving-column-body" data-du-scroll-container="">
+    <adh-recompile-on-change
+        data-key="userUrl"
+        data-value="{{userUrl}}">
+        <adh-user-profile
+            data-path="{{userUrl}}">
+            <section class="mercator-user-profile-proposal-list">
+                <h3>{{ "USERS_PROPOSALS" | translate:userBasic }}</h3>
+                <adh-mercator-user-proposal-listing
+                    data-path="{{path}}">
+                </adh-mercator-user-proposal-listing>
+            </section>
+        </adh-user-profile>
+    </adh-recompile-on-change>
+    <adh-user-message data-ng-if="data.showMessaging"></adh-user-message>
+    <div class="moving-column-mask" data-ng-show="data.showMessaging"></div>
+</div>
