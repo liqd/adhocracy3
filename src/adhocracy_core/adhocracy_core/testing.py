@@ -291,6 +291,13 @@ def changelog(changelog_meta):
 
 
 @fixture
+def registry_with_changelog(registry, changelog):
+    """Return registry with transaction_changelog."""
+    registry._transaction_changelog = changelog
+    return registry
+
+
+@fixture
 def mock_sheet() -> Mock:
     """Mock :class:`adhocracy_core.sheets.GenericResourceSheet`."""
     from adhocracy_core.interfaces import sheet_metadata
