@@ -12,12 +12,12 @@
             <div class="comment-header-column2">
                 <span class="comment-header-links">
                     <a href=""
-                        data-ng-if="commentItemOptions.POST"
+                        data-ng-if="poolOptions.POST"
                         data-ng-click="createComment()">
                         <i class="icon-reply"></i>
                         {{ "Reply" | translate }}</a>
                     <a href=""
-                        data-ng-if="poolOptions.POST"
+                        data-ng-if="commentItemOptions.POST"
                         data-ng-click="edit()">
                         {{ "Edit" | translate }}</a>
                     <!-- #FIXME: Dummy -->
