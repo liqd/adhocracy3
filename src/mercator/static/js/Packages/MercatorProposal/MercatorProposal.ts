@@ -583,7 +583,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
-        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, "/mercator", data.imageUpload);
+
+        var imagePathPromise : ng.IPromise<any>;
+        if (data.imageUpload.support) {
+            imagePathPromise = uploadImageFile(this.adhHttp, "/mercator", data.imageUpload);
+        } else {
+            imagePathPromise = this.$q.when();
+        }
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -674,7 +680,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         };
 
-        if (data.imageUpload.files.length > 0) {
+        if (data.imageUpload.support && data.imageUpload.files.length > 0) {
             return uploadImageFile(this.adhHttp, "/mercator", data.imageUpload).then((imagePath) => postProposal(imagePath));
         } else {
             return postProposal();
@@ -971,8 +977,10 @@ export var register = (angular) => {
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
 
-                var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
-                imgUploadController.$setValidity("required", imageExists());
+                if ($scope.currentUpload.support) {
+                    var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+                    imgUploadController.$setValidity("required", imageExists());
+                }
 
                 if ($scope.mercatorProposalForm.$valid) {
                     // pluck flow object from file upload scope, and
