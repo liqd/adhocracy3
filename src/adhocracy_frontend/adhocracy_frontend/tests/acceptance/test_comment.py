@@ -104,6 +104,7 @@ class TestComment:
         reply = create_reply_comment(browser, comment, 'other user reply')
         assert reply is not None
 
+
 def _visit_url(browser, rest_url):
     query = urlencode({
         'key': 'test',
