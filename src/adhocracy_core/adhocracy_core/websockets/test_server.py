@@ -329,14 +329,15 @@ class EventDispatchUnitTests(unittest.TestCase):
                                               'resource': self.request.application_url + '/child/',
                                               'child': self.request.application_url + '/child/grandchild/'}
 
-    def test_dispatch_deleted_notification(self):
-        msg = build_message({'event': 'deleted',
+    def test_dispatch_removed_notification(self):
+        msg = build_message({'event': 'removed',
                              'resource': '/child/grandchild'})
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
-        assert self._subscriber.queue[-1] == {'event': 'removed_child',
-                                              'resource': self.request.application_url + '/child/',
-                                              'child': self.request.application_url + '/child/grandchild/'}
+        assert self._subscriber.queue[-1] == {
+            'event': 'removed_child',
+            'resource': self.request.application_url + '/child/',
+            'child': self.request.application_url + '/child/grandchild/'}
 
     def test_dispatch_invalid_event_notification(self):
         msg = build_message({'event': 'new_child',
@@ -425,25 +426,25 @@ class ClientTrackerUnitTests(unittest.TestCase):
         result = self._tracker.unsubscribe(client, resource)
         assert result is False
 
-    def test_delete_all_subscriptions_empty(self):
+    def test_delete_subscriptions_for_client_empty(self):
         """Test deleting all subscriptions for a client that has none."""
         client = self._make_client()
-        self._tracker.delete_all_subscriptions(client)
+        self._tracker.delete_subscriptions_for_client(client)
         assert len(self._tracker._clients2resource_paths) == 0
         assert len(self._tracker._resource_paths2clients) == 0
 
-    def test_delete_all_subscriptions_two_resource(self):
+    def test_delete_subscriptions_for_client_two_resource(self):
         """Test deleting all subscriptions for a client that has two."""
         client = self._make_client()
         resource1 = self._child
         resource2 = self._child
         self._tracker.subscribe(client, resource1)
         self._tracker.subscribe(client, resource2)
-        self._tracker.delete_all_subscriptions(client)
+        self._tracker.delete_subscriptions_for_client(client)
         assert len(self._tracker._clients2resource_paths) == 0
         assert len(self._tracker._resource_paths2clients) == 0
 
-    def test_delete_all_subscriptions_two_clients(self):
+    def test_delete_subscriptions_for_client_two_clients(self):
         """Test deleting all subscriptions for one client subscribed to the
         same resource as another one.
         """
@@ -452,7 +453,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
         resource = self._child
         self._tracker.subscribe(client1, resource)
         self._tracker.subscribe(client2, resource)
-        self._tracker.delete_all_subscriptions(client1)
+        self._tracker.delete_subscriptions_for_client(client1)
         assert len(self._tracker._clients2resource_paths) == 1
         assert len(self._tracker._resource_paths2clients) == 1
         assert self._tracker._clients2resource_paths[client2] == {'/child'}

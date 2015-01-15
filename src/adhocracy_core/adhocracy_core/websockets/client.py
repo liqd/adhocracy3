@@ -15,6 +15,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.websockets.schemas import ServerNotification
+from adhocracy_core.utils import blocked_with_reason
 from adhocracy_core.utils import find_graph
 
 
@@ -139,7 +140,8 @@ class Client:
         while self.changelog_metadata_messages_to_send:
             meta = self.changelog_metadata_messages_to_send.pop()
             # FIXME: if an exception is raised, the current changelog is lost.
-            if meta.resource is None:
+            if (meta.resource is None or
+                    meta.visibility is VisibilityChange.invisible):
                 continue
             elif meta.created or meta.visibility is VisibilityChange.revealed:
                 self._send_resource_event(meta.resource, 'created')
@@ -184,8 +186,10 @@ class Client:
             for sheet in backreferencing_sheets:
                 backreferencing_resources.add(sheet.context)
         for resource in backreferencing_resources:
-            if resource not in processed_resources:
+            if (resource not in processed_resources and
+                    blocked_with_reason(resource) is None):
                 self._send_resource_event(resource, 'modified')
+                processed_resources.add(resource)
 
     def _send_changed_descendant_messages(self, processed_resources: set):
         affected_ancestors = set()

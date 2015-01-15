@@ -80,12 +80,19 @@ class ClientTracker():
         if not set_valued_dict[key]:
             del set_valued_dict[key]
 
-    def delete_all_subscriptions(self, client: Hashable):
+    def delete_subscriptions_for_client(self, client: Hashable):
         """Delete all subscriptions for a client."""
         path_set = self._clients2resource_paths.pop(client, set())
         for path in path_set:
             self._discard_from_set_valued_dict(self._resource_paths2clients,
                                                path, client)
+
+    def delete_subscriptions_to_resource(self, resource: IResource):
+        """Delete all subscriptions to a resource."""
+        client_set = self._resource_paths2clients.pop(resource, set())
+        for client in client_set:
+            self._discard_from_set_valued_dict(self._clients2resource_paths,
+                                               client, resource)
 
     def iterate_subscribers(self, resource: IResource) -> Iterable:
         """Return an iterator over all clients subscribed to a resource."""
@@ -263,8 +270,8 @@ class ClientCommunicator(WebSocketServerProtocol):
             self._dispatch_created_event(resource)
         elif event == 'modified':
             self._dispatch_modified_event(resource)
-        elif event == 'deleted':
-            self._dispatch_deleted_event(resource)
+        elif event == 'removed':
+            self._dispatch_removed_event(resource)
         elif event == 'changed_descendant':
             self._dispatch_changed_descendant_event(resource)
         else:
@@ -329,9 +336,9 @@ class ClientCommunicator(WebSocketServerProtocol):
         self._notify_resource_modified(resource)
         self._notify_modified_child(resource.__parent__, resource)
 
-    def _dispatch_deleted_event(self, resource: IResource):
-        # FIXME Should we also notify subscribers of the deleted resource?
-        # That's currently not part of the API.
+    def _dispatch_removed_event(self, resource: IResource):
+        self._notify_resource_removed(resource)
+        self._tracker.delete_subscriptions_to_resource(resource)
         self._notify_removed_child(resource.__parent__, resource)
 
     def _dispatch_changed_descendant_event(self, resource: IResource):
@@ -353,6 +360,11 @@ class ClientCommunicator(WebSocketServerProtocol):
         """Notify subscribers if a resource has been modified."""
         for client in self._tracker.iterate_subscribers(resource):
             client.send_notification(resource, 'modified')
+
+    def _notify_resource_removed(self, resource: IResource):
+        """Notify subscribers if a resource has been removed."""
+        for client in self._tracker.iterate_subscribers(resource):
+            client.send_notification(resource, 'removed')
 
     def _notify_modified_child(self, parent: IResource, child: IResource):
         """Notify subscribers if a child in a pool has been modified."""
@@ -392,7 +404,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         self._send_json_message(data)
 
     def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
-        self._tracker.delete_all_subscriptions(self)
+        self._tracker.delete_subscriptions_for_client(self)
         clean_str = 'Clean' if was_clean else 'Unclean'
         logger.debug('%s close of WebSocket connection to %s; reason: %s',
                      clean_str, self._client, reason)
