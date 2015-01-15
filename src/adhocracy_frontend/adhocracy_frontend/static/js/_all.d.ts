@@ -111,9 +111,6 @@ declare class FlowOpts {
     withCredentials : boolean;
 }
 
-declare module "fustyFlow" {}
-declare module "fustyFlowFactory" {}
-
 declare module "socialSharePrivacy" {}
 
 declare module "adhTemplates" {}

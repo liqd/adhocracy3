@@ -1,5 +1,3 @@
-import fustyFlowFactory = require("fustyFlowFactory");
-
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
@@ -843,7 +841,6 @@ export var register = (angular) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {
                 flowFactoryProvider.defaults = {};
             }
-            flowFactoryProvider.factory = fustyFlowFactory;
             flowFactoryProvider.defaults = {
                 singleFile : true,
                 maxChunkRetries : 1,
