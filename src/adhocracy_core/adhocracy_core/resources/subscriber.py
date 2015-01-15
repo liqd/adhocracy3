@@ -18,6 +18,7 @@ from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy_core.interfaces import ISheetReferenceModified
+from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
@@ -37,7 +38,8 @@ import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.rate
 
 
-changelog_metadata = ChangelogMetadata(False, False, None, None, None)
+changelog_metadata = ChangelogMetadata(False, False, None, None, None,
+                                       VisibilityChange.visible)
 logger = getLogger(__name__)
 
 
@@ -236,6 +238,13 @@ def metadata_modified_subscriber(event):
 
     if (was_hidden != is_hidden) or (was_deleted != is_deleted):
         _reindex_resource_and_descendants(event.object)
+    visibility_change = _determine_visibility_shange(was_hidden=was_hidden,
+                                                     was_deleted=was_deleted,
+                                                     is_hidden=is_hidden,
+                                                     is_deleted=is_deleted)
+    _add_changelog_metadata(event.registry,
+                            event.object,
+                            visibility=visibility_change)
 
 
 def _reindex_resource_and_descendants(resource: IResource):
@@ -246,6 +255,24 @@ def _reindex_resource_and_descendants(resource: IResource):
     resource_and_descendants = query.execute()
     for res in resource_and_descendants:
         adhocracy_catalog.reindex_resource(res)
+
+
+def _determine_visibility_shange(was_hidden: bool,
+                                 was_deleted: bool,
+                                 is_hidden: bool,
+                                 is_deleted: bool) -> VisibilityChange:
+    was_visible = not (was_hidden or was_deleted)
+    is_visible = not (is_hidden or is_deleted)
+    if was_visible:
+        if is_visible:
+            return VisibilityChange.visible
+        else:
+            return VisibilityChange.concealed
+    else:
+        if is_visible:
+            return VisibilityChange.revealed
+        else:
+            return VisibilityChange.invisible
 
 
 def includeme(config):
