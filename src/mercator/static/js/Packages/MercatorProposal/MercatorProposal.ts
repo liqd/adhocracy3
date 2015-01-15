@@ -660,6 +660,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
             if (typeof imagePath !== "undefined") {
                 data.introduction.picture = imagePath;
+            } else if (typeof data.introduction.picture === "undefined") {
+                delete data.introduction.picture;
             }
 
             var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
