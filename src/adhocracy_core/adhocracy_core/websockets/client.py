@@ -12,8 +12,10 @@ from websocket import WebSocketConnectionClosedException
 from websocket import WebSocketTimeoutException
 
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.websockets.schemas import ServerNotification
+from adhocracy_core.utils import find_graph
 
 
 logger = logging.getLogger(__name__)
@@ -33,9 +35,6 @@ class Client:
         """Set with :class:`adhocracy_core.resources.subscriber.ChangelogMetadata`
         that will be send to the websocket server with
         :func:`Client.send_messages`."""
-        self.affected_ancestors = set()
-        """Set of pools whose descendants have changed;
-        a "changed_descendant" event will be sent for each of them."""
         self._ws_url = ws_url
         self._ws_connection = None
         self._is_running = False
@@ -135,19 +134,27 @@ class Client:
 
     def _send_messages(self, changelog_metadata: list):
         self.changelog_metadata_messages_to_send.update(changelog_metadata)
+        created_or_removed_resources = set()
+        processed_resources = set()
         while self.changelog_metadata_messages_to_send:
             meta = self.changelog_metadata_messages_to_send.pop()
             # FIXME: if an exception is raised, the current changelog is lost.
             if meta.resource is None:
                 continue
-            elif meta.created:
+            elif meta.created or meta.visibility is VisibilityChange.revealed:
                 self._send_resource_event(meta.resource, 'created')
+                created_or_removed_resources.add(meta.resource)
+                processed_resources.add(meta.resource)
+            elif meta.visibility is VisibilityChange.concealed:
+                self._send_resource_event(meta.resource, 'removed')
+                created_or_removed_resources.add(meta.resource)
+                processed_resources.add(meta.resource)
             elif meta.modified:
                 self._send_resource_event(meta.resource, 'modified')
-            self._collect_ancestors(meta.resource)
-        while self.affected_ancestors:
-            ancestor = self.affected_ancestors.pop()
-            self._send_resource_event(ancestor, 'changed_descendant')
+                processed_resources.add(meta.resource)
+        if processed_resources:
+            self._send_modified_messages_for_backrefs(processed_resources)
+            self._send_changed_descendant_messages(processed_resources)
 
     def _send_resource_event(self, resource: IResource, event_type: str):
         schema = ServerNotification().bind(context=resource)
@@ -156,14 +163,46 @@ class Client:
         logger.debug('Sending message to Websocket server: %s', message_text)
         self._ws_connection.send(message_text)
 
-    def _collect_ancestors(self, resource: IResource):
+    def _send_modified_messages_for_backrefs(self, processed_resources: set):
+        """
+        Send 'modified' messages based on backreferences.
+
+        If a resource has a backreferences pointing to a newly created or
+        removed resource, it has been modified from the viewpoint of the
+        frontend (since that backreference didn't exist before or now is no
+        longer shown).
+        """
+        random_resource = next(iter(processed_resources))
+        graph = find_graph(random_resource)
+        if graph is None:  # pragma: no cover
+            logger.warning('No graph found--cannot send modified messages for '
+                           'backreferencing resources')
+            return
+        backreferencing_resources = set()
+        for resource in processed_resources:
+            backreferencing_sheets = graph.get_back_reference_sources(resource)
+            for sheet in backreferencing_sheets:
+                backreferencing_resources.add(sheet.context)
+        for resource in backreferencing_resources:
+            if resource not in processed_resources:
+                self._send_resource_event(resource, 'modified')
+
+    def _send_changed_descendant_messages(self, processed_resources: set):
+        affected_ancestors = set()
+        for resource in processed_resources:
+            self._add_ancestors(resource, affected_ancestors)
+        while affected_ancestors:
+            ancestor = affected_ancestors.pop()
+            self._send_resource_event(ancestor, 'changed_descendant')
+
+    def _collect_ancestors(self, resource: IResource, affected_ancestors: set):
         ancestors = lineage(resource)
         next(ancestors)  # skip the resource itself
         for ancestor in ancestors:
-            if ancestor in self.affected_ancestors:
+            if ancestor in affected_ancestors:
                 break  # no need to add ancestors twice
             else:
-                self.affected_ancestors.add(ancestor)
+                affected_ancestors.add(ancestor)
 
     def stop(self):
         self._is_stopped = True
