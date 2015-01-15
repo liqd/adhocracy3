@@ -43,7 +43,10 @@ def require_config_view(request):
     """Return the embeddee HTML."""
     url = request.cachebusted_url('adhocracy_frontend:build/'
                                   'stylesheets/a3.css')
-    query_params = url.split('?')[1]
+    if '?' in url:
+        query_params = url.split('?')[1]
+    else:
+        query_params = None
     result = render(
         'adhocracy_frontend:build/require-config.js.mako',
         {'url_args': query_params},

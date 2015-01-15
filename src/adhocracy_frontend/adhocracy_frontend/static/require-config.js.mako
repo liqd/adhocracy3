@@ -1,6 +1,8 @@
 require.config({
     baseUrl: "/static/js/",
+% if url_args:
     urlArgs: "${url_args}",
+% endif
     config: {
         text: {
             useXhr: function (url, protocol, hostname, port) {
