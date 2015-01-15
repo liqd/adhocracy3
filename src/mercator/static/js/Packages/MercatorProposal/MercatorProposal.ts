@@ -673,7 +673,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         subresource.parent = AdhUtil.parentPath(oldSubresource.path);
                         self.fill(data, subresource);
                         mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
-                    return subresource;
+                        return subresource;
                     });
                 }))
                 .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
@@ -681,7 +681,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         };
 
         if (data.imageUpload.support && data.imageUpload.files.length > 0) {
-            return uploadImageFile(this.adhHttp, "/mercator", data.imageUpload).then((imagePath) => postProposal(imagePath));
+            return uploadImageFile(this.adhHttp, "/mercator", data.imageUpload)
+                .then(postProposal);
         } else {
             return postProposal();
         }
