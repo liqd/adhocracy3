@@ -399,7 +399,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
                         scope.title = res.title;
                         scope.teaser = res.teaser;
-                        scope.picture = res.picture;
+                        scope.picture = res.picture ? res.picture : "/static/fallback.png#";  // FIXME: find a better way to handle /detail
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
                         this.countComments(subResource).then((c) => { scope.commentCount = c; data.commentCountTotal += c; });
                     })();
