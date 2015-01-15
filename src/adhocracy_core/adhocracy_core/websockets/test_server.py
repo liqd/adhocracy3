@@ -135,13 +135,18 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
                                         'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_subscribe_item_version(self):
+        # Subscribing ItemVersions used to be forbidden, but it's now allowed.
         from adhocracy_core.interfaces import IItemVersion
         alsoProvides(self._child, IItemVersion)
-        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message(
+            {'action': 'subscribe',
+             'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
-        assert self._comm.queue[0] == {'error': 'subscribe_not_supported',
-                                       'details': self.request.application_url + '/child/'}
+        assert self._comm.queue[0] == {
+            'status': 'ok',
+            'action': 'subscribe',
+            'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_with_binary_message(self):
         self._comm.onMessage(b'DEADBEEF', True)
@@ -217,10 +222,11 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert self._comm.queue[0] == {'error': 'unknown_resource', 'details': 7}
 
     def test_send_modified_notification(self):
-        self._comm.send_modified_notification(self._child)
+        self._comm.send_notification(self._child, 'modified')
         assert len(self._comm.queue) == 1
-        assert self._comm.queue[0] == {'event': 'modified',
-                                       'resource': self.request.application_url + '/child/'}
+        assert self._comm.queue[0] == {
+            'event': 'modified',
+            'resource': self.request.application_url + '/child/'}
 
     def test_send_child_notification(self):
         child = self._child

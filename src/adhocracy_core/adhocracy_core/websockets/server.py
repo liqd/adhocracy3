@@ -238,7 +238,6 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _handle_client_request_and_send_response(self, request: dict):
         action = request['action']
         resource = request['resource']
-        self._raise_if_forbidden_request(action, resource)
         update_was_necessary = self._update_resource_subscription(action,
                                                                   resource)
         self._send_status_confirmation(update_was_necessary, action, resource)
@@ -293,13 +292,6 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _raise_invalid_json_from_exception(self, err: Exception):
         raise WebSocketError('invalid_json', str(err))  # pragma: no cover
-
-    def _raise_if_forbidden_request(self, action: str, resource: IResource):
-        """Raise an error if a client tries to subscribe to an ItemVersion."""
-        if action == 'subscribe' and IItemVersion.providedBy(resource):
-            request = self._get_dummy_request()
-            resource_path = request.resource_url(resource)
-            raise WebSocketError('subscribe_not_supported', resource_path)
 
     def _update_resource_subscription(self, action: str,
                                       resource: str) -> bool:
