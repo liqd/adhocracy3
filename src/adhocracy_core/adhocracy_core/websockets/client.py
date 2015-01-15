@@ -194,12 +194,13 @@ class Client:
     def _send_changed_descendant_messages(self, processed_resources: set):
         affected_ancestors = set()
         for resource in processed_resources:
-            self._add_ancestors(resource, affected_ancestors)
+            self._collect_ancestors(resource, affected_ancestors)
         while affected_ancestors:
             ancestor = affected_ancestors.pop()
             self._send_resource_event(ancestor, 'changed_descendant')
 
     def _collect_ancestors(self, resource: IResource, affected_ancestors: set):
+        """Modify `affected_ancestors` in-place."""
         ancestors = lineage(resource)
         next(ancestors)  # skip the resource itself
         for ancestor in ancestors:

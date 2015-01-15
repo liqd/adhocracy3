@@ -144,8 +144,9 @@ class TestClient:
         metadata = [changelog_meta._replace(created=True)]
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
-        assert len(self._dummy_connection.queue) == 1
+        assert len(self._dummy_connection.queue) == 2
         assert 'created' in self._dummy_connection.queue[0]
+        assert 'changed_descendant' in self._dummy_connection.queue[1]
 
     def test_send_messages_if_not_running(self, changelog_meta):
         client = self._make_one(None)
@@ -181,8 +182,9 @@ class TestClient:
                     changelog_meta._replace(modified=True)]
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
-        assert len(self._dummy_connection.queue) == 1
+        assert len(self._dummy_connection.queue) == 2
         assert 'modified' in self._dummy_connection.queue[0]
+        assert 'changed_descendant' in self._dummy_connection.queue[1]
 
     def test_send_messages_created_and_modified(self, changelog_meta):
         """If a resource has been created and then modified, only a
@@ -194,8 +196,9 @@ class TestClient:
                                             modified=True)]
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
-        assert len(self._dummy_connection.queue) == 1
+        assert len(self._dummy_connection.queue) == 2
         assert 'created' in self._dummy_connection.queue[0]
+        assert 'changed_descendant' in self._dummy_connection.queue[1]
 
     def test_send_messages_two_resources(self, changelog_meta):
         client = self._make_one(None)
@@ -206,7 +209,8 @@ class TestClient:
                                             resource=resource2)]
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
-        assert len(self._dummy_connection.queue) == 2
+        assert len(self._dummy_connection.queue) == 3
+        assert 'changed_descendant' in self._dummy_connection.queue[-1]
 
 
 @mark.websocket
