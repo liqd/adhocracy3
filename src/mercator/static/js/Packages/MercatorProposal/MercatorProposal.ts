@@ -283,7 +283,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             });
     }
 
-
     /**
      * promise recursive comments count.
      */
@@ -311,7 +310,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 return parseInt((<any>pool).count, 10);  // see #261
             });
     }
-
 
     private initializeScope(scope : IScope) : IScopeData {
         if (!scope.hasOwnProperty("data")) {
@@ -860,12 +858,8 @@ export var register = (angular) => {
                     "gif",
                     "jpeg",
                     "png"
-                ] // correspond to exact mime types EG image/png
+                ]  // correspond to exact mime types EG image/png
             };
-
-            flowFactoryProvider.on("catchAll", () => {
-                // console.log(arguments);
-            });
         }])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
