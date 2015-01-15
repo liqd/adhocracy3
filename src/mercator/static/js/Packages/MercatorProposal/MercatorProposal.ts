@@ -199,7 +199,7 @@ export var uploadImageFile = (
     if (flow.files.length !== 1) {
         throw "could not upload file: $flow.files.length !== 1";
     }
-    var file : FlowFile = flow.files[0].file;
+    var file = flow.files[0].file;
 
     var bytes = () : any => {
         var func;
