@@ -87,6 +87,7 @@ class TestComment:
         comment = browser.find_by_css('.comment').first
         assert not _get_button(browser, comment, EDIT)
 
+    @mark.xfail
     def test_edit_other_user(self, browser, rest_url, user):
         login(browser, user[0], user[1])
         _visit_url(browser, rest_url)
