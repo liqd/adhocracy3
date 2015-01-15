@@ -39,10 +39,11 @@
             <textarea class="comment-content-edit-text" data-msd-elastic="" data-ng-switch-when="1" data-ng-model="data.content"></textarea>
             <div data-ng-switch-default="">
                 {{data.content}}
-                <adh-social-share data-uri="{{ data.path | adhResourceUrl | adhCanonicalUrl }}" data-tweet-text="huhu"></adh-social-share>
             </div>
         </div>
         <div class="comment-meta">
+            <adh-social-share data-uri="{{ data.path | adhResourceUrl | adhCanonicalUrl }}" data-tweet-text="huhu"></adh-social-share>
+
             <div class="comment-actions">
                 <span data-ng-switch-default=""></span>
                 <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="submit()">{{ "Save" | translate }}</a>
