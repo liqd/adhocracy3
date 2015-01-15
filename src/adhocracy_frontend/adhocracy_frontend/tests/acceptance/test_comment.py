@@ -87,6 +87,10 @@ class TestComment:
         comment = browser.find_by_css('.comment').first
         assert not _get_button(browser, comment, EDIT)
 
+    def test_reply_no_user(self, browser):
+        comment = browser.find_by_css('.comment').last
+        assert not _get_button(browser, comment, REPLY)
+
     @mark.xfail
     def test_edit_other_user(self, browser, rest_url, user):
         login(browser, user[0], user[1])
@@ -95,6 +99,10 @@ class TestComment:
         comment = browser.find_by_css('.comment').first
         assert not _get_button(browser, comment, EDIT)
 
+    def test_reply_other_user(self, browser):
+        comment = browser.find_by_css('.comment').last
+        reply = create_reply_comment(browser, comment, 'other user reply')
+        assert reply is not None
 
 def _visit_url(browser, rest_url):
     query = urlencode({
