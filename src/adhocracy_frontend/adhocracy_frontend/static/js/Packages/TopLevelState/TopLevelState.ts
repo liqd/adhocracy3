@@ -372,6 +372,7 @@ export class Service {
         if (key === "space") {
             return this.currentSpace;
         } else if (typeof space !== "undefined") {
+            this.data[space] = this.data[space] || this.provider.getSpaceDefaults(space) || {};
             return this.data[space][key];
         } else {
             return this.data[this.currentSpace][key];
