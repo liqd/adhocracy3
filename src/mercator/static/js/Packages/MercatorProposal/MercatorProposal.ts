@@ -89,7 +89,7 @@ export interface IScopeData {
         name : string;
         country : string;
         website : string;
-        date_of_foreseen_registration : Date;
+        date_of_foreseen_registration : string;
         how_can_we_help_you : string;
         status_other : string;
         commentCount : number;
