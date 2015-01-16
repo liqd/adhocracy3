@@ -709,7 +709,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     var parser : string;
 
     // parsers
-    var stringToDate : string = "(field : string) => new Date(field)";
+    var stringToDate : string = "(field : string) => field";
     var stringToInt : string = "(field : string) => parseInt(field)";
     var stringToFloat : string = "(field : string) => parseFloat(field)";
 
@@ -743,7 +743,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         resultType = "string";
         break;
     case "adhocracy_core.schema.DateTime":
-        resultType = "Date";
+        resultType = "string";
         parser = stringToDate;
         break;
     case "adhocracy_core.schema.URL":
