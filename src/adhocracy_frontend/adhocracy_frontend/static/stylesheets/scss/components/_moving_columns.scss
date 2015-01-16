@@ -178,11 +178,8 @@ States:
     background: $color-secondary-introvert;
     font-size: $font-size-small;
     height: $moving-column-menu-height;
+    line-height: $moving-column-menu-height / 1em;
     padding: 0 0 0 $padding-small;
-
-    &, a {
-        line-height: $moving-column-menu-height;
-    }
 
     a {
         @include inline-block;
