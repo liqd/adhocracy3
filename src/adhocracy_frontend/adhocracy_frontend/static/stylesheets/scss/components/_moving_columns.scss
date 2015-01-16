@@ -134,7 +134,7 @@ The menu should always have the same state as its columns.
 .moving-column-body {
     // layout
     position: absolute;
-    top: $moving-column-menu-height * ($font-size-small/$font-size-normal);
+    top: $moving-column-menu-height;
     bottom: 0;
     left: 0;
     width: 100%;
@@ -177,8 +177,8 @@ States:
     @include clearfix;
     background: $color-secondary-introvert;
     font-size: $font-size-small;
-    height: $moving-column-menu-height;
-    line-height: $moving-column-menu-height / 1em;
+    height: $moving-column-menu-height * ($font-size-normal / $font-size-small);
+    line-height: $moving-column-menu-height * ($font-size-normal / $font-size-small) / 1em;
     padding: 0 0 0 $padding-small;
 
     a {
@@ -248,7 +248,7 @@ States:
     @include transition(left 0.5s);
     display: none;
     position: absolute;
-    top: $moving-column-menu-height * ($font-size-small/$font-size-normal);
+    top: $moving-column-menu-height;
     bottom: 0;
     overflow-y: auto;
     left: -30%;
