@@ -248,7 +248,7 @@ States:
     @include transition(left 0.5s);
     display: none;
     position: absolute;
-    top: $moving-column-menu-height;
+    top: $moving-column-menu-height * ($font-size-small/$font-size-normal);
     bottom: 0;
     overflow-y: auto;
     left: -30%;
