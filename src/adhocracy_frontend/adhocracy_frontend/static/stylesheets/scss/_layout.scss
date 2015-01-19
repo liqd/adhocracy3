@@ -17,12 +17,19 @@
     float: left;
 }
 
+.l-header-left,
+.l-header-right {
+    position: relative;
+    z-index: 1;
+}
+
 .l-header-center {
     left: 0;
     position: absolute;
     text-align: center;
     top: 0;
     width: 100%;
+    z-index: 0;
 }
 
 .l-header-right {
