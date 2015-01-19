@@ -270,13 +270,23 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
         scope: {
             recipientUrl: "@"
         },
-        link: (scope)  => {
+        require: "^adhUserDetailColumn",
+        link: (scope, element, attrs, column)  => {
             scope.messageSend = () => {
                 return adhHttp.postRaw(adhConfig.rest_url + "/message_user", {
                     recipient: scope.recipientUrl,
                     title: scope.message.title,
                     text: scope.message.text
+                }).then(() => {
+                    column.hideMessaging();
+                    column.success("Message was send");
+                }, () => {
+                    // FIXME
                 });
+            };
+
+            scope.cancel = () => {
+                column.hideMessaging();
             };
         }
     };
