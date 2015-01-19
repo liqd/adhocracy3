@@ -269,7 +269,7 @@ class RESTView:
         Note: This default implementation currently only exist in order to
         satisfy the preflight request, which browsers do in CORS situations
         before doing an actual POST request. Subclasses still have to
-        configure the view and delegate to this implementation explictly if
+        configure the view and delegate to this implementation explicitly if
         they want to use it.
         """
         return {}
@@ -1050,7 +1050,13 @@ class MessageUserView(RESTView):
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return super().options()
+        result = {}
+        if self.request.has_permission('message_to_user', self.context):
+            schema = POSTMessageUserViewRequestSchema().bind(
+                context=self.context)
+            result['POST'] = {'request_body': schema.serialize({}),
+                              'response_body': ''}
+        return result
 
     @view_config(request_method='POST',
                  permission='message_to_user',
