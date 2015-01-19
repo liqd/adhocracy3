@@ -70,6 +70,7 @@ def require_config_view(request):
 
 def root_view(request):
     """Return the embeddee HTML."""
+    query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/root.html.mako',
         {'css': [request.cachebusted_url('adhocracy_frontend:build/'
@@ -82,7 +83,9 @@ def root_view(request):
                 '/static/require-config.js',
                 request.cachebusted_url('adhocracy_frontend:build/'
                                         'lib/jquery/dist/jquery.js'),
-                ]
+                ],
+         'meta_api': '/static/meta_api.json%s' % (
+             '?' + query_params if query_params else ''),
          },
         request=request)
     response = Response(result)

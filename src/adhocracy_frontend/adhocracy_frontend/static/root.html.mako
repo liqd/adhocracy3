@@ -19,9 +19,7 @@
             require(["text!/config.json"], function(config_string) {
                 var config = JSON.parse(config_string);
 
-                var rest_url = config.rest_url;
-
-                require(["Adhocracy", "text!" + rest_url + "/meta_api"], function(Adh, meta_api_string) {
+                require(["Adhocracy", "text!" + "${meta_api}"], function(Adh, meta_api_string) {
                     var meta_api = JSON.parse(meta_api_string);
                     $(document).ready(function() {
                         Adh.init(config, meta_api);
