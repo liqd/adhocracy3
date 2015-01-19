@@ -19,5 +19,20 @@ It is usually used in the header bar.
         display: inline;
         text-decoration: none;
     }
+
+    .user-indicator-logout,
+    .user-indicator-login {
+        color: $color-highlight-extrovert;
+        font-variant: small-caps;
+        font-size: $font-size-plus;
+
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
+
+        &:active {
+            color: $color-prime-normal;
+        }
+    }
 }
 
