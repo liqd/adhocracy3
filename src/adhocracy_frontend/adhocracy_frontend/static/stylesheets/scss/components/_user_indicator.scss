@@ -21,7 +21,8 @@ It is usually used in the header bar.
     }
 
     .user-indicator-logout,
-    .user-indicator-login {
+    .user-indicator-login,
+    .user-indicator-register {
         color: $color-highlight-extrovert;
         font-variant: small-caps;
         font-size: $font-size-plus;
