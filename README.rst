@@ -51,7 +51,7 @@ client (frontend):
 
 - `Splinter <http://splinter.cobrateam.info/>`_ (acceptance and frontend tests)
 
-- `Jasmine <https://jasmine.github.io/>` (unit tests)
+- `Jasmine <https://jasmine.github.io/>`_ (unit tests)
 
-- `Sass <http://sass-lang.com/>`/`Compass <http://compass-style.org/>`
+- `Sass <http://sass-lang.com/>`_/`Compass <http://compass-style.org/>`_
   (CSS preprocessor)
