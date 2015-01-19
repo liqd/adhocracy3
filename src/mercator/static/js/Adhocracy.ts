@@ -21,6 +21,7 @@ import angularPlaceholderShim = require("angularPlaceholderShim");  if (angularP
 import modernizr = require("modernizr");
 import moment = require("moment");
 
+import AdhAbuse = require("./Packages/Abuse/Abuse");
 import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
@@ -147,6 +148,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
 
     // register our modules
     app.value("adhConfig", config);
+    AdhAbuse.register(angular);
     AdhComment.register(angular);
     AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);
     AdhDateTime.register(angular);
