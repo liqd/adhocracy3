@@ -1,13 +1,14 @@
 from pytest import fixture
 from pytest import raises
 from pytest import mark
+import os
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposals
 from adhocracy_frontend.tests.acceptance.shared import wait
 
 TITLE = 'title'
-
+IMAGE = '%s/docs/source/_static/python.jpg' % os.environ.get('A3_ROOT', '.')
 
 @fixture(scope='class')
 def browser(browser):
@@ -62,7 +63,15 @@ class TestMercatorForm:
         browser.find_by_name('heard-from-colleague').first.check()
         assert is_valid(browser)
 
-    @mark.xfail  # image is missing
+    @mark.xfail # fails in phantomJs & firefox, succeeds in chrome
+    def test_image_is_required(self, browser):
+        browser.find_by_css('input[type="submit"]').first.click()
+        assert not is_valid(browser)
+
+        browser.find_by_css('input[type=file]').first.fill(IMAGE)
+        assert is_valid(browser)
+
+    @mark.xfail  # 500 Internal Server Error: Unsupported: Storing Blobs in <ZODB.Map
     def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
         assert wait(lambda: browser.url.endswith("/r/mercator/"), max_steps=20)
@@ -75,10 +84,7 @@ class TestMercatorForm:
         heard_of = browser.find_by_xpath('//*[@id="mercator-detail-view-additional"]/section/div/p').first
         assert not heard_of.text == ""
 
-    @mark.xfail
     def test_login_is_required(self):
-        # FIXME this is broken. Can we just remove this test?
-        # There are many permissions test now in src/adhocracy_mercator [joka]
         with raises(AssertionError):
             create_proposals(n=1)
 

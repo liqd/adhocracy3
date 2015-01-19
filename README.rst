@@ -49,4 +49,9 @@ client (frontend):
 
 - `AngularJS <http://angularjs.org/>`_ (application framework)
 
-- `Robot Framework <http://robotframework.org/>`_ (acceptance and frontend tests)
+- `Splinter <http://splinter.cobrateam.info/>`_ (acceptance and frontend tests)
+
+- `Jasmine <https://jasmine.github.io/>`_ (unit tests)
+
+- `Sass <http://sass-lang.com/>`_/`Compass <http://compass-style.org/>`_
+  (CSS preprocessor)

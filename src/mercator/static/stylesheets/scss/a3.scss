@@ -28,6 +28,7 @@
 @import "components/login";
 @import "components/navbar";
 @import "components/moving_columns";
+@import "components/messaging";
 @import "components/listing";
 @import "components/listing_theme";
 @import "components/user_indicator";
@@ -41,6 +42,8 @@
 @import "components/space_switch";
 @import "components/user_list";
 @import "components/rate";
+
+@import "third_party/social_share";
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";

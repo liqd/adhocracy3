@@ -168,27 +168,25 @@ When text is in error it shows in an invalid color state
 
 /*doc
 ---
-title: radio button
-name: radio
+title: label text
+name: label-text
 parent: input
 ---
 
-A radio button, like a checkbox, has the two states: is-checked and
-is-unchecked.  Of a group of radio buttons, none or a single one can be
-checked. "required" in this context means that any of the buttons must be
-checked.
+Class to add styling to a label when the label itself is used as a container.
 
 ```html_example
 <label>
-    <input name="radio-example" type="radio" />
-    One option
-</label>
-<label>
-    <input name="radio-example" type="radio" />
-    The other option
+    <span class="label-text">A label</span>
+    <input type="text" />
 </label>
 ```
 */
+
+.label-text {
+    display: block;
+    padding-bottom: 0.5em;
+}
 
 .input-error {
     @include inline-block;

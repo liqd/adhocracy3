@@ -1,0 +1,18 @@
+<div class="moving-column-menu">
+    <i class="icon-document moving-column-icon"></i>
+    <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ 'edit' | translate }}</a>
+
+    <div class="moving-column-menu-nav">
+        <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+    </div>
+</div>
+<div class="moving-column-collapsed">
+    <a href="{{ proposalUrl | adhResourceUrl }}">O</a>
+</div>
+<div class="moving-column-body" data-du-scroll-container="">
+    <adh-recompile-on-change data-value="{{proposalUrl}}" data-key="proposalUrl">
+        <adh-resource-wrapper>
+            <adh-mercator-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-proposal-detail-view>
+        </adh-resource-wrapper>
+    </adh-recompile-on-change>
+</div>

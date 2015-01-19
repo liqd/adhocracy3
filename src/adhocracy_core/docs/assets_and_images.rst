@@ -278,7 +278,7 @@ binary data (everything else is just metadata).
 The `data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type` may be
 omitted if the new MIME type is the same as the old one.
 
-If the `content_type` key is given, is *must* be identical to the current
+If the `content_type` key is given, it *must* be identical to the current
 content type of the asset (changing the type of resources is generally not
 allowed).
 

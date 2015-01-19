@@ -9,6 +9,7 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
+import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -88,7 +89,7 @@ export interface IScopeData {
         name : string;
         country : string;
         website : string;
-        date_of_foreseen_registration : Date;
+        date_of_foreseen_registration : string;
         how_can_we_help_you : string;
         status_other : string;
         commentCount : number;
@@ -186,6 +187,9 @@ export interface IControllerScope extends IScope {
  * compose the multi-part mime post request manually (no chunking).
  * The $flow object is just used for meta data retrieval and cleared
  * before it can upload anything.
+ *
+ * NOTE: this uses several HTML5 APIs so you need to check for
+ * compability before using it.
  */
 export var uploadImageFile = (
     adhHttp : AdhHttp.Service<any>,
@@ -195,25 +199,31 @@ export var uploadImageFile = (
     if (flow.files.length !== 1) {
         throw "could not upload file: $flow.files.length !== 1";
     }
-    var file : FlowFile = flow.files[0];
+    var file = flow.files[0].file;
 
     var bytes = () : any => {
-        var func = (file.file.mozSlice ? "mozSlice" :
-                    (file.file.webkitSlice ? "webkitSlice" :
-                     "slice"));
-        var bytes = file.file[func](0, file.file.size, file.file.type);
-        return bytes;
+        var func;
+        if (file.mozSlice) {
+            func = "mozSlice";
+        } else if (file.webkitSlice) {
+            func = "webkitSlice";
+        } else {
+            func = "slice";
+        }
+
+        return file[func](0, file.size, file.type);
     };
 
     var formData = new FormData();
     formData.append("content_type", RIMercatorIntroImage.content_type);
-    formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.file.type);
+    formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.type);
     formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
 
     return adhHttp.get(poolPath)
         .then((mercatorPool) => {
             var postPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
-            return adhHttp.postRaw(postPath, formData).then((rsp) => { return rsp.data.path; });
+            return adhHttp.postRaw(postPath, formData)
+                .then((rsp) => rsp.data.path);
         });
 };
 
@@ -273,7 +283,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             });
     }
 
-
     /**
      * promise recursive comments count.
      */
@@ -301,7 +310,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 return parseInt((<any>pool).count, 10);  // see #261
             });
     }
-
 
     private initializeScope(scope : IScope) : IScopeData {
         if (!scope.hasOwnProperty("data")) {
@@ -771,6 +779,7 @@ export var register = (angular) => {
             AdhPreliminaryNames.moduleName,
             AdhResourceArea.moduleName,
             AdhResourceWidgets.moduleName,
+            AdhSticky.moduleName,
             AdhTopLevelState.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
@@ -842,19 +851,14 @@ export var register = (angular) => {
                 simultaneousUploads : 4,
                 permanentErrors : [404, 500, 501, 502, 503],
                 // these are not native to flow but used by custom functions
-                maximumWidth : 900,
                 minimumWidth : 400,
-                maximumByteSize : 1000000,
+                maximumByteSize : 3000000,
                 acceptedFileTypes : [
                     "gif",
                     "jpeg",
                     "png"
-                ] // correspond to exact mime types EG image/png
+                ]  // correspond to exact mime types EG image/png
             };
-
-            flowFactoryProvider.on("catchAll", () => {
-                // console.log(arguments);
-            });
         }])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
@@ -950,7 +954,6 @@ export var register = (angular) => {
                         imgUploadController.$setValidity("required", true);
                         imgUploadController.$setValidity("tooBig", file.size <= flow.opts.maximumByteSize);
                         imgUploadController.$setValidity("wrongType", flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
-                        imgUploadController.$setValidity("tooWide", img.width <= flow.opts.maximumWidth);
                         imgUploadController.$setValidity("tooNarrow", img.width >= flow.opts.minimumWidth);
 
                         if (imgUploadController.$valid) {

@@ -1,0 +1,30 @@
+<div class="user-message">
+    <form
+        novalidate="novalidate"
+        name="messageForm">
+        <p>{{ "Message to" | translate }} Username</p>
+        <input
+            class="user-message-subject"
+            type="text"
+            name="subject"
+            placeholder="{{ 'Subject' | translate }}:"
+            data-ng-model="message.title"
+            required="required" />
+        <span
+            class="input-error"
+            data-ng-show="messageForm.subject.$invalid  && messageForm.$submitted">
+            {{ "Please enter a subject" | translate }}</span>
+        <textarea
+            class="user-message-text"
+            name="message"
+            placeholder="{{ 'Content' | translate }}:"
+            data-ng-model="message.text"
+            required="required"></textarea>
+        <span
+            class="input-error"
+            data-ng-show="messageForm.message.$invalid  && messageForm.$submitted">
+            {{ "Please enter a message" | translate }}</span>
+        <input class="user-message-button-submit" type="submit" value="{{ 'Send' | translate }}" data-ng-click="messageSend()" />
+        <a href="" data-ng-click="cancel()" >{{ "Cancel" | translate }}</a>
+    </form>
+</div>

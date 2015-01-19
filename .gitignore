@@ -12,7 +12,7 @@ __pycache__
 *.egg-info
 /.installed.cfg
 /.mr.developer.cfg
-/.sass-cache
+.sass-cache
 .idea
 /bin
 /docs/build
@@ -40,7 +40,6 @@ etc/tslint.json
 /src/adhocracy_frontend/adhocracy_frontend/static/js/AdhocracyIg.ts
 /src/adhocracy_frontend/adhocracy_frontend/static/test-no-blanket.html
 /src/adhocracy_frontend/adhocracy_frontend/static/lib/
-/src/adhocracy_frontend/adhocracy_frontend/static/stylesheets/.sass-cache/
 /src/adhocracy_frontend/adhocracy_frontend/static/stylesheets/a3.css
 /src/adhocracy_frontend/adhocracy_frontend/static/stylesheets/min/
 /src/rubygemsrecipe/build/

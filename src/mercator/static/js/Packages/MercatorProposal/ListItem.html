@@ -1,5 +1,5 @@
 <div class="mercator-proposal-list-item {{ selectedState }}" >
-    <div class="mercator-proposal-list-item-image"><img data-ng-src="{{ data.introduction.picture }}/thumbnail"></div>
+    <div class="mercator-proposal-list-item-image" data-ng-if="data.introduction.picture"><img data-ng-src="{{ data.introduction.picture }}/thumbnail"></div>
     <div class="mercator-proposal-list-item-body" data-ng-class="{'m-has-image': image}">
         <p class="mercator-proposal-list-item-username">
             <adh-user-meta
@@ -12,7 +12,7 @@
         <h3 class="mercator-proposal-list-item-title"><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
         <ul class="mercator-propsal-list-item-meta">
             <li class="mercator-propsal-list-item-meta-item">
-                {{ data.user_info.createtime | date :'d/M/yyyy'}}
+                <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
             <li class="mercator-propsal-list-item-meta-item">
             <i class="icon-speechbubbles"></i>

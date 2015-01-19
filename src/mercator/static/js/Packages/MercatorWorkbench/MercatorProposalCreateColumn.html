@@ -1,0 +1,14 @@
+<div class="moving-column-menu">
+    <a href="{{ platformUrl | adhResourceUrl }}">{{ "Cancel" | translate }}</a>
+</div>
+<div class="moving-column-body" data-du-scroll-container="">
+    <adh-resource-wrapper
+        data-on-submit="redirectAfterProposalSubmit(result)"
+        data-on-cancel="redirectAfterProposalCancel(platformUrl)">
+        <adh-mercator-proposal-create
+            data-path="@preliminary"
+            data-mode="edit"
+            data-pool-path="{{platformUrl}}">
+        <adh-mercator-proposal-create>
+    </adh-resource-wrapper>
+</div>

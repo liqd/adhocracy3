@@ -6,18 +6,18 @@
                     <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
                 </span>
                 <span class="comment-header-date">
-                    <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
+                    <adh-time data-datetime="data.modificationDate"></adh-time>
                 </span>
             </div>
             <div class="comment-header-column2">
                 <span class="comment-header-links">
                     <a href=""
-                        data-ng-if="commentItemOptions.POST"
+                        data-ng-if="poolOptions.POST"
                         data-ng-click="createComment()">
                         <i class="icon-reply"></i>
                         {{ "Reply" | translate }}</a>
                     <a href=""
-                        data-ng-if="poolOptions.POST"
+                        data-ng-if="commentItemOptions.POST"
                         data-ng-click="edit()">
                         {{ "Edit" | translate }}</a>
                     <!-- #FIXME: Dummy -->
@@ -37,9 +37,13 @@
         </div>
         <div class="comment-content">
             <textarea class="comment-content-edit-text" data-msd-elastic="" data-ng-switch-when="1" data-ng-model="data.content"></textarea>
-            <div data-ng-switch-default="">{{data.content}}</div>
+            <div data-ng-switch-default="">
+                {{data.content}}
+            </div>
         </div>
         <div class="comment-meta">
+            <adh-social-share data-uri="{{ data.path | adhResourceUrl | adhCanonicalUrl }}" data-tweet-text="huhu"></adh-social-share>
+
             <div class="comment-actions">
                 <span data-ng-switch-default=""></span>
                 <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="submit()">{{ "Save" | translate }}</a>

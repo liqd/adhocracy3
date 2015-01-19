@@ -141,7 +141,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         }
         path = this.formatUrl(path);
 
-        if (FormData.prototype.isPrototypeOf(obj)) {
+        if (typeof FormData !== "undefined" && FormData.prototype.isPrototypeOf(obj)) {
             return _self.$http({
                 method: "POST",
                 url: path,

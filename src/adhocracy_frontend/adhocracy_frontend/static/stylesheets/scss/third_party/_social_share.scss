@@ -1,0 +1,8 @@
+// This are just some overwrites to the socialshareprivacy css
+// Unfortunatly, we have to use overspecific selectors and a lot of !important
+
+body {
+    .social_share_privacy_area {
+        margin-bottom: 0 !important;
+    }
+}

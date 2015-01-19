@@ -28,7 +28,8 @@ require.config({
         q: "../lib/q/q",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
         moment: "../lib/moment/min/moment-with-locales",
-        sticky: "../lib/sticky-kit/jquery.sticky-kit"
+        sticky: "../lib/sticky-kit/jquery.sticky-kit",
+        socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min"
     },
     shim: {
         jquery: {
