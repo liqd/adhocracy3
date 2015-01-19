@@ -38,7 +38,7 @@ The effect of these flags is as follows:
   that has its own *deleted* flag set to true or that has an ancestor whose
   *deleted* flag is true. Likewise for *hidden* resources.
 * Normally, only resources that are neither *deleted* nor *hidden* are
-  listed in parent pools and  search queries.
+  listed in parent pools and search queries.
 * FIXME Not implemented yet, since the frontend doesn't yet need it:
   The parameter *include=deleted|hidden|all* can be used to include
   deleted and/or hidden resources in pool listings and other search queries.
@@ -90,7 +90,7 @@ The effect of these flags is as follows:
   contents. In any case the frontend should be prepared to deal with
   *410 Gone* when following backreferences in the same way as when
   following forward reference -- even if it didn't explicitly ask to include
-  them, they might show up to due caching.
+  them, they might show up due to caching.
 
 FIXME We should extend the Meta API to expose the distinction between
 references and backreferences to the frontend, currently only the backend
