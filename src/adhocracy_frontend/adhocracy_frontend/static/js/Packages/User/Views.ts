@@ -263,14 +263,20 @@ export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var userMessageDirective = (adhConfig : AdhConfig.IService) => {
+export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html",
+        scope: {
+            recipientUrl: "@"
+        },
         link: (scope)  => {
             scope.messageSend = () => {
-                // FIXME: Send a message code required
-                console.log("One day I hope to send a message");
+                return adhHttp.postRaw(adhConfig.rest_url + "/message_user", {
+                    recipient: scope.recipientUrl,
+                    title: scope.message.title,
+                    text: scope.message.text
+                });
             };
         }
     };
@@ -321,5 +327,5 @@ export var register = (angular) => {
         .directive("adhRegister", ["adhConfig", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])
-        .directive("adhUserMessage", ["adhConfig", userMessageDirective]);
+        .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective]);
 };
