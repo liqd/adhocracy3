@@ -3,13 +3,26 @@
 }
 
 .l-header-wrapper {
-    @extend %moving-column-single-width;
     @include clearfix;
     margin: 0 auto;
+    position: relative;
+}
+
+.l-header-wrapper,
+.l-header-center {
+    @extend %moving-column-single-width;
 }
 
 .l-header-left {
     float: left;
+}
+
+.l-header-center {
+    left: 0;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    width: 100%;
 }
 
 .l-header-right {
