@@ -16,14 +16,11 @@
         % endfor
 
         <script type="text/javascript">
-            require(["text!/config.json"], function(config_string) {
+            require(["Adhocracy", "text!/config.json", "text!" + "${meta_api}"], function(Adh, config_string, meta_api_string) {
                 var config = JSON.parse(config_string);
-
-                require(["Adhocracy", "text!" + "${meta_api}"], function(Adh, meta_api_string) {
-                    var meta_api = JSON.parse(meta_api_string);
-                    $(document).ready(function() {
-                        Adh.init(config, meta_api);
-                    });
+                var meta_api = JSON.parse(meta_api_string);
+                $(document).ready(function() {
+                    Adh.init(config, meta_api);
                 });
             });
         </script>
