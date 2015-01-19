@@ -851,9 +851,8 @@ export var register = (angular) => {
                 simultaneousUploads : 4,
                 permanentErrors : [404, 500, 501, 502, 503],
                 // these are not native to flow but used by custom functions
-                maximumWidth : 900,
                 minimumWidth : 400,
-                maximumByteSize : 1000000,
+                maximumByteSize : 3000000,
                 acceptedFileTypes : [
                     "gif",
                     "jpeg",
@@ -955,7 +954,6 @@ export var register = (angular) => {
                         imgUploadController.$setValidity("required", true);
                         imgUploadController.$setValidity("tooBig", file.size <= flow.opts.maximumByteSize);
                         imgUploadController.$setValidity("wrongType", flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
-                        imgUploadController.$setValidity("tooWide", img.width <= flow.opts.maximumWidth);
                         imgUploadController.$setValidity("tooNarrow", img.width >= flow.opts.minimumWidth);
 
                         if (imgUploadController.$valid) {
