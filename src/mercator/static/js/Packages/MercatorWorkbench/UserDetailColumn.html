@@ -1,6 +1,9 @@
 <div class="moving-column-menu">
     <i class="icon-user-unfilled moving-column-icon"></i>
-    <a data-ng-click="data.showMessaging = !data.showMessaging" href="">{{ "Messaging" | translate }}</a>
+    <a
+        href=""
+        data-ng-click="ctrl.toggleMessaging()"
+        data-ng-if="messageOptions.POST">{{ "Messaging" | translate }}</a>
 </div>
 <div class="moving-column-body" data-du-scroll-container="">
     <adh-recompile-on-change
@@ -16,6 +19,6 @@
             </section>
         </adh-user-profile>
     </adh-recompile-on-change>
-    <adh-user-message data-ng-if="data.showMessaging"></adh-user-message>
-    <div class="moving-column-mask" data-ng-show="data.showMessaging"></div>
+    <adh-user-message data-ng-if="showMessaging" data-recipient-url="{{userUrl}}"></adh-user-message>
+    <div class="moving-column-mask" data-ng-show="showMessaging"></div>
 </div>

@@ -263,14 +263,30 @@ export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var userMessageDirective = (adhConfig : AdhConfig.IService) => {
+export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserMessage.html",
-        link: (scope)  => {
+        scope: {
+            recipientUrl: "@"
+        },
+        require: "^adhUserDetailColumn",
+        link: (scope, element, attrs, column)  => {
             scope.messageSend = () => {
-                // FIXME: Send a message code required
-                console.log("One day I hope to send a message");
+                return adhHttp.postRaw(adhConfig.rest_url + "/message_user", {
+                    recipient: scope.recipientUrl,
+                    title: scope.message.title,
+                    text: scope.message.text
+                }).then(() => {
+                    column.hideMessaging();
+                    column.success("Message was send");
+                }, () => {
+                    // FIXME
+                });
+            };
+
+            scope.cancel = () => {
+                column.hideMessaging();
             };
         }
     };
@@ -321,5 +337,5 @@ export var register = (angular) => {
         .directive("adhRegister", ["adhConfig", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])
-        .directive("adhUserMessage", ["adhConfig", userMessageDirective]);
+        .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective]);
 };

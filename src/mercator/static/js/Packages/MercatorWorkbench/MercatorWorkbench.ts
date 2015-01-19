@@ -148,17 +148,44 @@ export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLe
 };
 
 
-export var userDetailColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
+export class UserDetailColumnController {
+    constructor(
+        adhTopLevelState : AdhTopLevelState.Service,
+        adhPermissions : AdhPermissions.Service,
+        adhConfig : AdhConfig.IService,
+        private $scope
+    ) {
+        $scope.ctrl = this;
+        $scope.showMessaging = false;
+        adhTopLevelState.bind("userUrl", $scope);
+        adhPermissions.bindScope($scope, adhConfig.rest_url + "/message_user", "messageOptions");
+    }
+
+    public success(message : string) : void {
+        // FIXME
+        console.log(message);
+    }
+
+    public showMessaging() : void {
+        this.$scope.showMessaging = true;
+    }
+
+    public hideMessaging() : void {
+        this.$scope.showMessaging = false;
+    }
+
+    public toggleMessaging() : void {
+        this.$scope.showMessaging = !this.$scope.showMessaging;
+    }
+}
+
+
+export var userDetailColumnDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
-        link: (scope) => {
-            adhTopLevelState.bind("userUrl", scope);
-            scope.data = {
-                showMessaging: false
-            };
-        }
+        controller: ["adhTopLevelState", "adhPermissions", "adhConfig", "$scope", UserDetailColumnController]
     };
 };
 
@@ -256,6 +283,6 @@ export var register = (angular) => {
             mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhTopLevelState", "adhConfig", mercatorProposalListingColumnDirective])
-        .directive("adhUserDetailColumn", ["adhTopLevelState", "adhConfig", userDetailColumnDirective])
+        .directive("adhUserDetailColumn", ["adhConfig", userDetailColumnDirective])
         .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
 };
