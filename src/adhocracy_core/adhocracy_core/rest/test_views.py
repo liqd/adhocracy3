@@ -1220,7 +1220,19 @@ class TestMessageUserView:
         assert inst.post() == ''
         assert request.registry.messenger.send_message_to_user.called
 
-    def test_options(self, request, context):
+    def test_options_with_permission(self, request, context):
+        inst = self._make_one(context, request)
+        result = inst.options()
+        assert 'POST' in result
+        assert result['POST']['request_body'] == {'recipient': '',
+                                                  'text': '',
+                                                  'title': ''}
+        assert result['POST']['response_body'] == ''
+
+    def test_options_without_permission(self, request, context):
+        from pyramid.request import Request
+        request.has_permission = Mock(spec=Request.has_permission,
+                                      return_value=False)
         inst = self._make_one(context, request)
         assert inst.options() == {}
 
