@@ -42,14 +42,24 @@ def config_view(request):
     return config
 
 
-def require_config_view(request):
-    """Return the embeddee HTML."""
+def cachebust_query_params(request):
+    """Return cachebust query params.
+
+    Due to simplicity, we currently use the same query parameter for all
+    static resources. If we use individual checksums, this will go away.
+    """
     url = request.cachebusted_url('adhocracy_frontend:build/'
                                   'stylesheets/a3.css')
     if '?' in url:
         query_params = url.split('?')[1]
     else:
         query_params = None
+    return query_params
+
+
+def require_config_view(request):
+    """Return the embeddee HTML."""
+    query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/require-config.js.mako',
         {'url_args': query_params},
