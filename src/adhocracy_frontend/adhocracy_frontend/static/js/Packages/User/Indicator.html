@@ -1,12 +1,12 @@
 <div class="user-indicator" data-ng-switch="user.loggedIn">
     <div ng-switch-when="true">
         <a href="{{ user.userPath | adhResourceUrl }}" class="user-indicator-name">{{user.data.name}}</a>,
-        <a class="user-indicator-logout" href="" data-ng-click="logOut()">{{ "Logout" | translate }}</a>
+        <a class="user-indicator-logout" href="" data-ng-click="logOut()">{{ "logout" | translate }}</a>
     </div>
     <div ng-switch-default="">
         <div class="user-indicator-primary">
-            <a class="user-indicator-login" href="/login">{{ "LogIn" | translate }}</a>
-            or <a class="user-indicator-register" href="/register">{{ 'Register' | translate }}</a>
+            <a class="user-indicator-login" href="/login">{{ "login" | translate }}</a>
+            or <a class="user-indicator-register" href="/register">{{ 'register' | translate }}</a>
         </div>
     </div>
 </div>
