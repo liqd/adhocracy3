@@ -78,9 +78,9 @@ Textinput that represents a title.
 
     &.has-focus,
     &:focus {
-        border-color: $color-highlight-invalid;
-        color: $color-highlight-invalid;
-        outline: 1px solid $color-highlight-invalid;
+        border-color: $color-function-invalid;
+        color: $color-function-invalid;
+        outline: 1px solid $color-function-invalid;
     }
 }
 
@@ -190,7 +190,7 @@ Class to add styling to a label when the label itself is used as a container.
 
 .input-error {
     @include inline-block;
-    color: $color-highlight-invalid;
+    color: $color-function-invalid;
     font-size: $font-size-small;
 }
 
