@@ -112,8 +112,8 @@ textarea {
 
     &.has-focus,
     &:focus {
-        border-color: $color-highlight-normal;
-        outline: 1px solid $color-highlight-normal;
+        border-color: $color-text-highlight-normal;
+        outline: 1px solid $color-text-highlight-normal;
     }
 
     &.ng-dirty, &.is-dirty {

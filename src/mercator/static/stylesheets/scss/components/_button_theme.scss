@@ -4,7 +4,7 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
-    @include button-color($color-text-inverted, $color-highlight-normal);
+    @include button-color($color-text-inverted, $color-text-highlight-normal);
 
     border: 0;
     font-weight: $font-weight-normal;

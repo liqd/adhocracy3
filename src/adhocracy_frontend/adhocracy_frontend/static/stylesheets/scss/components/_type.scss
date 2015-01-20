@@ -70,7 +70,7 @@ A hyperlink. It may have the following states:
 ```
 */
 a {
-    color: $color-highlight-normal;
+    color: $color-text-highlight-normal;
 
     &:hover,
     &.is-hover,
@@ -128,7 +128,7 @@ When is a <a href="#" class="disguised-link">Link</a> not a link?
 
     &:hover,
     &:focus {
-        color: $color-highlight-normal;
+        color: $color-text-highlight-normal;
     }
 }
 
@@ -364,7 +364,7 @@ category: Type
 blockquote {
     position: relative;
     font-style: italic;
-    border-left: 0.4em solid $color-highlight-normal;
+    border-left: 0.4em solid $color-text-highlight-normal;
     padding-left: 0.5em;
     margin: 1.5em;
 

@@ -100,7 +100,7 @@ category: Variables
 .color-prime-extrovert {background-color: $color-prime-extrovert;}
 .color-secondary-extrovert {background-color: $color-text-introvert;}
 .color-secondary-introvert {background-color: $color-secondary-introvert;}
-.color-highlight-normal {background-color: $color-highlight-normal;}
+.color-highlight-normal {background-color: $color-text-highlight-normal;}
 .color-highlight-introvert {background-color: $color-highlight-introvert;}
 .color-highlight-extrovert {background-color: $color-highlight-extrovert;}
 .color-highlight-reverse {background-color: $color-text-inverted;}
@@ -118,9 +118,9 @@ category: Variables
 @include check-contrast($color-text-normal, $color-structure-surface);
 @include check-contrast($color-prime-extrovert, $color-background);
 @include check-contrast($color-prime-extrovert, $color-structure-surface);
-@include check-contrast($color-highlight-normal, $color-text-inverted);
-@include check-contrast($color-highlight-normal, $color-background);
-@include check-contrast($color-highlight-normal, $color-structure-surface);
+@include check-contrast($color-text-highlight-normal, $color-text-inverted);
+@include check-contrast($color-text-highlight-normal, $color-background);
+@include check-contrast($color-text-highlight-normal, $color-structure-surface);
 
 
 /*doc

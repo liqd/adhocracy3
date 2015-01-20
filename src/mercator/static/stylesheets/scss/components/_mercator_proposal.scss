@@ -59,7 +59,7 @@ selected. If no proposal is selected, no state is applied.
     padding: 0 1em 1px;
 
     &.active {
-        color: $color-highlight-normal;
+        color: $color-text-highlight-normal;
     }
 }
 
@@ -85,7 +85,7 @@ selected. If no proposal is selected, no state is applied.
         margin-bottom: 1px;
 
         &, a {
-            color: $color-highlight-normal;
+            color: $color-text-highlight-normal;
             padding-bottom: 0;
         }
 
@@ -156,7 +156,7 @@ selected. If no proposal is selected, no state is applied.
     }
 
     &.mercator-propsal-list-item-meta-item-budget {
-        color: $color-highlight-normal;
+        color: $color-text-highlight-normal;
         font-size: $font-size-plus;
     }
 }
@@ -297,7 +297,7 @@ $mercator-proposal-detail-nav-width: 3.3%;
         text-decoration: none;
 
         &:hover, &:focus {
-            color: $color-highlight-normal;
+            color: $color-text-highlight-normal;
         }
     }
 }
