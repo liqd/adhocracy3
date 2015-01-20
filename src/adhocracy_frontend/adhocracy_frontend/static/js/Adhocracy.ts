@@ -62,13 +62,12 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         window.document.body.className += " is-embedded";
     }
 
-    var app = angular.module("a3", [
+    var appDependencies = [
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
         "ngAria",
         "ngMessages",
-        "templates",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
@@ -77,7 +76,13 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhResourceArea.moduleName,
         AdhProposal.moduleName,
         AdhSticky.moduleName
-    ]);
+    ];
+
+    if (config.cachebust) {
+        appDependencies.push("templates");
+    }
+
+    var app = angular.module("a3", appDependencies);
 
     app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", "$ariaProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
