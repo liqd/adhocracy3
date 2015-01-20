@@ -19,7 +19,7 @@ A simple box containing text.
 .textbox {
     padding: 1em;
     margin-bottom: 1em;
-    background-color: $color-structure-surface;
+    background-color: $color-structure-introvert;
 
     .m-unobtrusive {
         color: $color-text-introvert;
@@ -43,7 +43,7 @@ A generic box with a single button.
 ```
 */
 .box-with-button {
-    background-color: $color-structure-surface;
+    background-color: $color-structure-introvert;
     padding: 1em 1em 0;
     margin-bottom: 2em;
 

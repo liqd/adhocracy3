@@ -110,7 +110,7 @@ The menu should always have the same state as its columns.
     }
 
     &.is-collapse, &.is-hide {
-        background-color: $color-structure-surface;
+        background-color: $color-structure-introvert;
         border: 0;
         padding-left: 0;
 
@@ -219,7 +219,7 @@ States:
         vertical-align: baseline;
         text-decoration: none;
         color: $color-background;
-        background-color: $color-structure-surface;
+        background-color: $color-structure-introvert;
 
         &:hover, &:focus {
             color: $color-brand-three-normal;
@@ -254,7 +254,7 @@ States:
     left: -30%;
     width: 30%;
     z-index: 1;
-    background-color: $color-structure-surface;
+    background-color: $color-structure-introvert;
     padding: 0.5em;
 
     &.is-visible {
