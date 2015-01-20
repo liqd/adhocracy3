@@ -157,7 +157,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhWebSocket.register(angular);
 
     // force-load some services
-    var injector = angular.bootstrap(document, ["a3"]);
+    var injector = angular.bootstrap(document, ["a3"], {strictDi: true});
     injector.get("adhCrossWindowMessaging");
 
     loadComplete();
