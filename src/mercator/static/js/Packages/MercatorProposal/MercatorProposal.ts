@@ -102,8 +102,6 @@ export interface IScopeData {
         nickInstance : number;
     };
 
-    imageUpload : Flow;
-
     // 3. in detail
     description : {
         description : string;
@@ -161,7 +159,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     mercatorProposalForm? : any;
     data : IScopeData;
     selectedState : string;
-    flowSupported : boolean;
+    $flow? : Flow;
 }
 
 export interface IControllerScope extends IScope {
@@ -172,8 +170,6 @@ export interface IControllerScope extends IScope {
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
     mercatorProposalIntroductionForm? : any;
-    $flow : any;
-    currentUpload : any;
 }
 
 
@@ -228,8 +224,6 @@ export var uploadImageFile = (
 
 
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
-    private flow;
-
     constructor(
         public adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
@@ -240,7 +234,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ListItem.html";
-        this.flow = flowFactory.create();
     }
 
     public createDirective() : ng.IDirective {
@@ -262,7 +255,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     public link(scope, element, attrs, wrapper) {
         var instance = super.link(scope, element, attrs, wrapper);
-        instance.scope.flowSupported = this.flow.support;
+        instance.scope.$flow = this.flowFactory.create();
         return instance;
     }
 
@@ -655,7 +648,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             return this.$q.when(_.flatten([mercatorProposal, mercatorProposalVersion, subresources]));
         };
 
-        if (this.flow.support && data.imageUpload.files.length > 0) {
+        if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
             return uploadImageFile(this.adhHttp, "/mercator", instance.scope.$flow)
                 .then(postProposal);
         } else {
@@ -692,8 +685,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         };
 
-        if (this.flow.support && data.imageUpload.files.length > 0) {
-            return uploadImageFile(this.adhHttp, "/mercator", data.imageUpload)
+        if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
+            return uploadImageFile(this.adhHttp, "/mercator", instance.scope.$flow)
                 .then(postProposal);
         } else {
             return postProposal();
@@ -945,24 +938,18 @@ export var register = (angular) => {
             };
 
             var imageExists = () => {
-                if ($scope.flowSupported) {
-                    return ($scope.data.introduction && $scope.data.introduction.picture) || $scope.currentUpload.files.length > 0;
+                if ($scope.$flow && $scope.$flow.support) {
+                    return ($scope.data.introduction && $scope.data.introduction.picture) || $scope.$flow.files.length > 0;
                 } else {
                     return false;
                 }
             };
 
-            if ($scope.flowSupported) {
-
-                var imgUploadElement = $element.find("[name=introduction-picture-upload]");
-
-                $scope.$watch(() => imgUploadElement.scope().$flow, (flow) => {
+            if ($scope.$flow && $scope.$flow.support) {
                     var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
 
-                    $scope.currentUpload = flow;
-
                     // validate image upload
-                    flow.on("fileAdded", (file, event) => {
+                    $scope.$flow.on("fileAdded", (file, event) => {
                         // We can only check some constraints after the image has
                         // been loaded asynchronously.  So we always return false in
                         // order to keep flow.js from adding the image and then add
@@ -976,14 +963,15 @@ export var register = (angular) => {
                         img.onload = () => {
                             imgUploadController.$setDirty();
                             imgUploadController.$setValidity("required", true);
-                            imgUploadController.$setValidity("tooBig", file.size <= flow.opts.maximumByteSize);
-                            imgUploadController.$setValidity("wrongType", flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
-                            imgUploadController.$setValidity("tooNarrow", img.width >= flow.opts.minimumWidth);
+                            imgUploadController.$setValidity("tooBig", file.size <= $scope.$flow.opts.maximumByteSize);
+                            imgUploadController.$setValidity(
+                                "wrongType", $scope.$flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
+                            imgUploadController.$setValidity("tooNarrow", img.width >= $scope.$flow.opts.minimumWidth);
 
                             if (imgUploadController.$valid) {
-                                flow.files[0] = file;
+                                $scope.$flow.files[0] = file;
                             } else {
-                                flow.cancel();
+                                $scope.$flow.cancel();
                                 imgUploadController.$setValidity("required", imageExists());
                             }
 
@@ -993,24 +981,17 @@ export var register = (angular) => {
                         $scope.$apply();
                         return false;
                     });
-                });
             }
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
 
-                if ($scope.flowSupported) {
+                if ($scope.$flow && $scope.$flow.support) {
                     var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
                     imgUploadController.$setValidity("required", imageExists());
                 }
 
                 if ($scope.mercatorProposalForm.$valid) {
-                    if ($scope.flowSupported) {
-                        // pluck flow object from file upload scope, and
-                        // attach it to where ResourceWidgets can find it.
-                        $scope.data.imageUpload = imgUploadElement.scope().$flow;
-                    }
-
                     // append a random number to the nick to allow duplicate titles
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
                         Math.floor((Math.random() * 10000) + 1);
