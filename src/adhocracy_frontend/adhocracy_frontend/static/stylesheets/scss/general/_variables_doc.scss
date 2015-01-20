@@ -103,7 +103,7 @@ category: Variables
 .color-highlight-normal {background-color: $color-highlight-normal;}
 .color-highlight-introvert {background-color: $color-highlight-introvert;}
 .color-highlight-extrovert {background-color: $color-highlight-extrovert;}
-.color-highlight-reverse {background-color: $color-highlight-reverse;}
+.color-highlight-reverse {background-color: $color-text-inverted;}
 .color-highlight-valid {background-color: $color-highlight-valid;}
 .color-highlight-invalid {background-color: $color-highlight-invalid;}
 .color-background {background-color: $color-background;}
@@ -118,7 +118,7 @@ category: Variables
 @include check-contrast($color-text-normal, $color-structure-surface);
 @include check-contrast($color-prime-extrovert, $color-background);
 @include check-contrast($color-prime-extrovert, $color-structure-surface);
-@include check-contrast($color-highlight-normal, $color-highlight-reverse);
+@include check-contrast($color-highlight-normal, $color-text-inverted);
 @include check-contrast($color-highlight-normal, $color-background);
 @include check-contrast($color-highlight-normal, $color-structure-surface);
 

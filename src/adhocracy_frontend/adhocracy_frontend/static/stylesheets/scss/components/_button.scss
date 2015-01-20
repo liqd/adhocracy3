@@ -68,7 +68,7 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
-    @include button-color($color-highlight-normal, $color-highlight-reverse);
+    @include button-color($color-highlight-normal, $color-text-inverted);
 
     $border-width: 0.25em;
 
@@ -87,11 +87,11 @@ input[type="button"] {
     }
 
     &.has-focus, &:focus {
-        @include button-color($color-highlight-extrovert, $color-highlight-reverse);
+        @include button-color($color-highlight-extrovert, $color-text-inverted);
     }
 
     &.is-hover, &:hover {
-        @include button-color($color-highlight-introvert, $color-highlight-reverse);
+        @include button-color($color-highlight-introvert, $color-text-inverted);
     }
 
     &:disabled,
