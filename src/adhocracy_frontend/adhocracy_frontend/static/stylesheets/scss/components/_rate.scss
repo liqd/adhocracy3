@@ -28,7 +28,7 @@ The button has the is-rate-button-active state.
     margin-left: $arrow-width;
     padding: 0 0.5em;
     line-height: 2;
-    background-color: $color-brand-accent2;
+    background-color: $color-brand-one-normal;
     color: white;
     text-decoration: none;
 
@@ -40,7 +40,7 @@ The button has the is-rate-button-active state.
         height: 0;
         border-top: 1em solid transparent;
         border-bottom: 1em solid transparent;
-        border-right: $arrow-width solid $color-brand-accent2;
+        border-right: $arrow-width solid $color-brand-one-normal;
         border-left: 0;
     }
 
