@@ -384,7 +384,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.adhHttp.get(subResourcePaths.value),
             this.adhHttp.get(subResourcePaths.partners),
             this.adhHttp.get(subResourcePaths.finance),
-            this.adhHttp.get(subResourcePaths.experience)]);
+            this.adhHttp.get(subResourcePaths.experience)
+        ]);
 
         return subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
             subResources.forEach((subResource : ResourcesBase.Resource) => {
@@ -862,15 +863,15 @@ export var register = (angular) => {
                 flowFactoryProvider.defaults = {};
             }
             flowFactoryProvider.defaults = {
-                singleFile : true,
-                maxChunkRetries : 1,
-                chunkRetryInterval : 5000,
-                simultaneousUploads : 4,
-                permanentErrors : [404, 500, 501, 502, 503],
+                singleFile: true,
+                maxChunkRetries: 1,
+                chunkRetryInterval: 5000,
+                simultaneousUploads: 4,
+                permanentErrors: [404, 500, 501, 502, 503],
                 // these are not native to flow but used by custom functions
-                minimumWidth : 400,
-                maximumByteSize : 3000000,
-                acceptedFileTypes : [
+                minimumWidth: 400,
+                maximumByteSize: 3000000,
+                acceptedFileTypes: [
                     "gif",
                     "jpeg",
                     "png"
