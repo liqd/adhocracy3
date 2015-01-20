@@ -1,6 +1,6 @@
 /* documentation is in variables_doc */
 
-$color-prime-normal: #575756;
+$color-text-normal: #575756;
 $color-prime-extrovert: #1c1c1b;
 $color-secondary-extrovert: #4d4d4d;
 $color-secondary-normal: #333;
@@ -60,14 +60,14 @@ $padding-medium: 1em;
         font-size: $font-size-normal;
         //@include font-tracking(normal);
         line-height: 1.2;
-        color: $color-prime-normal;
+        color: $color-text-normal;
     } @else if $value == functional {
         font-family: $font-family-normal;
         font-weight: $font-weight-normal;
         font-size: $font-size-plus;
         @include font-tracking(normal);
         line-height: 1.2;
-        color: $color-prime-normal;
+        color: $color-text-normal;
     } @else if $value == functional-introvert {
         font-family: $font-family-normal;
         font-weight: $font-weight-introvert;
