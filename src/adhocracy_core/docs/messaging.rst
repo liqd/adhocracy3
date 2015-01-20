@@ -92,7 +92,7 @@ The end point '/message_all' can be used to send messages from a user to
     >> resp_data.status_code
     200
     >> resp_data.text
-    ''
+    '""'
 
 The fields are both required and have the same semantics as above.
 
