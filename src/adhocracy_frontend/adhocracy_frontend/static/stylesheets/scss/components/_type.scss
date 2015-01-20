@@ -123,7 +123,7 @@ When is a <a href="#" class="disguised-link">Link</a> not a link?
 ```
 */
 @mixin disguised-link {
-    color: $color-highlight-extrovert;
+    color: $color-text-highlight-introvert;
     text-decoration: none;
 
     &:hover,
@@ -174,8 +174,8 @@ category: Type
 
 @mixin inline-box {
     @include inline-block;
-    color: $color-highlight-extrovert;
-    border: 1px solid $color-highlight-extrovert;
+    color: $color-text-highlight-introvert;
+    border: 1px solid $color-text-highlight-introvert;
     font-size: $font-size-small;
     padding: 0 1em;
 }

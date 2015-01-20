@@ -178,7 +178,7 @@ parent: comment
         text-transform: uppercase;
 
         &:hover, &:focus, &:active {
-            color: $color-highlight-extrovert;
+            color: $color-text-highlight-introvert;
         }
     }
 }
