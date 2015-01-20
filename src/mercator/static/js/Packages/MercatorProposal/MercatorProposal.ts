@@ -595,11 +595,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
 
-        var imagePathPromise : ng.IPromise<any>;
-        if (this.flow.support) {
-            imagePathPromise = uploadImageFile(this.adhHttp, "/mercator", data.imageUpload);
-        } else {
-            imagePathPromise = this.$q.when();
+        var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
+        if (typeof imagePath !== "undefined") {
+            data.introduction.picture = imagePath;
+        } else if (typeof data.introduction.picture === "undefined") {
+            delete data.introduction.picture;
         }
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
@@ -615,9 +615,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         });
 
         this.fill(data, mercatorProposalVersion);
-
-        var introduction;  // we need to especially in order to inject
-                           // the image before posting version 1.
 
         var subresources = _.map([
             [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
@@ -651,17 +648,18 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.fill(data, version);
             mercatorProposalVersion.data[SIMercatorSubResources.nick][subresourceKey] = version.path;
 
-            if (subresourceKey === "introduction") {
-                introduction = version;
-            }
-
             return [item, version];
         });
 
-        return imagePathPromise.then((imagePath : string) => {
-            introduction.data[SIMercatorIntroduction.nick].picture = imagePath;
-            return _.flatten([mercatorProposal, mercatorProposalVersion, subresources]);
-        });
+        return this.$q.when(_.flatten([mercatorProposal, mercatorProposalVersion, subresources]));
+        };
+
+        if (this.flow.support && data.imageUpload.files.length > 0) {
+            return uploadImageFile(this.adhHttp, "/mercator", instance.scope.$flow)
+                .then(postProposal);
+        } else {
+            return postProposal();
+        }
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
