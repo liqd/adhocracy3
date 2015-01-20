@@ -111,7 +111,7 @@ category: Variables
 .color-structure-active {background-color: $color-structure-active;}
 .color-structure-border {background-color: $color-structure-border;}
 .color-structure-border-introvert {background-color: $color-structure-normal;}
-.color-structure-border-extrovert {background-color: $color-structure-border-extrovert;}
+.color-structure-border-extrovert {background-color: $color-structure-extrovert;}
 
 // some static contrast checks for a11y
 @include check-contrast($color-text-normal, $color-background);
