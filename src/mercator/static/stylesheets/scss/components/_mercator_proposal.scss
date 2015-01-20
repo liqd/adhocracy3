@@ -171,7 +171,7 @@ selected. If no proposal is selected, no state is applied.
 
 .mercator-proposal-detail-cover {
     @include span(full);
-    border-bottom: 1px solid $color-text-basic-introvert;
+    border-bottom: 1px solid $color-text-introvert;
     padding: 0.8em 0.8em 0.5em;
 
     .chapter-header {
@@ -216,7 +216,7 @@ $mercator-proposal-detail-nav-width: 3.3%;
 
 .mercator-proposal-chapters {
     background-color: white;
-    border-left: 1px solid $color-text-basic-introvert;
+    border-left: 1px solid $color-text-introvert;
     padding: 0 0.8em;
     width: 100% - $mercator-proposal-detail-nav-width;
 
@@ -240,7 +240,7 @@ $mercator-proposal-detail-nav-width: 3.3%;
 
 .mercator-proposal-list-item {
     @include container;
-    border-bottom: 1px solid $color-text-basic-introvert;
+    border-bottom: 1px solid $color-text-introvert;
     font-size: $font-size-plus;
     line-height: 1;
     padding: 1em 1.25em 1.125em 0.875em;
