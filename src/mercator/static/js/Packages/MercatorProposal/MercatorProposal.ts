@@ -596,62 +596,62 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var data : IScopeData = this.initializeScope(instance.scope);
 
         var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
-        if (typeof imagePath !== "undefined") {
-            data.introduction.picture = imagePath;
-        } else if (typeof data.introduction.picture === "undefined") {
-            delete data.introduction.picture;
-        }
+            if (typeof imagePath !== "undefined") {
+                data.introduction.picture = imagePath;
+            } else if (typeof data.introduction.picture === "undefined") {
+                delete data.introduction.picture;
+            }
 
-        var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposal.parent = instance.scope.poolPath;
-        mercatorProposal.data[SIName.nick] = new SIName.Sheet({
-            name: AdhUtil.normalizeName(data.introduction.title + data.introduction.nickInstance)
-        });
-
-        var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposalVersion.parent = mercatorProposal.path;
-        mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-            follows: [mercatorProposal.first_version_path]
-        });
-
-        this.fill(data, mercatorProposalVersion);
-
-        var subresources = _.map([
-            [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
-            [RIMercatorIntroduction, RIMercatorIntroductionVersion, "introduction"],
-            [RIMercatorDescription, RIMercatorDescriptionVersion, "description"],
-            [RIMercatorLocation, RIMercatorLocationVersion, "location"],
-            [RIMercatorStory, RIMercatorStoryVersion, "story"],
-            [RIMercatorOutcome, RIMercatorOutcomeVersion, "outcome"],
-            [RIMercatorSteps, RIMercatorStepsVersion, "steps"],
-            [RIMercatorValue, RIMercatorValueVersion, "value"],
-            [RIMercatorPartners, RIMercatorPartnersVersion, "partners"],
-            [RIMercatorFinance, RIMercatorFinanceVersion, "finance"],
-            [RIMercatorExperience, RIMercatorExperienceVersion, "experience"]
-        ], (stuff) => {
-            var itemClass = <any>stuff[0];
-            var versionClass = <any>stuff[1];
-            var subresourceKey = <string>stuff[2];
-
-            var item = new itemClass({preliminaryNames: this.adhPreliminaryNames});
-            item.parent = mercatorProposal.path;
-            item.data[SIName.nick] = new SIName.Sheet({
-                name: AdhUtil.normalizeName(subresourceKey)
+            var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
+            mercatorProposal.parent = instance.scope.poolPath;
+            mercatorProposal.data[SIName.nick] = new SIName.Sheet({
+                name: AdhUtil.normalizeName(data.introduction.title + data.introduction.nickInstance)
             });
 
-            var version = new versionClass({preliminaryNames: this.adhPreliminaryNames});
-            version.parent = item.path;
-            version.data[SIVersionable.nick] = new SIVersionable.Sheet({
-                follows: [item.first_version_path]
+            var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
+            mercatorProposalVersion.parent = mercatorProposal.path;
+            mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                follows: [mercatorProposal.first_version_path]
             });
 
-            this.fill(data, version);
-            mercatorProposalVersion.data[SIMercatorSubResources.nick][subresourceKey] = version.path;
+            this.fill(data, mercatorProposalVersion);
 
-            return [item, version];
-        });
+            var subresources = _.map([
+                [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
+                [RIMercatorIntroduction, RIMercatorIntroductionVersion, "introduction"],
+                [RIMercatorDescription, RIMercatorDescriptionVersion, "description"],
+                [RIMercatorLocation, RIMercatorLocationVersion, "location"],
+                [RIMercatorStory, RIMercatorStoryVersion, "story"],
+                [RIMercatorOutcome, RIMercatorOutcomeVersion, "outcome"],
+                [RIMercatorSteps, RIMercatorStepsVersion, "steps"],
+                [RIMercatorValue, RIMercatorValueVersion, "value"],
+                [RIMercatorPartners, RIMercatorPartnersVersion, "partners"],
+                [RIMercatorFinance, RIMercatorFinanceVersion, "finance"],
+                [RIMercatorExperience, RIMercatorExperienceVersion, "experience"]
+            ], (stuff) => {
+                var itemClass = <any>stuff[0];
+                var versionClass = <any>stuff[1];
+                var subresourceKey = <string>stuff[2];
 
-        return this.$q.when(_.flatten([mercatorProposal, mercatorProposalVersion, subresources]));
+                var item = new itemClass({preliminaryNames: this.adhPreliminaryNames});
+                item.parent = mercatorProposal.path;
+                item.data[SIName.nick] = new SIName.Sheet({
+                    name: AdhUtil.normalizeName(subresourceKey)
+                });
+
+                var version = new versionClass({preliminaryNames: this.adhPreliminaryNames});
+                version.parent = item.path;
+                version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                    follows: [item.first_version_path]
+                });
+
+                this.fill(data, version);
+                mercatorProposalVersion.data[SIMercatorSubResources.nick][subresourceKey] = version.path;
+
+                return [item, version];
+            });
+
+            return this.$q.when(_.flatten([mercatorProposal, mercatorProposalVersion, subresources]));
         };
 
         if (this.flow.support && data.imageUpload.files.length > 0) {
