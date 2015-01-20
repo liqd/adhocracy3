@@ -56,10 +56,10 @@ export class ProposalDetail {
             },
             controller: ["adhHttp", "adhWebSocket", "$scope", (
                 adhHttp : AdhHttp.Service<any>,
-                adhWebSocket : AdhWebSocket.IService,
+                adhWebSocket : AdhWebSocket.Service,
                 $scope : DetailScope<RIProposal>
             ) => {
-                var wsHandle : string;
+                var wsHandle : number;
 
                 var fetchAndUpdateContent = (itemPath : string) : void => {
                     adhHttp.getNewestVersionPathNoFork(itemPath)

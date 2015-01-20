@@ -4,99 +4,112 @@ import AdhConfig = require("../Config/Config");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 
 
+var config: AdhConfig.IService = <any>{
+    pkg_path: "mock",
+    rest_url: "mock",
+    rest_platform_path: "mock",
+    ws_url: "mock",
+    embedded: false,
+    trusted_domains: []
+};
+
 export var register = () => {
-    // FIXME: This should be ``describe("WebSocket")`` and should be wrapped in a
-    // ``describe("Services")`` to mirror the module structure. This is not
-    // currently possible because the script that generates AdhocracySpec.ts
-    // includes all *Spec.ts modules.
-
     describe("WebSocket", () => {
-        var config: AdhConfig.IService = <any>{
-            pkg_path: "mock",
-            rest_url: "mock",
-            rest_platform_path: "mock",
-            ws_url: "mock",
-            embedded: false,
-            trusted_domains: []
-        };
+        describe("Service", () => {
+            var service;
+            var adhEventHandlerClassMock;
+            var adhEventHandlerMock;
+            var adhRawWebSocketMock;
 
-        // constructor for a mock raw web socket that leaks the
-        // constructee for inspection.
-        var wsRaw: any;
-        var constructRawWebSocket = (uri: string): AdhWebSocket.IRawWebSocket => {
-            wsRaw = <any>jasmine.createSpyObj("RawWebSocketMock", ["send", "onmessage", "onerror", "onopen", "onclose"]);
-            return wsRaw;
-        };
-        var ws;
+            beforeEach(() => {
+                adhEventHandlerClassMock = function() {
+                    this.on = jasmine.createSpy("adhEventHandler.on");
+                    this.off = jasmine.createSpy("adhEventHandler.off");
+                    this.trigger = jasmine.createSpy("adhEventHandler.trigger");
+                    adhEventHandlerMock = this;
+                };
+                adhRawWebSocketMock = jasmine.createSpyObj("adhRawWebSocketFactory", ["send"]);
 
-        beforeEach(() => {
-            ws = AdhWebSocket.factoryIService(config, constructRawWebSocket);
-        });
+                service = new AdhWebSocket.Service(config, adhEventHandlerClassMock, () => adhRawWebSocketMock);
+            });
 
-        it("does not initially call the send method of web socket", () => {
-            expect(wsRaw.send.calls.any()).toEqual(false);
-        });
+            it("calls the send method of web socket on every register to different resources", () => {
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(0);
+                service.register("/adhocracy", () => null);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(1);
+                service.register("/adhocracy/somethingelse", () => null);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(2);
+            });
 
-        it("returns '0' as callback handle on first registration", () => {
-            expect(ws.register("/adhocracy", () => null)).toEqual("0");
-        });
+            it("sends only one subscription for multiple registrations to same resource", () => {
+                var resource = "/adhocracy/sidty";
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(0);
+                service.register(resource, () => null);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(1);
+                service.register(resource, () => null);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(1);
+            });
 
-        it("returns '1' as callback handle on second registration", () => {
-            ws.register("/adhocracy", () => null);
-            expect(ws.register("/adhocracy/somethingelse", () => null)).toEqual("1");
-        });
+            it("sends an unsubscription if all registrations have been unregistered", () => {
+                var resource = "/adhocracy/sidty";
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(0);
+                var id1 = service.register(resource, () => null);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(1);
+                var id2 = service.register(resource, () => null);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(1);
+                service.unregister(resource, id1);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(1);
+                service.unregister(resource, id2);
+                expect(adhRawWebSocketMock.send.calls.count()).toEqual(2);
+            });
 
-        it("calls the send method of web socket on every register to different resources", () => {
-            expect(wsRaw.send.calls.count()).toEqual(0);
-            ws.register("/adhocracy", () => null);
-            expect(wsRaw.send.calls.count()).toEqual(1);
-            ws.register("/adhocracy/somethingelse", () => null);
-            expect(wsRaw.send.calls.count()).toEqual(2);
-        });
+            it("throws on unregistration of a not-subscribed resource", () => {
+                console.log((<any>service).registrations);
+                expect(() => service.unregister("/adhocracy/somethingelse", 0)).toThrow();
+            });
 
-        it("sends only one subscription for multiple registrations to same resource", () => {
-            var resource = "/adhocracy/sidty";
-            ws.register(resource, () => null);
-            ws.register(resource, () => null);
-            expect(wsRaw.send.calls.count()).toEqual(1);
-            ws.register(resource, () => null);
-            expect(wsRaw.send.calls.count()).toEqual(1);
-        });
+            it("calls eventHandler.trigger on event", () => {
+                var resource = "/adhocracy/sidty";
+                var msg = {
+                    resource: resource,
+                    event: "new_child",
+                    child: resource + "/fiyudt8y"
+                };
 
-        it("calls callbacks only between being registered and being unregistered", () => {
-            // register spy object as callback
-            var cb = {
-                cb: (event) => null
-            };
-            (<any>spyOn(cb, "cb")).and.callThrough();
-            var handle: string = ws.register("/adhocracy/somethingactive", cb.cb);
+                adhRawWebSocketMock.onmessage({
+                    data: JSON.stringify(msg)
+                });
+                expect(adhEventHandlerMock.trigger).toHaveBeenCalledWith(resource, msg);
+            });
 
-            expect((<any>cb.cb).calls.count()).toEqual(0);
+            it("throws an exception on error", () => {
+                expect(() => adhRawWebSocketMock.onmessage({
+                    data: JSON.stringify({
+                        error: "some_error"
+                    })
+                })).toThrow();
 
-            // trigger event
-            wsRaw.onmessage({ data: JSON.stringify({
-                resource: "/adhocracy/somethingactive",
-                event: "new_child",
-                child: "/adhocracy/somethingactive/fiyudt8y"
-            }, null, 2)});
+                expect(() => adhRawWebSocketMock.onmessage({
+                    data: JSON.stringify({
+                        error: "unknown_action"
+                    })
+                })).toThrow();
 
-            expect((<any>cb.cb).calls.count()).toEqual(1);
+                expect(adhEventHandlerMock.trigger).not.toHaveBeenCalled();
+            });
 
-            // unregister callback
-            ws.unregister("/adhocracy/somethingactive", handle);
+            it("resends all subscriptions on WebSocket open", () => {
+                var id1 = service.register("resource1", () => null);
+                service.unregister("resource1", id1);
+                service.register("resource2", () => null);
+                service.register("resource2", () => null);
 
-            // trigger another event
-            wsRaw.onmessage({ data: JSON.stringify({
-                resource: "/adhocracy/somethingactive",
-                event: "new_child",
-                child: "/adhocracy/somethingactive/q2u7"
-            }, null, 2)});
+                var calls = adhRawWebSocketMock.send.calls.count();
 
-            expect((<any>cb.cb).calls.count()).toEqual(1);
-        });
+                adhRawWebSocketMock.onopen();
 
-        it("throws an exception on un-registration of a non-existing handle", () => {
-            expect(() => ws.unregister("/adhocracy/somethingelse", "81")).toThrow();
+                expect(adhRawWebSocketMock.send.calls.count()).toBe(calls + 1);
+            });
         });
     });
 };
