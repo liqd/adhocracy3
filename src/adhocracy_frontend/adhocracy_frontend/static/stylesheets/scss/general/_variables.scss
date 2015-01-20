@@ -1,24 +1,31 @@
 /* documentation is in variables_doc */
 
+// Text colors
 $color-text-normal: #575756;
+$color-text-introvert: #808080;
 $color-text-extrovert: #1c1c1b;
-$color-text-introvert: #4d4d4d;
+$color-text-highlight-normal: #26a9e0;
+$color-text-highlight-introvert: #808080;
 $color-text-highlight-extrovert: #333;
-$color-text-introvert: #e6e6e6;
-$color-text-highlight-normal: #00aae5;
-$color-text-highlight-introvert: #3eb7ea;
-$color-text-highlight-introvert: #0088b9;
 $color-text-inverted: white;
+
+// Function colors
 $color-function-valid: #2eac66;
 $color-function-invalid: #e6332a;
+
+// Background colors
 $color-background-base: white;
-$color-structure-introvert: #dadad9;
-$color-background-base-introvert: #f5f5f5;
+$color-background-base-introvert: #f2f2f2;
+
+// Structure colors
+$color-structure-normal: #e6e6e6;
+$color-structure-introvert: #ccc;
+$color-structure-extrovert: #999;
 $color-structure-border: #9d9c9c;
-$color-structure-normal: #dadad9;
-$color-structure-extrovert: #575756;
-$color-brand-three-normal: #ce128b;
+
+//Brand colors
 $color-brand-one-normal: #fcb813;
+$color-brand-three-normal: #ce128b;
 
 $font-family-normal: "Lato", sans-serif;
 $font-weight-introvert: 400;
