@@ -63,6 +63,17 @@ export var register = () => {
                 expect(delay).toBe(5000);
             });
 
+            it("uses scope.format to format the datetime if provided", () => {
+                var format = "format";
+                var result = "result";
+                scopeMock.format = format;
+                dtMock.format.and.returnValue(result);
+                directive.link(scopeMock);
+                scopeMock.$watch.calls.mostRecent().args[1](scopeMock.datetime);
+                expect(dtMock.format).toHaveBeenCalledWith(format);
+                expect(scopeMock.text).toBe(result);
+            });
+
             it("sets moment locale", () => {
                 directive.link(scopeMock);
                 expect(momentMock.locale).toHaveBeenCalledWith(configMock.locale);
