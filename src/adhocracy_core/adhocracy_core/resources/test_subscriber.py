@@ -503,7 +503,8 @@ class TestMetadataModifiedSubscriber:
         assert (registry_with_changelog._transaction_changelog['/'].visibility
                 is VisibilityChange.revealed)
 
-    def test_no_change(self, context, registry_with_changelog, request, mock_reindex):
+    def test_no_change_invisible(self, context, registry_with_changelog,
+                                 request, mock_reindex):
         from adhocracy_core.events import ResourceSheetModified
         from adhocracy_core.interfaces import VisibilityChange
         from adhocracy_core.resources.subscriber import metadata_modified_subscriber
@@ -523,6 +524,28 @@ class TestMetadataModifiedSubscriber:
         assert not mock_reindex.called
         assert (registry_with_changelog._transaction_changelog['/'].visibility
                 is VisibilityChange.invisible)
+
+    def test_no_change_visible(self, context, registry_with_changelog, request,
+                               mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.interfaces import VisibilityChange
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        old_appstruct = {'deleted': False, 'hidden': False}
+        new_appstruct = {'deleted': False, 'hidden': False}
+        request.has_permission = Mock(return_value=True)
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry_with_changelog,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=request)
+        metadata_modified_subscriber(event)
+        assert context.deleted is False
+        assert context.hidden is False
+        assert not mock_reindex.called
+        assert (registry_with_changelog._transaction_changelog['/'].visibility
+                is VisibilityChange.visible)
 
     def test_hiding_requires_permission(self, context, registry_with_changelog,
                                         request, mock_reindex):
