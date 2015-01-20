@@ -62,6 +62,20 @@ def resource_modified_metadata_subscriber(event):
               omit_readonly=False)
 
 
+@colander.deferred
+def deferred_validate_hidden(node, kw):
+    """Check hide_permission."""
+    context = kw['context']
+    request = kw.get('request', None)
+    if request is None:
+        return
+
+    def check_hide_permisison(node, cstruct):
+        if not request.has_permission('hide_resource', context):
+            raise colander.Invalid(node, 'Changing this field is not allowed')
+    return check_hide_permisison
+
+
 class MetadataSchema(colander.MappingSchema):
 
     """Metadata sheet data structure.
@@ -91,7 +105,7 @@ class MetadataSchema(colander.MappingSchema):
     modified_by = Reference(reftype=MetadataModifiedByReference, readonly=True)
     modification_date = DateTime(missing=colander.drop, readonly=True)
     deleted = Boolean()
-    hidden = Boolean()
+    hidden = Boolean(validator=deferred_validate_hidden)
 
 
 metadata_metadata = sheet_metadata_defaults._replace(

@@ -1,6 +1,8 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
+from unittest.mock import Mock
 
 
 @fixture
@@ -32,6 +34,10 @@ class TestResourceModifiedMetadataSubscriber:
 
 class TestIMetadataSchema:
 
+    @fixture
+    def request(self):
+        return testing.DummyRequest()
+
     def _make_one(self, **kwargs):
         from adhocracy_core.sheets.metadata import MetadataSchema
         return MetadataSchema(**kwargs)
@@ -53,14 +59,30 @@ class TestIMetadataSchema:
         assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
-    def test_serialize_empty_and_bind(self):
+    def test_serialize_empty_and_bind(self, context):
         from datetime import datetime
-        inst = self._make_one().bind()
+        inst = self._make_one().bind(context=context)
         result = inst.serialize({})
         this_year = str(datetime.now().year)
         assert this_year in result['creation_date']
         assert this_year in result['item_creation_date']
         assert this_year in result['modification_date']
+
+    def test_deserialize_hiding_requires_permission(self, context, request):
+        import colander
+        inst = self._make_one().bind(context=context, request=request)
+        request.has_permission = Mock(return_value=False)
+        with raises(colander.Invalid):
+            inst.deserialize({'hidden': False})
+        request.has_permission = Mock(return_value=True)
+        result = inst.deserialize({'hidden': False})
+        assert result['hidden'] is False
+
+    def test_deserialize_delete_doesnt_require_permission(self, context, request):
+        inst = self._make_one().bind(context=context, request=request)
+        request.has_permission = Mock(return_value=True)
+        result = inst.deserialize({'deleted': False})
+        assert result['deleted'] is False
 
 
 class TestMetadataSheet:
