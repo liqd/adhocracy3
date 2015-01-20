@@ -191,7 +191,7 @@ States:
         text-decoration: none;
 
         &:hover, &:focus {
-            color: $color-secondary-normal;
+            color: $color-text-highlight-extrovert;
         }
 
         &:active, &.is-active {
@@ -226,7 +226,7 @@ States:
         }
 
         &:active {
-            color: $color-secondary-normal;
+            color: $color-text-highlight-extrovert;
         }
 
         .moving-column-menu-nav-icon {
