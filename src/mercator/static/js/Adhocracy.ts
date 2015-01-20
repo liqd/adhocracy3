@@ -115,6 +115,9 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 resourceUrl: "/mercator/"
             });
     }]);
+    app.config(["$compileProvider", ($compileProvider) => {
+        $compileProvider.debugInfoEnabled(false);
+    }]);
     app.config(["$locationProvider", ($locationProvider) => {
         // Make sure HTML5 history API works.  (If support for older
         // browsers is required, we may have to study angular support
