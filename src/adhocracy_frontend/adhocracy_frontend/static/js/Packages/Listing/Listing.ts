@@ -64,7 +64,7 @@ export interface ListingScope<Container> extends ng.IScope {
     createPath? : string;
     elements : string[];
     update : () => ng.IPromise<void>;
-    wshandle : string;
+    wshandle : number;
     clear : () => void;
     onCreate : () => void;
 }
@@ -85,7 +85,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
     constructor(private containerAdapter : IListingContainerAdapter) {}
 
-    public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.IService) {
+    public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.Service) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
