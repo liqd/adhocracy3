@@ -73,12 +73,14 @@ class TestMetadataSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.sheets.metadata import MetadataSchema
+        from . import AttributeStorageSheet
         inst = meta.sheet_class(meta, context)
         assert inst.meta.isheet == IMetadata
         assert inst.meta.schema_class == MetadataSchema
         assert inst.meta.editable is True
         assert inst.meta.creatable is True
         assert inst.meta.readable is True
+        assert inst.meta.sheet_class is AttributeStorageSheet
 
 
 def test_index_creator_creator_exists(context, mock_metadata_sheet):

@@ -228,12 +228,6 @@ def metadata_modified_subscriber(event):
                                        'hidden',
                                        'Changing this field is not allowed')
 
-    # Store hidden/deleted status in object for efficient access
-    # FIXME a better place to do attribute storage is inside a custom metadata
-    # sheet class or just use AttributeStorageSheet sheet class.
-    event.object.deleted = is_deleted
-    event.object.hidden = is_hidden
-
     if (was_hidden != is_hidden) or (was_deleted != is_deleted):
         _reindex_resource_and_descendants(event.object)
 
