@@ -19,4 +19,5 @@ export interface IService {
     custom : {[key : string]: string};
     site_name : string;
     cachebust : boolean;
+    debug : boolean;
 }

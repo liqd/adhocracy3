@@ -103,7 +103,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
             });
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
-        $compileProvider.debugInfoEnabled(false);
+        $compileProvider.debugInfoEnabled(config.debug);
     }]);
     app.config(["$locationProvider", ($locationProvider) => {
         // Make sure HTML5 history API works.  (If support for older
