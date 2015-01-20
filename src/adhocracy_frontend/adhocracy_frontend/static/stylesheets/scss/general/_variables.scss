@@ -1,7 +1,7 @@
 /* documentation is in variables_doc */
 
 $color-text-normal: #575756;
-$color-prime-extrovert: #1c1c1b;
+$color-text-extrovert: #1c1c1b;
 $color-text-introvert: #4d4d4d;
 $color-text-highlight-extrovert: #333;
 $color-secondary-introvert: #e6e6e6;
@@ -88,7 +88,7 @@ $padding-medium: 1em;
         font-size: $font-size-large;
         @include font-tracking(narrow);
         line-height: 1.2;
-        color: $color-prime-extrovert;
+        color: $color-text-extrovert;
     } @else if $value == meta {
         font-family: $font-family-normal;
         font-weight: $font-weight-normal;

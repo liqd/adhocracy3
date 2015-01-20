@@ -97,7 +97,7 @@ category: Variables
 }
 
 .color-prime-normal {background-color: $color-text-normal;}
-.color-prime-extrovert {background-color: $color-prime-extrovert;}
+.color-prime-extrovert {background-color: $color-text-extrovert;}
 .color-secondary-extrovert {background-color: $color-text-introvert;}
 .color-secondary-introvert {background-color: $color-secondary-introvert;}
 .color-highlight-normal {background-color: $color-text-highlight-normal;}
@@ -116,8 +116,8 @@ category: Variables
 // some static contrast checks for a11y
 @include check-contrast($color-text-normal, $color-background-base);
 @include check-contrast($color-text-normal, $color-structure-introvert);
-@include check-contrast($color-prime-extrovert, $color-background-base);
-@include check-contrast($color-prime-extrovert, $color-structure-introvert);
+@include check-contrast($color-text-extrovert, $color-background-base);
+@include check-contrast($color-text-extrovert, $color-structure-introvert);
 @include check-contrast($color-text-highlight-normal, $color-text-inverted);
 @include check-contrast($color-text-highlight-normal, $color-background-base);
 @include check-contrast($color-text-highlight-normal, $color-structure-introvert);
