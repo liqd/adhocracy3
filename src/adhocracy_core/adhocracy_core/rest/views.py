@@ -1025,7 +1025,7 @@ class ReportAbuseView(RESTView):
 
 
 @view_defaults(
-    renderer='string',
+    renderer='simplejson',
     context=IRootPool,
     http_cache=0,
     name='message_user',
