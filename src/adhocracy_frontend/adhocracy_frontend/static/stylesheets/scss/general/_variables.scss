@@ -2,7 +2,7 @@
 
 $color-text-normal: #575756;
 $color-prime-extrovert: #1c1c1b;
-$color-secondary-extrovert: #4d4d4d;
+$color-text-introvert: #4d4d4d;
 $color-secondary-normal: #333;
 $color-secondary-introvert: #e6e6e6;
 $color-highlight-normal: #00aae5;
@@ -74,14 +74,14 @@ $padding-medium: 1em;
         font-size: $font-size-small;
         @include font-tracking(narrow);
         line-height: 1.5;
-        color: $color-secondary-extrovert;
+        color: $color-text-introvert;
     } @else if $value == introvert {
         font-family: $font-family-normal;
         font-weight: $font-weight-introvert;
         font-size: $font-size-normal;
         @include font-tracking(narrow);
         line-height: 1.2;
-        color: $color-secondary-extrovert;
+        color: $color-text-introvert;
     } @else if $value == header {
         font-family: $font-family-normal;
         font-weight: $font-weight-normal;
@@ -95,7 +95,7 @@ $padding-medium: 1em;
         font-size: $font-size-small;
         @include font-tracking(normal);
         line-height: 1.2;
-        color: $color-secondary-extrovert;
+        color: $color-text-introvert;
         text-transform: uppercase;
     } @else {
         @warn "no such text-style: #{$value}";

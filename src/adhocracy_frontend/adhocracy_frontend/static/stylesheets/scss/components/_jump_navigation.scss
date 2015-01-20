@@ -30,7 +30,7 @@ A navigation list containing hash tag links
     z-index: 1;
 
     &, a {
-        color: $color-secondary-extrovert;
+        color: $color-text-introvert;
     }
 
     ul, ol {
@@ -46,7 +46,7 @@ A navigation list containing hash tag links
         padding: 0 0.5em;
 
         &, a {
-            color: $color-secondary-extrovert;
+            color: $color-text-introvert;
         }
 
         a {

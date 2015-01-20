@@ -97,7 +97,7 @@ input[type="button"] {
     &:disabled,
     &.is-disabled,
     &.ng-disabled {
-        @include button-color($color-secondary-extrovert, $color-structure-surface);
+        @include button-color($color-text-introvert, $color-structure-surface);
         cursor: default;
     }
 }

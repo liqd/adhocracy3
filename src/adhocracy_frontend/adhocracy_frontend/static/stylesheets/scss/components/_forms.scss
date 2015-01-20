@@ -103,7 +103,7 @@ textarea {
 
     @include placeholder {
         @include opacity(1);
-        color: $color-secondary-extrovert;
+        color: $color-text-introvert;
     }
 
     &.m-title {
