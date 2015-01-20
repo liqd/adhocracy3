@@ -141,7 +141,7 @@ The menu should always have the same state as its columns.
     overflow-y: auto;
 
     // look
-    border: 0 solid $color-secondary-introvert;
+    border: 0 solid $color-text-basic-introvert;
     border-width: 0 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
 }
@@ -175,7 +175,7 @@ States:
 */
 .moving-column-menu {
     @include clearfix;
-    background: $color-secondary-introvert;
+    background: $color-text-basic-introvert;
     font-size: $font-size-small;
     height: $moving-column-menu-height * ($font-size-normal / $font-size-small);
     line-height: $moving-column-menu-height * ($font-size-normal / $font-size-small) / 1em;
