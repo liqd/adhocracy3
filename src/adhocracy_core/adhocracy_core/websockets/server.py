@@ -89,10 +89,11 @@ class ClientTracker():
 
     def delete_subscriptions_to_resource(self, resource: IResource):
         """Delete all subscriptions to a resource."""
-        client_set = self._resource_paths2clients.pop(resource, set())
+        path = resource_path(resource)
+        client_set = self._resource_paths2clients.pop(path, set())
         for client in client_set:
             self._discard_from_set_valued_dict(self._clients2resource_paths,
-                                               client, resource)
+                                               client, path)
 
     def iterate_subscribers(self, resource: IResource) -> Iterable:
         """Return an iterator over all clients subscribed to a resource."""
