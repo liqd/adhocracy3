@@ -106,20 +106,20 @@ category: Variables
 .color-highlight-reverse {background-color: $color-text-inverted;}
 .color-highlight-valid {background-color: $color-function-valid;}
 .color-highlight-invalid {background-color: $color-function-invalid;}
-.color-background {background-color: $color-background;}
+.color-background {background-color: $color-background-base;}
 .color-structure-surface {background-color: $color-structure-introvert;}
-.color-structure-active {background-color: $color-structure-active;}
+.color-structure-active {background-color: $color-background-base-introvert;}
 .color-structure-border {background-color: $color-structure-border;}
 .color-structure-border-introvert {background-color: $color-structure-normal;}
 .color-structure-border-extrovert {background-color: $color-structure-extrovert;}
 
 // some static contrast checks for a11y
-@include check-contrast($color-text-normal, $color-background);
+@include check-contrast($color-text-normal, $color-background-base);
 @include check-contrast($color-text-normal, $color-structure-introvert);
-@include check-contrast($color-prime-extrovert, $color-background);
+@include check-contrast($color-prime-extrovert, $color-background-base);
 @include check-contrast($color-prime-extrovert, $color-structure-introvert);
 @include check-contrast($color-text-highlight-normal, $color-text-inverted);
-@include check-contrast($color-text-highlight-normal, $color-background);
+@include check-contrast($color-text-highlight-normal, $color-background-base);
 @include check-contrast($color-text-highlight-normal, $color-structure-introvert);
 
 

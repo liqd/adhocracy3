@@ -28,7 +28,7 @@ selected. If no proposal is selected, no state is applied.
         width: 100% * 1 / 0.6289;
 
         .annotated-section-annotation {
-            background-color: $color-structure-active;
+            background-color: $color-background-base-introvert;
         }
     }
 }
@@ -80,7 +80,7 @@ selected. If no proposal is selected, no state is applied.
     padding: 1px 1px 0;
 
     li {
-        background: $color-structure-active;
+        background: $color-background-base-introvert;
         line-height: 2;
         margin-bottom: 1px;
 
@@ -195,7 +195,7 @@ selected. If no proposal is selected, no state is applied.
 }
 
 .mercator-proposal-detail-container {
-    background-color: $color-structure-active;
+    background-color: $color-background-base-introvert;
     clear: left;
     overflow: hidden;
 }
@@ -250,7 +250,7 @@ $mercator-proposal-detail-nav-width: 3.3%;
     }
 
     &.is-not-selected {
-        background: $color-structure-active;
+        background: $color-background-base-introvert;
 
         i[class*=icon-],
         .mercator-propsal-list-item-meta-item-budget {

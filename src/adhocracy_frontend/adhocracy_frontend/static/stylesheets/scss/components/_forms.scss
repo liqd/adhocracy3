@@ -99,7 +99,7 @@ textarea {
     padding: 0.25em $font-size-normal;
     border: 1px solid $color-structure-border;
     color: $color-text-normal;
-    background-color: $color-background;
+    background-color: $color-background-base;
 
     @include placeholder {
         @include opacity(1);
