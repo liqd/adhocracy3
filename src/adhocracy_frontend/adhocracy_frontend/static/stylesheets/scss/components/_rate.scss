@@ -86,7 +86,7 @@ rate-difference has the is-positive state. Can be is-negative.
 
     .rate-difference {
         &.is-positive {
-            color: $color-highlight-valid;
+            color: $color-function-valid;
         }
 
         &.is-negative {
