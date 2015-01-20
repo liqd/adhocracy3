@@ -1,29 +1,34 @@
-// Text colors
-$color-text-normal: #575756;
+//brand colors
+$color-brand-one-normal: #fcb813;
+$color-brand-one-extrovert: #231f20;
+$color-brand-two-normal: #00aae5;
+$color-brand-two-introvert: #0097d5;
+$color-brand-two-extrovert: #89c5ec;
+$color-brand-three-normal: #ce128b;
+$color-brand-four-normal: #73bf44;
+
+// text colors
+$color-text-normal: #333;
 $color-text-introvert: #808080;
 $color-text-extrovert: #1c1c1b;
-$color-text-highlight-normal: #26a9e0;
+$color-text-highlight-normal: $color-brand-two-normal;
 $color-text-highlight-introvert: #808080;
 $color-text-highlight-extrovert: #333;
 $color-text-inverted: white;
 
-// Function colors
-$color-function-valid: #2eac66;
-$color-function-invalid: #e6332a;
+// function colors
+$color-function-valid: $color-brand-four-normal;
+$color-function-invalid: #f00;
 
-// Background colors
+// background colors
 $color-background-base: white;
 $color-background-base-introvert: #f2f2f2;
 
-// Structure colors
+// structure colors
 $color-structure-normal: #e6e6e6;
 $color-structure-introvert: #ccc;
 $color-structure-extrovert: #999;
 $color-structure-border: #9d9c9c;
-
-//Brand colors
-$color-brand-one-normal: #fcb813;
-$color-brand-three-normal: #ce128b;
 
 $font-size-small: 12px;
 $font-size-normal: 14px;
