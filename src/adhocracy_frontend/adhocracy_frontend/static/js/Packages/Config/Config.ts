@@ -18,4 +18,5 @@ export interface IService {
     support_email : string;
     custom : {[key : string]: string};
     site_name : string;
+    cachebust : boolean;
 }
