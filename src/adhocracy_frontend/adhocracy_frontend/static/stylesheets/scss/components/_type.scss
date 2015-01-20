@@ -76,7 +76,7 @@ a {
     &.is-hover,
     &:focus,
     &.has-focus {
-        color: $color-highlight-introvert;
+        color: $color-text-highlight-introvert;
     }
 }
 
@@ -99,7 +99,7 @@ A call-to-action link
     text-transform: uppercase;
 
     &:hover, &:focus {
-        color: $color-highlight-introvert;
+        color: $color-text-highlight-introvert;
     }
 
     &.m-add:before {
