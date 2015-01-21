@@ -40,6 +40,7 @@ def config_view(request):
                         for k in custom_keys}
     config['site_name'] = settings.get('adhocracy.frontend.site_name',
                                        'Adhocracy')
+    config['debug'] = asbool(settings.get('adhocracy.frontend.debug', 'false'))
 
     config['cachebust'] = asbool(settings.get('cachebust.enabled', 'false'))
     return config

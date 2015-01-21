@@ -241,11 +241,20 @@ class TestVisibility:
         child.hidden = False
         assert is_hidden(child) is True
 
-    def test_view_blocked_by_metadata_no_metadata(self, registry):
+    def test_view_blocked_by_metadata_not_blocked_and_no_metadata(self,
+                                                                  registry):
         from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource = testing.DummyResource(__provides__=IResource)
         assert view_blocked_by_metadata(resource, registry) is None
+
+    def test_view_blocked_by_metadata_blocked_but_no_metadata(self, registry):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        resource = testing.DummyResource(__provides__=IResource)
+        resource.hidden = True
+        assert view_blocked_by_metadata(resource, registry) == {'reason':
+                                                                'hidden'}
 
     def test_view_blocked_by_metadata_not_blocked(self, resource_with_metadata,
                                                   registry):
@@ -261,14 +270,14 @@ class TestVisibility:
         assert result['reason'] == 'deleted'
 
     def test_view_blocked_by_metadata_hidden(self, resource_with_metadata,
-                                              registry):
+                                             registry):
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource_with_metadata.hidden = True
         result = view_blocked_by_metadata(resource_with_metadata, registry)
         assert result['reason'] == 'hidden'
 
     def test_view_blocked_by_metadata_both(self, resource_with_metadata,
-                                              registry):
+                                           registry):
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource_with_metadata.deleted = True
         resource_with_metadata.hidden = True

@@ -135,13 +135,18 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
                                         'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_subscribe_item_version(self):
+        # Subscribing ItemVersions used to be forbidden, but it's now allowed.
         from adhocracy_core.interfaces import IItemVersion
         alsoProvides(self._child, IItemVersion)
-        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
+        msg = build_message(
+            {'action': 'subscribe',
+             'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
-        assert self._comm.queue[0] == {'error': 'subscribe_not_supported',
-                                       'details': self.request.application_url + '/child/'}
+        assert self._comm.queue[0] == {
+            'status': 'ok',
+            'action': 'subscribe',
+            'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_with_binary_message(self):
         self._comm.onMessage(b'DEADBEEF', True)
@@ -217,10 +222,11 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert self._comm.queue[0] == {'error': 'unknown_resource', 'details': 7}
 
     def test_send_modified_notification(self):
-        self._comm.send_modified_notification(self._child)
+        self._comm.send_notification(self._child, 'modified')
         assert len(self._comm.queue) == 1
-        assert self._comm.queue[0] == {'event': 'modified',
-                                       'resource': self.request.application_url + '/child/'}
+        assert self._comm.queue[0] == {
+            'event': 'modified',
+            'resource': self.request.application_url + '/child/'}
 
     def test_send_child_notification(self):
         child = self._child
@@ -323,14 +329,33 @@ class EventDispatchUnitTests(unittest.TestCase):
                                               'resource': self.request.application_url + '/child/',
                                               'child': self.request.application_url + '/child/grandchild/'}
 
-    def test_dispatch_deleted_notification(self):
-        msg = build_message({'event': 'deleted',
+    def test_dispatch_removed_notification_removed_child(self):
+        msg = build_message({'event': 'removed',
                              'resource': '/child/grandchild'})
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
-        assert self._subscriber.queue[-1] == {'event': 'removed_child',
-                                              'resource': self.request.application_url + '/child/',
-                                              'child': self.request.application_url + '/child/grandchild/'}
+        assert self._subscriber.queue[-1] == {
+            'event': 'removed_child',
+            'resource': self.request.application_url + '/child/',
+            'child': self.request.application_url + '/child/grandchild/'}
+
+    def test_dispatch_removed_notification_removed_resource(self):
+        msg = build_message({'event': 'removed',
+                             'resource': '/child'})
+        self._dispatcher.onMessage(msg, False)
+        assert len(self._dispatcher.queue) == 0
+        assert self._subscriber.queue[-1] == {
+            'event': 'removed',
+            'resource': self.request.application_url + '/child/'}
+
+    def test_dispatch_changed_descendant_notification(self):
+        msg = build_message({'event': 'changed_descendant',
+                             'resource': '/child'})
+        self._dispatcher.onMessage(msg, False)
+        assert len(self._dispatcher.queue) == 0
+        assert self._subscriber.queue[-1] == {
+            'event': 'changed_descendant',
+            'resource': self.request.application_url + '/child/'}
 
     def test_dispatch_invalid_event_notification(self):
         msg = build_message({'event': 'new_child',
@@ -352,6 +377,10 @@ class ClientTrackerUnitTests(unittest.TestCase):
         app_root['child'] = testing.DummyResource()
         self._child = app_root['child']
         self._tracker = ClientTracker()
+
+    def _make_child2(self):
+        result = self._child.__parent__['child2'] = testing.DummyResource()
+        return result
 
     def test_subscribe(self):
         client = self._make_client()
@@ -375,14 +404,15 @@ class ClientTrackerUnitTests(unittest.TestCase):
         """Test client subscribing to two resources."""
         client = self._make_client()
         resource1 = self._child
-        resource2 = self._child.__parent__['child2'] = testing.DummyResource()
+        resource2 = self._make_child2()
         result1 = self._tracker.subscribe(client, resource1)
         result2 = self._tracker.subscribe(client, resource2)
         assert result1 is True
         assert result2 is True
         assert len(self._tracker._clients2resource_paths) == 1
         assert len(self._tracker._resource_paths2clients) == 2
-        assert self._tracker._clients2resource_paths[client] == {'/child', '/child2'}
+        assert self._tracker._clients2resource_paths[client] == {'/child',
+                                                                 '/child2'}
         assert self._tracker._resource_paths2clients['/child'] == {client}
         assert self._tracker._resource_paths2clients['/child2'] == {client}
 
@@ -419,25 +449,25 @@ class ClientTrackerUnitTests(unittest.TestCase):
         result = self._tracker.unsubscribe(client, resource)
         assert result is False
 
-    def test_delete_all_subscriptions_empty(self):
+    def test_delete_subscriptions_for_client_empty(self):
         """Test deleting all subscriptions for a client that has none."""
         client = self._make_client()
-        self._tracker.delete_all_subscriptions(client)
+        self._tracker.delete_subscriptions_for_client(client)
         assert len(self._tracker._clients2resource_paths) == 0
         assert len(self._tracker._resource_paths2clients) == 0
 
-    def test_delete_all_subscriptions_two_resource(self):
+    def test_delete_subscriptions_for_client_two_resources(self):
         """Test deleting all subscriptions for a client that has two."""
         client = self._make_client()
         resource1 = self._child
-        resource2 = self._child
+        resource2 = self._make_child2()
         self._tracker.subscribe(client, resource1)
         self._tracker.subscribe(client, resource2)
-        self._tracker.delete_all_subscriptions(client)
+        self._tracker.delete_subscriptions_for_client(client)
         assert len(self._tracker._clients2resource_paths) == 0
         assert len(self._tracker._resource_paths2clients) == 0
 
-    def test_delete_all_subscriptions_two_clients(self):
+    def test_delete_subscriptions_for_client_two_clients(self):
         """Test deleting all subscriptions for one client subscribed to the
         same resource as another one.
         """
@@ -446,12 +476,47 @@ class ClientTrackerUnitTests(unittest.TestCase):
         resource = self._child
         self._tracker.subscribe(client1, resource)
         self._tracker.subscribe(client2, resource)
-        self._tracker.delete_all_subscriptions(client1)
+        self._tracker.delete_subscriptions_for_client(client1)
         assert len(self._tracker._clients2resource_paths) == 1
         assert len(self._tracker._resource_paths2clients) == 1
         assert self._tracker._clients2resource_paths[client2] == {'/child'}
         assert self._tracker._resource_paths2clients['/child'] == {client2}
         assert client1 not in self._tracker._clients2resource_paths
+
+    def test_delete_subscriptions_to_resource_empty(self):
+        """Test deleting all subscriptions to a resource that has none."""
+        resource = self._child
+        self._tracker.delete_subscriptions_to_resource(resource)
+        assert len(self._tracker._clients2resource_paths) == 0
+        assert len(self._tracker._resource_paths2clients) == 0
+
+    def test_delete_subscriptions_to_resource_two_clients(self):
+        """Test deleting all subscriptions to a resource that has two."""
+        client1 = self._make_client()
+        client2 = self._make_client()
+        resource = self._child
+        assert len(self._tracker._clients2resource_paths) == 0
+        assert len(self._tracker._resource_paths2clients) == 0
+        self._tracker.subscribe(client1, resource)
+        self._tracker.subscribe(client2, resource)
+        self._tracker.delete_subscriptions_to_resource(resource)
+        assert len(self._tracker._clients2resource_paths) == 0
+        assert len(self._tracker._resource_paths2clients) == 0
+
+    def test_delete_subscriptions_to_resource_two_resources(self):
+        """Test deleting all subscriptions to a resource if the client has
+        multiple subscriptions.
+        """
+        client = self._make_client()
+        resource1 = self._child
+        resource2 = self._make_child2()
+        self._tracker.subscribe(client, resource1)
+        self._tracker.subscribe(client, resource2)
+        self._tracker.delete_subscriptions_to_resource(resource1)
+        assert len(self._tracker._clients2resource_paths) == 1
+        assert len(self._tracker._resource_paths2clients) == 1
+        assert self._tracker._clients2resource_paths[client] == {'/child2'}
+        assert self._tracker._resource_paths2clients['/child2'] == {client}
 
     def test_iterate_subscribers_empty(self):
         """Test iterating subscribers for a resource that has none."""

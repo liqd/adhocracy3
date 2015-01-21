@@ -86,8 +86,6 @@ ERROR_CODE will be one of the following:
   the expected information (for example, if it's a JSON array instead of a JSON
   object or if "action" or "resource" keys are missing or their values aren't
   strings). DETAILS contains a short description of the problem.
-* "subscribe_not_supported" if the client tried to subscribe to an ItemVersion.
-  DETAILS contains the path of resource that doesn't allow subscriptions.
 * "internal_error" if an internal error occurred at the server. DETAILS
   contains a short description of the problem. In an ideal world,
   this will never happen.
@@ -112,11 +110,24 @@ that has been subscribed.
 
         { "event": "modified", "resource": "RESOURCE_PATH" }
 
+  * If the Simple has been removed::
+
+        { "event": "removed", "resource": "RESOURCE_PATH" }
+
+    In practice this usually means that the resource has been marked as deleted
+    or hidden (see :ref:`deletion`).
+
 * If resource is a Pool:
 
   * If some of the Pool's metadata has changed (e.g. its title)::
 
         { "event": "modified", "resource": "RESOURCE_PATH" }
+
+    (Same as with Simples.)
+
+  * If the Pool has been removed::
+
+        { "event": "removed", "resource": "RESOURCE_PATH" }
 
     (Same as with Simples.)
 
@@ -132,6 +143,9 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "child": "CHILD_RESOURCE_PATH" }
 
+    In practice this usually means that the resource has been marked as deleted
+    or hidden (see :ref:`deletion`).
+
   * If a child (sub-Pool or Item) in the Pool is modified::
 
         { "event": "modified_child",
@@ -141,6 +155,17 @@ that has been subscribed.
     (Rationale for modify: a pool is probably rendered as a table of
     contents, and if the title of an object changes, the table of contents
     must be re-rendered.)
+
+  * If anything that lies below the pool (children, grandchildren etc.) has
+    been added, removed, or modified:
+
+        { "event": "changed_descendant", "resource": "RESOURCE_PATH" }
+
+    This event is sent only once per transaction and pool, even if multiple
+    of its descendants have been modified. It tells the frontend that any
+    *queries* previously sent to the pool should now be considered outdated,
+    as query results can refer to grandchildren and other resources that lie
+    below the pool, but aren't its direct children.
 
 * If resource is an Item (e.g. a Proposal):
 
@@ -158,31 +183,31 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "version": "VERSION_RESOURCE_PATH" }
 
-  * NO explicit notifications are sent if one of the sub-Items is changed,
-    e.g. if a new sub-Section or SectionVersion is added to a Section
-    within this Item. However, this should hardly matter since the
-    top-level Item (e.g. a Proposal) will usually be changed every time a
-    sub-Item is changed (changes result in a new version which is added to
-    the top-level Item). Only if the frontend wants to keep track of
-    isolated changes in a sub-Item, it needs to subscribe to it explicitly.
+  * The other events sent as the same as for Pools, since all Items are also
+    pools: "modified", "removed", "removed_child", "modified_child",
+    "changed_descendant". The "modified_child" and "removed_child" events
+    don't distinguish between sub-Items and ItemVersions -- both are
+    considered children.
 
-* If resource is an ItemVersion: subscriptions to ItemVersions are
-  currently unsupported. This may change in the future if we see the need
-  for it.
+* If resource is an ItemVersion:
 
-  (POSSIBLE FUTURE WORK:
+  * If a backreference in the version has changed::
 
-  * If a direct successor version is created (whose "follows" link points to
-    this version)::
+        { "event": "modified", "resource": "RESOURCE_PATH" }
 
-        { "event": "new_successor",
-          "resource": "RESOURCE_PATH",
-          "successor": "SUCCESSOR_RESOURCE_PATH" }
+    This happens e.g. if a successor version has been created that refers to
+    the subscribed version as its predecessor.
 
-  * NO notification is sent if an indirect successor is created (a
-    successor of a successor).
+    Otherwise, versions are immutable, so updated backreferences (the
+    reverse direction for a reference from another resource to this one) are
+    the only thing that can trigger a "modified" event.
 
-  )
+A note about resource removal: if a resource is removed (deleted or hidden),
+any subscribers to it will automatically be unsubscribed, so they won't
+receive further updates about this resource, even if it later "revealed"
+(unhidden or undeleted) again. Subscribers to the parent pool will receive a
+"new_child" or "new_version" message notifying them about the revealed
+resource just as if it had been newly created.
 
 
 Re-Connects

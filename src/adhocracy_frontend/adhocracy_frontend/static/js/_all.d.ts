@@ -69,6 +69,7 @@ declare class Flow {
     resume : () => any;
     pause : () => any;
     cancel : () => any;
+    on : (event : string, callback : Function) => void;
 }
 
 declare class FlowFile {
@@ -95,7 +96,6 @@ declare class FlowOpts {
     generateUniqueIdentifier : any;
     headers : any;
     maxChunkRetries : number;
-    maximumByteSize : number;
     method : string;
     onDropStopPropagation : boolean;
     permanentErrors : number[];
@@ -109,11 +109,14 @@ declare class FlowOpts {
     target : string;
     testChunks : boolean;
     withCredentials : boolean;
+
+    // these are not native to flow but used by custom functions
+    minimumWidth : number;
+    maximumByteSize : number;
+    acceptedFileTypes : string[];
 }
 
-declare module "fustyFlow" {}
-declare module "fustyFlowFactory" {}
-
 declare module "socialSharePrivacy" {}
-
 declare module "adhTemplates" {}
+declare module "angularPlaceholderShim" {}
+declare module "jqueryPlaceholderShim" {}

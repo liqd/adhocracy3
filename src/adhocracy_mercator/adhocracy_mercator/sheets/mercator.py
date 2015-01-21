@@ -388,7 +388,6 @@ class FinanceSchema(colander.MappingSchema):
         validator=colander.Range(min=0, max=50000))
     other_sources = SingleLine()
     granted = Boolean()
-    # financial_plan = AssetPath()  # (2 Mb. max.)
 
 
 finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
@@ -419,7 +418,6 @@ class ExperienceSchema(colander.MappingSchema):
 
     """Data structure for additional fields."""
 
-    # media = list of AssetPath()
     experience = Text()
 
 

@@ -140,8 +140,7 @@ def test_default_changelog_metadata():
 class TestReferenceHasNewVersionSubscriberUnitTest:
 
     @fixture
-    def registry(
-            self, config, registry, mock_resource_registry, changelog):
+    def registry(self, registry, mock_resource_registry, changelog):
         registry.content = mock_resource_registry
         registry._transaction_changelog = changelog
         return registry
@@ -434,7 +433,6 @@ class TestAddDefaultGroupToUserSubscriber:
         self.call_fut(event)
         assert mock_sheet.set.call_args[0] == ({'groups': [default_group]},)
 
-
     def test_default_group_not_exists(
             self, registry, principals, event, mock_sheet):
         from adhocracy_core.sheets.principal import IPermissions
@@ -459,51 +457,82 @@ class TestMetadataModifiedSubscriber:
                             mock_reindex)
         return mock_reindex
 
-    def test_newly_hidden(self, context, mock_reindex):
+    def test_newly_hidden(self, context, registry_with_changelog,
+                          mock_reindex):
         from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.interfaces import VisibilityChange
         from adhocracy_core.resources.subscriber import metadata_modified_subscriber
         from adhocracy_core.sheets.metadata import IMetadata
         old_appstruct = {'deleted': False, 'hidden': False}
         new_appstruct = {'deleted': False, 'hidden': True}
         event = ResourceSheetModified(object=context,
                                       isheet=IMetadata,
-                                      registry=None,
+                                      registry=registry_with_changelog,
                                       old_appstruct=old_appstruct,
                                       new_appstruct=new_appstruct,
                                       request=None)
         metadata_modified_subscriber(event)
         assert mock_reindex.called
+        assert (registry_with_changelog._transaction_changelog['/'].visibility
+                is VisibilityChange.concealed)
 
-    def test_newly_undeleted(self, context, mock_reindex):
+    def test_newly_undeleted(self, context, registry_with_changelog,
+                             mock_reindex):
         from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.interfaces import VisibilityChange
         from adhocracy_core.resources.subscriber import metadata_modified_subscriber
         from adhocracy_core.sheets.metadata import IMetadata
         old_appstruct = {'deleted': True, 'hidden': False}
         new_appstruct = {'deleted': False, 'hidden': False}
         event = ResourceSheetModified(object=context,
                                       isheet=IMetadata,
-                                      registry=None,
+                                      registry=registry_with_changelog,
                                       old_appstruct=old_appstruct,
                                       new_appstruct=new_appstruct,
                                       request=None)
         metadata_modified_subscriber(event)
         assert mock_reindex.called
+        assert (registry_with_changelog._transaction_changelog['/'].visibility
+                is VisibilityChange.revealed)
 
-    def test_no_change(self, context, mock_reindex):
+    def test_no_change_invisible(self, context, registry_with_changelog,
+                                 mock_reindex):
         from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.interfaces import VisibilityChange
         from adhocracy_core.resources.subscriber import metadata_modified_subscriber
         from adhocracy_core.sheets.metadata import IMetadata
         old_appstruct = {'deleted': False, 'hidden': True}
         new_appstruct = {'deleted': False, 'hidden': True}
         event = ResourceSheetModified(object=context,
                                       isheet=IMetadata,
-                                      registry=None,
+                                      registry=registry_with_changelog,
                                       old_appstruct=old_appstruct,
                                       new_appstruct=new_appstruct,
                                       request=None)
         metadata_modified_subscriber(event)
         assert not mock_reindex.called
+        assert (registry_with_changelog._transaction_changelog['/'].visibility
+                is VisibilityChange.invisible)
 
+    def test_no_change_visible(self, context, registry_with_changelog, request,
+                               mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.interfaces import VisibilityChange
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        old_appstruct = {'deleted': False, 'hidden': False}
+        new_appstruct = {'deleted': False, 'hidden': False}
+        request.has_permission = Mock(return_value=True)
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry_with_changelog,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=request)
+        metadata_modified_subscriber(event)
+        assert not mock_reindex.called
+        assert (registry_with_changelog._transaction_changelog['/'].visibility
+                is VisibilityChange.visible)
 
 
 class TestReindexResourceAndDescendants:

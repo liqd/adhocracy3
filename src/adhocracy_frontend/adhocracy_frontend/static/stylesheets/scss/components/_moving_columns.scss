@@ -23,11 +23,11 @@ States:
 ```html_example
 <div class="moving-columns" style="height: 10em; position: relative;">
     <div class="moving-column moving-column-structure">
-        <div class="placeholder moving-column-menu">
+        <div class="debug-placeholder moving-column-menu">
             <a onclick="$('.moving-column-sidebar').toggleClass('is-visible')">toggle sidebar</a>
         </div>
-        <div class="placeholder moving-column-sidebar">sidebar</div>
-        <div class="placeholder moving-column-body">structure column
+        <div class="debug-placeholder moving-column-sidebar">sidebar</div>
+        <div class="debug-placeholder moving-column-body">structure column
             this is scrolling
             this is scrolling
             this is scrolling
@@ -55,12 +55,12 @@ States:
         </div>
     </div>
     <div class="moving-column moving-column-content">
-        <div class="placeholder moving-column-menu">menu</div>
-        <div class="placeholder moving-column-body">content column</div>
+        <div class="debug-placeholder moving-column-menu">menu</div>
+        <div class="debug-placeholder moving-column-body">content column</div>
     </div>
     <div class="moving-column moving-column-content2">
-        <div class="placeholder moving-column-menu">menu</div>
-        <div class="placeholder moving-column-body">secondary-content-column</div>
+        <div class="debug-placeholder moving-column-menu">menu</div>
+        <div class="debug-placeholder moving-column-body">secondary-content-column</div>
     </div>
 </div>
 <a onclick="$('.moving-columns').toggleClass('is-collapse-show-show')">click me</a>
@@ -163,13 +163,13 @@ States:
 
 ```html_example
 <div class="moving-column-menu">
-    <span class="placeholder">icon</span>
-    <span class="placeholder">button</span>
-    <span class="placeholder">button</span>
-    <span class="placeholder">button</span>
-    <span class="placeholder">button</span>
-    <span class="placeholder">icon</span>
-    <span class="placeholder">icon</span>
+    <span class="debug-placeholder">icon</span>
+    <span class="debug-placeholder">button</span>
+    <span class="debug-placeholder">button</span>
+    <span class="debug-placeholder">button</span>
+    <span class="debug-placeholder">button</span>
+    <span class="debug-placeholder">icon</span>
+    <span class="debug-placeholder">icon</span>
 </div>
 ```
 */
