@@ -384,8 +384,8 @@ def is_hidden(resource: IResource) -> dict:
     return False
 
 
-def blocked_with_reason(resource: IResource) -> str:
-    """Return the reason if a resource is blocked, None otherwise."""
+def get_reason_if_blocked(resource: IResource) -> str:
+    """Check if a resource is blocked and return Reason, None otherwise."""
     reason = None
     if is_deleted(resource):
         reason = 'deleted'

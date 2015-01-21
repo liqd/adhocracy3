@@ -15,7 +15,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.websockets.schemas import ServerNotification
-from adhocracy_core.utils import blocked_with_reason
+from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import find_graph
 
 
@@ -187,7 +187,7 @@ class Client:
                 backreferencing_resources.add(sheet.context)
         for resource in backreferencing_resources:
             if (resource not in processed_resources and
-                    blocked_with_reason(resource) is None):
+                    get_reason_if_blocked(resource) is None):
                 self._send_resource_event(resource, 'modified')
                 processed_resources.add(resource)
 

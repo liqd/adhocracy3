@@ -16,7 +16,7 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
-from adhocracy_core.utils import blocked_with_reason
+from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import get_sheet_field
@@ -124,7 +124,7 @@ def view_blocked_by_metadata(resource: IResource,
 
     Otherwise, None is returned which means that the resource is viewable.
     """
-    block_reason = blocked_with_reason(resource)
+    block_reason = get_reason_if_blocked(resource)
     if block_reason is None:
         return None
     result = {'reason': block_reason}
