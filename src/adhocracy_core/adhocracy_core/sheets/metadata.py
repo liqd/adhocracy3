@@ -11,6 +11,7 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets import AttributeStorageSheet
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
@@ -63,6 +64,20 @@ def resource_modified_metadata_subscriber(event):
               omit_readonly=False)
 
 
+@colander.deferred
+def deferred_validate_hidden(node, kw):
+    """Check hide_permission."""
+    context = kw['context']
+    request = kw.get('request', None)
+    if request is None:
+        return
+
+    def check_hide_permisison(node, cstruct):
+        if not request.has_permission('hide_resource', context):
+            raise colander.Invalid(node, 'Changing this field is not allowed')
+    return check_hide_permisison
+
+
 class MetadataSchema(colander.MappingSchema):
 
     """Metadata sheet data structure.
@@ -92,12 +107,13 @@ class MetadataSchema(colander.MappingSchema):
     modified_by = Reference(reftype=MetadataModifiedByReference, readonly=True)
     modification_date = DateTime(missing=colander.drop, readonly=True)
     deleted = Boolean()
-    hidden = Boolean()
+    hidden = Boolean(validator=deferred_validate_hidden)
 
 
 metadata_metadata = sheet_metadata_defaults._replace(
     isheet=IMetadata,
     schema_class=MetadataSchema,
+    sheet_class=AttributeStorageSheet,
     editable=True,
     creatable=True,
     readable=True,

@@ -65,7 +65,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         window.document.body.className += " is-embedded";
     }
 
-    var app = angular.module("a3Mercator", [
+    var appDependencies = [
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
@@ -73,7 +73,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "ngMessages",
         "duScroll",
         "flow",
-        "templates",
         AdhComment.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
@@ -83,7 +82,13 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhResourceArea.moduleName,
         AdhProposal.moduleName,
         AdhSticky.moduleName
-    ]);
+    ];
+
+    if (config.cachebust) {
+        appDependencies.push("templates");
+    }
+
+    var app = angular.module("a3Mercator", appDependencies);
 
     app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", "$ariaProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
@@ -166,7 +171,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhWebSocket.register(angular);
 
     // force-load some services
-    var injector = angular.bootstrap(document, ["a3Mercator"]);
+    var injector = angular.bootstrap(document, ["a3Mercator"], {strictDi: true});
     injector.get("adhCrossWindowMessaging");
 
     loadComplete();
