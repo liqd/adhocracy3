@@ -12,7 +12,7 @@ IMAGE = '%s/docs/source/_static/python.jpg' % os.environ.get('A3_ROOT', '.')
 
 @fixture(scope='class')
 def browser(browser):
-    login_god(browser)
+    login_god(browser, visit_root=False)
     browser.visit(browser.app_url + 'r/mercator/@create_proposal')
     return browser
 

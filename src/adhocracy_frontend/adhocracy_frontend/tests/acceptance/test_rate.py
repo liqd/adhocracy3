@@ -10,7 +10,7 @@ from adhocracy_frontend.tests.acceptance.test_comment import create_top_level_co
 class TestRate:
 
     def test_create(self, browser, rest_url):
-        login_god(browser)
+        login_god(browser, visit_root=False)
         comment = create_comment(browser, rest_url, 'comment1')
         assert comment is not None
 

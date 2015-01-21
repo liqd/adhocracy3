@@ -48,14 +48,14 @@ def login(browser, name_or_email, password,
         browser.visit(browser.root_url)
 
 
-def login_god(browser):
+def login_god(browser, **kwargs):
     """Login god user."""
-    login(browser, god_login, god_password)
+    login(browser, god_login, god_password, **kwargs)
 
 
-def login_annotator(browser):
+def login_annotator(browser, **kwargs):
     """Login god user."""
-    login(browser, annotator_login, annotator_password)
+    login(browser, annotator_login, annotator_password, **kwargs)
 
 
 def logout(browser):
