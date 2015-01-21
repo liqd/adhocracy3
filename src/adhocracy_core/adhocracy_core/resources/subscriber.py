@@ -6,6 +6,7 @@ from logging import getLogger
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
+from pyramid.traversal import lineage
 
 from substanced.util import find_catalog
 from substanced.util import find_service
@@ -38,7 +39,7 @@ import adhocracy_core.sheets.rate
 
 
 changelog_metadata = ChangelogMetadata(False, False, None, None, None,
-                                       VisibilityChange.visible)
+                                       False, False, VisibilityChange.visible)
 logger = getLogger(__name__)
 
 
@@ -50,6 +51,22 @@ def resource_created_and_added_subscriber(event):
 def resource_modified_subscriber(event):
     """Add modified message to the transaction_changelog."""
     _add_changelog(event.registry, event.object, modified=True)
+    _add_changed_descendants_to_all_parents(event.registry, event.object)
+
+
+def _add_changed_descendants_to_all_parents(registry, resource):
+    for parent in lineage(resource.__parent__):
+        has_changed_descendants = _get_changelog(registry, parent,
+                                                 'changed_descendants')
+        if has_changed_descendants:
+            break
+        _add_changelog(registry, parent, changed_descendants=True)
+
+
+def resource_backreference_modified_subscriber(event):
+    """Add changed_backrefs message to the transaction_changelog."""
+    _add_changelog(event.registry, event.object, changed_backrefs=True)
+    _add_changed_descendants_to_all_parents(event.registry, event.object)
 
 
 def tag_created_and_added_or_modified_subscriber(event):
@@ -84,6 +101,14 @@ def _add_changelog(registry: Registry, resource: IResource, **kwargs):
     path = resource_path(resource)
     metadata = changelog[path]
     changelog[path] = metadata._replace(resource=resource, **kwargs)
+
+
+def _get_changelog(registry: Registry, resource: IResource, name):
+    """get changelog metadata `name`."""
+    changelog = registry._transaction_changelog
+    path = resource_path(resource)
+    metadata = changelog[path]
+    return getattr(metadata, name)
 
 
 def create_transaction_changelog():
@@ -261,6 +286,8 @@ def includeme(config):
                           IResourceCreatedAndAdded)
     config.add_subscriber(resource_modified_subscriber,
                           IResourceSheetModified)
+    config.add_subscriber(resource_backreference_modified_subscriber,
+                          ISheetReferenceModified)
     config.add_subscriber(itemversion_created_subscriber,
                           IItemVersionNewVersionAdded)
     config.add_subscriber(reference_has_new_version_subscriber,
