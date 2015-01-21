@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 
 from pyramid.testing import DummyResource
 from websocket import ABNF
@@ -79,8 +80,8 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
 class TestClient:
 
     @fixture
-    def changelog_meta(self, changelog_meta):
-        child = self._make_resource()
+    def changelog_meta(self, changelog_meta, pool_graph):
+        child = self._make_resource(parent=pool_graph)
         return changelog_meta._replace(resource=child)
 
     def _make_one(self, frame: ABNF):
@@ -90,11 +91,10 @@ class TestClient:
         client._ws_connection = self._dummy_connection
         return client
 
-    def _make_resource(self, name='child'):
+    def _make_resource(self, parent, name='child'):
         from pyramid.testing import DummyResource
-        context = DummyResource()
         resource = DummyResource()
-        context[name] = resource
+        parent[name] = resource
         return resource
 
     def test_receive_text_frame(self):
@@ -144,8 +144,9 @@ class TestClient:
         metadata = [changelog_meta._replace(created=True)]
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
-        assert len(self._dummy_connection.queue) == 1
+        assert len(self._dummy_connection.queue) == 2
         assert 'created' in self._dummy_connection.queue[0]
+        assert 'changed_descendant' in self._dummy_connection.queue[1]
 
     def test_send_messages_if_not_running(self, changelog_meta):
         client = self._make_one(None)
@@ -181,8 +182,9 @@ class TestClient:
                     changelog_meta._replace(modified=True)]
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
-        assert len(self._dummy_connection.queue) == 1
+        assert len(self._dummy_connection.queue) == 2
         assert 'modified' in self._dummy_connection.queue[0]
+        assert 'changed_descendant' in self._dummy_connection.queue[1]
 
     def test_send_messages_created_and_modified(self, changelog_meta):
         """If a resource has been created and then modified, only a
@@ -194,16 +196,86 @@ class TestClient:
                                             modified=True)]
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
-        assert len(self._dummy_connection.queue) == 1
+        assert len(self._dummy_connection.queue) == 2
         assert 'created' in self._dummy_connection.queue[0]
+        assert 'changed_descendant' in self._dummy_connection.queue[1]
 
-    def test_send_messages_two_resources(self, changelog_meta):
+    def test_send_messages_two_resources(self, changelog_meta, pool_graph):
         client = self._make_one(None)
         client._is_running = True
         resource2 = DummyResource()
+        resource2.__parent__ = pool_graph
         metadata = [changelog_meta._replace(created=True),
                     changelog_meta._replace(created=True,
                                             resource=resource2)]
+        client.send_messages(metadata)
+        assert self._dummy_connection.nothing_sent is False
+        assert len(self._dummy_connection.queue) == 3
+        assert 'changed_descendant' in self._dummy_connection.queue[-1]
+
+    def test_send_messages_invisible(self, changelog_meta):
+        """No event is sent for invisible resources."""
+        from adhocracy_core.interfaces import VisibilityChange
+        client = self._make_one(None)
+        client._is_running = True
+        metadata = [changelog_meta._replace(
+            modified=True, visibility=VisibilityChange.invisible)]
+        client.send_messages(metadata)
+        assert self._dummy_connection.nothing_sent is True
+        assert len(self._dummy_connection.queue) == 0
+
+    def test_send_messages_concealed(self, changelog_meta):
+        """If a resource has been concealed, a 'removed' event should be sent.
+        """
+        from adhocracy_core.interfaces import VisibilityChange
+        client = self._make_one(None)
+        client._is_running = True
+        metadata = [changelog_meta._replace(
+            visibility=VisibilityChange.concealed)]
+        client.send_messages(metadata)
+        assert self._dummy_connection.nothing_sent is False
+        assert len(self._dummy_connection.queue) == 2
+        assert 'removed' in self._dummy_connection.queue[0]
+        assert 'changed_descendant' in self._dummy_connection.queue[1]
+
+    def test_send_modified_messages_for_backrefs(self, changelog_meta,
+                                                 pool_graph):
+        """"A modified event is sent for a backreferenced resource."""
+        client = self._make_one(None)
+        client._is_running = True
+        metadata = [changelog_meta._replace(created=True)]
+        from adhocracy_core.graph import Graph
+        graph = pool_graph.__graph__
+        backref_resource = self._make_resource(parent=pool_graph,
+                                               name='backref')
+        backref_sheet = Mock()
+        backref_sheet.context = backref_resource
+        graph.get_back_reference_sources = Mock(
+            spec=Graph.get_back_reference_sources,
+            return_value=[backref_sheet])
+        assert graph is not None
+        client.send_messages(metadata)
+        assert self._dummy_connection.nothing_sent is False
+        assert len(self._dummy_connection.queue) == 3
+        assert 'modified' in self._dummy_connection.queue[1]
+        assert '/backref' in self._dummy_connection.queue[1]
+
+    def test_send_modified_messages_for_backrefs_no_duplicates(
+            self, changelog_meta, pool_graph):
+        """"No additional event is sent if a backreferenced resource
+        has changed anyway.
+        """
+        client = self._make_one(None)
+        client._is_running = True
+        metadata = [changelog_meta._replace(created=True)]
+        from adhocracy_core.graph import Graph
+        graph = pool_graph.__graph__
+        backref_sheet = Mock()
+        backref_sheet.context = changelog_meta.resource
+        graph.get_back_reference_sources = Mock(
+            spec=Graph.get_back_reference_sources,
+            return_value=[backref_sheet])
+        assert graph is not None
         client.send_messages(metadata)
         assert self._dummy_connection.nothing_sent is False
         assert len(self._dummy_connection.queue) == 2

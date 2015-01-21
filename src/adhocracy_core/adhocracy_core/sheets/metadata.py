@@ -3,7 +3,6 @@ from datetime import datetime
 from logging import getLogger
 
 from pyramid.registry import Registry
-from pyramid.location import lineage
 from pyramid.traversal import resource_path
 import colander
 
@@ -18,9 +17,12 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
+from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import is_deleted
+from adhocracy_core.utils import is_hidden
 
 
 logger = getLogger(__name__)
@@ -127,60 +129,27 @@ def index_creator(resource, default):
     return userid
 
 
-def is_deleted(resource: IResource) -> dict:
-    """Check whether a resource is deleted.
-
-    This also returns True for descendants of deleted resources, as a positive
-    deleted status is inherited.
-    """
-    for context in lineage(resource):
-        if getattr(context, 'deleted', False):
-            return True
-    return False
-
-
-def is_hidden(resource: IResource) -> dict:
-    """Check whether a resource is hidden.
-
-    This also returns True for descendants of hidden resources, as a positive
-    hidden status is inherited.
-    """
-    for context in lineage(resource):
-        if getattr(context, 'hidden', False):
-            return True
-    return False
-
-
 def view_blocked_by_metadata(resource: IResource,
                              registry: Registry) -> dict:
     """
     Return a dict with an explanation if viewing this resource is not allowed.
 
-    This is the case if the resources provides metadata and the `deleted`
-    or `hidden` flag is set.
+    This is the case if the `deleted` or `hidden` flag is set on the resource
+    or one of its parents. If the resource provides metadata, the date of the
+    last change and its author are added to the result.
 
     Otherwise, None is returned which means that the resource is viewable.
     """
-    result = None
+    block_reason = get_reason_if_blocked(resource)
+    if block_reason is None:
+        return None
+    result = {'reason': block_reason}
     if IMetadata.providedBy(resource):
         metadata = get_sheet(resource, IMetadata, registry=registry)
         appstruct = metadata.get()
-        block_reason = _blocked_with_reason(resource)
-        if block_reason:
-            result = {'reason': block_reason,
-                      'modification_date': appstruct['modification_date'],
-                      'modified_by': appstruct['modified_by']}
+        result['modification_date'] = appstruct['modification_date']
+        result['modified_by'] = appstruct['modified_by']
     return result
-
-
-def _blocked_with_reason(resource: IResource) -> str:
-    """Return the reason if a resource is blocked, None otherwise."""
-    reason = None
-    if is_deleted(resource):
-        reason = 'deleted'
-    if is_hidden(resource):
-        reason = 'both' if reason else 'hidden'
-    return reason
 
 
 def index_visibility(resource, default):

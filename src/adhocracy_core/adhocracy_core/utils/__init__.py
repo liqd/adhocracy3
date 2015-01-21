@@ -8,6 +8,7 @@ import json
 import pprint
 
 from pyramid.compat import is_nonstr_iter
+from pyramid.location import lineage
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
@@ -357,3 +358,37 @@ def get_last_new_version(registry, resource) -> IResource:
     item = find_interface(resource, IItem)
     item_changelog = get_changelog_metadata(item, registry)
     return item_changelog.last_version
+
+
+def is_deleted(resource: IResource) -> dict:
+    """Check whether a resource is deleted.
+
+    This also returns True for descendants of deleted resources, as a positive
+    deleted status is inherited.
+    """
+    for context in lineage(resource):
+        if getattr(context, 'deleted', False):
+            return True
+    return False
+
+
+def is_hidden(resource: IResource) -> dict:
+    """Check whether a resource is hidden.
+
+    This also returns True for descendants of hidden resources, as a positive
+    hidden status is inherited.
+    """
+    for context in lineage(resource):
+        if getattr(context, 'hidden', False):
+            return True
+    return False
+
+
+def get_reason_if_blocked(resource: IResource) -> str:
+    """Check if a resource is blocked and return Reason, None otherwise."""
+    reason = None
+    if is_deleted(resource):
+        reason = 'deleted'
+    if is_hidden(resource):
+        reason = 'both' if reason else 'hidden'
+    return reason

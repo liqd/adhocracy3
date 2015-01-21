@@ -142,7 +142,9 @@ class Graph(Persistent):
             for source in ObjectMap.sources(self._objectmap, target, reftype):
                 yield Reference(source, isheet, field, target)
 
-    def get_back_reference_sources(self, resource, reftype) -> Iterable:
+    def get_back_reference_sources(self,
+                                   resource,
+                                   reftype=SheetReference) -> Iterable:
         """Get generator of the sources of backreferences.
 
         :param resource: the resource whose backreferences we want
