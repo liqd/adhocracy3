@@ -315,11 +315,13 @@ class ResourceRESTView(RESTView):
         empty = {}  # tiny performance tweak
         cstruct = deepcopy(options_resource_response_data_dict)
 
-        if request.has_permission('edit_sheet', context):
+        if request.has_permission('edit_some_sheets', context):
             edits = self.registry.get_sheets_edit(context, request)
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
             if put_sheets:
-                cstruct['PUT']['request_body']['data'] = dict(put_sheets)
+                put_sheets_dict = dict(put_sheets)
+                self._inject_removal_permissions(put_sheets_dict)
+                cstruct['PUT']['request_body']['data'] = put_sheets_dict
             else:
                 del cstruct['PUT']
         else:
@@ -360,6 +362,14 @@ class ResourceRESTView(RESTView):
         # FIXME? maybe simplify options response data structure,
         # do we really need request/response_body, content_type,..?
         return cstruct
+
+    def _inject_removal_permissions(self, put_sheets_dict: dict):
+        """Show whether a user is allowed to delete or hide a resource."""
+        if IMetadata.__identifier__ in put_sheets_dict:
+            # everybody who can PUT metadata can delete the resource
+            put_sheets_dict[IMetadata.__identifier__]['deleted'] = ''
+            if self.request.has_permission('hide_resource', self.context):
+                put_sheets_dict[IMetadata.__identifier__]['hidden'] = ''
 
     @view_config(request_method='GET',
                  permission='view')
@@ -505,7 +515,7 @@ class PoolRESTView(SimpleRESTView):
         return self.build_post_response(resource)
 
     @view_config(request_method='PUT',
-                 permission='edit_sheet',
+                 permission='edit_some_sheets',
                  content_type='application/json')
     def put(self) -> dict:
         return super().put()

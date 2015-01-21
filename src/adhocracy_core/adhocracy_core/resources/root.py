@@ -43,7 +43,11 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
             (Allow, 'role:creator', 'add_proposalversion'),
             (Allow, 'role:creator', 'add_sectionversion'),
             (Allow, 'role:creator', 'add_paragraphversion'),
+            (Allow, 'role:creator', 'edit_some_sheets'),  # default permission
+            (Allow, 'role:creator', 'edit_metadata'),
             (Allow, 'role:manager', 'hide_resource'),
+            (Allow, 'role:manager', 'edit_some_sheets'),  # default permission
+            (Allow, 'role:manager', 'edit_metadata'),
             (Allow, 'role:admin', 'view'),
             (Allow, 'role:admin', 'view_sensitive'),  # sensitive info that
                                                       # only admins should see
