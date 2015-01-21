@@ -777,6 +777,17 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var imageUriFilter = () => {
+    return (path? : string, format : string = "detail") : string => {
+        if (path) {
+            return path + "/" + format;
+        } else {
+            return "/static/fallback_" + format + ".jpg";
+        }
+    };
+};
+
+
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -888,6 +899,7 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
+        .filter("adhImageUri", imageUriFilter)
         .controller("mercatorProposalFormController", ["$scope", "$element", "$window", ($scope : IControllerScope, $element, $window) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
