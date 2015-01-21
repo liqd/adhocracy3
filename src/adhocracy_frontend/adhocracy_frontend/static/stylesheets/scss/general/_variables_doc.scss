@@ -7,85 +7,145 @@ category: Variables
 
 <table class="styleguide-colors">
     <tr>
-        <td><div class="example-color color-prime-normal"></div></td>
-        <td><code>color-prime-normal</code></td>
+        <td colspan="3"><strong>Text colors</strong></td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-text-normal"></div></td>
+        <td><code>color-text-normal</code></td>
         <td>Default color for running text</td>
     </tr>
     <tr>
-        <td><div class="example-color color-prime-extrovert"></div></td>
-        <td><code>color-prime-extrovert</code></td>
-        <td>Default color for headings</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-secondary-extrovert"></div></td>
-        <td><code>color-secondary-extrovert</code></td>
+        <td><div class="example-color color-text-introvert"></div></td>
+        <td><code>color-text-introvert</code></td>
         <td>For secondary text</td>
     </tr>
     <tr>
-        <td><div class="example-color color-secondary-introvert"></div></td>
-        <td><code>color-secondary-introvert</code></td>
-        <td>For secondary text</td>
+        <td><div class="example-color color-text-inverted"></div></td>
+        <td><code>color-text-inverted</code></td>
+        <td>Used as either foreground or background with
+            <code>color-text-highlight-normal</code></td>
     </tr>
     <tr>
-        <td><div class="example-color color-highlight-normal"></div></td>
-        <td><code>color-highlight-normal</code></td>
+        <td><div class="example-color color-text-highlight-normal"></div></td>
+        <td><code>color-text-highlight-normal</code></td>
         <td>For highlighted content such as links</td>
     </tr>
     <tr>
-        <td><div class="example-color color-highlight-introvert"></div></td>
-        <td><code>color-highlight-introvert</code></td>
-        <td>For highlighted content in a is-hover state</td>
+        <td><div class="example-color color-text-highlight-introvert"></div></td>
+        <td><code>color-text-highlight-introvert</code></td>
+        <td>For highlighted content introverted style</td>
     </tr>
     <tr>
-        <td><div class="example-color color-highlight-extrovert"></div></td>
-        <td><code>color-highlight-extrovert</code></td>
-        <td>For highlighted content in a has-focus state</td>
+        <td><div class="example-color color-text-highlight-extrovert"></div></td>
+        <td><code>color-text-highlight-extrovert</code></td>
+        <td>For highlighted content extroverted style</td>
     </tr>
     <tr>
-        <td><div class="example-color color-highlight-reverse"></div></td>
-        <td><code>color-highlight-reverse</code></td>
-        <td>Used as either foreground or background with
-            <code>color-highlight-normal</code></td>
+        <td colspan="3"><strong>Brand colors</strong></td>
     </tr>
     <tr>
-        <td><div class="example-color color-highlight-valid"></div></td>
-        <td><code>color-highlight-valid</code></td>
+        <td><div class="example-color color-brand-one-normal"></div></td>
+        <td><code>color-brand-one-normal</code></td>
+        <td>Brand color 1</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-one-introvert"></div></td>
+        <td><code>color-brand-one-introvert</code></td>
+        <td>Brand color 1 introverted style</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-one-extrovert"></div></td>
+        <td><code>color-brand-one-extrovert</code></td>
+        <td>Brand color 1 extroverted style</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-two-normal"></div></td>
+        <td><code>color-brand-two-normal</code></td>
+        <td>Brand color 2</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-two-introvert"></div></td>
+        <td><code>color-brand-two-introvert</code></td>
+        <td>Brand color 2 introverted style</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-two-extrovert"></div></td>
+        <td><code>color-brand-two-extrovert</code></td>
+        <td>Brand color 2 extroverted style</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-three-normal"></div></td>
+        <td><code>color-brand-three-normal</code></td>
+        <td>Brand color 3</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-three-introvert"></div></td>
+        <td><code>color-brand-three-introvert</code></td>
+        <td>Brand color 3 introverted style</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-three-extrovert"></div></td>
+        <td><code>color-brand-three-extrovert</code></td>
+        <td>Brand color 3 extroverted style</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-four-normal"></div></td>
+        <td><code>color-brand-four-normal</code></td>
+        <td>Brand color 4</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-four-introvert"></div></td>
+        <td><code>color-brand-four-introvert</code></td>
+        <td>Brand color 4 introverted style</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-brand-four-extrovert"></div></td>
+        <td><code>color-brand-four-extrovert</code></td>
+        <td>Brand color 4 extroverted style</td>
+    </tr>
+    <tr>
+        <td colspan="3"><strong>Functional colors</strong></td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-function-valid"></div></td>
+        <td><code>color-function-valid</code></td>
         <td>For valid content</td>
     </tr>
     <tr>
-        <td><div class="example-color color-highlight-invalid"></div></td>
-        <td><code>color-highlight-invalid</code></td>
+        <td><div class="example-color color-function-invalid"></div></td>
+        <td><code>color-function-invalid</code></td>
         <td>For invalid content</td>
     </tr>
     <tr>
-        <td><div class="example-color color-background"></div></td>
-        <td><code>color-background</code></td>
-        <td>Default background color</td>
+        <td colspan="3"><strong>Structural colors</strong></td>
     </tr>
     <tr>
-        <td><div class="example-color color-structure-surface"></div></td>
-        <td><code>color-structure-surface</code></td>
-        <td>Secondary background color</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-active"></div></td>
-        <td><code>color-structure-active</code></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-border"></div></td>
-        <td><code>color-structure-border</code></td>
-        <td>Default border color</td>
-    </tr>
-    <tr>
-        <td><div class="example-color color-structure-border-introvert"></div></td>
-        <td><code>color-structure-border-introvert</code></td>
+        <td><div class="example-color color-structure-normal"></div></td>
+        <td><code>color-structure-normal</code></td>
         <td>Border color for inactive or disabled elements</td>
     </tr>
     <tr>
-        <td><div class="example-color color-structure-border-extrovert"></div></td>
-        <td><code>color-structure-border-extrovert</code></td>
+        <td><div class="example-color color-structure-introvert"></div></td>
+        <td><code>color-structure-introvert</code></td>
+        <td>Secondary background color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-structure-extrovert"></div></td>
+        <td><code>color-structure-extrovert</code></td>
         <td>border color for active or filled elements</td>
+    </tr>
+    <tr>
+        <td colspan="3"><strong>Background colors</strong></td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-background-base"></div></td>
+        <td><code>color-background-base</code></td>
+        <td>Default background color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-background-base-introvert"></div></td>
+        <td><code>color-background-base-introvert</code></td>
+        <td></td>
     </tr>
 </table>
 */
@@ -96,22 +156,38 @@ category: Variables
     border: 1px solid $color-structure-border;
 }
 
-.color-prime-normal {background-color: $color-text-normal;}
-.color-prime-extrovert {background-color: $color-text-extrovert;}
-.color-secondary-extrovert {background-color: $color-text-introvert;}
-.color-secondary-introvert {background-color: $color-text-introvert;}
-.color-highlight-normal {background-color: $color-text-highlight-normal;}
-.color-highlight-introvert {background-color: $color-text-highlight-introvert;}
-.color-highlight-extrovert {background-color: $color-text-highlight-introvert;}
-.color-highlight-reverse {background-color: $color-text-inverted;}
-.color-highlight-valid {background-color: $color-function-valid;}
-.color-highlight-invalid {background-color: $color-function-invalid;}
-.color-background {background-color: $color-background-base;}
-.color-structure-surface {background-color: $color-structure-introvert;}
-.color-structure-active {background-color: $color-background-base-introvert;}
+.color-brand-one-normal {background-color: $color-brand-one-normal;}
+.color-brand-one-introvert {background-color: $color-brand-one-introvert;}
+.color-brand-one-extrovert {background-color: $color-brand-one-extrovert;}
+.color-brand-two-normal {background-color: $color-brand-two-normal;}
+.color-brand-two-introvert {background-color: $color-brand-two-introvert;}
+.color-brand-two-extrovert {background-color: $color-brand-two-extrovert;}
+.color-brand-three-normal {background-color: $color-brand-three-normal;}
+.color-brand-three-introvert {background-color: $color-brand-three-introvert;}
+.color-brand-three-extrovert {background-color: $color-brand-three-extrovert;}
+.color-brand-four-normal {background-color: $color-brand-four-normal;}
+.color-brand-four-introvert {background-color: $color-brand-four-introvert;}
+.color-brand-four-extrovert {background-color: $color-brand-four-extrovert;}
+
+.color-text-normal {background-color: $color-text-normal;}
+.color-text-introvert {background-color: $color-text-introvert;}
+.color-text-extrovert {background-color: $color-text-extrovert;}
+.color-text-highlight-normal {background-color: $color-text-highlight-normal;}
+.color-text-highlight-introvert {background-color: $color-text-highlight-introvert;}
+.color-text-highlight-extrovert {background-color: $color-text-highlight-extrovert;}
+.color-text-inverted {background-color: $color-text-inverted;}
+
+.color-function-valid {background-color: $color-function-valid;}
+.color-function-invalid {background-color: $color-function-invalid;}
+
+.color-background-base {background-color: $color-background-base;}
+.color-background-base-introvert {background-color: $color-background-base-introvert;}
+
+.color-structure-normal {background-color: $color-structure-normal;}
+.color-structure-introvert {background-color: $color-structure-introvert;}
+.color-structure-extrovert {background-color: $color-structure-extrovert;}
 .color-structure-border {background-color: $color-structure-border;}
-.color-structure-border-introvert {background-color: $color-structure-normal;}
-.color-structure-border-extrovert {background-color: $color-structure-extrovert;}
+
 
 // some static contrast checks for a11y
 @include check-contrast($color-text-normal, $color-background-base);
