@@ -14,6 +14,7 @@ IMAGE = '%s/docs/source/_static/python.jpg' % os.environ.get('A3_ROOT', '.')
 def browser(browser):
     login_god(browser, visit_root=False)
     browser.visit(browser.app_url + 'r/mercator/@create_proposal')
+    browser.is_element_present_by_name('user-info-first-name', wait_time=10)
     return browser
 
 

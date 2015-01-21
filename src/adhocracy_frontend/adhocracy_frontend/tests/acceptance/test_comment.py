@@ -115,6 +115,7 @@ def _visit_url(browser, rest_url):
 def create_comment(browser, rest_url, name):
     """Go to content2 column and create comment with content 'comment1'."""
     _visit_url(browser, rest_url)
+    browser.is_element_present_by_css('.listing', wait_time=10)
     listing = browser.find_by_css('.listing').first
     comment = create_top_level_comment(browser, listing,  name)
     return comment
