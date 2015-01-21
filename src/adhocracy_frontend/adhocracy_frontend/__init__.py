@@ -7,6 +7,7 @@ from pyramid.events import NewResponse
 from pyramid.request import Request
 from pyramid.response import FileResponse
 from pyramid.response import Response
+from pyramid.settings import asbool
 from pyramid.settings import aslist
 
 from adhocracy_core.rest.views import add_cors_headers_subscriber
@@ -39,6 +40,8 @@ def config_view(request):
                         for k in custom_keys}
     config['site_name'] = settings.get('adhocracy.frontend.site_name',
                                        'Adhocracy')
+
+    config['cachebust'] = asbool(settings.get('cachebust.enabled', 'false'))
     return config
 
 
