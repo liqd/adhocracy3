@@ -70,7 +70,7 @@ class TestRate:
         assert wait(check_result)
 
     def test_multi_rateable(self, browser):
-        listing = browser.find_by_css('.listing')
+        listing = browser.find_by_css('.listing').first
 
         rateable1 = get_list_element(listing, 'comment1', descendant='.comment-content')
         button1 = rateable1.find_by_css('.rate-pro').first
