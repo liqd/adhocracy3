@@ -1,5 +1,8 @@
 require.config({
     baseUrl: "/static/js/",
+% if url_args:
+    urlArgs: "${url_args}",
+% endif
     config: {
         text: {
             useXhr: function (url, protocol, hostname, port) {
@@ -29,7 +32,8 @@ require.config({
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
         moment: "../lib/moment/min/moment-with-locales",
         sticky: "../lib/sticky-kit/jquery.sticky-kit",
-        socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min"
+        socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
+        adhTemplates: "./templates"
     },
     shim: {
         jquery: {

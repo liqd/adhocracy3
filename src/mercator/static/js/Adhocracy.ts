@@ -46,6 +46,7 @@ import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
+import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
 
 var loadComplete = () : void => {
@@ -72,6 +73,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "ngMessages",
         "duScroll",
         "flow",
+        "templates",
         AdhComment.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,

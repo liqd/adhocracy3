@@ -62,3 +62,11 @@ lib64/
 src/rubygemsrecipe/
 src/substanced/
 *.fontcustom-manifest.json
+src/pyramid_cachebust/
+/package.json
+/node_modules
+/Gruntfile.js
+src/mercator/build
+/tmp
+/wheelhouse
+/share

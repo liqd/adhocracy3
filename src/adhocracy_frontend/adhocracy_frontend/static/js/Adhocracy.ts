@@ -43,6 +43,7 @@ import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
+import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
 
 var loadComplete = () : void => {
@@ -67,6 +68,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "templates",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,

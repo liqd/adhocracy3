@@ -115,3 +115,5 @@ declare module "fustyFlow" {}
 declare module "fustyFlowFactory" {}
 
 declare module "socialSharePrivacy" {}
+
+declare module "adhTemplates" {}
