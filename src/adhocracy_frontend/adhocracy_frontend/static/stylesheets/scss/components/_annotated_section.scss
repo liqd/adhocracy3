@@ -23,7 +23,7 @@ A section with a additional annotation, typically displayed in a second column.
 ```
 */
 .annotated-section {
-    @include clearfix;
+    @include pie-clearfix;
 
     .annotated-section-body {
         float: left;
