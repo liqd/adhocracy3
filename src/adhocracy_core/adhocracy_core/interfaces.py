@@ -2,6 +2,7 @@
 from collections import Iterable
 from collections import namedtuple
 from collections import OrderedDict
+from enum import Enum
 
 from pyramid.interfaces import ILocation
 from pyramid.interfaces import IAuthorizationPolicy
@@ -454,10 +455,30 @@ class ITokenManger(Interface):  # pragma: no cover
         """ Delete authentication token."""
 
 
+class VisibilityChange(Enum):
+
+    """Track changes in the visibility of a resource."""
+
+    visible = 1
+    """Was and is visible"""
+
+    invisible = 2
+    """Was and is NOT visible"""
+
+    concealed = 3
+    """Was visible but is now invisible"""
+
+    revealed = 4
+    """Was invisible but is now visible"""
+
+
 class ChangelogMetadata(namedtuple('ChangelogMetadata',
-                                   ['modified', 'created', 'followed_by',
+                                   ['modified',
+                                    'created',
+                                    'followed_by',
                                     'resource',
-                                    'last_version'])):
+                                    'last_version',
+                                    'visibility'])):
 
     """Metadata to track modified resources during one transaction.
 
@@ -478,6 +499,8 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
         The last Version created in this transaction
         (only for :class:`adhocracy_core.interfaces.IItem`)
         FIXME: we assume linear history here
+    visibility (VisibilityChange):
+        Tracks the visibility of the resource and whether it has changed
     """
 
 

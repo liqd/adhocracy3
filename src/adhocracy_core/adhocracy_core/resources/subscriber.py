@@ -18,6 +18,7 @@ from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy_core.interfaces import ISheetReferenceModified
+from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
@@ -29,7 +30,6 @@ from adhocracy_core.utils import get_last_new_version
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_last_version
-from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.versions import IForkableVersionable
@@ -37,7 +37,8 @@ import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.rate
 
 
-changelog_metadata = ChangelogMetadata(False, False, None, None, None)
+changelog_metadata = ChangelogMetadata(False, False, None, None, None,
+                                       VisibilityChange.visible)
 logger = getLogger(__name__)
 
 
@@ -180,7 +181,7 @@ def _assert_we_are_not_forking(resource, registry, event):
 def _update_versionable(resource, isheet, appstruct, root_versions, registry,
                         creator) -> IResource:
     appstructs = _get_writable_appstructs(resource, registry)
-    # FIXME the need to switch between forkable and non forkable his bad
+    # FIXME the need to switch between forkable and non-forkable is bad
     is_forkable = IForkableVersionable.providedBy(resource)
     iversionable = IForkableVersionable if is_forkable else IVersionable
     appstructs[iversionable.__identifier__]['follows'] = [resource]
@@ -209,33 +210,23 @@ def _get_writable_appstructs(resource, registry) -> dict:
 def metadata_modified_subscriber(event):
     """Invoked after PUTting modified metadata fields.
 
-    :raises colander.Invalid: if
+    Reindex all resource and descendedants if hidden value is modified.
     """
     is_deleted = event.new_appstruct['deleted']
     is_hidden = event.new_appstruct['hidden']
     was_deleted = event.old_appstruct['deleted']
     was_hidden = event.old_appstruct['hidden']
-
-    if was_hidden != is_hidden:
-        if event.request is None:
-            logger.warning('Ignoring request to change hidden status to %s '
-                           'since we cannot check permissions',
-                           is_hidden)
-            return
-        if not event.request.has_permission('hide_resource', event.object):
-            # FIXME a better place to validate is inside the IMetadata schema.
-            raise_colander_style_error(IMetadata,
-                                       'hidden',
-                                       'Changing this field is not allowed')
-
-    # Store hidden/deleted status in object for efficient access
-    # FIXME a better place to do attribute storage is inside a custom metadata
-    # sheet class or just use AttributeStorageSheet sheet class.
-    event.object.deleted = is_deleted
-    event.object.hidden = is_hidden
-
-    if (was_hidden != is_hidden) or (was_deleted != is_deleted):
+    is_modified = (was_hidden != is_hidden) or (was_deleted != is_deleted)
+    if is_modified:
+        # reindex the private_visibility catalog index for all descendants
         _reindex_resource_and_descendants(event.object)
+    visibility_change = _determine_visibility_shange(was_hidden=was_hidden,
+                                                     was_deleted=was_deleted,
+                                                     is_hidden=is_hidden,
+                                                     is_deleted=is_deleted)
+    _add_changelog_metadata(event.registry,
+                            event.object,
+                            visibility=visibility_change)
 
 
 def _reindex_resource_and_descendants(resource: IResource):
@@ -246,6 +237,24 @@ def _reindex_resource_and_descendants(resource: IResource):
     resource_and_descendants = query.execute()
     for res in resource_and_descendants:
         adhocracy_catalog.reindex_resource(res)
+
+
+def _determine_visibility_shange(was_hidden: bool,
+                                 was_deleted: bool,
+                                 is_hidden: bool,
+                                 is_deleted: bool) -> VisibilityChange:
+    was_visible = not (was_hidden or was_deleted)
+    is_visible = not (is_hidden or is_deleted)
+    if was_visible:
+        if is_visible:
+            return VisibilityChange.visible
+        else:
+            return VisibilityChange.concealed
+    else:
+        if is_visible:
+            return VisibilityChange.revealed
+        else:
+            return VisibilityChange.invisible
 
 
 def includeme(config):

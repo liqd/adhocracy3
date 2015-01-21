@@ -56,3 +56,9 @@ This mixin allows to set attributes to placeholders in several browser.
         @content;
     }
 }
+
+.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+}

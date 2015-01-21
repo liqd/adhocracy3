@@ -1,6 +1,8 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
+from unittest.mock import Mock
 
 
 @fixture
@@ -32,6 +34,10 @@ class TestResourceModifiedMetadataSubscriber:
 
 class TestIMetadataSchema:
 
+    @fixture
+    def request(self):
+        return testing.DummyRequest()
+
     def _make_one(self, **kwargs):
         from adhocracy_core.sheets.metadata import MetadataSchema
         return MetadataSchema(**kwargs)
@@ -53,14 +59,30 @@ class TestIMetadataSchema:
         assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
-    def test_serialize_empty_and_bind(self):
+    def test_serialize_empty_and_bind(self, context):
         from datetime import datetime
-        inst = self._make_one().bind()
+        inst = self._make_one().bind(context=context)
         result = inst.serialize({})
         this_year = str(datetime.now().year)
         assert this_year in result['creation_date']
         assert this_year in result['item_creation_date']
         assert this_year in result['modification_date']
+
+    def test_deserialize_hiding_requires_permission(self, context, request):
+        import colander
+        inst = self._make_one().bind(context=context, request=request)
+        request.has_permission = Mock(return_value=False)
+        with raises(colander.Invalid):
+            inst.deserialize({'hidden': False})
+        request.has_permission = Mock(return_value=True)
+        result = inst.deserialize({'hidden': False})
+        assert result['hidden'] is False
+
+    def test_deserialize_delete_doesnt_require_permission(self, context, request):
+        inst = self._make_one().bind(context=context, request=request)
+        request.has_permission = Mock(return_value=True)
+        result = inst.deserialize({'deleted': False})
+        assert result['deleted'] is False
 
 
 class TestMetadataSheet:
@@ -73,12 +95,14 @@ class TestMetadataSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.sheets.metadata import MetadataSchema
+        from . import AttributeStorageSheet
         inst = meta.sheet_class(meta, context)
         assert inst.meta.isheet == IMetadata
         assert inst.meta.schema_class == MetadataSchema
         assert inst.meta.editable is True
         assert inst.meta.creatable is True
         assert inst.meta.readable is True
+        assert inst.meta.sheet_class is AttributeStorageSheet
 
 
 def test_index_creator_creator_exists(context, mock_metadata_sheet):
@@ -217,11 +241,20 @@ class TestVisibility:
         child.hidden = False
         assert is_hidden(child) is True
 
-    def test_view_blocked_by_metadata_no_metadata(self, registry):
+    def test_view_blocked_by_metadata_not_blocked_and_no_metadata(self,
+                                                                  registry):
         from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource = testing.DummyResource(__provides__=IResource)
         assert view_blocked_by_metadata(resource, registry) is None
+
+    def test_view_blocked_by_metadata_blocked_but_no_metadata(self, registry):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        resource = testing.DummyResource(__provides__=IResource)
+        resource.hidden = True
+        assert view_blocked_by_metadata(resource, registry) == {'reason':
+                                                                'hidden'}
 
     def test_view_blocked_by_metadata_not_blocked(self, resource_with_metadata,
                                                   registry):
@@ -237,14 +270,14 @@ class TestVisibility:
         assert result['reason'] == 'deleted'
 
     def test_view_blocked_by_metadata_hidden(self, resource_with_metadata,
-                                              registry):
+                                             registry):
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource_with_metadata.hidden = True
         result = view_blocked_by_metadata(resource_with_metadata, registry)
         assert result['reason'] == 'hidden'
 
     def test_view_blocked_by_metadata_both(self, resource_with_metadata,
-                                              registry):
+                                           registry):
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource_with_metadata.deleted = True
         resource_with_metadata.hidden = True

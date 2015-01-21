@@ -13,12 +13,12 @@ a form for creating new elements. This form is then always visible.
 
 ```html_example
 <div class="listing">
-    <form class="listing-create-form placeholder">
+    <form class="listing-create-form debug-placeholder">
         Create Form
     </form>
     <ol class="listing-elements">
-        <li class="listing-element placeholder">Element1</li>
-        <li class="listing-element placeholder">Element2</li>
+        <li class="listing-element debug-placeholder">Element1</li>
+        <li class="listing-element debug-placeholder">Element2</li>
     </ol>
 </div>
 ```

@@ -1,19 +1,19 @@
 /*doc
 ---
-title: Placeholder
-name: placeholder
+title: debug-placeholder
+name: debug-placeholder
 category: Debug
 ---
 
-The placeholder is useful only in unfinished drafts and styleguide
+The debug-placeholder is useful only in unfinished drafts and styleguide
 documentation. It can be used to style elements that are not yet done.
 
 ```html_example
-<div class="placeholder">Placeholder</div>
+<div class="debug-placeholder">debug-placeholder</div>
 ```
 */
 .placeholder {
-    background-color: $color-structure-introvert;
+    background-color: $color-structure-surface;
     border: 2px dashed $color-structure-border;
     min-width: 3em;
     min-height: 3em;

@@ -15,6 +15,8 @@ import angularTranslateLoader = require("angularTranslateLoader");  if (angularT
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 import angularFlow = require("angularFlow");  if (angularFlow) { ; };
+import jqueryPlaceholderShim = require("jqueryPlaceholderShim");  if (jqueryPlaceholderShim) { ; };
+import angularPlaceholderShim = require("angularPlaceholderShim");  if (angularPlaceholderShim) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
@@ -67,6 +69,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
 
     var appDependencies = [
         "monospaced.elastic",
+        "placeholderShim",
         "pascalprecht.translate",
         "ngAnimate",
         "ngAria",
@@ -90,12 +93,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
 
     var app = angular.module("a3Mercator", appDependencies);
 
-    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", "$ariaProvider", (
-        adhTopLevelStateProvider : AdhTopLevelState.Provider,
-        $translateProvider,
-        $locationProvider,
-        $ariaProvider
-    ) => {
+    app.config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
                 $location.replace();
@@ -116,20 +114,26 @@ export var init = (config : AdhConfig.IService, meta_api) => {
             .space("content", {
                 resourceUrl: "/mercator/"
             });
-
+    }]);
+    app.config(["$compileProvider", ($compileProvider) => {
+        $compileProvider.debugInfoEnabled(config.debug);
+    }]);
+    app.config(["$locationProvider", ($locationProvider) => {
         // Make sure HTML5 history API works.  (If support for older
         // browsers is required, we may have to study angular support
         // for conversion between history API and #!-URLs.  See
         // angular documentation for details.)
         $locationProvider.html5Mode(true);
-
+    }]);
+    app.config(["$translateProvider", ($translateProvider) => {
         $translateProvider.useStaticFilesLoader({
             prefix: "/static/i18n/",
             suffix: ".json"
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
-
+    }]);
+    app.config(["$ariaProvider", ($ariaProvider) => {
         $ariaProvider.config({
             tabindex: false
         });
@@ -171,7 +175,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhWebSocket.register(angular);
 
     // force-load some services
-    var injector = angular.bootstrap(document, ["a3Mercator"]);
+    var injector = angular.bootstrap(document, ["a3Mercator"], {strictDi: true});
     injector.get("adhCrossWindowMessaging");
 
     loadComplete();

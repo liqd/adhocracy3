@@ -33,7 +33,7 @@ another user or a group of users::
     >>> resp_data.status_code
     200
     >>> resp_data.text
-    ''
+    '""'
 
 The fields are all required and have the following semantics:
 

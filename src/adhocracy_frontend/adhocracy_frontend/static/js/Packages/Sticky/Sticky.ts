@@ -3,16 +3,19 @@
 import Sticky = require("sticky"); if (Sticky) { ; };
 
 
-export var createDirective = () => {
+export var createDirective = (Modernizr : ModernizrStatic) => {
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
-            var el = element.first();
-            var par = el.parents(".moving-column-body");
-
-            // if we are in a moving column use this as our parent by default
-            var opts = (par.length > 0) ? { scrolling_parent: par } : {};
-            el.stick_in_parent(opts);
+            if ((<any>Modernizr).csspositionsticky) {
+                element.addClass("sticky");
+            } else {
+                element.stick_in_parent({
+                    scrolling_parent: ".moving-column-body",
+                    recalc_every: 2000,
+                    bottoming: false
+                });
+            }
         }
     };
 };
@@ -23,5 +26,5 @@ export var moduleName = "adhSticky";
 export var register = (angular) => {
     angular
         .module(moduleName, [])
-        .directive("adhSticky", [createDirective]);
+        .directive("adhSticky", ["Modernizr", createDirective]);
 };

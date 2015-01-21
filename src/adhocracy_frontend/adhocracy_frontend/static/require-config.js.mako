@@ -24,15 +24,15 @@ require.config({
         angularScroll: "../lib/angular-scroll/angular-scroll.min",
         angularFlow: "../lib/ng-flow/dist/ng-flow",
         angularMessages: "../lib/angular-messages/angular-messages.min",
+        angularPlaceholderShim: "../lib/angular-placeholder-shim/angular-placeholder-shim",
         flow: "../lib/flow.js/dist/flow",
-        fustyFlow: "../lib/fusty-flow.js/src/fusty-flow",
-        fustyFlowFactory: "../lib/fusty-flow.js/src/fusty-flow-factory",
         lodash: "../lib/lodash/dist/lodash",
         q: "../lib/q/q",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
         moment: "../lib/moment/min/moment-with-locales",
         sticky: "../lib/sticky-kit/jquery.sticky-kit",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
+        jqueryPlaceholderShim: "../lib/jquery-html5-placeholder-shim/jquery.html5-placeholder-shim",
         adhTemplates: "./templates"
     },
     shim: {
@@ -60,18 +60,14 @@ require.config({
         angularElastic: {
             deps: ["angular"]
         },
+        angularPlaceholderShim: {
+            deps: ["angular", "jqueryPlaceholderShim"]
+        },
         angularScroll: {
             deps: ["angular"]
         },
         angularFlow: {
-            deps: ["angular", "fustyFlowFactory"]
-        },
-        fustyFlowFactory: {
-            exports: "fustyFlowFactory",
-            deps: ["fustyFlow"]
-        },
-        fustyFlow: {
-            deps: ["flow"]
+            deps: ["angular", "flow"]
         },
         modernizr: {
             exports: "Modernizr"

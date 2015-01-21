@@ -1,5 +1,3 @@
-import fustyFlowFactory = require("fustyFlowFactory");
-
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
@@ -104,8 +102,6 @@ export interface IScopeData {
         nickInstance : number;
     };
 
-    imageUpload : Flow;
-
     // 3. in detail
     description : {
         description : string;
@@ -163,6 +159,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     mercatorProposalForm? : any;
     data : IScopeData;
     selectedState : string;
+    $flow? : Flow;
 }
 
 export interface IControllerScope extends IScope {
@@ -173,8 +170,6 @@ export interface IControllerScope extends IScope {
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
     mercatorProposalIntroductionForm? : any;
-    $flow : any;
-    currentUpload : any;
 }
 
 
@@ -234,6 +229,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
+        private flowFactory,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -255,6 +251,12 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             });
         }];
         return directive;
+    }
+
+    public link(scope, element, attrs, wrapper) {
+        var instance = super.link(scope, element, attrs, wrapper);
+        instance.scope.$flow = this.flowFactory.create();
+        return instance;
     }
 
     public _handleDelete(
@@ -375,7 +377,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.adhHttp.get(subResourcePaths.value),
             this.adhHttp.get(subResourcePaths.partners),
             this.adhHttp.get(subResourcePaths.finance),
-            this.adhHttp.get(subResourcePaths.experience)]);
+            this.adhHttp.get(subResourcePaths.experience)
+        ]);
 
         return subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
             subResources.forEach((subResource : ResourcesBase.Resource) => {
@@ -585,68 +588,72 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
-        var imagePathPromise : ng.IPromise<string> = uploadImageFile(this.adhHttp, "/mercator", data.imageUpload);
 
-        var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposal.parent = instance.scope.poolPath;
-        mercatorProposal.data[SIName.nick] = new SIName.Sheet({
-            name: AdhUtil.normalizeName(data.introduction.title + data.introduction.nickInstance)
-        });
-
-        var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposalVersion.parent = mercatorProposal.path;
-        mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-            follows: [mercatorProposal.first_version_path]
-        });
-
-        this.fill(data, mercatorProposalVersion);
-
-        var introduction;  // we need to especially in order to inject
-                           // the image before posting version 1.
-
-        var subresources = _.map([
-            [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
-            [RIMercatorIntroduction, RIMercatorIntroductionVersion, "introduction"],
-            [RIMercatorDescription, RIMercatorDescriptionVersion, "description"],
-            [RIMercatorLocation, RIMercatorLocationVersion, "location"],
-            [RIMercatorStory, RIMercatorStoryVersion, "story"],
-            [RIMercatorOutcome, RIMercatorOutcomeVersion, "outcome"],
-            [RIMercatorSteps, RIMercatorStepsVersion, "steps"],
-            [RIMercatorValue, RIMercatorValueVersion, "value"],
-            [RIMercatorPartners, RIMercatorPartnersVersion, "partners"],
-            [RIMercatorFinance, RIMercatorFinanceVersion, "finance"],
-            [RIMercatorExperience, RIMercatorExperienceVersion, "experience"]
-        ], (stuff) => {
-            var itemClass = <any>stuff[0];
-            var versionClass = <any>stuff[1];
-            var subresourceKey = <string>stuff[2];
-
-            var item = new itemClass({preliminaryNames: this.adhPreliminaryNames});
-            item.parent = mercatorProposal.path;
-            item.data[SIName.nick] = new SIName.Sheet({
-                name: AdhUtil.normalizeName(subresourceKey)
-            });
-
-            var version = new versionClass({preliminaryNames: this.adhPreliminaryNames});
-            version.parent = item.path;
-            version.data[SIVersionable.nick] = new SIVersionable.Sheet({
-                follows: [item.first_version_path]
-            });
-
-            this.fill(data, version);
-            mercatorProposalVersion.data[SIMercatorSubResources.nick][subresourceKey] = version.path;
-
-            if (subresourceKey === "introduction") {
-                introduction = version;
+        var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
+            if (typeof imagePath !== "undefined") {
+                data.introduction.picture = imagePath;
+            } else if (typeof data.introduction.picture === "undefined") {
+                delete data.introduction.picture;
             }
 
-            return [item, version];
-        });
+            var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
+            mercatorProposal.parent = instance.scope.poolPath;
+            mercatorProposal.data[SIName.nick] = new SIName.Sheet({
+                name: AdhUtil.normalizeName(data.introduction.title + data.introduction.nickInstance)
+            });
 
-        return imagePathPromise.then((imagePath : string) => {
-            introduction.data[SIMercatorIntroduction.nick].picture = imagePath;
-            return _.flatten([mercatorProposal, mercatorProposalVersion, subresources]);
-        });
+            var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
+            mercatorProposalVersion.parent = mercatorProposal.path;
+            mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                follows: [mercatorProposal.first_version_path]
+            });
+
+            this.fill(data, mercatorProposalVersion);
+
+            var subresources = _.map([
+                [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
+                [RIMercatorIntroduction, RIMercatorIntroductionVersion, "introduction"],
+                [RIMercatorDescription, RIMercatorDescriptionVersion, "description"],
+                [RIMercatorLocation, RIMercatorLocationVersion, "location"],
+                [RIMercatorStory, RIMercatorStoryVersion, "story"],
+                [RIMercatorOutcome, RIMercatorOutcomeVersion, "outcome"],
+                [RIMercatorSteps, RIMercatorStepsVersion, "steps"],
+                [RIMercatorValue, RIMercatorValueVersion, "value"],
+                [RIMercatorPartners, RIMercatorPartnersVersion, "partners"],
+                [RIMercatorFinance, RIMercatorFinanceVersion, "finance"],
+                [RIMercatorExperience, RIMercatorExperienceVersion, "experience"]
+            ], (stuff) => {
+                var itemClass = <any>stuff[0];
+                var versionClass = <any>stuff[1];
+                var subresourceKey = <string>stuff[2];
+
+                var item = new itemClass({preliminaryNames: this.adhPreliminaryNames});
+                item.parent = mercatorProposal.path;
+                item.data[SIName.nick] = new SIName.Sheet({
+                    name: AdhUtil.normalizeName(subresourceKey)
+                });
+
+                var version = new versionClass({preliminaryNames: this.adhPreliminaryNames});
+                version.parent = item.path;
+                version.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                    follows: [item.first_version_path]
+                });
+
+                this.fill(data, version);
+                mercatorProposalVersion.data[SIMercatorSubResources.nick][subresourceKey] = version.path;
+
+                return [item, version];
+            });
+
+            return this.$q.when(_.flatten([mercatorProposal, mercatorProposalVersion, subresources]));
+        };
+
+        if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
+            return uploadImageFile(this.adhHttp, "/mercator", instance.scope.$flow)
+                .then(postProposal);
+        } else {
+            return postProposal();
+        }
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
@@ -656,6 +663,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
             if (typeof imagePath !== "undefined") {
                 data.introduction.picture = imagePath;
+            } else if (typeof data.introduction.picture === "undefined") {
+                delete data.introduction.picture;
             }
 
             var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
@@ -669,15 +678,16 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         subresource.parent = AdhUtil.parentPath(oldSubresource.path);
                         self.fill(data, subresource);
                         mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
-                    return subresource;
+                        return subresource;
                     });
                 }))
                 .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
 
         };
 
-        if (data.imageUpload.files.length > 0) {
-            return uploadImageFile(this.adhHttp, "/mercator", data.imageUpload).then((imagePath) => postProposal(imagePath));
+        if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
+            return uploadImageFile(this.adhHttp, "/mercator", instance.scope.$flow)
+                .then(postProposal);
         } else {
             return postProposal();
         }
@@ -695,9 +705,10 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
+        flowFactory,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 
@@ -723,9 +734,10 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
+        flowFactory,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 }
@@ -843,36 +855,35 @@ export var register = (angular) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {
                 flowFactoryProvider.defaults = {};
             }
-            flowFactoryProvider.factory = fustyFlowFactory;
             flowFactoryProvider.defaults = {
-                singleFile : true,
-                maxChunkRetries : 1,
-                chunkRetryInterval : 5000,
-                simultaneousUploads : 4,
-                permanentErrors : [404, 500, 501, 502, 503],
+                singleFile: true,
+                maxChunkRetries: 1,
+                chunkRetryInterval: 5000,
+                simultaneousUploads: 4,
+                permanentErrors: [404, 500, 501, 502, 503],
                 // these are not native to flow but used by custom functions
-                minimumWidth : 400,
-                maximumByteSize : 3000000,
-                acceptedFileTypes : [
+                minimumWidth: 400,
+                maximumByteSize: 3000000,
+                acceptedFileTypes: [
                     "gif",
                     "jpeg",
                     "png"
                 ]  // correspond to exact mime types EG image/png
             };
         }])
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
-                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q) => {
+                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
-                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
+        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q) => {
+                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
-                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
+        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q) => {
+                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
@@ -926,19 +937,19 @@ export var register = (angular) => {
                 return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
             };
 
-            var imgUploadElement = $element.find("[name=introduction-picture-upload]");
-
             var imageExists = () => {
-                return ($scope.data.introduction && $scope.data.introduction.picture) || $scope.currentUpload.files.length > 0;
+                if ($scope.$flow && $scope.$flow.support) {
+                    return ($scope.data.introduction && $scope.data.introduction.picture) || $scope.$flow.files.length > 0;
+                } else {
+                    return false;
+                }
             };
 
-            $scope.$watch(() => imgUploadElement.scope().$flow, (flow) => {
+            if ($scope.$flow && $scope.$flow.support) {
                 var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
 
-                $scope.currentUpload = flow;
-
                 // validate image upload
-                flow.on("fileAdded", (file, event) => {
+                $scope.$flow.on("fileAdded", (file, event) => {
                     // We can only check some constraints after the image has
                     // been loaded asynchronously.  So we always return false in
                     // order to keep flow.js from adding the image and then add
@@ -952,14 +963,15 @@ export var register = (angular) => {
                     img.onload = () => {
                         imgUploadController.$setDirty();
                         imgUploadController.$setValidity("required", true);
-                        imgUploadController.$setValidity("tooBig", file.size <= flow.opts.maximumByteSize);
-                        imgUploadController.$setValidity("wrongType", flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
-                        imgUploadController.$setValidity("tooNarrow", img.width >= flow.opts.minimumWidth);
+                        imgUploadController.$setValidity("tooBig", file.size <= $scope.$flow.opts.maximumByteSize);
+                        imgUploadController.$setValidity(
+                            "wrongType", $scope.$flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
+                        imgUploadController.$setValidity("tooNarrow", img.width >= $scope.$flow.opts.minimumWidth);
 
                         if (imgUploadController.$valid) {
-                            flow.files[0] = file;
+                            $scope.$flow.files[0] = file;
                         } else {
-                            flow.cancel();
+                            $scope.$flow.cancel();
                             imgUploadController.$setValidity("required", imageExists());
                         }
 
@@ -969,19 +981,17 @@ export var register = (angular) => {
                     $scope.$apply();
                     return false;
                 });
-            });
+            }
 
             $scope.submitIfValid = () => {
                 var container = $element.parents("[data-du-scroll-container]");
 
-                var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
-                imgUploadController.$setValidity("required", imageExists());
+                if ($scope.$flow && $scope.$flow.support) {
+                    var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+                    imgUploadController.$setValidity("required", imageExists());
+                }
 
                 if ($scope.mercatorProposalForm.$valid) {
-                    // pluck flow object from file upload scope, and
-                    // attach it to where ResourceWidgets can find it.
-                    $scope.data.imageUpload = imgUploadElement.scope().$flow;
-
                     // append a random number to the nick to allow duplicate titles
                     $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
                         Math.floor((Math.random() * 10000) + 1);

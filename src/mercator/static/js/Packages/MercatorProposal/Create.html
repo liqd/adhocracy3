@@ -20,17 +20,17 @@
             data-ng-init="setFormDefaults()"
             data-du-spy-context="">
 
-        <div class="annotated-section">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
+            <p>{{ error | adhFormatError | translate }}</p>
+        </div>
 
-            <div class="annotated-section-body">
+        <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalBasicForm" id="mercator-proposal-basic">
 
-                <div class="form-error" data-ng-repeat="error in errors track by $index">
-                    <p>{{ error | adhFormatError | translate }}</p>
-                </div>
+            <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
 
-                <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalBasicForm" id="mercator-proposal-basic">
+            <div class="annotated-section">
 
-                    <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
+                <div class="annotated-section-body">
 
                     <h3 class="mercator-proposal-form-subheading">{{ "User Info:" | translate }}</h3>
 
@@ -267,11 +267,11 @@
                         data-ng-if="showError('mercatorProposalBasicForm.organization-info-status-enum', 'required')">
                         {{ "Please select one" | translate }}</span>
 
-                </section>
+                </div><!-- /.annotated-section-body -->
 
-            </div><!-- /.annotated-section-body -->
+            </div><!-- /.annotated-section -->
 
-        </div><!-- /.annotated-section -->
+        </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalIntroductionForm" id="mercator-proposal-introduction">
 
@@ -320,7 +320,7 @@
 
             </div><!-- /.annotated-section -->
 
-            <div class="annotated-section">
+            <div class="annotated-section" data-ng-if="$flow.support">
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "Are you sure you are allowed to use this picture?" | translate }}
                     {{"Image must be of type" | translate }} <span ng-repeat="fo in currentUpload.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>,
@@ -333,6 +333,7 @@
                         <div
                             data-flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
                             data-flow-init=""
+                            data-flow-object="$flow"
                             data-ng-model="data.introduction.imageUpload"
                             data-ng-class="{ 'is-invalid': mercatorProposalIntroductionForm['introduction-picture-upload'].$invalid }"
                             name="introduction-picture-upload">
@@ -856,16 +857,12 @@
 
         </section>
 
-        <div class="annotated-section">
-            <div class="annotated-section-body">
-                <input
-                    type="submit"
-                    name="submit"
-                    value="{{ 'submit' | translate }}"
-                    class="m-call-to-action" />
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'submit' | translate }}"
+            class="m-call-to-action" />
 
-                <a class="button" href="" data-ng-click="cancel()">{{ "Cancel" | translate }}</a>
-            </div><!--/.annotated-section-body -->
-        </div><!--/.annotated-section -->
+        <a class="button" href="" data-ng-click="cancel()">{{ "Cancel" | translate }}</a>
     </form>
 </div><!-- /.mercator-proposal-form-container -->

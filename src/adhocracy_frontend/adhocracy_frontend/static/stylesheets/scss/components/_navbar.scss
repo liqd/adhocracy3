@@ -16,9 +16,9 @@ aligned ones will wrap.
 
 ```html_example
 <div class="navbar">
-    <div class="navbar-left placeholder">Sort</div>
-    <div class="navbar-left placeholder">View</div>
-    <div class="navbar-right placeholder">Meta</div>
+    <div class="navbar-left debug-placeholder">Sort</div>
+    <div class="navbar-left debug-placeholder">View</div>
+    <div class="navbar-right debug-placeholder">Meta</div>
     <a class="navbar-right button">Button</a>
 </div>
 ```
