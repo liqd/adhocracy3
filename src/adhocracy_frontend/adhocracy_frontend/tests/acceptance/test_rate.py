@@ -10,7 +10,7 @@ from adhocracy_frontend.tests.acceptance.test_comment import create_top_level_co
 class TestRate:
 
     def test_create(self, browser, rest_url):
-        login_god(browser)
+        login_god(browser, visit_root=False)
         comment = create_comment(browser, rest_url, 'comment1')
         assert comment is not None
 
@@ -70,7 +70,7 @@ class TestRate:
         assert wait(check_result)
 
     def test_multi_rateable(self, browser):
-        listing = browser.find_by_css('.listing')
+        listing = browser.find_by_css('.listing').first
 
         rateable1 = get_list_element(listing, 'comment1', descendant='.comment-content')
         button1 = rateable1.find_by_css('.rate-pro').first
