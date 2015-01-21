@@ -124,7 +124,8 @@ Lets put the above theory into practice by hiding (censoring) some content!
 First, lets import the needed stuff and start the Adhocracy testapp::
 
     >>> from pprint import pprint
-    >>> from adhocracy_core.testing import god_header
+    >>> from adhocracy_core.testing import (admin_header, contributor_header,
+    ...                                     manager_header)
     >>> from webtest import TestApp
     >>> app = getfixture('app')
     >>> testapp = TestApp(app)
@@ -135,15 +136,15 @@ Lets create some content::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...        'data': {'adhocracy_core.sheets.name.IName': {'name':  'GoodProposal'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
-    ...                               headers=god_header)
+    ...                               headers=admin_header)
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...        'data': {'adhocracy_core.sheets.name.IName': {'name': 'BadProposal'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
-    ...                               headers=god_header)
+    ...                               headers=admin_header)
     >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kommunismus'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy/BadProposal",
-    ...                               data, headers=god_header)
+    ...                               data, headers=contributor_header)
 
 As expected, we can retrieve the BadProposal and its child::
 
@@ -162,13 +163,38 @@ Both proposals show up in the pool::
     ['.../adhocracy/BadProposal/',
      '.../adhocracy/GoodProposal/']
 
+Lets check whether we have the permission to delete or hide the proposal.
+The person who has created a resource (creator role) has the right to delete
+it::
+
+    >>> resp_data = testapp.options(rest_url + "/adhocracy/BadProposal",
+    ...                             headers=admin_header).json
+    >>> resp_data['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata']
+    {'deleted': ''}
+
+But they cannot hide it -- that special right is reserved to managers::
+
+    >>> resp_data = testapp.options(rest_url + "/adhocracy/BadProposal",
+    ...                             headers=manager_header).json
+    >>> sorted(resp_data['PUT']['request_body']['data']
+    ...                 ['adhocracy_core.sheets.metadata.IMetadata'])
+    ['deleted', 'hidden']
+
+Note: normally the sheets listed in the OPTIONS response are just mapped to
+empty dictionaries, the contained fields are not listed. But IMetadata is a
+special case since not everybody who can delete a resource can hide it.
+Therefore, the presence of the 'deleted' and/or 'hidden' fields indicates
+that PUTting a new value for this field is allowed. Once more, the
+corresponding value is just a stub (the empty string) and doesn't have any
+meaning.
+
 Lets hide the bad proposal::
 
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
     ...                      {'hidden': True}}}
     >>> resp_data = testapp.put_json(rest_url + "/adhocracy/BadProposal", data,
-    ...                              headers=god_header)
+    ...                              headers=manager_header)
 
 Now we get an error message when trying to retrieve the BadProposal::
 
@@ -177,7 +203,7 @@ Now we get an error message when trying to retrieve the BadProposal::
     >>> resp_data['reason']
     'hidden'
     >>> resp_data['modified_by']
-    '.../principals/users/0000000/'
+    '.../principals/users/000...'
     >>> 'modification_date' in resp_data
     True
 
