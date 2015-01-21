@@ -78,9 +78,9 @@ Textinput that represents a title.
 
     &.has-focus,
     &:focus {
-        border-color: $color-highlight-invalid;
-        color: $color-highlight-invalid;
-        outline: 1px solid $color-highlight-invalid;
+        border-color: $color-function-invalid;
+        color: $color-function-invalid;
+        outline: 1px solid $color-function-invalid;
     }
 }
 
@@ -98,12 +98,12 @@ textarea {
     margin-bottom: 0.5em;
     padding: 0.25em $font-size-normal;
     border: 1px solid $color-structure-border;
-    color: $color-prime-normal;
-    background-color: $color-background;
+    color: $color-text-normal;
+    background-color: $color-background-base;
 
     @include placeholder {
         @include opacity(1);
-        color: $color-secondary-extrovert;
+        color: $color-text-introvert;
     }
 
     &.m-title {
@@ -112,8 +112,8 @@ textarea {
 
     &.has-focus,
     &:focus {
-        border-color: $color-highlight-normal;
-        outline: 1px solid $color-highlight-normal;
+        border-color: $color-text-highlight-normal;
+        outline: 1px solid $color-text-highlight-normal;
     }
 
     &.ng-dirty, &.is-dirty {
@@ -125,8 +125,8 @@ textarea {
     &.is-disabled,
     &.ng-disabled,
     &:disabled {
-        border-color: $color-structure-border-introvert;
-        outline: 1px solid $color-structure-border-introvert;
+        border-color: $color-structure-normal;
+        outline: 1px solid $color-structure-normal;
     }
 }
 
@@ -190,7 +190,7 @@ Class to add styling to a label when the label itself is used as a container.
 
 .input-error {
     @include inline-block;
-    color: $color-highlight-invalid;
+    color: $color-function-invalid;
     font-size: $font-size-small;
 }
 
@@ -289,7 +289,7 @@ This error concerns the whole form.
     padding: 0 1em;
     border-top: 1px solid $color-structure-border;
     border-bottom: 1px solid $color-structure-border;
-    background: $color-structure-surface;
+    background: $color-structure-introvert;
 }
 
 /*doc

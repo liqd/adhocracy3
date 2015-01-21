@@ -30,13 +30,13 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         width: 100% * 1 / 0.6289;
 
         .annotated-section-annotation {
-            background-color: $color-structure-active;
+            background-color: $color-background-base-introvert;
         }
     }
 }
 
 .mercator-proposal-form-container {
-    background: $color-structure-border-introvert;
+    background: $color-structure-normal;
 }
 
 .mercator-proposal-form-annotation {
@@ -52,7 +52,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-heading {
-    border: 1px solid $color-structure-border-introvert;
+    border: 1px solid $color-structure-normal;
     border-width: 1px 0;
     font-weight: bold;
     line-height: 1.5;
@@ -60,7 +60,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     padding: 0 1em 1px;
 
     &.active {
-        color: $color-highlight-normal;
+        color: $color-text-highlight-normal;
     }
 }
 
@@ -81,12 +81,12 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     padding: 1px 1px 0;
 
     li {
-        background: $color-structure-active;
+        background: $color-background-base-introvert;
         line-height: 2;
         margin-bottom: 1px;
 
         &, a {
-            color: $color-highlight-normal;
+            color: $color-text-highlight-normal;
             padding-bottom: 0;
         }
 
@@ -137,11 +137,11 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         vertical-align: middle;
 
         &.icon-speechbubbles {
-            color: $color-brand-accent1;
+            color: $color-brand-three-normal;
         }
 
         &.icon-pointy-rectangle-left {
-            color: $color-brand-accent2;
+            color: $color-brand-one-normal;
             font-size: 200%;
             vertical-align: text-top;
         }
@@ -157,7 +157,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 
     &.mercator-propsal-list-item-meta-item-budget {
-        color: $color-highlight-normal;
+        color: $color-text-highlight-normal;
         font-size: $font-size-plus;
     }
 }
@@ -166,13 +166,13 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     padding-bottom: 1em;
 
     .icon-speechbubbles {
-        color: $color-highlight-extrovert;
+        color: $color-text-highlight-introvert;
     }
 }
 
 .mercator-proposal-detail-cover {
     @include span(full);
-    border-bottom: 1px solid $color-secondary-introvert;
+    border-bottom: 1px solid $color-text-introvert;
     padding: 0.8em 0.8em 0.5em;
 
     .chapter-header {
@@ -196,7 +196,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-container {
-    background-color: $color-structure-active;
+    background-color: $color-background-base-introvert;
     clear: left;
 }
 
@@ -217,7 +217,7 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-chapters {
     background-color: white;
-    border-left: 1px solid $color-secondary-introvert;
+    border-left: 1px solid $color-text-introvert;
     padding: 0 0.8em;
     margin-left: $mercator-proposal-detail-nav-width;
 
@@ -240,7 +240,7 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item {
     @include container;
-    border-bottom: 1px solid $color-secondary-introvert;
+    border-bottom: 1px solid $color-text-introvert;
     font-size: $font-size-plus;
     line-height: 1;
     padding: 1em 1.25em 1.125em 0.875em;
@@ -250,11 +250,11 @@ $mercator-proposal-detail-nav-width: 2em;
     }
 
     &.is-not-selected {
-        background: $color-structure-active;
+        background: $color-background-base-introvert;
 
         i[class*=icon-],
         .mercator-propsal-list-item-meta-item-budget {
-            color: $color-highlight-extrovert;
+            color: $color-text-highlight-introvert;
         }
     }
 }
@@ -293,11 +293,11 @@ $mercator-proposal-detail-nav-width: 2em;
     padding: 0.9375em 0;
 
     a {
-        color: $color-prime-normal;
+        color: $color-text-normal;
         text-decoration: none;
 
         &:hover, &:focus {
-            color: $color-highlight-normal;
+            color: $color-text-highlight-normal;
         }
     }
 }
@@ -307,7 +307,7 @@ $mercator-proposal-detail-nav-width: 2em;
     padding-right: 2em;
 
     &.budget {
-        color: $color-secondary-extrovert;
+        color: $color-text-introvert;
     }
 
     strong {

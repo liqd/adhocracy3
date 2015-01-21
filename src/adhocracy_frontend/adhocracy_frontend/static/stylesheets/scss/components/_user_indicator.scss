@@ -23,7 +23,7 @@ It is usually used in the header bar.
     .user-indicator-logout,
     .user-indicator-login,
     .user-indicator-register {
-        color: $color-highlight-extrovert;
+        color: $color-text-highlight-introvert;
         font-variant: small-caps;
         font-size: $font-size-plus;
 
@@ -32,7 +32,7 @@ It is usually used in the header bar.
         }
 
         &:active {
-            color: $color-prime-normal;
+            color: $color-text-normal;
         }
     }
 }

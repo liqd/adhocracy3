@@ -48,7 +48,7 @@ is selected, no state is applied.
 */
 .comment-children {
     margin-top: 0.6em;
-    border-left: 0.0833em solid $color-brand-accent2;
+    border-left: 0.0833em solid $color-brand-one-normal;
 
     .comment {
         @include triangle-tl;
@@ -64,7 +64,7 @@ is selected, no state is applied.
     }
 
     .comment-create-form-text {
-        background: $color-structure-border-introvert;
+        background: $color-structure-normal;
     }
 }
 
@@ -165,20 +165,20 @@ parent: comment
 }
 
 .comment-action {
-    color: $color-secondary-extrovert;
+    color: $color-text-introvert;
     font-weight: bold;
     text-transform: lowercase;
     text-decoration: none;
 
     &:hover, &:focus, &:active {
-        color: darken($color-secondary-extrovert, 10%);
+        color: darken($color-text-introvert, 10%);
     }
 
     &.m-comment-reply {
         text-transform: uppercase;
 
         &:hover, &:focus, &:active {
-            color: $color-highlight-extrovert;
+            color: $color-text-highlight-introvert;
         }
     }
 }
@@ -222,7 +222,7 @@ parent: comment
         }
 
         a {
-            color: $color-highlight-normal;
+            color: $color-text-highlight-normal;
         }
     }
 

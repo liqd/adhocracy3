@@ -28,17 +28,17 @@ Switch the space (content/user)
         text-decoration: none;
 
         i {
-            color: $color-structure-border-extrovert;
+            color: $color-structure-extrovert;
             font-size: 130%;
         }
 
         &.is-active i {
-            color: $color-highlight-normal;
+            color: $color-text-highlight-normal;
         }
     }
 
     .separator {
         margin: 0 1em;
-        border-left: 2px solid $color-structure-border-extrovert;
+        border-left: 2px solid $color-structure-extrovert;
     }
 }

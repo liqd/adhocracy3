@@ -110,7 +110,7 @@ The menu should always have the same state as its columns.
     }
 
     &.is-collapse, &.is-hide {
-        background-color: $color-structure-surface;
+        background-color: $color-structure-introvert;
         border: 0;
         padding-left: 0;
 
@@ -141,7 +141,7 @@ The menu should always have the same state as its columns.
     overflow-y: auto;
 
     // look
-    border: 0 solid $color-secondary-introvert;
+    border: 0 solid $color-structure-normal;
     border-width: 0 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
 }
@@ -175,7 +175,7 @@ States:
 */
 .moving-column-menu {
     @include clearfix;
-    background: $color-secondary-introvert;
+    background: $color-structure-normal;
     font-size: $font-size-small;
     height: $moving-column-menu-height * ($font-size-normal / $font-size-small);
     line-height: $moving-column-menu-height * ($font-size-normal / $font-size-small) / 1em;
@@ -183,7 +183,7 @@ States:
 
     a {
         @include inline-block;
-        color: $color-highlight-extrovert;
+        color: $color-text-highlight-introvert;
         font-size: $font-size-small;
         font-weight: $font-weight-introvert;
         float: left;
@@ -191,11 +191,11 @@ States:
         text-decoration: none;
 
         &:hover, &:focus {
-            color: $color-secondary-normal;
+            color: $color-text-highlight-extrovert;
         }
 
         &:active, &.is-active {
-            color: $color-highlight-normal;
+            color: $color-text-highlight-normal;
          }
     }
 }
@@ -218,15 +218,15 @@ States:
         text-align: center;
         vertical-align: baseline;
         text-decoration: none;
-        color: $color-background;
-        background-color: $color-structure-surface;
+        color: $color-background-base;
+        background-color: $color-structure-introvert;
 
         &:hover, &:focus {
-            color: $color-brand-accent1;
+            color: $color-brand-three-normal;
         }
 
         &:active {
-            color: $color-secondary-normal;
+            color: $color-text-highlight-extrovert;
         }
 
         .moving-column-menu-nav-icon {
@@ -254,7 +254,7 @@ States:
     left: -30%;
     width: 30%;
     z-index: 1;
-    background-color: $color-structure-surface;
+    background-color: $color-structure-introvert;
     padding: 0.5em;
 
     &.is-visible {

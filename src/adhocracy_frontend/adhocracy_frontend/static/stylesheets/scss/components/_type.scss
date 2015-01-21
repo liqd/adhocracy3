@@ -29,7 +29,7 @@ category: Type
 h1, h2, h3, h4, h5, h6 {
     // better kerning (char spacing)
     text-rendering: optimizelegibility;
-    color: $color-prime-extrovert;
+    color: $color-text-extrovert;
 }
 
 /*doc
@@ -70,13 +70,13 @@ A hyperlink. It may have the following states:
 ```
 */
 a {
-    color: $color-highlight-normal;
+    color: $color-text-highlight-normal;
 
     &:hover,
     &.is-hover,
     &:focus,
     &.has-focus {
-        color: $color-highlight-introvert;
+        color: $color-text-highlight-introvert;
     }
 }
 
@@ -99,7 +99,7 @@ A call-to-action link
     text-transform: uppercase;
 
     &:hover, &:focus {
-        color: $color-highlight-introvert;
+        color: $color-text-highlight-introvert;
     }
 
     &.m-add:before {
@@ -123,12 +123,12 @@ When is a <a href="#" class="disguised-link">Link</a> not a link?
 ```
 */
 @mixin disguised-link {
-    color: $color-highlight-extrovert;
+    color: $color-text-highlight-introvert;
     text-decoration: none;
 
     &:hover,
     &:focus {
-        color: $color-highlight-normal;
+        color: $color-text-highlight-normal;
     }
 }
 
@@ -174,8 +174,8 @@ category: Type
 
 @mixin inline-box {
     @include inline-block;
-    color: $color-highlight-extrovert;
-    border: 1px solid $color-highlight-extrovert;
+    color: $color-text-highlight-introvert;
+    border: 1px solid $color-text-highlight-introvert;
     font-size: $font-size-small;
     padding: 0 1em;
 }
@@ -328,7 +328,7 @@ parent: inline
 */
 del {
     text-decoration: line-through;
-    color: $color-highlight-invalid;
+    color: $color-function-invalid;
 }
 
 /*doc
@@ -344,7 +344,7 @@ parent: inline
 */
 ins {
     text-decoration: underline;
-    color: $color-highlight-valid;
+    color: $color-function-valid;
 }
 
 /*doc
@@ -364,7 +364,7 @@ category: Type
 blockquote {
     position: relative;
     font-style: italic;
-    border-left: 0.4em solid $color-highlight-normal;
+    border-left: 0.4em solid $color-text-highlight-normal;
     padding-left: 0.5em;
     margin: 1.5em;
 
@@ -395,7 +395,7 @@ parent: inline
 */
 code {
     font-size: 0.9em;
-    background-color: $color-structure-surface;
+    background-color: $color-structure-introvert;
 }
 
 /*doc
@@ -416,7 +416,7 @@ pre {
     display: block;
     padding: 0.7em;
     font-size: 0.9em;
-    background-color: $color-structure-surface;
+    background-color: $color-structure-introvert;
     border: 1px solid $color-structure-border;
     max-height: 18em;
     overflow: auto;

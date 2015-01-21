@@ -12,11 +12,11 @@ documentation. It can be used to style elements that are not yet done.
 <div class="debug-placeholder">debug-placeholder</div>
 ```
 */
-.debug-placeholder {
-    background-color: $color-structure-surface;
+.placeholder {
+    background-color: $color-structure-normal;
     border: 2px dashed $color-structure-border;
     min-width: 3em;
     min-height: 3em;
-    color: $color-secondary-extrovert;
+    color: $color-text-introvert;
     text-align: center;
 }
