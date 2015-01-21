@@ -7,12 +7,11 @@ export var createDirective = () => {
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
-            var el = element.first();
-            var par = el.parents(".moving-column-body");
-
-            // if we are in a moving column use this as our parent by default
-            var opts = (par.length > 0) ? { scrolling_parent: par } : {};
-            el.stick_in_parent(opts);
+            element.stick_in_parent({
+                scrolling_parent: ".moving-column-body",
+                recalc_every: 2000,
+                bottoming: false
+            });
         }
     };
 };
