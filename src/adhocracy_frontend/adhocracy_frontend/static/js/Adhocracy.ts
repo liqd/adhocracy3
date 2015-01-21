@@ -13,6 +13,8 @@ import angularMessages = require("angularMessages");  if (angularMessages) { ; }
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
+import jqueryPlaceholderShim = require("jqueryPlaceholderShim");  if (jqueryPlaceholderShim) { ; };
+import angularPlaceholderShim = require("angularPlaceholderShim");  if (angularPlaceholderShim) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
@@ -64,6 +66,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
 
     var appDependencies = [
         "monospaced.elastic",
+        "placeholderShim",
         "pascalprecht.translate",
         "ngAnimate",
         "ngAria",

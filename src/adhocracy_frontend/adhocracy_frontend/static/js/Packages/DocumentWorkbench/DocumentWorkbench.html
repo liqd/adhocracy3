@@ -1,13 +1,13 @@
 <adh-spaces>
     <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'content'">
         <div class="moving-column moving-column-structure">
-            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-menu debug-placeholder"></div>
             <div class="moving-column-body">
                 <adh-web-socket-test data-paths="{{websocketTestPaths}}"></adh-web-socket-test>
             </div>
         </div>
         <div class="moving-column moving-column-content">
-            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-menu debug-placeholder"></div>
             <div class="moving-column-body">
                 <adh-listing data-path="{{path}}" data-content-type="{{contentType}}">
                     <div data-ng-switch="transclusionId">
@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="moving-column moving-column-content2">
-            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-menu debug-placeholder"></div>
             <div class="moving-column-body">
                 <adh-comment-listing data-path="{{content2Url}}">
             </div>
@@ -33,13 +33,13 @@
     </div>
     <div data-adh-moving-columns="" class="moving-columns" data-ng-show="currentSpace === 'user'">
         <div class="moving-column moving-column-structure">
-            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-menu debug-placeholder"></div>
             <div class="moving-column-body" data-du-scroll-container="">
                 <p>User list</p>
             </div>
         </div>
         <div class="moving-column moving-column-content">
-            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-menu debug-placeholder"></div>
             <div class="moving-column-body" data-du-scroll-container="" adh-user-profile>
                 <h1>{{user.data.name}}</h1>
                 <p><a href="mailto:{{user.data.email}}">{{user.data.email}}</a></p>

@@ -115,5 +115,6 @@ declare module "fustyFlow" {}
 declare module "fustyFlowFactory" {}
 
 declare module "socialSharePrivacy" {}
-
 declare module "adhTemplates" {}
+declare module "angularPlaceholderShim" {}
+declare module "jqueryPlaceholderShim" {}
