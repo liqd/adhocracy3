@@ -194,7 +194,7 @@ def browser_test_helper(browser, url, wait=5) -> Browser:
 
     def jasmine_finished(browser):
         code = 'jsApiReporter.finished'
-        return browser.browser.evaluate_script(code)
+        return browser.evaluate_script(code)
 
     browser.wait_for_condition(jasmine_finished, wait)
 

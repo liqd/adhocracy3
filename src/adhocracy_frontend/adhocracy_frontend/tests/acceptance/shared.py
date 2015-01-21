@@ -70,24 +70,24 @@ def logout(browser):
 
 def is_logged_in(browser):
     """Check if user is logged in."""
-    return browser.browser.is_element_present_by_css('.user-indicator-logout')
+    return browser.is_element_present_by_css('.user-indicator-logout')
 
 
 def is_logged_out(browser):
     """Check if user is logged out."""
-    return browser.browser.is_element_not_present_by_css(
+    return browser.is_element_not_present_by_css(
         '.user-indicator-logout')
 
 
 def fill_input(browser, css_selector, value):
     """Find `css_selector` and fill value."""
-    element = browser.browser.find_by_css(css_selector).first
+    element = browser.find_by_css(css_selector).first
     element.fill(value)
 
 
 def click_button(browser, css_selector):
     """Find `css_selector` and click."""
-    element = browser.browser.find_by_css(css_selector).first
+    element = browser.find_by_css(css_selector).first
     element.click()
 
 
@@ -106,7 +106,7 @@ def get_listing_create_form(listing) -> WebDriverElement:
 
 def get_column_listing(browser, column_name: str) -> WebDriverElement:
     """Return the listing in the content column ."""
-    column = browser.browser.find_by_css('.moving-column-' + column_name)
+    column = browser.find_by_css('.moving-column-' + column_name)
     listing = column.first.find_by_css('.listing')
     return listing
 
