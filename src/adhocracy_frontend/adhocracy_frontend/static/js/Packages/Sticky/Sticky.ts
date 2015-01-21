@@ -9,6 +9,8 @@ export var createDirective = () => {
         link: (scope, element, attrs) => {
             element.stick_in_parent({
                 scrolling_parent: ".moving-column-body",
+                recalc_every: 2000,
+                bottoming: false
             });
         }
     };
