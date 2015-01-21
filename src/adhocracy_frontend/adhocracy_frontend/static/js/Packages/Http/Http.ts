@@ -9,12 +9,14 @@ import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhUtil = require("../Util/Util");
+import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
 
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
+import AdhCache = require("./Cache");
 import AdhConvert = require("./Convert");
 import AdhError = require("./Error");
 import AdhMetaApi = require("./MetaApi");
@@ -68,13 +70,15 @@ export interface IBatchResult {
 // ``Resources.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
 export class Service<Content extends ResourcesBase.Resource> {
+
     constructor(
         private $http : ng.IHttpService,
         private $q : ng.IQService,
         private $timeout : ng.ITimeoutService,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
         private adhPreliminaryNames : AdhPreliminaryNames.Service,
-        private adhConfig : AdhConfig.IService
+        private adhConfig : AdhConfig.IService,
+        private adhCache? : AdhCache.Service
     ) {}
 
     private formatUrl(path) {
@@ -92,24 +96,25 @@ export class Service<Content extends ResourcesBase.Resource> {
         }
     }
 
+    private importOptions(raw : { data : IOptions }) : IOptions {
+        return {
+            OPTIONS: raw.data.hasOwnProperty("OPTIONS") && raw.data.OPTIONS ? true : false,
+            PUT: raw.data.hasOwnProperty("PUT") && raw.data.PUT ? true : false,
+            GET: raw.data.hasOwnProperty("GET") && raw.data.GET ? true : false,
+            POST: raw.data.hasOwnProperty("POST") && raw.data.POST ? true : false,
+            HEAD: raw.data.hasOwnProperty("HEAD") && raw.data.HEAD ? true : false
+        };
+    }
+
     public options(path : string) : ng.IPromise<IOptions> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-options preliminary path: " + path;
         }
         path = this.formatUrl(path);
 
-        var importOptions = (raw : { data : IOptions }) : IOptions => {
-            return {
-                OPTIONS: raw.data.hasOwnProperty("OPTIONS") && raw.data.OPTIONS ? true : false,
-                PUT: raw.data.hasOwnProperty("PUT") && raw.data.PUT ? true : false,
-                GET: raw.data.hasOwnProperty("GET") && raw.data.GET ? true : false,
-                POST: raw.data.hasOwnProperty("POST") && raw.data.POST ? true : false,
-                HEAD: raw.data.hasOwnProperty("HEAD") && raw.data.HEAD ? true : false
-            };
-        };
-
-        return this.$http({method: "OPTIONS", url: path})
-            .then(importOptions, AdhError.logBackendError);
+        return this.adhCache.memoize(path, "OPTIONS",
+            () => this.$http({method: "OPTIONS", url: path})
+                .then(this.importOptions, AdhError.logBackendError));
     }
 
     public getRaw(path : string, params ?: { [key : string] : string }) : ng.IHttpPromise<any> {
@@ -117,15 +122,17 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-get preliminary path: " + path;
         }
         path = this.formatUrl(path);
-        return this.$http
-            .get(path, { params : params });
+
+        return this.$http.get(path, { params : params });
     }
 
     public get(path : string, params ?: { [key : string] : string }) : ng.IPromise<Content> {
-        return this.getRaw(path, params)
-            .then(
+        var query = (typeof params === "undefined") ? "" : "?" + $.param(params);
+
+        return this.adhCache.memoize(path, query,
+            () => this.getRaw(path, params).then(
                 (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
-                AdhError.logBackendError);
+                AdhError.logBackendError));
     }
 
     public putRaw(path : string, obj : Content) : ng.IHttpPromise<any> {
@@ -133,6 +140,7 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-put preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        this.adhCache.invalidate(path);
         return this.$http
             .put(path, obj);
     }
@@ -151,6 +159,8 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-post preliminary path: " + path;
         }
         path = this.formatUrl(path);
+
+        this.adhCache.invalidate(path);
 
         if (typeof FormData !== "undefined" && FormData.prototype.isPrototypeOf(obj)) {
             return _self.$http({
@@ -236,7 +246,13 @@ export class Service<Content extends ResourcesBase.Resource> {
                 transaction.post(resource.parent, resource);
             });
 
-            return transaction.commit().then(batchResult => batchResult.postedResources);
+            return transaction.commit().then(batchResult => {
+                _.forEach(batchResult.postedResources, (resource) => {
+                    this.adhCache.invalidate(AdhUtil.parentPath(resource.path));
+                });
+
+                return batchResult.postedResources;
+            });
         });
     }
 
@@ -407,9 +423,13 @@ export var moduleName = "adhHttp";
 export var register = (angular, metaApi) => {
     angular
         .module(moduleName, [
-            AdhPreliminaryNames.moduleName
+            AdhPreliminaryNames.moduleName,
+            AdhWebSocket.moduleName,
+            "angular-data.DSCacheFactory",
         ])
-        .service("adhHttp", ["$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", Service])
+        .service("adhHttp", [
+            "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
+        .service("adhCache", ["adhWebSocket", "DSCacheFactory", AdhCache.Service])
         .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
         .filter("adhFormatError", () => AdhError.formatError);
 };

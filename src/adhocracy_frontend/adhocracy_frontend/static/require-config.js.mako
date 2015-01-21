@@ -24,6 +24,7 @@ require.config({
         angular: "../lib/angular/angular",
         angularAnimate: "../lib/angular-animate/angular-animate",
         angularAria: "../lib/angular-aria/angular-aria",
+        angularCache: "../lib/angular-cache/dist/angular-cache.min",
         angularTranslate: "../lib/angular-translate/angular-translate",
         angularTranslateLoader: "../lib/angular-translate-loader-static-files/angular-translate-loader-static-files",
         angularElastic: "../lib/angular-elastic/elastic",
@@ -54,6 +55,9 @@ require.config({
             deps: ["angular"]
         },
         angularMessages: {
+            deps: ["angular"]
+        },
+        angularCache: {
             deps: ["angular"]
         },
         angularTranslate: {

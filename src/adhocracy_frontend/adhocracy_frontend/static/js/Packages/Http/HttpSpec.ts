@@ -88,6 +88,7 @@ export var register = () => {
             var $timeoutMock;
             var adhMetaApiMock;
             var adhConfigMock;
+            var adhCacheMock;
             var adhHttp : AdhHttp.Service<any>;
 
             beforeEach(() => {
@@ -96,7 +97,13 @@ export var register = () => {
                 $timeoutMock = mkTimeoutMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
                 adhConfigMock = { rest_url: "" };
-                adhHttp = new AdhHttp.Service($httpMock, <any>q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock);
+                adhCacheMock = {
+                    invalidate: (path) => undefined,
+                    invalidateAll: () => undefined,
+                    memoize: (path, subkey, closure) => closure()
+                };
+                adhHttp = new AdhHttp.Service(
+                    $httpMock, <any>q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock, adhCacheMock);
             });
 
             describe("options", () => {
