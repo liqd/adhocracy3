@@ -268,12 +268,22 @@ States:
     }
 }
 
-.moving-column-mask {
-    @include opacity(0.5);
-    background-color: black;
-    height: 100%;
+.moving-column-mask,
+.moving-column-overlay-dialogue {
     left: 0;
     position: absolute;
     top: 0;
     width: 100%;
+}
+
+.moving-column-mask {
+    @include opacity(0.5);
+    background-color: black;
+    height: 100%;
+}
+
+.moving-column-overlay-dialogue {
+    background: $color-structure-normal;
+    padding: 1em;
+    text-align: center;
 }
