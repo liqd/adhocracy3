@@ -14,24 +14,24 @@ is selected, no state is applied.
 
 ```html_example
 <div class="comment">
-    <div class="comment-main placeholder">Comment Main</div>
+    <div class="comment-main debug-placeholder">Comment Main</div>
 
-    <div class="comment-children-create-form placeholder">
+    <div class="comment-children-create-form debug-placeholder">
         Comment Create Form
     </div>
 
 
     <div class="comment-children">
         <div class="comment">
-            <div class="comment-main placeholder">Comment Main</div>
+            <div class="comment-main debug-placeholder">Comment Main</div>
 
             <div class="comment-children">
             </div>
         </div>
         <div class="comment">
-            <div class="comment-main placeholder">Comment Main</div>
+            <div class="comment-main debug-placeholder">Comment Main</div>
 
-            <div class="comment-children-create-form placeholder">
+            <div class="comment-children-create-form debug-placeholder">
                 Comment Create Form
             </div>
 
@@ -40,7 +40,7 @@ is selected, no state is applied.
     </div>
 </div>
 <div class="comment">
-    <div class="comment-main placeholder">Comment Main</div>
+    <div class="comment-main debug-placeholder">Comment Main</div>
 
     <div class="comment-children"></div>
 </div>
