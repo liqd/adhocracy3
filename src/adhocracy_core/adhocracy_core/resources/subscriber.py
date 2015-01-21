@@ -44,12 +44,12 @@ logger = getLogger(__name__)
 
 def resource_created_and_added_subscriber(event):
     """Add created message to the transaction_changelog."""
-    _add_changelog_metadata(event.registry, event.object, created=True)
+    _add_changelog(event.registry, event.object, created=True)
 
 
 def resource_modified_subscriber(event):
     """Add modified message to the transaction_changelog."""
-    _add_changelog_metadata(event.registry, event.object, modified=True)
+    _add_changelog(event.registry, event.object, modified=True)
 
 
 def tag_created_and_added_or_modified_subscriber(event):
@@ -73,14 +73,12 @@ def itemversion_created_subscriber(event):
     """Add new `follwed_by` and `last_version` to the transaction_changelog."""
     if event.new_version is None:
         return
-    _add_changelog_metadata(event.registry, event.object,
-                            followed_by=event.new_version)
+    _add_changelog(event.registry, event.object, followed_by=event.new_version)
     item = find_interface(event.object, IItem)
-    _add_changelog_metadata(event.registry, item,
-                            last_version=event.new_version)
+    _add_changelog(event.registry, item, last_version=event.new_version)
 
 
-def _add_changelog_metadata(registry: Registry, resource: IResource, **kwargs):
+def _add_changelog(registry: Registry, resource: IResource, **kwargs):
     """Add changelog metadata `kwargs` to the transaction changelog."""
     changelog = registry._transaction_changelog
     path = resource_path(resource)
@@ -220,13 +218,11 @@ def metadata_modified_subscriber(event):
     if is_modified:
         # reindex the private_visibility catalog index for all descendants
         _reindex_resource_and_descendants(event.object)
-    visibility_change = _determine_visibility_shange(was_hidden=was_hidden,
+    visibility_change = _determine_visibility_change(was_hidden=was_hidden,
                                                      was_deleted=was_deleted,
                                                      is_hidden=is_hidden,
                                                      is_deleted=is_deleted)
-    _add_changelog_metadata(event.registry,
-                            event.object,
-                            visibility=visibility_change)
+    _add_changelog(event.registry, event.object, visibility=visibility_change)
 
 
 def _reindex_resource_and_descendants(resource: IResource):
@@ -239,7 +235,7 @@ def _reindex_resource_and_descendants(resource: IResource):
         adhocracy_catalog.reindex_resource(res)
 
 
-def _determine_visibility_shange(was_hidden: bool,
+def _determine_visibility_change(was_hidden: bool,
                                  was_deleted: bool,
                                  is_hidden: bool,
                                  is_deleted: bool) -> VisibilityChange:
