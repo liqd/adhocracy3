@@ -56,6 +56,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
             (Allow, 'role:admin', 'add_group'),
             (Allow, 'role:admin', 'add_pool'),
             (Allow, 'role:admin', 'edit_group'),
+            (Allow, 'role:admin', 'edit_some_sheets'),  # duplicate
             (Allow, 'role:admin', 'edit_sheet'),  # default permission
             (Allow, 'role:admin', 'manage_principals'),
             (Allow, 'role:god', ALL_PERMISSIONS),
