@@ -29,7 +29,6 @@ from adhocracy_core.utils import get_last_new_version
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_last_version
-from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.versions import IForkableVersionable
@@ -209,32 +208,15 @@ def _get_writable_appstructs(resource, registry) -> dict:
 def metadata_modified_subscriber(event):
     """Invoked after PUTting modified metadata fields.
 
-    :raises colander.Invalid: if
+    Reindex all resource and descendedants if hidden value is modified.
     """
     is_deleted = event.new_appstruct['deleted']
     is_hidden = event.new_appstruct['hidden']
     was_deleted = event.old_appstruct['deleted']
     was_hidden = event.old_appstruct['hidden']
-
-    if was_hidden != is_hidden:
-        if event.request is None:
-            logger.warning('Ignoring request to change hidden status to %s '
-                           'since we cannot check permissions',
-                           is_hidden)
-            return
-        if not event.request.has_permission('hide_resource', event.object):
-            # FIXME a better place to validate is inside the IMetadata schema.
-            raise_colander_style_error(IMetadata,
-                                       'hidden',
-                                       'Changing this field is not allowed')
-
-    # Store hidden/deleted status in object for efficient access
-    # FIXME a better place to do attribute storage is inside a custom metadata
-    # sheet class or just use AttributeStorageSheet sheet class.
-    event.object.deleted = is_deleted
-    event.object.hidden = is_hidden
-
-    if (was_hidden != is_hidden) or (was_deleted != is_deleted):
+    is_modified = (was_hidden != is_hidden) or (was_deleted != is_deleted)
+    if is_modified:
+        # reindex the private_visibility catalog index for all descendants
         _reindex_resource_and_descendants(event.object)
 
 

@@ -459,122 +459,51 @@ class TestMetadataModifiedSubscriber:
                             mock_reindex)
         return mock_reindex
 
-    def test_newly_hidden(self, context, registry, request, mock_reindex):
+    def test_newly_hidden(self, context, mock_reindex):
         from adhocracy_core.events import ResourceSheetModified
         from adhocracy_core.resources.subscriber import metadata_modified_subscriber
         from adhocracy_core.sheets.metadata import IMetadata
         old_appstruct = {'deleted': False, 'hidden': False}
         new_appstruct = {'deleted': False, 'hidden': True}
-        request.has_permission = Mock(return_value=True)
         event = ResourceSheetModified(object=context,
                                       isheet=IMetadata,
-                                      registry=registry,
+                                      registry=None,
                                       old_appstruct=old_appstruct,
                                       new_appstruct=new_appstruct,
-                                      request=request)
+                                      request=None)
         metadata_modified_subscriber(event)
-        assert context.deleted is False
-        assert context.hidden is True
         assert mock_reindex.called
 
-    def test_newly_undeleted(self, context, registry, request, mock_reindex):
+    def test_newly_undeleted(self, context, mock_reindex):
         from adhocracy_core.events import ResourceSheetModified
         from adhocracy_core.resources.subscriber import metadata_modified_subscriber
         from adhocracy_core.sheets.metadata import IMetadata
         old_appstruct = {'deleted': True, 'hidden': False}
         new_appstruct = {'deleted': False, 'hidden': False}
-        request.has_permission = Mock(return_value=True)
         event = ResourceSheetModified(object=context,
                                       isheet=IMetadata,
-                                      registry=registry,
+                                      registry=None,
                                       old_appstruct=old_appstruct,
                                       new_appstruct=new_appstruct,
-                                      request=request)
+                                      request=None)
         metadata_modified_subscriber(event)
-        assert context.deleted is False
-        assert context.hidden is False
         assert mock_reindex.called
 
-    def test_no_change(self, context, registry, request, mock_reindex):
+    def test_no_change(self, context, mock_reindex):
         from adhocracy_core.events import ResourceSheetModified
         from adhocracy_core.resources.subscriber import metadata_modified_subscriber
         from adhocracy_core.sheets.metadata import IMetadata
         old_appstruct = {'deleted': False, 'hidden': True}
         new_appstruct = {'deleted': False, 'hidden': True}
-        request.has_permission = Mock(return_value=True)
         event = ResourceSheetModified(object=context,
                                       isheet=IMetadata,
-                                      registry=registry,
-                                      old_appstruct=old_appstruct,
-                                      new_appstruct=new_appstruct,
-                                      request=request)
-        metadata_modified_subscriber(event)
-        assert context.deleted is False
-        assert context.hidden is True
-        assert not mock_reindex.called
-
-    def test_hiding_requires_permission(self, context, registry, request,
-                                        mock_reindex):
-        from adhocracy_core.events import ResourceSheetModified
-        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
-        from adhocracy_core.sheets.metadata import IMetadata
-        import colander
-        old_appstruct = {'deleted': False, 'hidden': False}
-        new_appstruct = {'deleted': False, 'hidden': True}
-        request.has_permission = Mock(return_value=False)
-        context.deleted = None
-        context.hidden = None
-        event = ResourceSheetModified(object=context,
-                                      isheet=IMetadata,
-                                      registry=registry,
-                                      old_appstruct=old_appstruct,
-                                      new_appstruct=new_appstruct,
-                                      request=request)
-        with raises(colander.Invalid):
-            metadata_modified_subscriber(event)
-        assert context.deleted is None
-        assert context.hidden is None
-        assert not mock_reindex.called
-
-    def test_deletion_doesnt_require_permission(self, context, registry,
-                                               request, mock_reindex):
-        from adhocracy_core.events import ResourceSheetModified
-        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
-        from adhocracy_core.sheets.metadata import IMetadata
-        old_appstruct = {'deleted': False, 'hidden': False}
-        new_appstruct = {'deleted': True, 'hidden': False}
-        request.has_permission = Mock(return_value=False)
-        context.deleted = None
-        context.hidden = None
-        event = ResourceSheetModified(object=context,
-                                      isheet=IMetadata,
-                                      registry=registry,
-                                      old_appstruct=old_appstruct,
-                                      new_appstruct=new_appstruct,
-                                      request=request)
-        metadata_modified_subscriber(event)
-        assert context.deleted is True
-        assert context.hidden is False
-        assert mock_reindex.called
-
-    def test_no_hiding_without_request(self, context, registry, mock_reindex):
-        from adhocracy_core.events import ResourceSheetModified
-        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
-        from adhocracy_core.sheets.metadata import IMetadata
-        old_appstruct = {'deleted': False, 'hidden': False}
-        new_appstruct = {'deleted': False, 'hidden': True}
-        context.deleted = None
-        context.hidden = None
-        event = ResourceSheetModified(object=context,
-                                      isheet=IMetadata,
-                                      registry=registry,
+                                      registry=None,
                                       old_appstruct=old_appstruct,
                                       new_appstruct=new_appstruct,
                                       request=None)
         metadata_modified_subscriber(event)
-        assert context.deleted is None
-        assert context.hidden is None
         assert not mock_reindex.called
+
 
 
 class TestReindexResourceAndDescendants:
