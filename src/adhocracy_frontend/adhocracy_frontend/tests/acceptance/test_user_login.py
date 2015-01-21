@@ -30,7 +30,7 @@ class TestUserLogin:
     def test_register_error_wrong_password_repeat(self, browser):
         register(browser, 'user4', 'email4@example.com', 'password4',
                  'wrong_repeated_password', expect_success=False)
-        assert browser.browser.is_element_present_by_css(
+        assert browser.is_element_present_by_css(
             '.register [type="submit"]:disabled')
 
     def test_login_name_with_wrong_name(self, browser):

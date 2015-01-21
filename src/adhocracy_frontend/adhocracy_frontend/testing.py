@@ -125,6 +125,7 @@ def browser_instance_getter_class(request,
                                   splinter_driver_kwargs,
                                   splinter_file_download_dir,
                                   splinter_firefox_profile_preferences,
+                                  splinter_firefox_profile_directory,
                                   splinter_make_screenshot_on_failure,
                                   splinter_remote_url,
                                   splinter_screenshot_dir,
@@ -145,6 +146,7 @@ def browser_instance_getter_class(request,
                                    splinter_driver_kwargs,
                                    splinter_file_download_dir,
                                    splinter_firefox_profile_preferences,
+                                   splinter_firefox_profile_directory,
                                    splinter_make_screenshot_on_failure,
                                    splinter_remote_url,
                                    splinter_screenshot_dir,
@@ -194,7 +196,7 @@ def browser_test_helper(browser, url, wait=5) -> Browser:
 
     def jasmine_finished(browser):
         code = 'jsApiReporter.finished'
-        return browser.browser.evaluate_script(code)
+        return browser.evaluate_script(code)
 
     browser.wait_for_condition(jasmine_finished, wait)
 
