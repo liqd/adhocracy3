@@ -367,7 +367,7 @@ class ResourceRESTView(RESTView):
         """Show whether a user is allowed to delete or hide a resource."""
         if IMetadata.__identifier__ in put_sheets_dict:
             # everybody who can PUT metadata can delete the resource
-            put_sheets_dict[IMetadata.__identifier__]['deleted'] = ''
+            put_sheets_dict[IMetadata.__identifier__] = {'deleted': ''}
             if self.request.has_permission('hide_resource', self.context):
                 put_sheets_dict[IMetadata.__identifier__]['hidden'] = ''
 
