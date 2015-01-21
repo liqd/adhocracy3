@@ -49,7 +49,7 @@ class Event(colander.SchemaNode):
                                 'removed_child',
                                 'modified_child',
                                 'new_version',
-                                'created'])   # Only sent internally
+                                'created'])   # Only used internally
     default = 'modified'
 
 
