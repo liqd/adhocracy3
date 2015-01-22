@@ -1,4 +1,28 @@
+/*doc
+---
+title: User Message
+name: user-message
+category: widgets
+---
+
+A message overlay to appear in a moving column
+
+```html_example
+<div class="static-example">
+    <div class="user-message">
+        <form>
+            <p class="ng-binding">Message to Username</p>
+            <input class="user-message-subject" type="text">
+            <textarea class="user-message-text"></textarea>
+            <input class="user-message-button-submit" type="submit" value="Send">
+            <a href="">Cancel</a>
+        </form>
+    </div>
+</div>
+```
+*/
 .user-message {
+    @include clearfix;
     background: $color-structure-normal;
     border-top: 1px solid $color-structure-border;
     left: 0;
@@ -20,4 +44,8 @@
     .input-error {
         display: block;
     }
+}
+
+.static-example .user-message {
+    position: static;
 }
