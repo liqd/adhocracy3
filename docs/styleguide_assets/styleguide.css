@@ -1,8 +1,8 @@
-.styleguide {
+.styleguide-html {
     background-color: lightsteelblue;
 }
 
-.styleguide body {
+.styleguide-html body {
     max-width: 60em;
     margin: 0 auto;
     padding: 0.5em;
@@ -28,26 +28,26 @@
     text-decoration: none;
 }
 
-.styleguide .codeExample {
+.styleguide-html .codeExample {
     border: 1px solid silver;
     border-radius: 0.5em;
     overflow: hidden;
 }
-.styleguide .codeExample .exampleOutput {
+.styleguide-html .codeExample .exampleOutput {
     border-bottom: 1px solid silver;
     padding: 1em;
 }
-.styleguide .codeExample .codeBlock pre {
+.styleguide-html .codeExample .codeBlock pre {
     margin: 0;
     padding: 1em;
     border: none;
 }
 
-.styleguide .components > h1 {
+.styleguide-html .components > h1 {
     padding-bottom: 0.2em;
     border-bottom: 1px solid silver;
 }
-.styleguide .components > h1:not(:first-of-type) {
+.styleguide-html .components > h1:not(:first-of-type) {
     margin-top: 3em;
 }
 
