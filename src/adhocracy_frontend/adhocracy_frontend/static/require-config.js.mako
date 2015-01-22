@@ -13,6 +13,12 @@ require.config({
         }
     },
     paths: {
+% if minify:
+        Adhocracy: "./Adhocracy.min",
+% else:
+        Adhocracy: "./Adhocracy",
+        adhTemplates: "./templates",
+% endif
         text: "../lib/requirejs-text/text",
         jquery: "../lib/jquery/dist/jquery",
         angular: "../lib/angular/angular",
@@ -32,8 +38,7 @@ require.config({
         moment: "../lib/moment/min/moment-with-locales",
         sticky: "../lib/sticky-kit/jquery.sticky-kit",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
-        jqueryPlaceholderShim: "../lib/jquery-html5-placeholder-shim/jquery.html5-placeholder-shim",
-        adhTemplates: "./templates"
+        jqueryPlaceholderShim: "../lib/jquery-html5-placeholder-shim/jquery.html5-placeholder-shim"
     },
     shim: {
         jquery: {
