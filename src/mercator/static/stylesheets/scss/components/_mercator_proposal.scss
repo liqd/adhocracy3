@@ -163,6 +163,14 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 }
 
+.mercator-proposal-detail-username a {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 .mercator-proposal-detail-meta {
     padding-bottom: 1.66666666em;
 
