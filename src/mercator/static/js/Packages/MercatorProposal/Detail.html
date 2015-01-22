@@ -38,20 +38,25 @@
                     data-du-scrollspy=""
                     title='{{ "Brief Proposal" | translate }}'>1.</a></li>
                 <li><a
+                    href="#mercator-detail-whos"
+                    data-du-smooth-scroll=""
+                    data-du-scrollspy=""
+                    title='{{ "Who is behind it?" | translate }}'>2.</a></li>
+                <li><a
                     href="#mercator-detail-view-detailed-proposal"
                     data-du-smooth-scroll=""
                     data-du-scrollspy=""
-                    title='{{ "Detailed Proposal" | translate }}'>2.</a></li>
+                    title='{{ "Detailed Proposal" | translate }}'>3.</a></li>
                 <li><a
                     href="#mercator-detail-view-goals-and-vision"
                     data-du-smooth-scroll=""
                     data-du-scrollspy=""
-                    title='{{ "Goals and Vision" | translate }}'>3.</a></li>
+                    title='{{ "Goals and Vision" | translate }}'>4.</a></li>
                 <li><a
                     href="#mercator-detail-view-additional"
                     data-du-smooth-scroll=""
                     data-du-scrollspy=""
-                    title='{{ "Additional" | translate }}'>4.</a></li>
+                    title='{{ "Additional" | translate }}'>5.</a></li>
             </ol>
         </nav>
 
@@ -92,9 +97,13 @@
                         <i class="icon-speechbubble"></i> {{ data.finance.commentCount }}
                     </a>
                 </section><!-- /.commentable-section -->
+            </section><!-- /.chapter -->
 
+            <section class="chapter" id="mercator-detail-whos">
                 <section class="commentable-section">
-                    <h3>{{ "Who is behind it?" | translate }}</h3>
+                <h2 class="chapter-header"
+                    data-du-scrollspy="mercator-detail-whos"
+                    data-offset="50">{{ "Who is behind it?" | translate }}</h2>
 
                     <adh-user-meta
                          data-ng-if="data.user_info"
