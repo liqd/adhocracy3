@@ -16,7 +16,6 @@ from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.websockets.schemas import ServerNotification
 from adhocracy_core.utils import get_reason_if_blocked
-from adhocracy_core.utils import find_graph
 
 
 logger = logging.getLogger(__name__)
@@ -135,8 +134,6 @@ class Client:
 
     def _send_messages(self, changelog_metadata: list):
         self.changelog_metadata_messages_to_send.update(changelog_metadata)
-        created_or_removed_resources = set()
-        processed_resources = set()
         while self.changelog_metadata_messages_to_send:
             meta = self.changelog_metadata_messages_to_send.pop()
             # FIXME: if an exception is raised, the current changelog is lost.
@@ -145,18 +142,16 @@ class Client:
                 continue
             elif meta.created or meta.visibility is VisibilityChange.revealed:
                 self._send_resource_event(meta.resource, 'created')
-                created_or_removed_resources.add(meta.resource)
-                processed_resources.add(meta.resource)
             elif meta.visibility is VisibilityChange.concealed:
                 self._send_resource_event(meta.resource, 'removed')
-                created_or_removed_resources.add(meta.resource)
-                processed_resources.add(meta.resource)
-            elif meta.modified:
+            elif get_reason_if_blocked(meta.resource is not None):
+                # hidden resources may still be modified by autoupdates
+                # but we don't want to expose this to the client.
+                continue
+            elif meta.modified or meta.changed_backrefs:
                 self._send_resource_event(meta.resource, 'modified')
-                processed_resources.add(meta.resource)
-        if processed_resources:
-            self._send_modified_messages_for_backrefs(processed_resources)
-            self._send_changed_descendant_messages(processed_resources)
+            if meta.changed_descendants:
+                self._send_resource_event(meta.resource, 'changed_descendants')
 
     def _send_resource_event(self, resource: IResource, event_type: str):
         schema = ServerNotification().bind(context=resource)
@@ -164,32 +159,6 @@ class Client:
         message_text = json.dumps(message)
         logger.debug('Sending message to Websocket server: %s', message_text)
         self._ws_connection.send(message_text)
-
-    def _send_modified_messages_for_backrefs(self, processed_resources: set):
-        """
-        Send 'modified' messages based on backreferences.
-
-        If a resource has a backreferences pointing to a newly created or
-        removed resource, it has been modified from the viewpoint of the
-        frontend (since that backreference didn't exist before or now is no
-        longer shown).
-        """
-        random_resource = next(iter(processed_resources))
-        graph = find_graph(random_resource)
-        if graph is None:  # pragma: no cover
-            logger.warning('No graph found--cannot send modified messages for '
-                           'backreferencing resources')
-            return
-        backreferencing_resources = set()
-        for resource in processed_resources:
-            backreferencing_sheets = graph.get_back_reference_sources(resource)
-            for sheet in backreferencing_sheets:
-                backreferencing_resources.add(sheet.context)
-        for resource in backreferencing_resources:
-            if (resource not in processed_resources and
-                    get_reason_if_blocked(resource) is None):
-                self._send_resource_event(resource, 'modified')
-                processed_resources.add(resource)
 
     def _send_changed_descendant_messages(self, processed_resources: set):
         affected_ancestors = set()

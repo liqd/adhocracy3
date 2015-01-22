@@ -99,13 +99,69 @@ class TestItemVersionCreated:
 
 class TestResourceModifiedSubscriber:
 
+    @fixture
+    def context(self, context):
+        root = testing.DummyResource()
+        root['parent'] = testing.DummyResource()
+        root['parent']['child'] = context
+        return context
+
     def _call_fut(self, event):
         from adhocracy_core.resources.subscriber import resource_modified_subscriber
         return resource_modified_subscriber(event)
 
-    def test_call(self, event, changelog):
+    def test_set_modified_changelog(self, event, context, changelog):
+        event.object = context
         self._call_fut(event)
-        assert changelog['/'].modified is True
+        assert changelog['/parent/child'].modified is True
+
+    def test_dont_set_changed_descendants_for_context(self, event, context,
+                                                      changelog):
+        event.object = context
+        self._call_fut(event)
+        assert changelog['/parent/child'].changed_descendants is False
+
+    def test_set_changed_descendants_changelog_for_parents(self, event, context,
+                                                           changelog):
+        event.object = context
+        self._call_fut(event)
+        assert changelog['/parent'].changed_descendants is True
+        assert changelog['/'].changed_descendants is True
+
+    def test_set_changed_descendants_only_once(self, event, context, changelog):
+        """Stop iterating all parents if `changed_descendants` is already set"""
+        event.object = context
+        changelog['/parent'] = \
+            changelog['parent']._replace(changed_descendants=True)
+        self._call_fut(event)
+        assert changelog['/parent'].changed_descendants is True
+        assert changelog['/'].changed_descendants is False
+
+
+class TestResourceBackreferenceModifiedSubscriber:
+
+    @fixture
+    def context(self, context):
+        root = testing.DummyResource()
+        root['parent'] = testing.DummyResource()
+        root['parent']['child'] = context
+        return context
+
+    def _call_fut(self, event):
+        from .subscriber import resource_backreference_modified_subscriber
+        return resource_backreference_modified_subscriber(event)
+
+    def test_set_changed_backrefs_changelog(self, event, context, changelog):
+        event.object = context
+        self._call_fut(event)
+        assert changelog['/parent/child'].changed_backrefs is True
+
+    def test_set_changed_descendants_changelog_for_parents(self, event, context,
+                                                           changelog):
+        event.object = context
+        self._call_fut(event)
+        assert changelog['/parent'].changed_descendants is True
+        assert changelog['/'].changed_descendants is True
 
 
 def test_create_transaction_changelog():
@@ -608,3 +664,4 @@ def test_register_subscriber(registry):
     assert subscriber.tag_created_and_added_or_modified_subscriber.__name__ in handlers
     assert subscriber.user_created_and_added_subscriber.__name__ in handlers
     assert subscriber.rate_backreference_modified_subscriber.__name__ in handlers
+    assert subscriber.resource_backreference_modified_subscriber.__name__ in handlers

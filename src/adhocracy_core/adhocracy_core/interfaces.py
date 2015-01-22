@@ -478,6 +478,8 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
                                     'followed_by',
                                     'resource',
                                     'last_version',
+                                    'changed_descendants',
+                                    'changed_backrefs',
                                     'visibility'])):
 
     """Metadata to track modified resources during one transaction.
@@ -499,6 +501,9 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
         The last Version created in this transaction
         (only for :class:`adhocracy_core.interfaces.IItem`)
         FIXME: we assume linear history here
+    changed_descendants (bool): child or grandchild is modified or has
+                                changed_backrefs
+    changed_backrefs (bool): References targeting this resource are changed
     visibility (VisibilityChange):
         Tracks the visibility of the resource and whether it has changed
     """
