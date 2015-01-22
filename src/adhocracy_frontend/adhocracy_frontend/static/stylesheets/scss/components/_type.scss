@@ -185,7 +185,9 @@ category: Type
 }
 
 .inline-boxes {
-    padding: 0;
+    clear: left;
+    margin: 0;
+    padding: 0 0 10 / 14 * 1em;
 
     li {
         @include inline-box;

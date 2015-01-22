@@ -79,17 +79,13 @@
                     </div>
                     <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">{{ "project is granted" | translate }}</strong></p>
 
-                    <div data-ng-if="data.finance.other_sources" class="mercator-proposal-other-sources">
-                        <h4>{{ "Other sources of income" | translate }}</h4>
-                        <p class="functional-introvert">{{ data.finance.other_sources }}</p>
-                    </div>
-
                     <ul class="inline-boxes">
                         <li data-ng-if="data.location.location_is_online">{{ "ONLINE" | translate }}</li>
                         <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
                         <li data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</li>
                         <li data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</li>
                         <li data-ng-if="data.location.location_is_linked_to_ruhr">{{ "Ruhr Gebiet, Germany" | translate }}</li>
+                        <li data-ng-if="data.finance.other_sources">{{ data.finance.other_sources }}</li>
                     </ul>
 
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:finance'}}">
