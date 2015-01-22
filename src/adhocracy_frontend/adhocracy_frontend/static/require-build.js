@@ -1,3 +1,8 @@
+/* r.js configuration
+ *
+ * This will combine all our code into a single javascript file.
+ * External deoendencies are ignored.
+ */
 ({
     baseUrl: "js",
     paths: {
