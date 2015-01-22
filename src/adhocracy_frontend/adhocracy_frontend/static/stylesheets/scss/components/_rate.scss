@@ -20,17 +20,16 @@ The button has the is-rate-button-active state.
     white-space: nowrap;
 }
 
-$line-height: (24/14);
+$line-height: (24/12);
+$arrow-width: 1em;
 
 .like-button {
-    $arrow-width: 1em;
-
     @include inline-block;
-    font-size: $font-size-normal;
-    font-variant: small-caps;
+    font-size: $font-size-small;
     position: relative;
     margin-left: $arrow-width;
-    padding: 0 0.71428571em;
+    padding: 0 0.83333333em;
+    text-transform: uppercase;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
     color: white;
