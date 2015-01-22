@@ -715,6 +715,11 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     public link(scope, element, attrs, wrapper) {
         var instance = super.link(scope, element, attrs, wrapper);
         instance.scope.data = <any>{};
+        instance.scope.$watch("$viewContentLoaded", function() {
+            if (!Modernizr.inputtypes.number) {
+                (<any>$("body")).updatePolyfill();
+            }
+        });
         return instance;
     }
 
