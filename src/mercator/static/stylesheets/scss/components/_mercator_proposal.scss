@@ -230,6 +230,7 @@ $mercator-proposal-detail-nav-width: 2em;
 .mercator-proposal-chapters {
     background-color: white;
     border-left: 1px solid $color-text-introvert;
+    counter-reset: chapter-counter;
     padding: 0 0.8em;
     margin-left: $mercator-proposal-detail-nav-width;
 
@@ -238,6 +239,11 @@ $mercator-proposal-detail-nav-width: 2em;
         font-size: $font-size-normal;
         margin: 0 0 1em;
         padding: 0;
+
+        &:before {
+            content: counter(chapter-counter) ". ";
+            counter-increment: chapter-counter;
+        }
     }
 
     h3 {
