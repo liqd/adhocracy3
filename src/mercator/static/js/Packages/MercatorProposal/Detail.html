@@ -121,7 +121,8 @@
                                         href="mailto:{{ data.organization_info.email }}">
                                         {{ data.organization_info.name }}</a></li>
                                 <li><i class="icon-map-pin"></i> {{ data.organization_info.country | adhCountryName | translate }}</li>
-                                <li>{{ "Non Profit" | translate }} {{ data.organization_info.date_of_foreseen_registration }}</li>
+                                <li>{{ "Non Profit" | translate }}
+                                <adh-time data-datetime="data.organization_info.date_of_foreseen_registration" data-format="D/M/YYYY"></adh-time></li>
                             </ul>
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
@@ -134,7 +135,7 @@
                                  <li><i class="icon-map-pin"></i> {{ data.organization_info.country | adhCountryName | translate }}</li>
                                 <li>
                                     {{ "NGO" | translate }}
-                                    {{ data.organization_info.date_of_foreseen_registration }}
+                                    <adh-time data-datetime="data.organization_info.date_of_foreseen_registration" data-format="D/M/YYYY"></adh-time>
                                 </li>
                             </ul>
                         </div>

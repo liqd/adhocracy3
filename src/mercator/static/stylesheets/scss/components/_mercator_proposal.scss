@@ -172,8 +172,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-orgs-columns {
-    margin: 0;
+    margin: 20 / 14 * 1em 0;
+    overflow: hidden;
     padding: 0;
+
     li {
         @include gallery(1 of 3);
         display: inline;
