@@ -28,6 +28,7 @@
 .icon-document:before,
 .icon-documents:before,
 .icon-list:before,
+.icon-map-pin:before,
 .icon-minus:before,
 .icon-pig:before,
 .icon-pointy-rectangle-left:before,
@@ -62,6 +63,7 @@
 .icon-document:before { content: "\f101"; }
 .icon-documents:before { content: "\f102"; }
 .icon-list:before { content: "\f103"; }
+.icon-map-pin:before { content: "\f114"; }
 .icon-minus:before { content: "\f104"; }
 .icon-pig:before { content: "\f105"; }
 .icon-pointy-rectangle-left:before { content: "\f106"; }
