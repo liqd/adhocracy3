@@ -9,6 +9,7 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
  */
 export interface IRawWebSocket {
     send : (msg : string) => void;
+    addEventListener : (event : any, callback : () => void) => void;
     onmessage? : (event : any) => void;
     onerror? : (event : any) => void;
     onopen? : (event : any) => void;
@@ -64,6 +65,7 @@ interface IServerMessage extends IResponseOk, IResponseError, IServerEvent {};
 export class Service {
     "use strict";
 
+    private connected : boolean;
     private ws : IRawWebSocket;
     private registrations : {[path : string] : number};
     private eventHandler : AdhEventHandler.EventHandler;
@@ -73,13 +75,25 @@ export class Service {
         private adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
         rawWebSocketFactory : (uri : string) => IRawWebSocket
     ) {
+        this.connected = false;
         this.eventHandler = new adhEventHandlerClass();
         this.registrations = {};
 
         this.ws = rawWebSocketFactory(adhConfig.ws_url);
         this.ws.onmessage = this.onmessage.bind(this);
         this.ws.onerror = this.onerror.bind(this);
-        this.ws.onopen = this.resendSubscriptions.bind(this);
+
+        this.ws.onopen = (ev) => {
+            this.resendSubscriptions();
+            this.connected = true;
+        };
+        this.ws.addEventListener("close", () => {
+            this.connected = false;
+        });
+    }
+
+    public isConnected() {
+        return this.connected;
     }
 
     public register(path : string, callback : (msg : IServerEvent) => void) : number {
@@ -101,6 +115,10 @@ export class Service {
         if (this.registrations[path] === 0) {
             this.send("unsubscribe", path);
         }
+    }
+
+    public addEventListener(event : string, callback : () => void) : void {
+        this.ws.addEventListener(event, callback);
     }
 
     private resendSubscriptions() : void {

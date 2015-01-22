@@ -28,7 +28,7 @@ export var register = () => {
                     this.trigger = jasmine.createSpy("adhEventHandler.trigger");
                     adhEventHandlerMock = this;
                 };
-                adhRawWebSocketMock = jasmine.createSpyObj("adhRawWebSocketFactory", ["send"]);
+                adhRawWebSocketMock = jasmine.createSpyObj("adhRawWebSocketFactory", ["send", "addEventListener"]);
 
                 service = new AdhWebSocket.Service(config, adhEventHandlerClassMock, () => adhRawWebSocketMock);
             });
