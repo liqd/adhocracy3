@@ -47,14 +47,17 @@ displayed as a button in a second column.
 */
 
 .commentable-section {
-    margin-bottom: 1em;
-    padding-bottom: 1em;
-    padding-right: 2.57142857em;
+    margin-bottom: 20 / 14 * 1em;
+    padding-right: 36 / 14 * 1em;
     position: relative;
+
+    > p {
+        margin-bottom: 0;
+    }
 
     .commentable-section-show-comments {
         @include show-comments;
-        max-width: 2.57142857em;
+        max-width: 36 / 14 * 1em;
         position: absolute;
         right: 0;
         top: 0;
