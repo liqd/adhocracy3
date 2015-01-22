@@ -49,12 +49,12 @@ displayed as a button in a second column.
 .commentable-section {
     margin-bottom: 1em;
     padding-bottom: 1em;
-    padding-right: 30%;
+    padding-right: 2.57142857em;
     position: relative;
 
     .commentable-section-show-comments {
         @include show-comments;
-        max-width: 30%;
+        max-width: 2.57142857em;
         position: absolute;
         right: 0;
         top: 0;
