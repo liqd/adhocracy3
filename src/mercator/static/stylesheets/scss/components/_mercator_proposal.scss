@@ -171,6 +171,13 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 }
 
+.mercator-proposal-detail-orgs-columns {
+    li {
+        display: inline;
+        list-style-type: none;
+    }
+}
+
 .mercator-proposal-detail-meta {
     padding-bottom: 1.66666666em;
 

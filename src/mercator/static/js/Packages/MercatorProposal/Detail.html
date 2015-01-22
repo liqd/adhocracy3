@@ -114,38 +114,43 @@
 
                     <div data-ng-switch="data.organization_info.status_enum">
                         <div data-ng-switch-when="registered_nonprofit">
-                            <div>
-                                <p>{{ data.organization_info.name }}</p>
-                                <p>{{ data.organization_info.website }}</p>
-                                <p>{{ "We are a registered non-profit" | translate }}</p>
-                            </div>
-                            <div>
-                                {{ data.organization_info.country | adhCountryName | translate }}
-                            </div>
+                            <ul class="mercator-proposal-detail-orgs-columns">
+                                <li>{{ data.organization_info.name }}
+                                    <a
+                                        data-ng-if="data.organization_info.email"
+                                        href="mailto:{{ data.organization_info.email }}">
+                                        {{ data.organization_info.name }}</a></li>
+                                <li><i class="icon-map-pin"></i> {{ data.organization_info.country | adhCountryName | translate }}</li>
+                                <li>{{ "Non Profit" | translate }} {{ data.organization_info.date_of_foreseen_registration }}</li>
+                            </ul>
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
-                            <div>
-                                <p>{{ data.organization_info.name }}</p>
-                                <p>{{ data.organization_info.website }}</p>
-                                <p>
-                                    {{ "NGO registration is planned or in process " | translate }}
+                            <ul class="mercator-proposal-detail-orgs-columns">
+                                <li>{{ data.organization_info.name }}
+                                    <a
+                                        data-ng-if="data.organization_info.email"
+                                        href="mailto:{{ data.organization_info.email }}">
+                                        {{ data.organization_info.name }}</a></li>
+                                 <li><i class="icon-map-pin"></i> {{ data.organization_info.country | adhCountryName | translate }}</li>
+                                <li>
+                                    {{ "NGO" | translate }}
                                     {{ data.organization_info.date_of_foreseen_registration }}
-                                </p>
-                            </div>
-                            <div>
-                                {{ data.organization_info.country | adhCountryName | translate }}
-                            </div>
+                                </li>
+                            </ul>
                         </div>
                         <div data-ng-switch-when="support_needed">
-                            <div>
-                                <p>{{ data.organization_info.name }}</p>
-                                <p>{{ data.organization_info.website }}</p>
-                                <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
-                                <p>{{ data.organization_info.how_can_we_help_you }}</p>
-                            </div>
-                            <div>
-                                {{ data.organization_info.country | adhCountryName | translate }}
-                            </div>
+                            <ul class="mercator-proposal-detail-orgs-columns">
+                                <li>{{ data.organization_info.name }}
+                                    <a
+                                        data-ng-if="data.organization_info.email"
+                                        href="mailto:{{ data.organization_info.email }}">
+                                        {{ data.organization_info.name }}</a></li>
+                                 <li><i class="icon-map-pin"></i> {{ data.organization_info.country | adhCountryName | translate }}</li>
+                                <li>
+                                    {{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}
+                                </li>
+                                <li>{ data.organization_info.how_can_we_help_you }}</li>
+                            </ul>
                         </div>
                         <div data-ng-switch-when="other">
                             <p>{{ data.organization_info.status_other }}</p>
