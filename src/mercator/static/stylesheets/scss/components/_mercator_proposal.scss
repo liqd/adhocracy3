@@ -240,6 +240,10 @@ $mercator-proposal-detail-nav-width: 2em;
         margin: 0 0 1em;
         padding: 0;
 
+        &.active {
+            color: $color-text-highlight-normal;
+        }
+
         &:before {
             content: counter(chapter-counter) ". ";
             counter-increment: chapter-counter;
