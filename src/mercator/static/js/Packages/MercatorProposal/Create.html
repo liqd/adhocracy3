@@ -323,9 +323,9 @@
             <div class="annotated-section" data-ng-if="$flow.support">
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "Are you sure you are allowed to use this picture?" | translate }}
-                    {{"Image must be of type" | translate }} <span ng-repeat="fo in currentUpload.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>,
-                    <br/>{{"no bigger than" | translate }} {{currentUpload.opts.maximumByteSize/1000000}}MB,
-                    <br/>{{"not less than" | translate }} {{currentUpload.opts.minimumWidth}}px {{"wide" | translate}}
+                    {{"Image must be of type" | translate }} <span ng-repeat="fo in $flow.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>,
+                    <br/>{{"no bigger than" | translate }} {{$flow.opts.maximumByteSize/1000000}}MB,
+                    <br/>{{"not less than" | translate }} {{$flow.opts.minimumWidth}}px {{"wide" | translate}}
                 </div>
                 <div class="annotated-section-body">
                     <label>
