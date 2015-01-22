@@ -718,6 +718,7 @@
                             type="number"
                             data-ng-model="data.finance.requested_funding"
                             name="finance-requested-funding"
+                            min="0"
                             max="50000"
                             required="required" />
 
@@ -725,6 +726,14 @@
                             class="input-error"
                             data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'required')">
                             {{ "Please enter requested funding" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'max')">
+                            {{ "Not more than 50,000€ are allowed" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'min')">
+                            {{ "Please insert a number higher than 0" | translate }}</span>
                     </label>
 
                     <label>
