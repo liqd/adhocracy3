@@ -47,11 +47,23 @@ $arrow-width: 1em;
         border-left: 0;
     }
 
-    &.is-rate-button-active,
     &:hover,
     &:focus {
-        @include opacity(0.6);
         color: white;
+        background-color: $color-brand-one-extrovert;
+
+        &:before {
+            border-right-color: $color-brand-one-extrovert;
+        }
+    }
+
+    &:active,
+    &.is-rate-button-active {
+        background: $color-function-valid;
+
+        &:before {
+            border-right-color: $color-function-valid;
+        }
     }
 }
 
