@@ -166,8 +166,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 .mercator-proposal-detail-meta {
     padding-bottom: 1.66666666em;
 
-    .icon-speechbubbles {
-        color: $color-text-highlight-introvert;
+    i {
+        .icon-speechbubbles {
+            color: $color-text-highlight-introvert;
+        }
     }
 }
 
@@ -189,6 +191,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 .mercator-proposal-cover-show-comments {
     @include show-comments;
     float: right;
+
+    &:hover {
+        color: $color-brand-three-normal;
+    }
 
     i {
         font-size: 217%;
@@ -295,7 +301,7 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item-title {
     font-size: $font-size-plus;
-    font-weight: $font-weight-normal;
+    font-weight: $font-weight-extrovert;
     padding: 0.9375em 0;
 
     a {
