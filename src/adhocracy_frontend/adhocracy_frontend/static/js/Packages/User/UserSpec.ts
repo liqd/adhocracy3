@@ -13,6 +13,7 @@ export var register = () => {
         describe("Service", () => {
             var adhUser;
             var adhHttpMock;
+            var adhCacheMock;
             var httpMock;
             var rootScopeMock;
             var windowMock;
@@ -28,6 +29,12 @@ export var register = () => {
                         "adhocracy_core.sheets.principal.IUserBasic": {}
                     }
                 }));
+
+                adhCacheMock = {
+                    invalidate: (path) => undefined,
+                    invalidateAll: () => undefined,
+                    memoize: (path, subkey, closure) => closure()
+                };
 
                 httpMock = <any>jasmine.createSpyObj("httpMock", ["post"]);
                 httpMock.defaults = {
@@ -52,7 +59,8 @@ export var register = () => {
                     localstorage: true
                 };
 
-                adhUser = new AdhUser.Service(adhHttpMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+                adhUser = new AdhUser.Service(
+                    adhHttpMock, adhCacheMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {
