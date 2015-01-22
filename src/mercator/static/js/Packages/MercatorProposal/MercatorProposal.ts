@@ -718,6 +718,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         instance.scope.$watch("$viewContentLoaded", function() {
             if (!Modernizr.inputtypes.number) {
                 (<any>$("body")).updatePolyfill();
+                $(".has-input-buttons").removeClass( "has-input-buttons").css({"display" : "inline-block"});
             }
         });
         return instance;
