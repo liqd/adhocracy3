@@ -2,5 +2,8 @@
     <span class="like-difference">
         {{rates.pro | signum}}
     </span>
-    <a href="" class="{{isActiveClass(1)}} like-button" data-ng-click="toggle()">{{ "Support" | translate }}</a>
+    <a href="" class="{{isActiveClass(1)}} like-button" data-ng-click="toggle()">
+        <span data-ng-if="!isActiveClass(1)">{{ "Support" | translate }}</span>
+        <span data-ng-if="isActiveClass(1)">{{ "Supporting" | translate }}</span>
+    </a>
 </div>
