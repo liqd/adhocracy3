@@ -566,3 +566,37 @@ class IRateValidator(Interface):  # pragma: no cover
 class Reference(namedtuple('Reference', 'source isheet field target')):
 
     """Fields: source isheet field target."""
+
+
+class HTTPCacheMode(Enum):
+
+    """Caching Mode for :class:`IHTTPCacheStrategy`s.
+
+    You can change the mode in you pyramid ini file with the
+    `adhocracy_core.caching.http.mode` setting.
+    """
+
+    no_cache = 1
+    """Make all cache strategies set do not cache header only."""
+
+    without_proxy_cache = 2
+    """Make all cache strategies set headers that work without a proxy cache"""
+
+    with_proxy_cache = 3
+    """Make all cache strategies set headers that only work with a proxy cache
+    between webserver and backend.
+    The proxy cache has to accepts purge requests form the backend.
+    To make this work you have to set the `adhocracy_core.caching.http.pureurl`
+    setting in you pyramid ini file.
+    """
+
+
+class IHTTPCacheStrategy(Interface):  # pragma: no cover
+
+    """Strategy to set http cache headers."""
+
+    def set_cache_headers_for_mode(mode: HTTPCacheMode):
+        """Set response cache headers according to :class:`HTTPCacheMode`."""
+
+    def check_conditional_request():
+        """Check if conditional_request and raise 304 Error if needed."""
