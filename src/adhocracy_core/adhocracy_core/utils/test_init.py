@@ -291,6 +291,34 @@ class TestGetMatchingIsheet:
         assert self._call_fut(context, IPredicateSheet) is None
 
 
+def test_get_reason_blocked_not_deleted_not_hidden(context):
+    from . import get_reason_if_blocked
+    context.deleted = False
+    context.hidden = False
+    assert get_reason_if_blocked(context) == None
+
+
+def test_get_reason_blocked_is_deleted_not_hidden(context):
+    from . import get_reason_if_blocked
+    context.deleted = True
+    context.hidden = False
+    assert get_reason_if_blocked(context) == 'deleted'
+
+
+def test_get_reason_blocked_not_hidden_is_hidden(context):
+    from . import get_reason_if_blocked
+    context.deleted = False
+    context.hidden = True
+    assert get_reason_if_blocked(context) == 'hidden'
+
+
+def test_get_reason_blocked_is_hidden_is_hidden(context):
+    from . import get_reason_if_blocked
+    context.deleted = True
+    context.hidden = True
+    assert get_reason_if_blocked(context) == 'both'
+
+
 class TestRaiseColanderStyleError:
 
     def _call_fut(self, *args):
