@@ -8,4 +8,9 @@
     <div class="moving-column-collapsed">
         <adh-inject data-transclusion-id="collapsed"></adh-inject>
     </div>
+
+    <div class="moving-column-mask" data-ng-show="overlay"></div>
+    <div class="moving-column-overlay" data-ng-if="overlay">
+        <adh-inject data-transclusion-id="overlays"></adh-inject>
+    </div>
 </div>

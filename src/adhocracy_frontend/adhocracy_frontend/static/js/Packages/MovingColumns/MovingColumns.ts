@@ -134,6 +134,24 @@ export class MovingColumnController {
         $scope.ctrl = this;
         $scope.shared = {};
     }
+
+    public showOverlay(key : string) : void {
+        this.$scope.overlay = key;
+    }
+
+    public hideOverlay(key? : string) : void {
+        if (typeof key === "undefined" || this.$scope.overlay === key) {
+            this.$scope.overlay = undefined;
+        }
+    }
+
+    public toggleOverlay(key : string, condition? : boolean) : void {
+        if (condition || (typeof condition === "undefined" && this.$scope.overlay !== key)) {
+            this.$scope.overlay = key;
+        } else if (this.$scope.overlay === key) {
+            this.$scope.overlay = undefined;
+        }
+    }
 }
 
 
