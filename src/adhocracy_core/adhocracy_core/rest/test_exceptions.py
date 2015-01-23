@@ -4,7 +4,7 @@ import colander
 
 
 @fixture
-def request():
+def request_():
     return testing.DummyRequest()
 
 
@@ -14,7 +14,7 @@ class TestHandleError400ColanderInvalid:
         from adhocracy_core.rest.exceptions import handle_error_400_colander_invalid
         return handle_error_400_colander_invalid(error, request)
 
-    def test_render_exception_error(self, request):
+    def test_render_exception_error(self, request_):
         from cornice.util import _JSONError
         import json
         invalid0 = colander.SchemaNode(typ=colander.String(), name='parent0',
@@ -27,7 +27,7 @@ class TestHandleError400ColanderInvalid:
         error0.add(error1, 1)
         error1.add(error2, 0)
 
-        inst = self.make_one(error0, request)
+        inst = self.make_one(error0, request_)
 
         assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
@@ -40,16 +40,16 @@ class TestHandleError400ColanderInvalid:
 
 class TestHandleError500Exception:
 
-    def make_one(self, error, request):
+    def make_one(self, error, request_):
         from adhocracy_core.rest.exceptions import handle_error_500_exception
-        return handle_error_500_exception(error, request)
+        return handle_error_500_exception(error, request_)
 
-    def test_render_exception_error(self, request):
+    def test_render_exception_error(self, request_):
         from cornice.util import _JSONError
         import json
         error = Exception('arg1')
 
-        inst = self.make_one(error, request)
+        inst = self.make_one(error, request_)
 
         assert isinstance(inst, _JSONError)
         assert inst.status == '500 Internal Server Error'
@@ -64,12 +64,12 @@ class TestHandleError500Exception:
 
 class TestHandleAutoUpdateNoForkAllowed400Exception:
 
-    def make_one(self, error, request):
+    def make_one(self, error, request_):
         from adhocracy_core.rest.exceptions import \
             handle_error_400_auto_update_no_fork_allowed
-        return handle_error_400_auto_update_no_fork_allowed(error, request)
+        return handle_error_400_auto_update_no_fork_allowed(error, request_)
 
-    def test_render_exception_error(self, request):
+    def test_render_exception_error(self, request_):
         from cornice.util import _JSONError
         from adhocracy_core.interfaces import ISheet
         resource = testing.DummyResource(__name__='resource')
@@ -80,7 +80,7 @@ class TestHandleAutoUpdateNoForkAllowed400Exception:
                                       old_version=testing.DummyResource(__name__='referenced_old_version'))
         error = testing.DummyResource(resource=resource,
                                       event=event)
-        inst = self.make_one(error, request)
+        inst = self.make_one(error, request_)
         assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
         wanted = \
@@ -94,3 +94,44 @@ class TestHandleAutoUpdateNoForkAllowed400Exception:
                          'name': 'root_versions'}],
              'status': 'error'}
         assert inst.json == wanted
+
+
+class TestHandleError410:
+
+    @fixture
+    def error(self):
+        from pyramid.httpexceptions import HTTPGone
+        return HTTPGone()
+
+    def make_one(self, error, request):
+        from adhocracy_core.rest.exceptions import handle_error_410_exception
+        return handle_error_410_exception(error, request)
+
+    def test_no_detail_no_imetadata(self, error, request_):
+        inst = self.make_one(error, request_)
+        assert inst.content_type == 'application/json'
+        assert inst.json_body['modification_date'] == ''
+        assert inst.json_body['modified_by'] == ''
+        assert inst.json_body['reason'] == ''
+
+    def test_with_detail_no_imetadata(self, error, request_):
+        error.detail = 'hidden'
+        inst = self.make_one(error, request_)
+        assert inst.json_body['reason'] == 'hidden'
+
+    def test_with_detail_and_imetadata(self, error, request_, mock_sheet,
+                                       registry):
+        from datetime import datetime
+        from adhocracy_core.testing import add_and_register_sheet
+        from adhocracy_core.sheets.metadata import IMetadata
+        resource = testing.DummyResource(__provides__=[IMetadata])
+        user = testing.DummyResource(__name__='/user')
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
+        mock_sheet.get.return_value = {'modification_date': datetime.today(),
+                                       'modified_by': user}
+        add_and_register_sheet(resource, mock_sheet, registry)
+        error.detail = 'hidden'
+        request_.context = resource
+        inst = self.make_one(error, request_)
+        assert inst.json_body['modification_date'].endswith('00:00')
+        assert inst.json_body['modified_by'].endswith('user/')

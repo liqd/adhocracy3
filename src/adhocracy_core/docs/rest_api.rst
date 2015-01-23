@@ -310,6 +310,10 @@ Returns only http headers::
     >>> resp.text
     ''
 
+The caching headers are set to no-cache to ease testing::
+
+   >>> resp.headers['X-Caching-Mode']
+   'no_cache'
 
 GET
 ~~~
@@ -382,6 +386,7 @@ The response object has 3 top-level entries:
 
       >>> sorted(resp_data['updated_resources']['changed_descendants'])
       ['http://localhost/', 'http://localhost/principals/', 'http://localhost/principals/users/']
+
 
 PUT
 ~~~
@@ -534,6 +539,7 @@ The return data has the new attribute 'first_version_path' to get the path first
     >>> pvrs0_path
     '.../adhocracy/Proposals/kommunismus/VERSION_0000000/'
 
+
 Version IDs are numeric and assigned by the server.  The front-end has
 no control over them, and they are not supposed to be human-memorable.
 For human-memorable version pointers that also allow for complex
@@ -576,7 +582,6 @@ Create a new version of the proposal that follows the first version ::
     >>> pvrs1_path = resp.json["path"]
     >>> pvrs1_path != pvrs0_path
     True
-
 
 Add and update child resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

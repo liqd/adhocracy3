@@ -17,7 +17,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
-from adhocracy_core.utils import get_reason_if_blocked
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import get_sheet_field
@@ -130,26 +129,21 @@ def index_creator(resource, default):
     return userid
 
 
-def view_blocked_by_metadata(resource: IResource,
-                             registry: Registry) -> dict:
+def view_blocked_by_metadata(resource: IResource, registry: Registry,
+                             block_reason: str) -> dict:
     """
-    Return a dict with an explanation if viewing this resource is not allowed.
+    Return a dict with an explanation why viewing this resource is not allowed.
 
-    This is the case if the `deleted` or `hidden` flag is set on the resource
-    or one of its parents. If the resource provides metadata, the date of the
+    If the resource provides metadata, the date of the
     last change and its author are added to the result.
-
-    Otherwise, None is returned which means that the resource is viewable.
     """
-    block_reason = get_reason_if_blocked(resource)
-    if block_reason is None:
-        return None
     result = {'reason': block_reason}
-    if IMetadata.providedBy(resource):
-        metadata = get_sheet(resource, IMetadata, registry=registry)
-        appstruct = metadata.get()
-        result['modification_date'] = appstruct['modification_date']
-        result['modified_by'] = appstruct['modified_by']
+    if not IMetadata.providedBy(resource):
+        return result
+    metadata = get_sheet(resource, IMetadata, registry=registry)
+    appstruct = metadata.get()
+    result['modification_date'] = appstruct['modification_date']
+    result['modified_by'] = appstruct['modified_by']
     return result
 
 
