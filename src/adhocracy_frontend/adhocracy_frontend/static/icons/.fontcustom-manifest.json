@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "ff27f3ac95fcf71eafd926b2372bc88f90df1ee76a275466f93ccb6df9101422",
-    "current": "ff27f3ac95fcf71eafd926b2372bc88f90df1ee76a275466f93ccb6df9101422"
+    "previous": "ef28ef8c6b801c95f95208244570f179b776d422db0c17bd5d274d827d244726",
+    "current": "ef28ef8c6b801c95f95208244570f179b776d422db0c17bd5d274d827d244726"
   },
   "fonts": [
     "fonts/adhocracy3-icons.ttf",
@@ -77,6 +77,10 @@
     "triangle-inverse-up": {
       "codepoint": 61711,
       "source": "svg/triangle-inverse-up.svg"
+    },
+    "triangle-up": {
+      "codepoint": 61717,
+      "source": "svg/triangle-up.svg"
     },
     "user": {
       "codepoint": 61708,
