@@ -45,28 +45,45 @@ logger = getLogger(__name__)
 
 def resource_created_and_added_subscriber(event):
     """Add created message to the transaction_changelog."""
-    _add_changelog(event.registry, event.object, created=True)
+    _add_changelog(event.registry, event.object, key='created', value=True)
 
 
 def resource_modified_subscriber(event):
     """Add modified message to the transaction_changelog."""
-    _add_changelog(event.registry, event.object, modified=True)
+    _add_changelog(event.registry, event.object, key='modified', value=True)
     _add_changed_descendants_to_all_parents(event.registry, event.object)
 
 
 def _add_changed_descendants_to_all_parents(registry, resource):
     for parent in lineage(resource.__parent__):
-        has_changed_descendants = _get_changelog(registry, parent,
-                                                 'changed_descendants')
-        if has_changed_descendants:
+        changed_descendants_is_changed = _add_changelog(
+            registry, parent, key='changed_descendants', value=True)
+        if changed_descendants_is_changed:
+            _increment_changed_descendants_counter(parent)
+        else:
             break
-        _add_changelog(registry, parent, changed_descendants=True)
+
+
+def _increment_changed_descendants_counter(context):
+    counter = getattr(context, '__changed_descendants_counter__', None)
+    if counter:  # pragma: no branch
+        counter.change(1)
 
 
 def resource_backreference_modified_subscriber(event):
     """Add changed_backrefs message to the transaction_changelog."""
-    _add_changelog(event.registry, event.object, changed_backrefs=True)
+    changed_backrefs_is_modified = _add_changelog(event.registry, event.object,
+                                                  key='changed_backrefs',
+                                                  value=True)
+    if changed_backrefs_is_modified:
+        _increment_changed_backrefs_counter(event.object)
     _add_changed_descendants_to_all_parents(event.registry, event.object)
+
+
+def _increment_changed_backrefs_counter(context):
+    counter = getattr(context, '__changed_backrefs_counter__', None)
+    if counter:  # pragma: no branch
+        counter.change(1)
 
 
 def tag_created_and_added_or_modified_subscriber(event):
@@ -90,25 +107,29 @@ def itemversion_created_subscriber(event):
     """Add new `follwed_by` and `last_version` to the transaction_changelog."""
     if event.new_version is None:
         return
-    _add_changelog(event.registry, event.object, followed_by=event.new_version)
+    _add_changelog(event.registry, event.object, key='followed_by',
+                   value=event.new_version)
     item = find_interface(event.object, IItem)
-    _add_changelog(event.registry, item, last_version=event.new_version)
+    _add_changelog(event.registry, item, key='last_version',
+                   value=event.new_version)
 
 
-def _add_changelog(registry: Registry, resource: IResource, **kwargs):
-    """Add changelog metadata `kwargs` to the transaction changelog."""
+def _add_changelog(registry: Registry, resource: IResource, key: str,
+                   value: object) -> bool:
+    """Add metadata `key/value` to the transaction changelog if needed.
+
+    Return: True if new metadata value was added else False (no value change)
+    """
     changelog = registry._transaction_changelog
     path = resource_path(resource)
     metadata = changelog[path]
-    changelog[path] = metadata._replace(resource=resource, **kwargs)
-
-
-def _get_changelog(registry: Registry, resource: IResource, name):
-    """get changelog metadata `name`."""
-    changelog = registry._transaction_changelog
-    path = resource_path(resource)
-    metadata = changelog[path]
-    return getattr(metadata, name)
+    old_value = getattr(metadata, key)
+    if old_value is not value:
+        changelog[path] = metadata._replace(**{'resource': resource,
+                                               key: value})
+        return True
+    else:
+        return False
 
 
 def create_transaction_changelog():
@@ -247,7 +268,8 @@ def metadata_modified_subscriber(event):
                                                      was_deleted=was_deleted,
                                                      is_hidden=is_hidden,
                                                      is_deleted=is_deleted)
-    _add_changelog(event.registry, event.object, visibility=visibility_change)
+    _add_changelog(event.registry, event.object, key='visibility',
+                   value=visibility_change)
 
 
 def _reindex_resource_and_descendants(resource: IResource):

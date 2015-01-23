@@ -101,8 +101,11 @@ class TestResourceModifiedSubscriber:
 
     @fixture
     def context(self, context):
+        from BTrees.Length import Length
         root = testing.DummyResource()
+        root.__changed_descendants_counter__ = Length()
         root['parent'] = testing.DummyResource()
+        root['parent'].__changed_descendants_counter__ = Length()
         root['parent']['child'] = context
         return context
 
@@ -110,58 +113,73 @@ class TestResourceModifiedSubscriber:
         from adhocracy_core.resources.subscriber import resource_modified_subscriber
         return resource_modified_subscriber(event)
 
-    def test_set_modified_changelog(self, event, context, changelog):
-        event.object = context
+    def test_set_modified_changelog(self, event, changelog):
         self._call_fut(event)
         assert changelog['/parent/child'].modified is True
 
-    def test_dont_set_changed_descendants_for_context(self, event, context,
-                                                      changelog):
-        event.object = context
+    def test_dont_set_changed_descendants_for_context(self, event, changelog):
         self._call_fut(event)
         assert changelog['/parent/child'].changed_descendants is False
 
-    def test_set_changed_descendants_changelog_for_parents(self, event, context,
+    def test_set_changed_descendants_changelog_for_parents(self, event,
                                                            changelog):
-        event.object = context
         self._call_fut(event)
         assert changelog['/parent'].changed_descendants is True
         assert changelog['/'].changed_descendants is True
 
-    def test_set_changed_descendants_only_once(self, event, context, changelog):
+    def test_set_changed_descendants_only_once(self, event, changelog):
         """Stop iterating all parents if `changed_descendants` is already set"""
-        event.object = context
         changelog['/parent'] = \
             changelog['parent']._replace(changed_descendants=True)
         self._call_fut(event)
         assert changelog['/parent'].changed_descendants is True
         assert changelog['/'].changed_descendants is False
 
+    def test_increment_changed_descendants_counter_for_parents(self, event,
+                                                               changelog):
+        self._call_fut(event)
+        assert changelog['/parent'].resource.\
+                   __changed_descendants_counter__() == 1
+        assert changelog['/'].resource.__changed_descendants_counter__() == 1
+
 
 class TestResourceBackreferenceModifiedSubscriber:
 
     @fixture
     def context(self, context):
+        from BTrees.Length import Length
         root = testing.DummyResource()
+        root.__changed_descendants_counter__ = Length()
         root['parent'] = testing.DummyResource()
+        root['parent'].__changed_descendants_counter__ = Length()
         root['parent']['child'] = context
+        context.__changed_backrefs_counter__ = Length()
         return context
 
     def _call_fut(self, event):
         from .subscriber import resource_backreference_modified_subscriber
         return resource_backreference_modified_subscriber(event)
 
-    def test_set_changed_backrefs_changelog(self, event, context, changelog):
-        event.object = context
+    def test_set_changed_backrefs_changelog(self, event, changelog):
         self._call_fut(event)
         assert changelog['/parent/child'].changed_backrefs is True
 
-    def test_set_changed_descendants_changelog_for_parents(self, event, context,
+    def test_set_changed_backrefs_counter(self, event, changelog):
+        self._call_fut(event)
+        assert changelog['/parent/child'].resource.\
+                   __changed_backrefs_counter__() == 1
+
+    def test_set_changed_descendants_changelog_for_parents(self, event,
                                                            changelog):
-        event.object = context
         self._call_fut(event)
         assert changelog['/parent'].changed_descendants is True
         assert changelog['/'].changed_descendants is True
+
+    def test_increment_changed_descendants_counter_for_parents(self, event,
+                                                               changelog):
+        self._call_fut(event)
+        assert changelog['/parent'].resource.__changed_descendants_counter__() == 1
+        assert changelog['/'].resource.__changed_descendants_counter__() == 1
 
 
 def test_create_transaction_changelog():

@@ -1,6 +1,5 @@
 """Pool resource type and zodb persistent IPool implementation."""
 import datetime
-
 from substanced.folder import Folder
 from substanced.util import find_service
 from substanced.interfaces import IFolder
@@ -12,6 +11,7 @@ import adhocracy_core.sheets.metadata
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.resource import Base
+from adhocracy_core.resources.resource import Length
 from adhocracy_core.resources.resource import resource_metadata_defaults
 
 
@@ -36,6 +36,12 @@ class Pool(Base, Folder):
 
     _autoname_length = 7
     _autoname_last = -1
+
+    def __init__(self, data=None, family=None):
+        Folder.__init__(self, data=data, family=family)
+        Base.__init__(self)
+        self.__changed_descendants_counter__ = Length()
+        """Counter that should increment if descendants are changed."""
 
     def next_name(self, subobject, prefix='') -> str:
         """Generate name to add subobject to the folder.
