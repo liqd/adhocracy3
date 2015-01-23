@@ -145,7 +145,7 @@ export var register = () => {
                         resourceWidget._handleDelete = jasmine.createSpy("_handleDelete").and.returnValue(q.when());
                         resourceWidget.provide = jasmine.createSpy("provide").and.returnValue(q.when());
 
-                        directive.link(scopeMock, undefined, undefined, instanceMock.wrapper);
+                        directive.link(scopeMock, undefined, undefined, [instanceMock.wrapper]);
 
                         // instance is private, but we can get it via this hack
                         instance = resourceWidget.update.calls.mostRecent().args[0];
