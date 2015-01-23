@@ -23,7 +23,7 @@ export var movingColumns = (
 
             var maxShowWidth = 55 * fontSize;
             var minShowWidth = 35 * fontSize;
-            var collapseWidth = 2.5 * fontSize;
+            var collapseWidth = 2 * fontSize;
             var spacing = Math.ceil(0.3 * fontSize);
 
             var clearStates = (element) => {

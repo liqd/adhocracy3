@@ -129,6 +129,12 @@ The menu should always have the same state as its columns.
         background-color: $color-background-base;
         border: 2px solid $color-structure-normal;
         border-width: 2px 0 2px 2px;
+        font-size: $font-size-small;
+        text-align: center;
+
+        .moving-column-icon {
+            float: none;
+        }
     }
 }
 
