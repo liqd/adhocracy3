@@ -89,6 +89,25 @@ class TestBatchView:
                                                   'modified': [],
                                                   'removed': []}}
 
+    def test_post_successful_subrequest_with_updated_resources(
+            self, context, request, mock_invoke_subrequest):
+        request.body = self._make_json_with_subrequest_cstructs()
+        inst = self._make_one(context, request)
+        response_body = {'path': '/pool/item',
+                 'first_version_path': '/pool/item/v1',
+                 'updated_resources': {'created': ['/pool/item/v1']}}
+        mock_invoke_subrequest.return_value = DummySubresponse(
+            status_code=200, json=response_body,)
+        response = inst.post()
+        assert response == {'responses': [{'body': {'path': '/pool/item',
+                                                    'first_version_path':
+                                                        '/pool/item/v1'},
+                                           'code': 200}],
+                            'updated_resources': {'changed_descendants': [],
+                                                  'created': [],
+                                                  'modified': [],
+                                                  'removed': []}}
+
     def test_post_successful_subrequest_resolve_result_paths(self, context, request, mock_invoke_subrequest):
         cstruct1 = self._make_subrequest_cstruct(result_first_version_path='@item/v1')
         cstruct2 = self._make_subrequest_cstruct(body={'ISheet': {'ref': '@item/v1'}})

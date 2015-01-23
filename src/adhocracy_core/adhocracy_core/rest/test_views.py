@@ -254,7 +254,8 @@ class TestValidatePOSTRootVersions:
 class TestRESTView:
 
     @fixture
-    def request(self, cornice_request):
+    def request(self, cornice_request, changelog):
+        cornice_request.registry._transaction_changelog = changelog
         return cornice_request
 
     def make_one(self, context, request):
@@ -272,6 +273,43 @@ class TestRESTView:
         assert inst.request is request
         assert inst.request.errors == []
         assert inst.request.validated == {}
+
+    def test__build_updated_resources_dict_empty(self, request, context):
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert result == {}
+
+    def test__build_updated_resources_dict_one_resource(
+            self, request, context, changelog_meta):
+        res = testing.DummyResource()
+        request.registry._transaction_changelog[
+            res] = changelog_meta._replace(resource=res, created=True)
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert result == {'created': [res]}
+
+    def test__build_updated_resources_dict_one_resource_two_events(
+            self, request, context, changelog_meta):
+        res = testing.DummyResource()
+        request.registry._transaction_changelog[
+            res] = changelog_meta._replace(
+            resource=res,  created=True, changed_descendants=True)
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert result == {'changed_descendants': [res], 'created': [res]}
+
+    def test__build_updated_resources_dict_two_resources(
+            self, request, context, changelog_meta):
+        res1 = testing.DummyResource()
+        res2 = testing.DummyResource()
+        request.registry._transaction_changelog[
+            res1] = changelog_meta._replace(resource=res1, created=True)
+        request.registry._transaction_changelog[
+            res2] = changelog_meta._replace(resource=res2, created=True)
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert list(result.keys()) == ['created']
+        assert set(result['created']) == {res1, res2}
 
 
 class TestResourceRESTView:
