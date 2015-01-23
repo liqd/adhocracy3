@@ -29,21 +29,31 @@
             display: block;
         }
 
-        &:active :before {
+        &:active:before {
+            color: $color-text-highlight-normal;
             content: "\f106";
         }
     }
 
     .user-profile-info-proposals {
-        margin-top: 46 / 14 * 1em;
+        margin-top: 64 / 14 * 1em;
         text-align: left;
+
+
+        .listing-empty-text,
+        .mercator-user-profile-proposal-list-heading {
+            text-align: center;
+        }
+
+        .listing-empty-text {
+            padding: 1em 0;
+        }
 
         .mercator-user-profile-proposal-list-heading {
             background: $color-structure-normal;
             font-weight: $font-weight-normal;
             margin: 0;
             padding: 32 / 14 * 1em 0;
-            text-align: center;
         }
     }
 }
