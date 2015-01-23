@@ -57,6 +57,7 @@ from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
+from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
@@ -287,6 +288,16 @@ class RESTView:
     def delete(self) -> dict:
         raise HTTPMethodNotAllowed()
 
+    def _build_updated_resources_dict(self) -> dict:
+        """Utility method used by several subclasses."""
+        result = defaultdict(list)
+        changelog_meta = self.request.registry._transaction_changelog.values()
+        for meta in changelog_meta:
+            events = extract_events_from_changelog_metadata(meta)
+            for event in events:
+                result[event].append(meta.resource)
+        return result
+
 
 def _get_schema_and_validators(view_class, request: Request) -> tuple:
     http_method = request.method.upper()
@@ -447,20 +458,16 @@ class SimpleRESTView(ResourceRESTView):
                 sheet.set(appstructs[name],
                           registry=self.request.registry,
                           request=self.request)
+
+        appstruct = {}
+        if not is_batchmode(self.request.registry):
+            appstruct[
+                'updated_resources'] = self._build_updated_resources_dict()
+
         schema = ResourceResponseSchema().bind(request=self.request,
                                                context=self.context)
-        appstruct = {'updated_resources': self._build_updated_resources_dict()}
         cstruct = schema.serialize(appstruct)
         return cstruct
-
-    def _build_updated_resources_dict(self) -> dict:
-        result = defaultdict(list)
-        changelog_meta = self.request.registry._transaction_changelog.values()
-        for meta in changelog_meta:
-            events = extract_events_from_changelog_metadata(meta)
-            for event in events:
-                result[event].append(meta.resource)
-        return result
 
 
 @view_defaults(
@@ -493,7 +500,10 @@ class PoolRESTView(SimpleRESTView):
         else:
             schema = ResourceResponseSchema().bind(request=self.request,
                                                    context=resource)
-        appstruct['updated_resources'] = self._build_updated_resources_dict()
+
+        if not is_batchmode(self.request.registry):
+            appstruct[
+                'updated_resources'] = self._build_updated_resources_dict()
         return schema.serialize(appstruct)
 
     def _get_first_version(self, item: IItem) -> IItemVersion:
