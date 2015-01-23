@@ -8,6 +8,12 @@
     <div class="moving-column-collapsed">
         <adh-inject data-transclusion-id="collapsed"></adh-inject>
     </div>
+    <div
+        class="moving-column-sidebar"
+        data-ng-class="{'is-visible': showSidebar}"
+        aria-visible="{{showSidebar}}">
+        <adh-inject data-transclusion-id="sidebar"></adh-inject>
+    </div>
 
     <div class="moving-column-mask" data-ng-show="overlay"></div>
     <div class="moving-column-overlay" data-ng-if="overlay">

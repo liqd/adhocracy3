@@ -171,6 +171,21 @@ export class MovingColumnController {
             this.$scope.overlay = undefined;
         }
     }
+
+    public showSidebar() : void {
+        this.toggleSidebar(true);
+    }
+
+    public hideSidebar() : void {
+        this.toggleSidebar(false);
+    }
+
+    public toggleSidebar(condition? : boolean) : void {
+        if (typeof condition === "undefined") {
+            condition = !this.$scope.showSidebar;
+        }
+        this.$scope.showSidebar = condition;
+    }
 }
 
 
