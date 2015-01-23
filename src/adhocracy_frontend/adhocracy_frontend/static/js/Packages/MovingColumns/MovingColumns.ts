@@ -1,6 +1,9 @@
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+
+export var pkgLocation = "/MovingColumns";
 
 
 export var movingColumns = (
@@ -126,6 +129,25 @@ export var movingColumns = (
 };
 
 
+export class MovingColumnController {
+    constructor(protected $timeout : ng.ITimeoutService, protected $scope) {
+        $scope.ctrl = this;
+        $scope.shared = {};
+    }
+}
+
+
+export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        transclude: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
+        controller: ["$timeout", "$scope", MovingColumnController]
+    };
+};
+
+
 export var moduleName = "adhMovingColumns";
 
 export var register = (angular) => {
@@ -133,5 +155,6 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhTopLevelState.moduleName
         ])
+        .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
         .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
 };
