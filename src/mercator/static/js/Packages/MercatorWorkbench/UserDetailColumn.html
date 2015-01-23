@@ -1,12 +1,14 @@
-<div class="moving-column-menu">
-    <i class="icon-user-unfilled moving-column-icon"></i>
-    <a
-        href=""
-        data-ng-click="ctrl.toggleMessaging()"
-        data-ng-if="messageOptions.POST">{{ "Messaging" | translate }}</a>
-</div>
-<div class="moving-column-body" data-du-scroll-container="">
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <i class="icon-user-unfilled moving-column-icon"></i>
+        <a
+            href=""
+            data-ng-click="ctrl.toggleOverlay('messaging')"
+            data-ng-if="messageOptions.POST">{{ "Messaging" | translate }}</a>
+    </div>
+
     <adh-recompile-on-change
+        data-ng-switch-when="body"
         data-key="userUrl"
         data-value="{{userUrl}}">
         <adh-user-profile
@@ -19,5 +21,6 @@
             </section>
         </adh-user-profile>
     </adh-recompile-on-change>
-    <adh-user-message data-ng-if="showMessaging" data-recipient-url="{{userUrl}}"></adh-user-message>
+
+    <adh-user-message data-ng-switch-when="overlays" data-recipient-url="{{userUrl}}"></adh-user-message>
 </div>

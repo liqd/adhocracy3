@@ -1,27 +1,27 @@
 <adh-space data-key="content">
     <div data-adh-moving-columns="" class="moving-columns">
-        <div class="moving-column moving-column-structure">
+        <adh-moving-column>
             <adh-mercator-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mercator-proposal-create-column>
             <adh-mercator-proposal-listing-column data-ng-if="view !== 'create_proposal'"><adh-mercator-proposal-listing-column>
-        </div>
-        <div class="moving-column moving-column-content">
+        </adh-moving-column>
+        <adh-moving-column>
             <adh-mercator-proposal-edit-column data-ng-if="view === 'edit'"></adh-mercator-proposal-edit-column>
             <adh-mercator-proposal-detail-column data-ng-if="view !== 'edit'"></adh-mercator-proposal-detail-column>
-        </div>
-        <div class="moving-column moving-column-content2">
+        </adh-moving-column>
+        <adh-moving-column>
             <adh-comment-column></adh-comment-column>
-        </div>
+        </adh-moving-column>
     </div>
 </adh-space>
 
 <adh-space data-key="user">
     <div data-adh-moving-columns="" class="moving-columns">
-        <div class="moving-column moving-column-structure">
+        <adh-moving-column>
             <adh-user-listing-column></adh-user-listing-column>
-        </div>
-        <div class="moving-column moving-column-content">
+        </adh-moving-column>
+        <adh-moving-column>
             <adh-user-detail-column></adh-user-detail-column>
-        </div>
+        </adh-moving-column>
     </div>
 </adh-space>
 
