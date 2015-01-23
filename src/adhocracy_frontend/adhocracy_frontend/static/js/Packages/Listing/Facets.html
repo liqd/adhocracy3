@@ -1,12 +1,14 @@
-<ul>
-    <li data-ng-repeat="facet in facets">
-        <h3 class="facet-header">{{ facet.name | translate }}</h3>
-        <ul>
-            <li data-ng-repeat="item in facet.items">
-                <label data-ng-click="toggleItem(facet, item)">
-                    <input type="checkbox" data-autocomplete="off"> {{ item.name | translate }}
-                </label>
-            </li>
-        </ul>
-    </li>
-</ul>
+<div class="facets">
+    <ul>
+        <li data-ng-repeat="facet in facets">
+            <h3 class="facet-header">{{ facet.name | translate }}</h3>
+            <ul>
+                <li data-ng-repeat="item in facet.items">
+                    <label data-ng-click="toggleItem(facet, item)">
+                        <input type="checkbox" data-autocomplete="off"> {{ item.name | translate }}
+                    </label>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div><!-- /.facets -->
