@@ -68,7 +68,7 @@ class TestBatchView:
 
     def test_post_empty(self, context, request):
         inst = self._make_one(context, request)
-        assert inst.post() == []
+        assert inst.post() == {'responses': []}
 
     def test_post_successful_subrequest(self, context, request, mock_invoke_subrequest):
         request.body = self._make_json_with_subrequest_cstructs()
@@ -78,7 +78,7 @@ class TestBatchView:
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
                                                                json=paths,)
         response = inst.post()
-        assert response == [{'body': paths, 'code': 200}]
+        assert response == {'responses': [{'body': paths, 'code': 200}]}
 
     def test_post_successful_subrequest_resolve_result_paths(self, context, request, mock_invoke_subrequest):
         cstruct1 = self._make_subrequest_cstruct(result_first_version_path='@item/v1')

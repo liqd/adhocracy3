@@ -95,7 +95,31 @@ class BatchView(RESTView):
         return item_response
 
     def _response_list_to_json(self, response_list: list) -> list:
-        return [response.to_dict() for response in response_list]
+        """
+        Convert the list of batch responses into a JSON dict.
+
+        The dict has two fields:
+
+        * responses: the list of batch responses, but without their
+          "updated_resources" child element
+        * updated_resources: the listing of resources affected by the
+          transaction -- if none of the subrequests is a POST or PUT,
+          this field is omitted
+        """
+        responses = []
+        updated_resources = None
+        for response in response_list:
+            if 'updated_resources' in response.body:
+                # We keep the updated_resources listing from the *last*
+                # response that has one, as it will contain *all* affected
+                # resources
+                updated_resources = response.body['updated_resources']
+                del response.body['updated_resources']
+            responses.append(response.to_dict())
+        result = {'responses': responses}
+        if updated_resources is not None:
+            result['updated_resources'] = updated_resources
+        return result
 
     def _resolve_preliminary_paths(self, json_value: object,
                                    path_map: dict) -> object:
