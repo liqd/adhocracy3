@@ -47,14 +47,11 @@ export var emptyOptions : IOptions = {
 };
 
 
-export interface IBatchResult {
-    postedResources : ResourcesBase.Resource[];
-    updated : {
-        changed_descendants : string[];
-        created : string[];
-        modified : string[];
-        removed : string[];
-    };
+export interface IUpdated {
+    changed_descendants : string[];
+    created : string[];
+    modified : string[];
+    removed : string[];
 }
 
 
@@ -246,12 +243,12 @@ export class Service<Content extends ResourcesBase.Resource> {
                 transaction.post(resource.parent, resource);
             });
 
-            return transaction.commit().then(batchResult => {
-                _.forEach(batchResult.postedResources, (resource) => {
+            return transaction.commit().then(postedResources => {
+                _.forEach(postedResources, (resource) => {
                     this.adhCache.invalidate(AdhUtil.parentPath(resource.path));
                 });
 
-                return batchResult.postedResources;
+                return postedResources;
             });
         });
     }

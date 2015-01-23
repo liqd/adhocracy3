@@ -7,7 +7,6 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import ResourcesBase = require("../../ResourcesBase");
 import Resources_ = require("../../Resources_");
 
-import AdhHttp = require("./Http");
 import AdhMetaApi = require("./MetaApi");
 
 
@@ -141,19 +140,16 @@ export var importContent = <Content extends ResourcesBase.Resource>(
  * far.
  */
 export var importBatchContent = <Content extends ResourcesBase.Resource>(
-    batchResponse,
+    responses,
     metaApi : AdhMetaApi.MetaApiQuery,
     preliminaryNames : AdhPreliminaryNames.Service
-) : AdhHttp.IBatchResult => {
+) : Content[] => {
 
-    return {
-        postedResources: batchResponse.data.responses.map((response) => {
-            response.data = response.body;
-            delete response.body;
-            return importContent(response, metaApi, preliminaryNames);
-        }),
-        updated: batchResponse.data.updated_resources
-    };
+    return responses.map((response) => {
+        response.data = response.body;
+        delete response.body;
+        return importContent(response, metaApi, preliminaryNames);
+    });
 };
 
 
