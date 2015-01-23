@@ -155,7 +155,6 @@ export var userDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            scope.showMessaging = false;
             adhTopLevelState.bind("userUrl", scope);
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
         }
