@@ -1,9 +1,11 @@
-{{ "Filter list" | translate }}
 <ul>
-    <li data-ng-repeat="facet in facets">{{ facet.name | translate }}
+    <li data-ng-repeat="facet in facets">
+        <h3 class="facet-header">{{ facet.name | translate }}</h3>
         <ul>
             <li data-ng-repeat="item in facet.items">
-                <a href="" data-ng-click="toggleItem(facet, item)">{{ item.name | translate }}</a> <span ng-if="item.enabled">(enabled)</span>
+                <label data-ng-click="toggleItem(facet, item)">
+                    <input type="checkbox" data-autocomplete="off"> {{ item.name | translate }}
+                </label>
             </li>
         </ul>
     </li>
