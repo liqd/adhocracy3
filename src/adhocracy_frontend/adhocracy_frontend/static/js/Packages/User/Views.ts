@@ -270,7 +270,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
         scope: {
             recipientUrl: "@"
         },
-        require: "^adhUserDetailColumn",
+        require: "^adhMovingColumn",
         link: (scope, element, attrs, column)  => {
             scope.messageSend = () => {
                 return adhHttp.postRaw(adhConfig.rest_url + "/message_user", {
@@ -278,15 +278,15 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
                     title: scope.message.title,
                     text: scope.message.text
                 }).then(() => {
-                    column.hideMessaging();
-                    column.success("Message was send");
+                    column.hideOverlay();
+                    column.alert("Message was send", "success");
                 }, () => {
                     // FIXME
                 });
             };
 
             scope.cancel = () => {
-                column.hideMessaging();
+                column.hideOverlay();
             };
         }
     };

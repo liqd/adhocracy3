@@ -1,8 +1,11 @@
-<div class="moving-column-menu">
-    <div class="moving-column-menu-nav">
+<div data-ng-switch="transclusionId">
+    <div class="moving-column-menu-nav" data-ng-switch-when="menu">
         <a href="{{ proposalUrl | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
     </div>
-</div>
-<div class="moving-column-body" data-du-scroll-container="">
-    <adh-comment-listing data-ng-if="commentableUrl" data-path="{{commentableUrl}}">
+
+    <adh-comment-listing
+        data-ng-if="commentableUrl"
+        data-path="{{commentableUrl}}"
+        data-ng-switch-when="body">
+    </adh-comment-listing>
 </div>
