@@ -19,17 +19,24 @@ from adhocracy_core.resources.principal import IGroup
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
 
-
-root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
+# Permissons to roles mapping (ACL)
+# Every role should only have the permission for the specific actions it is
+# meant to enable.
+root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
+                                                 # view sheet default,
+                                                 # view resource default
             (Allow, 'system.Everyone', 'add_user'),
             (Allow, 'system.Everyone', 'create_sheet_password'),
             (Allow, 'system.Everyone', 'create_sheet_userbasic'),
+            # Annotator role
             (Allow, 'role:annotator', 'view'),
-            (Allow, 'role:annotator', 'add_resource'),  # default permission
-            (Allow, 'role:annotator', 'create_sheet'),  # default permission
+            (Allow, 'role:annotator', 'add_resource'),  # post request default,
+                                                        # create resource def.
+            (Allow, 'role:annotator', 'create_sheet'),  # create sheet default
             (Allow, 'role:annotator', 'add_asset'),
             (Allow, 'role:annotator', 'add_comment'),
             (Allow, 'role:annotator', 'add_rate'),
+            # Contributor role
             (Allow, 'role:contributor', 'view'),
             (Allow, 'role:contributor', 'add_resource'),
             (Allow, 'role:contributor', 'create_sheet'),
@@ -38,16 +45,21 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
             (Allow, 'role:contributor', 'add_paragraph'),
             (Allow, 'role:contributor', 'add_externalresource'),
             (Allow, 'role:contributor', 'message_to_user'),
+            # Creator role
+            (Allow, 'role:contributor', 'view'),
             (Allow, 'role:creator', 'add_commentversion'),
             (Allow, 'role:creator', 'add_rateversion'),
             (Allow, 'role:creator', 'add_proposalversion'),
             (Allow, 'role:creator', 'add_sectionversion'),
             (Allow, 'role:creator', 'add_paragraphversion'),
-            (Allow, 'role:creator', 'edit_some_sheets'),  # default permission
+            (Allow, 'role:creator', 'edit_some_sheets'),  # put request default
             (Allow, 'role:creator', 'edit_metadata'),
+            # Manager role
             (Allow, 'role:manager', 'hide_resource'),
-            (Allow, 'role:manager', 'edit_some_sheets'),  # default permission
+            (Allow, 'role:manager', 'edit_some_sheets'),
             (Allow, 'role:manager', 'edit_metadata'),
+            # Admin role
+            (Allow, 'role:manager', 'hide_resource'),
             (Allow, 'role:admin', 'view'),
             (Allow, 'role:admin', 'view_sensitive'),  # sensitive info that
                                                       # only admins should see
@@ -56,11 +68,13 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # default permission
             (Allow, 'role:admin', 'add_group'),
             (Allow, 'role:admin', 'add_pool'),
             (Allow, 'role:admin', 'edit_group'),
-            (Allow, 'role:admin', 'edit_some_sheets'),  # duplicate
-            (Allow, 'role:admin', 'edit_sheet'),  # default permission
+            (Allow, 'role:admin', 'edit_some_sheets'),
+            (Allow, 'role:admin', 'edit_sheet'),  # edit sheets default
             (Allow, 'role:admin', 'manage_principals'),
+            # God role
             (Allow, 'role:god', ALL_PERMISSIONS),
             ]
+# FIXME: nice documentation for default permissions and how to set permissions
 # FIXME every sheet/resource should have the posibility to add the needed ACEs
 
 
