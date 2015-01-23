@@ -2,19 +2,19 @@
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}"/>
     <div class="mercator-proposal-detail-cover">
         <ul class="mercator-proposal-detail-meta">
-            <li class="mercator-propsal-detail-meta-item">
+            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} {{ "Total Comments" | translate }}
             </li>
-            <li class="mercator-propsal-detail-meta-item">
+            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-date">
                 <i class="icon-calendar"></i>
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li class="mercator-propsal-detail-meta-item">
+            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-budget">
                 <i class="icon-pig"></i>
                 {{data.finance.requested_funding | number}} &euro;
             </li>
-            <li class="mercator-propsal-detail-meta-item">
+            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-rate">
                 <adh-like data-refers-to="{{path}}"
                     data-post-pool-sheet="adhocracy.sheets.rate.ILikeable"
                     data-post-pool-field="post_pool">

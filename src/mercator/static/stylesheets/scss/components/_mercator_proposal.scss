@@ -136,18 +136,26 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         line-height: 1;
         margin-right: 1px;
         vertical-align: middle;
+    }
 
-        &.icon-speechbubbles {
+    &.mercator-propsal-list-item-meta-item-total-comments,
+    &.mercator-propsal-detail-meta-item-total-comments {
+        i {
             color: $color-brand-three-normal;
         }
+    }
 
-        &.icon-pointy-rectangle-left {
+    &.mercator-propsal-list-item-meta-item-supporters,
+    &.mercator-propsal-detail-meta-item-total-supporters {
+        i {
             color: $color-brand-one-normal;
             font-size: 200%;
             vertical-align: text-top;
         }
+    }
 
-        &.icon-pig {
+    &.mercator-propsal-detail-meta-item-budget {
+        i {
             font-size: 160%;
         }
     }
@@ -186,8 +194,8 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 .mercator-proposal-detail-meta {
     padding-bottom: 1.66666666em;
 
-    i {
-        &.icon-speechbubbles {
+    .mercator-propsal-detail-meta-item-total-comments {
+        i {
             color: $color-text-highlight-introvert;
         }
     }
