@@ -12,10 +12,9 @@ from websocket import WebSocketConnectionClosedException
 from websocket import WebSocketTimeoutException
 
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.utils import exception_to_str
+from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.websockets.schemas import ServerNotification
-from adhocracy_core.utils import get_reason_if_blocked
 
 
 logger = logging.getLogger(__name__)
@@ -136,22 +135,9 @@ class Client:
         self.changelog_metadata_messages_to_send.update(changelog_metadata)
         while self.changelog_metadata_messages_to_send:
             meta = self.changelog_metadata_messages_to_send.pop()
-            # FIXME: if an exception is raised, the current changelog is lost.
-            if (meta.resource is None or
-                    meta.visibility is VisibilityChange.invisible):
-                continue
-            elif meta.created or meta.visibility is VisibilityChange.revealed:
-                self._send_resource_event(meta.resource, 'created')
-            elif meta.visibility is VisibilityChange.concealed:
-                self._send_resource_event(meta.resource, 'removed')
-            elif get_reason_if_blocked(meta.resource is not None):
-                # hidden resources may still be modified by autoupdates
-                # but we don't want to expose this to the client.
-                continue
-            elif meta.modified or meta.changed_backrefs:
-                self._send_resource_event(meta.resource, 'modified')
-            if meta.changed_descendants:
-                self._send_resource_event(meta.resource, 'changed_descendants')
+            events = extract_events_from_changelog_metadata(meta)
+            for event in events:
+                self._send_resource_event(meta.resource, event)
 
     def _send_resource_event(self, resource: IResource, event_type: str):
         schema = ServerNotification().bind(context=resource)
