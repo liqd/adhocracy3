@@ -2,9 +2,11 @@
     data-itemscope=""
     data-itemtype="http://schema.org/Person"
     data-ng-if="path"
-    class="user-profile">
+    class="user-profile-info">
 
-    <h1 data-itemprop="name" class="user-profile-name"><span class="user-profile-name-text">{{userBasic.name}}</span></h1>
-    <i class="icon-mail user-profile-icon"></i>
-    <adh-inject></adh-inject>
+    <h1 data-itemprop="name" class="user-profile-info-name"><span class="user-profile-info-name-text">{{userBasic.name}}</span></h1>
+    <i class="icon-mail user-profile-info-icon"></i>
+    <div class="user-profile-info-proposals">
+        <adh-inject></adh-inject>
+    </div><!-- .user-profile-info-proposals -->
 </section>
