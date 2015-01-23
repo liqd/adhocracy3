@@ -264,7 +264,6 @@ export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
-                        console.log($scope);
                     });
             }
         }]
