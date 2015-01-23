@@ -10,17 +10,17 @@
 
     <adh-facets
         data-ng-switch-when="sidebar"
-        data-update="data.update"
-        data-facets="data.facets">
+        data-update="shared.update"
+        data-facets="shared.facets">
     </adh-facets>
 
     <adh-mercator-proposal-listing
         data-ng-switch-when="body"
         data-path="{{platformUrl}}"
         data-content-type="{{contentType}}"
-        data-update="data.update"
-        data-facets="data.facets"
-        data-sort="data.sort"
+        data-update="shared.update"
+        data-facets="shared.facets"
+        data-sort="shared.sort"
     >
     </adh-mercator-proposal-listing>
 </div>
