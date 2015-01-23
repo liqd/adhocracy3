@@ -1108,7 +1108,7 @@ Let's add some more paragraphs to the second section above ::
     ...           },
     ...         ]
 
-The batch response is a dictionary with one or two fields::
+The batch response is a dictionary with two fields::
 
     >>> batch_resp = testapp.post_json(batch_url, batch, headers=god_header).json
     >>> sorted(batch_resp)
@@ -1118,7 +1118,7 @@ The batch response is a dictionary with one or two fields::
 
 'updated_resources' lists all the resources affected by the POST and PUT
 requests in the batch request. If the batch requests doesn't contain any such
-requests (only GET etc.), this field will be missing. ::
+requests (only GET etc.), all of its sub-entries will be empty. ::
 
     >>> updated_resources = batch_resp['updated_resources']
     >>> 'http://localhost/adhocracy/Proposals/' in updated_resources['changed_descendants']
