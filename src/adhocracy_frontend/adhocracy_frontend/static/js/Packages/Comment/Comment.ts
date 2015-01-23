@@ -6,6 +6,7 @@ import AdhDone = require("../Done/Done");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../Rate/Rate");
@@ -54,6 +55,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     createComment() : void;
     cancelCreateComment() : void;
     afterCreateComment() : ng.IPromise<void>;
+    report? : () => void;
     data : {
         content : string;
         creator : string;
@@ -80,36 +82,13 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
     }
 
     createRecursionDirective(adhRecursionHelper) {
-        var self = this;
-
         var directive = this.createDirective();
         directive.compile = (element) => adhRecursionHelper.compile(element, directive.link);
 
+        directive.require.push("?^adhMovingColumn");
+
         directive.scope.refersTo = "@";
         directive.scope.poolPath = "@";
-
-        directive.link = (scope : ICommentResourceScope, element, attrs, wrapper) => {
-            var instance = self.link(scope, element, attrs, wrapper);
-
-            scope.show = {
-                createForm: false
-            };
-
-            scope.createComment = () => {
-                scope.show.createForm = true;
-                scope.createPath = self.adhPreliminaryNames.nextPreliminary();
-            };
-
-            scope.cancelCreateComment = () => {
-                scope.show.createForm = false;
-            };
-
-            scope.afterCreateComment = () => {
-                return this.update(instance).then(() => {
-                    scope.show.createForm = false;
-                });
-            };
-        };
 
         directive.controller = ["adhTopLevelState", "$scope", (
             adhTopLevelState : AdhTopLevelState.Service,
@@ -127,6 +106,42 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         }];
 
         return directive;
+    }
+
+    public link(scope : ICommentResourceScope, element, attrs, controllers) {
+        var self = this;
+
+        var instance = super.link(scope, element, attrs, controllers);
+
+        // the report abuse UI is only available in moving columns
+        var column : AdhMovingColumns.MovingColumnController = controllers[1];
+        if (column) {
+            scope.report = () => {
+                column.$scope.shared.abuseUrl = scope.data.path;
+                column.toggleOverlay("abuse");
+            };
+        }
+
+        scope.show = {
+            createForm: false
+        };
+
+        scope.createComment = () => {
+            scope.show.createForm = true;
+            scope.createPath = self.adhPreliminaryNames.nextPreliminary();
+        };
+
+        scope.cancelCreateComment = () => {
+            scope.show.createForm = false;
+        };
+
+        scope.afterCreateComment = () => {
+            return this.update(instance).then(() => {
+                scope.show.createForm = false;
+            });
+        };
+
+        return instance;
     }
 
     public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
