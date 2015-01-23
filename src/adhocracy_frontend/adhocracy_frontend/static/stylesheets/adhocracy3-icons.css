@@ -38,7 +38,6 @@
 .icon-reply:before,
 .icon-speechbubble:before,
 .icon-speechbubble-document:before,
-.icon-speechbubble-outline:before,
 .icon-speechbubbles:before,
 .icon-triangle-inverse-down:before,
 .icon-triangle-inverse-up:before,
@@ -76,7 +75,6 @@
 .icon-reply:before { content: "\f10c"; }
 .icon-speechbubble:before { content: "\f10d"; }
 .icon-speechbubble-document:before { content: "\f10e"; }
-.icon-speechbubble-outline:before { content: "\f10f"; }
 .icon-speechbubbles:before { content: "\f110"; }
 .icon-triangle-inverse-down:before { content: "\f111"; }
 .icon-triangle-inverse-up:before { content: "\f112"; }
