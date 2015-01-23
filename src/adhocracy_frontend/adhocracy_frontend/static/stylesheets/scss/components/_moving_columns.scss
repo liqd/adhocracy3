@@ -261,6 +261,7 @@ States:
 
 .moving-column-sidebar {
     @include transition(left 0.5s);
+    border-top: 1px solid $color-structure-border;
     display: none;
     left: -25%;
     width: 25%;
@@ -276,6 +277,18 @@ States:
     &.is-visible-add,
     &.is-visible-remove {
         display: block;
+    }
+
+    .moving-column-sidebar-close {
+        color: $color-text-introvert;
+        position: absolute;
+        right: 1em;
+        text-decoration: none;
+        top: 1em;
+
+        &:hover {
+            color: $color-structure-normal;
+        }
     }
 }
 
