@@ -272,7 +272,11 @@ $mercator-proposal-detail-nav-width: 2em;
     }
 
     h3 {
-        margin: 0;
+        color: $color-text-introvert;
+        font-variant: small-caps;
+        line-height: 1.15;
+        margin: 0 0 15 / 14 * 1em;
+        text-transform: lowercase;
     }
 }
 
