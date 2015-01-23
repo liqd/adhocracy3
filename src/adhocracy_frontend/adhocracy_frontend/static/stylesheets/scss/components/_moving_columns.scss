@@ -325,3 +325,15 @@ A list of alert messages to notify users in the moving column
         background: $color-function-valid;
     }
 }
+
+.moving-column-overlay {
+    @include clearfix;
+    background: $color-structure-normal;
+    border-top: 1px solid $color-structure-border;
+    padding: 1em;
+
+    textarea,
+    input[type="text"] {
+        background: white;
+    }
+}
