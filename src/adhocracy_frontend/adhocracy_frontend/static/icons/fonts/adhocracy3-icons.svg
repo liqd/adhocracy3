@@ -5,7 +5,7 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Fri Jan 23 17:07:50 2015
+Created by FontForge 20120731 at Fri Jan 23 18:38:05 2015
  By Caroline Clifford,,,
 Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -19,7 +19,7 @@ Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
     panose-1="2 0 6 3 0 0 0 0 0 0"
     ascent="448"
     descent="-64"
-    bbox="-0.25 -238 1435 505"
+    bbox="-0.25 -64 519 505"
     underline-thickness="25.6"
     underline-position="-51.2"
     unicode-range="U+F100-F117"
@@ -58,10 +58,9 @@ d="M154 358h-128v-332h281v204h-128c-16 0 -25 10 -25 26v102zM179 384v-128c0 -2 24
     <glyph glyph-name="uniF116" unicode="&#xf116;" horiz-adv-x="482" 
 d="M274 177h-3c-19 0 -35 7 -48 20c-22 23 -45 72 -42 131c2 38 40 59 90 60v0h3c50 -1 85 -22 87 -60c3 -60 -17 -108 -39 -131c-13 -13 -29 -20 -48 -20zM271 358c-34 -1 -59 -9 -60 -30c-2 -50 15 -93 31 -110c7 -7 15 -11 26 -11h3c11 0 19 4 26 11c16 17 36 60 34 110
 c-1 21 -25 29 -60 30zM422 56h-302v16c0 78 77 105 143 105h5h3c63 0 151 -27 151 -105v-16zM151 87h241c-11 56 -95 60 -118 60h-3h-5c-23 0 -104 -4 -115 -60zM482 -4h-422v452h422v-452zM90 26h362v392h-362v-392zM422 -64h-422v422h30v-392h392v-30z" />
-    <glyph glyph-name="uniF106" unicode="&#xf106;" horiz-adv-x="1435" 
+    <glyph glyph-name="uniF106" unicode="&#xf106;" 
 d="M503 72c0 -25 -21 -45 -46 -45h-402c-25 0 -46 20 -46 45v240c0 25 21 45 46 45h402c25 0 46 -20 46 -45v-240zM457 18c30 0 55 24 55 54v240c0 30 -25 54 -55 54h-402c-30 0 -55 -24 -55 -54v-240c0 -30 25 -54 55 -54h402zM55 347v0h402c20 0 37 -15 37 -35v-240
-c0 -20 -17 -35 -37 -35h-402c-20 0 -37 15 -37 35v240c0 20 17 35 37 35zM490 343l-234 -191l-234 191zM256 143c2 0 4 1 6 2l233 191c4 3 5 9 2 13s-9 4 -13 1l-228 -186l-228 186c-4 3 -10 3 -13 -1s-2 -10 2 -13l233 -191c2 -1 4 -2 6 -2zM923 -238h512v512h-512v-512z
-" />
+c0 -20 -17 -35 -37 -35h-402c-20 0 -37 15 -37 35v240c0 20 17 35 37 35zM490 343l-234 -191l-234 191zM256 143c2 0 4 1 6 2l233 191c4 3 5 9 2 13s-9 4 -13 1l-228 -186l-228 186c-4 3 -10 3 -13 -1s-2 -10 2 -13l233 -191c2 -1 4 -2 6 -2z" />
     <glyph glyph-name="uniF111" unicode="&#xf111;" 
 d="M0 -21v469h512v-469h-512zM427 320h-342l171 -256z" />
     <glyph glyph-name="uniF114" unicode="&#xf114;" horiz-adv-x="441" 
