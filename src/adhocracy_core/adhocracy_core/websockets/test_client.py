@@ -236,8 +236,7 @@ class TestClient:
         assert len(self._dummy_connection.queue) == 1
         assert 'removed' in self._dummy_connection.queue[0]
 
-    def test_send_modified_messages_for_backrefs(self, changelog_meta,
-                                                 pool_graph):
+    def test_send_modified_messages_for_backrefs(self, changelog_meta):
         """"A modified event is sent for a backreferenced resource."""
         client = self._make_one(None)
         client._is_running = True
@@ -260,6 +259,19 @@ class TestClient:
         assert self._dummy_connection.nothing_sent is False
         assert len(self._dummy_connection.queue) == 1
         assert 'created' in self._dummy_connection.queue[0]
+
+    def test_send_messages_resource_is_blocked(self, changelog_meta):
+        """If a resource is blocked, no event should be sent."""
+        from adhocracy_core.interfaces import VisibilityChange
+        client = self._make_one(None)
+        client._is_running = True
+        resource = DummyResource()
+        resource.hidden = True
+        metadata = [changelog_meta._replace(modified=True,
+                                            resource=resource)]
+        client.send_messages(metadata)
+        assert self._dummy_connection.nothing_sent is True
+        assert len(self._dummy_connection.queue) == 0
 
 
 @mark.websocket

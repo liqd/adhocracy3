@@ -265,7 +265,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
     // generate root module Resources_.ts
     (() => {
         var rootModule = "";
-        var relativeRoot = outPath + "/Resources_/";
+        var relativeRoot = "./Resources_/";
         var imports : string[] = [];
         (() => {
             for (var modulePath in modules) {

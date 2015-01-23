@@ -300,6 +300,18 @@ Lets replace the uploaded python with another one::
     >>> resp_data = testapp.put(pic_path, request_body,
     ...             headers=god_header, upload_files=upload_files).json
 
+As usual, the response lists the resources affected by the transaction::
+
+    >>> updated_resources = resp_data['updated_resources']
+    >>> sorted(updated_resources)
+    ['changed_descendants', 'created', 'modified', 'removed']
+    >>> resp_data['updated_resources']['modified']
+    ['http://localhost/adhocracy/ProposalPool/assets/0000000/']
+    >>> updated_resources['created'] == updated_resources['removed'] == []
+    True
+    >>> 'http://localhost/adhocracy/ProposalPool/' in updated_resources['changed_descendants']
+    True
+
 If we download the image metadata again, we see that filename and size have
 changed accordingly::
 

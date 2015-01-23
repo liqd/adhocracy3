@@ -338,8 +338,54 @@ Create a new resource ::
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", prop, headers=god_header).json
     >>> resp_data["content_type"]
     'adhocracy_core.resources.pool.IBasicPool'
-    >>> resp_data["path"]
-    '.../adhocracy/Proposals/'
+
+The response object has 3 top-level entries:
+
+* The content type and the path of the new resource::
+
+      >>> resp_data['content_type']
+      'adhocracy_core.resources.pool.IBasicPool'
+      >>> resp_data['path']
+      '.../adhocracy/Proposals/'
+
+* A listing of resources affected by the transaction::
+
+      >>> sorted(resp_data['updated_resources'])
+      ['changed_descendants', 'created', 'modified', 'removed']
+
+  The subkey 'created' lists any resources that have been created by the
+  transaction::
+
+      >>> resp_data['updated_resources']['created']
+      ['http://localhost/adhocracy/Proposals/']
+
+  The subkey 'modified' lists any resources that have been modified::
+
+      >>> resp_data['updated_resources']['modified']
+      ['http://localhost/principals/users/0000000/']
+
+  Modifications also include that case that a reference from another
+  resource has been added or removed, since references are often exposed in
+  both directions (the reserve direction is called "backreference").
+  In this case, the user is shown as modified since the new resource
+  contains a reference to its creator.
+
+  The subkey 'removed' lists any resources that have been removed
+  by marking them as deleted or hidden (see :ref:`deletion`)::
+
+      >>> resp_data['updated_resources']['removed']
+      []
+
+  A resource will be shown it at most *one* of the 'created', 'modified', or
+  'removed' lists, never in two or more of them.
+
+  The subkey 'changed_descendants' lists the parent (and grandparent etc.)
+  pools of all the resources that have been created, modified, or removed.
+  Any *query* to such pools may have become outdated as a result of the
+  transaction (see "Filtering Pools" section below)::
+
+      >>> sorted(resp_data['updated_resources']['changed_descendants'])
+      ['http://localhost/', 'http://localhost/principals/', 'http://localhost/principals/users/']
 
 
 PUT
@@ -367,6 +413,7 @@ FIXME: write test cases for attributes with "create_mandatory",
 "editable", etc.  (those work the same in PUT and POST, and on any
 attribute in the json tree.)
 
+PUT responses have the same fields as POST responses.
 
 ERROR Handling
 ~~~~~~~~~~~~~~
@@ -1065,24 +1112,47 @@ Let's add some more paragraphs to the second section above ::
     ...             'path': '@par1_item/v2'
     ...           },
     ...         ]
+
+The batch response is a dictionary with two fields::
+
     >>> batch_resp = testapp.post_json(batch_url, batch, headers=god_header).json
-    >>> len(batch_resp)
+    >>> sorted(batch_resp)
+    ['responses', 'updated_resources']
+
+'responses' is an array of the individual responses.
+
+'updated_resources' lists all the resources affected by the POST and PUT
+requests in the batch request. If the batch requests doesn't contain any such
+requests (only GET etc.), all of its sub-entries will be empty. ::
+
+    >>> updated_resources = batch_resp['updated_resources']
+    >>> 'http://localhost/adhocracy/Proposals/' in updated_resources['changed_descendants']
+    True
+    >>> 'http://localhost/adhocracy/Proposals/kommunismus/par1/VERSION_0000001/' in updated_resources['created']
+    True
+
+Lets inspect some of the responses. The 'code' field contains the HTTP status
+code. The 'body' field contains the JSON dict that would normally be sent as
+body of the request, except that its 'updated_resources' field (if any) is
+omitted::
+
+    >>> len(batch_resp['responses'])
     3
-    >>> pprint(batch_resp[0])
+    >>> pprint(batch_resp['responses'][0])
     {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
               'first_version_path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000000/',
               'path': '.../adhocracy/Proposals/kommunismus/par1/'},
      'code': 200}
-    >>> pprint(batch_resp[1])
+    >>> pprint(batch_resp['responses'][1])
     {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
               'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
-    >>> pprint(batch_resp[2])
+    >>> pprint(batch_resp['responses'][2])
     {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
               'data': {...},
               'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
-     >>> batch_resp[2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['content']
+     >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['content']
      'sein blick ist vom vorüberziehn der stäbchen'
 
 
@@ -1135,7 +1205,9 @@ the paragraph will not be present in the database ::
     ...         ]
     >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,
     ...                                        status=400, headers=god_header).json
-    >>> pprint(invalid_batch_resp)
+    >>> pprint(sorted(invalid_batch_resp['updated_resources']))
+    ['changed_descendants', 'created', 'modified', 'removed']
+    >>> pprint(invalid_batch_resp['responses'])
     [{'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
                'first_version_path': '...',
                'path': '...'},
@@ -1143,7 +1215,7 @@ the paragraph will not be present in the database ::
      {'body': {'errors': [...],
                'status': 'error'},
       'code': 400}]
-    >>> get_nonexistent_obj = testapp.get(invalid_batch_resp[0]['body']['path'], status=404)
+    >>> get_nonexistent_obj = testapp.get(invalid_batch_resp['responses'][0]['body']['path'], status=404)
     >>> get_nonexistent_obj.status
     '404 Not Found'
 

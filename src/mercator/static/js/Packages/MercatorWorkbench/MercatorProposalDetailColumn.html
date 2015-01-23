@@ -1,18 +1,25 @@
-<div class="moving-column-menu">
-    <i class="icon-document moving-column-icon"></i>
-    <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ 'edit' | translate }}</a>
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <i class="icon-document moving-column-icon"></i>
+        <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ 'edit' | translate }}</a>
+        <a href="" data-ng-click="ctrl.toggleOverlay('abuse')">{{ 'report' | translate }}</a>
 
-    <div class="moving-column-menu-nav">
-        <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        <div class="moving-column-menu-nav">
+            <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        </div>
     </div>
-</div>
-<div class="moving-column-collapsed">
-    <a href="{{ proposalUrl | adhResourceUrl }}">O</a>
-</div>
-<div class="moving-column-body" data-du-scroll-container="">
-    <adh-recompile-on-change data-value="{{proposalUrl}}" data-key="proposalUrl">
+
+    <a data-ng-switch-when="collapsed" href="{{ proposalUrl | adhResourceUrl }}">O</a>
+
+    <adh-recompile-on-change data-ng-switch-when="body" data-value="{{proposalUrl}}" data-key="proposalUrl">
         <adh-resource-wrapper>
             <adh-mercator-proposal-detail-view data-ng-if="proposalUrl" data-path="{{proposalUrl}}"></adh-mercator-proposal-detail-view>
         </adh-resource-wrapper>
     </adh-recompile-on-change>
+
+    <adh-report-abuse
+        data-ng-switch-when="overlays"
+        data-ng-if="overlay === 'abuse'"
+        data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
+    </adh-report-abuse>
 </div>

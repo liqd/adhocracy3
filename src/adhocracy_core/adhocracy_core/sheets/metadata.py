@@ -116,6 +116,7 @@ metadata_metadata = sheet_metadata_defaults._replace(
     editable=True,
     creatable=True,
     readable=True,
+    permission_edit='edit_metadata',
 )
 
 

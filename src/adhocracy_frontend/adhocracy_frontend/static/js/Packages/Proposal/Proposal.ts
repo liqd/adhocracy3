@@ -26,17 +26,17 @@ var pkgLocation = "/Proposal";
 /**
  * contents of the resource with view mode.
  */
-interface DetailScope<Data> extends ng.IScope {
+export interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
     content : ResourcesBase.Resource;
     path : string;
 }
 
-interface DetailRefScope<Data> extends DetailScope<Data> {
+export interface DetailRefScope<Data> extends DetailScope<Data> {
     ref : string;
 }
 
-interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
+export interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
     list : () => void;
     display : () => void;
     edit : () => void;
@@ -148,7 +148,7 @@ export class ProposalVersionDetail {
     }
 }
 
-interface IScopeProposalVersion {
+export interface IScopeProposalVersion {
     content : RIProposalVersion;
     paragraphVersions : RIParagraphVersion[];
     addParagraphVersion : () => void;
@@ -362,9 +362,9 @@ export class Service {
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 
                 return transaction.commit()
-                    .then((responses) : ResourcesBase.Resource => {
+                    .then((batchResult) => {
                         // return the latest proposal Version
-                        return responses[postProposalVersion.index];
+                        return batchResult.postedResources[postProposalVersion.index];
                     });
             });
     }

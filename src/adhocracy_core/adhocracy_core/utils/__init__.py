@@ -29,6 +29,7 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import VisibilityChange
 
 
 def append_if_not_none(lst: list, element: object):
@@ -392,3 +393,33 @@ def get_reason_if_blocked(resource: IResource) -> str:
     if is_hidden(resource):
         reason = 'both' if reason else 'hidden'
     return reason
+
+
+def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
+    """
+    Extract the relevant events affecting a resource.
+
+    :param meta: an entry in the transaction changelog
+    :return: a list of 0 to 2 events
+    """
+    events = []
+    test_changed_descendants = True
+
+    if (meta.resource is None or
+            meta.visibility is VisibilityChange.invisible):
+        test_changed_descendants = False
+    elif meta.created or meta.visibility is VisibilityChange.revealed:
+        events.append('created')
+    elif meta.visibility is VisibilityChange.concealed:
+        events.append('removed')
+        test_changed_descendants = False
+    elif get_reason_if_blocked(meta.resource) is not None:
+        # hidden resources may still be modified by autoupdates
+        # but we don't want to expose them
+        test_changed_descendants = False
+    elif meta.modified or meta.changed_backrefs:
+        events.append('modified')
+
+    if test_changed_descendants and meta.changed_descendants:
+        events.append('changed_descendants')
+    return events

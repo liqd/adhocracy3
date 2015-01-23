@@ -54,6 +54,6 @@ def select_proposal(browser):
     assert wait(lambda: proposal_title.html)
     proposal_title.click()
 
-    link = browser.find_by_css(".moving-column-content").first.\
+    link = browser.find_by_css(".moving-column")[1].\
         find_by_css(".mercator-proposal-detail-cover h1 a")
     assert wait(lambda: proposal_title.html in link["href"])

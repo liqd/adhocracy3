@@ -1,4 +1,5 @@
 """Rest API views."""
+from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
@@ -53,8 +54,10 @@ from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
+from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
@@ -302,6 +305,16 @@ class RESTView:
     def delete(self) -> dict:
         raise HTTPMethodNotAllowed()
 
+    def _build_updated_resources_dict(self) -> dict:
+        """Utility method used by several subclasses."""
+        result = defaultdict(list)
+        changelog_meta = self.request.registry._transaction_changelog.values()
+        for meta in changelog_meta:
+            events = extract_events_from_changelog_metadata(meta)
+            for event in events:
+                result[event].append(meta.resource)
+        return result
+
 
 def _get_schema_and_validators(view_class, request: Request) -> tuple:
     http_method = request.method.upper()
@@ -332,11 +345,13 @@ class ResourceRESTView(RESTView):
         empty = {}  # tiny performance tweak
         cstruct = deepcopy(options_resource_response_data_dict)
 
-        if request.has_permission('edit_sheet', context):
+        if request.has_permission('edit_some_sheets', context):
             edits = self.registry.get_sheets_edit(context, request)
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
             if put_sheets:
-                cstruct['PUT']['request_body']['data'] = dict(put_sheets)
+                put_sheets_dict = dict(put_sheets)
+                self._inject_removal_permissions(put_sheets_dict)
+                cstruct['PUT']['request_body']['data'] = put_sheets_dict
             else:
                 del cstruct['PUT']
         else:
@@ -377,6 +392,14 @@ class ResourceRESTView(RESTView):
         # FIXME? maybe simplify options response data structure,
         # do we really need request/response_body, content_type,..?
         return cstruct
+
+    def _inject_removal_permissions(self, put_sheets_dict: dict):
+        """Show whether a user is allowed to delete or hide a resource."""
+        if IMetadata.__identifier__ in put_sheets_dict:
+            # everybody who can PUT metadata can delete the resource
+            put_sheets_dict[IMetadata.__identifier__] = {'deleted': ''}
+            if self.request.has_permission('hide_resource', self.context):
+                put_sheets_dict[IMetadata.__identifier__]['hidden'] = ''
 
     @view_config(request_method='GET',
                  permission='view')
@@ -442,9 +465,15 @@ class SimpleRESTView(ResourceRESTView):
                 sheet.set(appstructs[name],
                           registry=self.request.registry,
                           request=self.request)
+
+        appstruct = {}
+        if not is_batchmode(self.request.registry):
+            appstruct[
+                'updated_resources'] = self._build_updated_resources_dict()
+
         schema = ResourceResponseSchema().bind(request=self.request,
                                                context=self.context)
-        cstruct = schema.serialize()
+        cstruct = schema.serialize(appstruct)
         return cstruct
 
 
@@ -478,6 +507,10 @@ class PoolRESTView(SimpleRESTView):
         else:
             schema = ResourceResponseSchema().bind(request=self.request,
                                                    context=resource)
+
+        if not is_batchmode(self.request.registry):
+            appstruct[
+                'updated_resources'] = self._build_updated_resources_dict()
         return schema.serialize(appstruct)
 
     def _get_first_version(self, item: IItem) -> IItemVersion:
@@ -502,7 +535,7 @@ class PoolRESTView(SimpleRESTView):
         return self.build_post_response(resource)
 
     @view_config(request_method='PUT',
-                 permission='edit_sheet',
+                 permission='edit_some_sheets',
                  content_type='application/json')
     def put(self) -> dict:
         return super().put()

@@ -131,16 +131,31 @@ The menu should always have the same state as its columns.
     min-width: $font-size-normal * 35;
 }
 
-.moving-column-body {
-    // layout
+.moving-column-body,
+.moving-column-sidebar,
+.moving-column-overlay,
+.moving-column-alerts,
+.moving-column-mask {
     position: absolute;
     top: $moving-column-menu-height;
-    bottom: 0;
     left: 0;
-    width: 100%;
     overflow-y: auto;
+}
 
-    // look
+.moving-column-body,
+.moving-column-sidebar,
+.moving-column-mask {
+    bottom: 0;
+}
+
+.moving-column-body,
+.moving-column-overlay,
+.moving-column-alerts,
+.moving-column-mask {
+    right: 0;
+}
+
+.moving-column-body {
     border: 0 solid $color-structure-normal;
     border-width: 0 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
@@ -247,10 +262,6 @@ States:
 .moving-column-sidebar {
     @include transition(left 0.5s);
     display: none;
-    position: absolute;
-    top: $moving-column-menu-height;
-    bottom: 0;
-    overflow-y: auto;
     left: -30%;
     width: 30%;
     z-index: 1;
@@ -268,43 +279,61 @@ States:
     }
 }
 
-.moving-column-mask,
-.moving-column-overlay-dialogue {
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-}
-
 .moving-column-mask {
     @include opacity(0.5);
     background-color: black;
-    height: 100%;
 }
 
 /*doc
 ---
-title: Moving Column Overlay Dialogue
-name: moving-column-overlay-dialogue
+title: Moving Column Alerts
+name: moving-column-alerts
 parent: moving-columns
 ---
 
-A dialogue to notify users in the moving column
+A list of alert messages to notify users in the moving column
 
 ```html_example
-<div class="static-example">
-    <div class="moving-column-overlay-dialogue">
-        Thank you! Your message has been sent.
-    </div>
-</div>
+<ul class="moving-column-alerts static-example">
+    <li class="moving-column-alert m-error">Error</li>
+    <li class="moving-column-alert m-warning">Warning</li>
+    <li class="moving-column-alert m-info">Info</li>
+    <li class="moving-column-alert m-success">Success</li>
+</ul>
 ```
 */
-.moving-column-overlay-dialogue {
+.moving-column-alerts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.moving-column-alert {
     background: $color-structure-normal;
     padding: 1em;
     text-align: center;
+
+    &.m-error {
+        background: $color-function-invalid;
+    }
+
+    &.m-warning {
+        background: mix($color-function-invalid, $color-structure-normal);
+    }
+
+    &.m-success {
+        background: $color-function-valid;
+    }
 }
 
-.static-example .moving-column-overlay-dialogue {
-    position: static;
+.moving-column-overlay {
+    @include clearfix;
+    background: $color-structure-normal;
+    border-top: 1px solid $color-structure-border;
+    padding: 1em;
+
+    textarea,
+    input[type="text"] {
+        background: white;
+    }
 }

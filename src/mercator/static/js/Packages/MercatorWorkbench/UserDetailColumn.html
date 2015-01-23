@@ -1,12 +1,18 @@
-<div class="moving-column-menu">
-    <i class="icon-user-unfilled moving-column-icon"></i>
-    <a
-        href=""
-        data-ng-click="ctrl.toggleMessaging()"
-        data-ng-if="messageOptions.POST">{{ "Messaging" | translate }}</a>
-</div>
-<div class="moving-column-body" data-du-scroll-container="">
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <i class="icon-user-unfilled moving-column-icon"></i>
+        <a
+            href=""
+            data-ng-click="ctrl.toggleOverlay('messaging')"
+            data-ng-if="messageOptions.POST">{{ "Messaging" | translate }}</a>
+
+        <div class="moving-column-menu-nav">
+            <a href="{{ '/principals/users/' | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        </div>
+    </div>
+
     <adh-recompile-on-change
+        data-ng-switch-when="body"
         data-key="userUrl"
         data-value="{{userUrl}}">
         <adh-user-profile
@@ -19,9 +25,10 @@
             </section>
         </adh-user-profile>
     </adh-recompile-on-change>
-    <adh-user-message data-ng-if="showMessaging" data-recipient-url="{{userUrl}}"></adh-user-message>
-    <div class="moving-column-overlay-dialogue">
-        {{ "Thank you! Your message has been sent." | translate }}
-    </div>
-    <div class="moving-column-mask" data-ng-show="showMessaging"></div>
+
+    <adh-user-message
+        data-ng-switch-when="overlays"
+        data-ng-if="overlay === 'messaging'"
+        data-recipient-url="{{userUrl}}">
+    </adh-user-message>
 </div>

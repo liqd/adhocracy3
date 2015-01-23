@@ -1,8 +1,16 @@
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
+export var pkgLocation = "/MovingColumns";
 
+
+/**
+ * Moving Columns directive
+ *
+ * taking care of showing, hiding and resizing the columns
+ */
 export var movingColumns = (
     adhTopLevelState : AdhTopLevelState.Service,
     $timeout,
@@ -70,8 +78,10 @@ export var movingColumns = (
                 var offset : number = (totalWidth - totalShowWidthWithSpacing) / 2 - collapseCount * (collapseWidth + spacing);
                 offset = Math.max(offset, 0);
 
+                var columns = element.find(".moving-column");
+
                 for (var i = 0; i < 3; i++) {
-                    var child = element.children().eq(i);
+                    var child = columns.eq(i);
                     child.css({left: offset});
                     clearStates(child);
                     switch (parts[i + 1]) {
@@ -99,11 +109,12 @@ export var movingColumns = (
             };
 
             var resizeNoTransition = () => {
-                var transition = element.children().css("transition");
-                element.children().css("transition", "none");
+                var columns = element.find(".moving-column");
+                var transition = columns.css("transition");
+                columns.css("transition", "none");
                 resize();
                 $timeout(() => {
-                    element.children().css("transition", transition);
+                    columns.css("transition", transition);
                 }, 1);
             };
 
@@ -121,7 +132,113 @@ export var movingColumns = (
             adhTopLevelState.on("movingColumns", move);
             adhTopLevelState.on("focus", resize);
             adhTopLevelState.on("space", () => _.defer(resizeNoTransition));
+            scope.$watch(() => element.find(".moving-column").length, resize);
         }
+    };
+};
+
+
+/**
+ * Moving Column directive
+ *
+ * Every moving column should be wrapped in an instance of this directive.
+ * It provides common functionality, e.g. alerts, sidebar and overlays
+ * via a controller that can be required by subelements.
+ *
+ * Subelements can inject template code with the following transclusionIds
+ * (see AdhInject):
+ *
+ * -   body
+ * -   menu
+ * -   collapsed
+ * -   sidebar
+ * -   overlays
+ */
+export interface IMovingColumnScope extends ng.IScope {
+    // the controller with interfaces for alerts, overlays, ...
+    ctrl : MovingColumnController;
+
+    // an object that can be used to share data between different parts of the column.
+    shared;
+
+    // key of the currently active overlay or undefined
+    overlay : string;
+
+    // private
+    _alerts : {[id : number]: {
+        message : string;
+        mode : string;
+    }};
+    _showSidebar : boolean;
+}
+
+export class MovingColumnController {
+    private lastId : number;
+
+    constructor(protected $timeout : ng.ITimeoutService, public $scope : IMovingColumnScope) {
+        $scope.ctrl = this;
+        $scope._alerts = {};
+        $scope.shared = {};
+
+        this.lastId = 0;
+    }
+
+    public alert(message : string, mode : string = "info", duration : number = 3000) : void {
+        var id = this.lastId++;
+        this.$timeout(() => this.removeAlert(id), duration);
+
+        this.$scope._alerts[id] = {
+            message: message,
+            mode: mode
+        };
+    }
+
+    public removeAlert(id : number) : void {
+        delete this.$scope._alerts[id];
+    }
+
+    public showOverlay(key : string) : void {
+        this.$scope.overlay = key;
+    }
+
+    public hideOverlay(key? : string) : void {
+        if (typeof key === "undefined" || this.$scope.overlay === key) {
+            this.$scope.overlay = undefined;
+        }
+    }
+
+    public toggleOverlay(key : string, condition? : boolean) : void {
+        if (condition || (typeof condition === "undefined" && this.$scope.overlay !== key)) {
+            this.$scope.overlay = key;
+        } else if (this.$scope.overlay === key) {
+            this.$scope.overlay = undefined;
+        }
+    }
+
+    public showSidebar() : void {
+        this.toggleSidebar(true);
+    }
+
+    public hideSidebar() : void {
+        this.toggleSidebar(false);
+    }
+
+    public toggleSidebar(condition? : boolean) : void {
+        if (typeof condition === "undefined") {
+            condition = !this.$scope._showSidebar;
+        }
+        this.$scope._showSidebar = condition;
+    }
+}
+
+
+export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: true,
+        transclude: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
+        controller: ["$timeout", "$scope", MovingColumnController]
     };
 };
 
@@ -133,5 +250,6 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhTopLevelState.moduleName
         ])
+        .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
         .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
 };

@@ -215,6 +215,13 @@ Reviewer
 Manager
 --------
 
+FIXME Can delete and hide resources::
+
+    >>> resp_data = testapp.options(pool, headers=manager_header).json
+    >>> sorted(resp_data['PUT']['request_body']['data']
+    ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
+    ['deleted', 'hidden']
+
 Admin
 ------
 
@@ -245,12 +252,7 @@ Can create process structure::
     ['adhocracy_core.resources.asset.IPoolWithAssets',
      'adhocracy_core.resources.pool.IBasicPool']
 
-Can edit process structure::
-
-    >>> resp_data = testapp.options(pool, headers=admin_header).json
-    >>> 'adhocracy_core.sheets.metadata.IMetadata' in resp_data['PUT']['request_body']['data']
-    True
-
+FIXME Can edit process structure, but we don't have an example for that yet.
 
 Can create groups::
 

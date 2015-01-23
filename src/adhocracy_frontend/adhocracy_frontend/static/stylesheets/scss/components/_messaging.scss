@@ -2,10 +2,10 @@
 ---
 title: User Message
 name: user-message
-category: widgets
+category: Widgets
 ---
 
-A message overlay to appear in a moving column
+A form for sending messages to other users
 
 ```html_example
 <div class="static-example">
@@ -22,21 +22,6 @@ A message overlay to appear in a moving column
 ```
 */
 .user-message {
-    @include clearfix;
-    background: $color-structure-normal;
-    border-top: 1px solid $color-structure-border;
-    left: 0;
-    top: 0;
-    padding: 1em;
-    position: absolute;
-    width: 100%;
-    z-index: 100;
-
-    .user-message-subject,
-    .user-message-text {
-        background-color: white;
-    }
-
     .user-message-button-submit {
         float: right;
     }
@@ -44,8 +29,4 @@ A message overlay to appear in a moving column
     .input-error {
         display: block;
     }
-}
-
-.static-example .user-message {
-    position: static;
 }

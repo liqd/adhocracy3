@@ -236,14 +236,14 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
 
         return {
             restrict: "E",
-            require: "^adhResourceWrapper",
+            require: ["^adhResourceWrapper"],
             templateUrl: self.templateUrl,
             scope: {
                 mode: "@",
                 path: "@"
             },
-            link: (scope : S, element, attrs, wrapper) => {
-                self.link(scope, element, attrs, wrapper);
+            link: (scope : S, element, attrs, controllers) => {
+                self.link(scope, element, attrs, controllers);
             }
         };
     }
@@ -252,9 +252,11 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         scope : S,
         element : ng.IAugmentedJQuery,
         attrs : ng.IAttributes,
-        wrapper : IResourceWrapperController
+        controllers
     ) : IResourceWidgetInstance<R, S> {
         var self : ResourceWidget<R, S> = this;
+
+        var wrapper : IResourceWrapperController = controllers[0];
 
         var instance : IResourceWidgetInstance<R, S> = {
             scope: scope,

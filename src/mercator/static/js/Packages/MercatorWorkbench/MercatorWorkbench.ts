@@ -1,5 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import AdhAbuse = require("../Abuse/Abuse");
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
@@ -49,9 +50,9 @@ var bindRedirectsToScope = (scope, adhConfig, $location) => {
 export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
-        link: (scope) => {
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             adhTopLevelState.bind("proposalUrl", scope);
             adhTopLevelState.bind("commentableUrl", scope);
         }
@@ -66,9 +67,9 @@ export var mercatorProposalCreateColumnDirective = (
 ) => {
     return {
         restrict: "E",
-        scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreateColumn.html",
-        link: (scope) => {
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             adhTopLevelState.bind("platformUrl", scope);
             bindRedirectsToScope(scope, adhConfig, $location);
         }
@@ -83,9 +84,9 @@ export var mercatorProposalDetailColumnDirective = (
 ) => {
     return {
         restrict: "E",
-        scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalDetailColumn.html",
-        link: (scope) => {
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             adhTopLevelState.bind("platformUrl", scope);
             adhTopLevelState.bind("proposalUrl", scope);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
@@ -101,9 +102,9 @@ export var mercatorProposalEditColumnDirective = (
 ) => {
     return {
         restrict: "E",
-        scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalEditColumn.html",
-        link: (scope) => {
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             adhTopLevelState.bind("platformUrl", scope);
             adhTopLevelState.bind("proposalUrl", scope);
             bindRedirectsToScope(scope, adhConfig, $location);
@@ -115,86 +116,64 @@ export var mercatorProposalEditColumnDirective = (
 export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalListingColumn.html",
-        link: (scope) => {
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             adhTopLevelState.bind("platformUrl", scope);
             adhTopLevelState.bind("proposalUrl", scope);
             scope.contentType = RIMercatorProposalVersion.content_type;
-            scope.data = {
-                facets: [{
-                    key: "mercator_location",
-                    name: "Location",
-                    items: [
-                        {key: "specific", name: "Specific"},
-                        {key: "online", name: "Online"},
-                        {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
-                    ]
-                }, {
-                    key: "mercator_requested_funding",
-                    name: "Requested funding",
-                    items: [
-                        {key: "5000", name: "0 - 5000 €"},
-                        {key: "10000", name: "5000 - 10000 €"},
-                        {key: "20000", name: "10000 - 20000 €"},
-                        {key: "50000", name: "20000 - 50000 €"}
-                    ]
-                }],
-                showFacets: false,
-                sort: "-rates"
-            };
+            scope.shared.facets = [{
+                key: "mercator_location",
+                name: "Location",
+                items: [
+                    {key: "specific", name: "Specific"},
+                    {key: "online", name: "Online"},
+                    {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
+                ]
+            }, {
+                key: "mercator_requested_funding",
+                name: "Requested funding",
+                items: [
+                    {key: "5000", name: "0 - 5000 €"},
+                    {key: "10000", name: "5000 - 10000 €"},
+                    {key: "20000", name: "10000 - 20000 €"},
+                    {key: "50000", name: "20000 - 50000 €"}
+                ]
+            }];
+            scope.shared.sort = "-rates";
         }
     };
 };
 
 
-export class UserDetailColumnController {
-    constructor(
-        adhTopLevelState : AdhTopLevelState.Service,
-        adhPermissions : AdhPermissions.Service,
-        adhConfig : AdhConfig.IService,
-        private $scope
-    ) {
-        $scope.ctrl = this;
-        $scope.showMessaging = false;
-        adhTopLevelState.bind("userUrl", $scope);
-        adhPermissions.bindScope($scope, adhConfig.rest_url + "/message_user", "messageOptions");
-    }
-
-    public success(message : string) : void {
-        // FIXME
-        console.log(message);
-    }
-
-    public showMessaging() : void {
-        this.$scope.showMessaging = true;
-    }
-
-    public hideMessaging() : void {
-        this.$scope.showMessaging = false;
-    }
-
-    public toggleMessaging() : void {
-        this.$scope.showMessaging = !this.$scope.showMessaging;
-    }
-}
-
-
-export var userDetailColumnDirective = (adhConfig : AdhConfig.IService) => {
+export var userDetailColumnDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhConfig : AdhConfig.IService
+) => {
     return {
         restrict: "E",
-        scope: {},
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
-        controller: ["adhTopLevelState", "adhPermissions", "adhConfig", "$scope", UserDetailColumnController]
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            adhTopLevelState.bind("userUrl", scope);
+            adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+        }
     };
 };
 
 
-export var userListingColumnDirective = (adhConfig : AdhConfig.IService) => {
+export var userListingColumnDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService
+) => {
     return {
         restrict: "E",
-        scope: {},
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            adhTopLevelState.bind("userUrl", scope);
+        }
     };
 };
 
@@ -204,6 +183,7 @@ export var moduleName = "adhMercatorWorkbench";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhAbuse.moduleName,
             AdhComment.moduleName,
             AdhHttp.moduleName,
             AdhListing.moduleName,
@@ -221,25 +201,34 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RICommentVersion.content_type, "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) =>
+                .specific(RICommentVersion.content_type, "", ["adhHttp", "$q", (adhHttp : AdhHttp.Service<any>, $q : ng.IQService) =>
                                                               (resource : RICommentVersion) => {
                     var specifics = {};
                     specifics["commentUrl"] = resource.path;
-                    specifics["commentableUrl"] = resource.data[SIComment.nick].refers_to;
 
-                    return adhHttp.get(specifics["commentableUrl"])
-                        .then((commentable) => {
-                            if (commentable.content_type === RIMercatorProposalVersion.content_type) {
-                                specifics["proposalUrl"] = specifics["commentableUrl"];
-                            } else {
-                                var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
-                                var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
-                                return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
-                                    specifics["proposalUrl"] = proposalUrl;
-                                });
-                            }
-                        })
-                        .then(() => specifics);
+                    var getCommentableUrl = (resource) : ng.IPromise<any> => {
+                        if (resource.content_type !== RICommentVersion.content_type) {
+                            return $q.when(resource);
+                        } else {
+                            var url = resource.data[SIComment.nick].refers_to;
+                            return adhHttp.get(url).then(getCommentableUrl);
+                        }
+                    };
+
+                    return getCommentableUrl(resource).then((commentable) => {
+                        specifics["commentableUrl"] = commentable.path;
+
+                        if (commentable.content_type === RIMercatorProposalVersion.content_type) {
+                            specifics["proposalUrl"] = specifics["commentableUrl"];
+                        } else {
+                            var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
+                            var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
+                            return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
+                                specifics["proposalUrl"] = proposalUrl;
+                            });
+                        }
+                    })
+                    .then(() => specifics);
                 }])
                 .default(RIUser.content_type, "", {
                     space: "user",
@@ -252,7 +241,9 @@ export var register = (angular) => {
                 })
                 .default(RIUsersService.content_type, "", {
                     space: "user",
-                    movingColumns: "is-show-hide-hide"
+                    movingColumns: "is-show-hide-hide",
+                    userUrl: "",  // not used by default, but should be overridable
+                    focus: "0"
                 })
                 .default(RIPoolWithAssets.content_type, "", {
                     space: "content",
@@ -283,6 +274,6 @@ export var register = (angular) => {
             mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhTopLevelState", "adhConfig", mercatorProposalListingColumnDirective])
-        .directive("adhUserDetailColumn", ["adhConfig", userDetailColumnDirective])
-        .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
+        .directive("adhUserDetailColumn", ["adhTopLevelState", "adhPermissions", "adhConfig", userDetailColumnDirective])
+        .directive("adhUserListingColumn", ["adhTopLevelState", "adhConfig", userListingColumnDirective]);
 };
