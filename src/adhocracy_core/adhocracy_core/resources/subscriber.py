@@ -66,7 +66,7 @@ def _add_changed_descendants_to_all_parents(registry, resource):
 
 def _increment_changed_descendants_counter(context):
     counter = getattr(context, '__changed_descendants_counter__', None)
-    if counter:  # pragma: no branch
+    if counter is not None:  # pragma: no branch
         counter.change(1)
 
 
@@ -82,7 +82,7 @@ def resource_backreference_modified_subscriber(event):
 
 def _increment_changed_backrefs_counter(context):
     counter = getattr(context, '__changed_backrefs_counter__', None)
-    if counter:  # pragma: no branch
+    if counter is not None:  # pragma: no branch
         counter.change(1)
 
 
