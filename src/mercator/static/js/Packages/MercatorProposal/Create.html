@@ -131,6 +131,11 @@
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}" />
 
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
+
                         </fieldset>
 
                         <label>
@@ -182,10 +187,15 @@
                                 {{ "Please enter your registration date" | translate }}</span>
 
                             <input
-                                type="text"
+                                type="url"
                                 data-ng-model="data.organization_info.website"
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}"/>
+
+                             <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
 
                         </fieldset>
 
@@ -225,10 +235,15 @@
                                 {{ "Please enter your organization country" | translate }}</span>
 
                             <input
-                                type="text"
+                                type="url"
                                 data-ng-model="data.organization_info.website"
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}" />
+
+                             <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
 
                             <label>
                                 <span class="label-text">{{ "How can we help you? Please specify:" | translate }}</span>
