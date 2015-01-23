@@ -88,47 +88,47 @@ export var register = () => {
                         expect(recursionHelperMock.compile).toHaveBeenCalled();
                     });
                 });
+            });
 
-                describe("link", () => {
-                    beforeEach(() => {
-                        spyOn(widget, "update").and.returnValue(q.when());
-                        spyOn(widget, "setMode");
-                        directive.link(instanceMock.scope, "element", "attrs", wrapperMock);
+            describe("link", () => {
+                beforeEach(() => {
+                    spyOn(widget, "update").and.returnValue(q.when());
+                    spyOn(widget, "setMode");
+                    widget.link(instanceMock.scope, "element", "attrs", [wrapperMock]);
+                });
+
+                describe("createComment", () => {
+                    it("sets scope.show.createForm to true", () => {
+                        instanceMock.scope.createComment();
+                        expect(instanceMock.scope.show.createForm).toBe(true);
                     });
 
-                    describe("createComment", () => {
-                        it("sets scope.show.createForm to true", () => {
-                            instanceMock.scope.createComment();
-                            expect(instanceMock.scope.show.createForm).toBe(true);
-                        });
+                    it("sets scope.createPath to a preliminary name", () => {
+                        adhPreliminaryNamesMock.nextPreliminary.and.returnValue("preliminary name");
+                        instanceMock.scope.createComment();
+                        expect(instanceMock.scope.createPath).toBe("preliminary name");
+                    });
+                });
 
-                        it("sets scope.createPath to a preliminary name", () => {
-                            adhPreliminaryNamesMock.nextPreliminary.and.returnValue("preliminary name");
-                            instanceMock.scope.createComment();
-                            expect(instanceMock.scope.createPath).toBe("preliminary name");
-                        });
+                describe("cancelCreateComment", () => {
+                    it("sets scope.show.createForm to false", () => {
+                        instanceMock.scope.cancelCreateComment();
+                        expect(instanceMock.scope.show.createForm).toBe(false);
+                    });
+                });
+
+                describe("afterCreateComment", () => {
+                    beforeEach((done) => {
+                        adapterMock.creator.and.returnValue("afterCreateCommentCreator");
+                        instanceMock.scope.afterCreateComment().then(done);
                     });
 
-                    describe("cancelCreateComment", () => {
-                        it("sets scope.show.createForm to false", () => {
-                            instanceMock.scope.cancelCreateComment();
-                            expect(instanceMock.scope.show.createForm).toBe(false);
-                        });
+                    it("updates the scope", () => {
+                        expect(widget.update).toHaveBeenCalled();
                     });
 
-                    describe("afterCreateComment", () => {
-                        beforeEach((done) => {
-                            adapterMock.creator.and.returnValue("afterCreateCommentCreator");
-                            instanceMock.scope.afterCreateComment().then(done);
-                        });
-
-                        it("updates the scope", () => {
-                            expect(widget.update).toHaveBeenCalled();
-                        });
-
-                        it("sets scope.show.createForm to false", () => {
-                            expect(instanceMock.scope.show.createForm).toBe(false);
-                        });
+                    it("sets scope.show.createForm to false", () => {
+                        expect(instanceMock.scope.show.createForm).toBe(false);
                     });
                 });
             });

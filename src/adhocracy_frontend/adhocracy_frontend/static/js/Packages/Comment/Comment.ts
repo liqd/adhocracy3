@@ -80,36 +80,11 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
     }
 
     createRecursionDirective(adhRecursionHelper) {
-        var self = this;
-
         var directive = this.createDirective();
         directive.compile = (element) => adhRecursionHelper.compile(element, directive.link);
 
         directive.scope.refersTo = "@";
         directive.scope.poolPath = "@";
-
-        directive.link = (scope : ICommentResourceScope, element, attrs, wrapper) => {
-            var instance = self.link(scope, element, attrs, wrapper);
-
-            scope.show = {
-                createForm: false
-            };
-
-            scope.createComment = () => {
-                scope.show.createForm = true;
-                scope.createPath = self.adhPreliminaryNames.nextPreliminary();
-            };
-
-            scope.cancelCreateComment = () => {
-                scope.show.createForm = false;
-            };
-
-            scope.afterCreateComment = () => {
-                return this.update(instance).then(() => {
-                    scope.show.createForm = false;
-                });
-            };
-        };
 
         directive.controller = ["adhTopLevelState", "$scope", (
             adhTopLevelState : AdhTopLevelState.Service,
@@ -127,6 +102,33 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         }];
 
         return directive;
+    }
+
+    public link(scope : ICommentResourceScope, element, attrs, controllers) {
+        var self = this;
+
+        var instance = super.link(scope, element, attrs, controllers);
+
+        scope.show = {
+            createForm: false
+        };
+
+        scope.createComment = () => {
+            scope.show.createForm = true;
+            scope.createPath = self.adhPreliminaryNames.nextPreliminary();
+        };
+
+        scope.cancelCreateComment = () => {
+            scope.show.createForm = false;
+        };
+
+        scope.afterCreateComment = () => {
+            return this.update(instance).then(() => {
+                scope.show.createForm = false;
+            });
+        };
+
+        return instance;
     }
 
     public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
