@@ -33,7 +33,7 @@ export interface IOptions {
     GET : boolean;
     POST : boolean;
     HEAD : boolean;
-};
+}
 
 
 export var emptyOptions : IOptions = {
