@@ -143,9 +143,14 @@ export class Service<Content extends ResourcesBase.Resource> {
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
+        var _self = this;
+
         return this.putRaw(path, AdhConvert.exportContent(this.adhMetaApi, obj))
             .then(
-                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                (response) => {
+                    _self.adhCache.invalidateUpdated(response.data.updated_resources);
+                    return AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames);
+                },
                 AdhError.logBackendError);
     }
 
@@ -156,8 +161,6 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-post preliminary path: " + path;
         }
         path = this.formatUrl(path);
-
-        this.adhCache.invalidate(path);
 
         if (typeof FormData !== "undefined" && FormData.prototype.isPrototypeOf(obj)) {
             return _self.$http({
@@ -178,7 +181,10 @@ export class Service<Content extends ResourcesBase.Resource> {
 
         return _self.postRaw(path, AdhConvert.exportContent(_self.adhMetaApi, obj))
             .then(
-                (response) => AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames),
+                (response) => {
+                    this.adhCache.invalidateUpdated(response.data.updated_resources);
+                    return AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames);
+                },
                 AdhError.logBackendError);
     }
 
@@ -410,7 +416,7 @@ export class Service<Content extends ResourcesBase.Resource> {
      *     };
      */
     public withTransaction<Result>(callback : (httpTrans : AdhTransaction.Transaction) => ng.IPromise<Result>) : ng.IPromise<Result> {
-        return callback(new AdhTransaction.Transaction(this, this.adhMetaApi, this.adhPreliminaryNames, this.adhConfig));
+        return callback(new AdhTransaction.Transaction(this, this.adhCache, this.adhMetaApi, this.adhPreliminaryNames, this.adhConfig));
     }
 }
 

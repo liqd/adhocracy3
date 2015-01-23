@@ -3,7 +3,10 @@
 
 import _ = require("lodash");
 
+import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
+
+import AdhHttp = require("./Http");
 
 export interface IHttpCacheItem {
     wshandle : number;
@@ -62,6 +65,26 @@ export class Service {
                 if (this.debug) { console.log("invalidate: " + path); };
             }
         }
+    }
+
+    public invalidateUpdated(updated : AdhHttp.IUpdated, posted? : string[]) : void {
+        // FIXME: Use less naive invalidation strategy, which invalidates more carefully.
+        var mustInvalidate = [
+            updated.changed_descendants,
+            updated.created,
+            updated.modified,
+            updated.removed,
+            _.map(updated.created, AdhUtil.parentPath),
+            _.map(updated.modified, AdhUtil.parentPath),
+            _.map(updated.removed, AdhUtil.parentPath)
+        ];
+        if (typeof posted !== "undefined") {
+            mustInvalidate.push(posted);
+            mustInvalidate.push(_.map(posted, AdhUtil.parentPath));
+        }
+        _.forEach(<string[]>_.uniq(_.flatten(mustInvalidate)), (path) => {
+            this.invalidate(path);
+        });
     }
 
     public invalidateAll() : void {

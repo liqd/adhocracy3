@@ -100,6 +100,7 @@ export var register = () => {
                 adhCacheMock = {
                     invalidate: (path) => undefined,
                     invalidateAll: () => undefined,
+                    invalidateUpdated: (updated, posted) => undefined,
                     memoize: (path, subkey, closure) => closure()
                 };
                 adhHttp = new AdhHttp.Service(
