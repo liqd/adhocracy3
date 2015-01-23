@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
 import colander
 import pytest
 
@@ -314,7 +315,6 @@ class TestRESTView:
 
 class TestResourceRESTView:
 
-
     @fixture
     def request_(self, cornice_request, mock_resource_registry):
         cornice_request.registry.content = mock_resource_registry
@@ -329,6 +329,27 @@ class TestResourceRESTView:
         inst = self.make_one(context, request_)
         assert isinstance(inst, RESTView)
         assert inst.registry is request_.registry.content
+
+    def test_create_method_get_and_resource_blocked(self, request_, context):
+        from pyramid.httpexceptions import HTTPGone
+        request_.method = 'GET'
+        context.hidden = True
+        with raises(HTTPGone):
+            self.make_one(context, request_)
+
+    def test_create_method_head_and_resource_blocked(self, request_, context):
+        from pyramid.httpexceptions import HTTPGone
+        request_.method = 'HEAD'
+        context.hidden = True
+        with raises(HTTPGone):
+            self.make_one(context, request_)
+
+    def test_create_method_post_and_resource_blocked(self, request_, context):
+        from pyramid.httpexceptions import HTTPGone
+        request_.method = 'POST'
+        context.deleted = True
+        with raises(HTTPGone):
+            self.make_one(context, request_)
 
     def test_options_valid_with_sheets_and_addables(
             self, request_, context, resource_meta, mock_sheet):
@@ -426,22 +447,7 @@ class TestResourceRESTView:
         mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
         inst = self.make_one(context, request_)
-        assert inst.get()['data'][ISheet.__identifier__] ==  {'name': '1'}
-
-    def test_get_blocked(self, config, request_):
-        config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.sheets.metadata')
-        from adhocracy_core.interfaces import IResource
-        from adhocracy_core.sheets.metadata import IMetadata
-        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
-        resource.hidden = True
-        inst = self.make_one(resource, request_)
-        response = inst.get()
-        assert response['reason'] == 'hidden'
-        assert set(response.keys()) == {'reason',
-                                        'modification_date',
-                                        'modified_by'}
+        assert inst.get()['data'][ISheet.__identifier__] == {'name': '1'}
 
 
 class TestSimpleRESTView:
@@ -695,18 +701,6 @@ class TestItemRESTView:
         wanted = {'path': request.application_url + '/',  'data': {},
                   'content_type': IItem.__identifier__,
                   'first_version_path': ''}
-        assert inst.get() == wanted
-
-    def test_get_blocked(self, request):
-        from adhocracy_core.interfaces import IResource
-        from adhocracy_core.sheets.metadata import IMetadata
-        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
-        resource.hidden = True
-        inst = self.make_one(resource, request)
-        wanted = {'reason': 'deleted',
-                  'modification_date': 'yesterday',
-                  'modified_by': 'me'}
-        inst.respond_if_blocked = lambda: wanted
         assert inst.get() == wanted
 
     def test_post_valid(self, request, context):
@@ -1434,21 +1428,6 @@ class TestAssetDownloadRESTView:
         monkeypatch.setattr(views, 'retrieve_asset_file', mock_retrieve)
         inst = self.make_one(context, request_)
         assert inst.get() == mock_response
-
-    def test_get_blocked(self, config, request_):
-        config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.sheets.metadata')
-        from adhocracy_core.interfaces import IResource
-        from adhocracy_core.sheets.metadata import IMetadata
-        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
-        resource.hidden = True
-        inst = self.make_one(resource, request_)
-        response = inst.get()
-        assert response['reason'] == 'hidden'
-        assert set(response.keys()) == {'reason',
-                                        'modification_date',
-                                        'modified_by'}
 
 
 class TestShowRequestBody:

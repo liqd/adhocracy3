@@ -91,7 +91,7 @@ class BlockExplanationResponseSchema(colander.Schema):
 
     reason = SingleLine()
     modified_by = Reference()
-    modification_date = DateTime()
+    modification_date = DateTime(default=colander.null)
 
 
 class PUTResourceRequestSchema(colander.Schema):
