@@ -346,6 +346,31 @@ class TestResourceRESTView:
                   'OPTIONS': {}}
         assert wanted == response
 
+    def test_inject_removal_permissions_no_metadata(self, request_, context):
+        from adhocracy_core.sheets.metadata import IMetadata
+        inst = self.make_one(context, request_)
+        d = {'DummySheet': {}}
+        inst._inject_removal_permissions(d)
+        assert d == {'DummySheet': {}}
+
+    def test_inject_removal_permissions_metadata_without_hide_permission(
+            self, request_, context):
+        from adhocracy_core.sheets.metadata import IMetadata
+        request_.has_permission = Mock(return_value=False)
+        inst = self.make_one(context, request_)
+        d = {IMetadata.__identifier__: {}}
+        inst._inject_removal_permissions(d)
+        assert d == {IMetadata.__identifier__: {'deleted': ''}}
+
+    def test_inject_removal_permissions_metadata_with_hide_permission(
+            self, request_, context):
+        from adhocracy_core.sheets.metadata import IMetadata
+        request_.has_permission = Mock(return_value=True)
+        inst = self.make_one(context, request_)
+        d = {IMetadata.__identifier__: {}}
+        inst._inject_removal_permissions(d)
+        assert d == {IMetadata.__identifier__: {'deleted': '', 'hidden': ''}}
+
     def test_get_valid_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
 
