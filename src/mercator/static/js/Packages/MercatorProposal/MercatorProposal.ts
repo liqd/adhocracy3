@@ -1017,8 +1017,15 @@ export var register = (angular) => {
                             }
                         });
                 } else {
-                    var element = $element.find(".ng-invalid");
-                    container.scrollToElementAnimated(element);
+                    var getErrorControllers = (ctrl) => _.flatten(_.values(ctrl.$error));
+
+                    var errorForms = getErrorControllers($scope.mercatorProposalForm);
+                    var errorControllers = _.flatten(_.map(errorForms, getErrorControllers));
+                    var names = _.unique(_.map(errorControllers, "$name"));
+                    var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
+
+                    var element = $element.find(selector).first();
+                    container.scrollToElementAnimated(element, 20);
                 }
             };
         }]);
