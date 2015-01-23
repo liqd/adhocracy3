@@ -1,4 +1,5 @@
 """Rest API views."""
+from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
@@ -53,6 +54,7 @@ from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import strip_optional_prefix
@@ -447,8 +449,18 @@ class SimpleRESTView(ResourceRESTView):
                           request=self.request)
         schema = ResourceResponseSchema().bind(request=self.request,
                                                context=self.context)
-        cstruct = schema.serialize()
+        appstruct = {'updated_resources': self._build_updated_resources_dict()}
+        cstruct = schema.serialize(appstruct)
         return cstruct
+
+    def _build_updated_resources_dict(self) -> dict:
+        result = defaultdict(list)
+        changelog_meta = self.request.registry._transaction_changelog.values()
+        for meta in changelog_meta:
+            events = extract_events_from_changelog_metadata(meta)
+            for event in events:
+                result[event].append(meta.resource)
+        return result
 
 
 @view_defaults(
@@ -481,6 +493,7 @@ class PoolRESTView(SimpleRESTView):
         else:
             schema = ResourceResponseSchema().bind(request=self.request,
                                                    context=resource)
+        appstruct['updated_resources'] = self._build_updated_resources_dict()
         return schema.serialize(appstruct)
 
     def _get_first_version(self, item: IItem) -> IItemVersion:
