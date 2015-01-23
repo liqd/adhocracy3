@@ -96,7 +96,7 @@ export class Transaction {
         };
     }
 
-    public commit() : ng.IPromise<ResourcesBase.Resource[]> {
+    public commit() : ng.IPromise<AdhHttp.IBatchResult> {
         this.checkNotCommitted();
         this.committed = true;
         var conv = (request) => {
@@ -107,7 +107,7 @@ export class Transaction {
         };
 
         return this.adhHttp.postRaw("/batch", this.requests.map(conv)).then(
-            (response) => AdhConvert.importBatchContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+            (response) => AdhConvert.importBatchContent(response, this.adhMetaApi, this.adhPreliminaryNames),
             AdhError.logBackendBatchError);
     }
 }

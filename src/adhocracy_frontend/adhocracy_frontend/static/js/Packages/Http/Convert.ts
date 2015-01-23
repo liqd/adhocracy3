@@ -5,6 +5,7 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import ResourcesBase = require("../../ResourcesBase");
 import Resources_ = require("../../Resources_");
 
+import AdhHttp = require("./Http");
 import AdhMetaApi = require("./MetaApi");
 
 
@@ -138,19 +139,19 @@ export var importContent = <Content extends ResourcesBase.Resource>(
  * far.
  */
 export var importBatchContent = <Content extends ResourcesBase.Resource>(
-    responses : { data : {body : Content}[] },
+    batchResponse,
     metaApi : AdhMetaApi.MetaApiQuery,
     preliminaryNames : AdhPreliminaryNames.Service
-) : Content[] => {
-    // FIXME: description files don't appear to support array-typed
-    // response bodies.  this might be a good thing (web security and
-    // all).  change rest batch spec to wrap array in trivial object?
+) : AdhHttp.IBatchResult => {
 
-    return (<any>(responses.data)).map((response) => {
-        response.data = response.body;
-        delete response.body;
-        return importContent(response, metaApi, preliminaryNames);
-    });
+    return {
+        postedResources: batchResponse.data.responses.map((response) => {
+            response.data = response.body;
+            delete response.body;
+            return importContent(response, metaApi, preliminaryNames);
+        }),
+        updated: batchResponse.data.updated_resources
+    };
 };
 
 

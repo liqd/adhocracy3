@@ -254,7 +254,8 @@ class TestValidatePOSTRootVersions:
 class TestRESTView:
 
     @fixture
-    def request(self, cornice_request):
+    def request(self, cornice_request, changelog):
+        cornice_request.registry._transaction_changelog = changelog
         return cornice_request
 
     def make_one(self, context, request):
@@ -272,6 +273,43 @@ class TestRESTView:
         assert inst.request is request
         assert inst.request.errors == []
         assert inst.request.validated == {}
+
+    def test__build_updated_resources_dict_empty(self, request, context):
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert result == {}
+
+    def test__build_updated_resources_dict_one_resource(
+            self, request, context, changelog_meta):
+        res = testing.DummyResource()
+        request.registry._transaction_changelog[
+            res] = changelog_meta._replace(resource=res, created=True)
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert result == {'created': [res]}
+
+    def test__build_updated_resources_dict_one_resource_two_events(
+            self, request, context, changelog_meta):
+        res = testing.DummyResource()
+        request.registry._transaction_changelog[
+            res] = changelog_meta._replace(
+            resource=res,  created=True, changed_descendants=True)
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert result == {'changed_descendants': [res], 'created': [res]}
+
+    def test__build_updated_resources_dict_two_resources(
+            self, request, context, changelog_meta):
+        res1 = testing.DummyResource()
+        res2 = testing.DummyResource()
+        request.registry._transaction_changelog[
+            res1] = changelog_meta._replace(resource=res1, created=True)
+        request.registry._transaction_changelog[
+            res2] = changelog_meta._replace(resource=res2, created=True)
+        inst = self.make_one(context, request)
+        result = inst._build_updated_resources_dict()
+        assert list(result.keys()) == ['created']
+        assert set(result['created']) == {res1, res2}
 
 
 class TestResourceRESTView:
@@ -409,7 +447,9 @@ class TestResourceRESTView:
 class TestSimpleRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry):
+    def request(self, cornice_request, registry_with_changelog,
+                mock_resource_registry):
+        cornice_request.registry = registry_with_changelog
         cornice_request.registry.content = mock_resource_registry
         return cornice_request
 
@@ -434,7 +474,12 @@ class TestSimpleRESTView:
         inst = self.make_one(context, request)
         response = inst.put()
 
-        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
+        wanted = {'path': request.application_url + '/',
+                  'content_type': IResource.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                          'created': [],
+                          'modified': [],
+                          'removed': []}}
         assert wanted == response
 
     def test_put_valid_with_sheets(self, request, context, mock_sheet):
@@ -446,7 +491,12 @@ class TestSimpleRESTView:
         inst = self.make_one(context, request)
         response = inst.put()
 
-        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
+        wanted = {'path': request.application_url + '/',
+                  'content_type': IResource.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
         assert mock_sheet.set.call_args[0][0] == {'x': 'y'}
 
@@ -454,7 +504,9 @@ class TestSimpleRESTView:
 class TestPoolRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry):
+    def request(self, cornice_request, registry_with_changelog,
+                mock_resource_registry):
+        cornice_request.registry = registry_with_changelog
         cornice_request.registry.content = mock_resource_registry
         return cornice_request
 
@@ -524,7 +576,12 @@ class TestPoolRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
 
-        wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
+        wanted = {'path': request.application_url + '/child/',
+                  'content_type': IResourceX.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
 
     def test_put_valid_no_sheets(self, request, context, mock_sheet):
@@ -532,14 +589,21 @@ class TestPoolRESTView:
         request.validated = {"content_type": "X", "data": {}}
         inst = self.make_one(context, request)
         response = inst.put()
-        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
+        wanted = {'path': request.application_url + '/',
+                  'content_type': IResource.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
 
 
 class TestUsersRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry):
+    def request(self, cornice_request, registry_with_changelog,
+                mock_resource_registry):
+        cornice_request.registry = registry_with_changelog
         cornice_request.registry.content = mock_resource_registry
         return cornice_request
 
@@ -569,7 +633,12 @@ class TestUsersRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
 
-        wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
+        wanted = {'path': request.application_url + '/child/',
+                  'content_type': IResourceX.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
                                        creator=None,
                                        appstructs={},
@@ -654,7 +723,12 @@ class TestItemRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
 
-        wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
+        wanted = {'path': request.application_url + '/child/',
+                  'content_type': IResourceX.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
                                        creator=None,
                                        appstructs={},
@@ -679,7 +753,11 @@ class TestItemRESTView:
 
         wanted = {'path': request.application_url + '/child/',
                   'content_type': IItem.__identifier__,
-                  'first_version_path': request.application_url + '/child/first/'}
+                  'first_version_path': request.application_url + '/child/first/',
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
 
     def test_post_valid_itemversion(self, request, context):
@@ -697,7 +775,11 @@ class TestItemRESTView:
         response = inst.post()
 
         wanted = {'path': request.application_url + '/child/',
-                  'content_type': IItemVersion.__identifier__}
+                  'content_type': IItemVersion.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert request.registry.content.create.call_args[1]['root_versions'] == [root]
         assert wanted == response
 
@@ -718,7 +800,11 @@ class TestItemRESTView:
 
         assert inst.put.call_count == 1
         wanted = {'path': request.application_url + '/last_new_version/',
-                  'content_type': IItemVersion.__identifier__}
+                  'content_type': IItemVersion.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
 
     def test_put_valid_no_sheets(self, request, context, mock_sheet):
@@ -726,7 +812,12 @@ class TestItemRESTView:
         request.validated = {"content_type": "X", "data": {}}
         inst = self.make_one(context, request)
         response = inst.put()
-        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
+        wanted = {'path': request.application_url + '/',
+                  'content_type': IResource.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
 
 
@@ -1283,7 +1374,11 @@ class TestAssetsServiceRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
         wanted = {'path': request.application_url + '/child/',
-                  'content_type': IResourceX.__identifier__}
+                  'content_type': IResourceX.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
 
 
@@ -1309,7 +1404,11 @@ class TestAssetRESTView:
         inst = self.make_one(context, request_)
         response = inst.put()
         wanted = {'path': request_.application_url + '/',
-                  'content_type': IResource.__identifier__}
+                  'content_type': IResource.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
         assert wanted == response
         assert mock_validate.called
 

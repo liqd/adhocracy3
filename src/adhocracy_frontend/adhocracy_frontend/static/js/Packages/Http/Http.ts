@@ -33,7 +33,7 @@ export interface IOptions {
     GET : boolean;
     POST : boolean;
     HEAD : boolean;
-};
+}
 
 
 export var emptyOptions : IOptions = {
@@ -43,6 +43,17 @@ export var emptyOptions : IOptions = {
     POST: false,
     HEAD: false
 };
+
+
+export interface IBatchResult {
+    postedResources : ResourcesBase.Resource[];
+    updated : {
+        changed_descendants : string[];
+        created : string[];
+        modified : string[];
+        removed : string[];
+    };
+}
 
 
 /**
@@ -225,7 +236,7 @@ export class Service<Content extends ResourcesBase.Resource> {
                 transaction.post(resource.parent, resource);
             });
 
-            return transaction.commit();
+            return transaction.commit().then(batchResult => batchResult.postedResources);
         });
     }
 

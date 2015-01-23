@@ -12,6 +12,7 @@ from pyramid.view import view_defaults
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.rest.exceptions import internal_exception_to_dict
 from adhocracy_core.rest.schemas import POSTBatchRequestSchema
+from adhocracy_core.rest.schemas import UpdatedResourcesSchema
 from adhocracy_core.rest.views import RESTView
 from adhocracy_core.utils import set_batchmode
 
@@ -95,7 +96,26 @@ class BatchView(RESTView):
         return item_response
 
     def _response_list_to_json(self, response_list: list) -> list:
-        return [response.to_dict() for response in response_list]
+        """
+        Convert the list of batch responses into a JSON dict.
+
+        The dict has two fields:
+
+        * responses: the list of batch responses, but without their
+          "updated_resources" child element
+        * updated_resources: the listing of resources affected by the
+          transaction
+        """
+        responses = []
+        for response in response_list:
+            if 'updated_resources' in response.body:
+                del response.body['updated_resources']
+            responses.append(response.to_dict())
+        updated_resources = self._build_updated_resources_dict()
+        schema = UpdatedResourcesSchema().bind(request=self.request,
+                                               context=self.context)
+        return {'responses': responses,
+                'updated_resources': schema.serialize(updated_resources)}
 
     def _resolve_preliminary_paths(self, json_value: object,
                                    path_map: dict) -> object:
