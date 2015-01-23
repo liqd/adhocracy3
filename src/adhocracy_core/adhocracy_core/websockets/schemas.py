@@ -44,7 +44,7 @@ class Event(colander.SchemaNode):
     schema_type = colander.String
     validator = colander.OneOf(['modified',            # Used internally
                                 'removed',             # and for
-                                'changed_descendant',  # the client
+                                'changed_descendants',  # the client
                                 'new_child',
                                 'removed_child',
                                 'modified_child',
