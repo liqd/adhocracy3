@@ -10,8 +10,8 @@
     </div>
     <div
         class="moving-column-sidebar"
-        data-ng-class="{'is-visible': showSidebar}"
-        aria-visible="{{showSidebar}}">
+        data-ng-class="{'is-visible': _showSidebar}"
+        aria-visible="{{_showSidebar}}">
         <adh-inject data-transclusion-id="sidebar"></adh-inject>
     </div>
 
@@ -20,7 +20,7 @@
         <adh-inject data-transclusion-id="overlays"></adh-inject>
     </div>
     <ul class="moving-column-alerts">
-        <li data-ng-repeat="(id, alert) in alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="ctrl.removeAlert(id)">
+        <li data-ng-repeat="(id, alert) in _alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="ctrl.removeAlert(id)">
             {{ alert.message }}
         </li>
     </ul>

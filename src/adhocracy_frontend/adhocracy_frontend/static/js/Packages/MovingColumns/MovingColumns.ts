@@ -6,6 +6,11 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 export var pkgLocation = "/MovingColumns";
 
 
+/**
+ * Moving Columns directive
+ *
+ * taking care of showing, hiding and resizing the columns
+ */
 export var movingColumns = (
     adhTopLevelState : AdhTopLevelState.Service,
     $timeout,
@@ -133,12 +138,46 @@ export var movingColumns = (
 };
 
 
+/**
+ * Moving Column directive
+ *
+ * Every moving column should be wrapped in an instance of this directive.
+ * It provides common functionality, e.g. alerts, sidebar and overlays
+ * via a controller that can be required by subelements.
+ *
+ * Subelements can inject template code with the following transclusionIds
+ * (see AdhInject):
+ *
+ * -   body
+ * -   menu
+ * -   collapsed
+ * -   sidebar
+ * -   overlays
+ */
+export interface IMovingColumnScope extends ng.IScope {
+    // the controller with interfaces for alerts, overlays, ...
+    ctrl : MovingColumnController;
+
+    // an object that can be used to share data between different parts of the column.
+    shared : {[id : string]: any};
+
+    // key of the currently active overlay or undefined
+    overlay : string;
+
+    // private
+    _alerts : {[id : number]: {
+        message : string;
+        mode : string;
+    }};
+    _showSidebar : boolean;
+}
+
 export class MovingColumnController {
     private lastId : number;
 
-    constructor(protected $timeout : ng.ITimeoutService, protected $scope) {
+    constructor(protected $timeout : ng.ITimeoutService, protected $scope : IMovingColumnScope) {
         $scope.ctrl = this;
-        $scope.alerts = {};
+        $scope._alerts = {};
         $scope.shared = {};
 
         this.lastId = 0;
@@ -148,14 +187,14 @@ export class MovingColumnController {
         var id = this.lastId++;
         this.$timeout(() => this.removeAlert(id), duration);
 
-        this.$scope.alerts[id] = {
+        this.$scope._alerts[id] = {
             message: message,
             mode: mode
         };
     }
 
     public removeAlert(id : number) : void {
-        delete this.$scope.alerts[id];
+        delete this.$scope._alerts[id];
     }
 
     public showOverlay(key : string) : void {
@@ -186,9 +225,9 @@ export class MovingColumnController {
 
     public toggleSidebar(condition? : boolean) : void {
         if (typeof condition === "undefined") {
-            condition = !this.$scope.showSidebar;
+            condition = !this.$scope._showSidebar;
         }
-        this.$scope.showSidebar = condition;
+        this.$scope._showSidebar = condition;
     }
 }
 

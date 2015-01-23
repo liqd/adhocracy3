@@ -3,7 +3,7 @@
         <i class="icon-list moving-column-icon"></i>
         <a href=""
             data-ng-click="ctrl.toggleSidebar()"
-            data-ng-class="{'is-active': showSidebar}">{{ "filters" | translate }}</a>
+            data-ng-class="{'is-active': _showSidebar}">{{ "filters" | translate }}</a>
     </div>
 
     <a data-ng-switch-when="collapsed" href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">O</a>
