@@ -1,8 +1,8 @@
-<div class="moving-column-menu">
-    <a href="{{ platformUrl | adhResourceUrl }}">{{ "Cancel" | translate }}</a>
-</div>
-<div class="moving-column-body" data-du-scroll-container="">
+<div data-ng-switch="transclusionId">
+    <a data-ng-switch-when="menu" href="{{ platformUrl | adhResourceUrl }}">{{ "Cancel" | translate }}</a>
+
     <adh-resource-wrapper
+        data-ng-switch-when="body"
         data-on-submit="redirectAfterProposalSubmit(result)"
         data-on-cancel="redirectAfterProposalCancel(platformUrl)">
         <adh-mercator-proposal-create

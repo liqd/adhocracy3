@@ -1,28 +1,26 @@
-<div class="moving-column-menu">
-    <i class="icon-list moving-column-icon"></i>
-    <a href=""
-        data-ng-click="data.showFacets = !data.showFacets"
-        data-ng-class="{'is-active': data.showFacets}">{{ "filters" | translate }}</a>
-</div>
-<div class="moving-column-collapsed">
-    <a href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">O</a>
-</div>
-<div
-    class="moving-column-sidebar"
-    data-ng-class="{'is-visible': data.showFacets}"
-    aria-visible="{{data.showFacets}}">
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <i class="icon-list moving-column-icon"></i>
+        <a href=""
+            data-ng-click="ctrl.toggleSidebar()"
+            data-ng-class="{'is-active': _showSidebar}">{{ "filters" | translate }}</a>
+    </div>
+
+    <a data-ng-switch-when="collapsed" href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">O</a>
+
     <adh-facets
-        data-update="data.update"
-        data-facets="data.facets">
+        data-ng-switch-when="sidebar"
+        data-update="shared.update"
+        data-facets="shared.facets">
     </adh-facets>
-</div>
-<div class="moving-column-body" data-du-scroll-container="">
+
     <adh-mercator-proposal-listing
+        data-ng-switch-when="body"
         data-path="{{platformUrl}}"
         data-content-type="{{contentType}}"
-        data-update="data.update"
-        data-facets="data.facets"
-        data-sort="data.sort"
+        data-update="shared.update"
+        data-facets="shared.facets"
+        data-sort="shared.sort"
     >
     </adh-mercator-proposal-listing>
 </div>
