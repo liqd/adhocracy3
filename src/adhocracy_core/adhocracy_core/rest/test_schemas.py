@@ -38,16 +38,26 @@ class TestResourceResponseSchema:
     def test_serialize_no_appstruct(self, request, context):
         inst = self.make_one().bind(request=request, context=context)
         wanted = {'content_type': IResource.__identifier__,
-                  'path': request.application_url +'/'}
+                  'path': request.application_url + '/',
+                  'updated_resources': {'changed_descendants': [],
+                          'created': [],
+                          'modified': [],
+                          'removed': []}}
         assert inst.serialize() == wanted
 
     def test_serialize_with_appstruct(self, request, context):
         inst = self.make_one().bind(request=request, context=context)
         context['child'] = testing.DummyResource()
         wanted = {'content_type': ISheet.__identifier__,
-                  'path': request.application_url + '/child/'}
+                  'path': request.application_url + '/child/',
+                  'updated_resources': {'changed_descendants': [],
+                          'created': [request.application_url + '/child/'],
+                          'modified': [],
+                          'removed': []}}
         assert inst.serialize({'content_type': ISheet,
-                               'path': context['child']}) == wanted
+                               'path': context['child'],
+                               'updated_resources':
+                                   {'created': [context['child']]}}) == wanted
 
 
 class TestItemResponseSchema:

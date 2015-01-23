@@ -409,7 +409,12 @@ class TestSimpleRESTView:
         inst = self.make_one(context, request)
         response = inst.put()
 
-        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
+        wanted = {'path': request.application_url + '/',
+                  'content_type': IResource.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                          'created': [],
+                          'modified': [],
+                          'removed': []}}
         assert wanted == response
 
     def test_put_valid_with_sheets(self, request, context, mock_sheet):
