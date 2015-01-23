@@ -105,12 +105,13 @@
                         data-du-scrollspy="mercator-proposal-detail-whos"
                         data-offset="50">{{ "Who is behind it?" | translate }}</h2>
 
-                    <adh-user-meta
-                        class="mercator-proposal-detail-username"
-                        data-ng-if="data.user_info"
-                        data-path="{{data.user_info.path}}"
-                        data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-                    </adh-user-meta>
+                    <div class="mercator-proposal-detail-username">
+                        <adh-user-meta
+                            data-ng-if="data.user_info"
+                            data-path="{{data.user_info.path}}"
+                            data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
+                        </adh-user-meta>
+                    </div>
 
                     <div data-ng-switch="data.organization_info.status_enum">
                         <div data-ng-switch-when="registered_nonprofit">
