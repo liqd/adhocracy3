@@ -1,0 +1,29 @@
+.facets {
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .facet {
+        margin-bottom: 50 / 14 * 1em;
+    }
+
+    .facet-header {
+        color: $color-text-introvert;
+        font-size: $font-size-small;
+        font-weight: $font-weight-normal;
+        line-height: 1.15;
+        margin: 0 0 20 / 14 * 1em;
+    }
+
+    .facet-item {
+        line-height: 1;
+        margin-bottom: 1em;
+    }
+
+    .facet-item-checkbox {
+        margin-right: 3px;
+        vertical-align: middle;
+    }
+}

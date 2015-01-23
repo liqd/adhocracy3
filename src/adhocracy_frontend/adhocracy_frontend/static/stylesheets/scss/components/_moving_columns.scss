@@ -262,11 +262,11 @@ States:
 .moving-column-sidebar {
     @include transition(left 0.5s);
     display: none;
-    left: -30%;
-    width: 30%;
+    left: -25%;
+    width: 25%;
     z-index: 1;
     background-color: $color-structure-normal;
-    padding: 0.5em;
+    padding: 16 / 14 * 1em 20 / 14 * 1em;
 
     &.is-visible {
         left: 0;
