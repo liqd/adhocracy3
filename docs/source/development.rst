@@ -188,12 +188,15 @@ node.js
 ```````
 ::
 
-    bin/npm --prefix parts/nodejs/lib/ outdated
+    bin/npm --prefix node_modules outdated
 
 bower
 `````
 
-not available
+::
+
+    cd .../lib  # where bower installs the libraries
+    bower list
 
 Adhocracy Releases
 ------------------
