@@ -201,25 +201,34 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RICommentVersion.content_type, "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) =>
+                .specific(RICommentVersion.content_type, "", ["adhHttp", "$q", (adhHttp : AdhHttp.Service<any>, $q : ng.IQService) =>
                                                               (resource : RICommentVersion) => {
                     var specifics = {};
                     specifics["commentUrl"] = resource.path;
-                    specifics["commentableUrl"] = resource.data[SIComment.nick].refers_to;
 
-                    return adhHttp.get(specifics["commentableUrl"])
-                        .then((commentable) => {
-                            if (commentable.content_type === RIMercatorProposalVersion.content_type) {
-                                specifics["proposalUrl"] = specifics["commentableUrl"];
-                            } else {
-                                var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
-                                var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
-                                return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
-                                    specifics["proposalUrl"] = proposalUrl;
-                                });
-                            }
-                        })
-                        .then(() => specifics);
+                    var getCommentableUrl = (resource) : ng.IPromise<any> => {
+                        if (resource.content_type !== RICommentVersion.content_type) {
+                            return $q.when(resource);
+                        } else {
+                            var url = resource.data[SIComment.nick].refers_to;
+                            return adhHttp.get(url).then(getCommentableUrl);
+                        }
+                    };
+
+                    return getCommentableUrl(resource).then((commentable) => {
+                        specifics["commentableUrl"] = commentable.path;
+
+                        if (commentable.content_type === RIMercatorProposalVersion.content_type) {
+                            specifics["proposalUrl"] = specifics["commentableUrl"];
+                        } else {
+                            var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
+                            var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
+                            return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
+                                specifics["proposalUrl"] = proposalUrl;
+                            });
+                        }
+                    })
+                    .then(() => specifics);
                 }])
                 .default(RIUser.content_type, "", {
                     space: "user",
