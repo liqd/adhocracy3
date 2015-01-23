@@ -231,13 +231,21 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             path: "@",
             me: "=?"
         },
-        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+        controller: ["adhHttp", "$scope", "adhTopLevelState", (adhHttp : AdhHttp.Service<any>, $scope,
+            adhTopLevelState : AdhTopLevelState.Service) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                     });
             }
+            adhTopLevelState.on("userUrl", (userUrl) => {
+                if (!userUrl) {
+                    $scope.selectedState = "";
+                } else if (userUrl === $scope.path) {
+                    $scope.selectedState = "is-selected";
+                }
+            });
         }]
     };
 };

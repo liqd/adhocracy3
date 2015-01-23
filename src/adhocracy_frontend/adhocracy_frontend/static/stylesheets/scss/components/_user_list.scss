@@ -44,7 +44,7 @@ A user list item within a listing widget
         line-height: $font-size-large/$font-size-normal;
     }
 
-    &.m-me, &:hover, &:focus {
+    &.m-me, &:hover, &:focus, &.is-selected {
         background: white;
 
         .user-list-item-button {
