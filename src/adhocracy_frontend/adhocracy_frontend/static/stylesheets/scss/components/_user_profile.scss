@@ -17,7 +17,7 @@
     }
 
     .user-profile-info-icon {
-        display: inline-block;
+        @include inline-block;
         line-height: 1;
         font-size: 400%;
 
