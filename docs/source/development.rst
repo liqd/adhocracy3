@@ -188,7 +188,7 @@ node.js
 ```````
 ::
 
-    bin/npm --prefix parts/nodejs/lib/ outdated
+    bin/npm --prefix node_modules outdated
 
 bower
 `````
