@@ -6,6 +6,7 @@ import AdhDone = require("../Done/Done");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../Rate/Rate");
@@ -54,6 +55,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     createComment() : void;
     cancelCreateComment() : void;
     afterCreateComment() : ng.IPromise<void>;
+    report? : () => void;
     data : {
         content : string;
         creator : string;
@@ -83,6 +85,8 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         var directive = this.createDirective();
         directive.compile = (element) => adhRecursionHelper.compile(element, directive.link);
 
+        directive.require.push("?^adhMovingColumn");
+
         directive.scope.refersTo = "@";
         directive.scope.poolPath = "@";
 
@@ -108,6 +112,15 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         var self = this;
 
         var instance = super.link(scope, element, attrs, controllers);
+
+        // the report abuse UI is only available in moving columns
+        var column : AdhMovingColumns.MovingColumnController = controllers[1];
+        if (column) {
+            scope.report = () => {
+                column.$scope.shared.abuseUrl = scope.path;
+                column.toggleOverlay("abuse");
+            };
+        }
 
         scope.show = {
             createForm: false
