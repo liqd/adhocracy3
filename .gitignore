@@ -70,3 +70,4 @@ src/mercator/build
 /tmp
 /wheelhouse
 /share
+.fontcustom-manifest.json
