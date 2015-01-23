@@ -413,7 +413,7 @@ def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
     elif meta.visibility is VisibilityChange.concealed:
         events.append('removed')
         test_changed_descendants = False
-    elif get_reason_if_blocked(meta.resource is not None):
+    elif get_reason_if_blocked(meta.resource) is not None:
         # hidden resources may still be modified by autoupdates
         # but we don't want to expose them
         test_changed_descendants = False
