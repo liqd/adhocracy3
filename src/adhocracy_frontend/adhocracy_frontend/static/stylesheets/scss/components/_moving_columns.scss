@@ -124,6 +124,12 @@ The menu should always have the same state as its columns.
             display: block;
         }
     }
+
+    &.is-collapse {
+        background-color: $color-background-base;
+        border: 2px solid $color-structure-normal;
+        border-width: 2px 0 2px 2px;
+    }
 }
 
 %moving-column-single-width {
