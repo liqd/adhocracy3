@@ -25,22 +25,30 @@ A user list item within a listing widget
 ```
 */
 
-.user-list-item {
+.user-list-item-link {
     background: $color-background-base-introvert;
     border-bottom: 2px solid $color-structure-normal;
+    display: block;
     line-height: 1;
     overflow: hidden;
-    padding: 20 / 14 * 1em 1em;
+    padding: 20 / 14 * 1em 20 / 14 * 1em 20 / 14 * 1em 1em;
+    text-decoration: none;
 
     .user-list-item-name {
+        color: $color-text-normal;
         font-size: $font-size-large;
     }
 
-    .user-profile-button {
+    .user-list-item-button {
         float: right;
+        line-height: $font-size-large/$font-size-normal;
     }
 
-    &.m-me {
-        background: $color-structure-introvert;
+    &.m-me, &:hover, &:focus {
+        background: white;
+
+        .user-list-item-button {
+            color: $color-text-highlight-normal;
+        }
     }
 }
