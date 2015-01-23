@@ -22,5 +22,9 @@
         </adh-user-profile>
     </adh-recompile-on-change>
 
-    <adh-user-message data-ng-switch-when="overlays" data-recipient-url="{{userUrl}}"></adh-user-message>
+    <adh-user-message
+        data-ng-switch-when="overlays"
+        data-ng-if="overlay === 'messaging'"
+        data-recipient-url="{{userUrl}}">
+    </adh-user-message>
 </div>
