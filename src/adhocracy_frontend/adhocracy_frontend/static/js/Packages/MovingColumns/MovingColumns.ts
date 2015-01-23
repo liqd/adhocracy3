@@ -73,8 +73,10 @@ export var movingColumns = (
                 var offset : number = (totalWidth - totalShowWidthWithSpacing) / 2 - collapseCount * (collapseWidth + spacing);
                 offset = Math.max(offset, 0);
 
+                var columns = element.find(".moving-column");
+
                 for (var i = 0; i < 3; i++) {
-                    var child = element.children().eq(i);
+                    var child = columns.eq(i);
                     child.css({left: offset});
                     clearStates(child);
                     switch (parts[i + 1]) {
@@ -102,11 +104,12 @@ export var movingColumns = (
             };
 
             var resizeNoTransition = () => {
-                var transition = element.children().css("transition");
-                element.children().css("transition", "none");
+                var columns = element.find(".moving-column");
+                var transition = columns.css("transition");
+                columns.css("transition", "none");
                 resize();
                 $timeout(() => {
-                    element.children().css("transition", transition);
+                    columns.css("transition", transition);
                 }, 1);
             };
 
@@ -124,6 +127,7 @@ export var movingColumns = (
             adhTopLevelState.on("movingColumns", move);
             adhTopLevelState.on("focus", resize);
             adhTopLevelState.on("space", () => _.defer(resizeNoTransition));
+            scope.$watch(() => element.find(".moving-column").length, resize);
         }
     };
 };
