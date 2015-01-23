@@ -184,7 +184,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('Client connecting: %s', self._client)
 
     def _client_runs_on_localhost(self):
-        return any(self._client.startswith(prefix) for prefix in
+        return any(localhost in self._client for localhost in
                    ('localhost:', '127.0.0.1:', '::1:'))
 
     def onOpen(self):  # noqa
