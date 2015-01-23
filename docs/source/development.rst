@@ -193,7 +193,10 @@ node.js
 bower
 `````
 
-not available
+::
+
+    cd .../lib  # where bower installs the libraries
+    bower list
 
 Adhocracy Releases
 ------------------
