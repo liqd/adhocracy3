@@ -45,6 +45,17 @@ export var emptyOptions : IOptions = {
 };
 
 
+export interface IBatchResult {
+    postedResources : ResourcesBase.Resource[];
+    updated : {
+        changed_descendants : string[];
+        created : string[];
+        modified : string[];
+        removed : string[];
+    };
+}
+
+
 /**
  * send and receive objects with adhocracy data model awareness
  *
@@ -225,7 +236,7 @@ export class Service<Content extends ResourcesBase.Resource> {
                 transaction.post(resource.parent, resource);
             });
 
-            return transaction.commit();
+            return transaction.commit().then(batchResult => batchResult.postedResources);
         });
     }
 
