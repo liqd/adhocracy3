@@ -117,7 +117,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         var column : AdhMovingColumns.MovingColumnController = controllers[1];
         if (column) {
             scope.report = () => {
-                column.$scope.shared.abuseUrl = scope.path;
+                column.$scope.shared.abuseUrl = scope.data.path;
                 column.toggleOverlay("abuse");
             };
         }
