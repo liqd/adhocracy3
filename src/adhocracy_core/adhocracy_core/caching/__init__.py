@@ -200,6 +200,12 @@ def etag_modified(context: IResource, request: IRequest) -> str:
     return modified
 
 
+def etag_userid(context: IResource, request: IRequest) -> str:
+    """Return :term:`userid`."""
+    userid = request.authenticated_userid
+    return str(userid)
+
+
 @implementer(IHTTPCacheStrategy)
 class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
 
@@ -214,7 +220,7 @@ class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
     browser_max_age = 0
     proxy_max_age = 60 * 60 * 24 * 30 * 12
     vary = ('X-User-Path', 'X-User-Token')
-    etags = (etag_backrefs, etag_descendants, etag_modified)
+    etags = (etag_backrefs, etag_descendants, etag_modified, etag_userid)
 
 
 def includeme(config):
