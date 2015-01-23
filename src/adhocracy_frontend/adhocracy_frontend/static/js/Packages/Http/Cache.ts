@@ -43,22 +43,33 @@ export class Service {
             }
         });
 
-        adhWebSocket.addEventListener("close", this.invalidateAll());
+
+        adhWebSocket.addEventListener("close", (msg) => {
+            this.invalidateAll();
+        });
+    }
+
+    private isConnected() {
+        return this.adhWebSocket.isConnected();
     }
 
     public invalidate(path : string) : void {
-        var cached = this.cache.get(path);
-        if (typeof cached !== "undefined") {
-            this.adhWebSocket.unregister(path, cached.wshandle);
-            this.cache.remove(path);
-            if (this.debug) { console.log("invalidate: " + path); };
+        if (this.isConnected()) {
+            var cached = this.cache.get(path);
+            if (typeof cached !== "undefined") {
+                this.adhWebSocket.unregister(path, cached.wshandle);
+                this.cache.remove(path);
+                if (this.debug) { console.log("invalidate: " + path); };
+            }
         }
     }
 
     public invalidateAll() : void {
-        _.forEach(this.cache.keys(), (key : string) => {
-            this.invalidate(key);
-        });
+        if (this.isConnected()) {
+            _.forEach(this.cache.keys(), (key : string) => {
+                this.invalidate(key);
+            });
+        }
     }
 
     private getOrSetCached(path : string) : IHttpCacheItem {
@@ -77,16 +88,20 @@ export class Service {
     }
 
     public memoize(path, subkey, closure) {
-        var cached = this.getOrSetCached(path);
+        if (this.isConnected()) {
+            var cached = this.getOrSetCached(path);
 
-        var promise = cached.promises[subkey];
-        if (typeof promise === "undefined") {
-            if (this.debug) { console.log("cache miss: " + path + " " + subkey); };
-            promise = closure();
-            cached.promises[subkey] = promise;
+            var promise = cached.promises[subkey];
+            if (typeof promise === "undefined") {
+                if (this.debug) { console.log("cache miss: " + path + " " + subkey); };
+                promise = closure();
+                cached.promises[subkey] = promise;
+            } else {
+                if (this.debug) { console.log("cache hit: " + path + " " + subkey); };
+            }
+            return promise;
         } else {
-            if (this.debug) { console.log("cache hit: " + path + " " + subkey); };
+            return closure();
         }
-        return promise;
     }
 }
