@@ -13,4 +13,9 @@
     <div class="moving-column-overlay" data-ng-if="overlay">
         <adh-inject data-transclusion-id="overlays"></adh-inject>
     </div>
+    <ul class="moving-column-alerts">
+        <li data-ng-repeat="(id, alert) in alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="ctrl.removeAlert(id)">
+            {{ alert.message }}
+        </li>
+    </ul>
 </div>

@@ -130,9 +130,28 @@ export var movingColumns = (
 
 
 export class MovingColumnController {
+    private lastId : number;
+
     constructor(protected $timeout : ng.ITimeoutService, protected $scope) {
         $scope.ctrl = this;
+        $scope.alerts = {};
         $scope.shared = {};
+
+        this.lastId = 0;
+    }
+
+    public alert(message : string, mode : string = "info", duration : number = 3000) : void {
+        var id = this.lastId++;
+        this.$timeout(() => this.removeAlert(id), duration);
+
+        this.$scope.alerts[id] = {
+            message: message,
+            mode: mode
+        };
+    }
+
+    public removeAlert(id : number) : void {
+        delete this.$scope.alerts[id];
     }
 
     public showOverlay(key : string) : void {
