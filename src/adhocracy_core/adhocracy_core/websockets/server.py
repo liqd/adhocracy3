@@ -184,8 +184,9 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('Client connecting: %s', self._client)
 
     def _client_runs_on_localhost(self):
-        return any(localhost in self._client for localhost in
-                   ('localhost:', '127.0.0.1:', '::1:'))
+        runs_on_localhost = any(self._client.startswith(prefix) for prefix in
+                                ('tcp:localhost:', 'tcp:127.0.0.1:', '::1:'))
+        return runs_on_localhost
 
     def onOpen(self):  # noqa
         logger.debug('WebSocket connection to %s open', self._client)
