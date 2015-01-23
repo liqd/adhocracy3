@@ -282,8 +282,29 @@ States:
     height: 100%;
 }
 
+/*doc
+---
+title: Moving Column Overlay Dialogue
+name: moving-column-overlay-dialogue
+parent: moving-columns
+---
+
+A dialogue to notify users in the moving column
+
+```html_example
+<div class="static-example">
+    <div class="moving-column-overlay-dialogue">
+        Thank you! Your message has been sent.
+    </div>
+</div>
+```
+*/
 .moving-column-overlay-dialogue {
     background: $color-structure-normal;
     padding: 1em;
     text-align: center;
+}
+
+.static-example .moving-column-overlay-dialogue {
+    position: static;
 }

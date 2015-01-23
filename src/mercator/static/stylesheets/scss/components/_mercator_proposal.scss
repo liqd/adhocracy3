@@ -287,14 +287,10 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item {
     @include container;
-    border-bottom: 1px solid $color-text-introvert;
+    border-bottom: 2px solid $color-structure-normal;
     font-size: $font-size-plus;
     line-height: 1;
     padding: 1em 1.25em 1.125em 0.875em;
-
-    .m-has-image {
-        float: left;
-    }
 
     &.is-not-selected {
         background: $color-background-base-introvert;
