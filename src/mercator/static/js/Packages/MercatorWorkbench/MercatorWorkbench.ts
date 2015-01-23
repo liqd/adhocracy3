@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAbuse = require("./Packages/Abuse/Abuse");
+import AdhAbuse = require("../Abuse/Abuse");
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
