@@ -26,9 +26,15 @@ A user list item within a listing widget
 */
 
 .user-list-item {
-    border-bottom: 1px solid $color-structure-border;
+    background: $color-background-base-introvert;
+    border-bottom: 2px solid $color-structure-normal;
+    line-height: 1;
     overflow: hidden;
-    padding: 10px;
+    padding: 20 / 14 * 1em 1em;
+
+    .user-list-item-name {
+        font-size: $font-size-large;
+    }
 
     .user-profile-button {
         float: right;
