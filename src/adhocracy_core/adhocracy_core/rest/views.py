@@ -20,6 +20,7 @@ from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
 
+from adhocracy_core.caching import set_cache_header
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -257,6 +258,7 @@ class RESTView:
         """Context Resource."""
         self.request = request
         """:class:`pyramid.request.Request`."""
+        set_cache_header(context, request)
         schema_class, validators = _get_schema_and_validators(self, request)
         validate_request_data(context, request,
                               schema=schema_class(),
@@ -592,7 +594,6 @@ class UsersRESTView(PoolRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IAssetsService,
-    http_cache=0,
 )
 class AssetsServiceRESTView(PoolRESTView):
 
@@ -608,7 +609,6 @@ class AssetsServiceRESTView(PoolRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IAsset,
-    http_cache=0,
 )
 class AssetRESTView(SimpleRESTView):
 
@@ -1027,7 +1027,6 @@ class ReportAbuseView(RESTView):
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
-    http_cache=0,
     name='message_user',
 )
 class MessageUserView(RESTView):

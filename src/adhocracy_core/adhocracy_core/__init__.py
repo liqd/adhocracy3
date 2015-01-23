@@ -69,6 +69,7 @@ def includeme(config):
     config.include('.registry')
     config.include('.graph')
     config.include('.catalog')
+    config.include('.caching')
     config.include('.messaging')
     config.include('.sheets')
     config.include('.resources.asset')
