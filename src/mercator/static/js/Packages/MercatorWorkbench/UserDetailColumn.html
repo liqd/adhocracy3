@@ -5,6 +5,10 @@
             href=""
             data-ng-click="ctrl.toggleOverlay('messaging')"
             data-ng-if="messageOptions.POST">{{ "Messaging" | translate }}</a>
+
+        <div class="moving-column-menu-nav">
+            <a href="{{ '/principals/users/' | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        </div>
     </div>
 
     <adh-recompile-on-change
