@@ -162,11 +162,17 @@ export var userDetailColumnDirective = (
 };
 
 
-export var userListingColumnDirective = (adhConfig : AdhConfig.IService) => {
+export var userListingColumnDirective = (
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html",
-        require: "^adhMovingColumn"
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            adhTopLevelState.bind("userUrl", scope);
+        }
     };
 };
 
@@ -224,7 +230,9 @@ export var register = (angular) => {
                 })
                 .default(RIUsersService.content_type, "", {
                     space: "user",
-                    movingColumns: "is-show-hide-hide"
+                    movingColumns: "is-show-hide-hide",
+                    userUrl: "",  // not used by default, but should be overridable
+                    focus: "0"
                 })
                 .default(RIPoolWithAssets.content_type, "", {
                     space: "content",
@@ -256,5 +264,5 @@ export var register = (angular) => {
         .directive("adhMercatorProposalEditColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhTopLevelState", "adhConfig", mercatorProposalListingColumnDirective])
         .directive("adhUserDetailColumn", ["adhTopLevelState", "adhPermissions", "adhConfig", userDetailColumnDirective])
-        .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
+        .directive("adhUserListingColumn", ["adhTopLevelState", "adhConfig", userListingColumnDirective]);
 };
