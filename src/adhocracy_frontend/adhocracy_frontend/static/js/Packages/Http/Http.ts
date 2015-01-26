@@ -95,11 +95,11 @@ export class Service<Content extends ResourcesBase.Resource> {
 
     private importOptions(raw : { data : IOptions }) : IOptions {
         return {
-            OPTIONS: raw.data.hasOwnProperty("OPTIONS") && raw.data.OPTIONS ? true : false,
-            PUT: raw.data.hasOwnProperty("PUT") && raw.data.PUT ? true : false,
-            GET: raw.data.hasOwnProperty("GET") && raw.data.GET ? true : false,
-            POST: raw.data.hasOwnProperty("POST") && raw.data.POST ? true : false,
-            HEAD: raw.data.hasOwnProperty("HEAD") && raw.data.HEAD ? true : false
+            OPTIONS: !!raw.data.OPTIONS,
+            PUT: !!raw.data.PUT,
+            GET: !!raw.data.GET,
+            POST: !!raw.data.POST,
+            HEAD: !!raw.data.HEAD
         };
     }
 
