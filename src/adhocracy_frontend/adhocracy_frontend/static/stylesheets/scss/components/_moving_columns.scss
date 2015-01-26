@@ -273,12 +273,13 @@ States:
 
 .moving-column-sidebar {
     @include transition(left 0.5s);
+    border-top: 1px solid $color-structure-border;
     display: none;
-    left: -30%;
-    width: 30%;
+    left: -25%;
+    width: 25%;
     z-index: 1;
-    background-color: $color-structure-introvert;
-    padding: 0.5em;
+    background-color: $color-structure-normal;
+    padding: 16 / 14 * 1em 20 / 14 * 1em;
 
     &.is-visible {
         left: 0;
@@ -288,6 +289,18 @@ States:
     &.is-visible-add,
     &.is-visible-remove {
         display: block;
+    }
+
+    .moving-column-sidebar-close {
+        color: $color-text-introvert;
+        position: absolute;
+        right: 1em;
+        text-decoration: none;
+        top: 1em;
+
+        &:hover, &:focus {
+            color: $color-text-extrovert;
+        }
     }
 }
 
