@@ -5,6 +5,7 @@ from adhocracy_core.interfaces import HTTPCacheMode
 from adhocracy_core.interfaces import IHTTPCacheStrategy
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.exceptions import ConfigurationError
+from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.utils import get_reason_if_blocked
 from pyramid.httpexceptions import HTTPNotModified
 from pyramid.interfaces import IRequest
@@ -236,6 +237,19 @@ class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
              etag_blocked)
 
 
+@implementer(IHTTPCacheStrategy)
+class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
+
+    """Weak strategy adapter for :class:`IAssetDownload`."""
+
+    browser_max_age = 60 * 5
+    etags = (etag_modified, etag_userid, etag_blocked)
+
+    def __init__(self, context, request):
+        parent = context.__parent__  # reuse parent cache header
+        super().__init__(parent, request)
+
+
 def includeme(config):
     """Register cache strategies."""
     register_cache_strategy(HTTPCacheStrategyWeakAdapter,
@@ -246,8 +260,11 @@ def includeme(config):
                             IResource,
                             config.registry,
                             'OPTIONS')
-
-    register_cache_strategy(HTTPCacheStrategyWeakAdapter,
-                            IResource,
+    register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
+                            IAssetDownload,
                             config.registry,
-                            'HEAD')
+                            'GET')
+    register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
+                            IAssetDownload,
+                            config.registry,
+                            'OPTIONS')
