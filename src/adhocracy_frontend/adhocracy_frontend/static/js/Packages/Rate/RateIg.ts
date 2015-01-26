@@ -43,20 +43,46 @@ export var register = (angular, config, meta_api) => {
         var _rateVersion : RIRateVersion;
 
         beforeEach((done) => {
-            angular.module("test", []).value("adhConfig", config);
+            adhMetaApi = angular.injector(["ng"]).invoke(() => new AdhMetaApi.MetaApiQuery(meta_api));
+            adhPreliminaryNames = angular.injector(["ng"]).invoke(() => new AdhPreliminaryNames.Service());
 
-            var injector = angular.injector(["ng", "test", AdhUser.moduleName]);
+            adhHttp = (() => {
+                var factory = ($http, $q, $timeout) => {
+                    $http.defaults.headers.common["X-User-Token"] = "SECRET_GOD";
+                    $http.defaults.headers.common["X-User-Path"] = "/principals/users/0000000/";
 
-            injector.invoke(["$http", "adhUser", ($http, adhUser) => {
-                $http.defaults.headers.common["X-User-Token"] = "SECRET_GOD";
-                $http.defaults.headers.common["X-User-Path"] = "/principals/users/0000000/";
-
-                adhUser.userPath = "/principals/users/0000000/";
-            }]);
+                    return (new AdhHttp.Service($http, $q, $timeout, adhMetaApi, adhPreliminaryNames, config));
+                };
+                factory.$inject = ["$http", "$q", "$timeout"];
+                return angular.injector(["ng"]).invoke(factory);
+            })();
 
             // When localstorage is available, adhUser will delete userPath
             // which prevents us from setting it synchronously.
             (<any>modernizr).localstorage = false;
+
+            adhUser = (() => {
+                var factory = (
+                    $q,
+                    $http,
+                    $rootScope,
+                    $window
+                ) => {
+                    return (new AdhUser.Service(
+                        adhHttp,
+                        $q,
+                        $http,
+                        $rootScope,
+                        $window,
+                        angular,
+                        modernizr
+                    ));
+                };
+                factory.$inject = ["$q", "$http", "$rootScope", "$window"];
+                return angular.injector(["ng"]).invoke(factory);
+            })();
+
+            adhUser.userPath = "/principals/users/0000000/";
 
             var poolPath = "/adhocracy";
             var proposalName = "Against_Curtains_" + Math.random();
