@@ -110,6 +110,13 @@ export class Service {
         return cached;
     }
 
+    /**
+     * If the cache already contains the combination of path and subkey, return
+     * the cached value.
+     *
+     * Otherwise, execute the given closure, store the result in the cache and
+     * return it.
+     */
     public memoize(path, subkey, closure) {
         if (this.isConnected()) {
             var cached = this.getOrSetCached(path);
