@@ -108,17 +108,18 @@ class HTTPCacheStrategyBaseAdapter:
         raise `pyramid.httpexceptions.HTTPNotModified`:
             if conditional request and context is not modified.
         """
-        if self.request.if_modified_since:
-            self._check_condition_modified_since()
-        if self.request.if_none_match:
+        if self.request.if_none_match:    # check etag first
             self._check_condition_none_match()
+        elif self.request.if_modified_since:  # last_modified as backup only
+            self._check_condition_modified_since()
 
     def _check_condition_modified_since(self):
         self.set_last_modified()
         last_modified = self.request.response.last_modified
         if last_modified is None:  # pragma: no coverage
             return
-        if last_modified > self.request.if_modified_since:  # pragma: no branch
+        modified_since = self.request.if_modified_since
+        if last_modified >= modified_since:  # pragma: no branch
             raise HTTPNotModified()
 
     def _check_condition_none_match(self):
@@ -126,7 +127,7 @@ class HTTPCacheStrategyBaseAdapter:
         etag = self.request.response.etag
         if etag is None:
             return
-        if etag != self.request.if_none_match:  # pragma: no branch
+        if etag == self.request.if_none_match.etags[0]:  # pragma: no branch
             raise HTTPNotModified()
 
     def set_cache_headers_for_mode(self, mode: HTTPCacheMode):
