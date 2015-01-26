@@ -44,31 +44,35 @@
 
                     <h4 class="mercator-proposal-form-sub-subheading">{{ "Proposal pitch" | translate }}</h4>
 
-                    <input
-                        type="text"
-                        data-ng-change="changefield()"
-                        data-ng-model="data.user_info.first_name"
-                        name="user-info-first-name"
-                        placeholder="{{ 'Name' | translate }}"
-                        required="required" />
+                    <div class="row">
+                        <div class="cols-2">
+                            <input
+                                type="text"
+                                data-ng-change="changefield()"
+                                data-ng-model="data.user_info.first_name"
+                                name="user-info-first-name"
+                                placeholder="{{ 'Name' | translate }}"
+                                required="required" />
 
-                    <span
-                        class="input-error"
-                        data-ng-if="showError('mercatorProposalBasicForm.user-info-first-name', 'required')">
-                        {{ "Please enter your first name" | translate }}</span>
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.user-info-first-name', 'required')">
+                                {{ "Please enter your first name" | translate }}</span>
+                        </div>
+                        <div class="cols-2">
+                            <input
+                                type="text"
+                                data-ng-model="data.user_info.last_name"
+                                name="user-info-last-name"
+                                placeholder="{{ 'Lastname' | translate }}"
+                                required="required" />
 
-                    <input
-                        type="text"
-                        data-ng-model="data.user_info.last_name"
-                        name="user-info-last-name"
-                        placeholder="{{ 'Lastname' | translate }}"
-                        required="required" />
-
-                    <span
-                        class="input-error"
-                        data-ng-if="showError('mercatorProposalBasicForm.user-info-last-name', 'required')">
-                        {{ "Please enter your last name" | translate }}</span>
-
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.user-info-last-name', 'required')">
+                                {{ "Please enter your last name" | translate }}</span>
+                        </div>
+                    </div>
                     <country-select
                         data-ng-change="changefield()"
                         data-ng-model="data.user_info.country"

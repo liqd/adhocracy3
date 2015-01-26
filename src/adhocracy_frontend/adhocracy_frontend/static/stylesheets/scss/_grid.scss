@@ -1,5 +1,17 @@
 // http://susydocs.oddbird.net/en/latest/settings/
 
 $susy: (
-  gutters: 0.1
+    gutters: 0.1
 );
+
+.row {
+    @include container;
+}
+
+.cols-2 {
+    @include gallery(1 of 2);
+}
+
+.cols-3 {
+    @include gallery(1 of 3);
+}
