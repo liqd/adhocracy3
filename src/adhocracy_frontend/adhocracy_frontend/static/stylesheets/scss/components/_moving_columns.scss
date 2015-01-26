@@ -298,8 +298,8 @@ States:
         text-decoration: none;
         top: 1em;
 
-        &:hover {
-            color: $color-structure-normal;
+        &:hover, &:focus {
+            color: $color-text-extrovert;
         }
     }
 }
