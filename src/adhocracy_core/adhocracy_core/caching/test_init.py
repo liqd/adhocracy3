@@ -211,7 +211,24 @@ class TestHTTPCacheStrategyBaseAdapter:
         assert dummyinst.set_vary.called
 
 
-def test_etag_userid_without_authenticated_user(context, request_):
+def test_etag_blocked_context_is_blocked(context):
+    from . import etag_blocked
+    context.hidden = True
+    assert etag_blocked(context, None) == 'hidden'
+
+
+def test_etag_blocked_context_is_non_blocked(context):
+    from . import etag_blocked
+    assert etag_blocked(context, None) == 'None'
+
+
+def test_etag_userid_with_authenticated_user(context):
+    from . import etag_userid
+    request = testing.DummyResource(authenticated_userid='userid')
+    assert etag_userid(context, request) == 'userid'
+
+
+def test_etag_userid_without_authenticated_user(context):
     from . import etag_userid
     request = testing.DummyResource(authenticated_userid=None)
     assert etag_userid(context, request) == 'None'
@@ -234,13 +251,13 @@ class TestHTTPCacheStrategyWeakAdapter:
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IHTTPCacheStrategy
         from . import etag_backrefs, etag_descendants, etag_modified, \
-            etag_userid
+            etag_userid, etag_blocked
         assert verifyObject(IHTTPCacheStrategy, inst)
         assert inst.browser_max_age == 0
         assert inst.proxy_max_age == 31104000
         assert inst.vary == ('X-User-Path', 'X-User-Token')
         assert inst.etags == (etag_backrefs, etag_descendants, etag_modified,
-                              etag_userid)
+                              etag_userid, etag_blocked)
 
 
 @fixture()
@@ -310,7 +327,7 @@ class TestIntegrationCaching:
              HTTPCacheMode.without_proxy_cache.name
         resp = app_user.get('/', status=200)
         assert resp.headers['Cache-control'] == 'max-age=0, must-revalidate'
-        assert resp.headers['etag'] == '"None|None|None|None"'
+        assert resp.headers['etag'] == '"None|None|None|None|None"'
 
     def test_strategy_with_mode_proxy_cache_get(self, app_user, registry):
         from adhocracy_core.interfaces import HTTPCacheMode
@@ -320,7 +337,7 @@ class TestIntegrationCaching:
         assert resp.headers['Cache-control'] ==\
                'max-age=0, proxy-revalidate, s-maxage=31104000'
         assert resp.headers['Vary'] == 'X-User-Path, X-User-Token'
-        assert resp.headers['etag'] == '"None|None|None|None"'
+        assert resp.headers['etag'] == '"None|None|None|None|None"'
 
     def test_strategy_not_modified_if_modified_since_request(self, app_user,
                                                              context):
