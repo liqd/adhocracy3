@@ -341,7 +341,8 @@
                                 current image:
                                 <img class="mercator-proposal-detail-view-image"
                                      data-ng-src="{{ data.introduction.picture | adhImageUri }}"
-                                     style="width: 100%; height: 203px"/>
+                                     style="width: 100%; height: 203px"
+                                     alt="{{ 'current image' | translate }}" />
                             </div>
                             <button
                                 type="button"
@@ -375,7 +376,7 @@
                                 </span>
                             </div>
                             <div class="picture-upload-file" ng-if="$flow.files.length > 0" data-ng-repeat="file in $flow.files">
-                                <img data-flow-img="file" height="120" /><br/>{{file.name}}
+                                <img data-flow-img="file" height="120" alt="{{ 'selected image' | translate }}" /><br/>{{file.name}}
                             </div>
                         </div>
                     </label>
