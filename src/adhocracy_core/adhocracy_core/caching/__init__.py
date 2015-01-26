@@ -5,6 +5,7 @@ from adhocracy_core.interfaces import HTTPCacheMode
 from adhocracy_core.interfaces import IHTTPCacheStrategy
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.exceptions import ConfigurationError
+from adhocracy_core.utils import get_reason_if_blocked
 from pyramid.httpexceptions import HTTPNotModified
 from pyramid.interfaces import IRequest
 from pyramid.registry import Registry
@@ -206,6 +207,12 @@ def etag_userid(context: IResource, request: IRequest) -> str:
     return str(userid)
 
 
+def etag_blocked(context: IResource, request: IRequest) -> str:
+    """Return `resource` blocked status."""
+    reason = get_reason_if_blocked(context)
+    return str(reason)
+
+
 @implementer(IHTTPCacheStrategy)
 class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
 
@@ -220,7 +227,8 @@ class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
     browser_max_age = 0
     proxy_max_age = 60 * 60 * 24 * 30 * 12
     vary = ('X-User-Path', 'X-User-Token')
-    etags = (etag_backrefs, etag_descendants, etag_modified, etag_userid)
+    etags = (etag_backrefs, etag_descendants, etag_modified, etag_userid,
+             etag_blocked)
 
 
 def includeme(config):
