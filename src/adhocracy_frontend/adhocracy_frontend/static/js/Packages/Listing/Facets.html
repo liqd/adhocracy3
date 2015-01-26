@@ -3,11 +3,12 @@
         <li data-ng-repeat="facet in facets" class="facet">
             <h3 class="facet-header">{{ facet.name | translate }}</h3>
             <ul>
-                <li data-ng-repeat="item in facet.items" class="facet-item">
-                    <label data-ng-click="toggleItem(facet, item)">
-                        <input type="checkbox" autocomplete="off" class="facet-item-checkbox">
-                        {{ item.name | translate }}
-                    </label>
+                <li
+                    data-ng-repeat="item in facet.items"
+                    class="facet-item"
+                    ng-class="{'is-active': item.enabled}"
+                    ng-click="toggleItem(facet, item)">
+                    {{ item.name | translate }}
                 </li>
             </ul>
         </li>

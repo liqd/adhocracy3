@@ -18,8 +18,17 @@
     }
 
     .facet-item {
+        cursor: pointer;
         line-height: 1;
         margin-bottom: 1em;
+
+        &:hover, &:focus {
+            color: $color-text-highlight-normal;
+        }
+
+        &.is-active, &:active {
+            color: $color-function-valid;
+        }
     }
 
     .facet-item-checkbox {
