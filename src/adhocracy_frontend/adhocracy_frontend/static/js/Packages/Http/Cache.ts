@@ -20,7 +20,7 @@ export interface IHttpCacheItem {
  * This implements a cache which allows to store and automatically invalidate
  * imported HTTP responses.
  *
- * It is currently very much tied to the requirements of the HTTP responses.
+ * It is currently very much tied to the requirements of the adhHttp service.
  */
 export class Service {
     "use strict";
