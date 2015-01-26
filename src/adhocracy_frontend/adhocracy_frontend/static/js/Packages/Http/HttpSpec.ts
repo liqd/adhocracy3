@@ -428,13 +428,21 @@ export var register = () => {
                 var _httpTrans;
 
                 beforeEach((done) => {
-                    $httpMock.post.and.returnValue(q.when({data: [
-                        {body: {content_type: RIParagraph.content_type, path: "get response"}},
-                        {body: {content_type: RIParagraph.content_type, path: "put response"}},
-                        {body: {content_type: RIParagraph.content_type, path: "post1 response"}},
-                        {body: {content_type: RIParagraph.content_type, path: "post2 response"}},
-                        {body: {content_type: RIParagraph.content_type, path: "get2 response"}}
-                    ]}));
+                    $httpMock.post.and.returnValue(q.when({data: {
+                        responses: [
+                            {body: {content_type: RIParagraph.content_type, path: "get response"}},
+                            {body: {content_type: RIParagraph.content_type, path: "put response"}},
+                            {body: {content_type: RIParagraph.content_type, path: "post1 response"}},
+                            {body: {content_type: RIParagraph.content_type, path: "post2 response"}},
+                            {body: {content_type: RIParagraph.content_type, path: "get2 response"}}
+                        ],
+                        updated_resources: {
+                            changed_descendants: [],
+                            created: [],
+                            modified: [],
+                            removed: []
+                        }
+                    }}));
 
                     adhHttp.withTransaction((httpTrans) => {
                         _httpTrans = httpTrans;
@@ -497,11 +505,11 @@ export var register = () => {
                 });
 
                 it("maps preliminary data to responses via `index`", () => {
-                    expect(response[get.index].path).toBe("get response");
-                    expect(response[put.index].path).toBe("put response");
-                    expect(response[post1.index].path).toBe("post1 response");
-                    expect(response[post2.index].path).toBe("post2 response");
-                    expect(response[get2.index].path).toBe("get2 response");
+                    expect(response.postedResources[get.index].path).toBe("get response");
+                    expect(response.postedResources[put.index].path).toBe("put response");
+                    expect(response.postedResources[post1.index].path).toBe("post1 response");
+                    expect(response.postedResources[post2.index].path).toBe("post2 response");
+                    expect(response.postedResources[get2.index].path).toBe("get2 response");
                 });
 
                 it("throws if you try to use the transaction after commit", () => {

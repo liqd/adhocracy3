@@ -247,15 +247,15 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
                                        'version': self.request.application_url + '/child/version_007/'}
 
     def test_client_may_send_notifications_if_localhost(self):
-        self._connect('localhost:1234')
+        self._connect('tcp:localhost:1234')
         assert self._comm._client_may_send_notifications is True
 
     def test_client_may_send_notifications_if_localhost_ipv4(self):
-        self._connect('127.0.0.1:1234')
+        self._connect('tcp:127.0.0.1:1234')
         assert self._comm._client_may_send_notifications is True
 
     def test_client_may_not_send_notifications_if_not_localhost(self):
-        self._connect('78.46.75.118:1234')
+        self._connect('tcp:78.46.75.118:1234')
         assert self._comm._client_may_send_notifications is False
 
 
@@ -286,7 +286,7 @@ class EventDispatchUnitTests(unittest.TestCase):
         msg = build_message({'action': 'subscribe', 'resource': request.application_url + '/child/'})
         self._subscriber.onMessage(msg, False)
         self._dispatcher = QueueingClientCommunicator()
-        connection_request = DummyConnectionRequest('localhost:1234')
+        connection_request = DummyConnectionRequest('tcp:localhost:1234')
         self._dispatcher.onConnect(connection_request)
 
     def tearDown(self):
@@ -348,13 +348,13 @@ class EventDispatchUnitTests(unittest.TestCase):
             'event': 'removed',
             'resource': self.request.application_url + '/child/'}
 
-    def test_dispatch_changed_descendant_notification(self):
-        msg = build_message({'event': 'changed_descendant',
+    def test_dispatch_changed_descendants_notification(self):
+        msg = build_message({'event': 'changed_descendants',
                              'resource': '/child'})
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {
-            'event': 'changed_descendant',
+            'event': 'changed_descendants',
             'resource': self.request.application_url + '/child/'}
 
     def test_dispatch_invalid_event_notification(self):

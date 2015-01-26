@@ -1,5 +1,7 @@
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import AdhUser = require("./User");
@@ -231,34 +233,55 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             path: "@",
             me: "=?"
         },
-        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+        controller: ["adhHttp", "$scope", "adhTopLevelState", (adhHttp : AdhHttp.Service<any>, $scope,
+            adhTopLevelState : AdhTopLevelState.Service) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                     });
             }
+            adhTopLevelState.on("userUrl", (userUrl) => {
+                if (!userUrl) {
+                    $scope.selectedState = "";
+                } else if (userUrl === $scope.path) {
+                    $scope.selectedState = "is-selected";
+                } else {
+                    $scope.selectedState = "is-not-selected";
+                }
+            });
         }]
     };
 };
 
 
-export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
+export var userProfileDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
         transclude: true,
+        require: "^adhMovingColumn",
         scope: {
             path: "@"
         },
-        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
-            if ($scope.path) {
-                adhHttp.resolve($scope.path)
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+
+            scope.showMessaging = () => {
+                column.showOverlay("messaging");
+            };
+
+            if (scope.path) {
+                adhHttp.resolve(scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data[SIUserBasic.nick];
+                        scope.userBasic = res.data[SIUserBasic.nick];
                     });
             }
-        }]
+        }
     };
 };
 
@@ -298,6 +321,7 @@ export var moduleName = "adhUserViews";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhPermissions.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
@@ -332,7 +356,7 @@ export var register = (angular) => {
         }])
         .directive("adhListUsers", ["adhUser", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
-        .directive("adhUserProfile", ["adhConfig", userProfileDirective])
+        .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", userProfileDirective])
         .directive("adhLogin", ["adhConfig", loginDirective])
         .directive("adhRegister", ["adhConfig", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])

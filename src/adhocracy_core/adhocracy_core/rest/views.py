@@ -1,4 +1,5 @@
 """Rest API views."""
+from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
@@ -14,12 +15,14 @@ from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
 from pyramid.events import NewResponse
 from pyramid.httpexceptions import HTTPMethodNotAllowed
+from pyramid.httpexceptions import HTTPGone
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
 
+from adhocracy_core.caching import set_cache_header
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -32,7 +35,6 @@ from adhocracy_core.resources.asset import IAssetsService
 from adhocracy_core.resources.asset import validate_and_complete_asset
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
-from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
 from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
@@ -52,9 +54,10 @@ from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
+from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
@@ -64,6 +67,21 @@ import adhocracy_core.sheets.pool
 
 
 logger = getLogger(__name__)
+
+
+def respond_if_blocked(context, request):
+    """
+    Set 410 Gone and construct response if resource is deleted or hidden.
+
+    Otherwise or it request method is 'options' or 'put' return None
+    """
+    # FIXME handle OPTIONS request
+    from adhocracy_core.utils import get_reason_if_blocked
+    if request.method not in ['HEAD', 'GET', 'POST']:
+        return
+    block_reason = get_reason_if_blocked(context)
+    if block_reason is not None:
+        raise HTTPGone(detail=block_reason)
 
 
 def validate_post_root_versions(context, request: Request):
@@ -257,6 +275,8 @@ class RESTView:
         """Context Resource."""
         self.request = request
         """:class:`pyramid.request.Request`."""
+        respond_if_blocked(context, request)
+        set_cache_header(context, request)
         schema_class, validators = _get_schema_and_validators(self, request)
         validate_request_data(context, request,
                               schema=schema_class(),
@@ -284,6 +304,16 @@ class RESTView:
 
     def delete(self) -> dict:
         raise HTTPMethodNotAllowed()
+
+    def _build_updated_resources_dict(self) -> dict:
+        """Utility method used by several subclasses."""
+        result = defaultdict(list)
+        changelog_meta = self.request.registry._transaction_changelog.values()
+        for meta in changelog_meta:
+            events = extract_events_from_changelog_metadata(meta)
+            for event in events:
+                result[event].append(meta.resource)
+        return result
 
 
 def _get_schema_and_validators(view_class, request: Request) -> tuple:
@@ -375,31 +405,11 @@ class ResourceRESTView(RESTView):
                  permission='view')
     def get(self) -> dict:
         """Get resource data (unless deleted or hidden)."""
-        response_if_blocked = self.respond_if_blocked()
-        if response_if_blocked is not None:
-            return response_if_blocked
         schema = GETResourceResponseSchema().bind(request=self.request,
                                                   context=self.context)
         cstruct = schema.serialize()
         cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct
-
-    def respond_if_blocked(self):
-        """
-        Set 410 Gone and construct response if resource is deleted or hidden.
-
-        Otherwise return None.
-        Note that subclasses MUST overwriting `get()` MUST invoke this method!
-        """
-        block_explanation = view_blocked_by_metadata(self.context,
-                                                     self.request.registry)
-        if block_explanation:
-            self.request.response.status_code = 410  # Gone
-            schema = BlockExplanationResponseSchema().bind(
-                request=self.request, context=self.context)
-            return schema.serialize(block_explanation)
-        else:
-            return None
 
     def _get_sheets_data_cstruct(self):
         queryparams = self.request.validated if self.request.validated else {}
@@ -455,9 +465,15 @@ class SimpleRESTView(ResourceRESTView):
                 sheet.set(appstructs[name],
                           registry=self.request.registry,
                           request=self.request)
+
+        appstruct = {}
+        if not is_batchmode(self.request.registry):
+            appstruct[
+                'updated_resources'] = self._build_updated_resources_dict()
+
         schema = ResourceResponseSchema().bind(request=self.request,
                                                context=self.context)
-        cstruct = schema.serialize()
+        cstruct = schema.serialize(appstruct)
         return cstruct
 
 
@@ -491,6 +507,10 @@ class PoolRESTView(SimpleRESTView):
         else:
             schema = ResourceResponseSchema().bind(request=self.request,
                                                    context=resource)
+
+        if not is_batchmode(self.request.registry):
+            appstruct[
+                'updated_resources'] = self._build_updated_resources_dict()
         return schema.serialize(appstruct)
 
     def _get_first_version(self, item: IItem) -> IItemVersion:
@@ -535,9 +555,6 @@ class ItemRESTView(PoolRESTView):
                  permission='view')
     def get(self) -> dict:
         """Get resource data."""
-        response_if_blocked = self.respond_if_blocked()
-        if response_if_blocked is not None:
-            return response_if_blocked
         schema = GETItemResponseSchema().bind(request=self.request,
                                               context=self.context)
         appstruct = {}
@@ -602,7 +619,6 @@ class UsersRESTView(PoolRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IAssetsService,
-    http_cache=0,
 )
 class AssetsServiceRESTView(PoolRESTView):
 
@@ -618,7 +634,6 @@ class AssetsServiceRESTView(PoolRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IAsset,
-    http_cache=0,
 )
 class AssetRESTView(SimpleRESTView):
 
@@ -650,9 +665,6 @@ class AssetDownloadRESTView(SimpleRESTView):
                  permission='view')
     def get(self) -> dict:
         """Get asset data (unless deleted or hidden)."""
-        response_if_blocked = self.respond_if_blocked()
-        if response_if_blocked is not None:
-            return response_if_blocked
         file = retrieve_asset_file(self.context, self.request.registry)
         return file.get_response(self.context, self.request.registry)
 
@@ -1037,7 +1049,6 @@ class ReportAbuseView(RESTView):
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
-    http_cache=0,
     name='message_user',
 )
 class MessageUserView(RESTView):

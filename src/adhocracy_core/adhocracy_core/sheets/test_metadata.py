@@ -241,50 +241,14 @@ class TestVisibility:
         child.hidden = False
         assert is_hidden(child) is True
 
-    def test_view_blocked_by_metadata_not_blocked_and_no_metadata(self,
-                                                                  registry):
+    def test_view_blocked_by_metadata_no_imetadata(self, registry):
         from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource = testing.DummyResource(__provides__=IResource)
-        assert view_blocked_by_metadata(resource, registry) is None
+        assert view_blocked_by_metadata(resource, registry, 'hidden') ==\
+               {'reason': 'hidden'}
 
-    def test_view_blocked_by_metadata_blocked_but_no_metadata(self, registry):
-        from adhocracy_core.interfaces import IResource
-        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-        resource = testing.DummyResource(__provides__=IResource)
-        resource.hidden = True
-        assert view_blocked_by_metadata(resource, registry) == {'reason':
-                                                                'hidden'}
-
-    def test_view_blocked_by_metadata_not_blocked(self, resource_with_metadata,
-                                                  registry):
-        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-        result = view_blocked_by_metadata(resource_with_metadata, registry)
-        assert result is None
-
-    def test_view_blocked_by_metadata_deleted(self, resource_with_metadata,
-                                              registry):
-        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-        resource_with_metadata.deleted = True
-        result = view_blocked_by_metadata(resource_with_metadata, registry)
-        assert result['reason'] == 'deleted'
-
-    def test_view_blocked_by_metadata_hidden(self, resource_with_metadata,
-                                             registry):
-        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-        resource_with_metadata.hidden = True
-        result = view_blocked_by_metadata(resource_with_metadata, registry)
-        assert result['reason'] == 'hidden'
-
-    def test_view_blocked_by_metadata_both(self, resource_with_metadata,
-                                           registry):
-        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-        resource_with_metadata.deleted = True
-        resource_with_metadata.hidden = True
-        result = view_blocked_by_metadata(resource_with_metadata, registry)
-        assert result['reason'] == 'both'
-
-    def test_view_blocked_by_metadata_result_fields_correct(
+    def test_view_blocked_by_metadata_with_imetadata(
             self, pool_graph, resource_with_metadata, registry):
         from datetime import datetime
         from adhocracy_core.resources.principal import IUser
@@ -302,7 +266,8 @@ class TestVisibility:
         appstruct['modification_date'] = now
         metadata.set(appstruct, omit_readonly=False, send_event=False)
         resource_with_metadata.hidden = True
-        result = view_blocked_by_metadata(resource_with_metadata, registry)
+        result = view_blocked_by_metadata(resource_with_metadata, registry,
+                                          'hidden')
         assert result['modified_by'] == user
         assert result['modification_date'] == now
 

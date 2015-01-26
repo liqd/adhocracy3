@@ -1,7 +1,7 @@
 """Basic zodb persistent implementation for IResrouce."""
 from persistent import Persistent
 from zope.interface import implementer
-
+from BTrees.Length import Length
 from adhocracy_core.interfaces import resource_metadata
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.utils import get_iresource
@@ -15,6 +15,10 @@ class Base(Persistent):
 
     __parent__ = None
     __name__ = None
+
+    def __init__(self):
+        self.__changed_backrefs_counter__ = Length()
+        """Counter that should increment if backreferences are changed."""
 
     def __repr__(self):
         iface = get_iresource(self) or self.__class__

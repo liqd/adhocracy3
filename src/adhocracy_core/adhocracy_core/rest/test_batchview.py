@@ -41,7 +41,8 @@ class TestBatchView:
         return mock
 
     @fixture
-    def request(self, cornice_request, mock_invoke_subrequest):
+    def request(self, cornice_request, changelog, mock_invoke_subrequest):
+        cornice_request.registry._transaction_changelog = changelog
         cornice_request.invoke_subrequest = mock_invoke_subrequest
         cornice_request.method = 'POST'
         return cornice_request
@@ -68,7 +69,11 @@ class TestBatchView:
 
     def test_post_empty(self, context, request):
         inst = self._make_one(context, request)
-        assert inst.post() == []
+        assert inst.post() == {'responses': [],
+                               'updated_resources': {'changed_descendants': [],
+                                                     'created': [],
+                                                     'modified': [],
+                                                     'removed': []}}
 
     def test_post_successful_subrequest(self, context, request, mock_invoke_subrequest):
         request.body = self._make_json_with_subrequest_cstructs()
@@ -78,7 +83,30 @@ class TestBatchView:
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
                                                                json=paths,)
         response = inst.post()
-        assert response == [{'body': paths, 'code': 200}]
+        assert response == {'responses': [{'body': paths, 'code': 200}],
+                            'updated_resources': {'changed_descendants': [],
+                                                  'created': [],
+                                                  'modified': [],
+                                                  'removed': []}}
+
+    def test_post_successful_subrequest_with_updated_resources(
+            self, context, request, mock_invoke_subrequest):
+        request.body = self._make_json_with_subrequest_cstructs()
+        inst = self._make_one(context, request)
+        response_body = {'path': '/pool/item',
+                 'first_version_path': '/pool/item/v1',
+                 'updated_resources': {'created': ['/pool/item/v1']}}
+        mock_invoke_subrequest.return_value = DummySubresponse(
+            status_code=200, json=response_body,)
+        response = inst.post()
+        assert response == {'responses': [{'body': {'path': '/pool/item',
+                                                    'first_version_path':
+                                                        '/pool/item/v1'},
+                                           'code': 200}],
+                            'updated_resources': {'changed_descendants': [],
+                                                  'created': [],
+                                                  'modified': [],
+                                                  'removed': []}}
 
     def test_post_successful_subrequest_resolve_result_paths(self, context, request, mock_invoke_subrequest):
         cstruct1 = self._make_subrequest_cstruct(result_first_version_path='@item/v1')

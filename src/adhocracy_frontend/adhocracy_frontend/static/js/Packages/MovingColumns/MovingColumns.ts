@@ -23,7 +23,7 @@ export var movingColumns = (
 
             var maxShowWidth = 55 * fontSize;
             var minShowWidth = 35 * fontSize;
-            var collapseWidth = 3 * fontSize;
+            var collapseWidth = 2 * fontSize;
             var spacing = Math.ceil(0.3 * fontSize);
 
             var clearStates = (element) => {
@@ -159,7 +159,7 @@ export interface IMovingColumnScope extends ng.IScope {
     ctrl : MovingColumnController;
 
     // an object that can be used to share data between different parts of the column.
-    shared : {[id : string]: any};
+    shared;
 
     // key of the currently active overlay or undefined
     overlay : string;
@@ -175,7 +175,7 @@ export interface IMovingColumnScope extends ng.IScope {
 export class MovingColumnController {
     private lastId : number;
 
-    constructor(protected $timeout : ng.ITimeoutService, protected $scope : IMovingColumnScope) {
+    constructor(protected $timeout : ng.ITimeoutService, public $scope : IMovingColumnScope) {
         $scope.ctrl = this;
         $scope._alerts = {};
         $scope.shared = {};

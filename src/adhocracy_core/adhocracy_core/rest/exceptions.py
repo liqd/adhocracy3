@@ -1,16 +1,20 @@
 """Rest API exceptions."""
+import json
 import logging
+import colander
 
 from cornice.util import _JSONError
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
 from pyramid.traversal import resource_path
-import colander
+from pyramid.httpexceptions import HTTPGone
 
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.utils import log_compatible_datetime
 from adhocracy_core.utils import named_object
+from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
 
 
 logger = logging.getLogger(__name__)
@@ -65,6 +69,25 @@ def handle_error_500_exception(error, request):
     error_dict = internal_exception_to_dict(error)
     logger.exception('internal')
     return _JSONError([error_dict], 500)
+
+
+@view_config(context=HTTPGone,
+             permission=NO_PERMISSION_REQUIRED,
+             )
+def handle_error_410_exception(error, request):
+    """Add json body with explanation to 410 errors."""
+    context = request.context
+    registry = request.registry
+    reason = error.detail or ''
+    explanation = view_blocked_by_metadata(context, registry, reason)
+    schema = BlockExplanationResponseSchema().bind(request=request,
+                                                   context=context)
+    cstruct = schema.serialize(explanation)
+    error.content_type = 'application/json'
+    if cstruct['modification_date'] is colander.null:
+        cstruct['modification_date'] = ''
+    error.text = json.dumps(cstruct)
+    return error
 
 
 def internal_exception_to_dict(error: Exception) -> dict:

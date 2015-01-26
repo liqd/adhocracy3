@@ -31,9 +31,21 @@ from adhocracy_core.utils import unflatten_multipart_request
 resolver = DottedNameResolver()
 
 
+class UpdatedResourcesSchema(colander.Schema):
+
+    """List the resources affected by a transaction."""
+
+    created = Resources()
+    modified = Resources()
+    removed = Resources()
+    changed_descendants = Resources()
+
+
 class ResourceResponseSchema(ResourcePathSchema):
 
     """Data structure for responses of Resource requests."""
+
+    updated_resources = UpdatedResourcesSchema()
 
 
 class ItemResponseSchema(ResourceResponseSchema):
@@ -79,7 +91,7 @@ class BlockExplanationResponseSchema(colander.Schema):
 
     reason = SingleLine()
     modified_by = Reference()
-    modification_date = DateTime()
+    modification_date = DateTime(default=colander.null)
 
 
 class PUTResourceRequestSchema(colander.Schema):
