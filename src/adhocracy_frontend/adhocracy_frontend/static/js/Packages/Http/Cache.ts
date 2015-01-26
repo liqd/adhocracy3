@@ -52,12 +52,8 @@ export class Service {
         });
     }
 
-    private isConnected() {
-        return this.adhWebSocket.isConnected();
-    }
-
     public invalidate(path : string) : void {
-        if (this.isConnected()) {
+        if (this.adhWebSocket.isConnected()) {
             var cached = this.cache.get(path);
             if (typeof cached !== "undefined") {
                 this.adhWebSocket.unregister(path, cached.wshandle);
@@ -88,7 +84,7 @@ export class Service {
     }
 
     public invalidateAll() : void {
-        if (this.isConnected()) {
+        if (this.adhWebSocket.isConnected()) {
             _.forEach(this.cache.keys(), (key : string) => {
                 this.invalidate(key);
             });
@@ -118,7 +114,7 @@ export class Service {
      * return it.
      */
     public memoize(path, subkey, closure) {
-        if (this.isConnected()) {
+        if (this.adhWebSocket.isConnected()) {
             var cached = this.getOrSetCached(path);
 
             var promise = cached.promises[subkey];
