@@ -234,10 +234,40 @@ def test_etag_userid_without_authenticated_user(context):
     assert etag_userid(context, request) == 'None'
 
 
-def test_etag_userid_with_authenticated_user(context, request_):
+def test_etag_userid_with_authenticated_user(context):
     from . import etag_userid
     request = testing.DummyResource(authenticated_userid='userid')
     assert etag_userid(context, request) == 'userid'
+
+
+@fixture
+def context_with_counters(context):
+    from BTrees.Length import Length
+    context.__changed_descendants_counter__ = Length()
+    context.__changed_backrefs_counter__ = Length()
+    return context
+
+
+def test_etag_descendants_with_counter(context_with_counters):
+    from . import etag_descendants
+    context_with_counters.__changed_descendants_counter__.change(1)
+    assert etag_descendants(context_with_counters, None) == '1'
+
+
+def test_etag_descendants_without_counter(context):
+    from . import etag_descendants
+    assert etag_descendants(context, None) == 'None'
+
+
+def test_etag_backrefs_with_counter(context_with_counters):
+    from . import etag_backrefs
+    context_with_counters.__changed_backrefs_counter__.change(1)
+    assert etag_backrefs(context_with_counters, None) == '1'
+
+
+def test_etag_changed_backrefs_without_counter(context):
+    from . import etag_backrefs
+    assert etag_backrefs(context, None) == 'None'
 
 
 class TestHTTPCacheStrategyWeakAdapter:

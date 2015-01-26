@@ -185,14 +185,18 @@ class HTTPCacheStrategyBaseAdapter:
 def etag_backrefs(context: IResource, request: IRequest) -> str:
     """Return changed backrefs counter value."""
     changed_backrefs = getattr(context, '__changed_backrefs_counter__', None)
-    return str(changed_backrefs)
+    if changed_backrefs is not None:
+        return str(changed_backrefs())
+    return str(None)
 
 
 def etag_descendants(context: IResource, request: IRequest) -> str:
     """Return changed descendants counter value."""
     changed_descendants = getattr(context, '__changed_descendants_counter__',
                                   None)
-    return str(changed_descendants)
+    if changed_descendants is not None:
+        return str(changed_descendants())
+    return str(None)
 
 
 def etag_modified(context: IResource, request: IRequest) -> str:
