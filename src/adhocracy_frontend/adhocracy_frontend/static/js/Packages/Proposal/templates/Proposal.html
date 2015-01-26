@@ -9,15 +9,15 @@
             <div class="buttons_box">
                 <button type="button" class="edit_button" data-ng-click="edit()">{{ "edit" | translate }}</button>
                 <button type="button" class="close_button" data-ng-click="list()">{{ "close" | translate }}</button>
-                <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</a>
+                <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
             </div>
             <h1>{{content.data['adhocracy_core.sheets.document.IDocument'].title}}</h1>
             <p><em>{{content.data['adhocracy_core.sheets.document.IDocument'].description}}</em></p>
             {{ "author" | translate }}:
-            <adh-user-meta data-path="{{content.data['adhocracy_core.sheets.metadata.IMetadata'].creator}}"</adh-user-meta>
+            <adh-user-meta data-path="{{content.data['adhocracy_core.sheets.metadata.IMetadata'].creator}}"></adh-user-meta>
         </div>
         <div data-ng-switch-when="edit">
-            <input type="text" name="title" class="m-title" data-ng-model="content.data['adhocracy_core.sheets.document.IDocument'].title" placeholder="{{ 'title' | translate }}"></input>
+            <input type="text" name="title" class="m-title" data-ng-model="content.data['adhocracy_core.sheets.document.IDocument'].title" placeholder="{{ 'title' | translate }}" />
             <textarea data-msd-elastic="" name="description" data-ng-model="content.data['adhocracy_core.sheets.document.IDocument'].description" placeholder="{{ 'description' | translate }}"></textarea>
         </div>
         <div data-ng-switch-default="">
