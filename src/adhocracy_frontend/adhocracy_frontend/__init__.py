@@ -119,7 +119,7 @@ def includeme(config):
     config.include('pyramid_cachebust')
     config.include('pyramid_mako')
     if config.get_settings()['cachebust.enabled'] == 'true':
-        cache_max_age = 36000
+        cache_max_age = 30 * 24 * 60 * 60  # 30 days
     else:
         cache_max_age = 0
     config.add_route('config_json', 'config.json')
