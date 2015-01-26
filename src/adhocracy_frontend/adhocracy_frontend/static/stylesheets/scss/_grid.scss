@@ -1,3 +1,7 @@
 // http://susydocs.oddbird.net/en/latest/settings/
 
-// use default susy settings for now.
+$susy: (
+  columns: 12,
+  gutters: .1,
+  math: fluid,
+);
