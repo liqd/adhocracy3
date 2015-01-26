@@ -68,7 +68,8 @@ export class Service {
     private connected : boolean;
     private ws : IRawWebSocket;
     private registrations : {[path : string] : number};
-    private eventHandler : AdhEventHandler.EventHandler;
+    private pathEventHandler : AdhEventHandler.EventHandler;
+    private rawEventHandlers : AdhEventHandler.EventHandler;
 
     constructor(
         private adhConfig : AdhConfig.IService,
@@ -76,20 +77,29 @@ export class Service {
         rawWebSocketFactory : (uri : string) => IRawWebSocket
     ) {
         this.connected = false;
-        this.eventHandler = new adhEventHandlerClass();
+        this.pathEventHandler = new adhEventHandlerClass();
         this.registrations = {};
 
-        this.ws = rawWebSocketFactory(adhConfig.ws_url);
-        this.ws.onmessage = this.onmessage.bind(this);
-        this.ws.onerror = this.onerror.bind(this);
+        this.rawEventHandlers = new adhEventHandlerClass();
 
+        this.ws = rawWebSocketFactory(adhConfig.ws_url);
+        this.ws.onmessage = (ev) => {
+            this.onmessage(ev);
+            this.pathEventHandler.trigger("message", ev);
+        };
+        this.ws.onerror = (ev) => {
+            this.onerror(ev);
+            this.pathEventHandler.trigger("error", ev);
+        };
         this.ws.onopen = (ev) => {
             this.resendSubscriptions();
             this.connected = true;
+            this.pathEventHandler.trigger("open", ev);
         };
-        this.ws.addEventListener("close", () => {
+        this.ws.onclose = (ev) => {
             this.connected = false;
-        });
+            this.pathEventHandler.trigger("close", ev);
+        };
     }
 
     public isConnected() {
@@ -103,22 +113,22 @@ export class Service {
         } else {
             this.registrations[path] += 1;
         }
-        return this.eventHandler.on(path, callback);
+        return this.pathEventHandler.on(path, callback);
     }
 
     public unregister(path : string, id : number) : void {
         if (!this.registrations[path]) {
             throw "resource is not registered";
         }
-        this.eventHandler.off(path, id);
+        this.pathEventHandler.off(path, id);
         this.registrations[path] -= 1;
         if (this.registrations[path] === 0) {
             this.send("unsubscribe", path);
         }
     }
 
-    public addEventListener(event : string, callback : () => void) : void {
-        this.ws.addEventListener(event, callback);
+    public addEventListener(event : string, callback : () => void) : number {
+        return this.rawEventHandlers.on(event, callback);
     }
 
     private resendSubscriptions() : void {
@@ -139,7 +149,7 @@ export class Service {
         var msg : IServerMessage = JSON.parse(event.data);
 
         if (msg.hasOwnProperty("event")) {
-            this.eventHandler.trigger(msg.resource, <IServerEvent>msg);
+            this.pathEventHandler.trigger(msg.resource, <IServerEvent>msg);
         } else if (msg.hasOwnProperty("error")) {
             this.handleErrorResponse(<IResponseError>msg);
         }

@@ -18,7 +18,7 @@ export var register = () => {
         describe("Service", () => {
             var service;
             var adhEventHandlerClassMock;
-            var adhEventHandlerMock;
+            var adhEventHandlerMocks;
             var adhRawWebSocketMock;
 
             beforeEach(() => {
@@ -26,10 +26,10 @@ export var register = () => {
                     this.on = jasmine.createSpy("adhEventHandler.on");
                     this.off = jasmine.createSpy("adhEventHandler.off");
                     this.trigger = jasmine.createSpy("adhEventHandler.trigger");
-                    adhEventHandlerMock = this;
+                    adhEventHandlerMocks.push(this);
                 };
                 adhRawWebSocketMock = jasmine.createSpyObj("adhRawWebSocketFactory", ["send", "addEventListener"]);
-
+                adhEventHandlerMocks = [];
                 service = new AdhWebSocket.Service(config, adhEventHandlerClassMock, () => adhRawWebSocketMock);
             });
 
@@ -79,7 +79,7 @@ export var register = () => {
                 adhRawWebSocketMock.onmessage({
                     data: JSON.stringify(msg)
                 });
-                expect(adhEventHandlerMock.trigger).toHaveBeenCalledWith(resource, msg);
+                expect(adhEventHandlerMocks[0].trigger).toHaveBeenCalledWith(resource, msg);
             });
 
             it("throws an exception on error", () => {
@@ -95,7 +95,7 @@ export var register = () => {
                     })
                 })).toThrow();
 
-                expect(adhEventHandlerMock.trigger).not.toHaveBeenCalled();
+                expect(adhEventHandlerMocks[0].trigger).not.toHaveBeenCalled();
             });
 
             it("resends all subscriptions on WebSocket open", () => {
