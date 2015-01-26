@@ -244,6 +244,8 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
                     $scope.selectedState = "";
                 } else if (userUrl === $scope.path) {
                     $scope.selectedState = "is-selected";
+                } else {
+                    $scope.selectedState = "is-not-selected";
                 }
             });
         }]
