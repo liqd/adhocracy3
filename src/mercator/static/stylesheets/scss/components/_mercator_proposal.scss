@@ -89,6 +89,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
             background: white;
             text-decoration: underline;
         }
+
+        &:first-child {
+            padding-top: 1px;
+        }
     }
 
     a {
