@@ -195,19 +195,11 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                         $scope.isAnonymous = false;
-
-                        if (typeof $scope.name !== "undefined") {
-                            $scope.userBasic.name = $scope.name;
-                        };
                     });
             } else {
                 $translate("guest").then((translated) => {
                     $scope.userBasic = {
                         name: translated
-                    };
-
-                    if (typeof $scope.name !== "undefined") {
-                        $scope.userBasic.name = $scope.name;
                     };
                 });
                 $scope.isAnonymous = true;

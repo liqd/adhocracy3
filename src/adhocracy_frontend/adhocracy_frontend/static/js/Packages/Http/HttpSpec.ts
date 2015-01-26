@@ -88,6 +88,7 @@ export var register = () => {
             var $timeoutMock;
             var adhMetaApiMock;
             var adhConfigMock;
+            var adhCacheMock;
             var adhHttp : AdhHttp.Service<any>;
 
             beforeEach(() => {
@@ -96,7 +97,14 @@ export var register = () => {
                 $timeoutMock = mkTimeoutMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
                 adhConfigMock = { rest_url: "" };
-                adhHttp = new AdhHttp.Service($httpMock, <any>q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock);
+                adhCacheMock = {
+                    invalidate: (path) => undefined,
+                    invalidateAll: () => undefined,
+                    invalidateUpdated: (updated, posted) => undefined,
+                    memoize: (path, subkey, closure) => closure()
+                };
+                adhHttp = new AdhHttp.Service(
+                    $httpMock, <any>q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock, adhCacheMock);
             });
 
             describe("options", () => {
@@ -505,11 +513,11 @@ export var register = () => {
                 });
 
                 it("maps preliminary data to responses via `index`", () => {
-                    expect(response.postedResources[get.index].path).toBe("get response");
-                    expect(response.postedResources[put.index].path).toBe("put response");
-                    expect(response.postedResources[post1.index].path).toBe("post1 response");
-                    expect(response.postedResources[post2.index].path).toBe("post2 response");
-                    expect(response.postedResources[get2.index].path).toBe("get2 response");
+                    expect(response[get.index].path).toBe("get response");
+                    expect(response[put.index].path).toBe("put response");
+                    expect(response[post1.index].path).toBe("post1 response");
+                    expect(response[post2.index].path).toBe("post2 response");
+                    expect(response[get2.index].path).toBe("get2 response");
                 });
 
                 it("throws if you try to use the transaction after commit", () => {

@@ -9,6 +9,7 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
  */
 export interface IRawWebSocket {
     send : (msg : string) => void;
+    addEventListener : (event : any, callback : () => void) => void;
     onmessage? : (event : any) => void;
     onerror? : (event : any) => void;
     onopen? : (event : any) => void;
@@ -64,22 +65,45 @@ interface IServerMessage extends IResponseOk, IResponseError, IServerEvent {};
 export class Service {
     "use strict";
 
+    private connected : boolean;
     private ws : IRawWebSocket;
     private registrations : {[path : string] : number};
-    private eventHandler : AdhEventHandler.EventHandler;
+    private messageEventHandler : AdhEventHandler.EventHandler;
+    private domEventHandler : AdhEventHandler.EventHandler;
 
     constructor(
         private adhConfig : AdhConfig.IService,
         private adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
         rawWebSocketFactory : (uri : string) => IRawWebSocket
     ) {
-        this.eventHandler = new adhEventHandlerClass();
+        this.connected = false;
+        this.messageEventHandler = new adhEventHandlerClass();
         this.registrations = {};
 
+        this.domEventHandler = new adhEventHandlerClass();
+
         this.ws = rawWebSocketFactory(adhConfig.ws_url);
-        this.ws.onmessage = this.onmessage.bind(this);
-        this.ws.onerror = this.onerror.bind(this);
-        this.ws.onopen = this.resendSubscriptions.bind(this);
+        this.ws.onmessage = (ev) => {
+            this.onmessage(ev);
+            this.domEventHandler.trigger("message", ev);
+        };
+        this.ws.onerror = (ev) => {
+            this.onerror(ev);
+            this.domEventHandler.trigger("error", ev);
+        };
+        this.ws.onopen = (ev) => {
+            this.resendSubscriptions();
+            this.connected = true;
+            this.domEventHandler.trigger("open", ev);
+        };
+        this.ws.onclose = (ev) => {
+            this.connected = false;
+            this.domEventHandler.trigger("close", ev);
+        };
+    }
+
+    public isConnected() {
+        return this.connected;
     }
 
     public register(path : string, callback : (msg : IServerEvent) => void) : number {
@@ -89,18 +113,22 @@ export class Service {
         } else {
             this.registrations[path] += 1;
         }
-        return this.eventHandler.on(path, callback);
+        return this.messageEventHandler.on(path, callback);
     }
 
     public unregister(path : string, id : number) : void {
         if (!this.registrations[path]) {
             throw "resource is not registered";
         }
-        this.eventHandler.off(path, id);
+        this.messageEventHandler.off(path, id);
         this.registrations[path] -= 1;
         if (this.registrations[path] === 0) {
             this.send("unsubscribe", path);
         }
+    }
+
+    public addEventListener(event : string, callback : () => void) : number {
+        return this.domEventHandler.on(event, callback);
     }
 
     private resendSubscriptions() : void {
@@ -121,7 +149,7 @@ export class Service {
         var msg : IServerMessage = JSON.parse(event.data);
 
         if (msg.hasOwnProperty("event")) {
-            this.eventHandler.trigger(msg.resource, <IServerEvent>msg);
+            this.messageEventHandler.trigger(msg.resource, <IServerEvent>msg);
         } else if (msg.hasOwnProperty("error")) {
             this.handleErrorResponse(<IResponseError>msg);
         }
