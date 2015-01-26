@@ -92,6 +92,8 @@ def root_view(request):
                 ],
          'meta_api': '/static/meta_api.json%s' % (
              '?' + query_params if query_params else ''),
+         'config': '/config.json%s' % (
+             '?' + query_params if query_params else ''),
          },
         request=request)
     response = Response(result)
@@ -116,8 +118,13 @@ def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config.include('pyramid_cachebust')
     config.include('pyramid_mako')
+    if config.get_settings()['cachebust.enabled'] == 'true':
+        cache_max_age = 36000
+    else:
+        cache_max_age = 0
     config.add_route('config_json', 'config.json')
-    config.add_view(config_view, route_name='config_json', renderer='json')
+    config.add_view(config_view, route_name='config_json', renderer='json',
+                    http_cache=(cache_max_age, {'public': True}))
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')
@@ -130,10 +137,6 @@ def includeme(config):
     # AdhocracySDK shall not be cached the way other static files are cached
     config.add_route('adhocracy_sdk', 'AdhocracySDK.js')
     config.add_view(adhocracy_sdk_view, route_name='adhocracy_sdk')
-    if config.get_settings()['cachebust.enabled'] == 'true':
-        cache_max_age = 36000
-    else:
-        cache_max_age = 0
     config.add_static_view('static', 'adhocracy_frontend:build/',
                            cache_max_age=cache_max_age)
     config.add_subscriber(add_cors_headers_subscriber, NewResponse)
