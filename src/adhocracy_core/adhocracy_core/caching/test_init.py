@@ -384,14 +384,14 @@ class TestIntegrationCaching:
 
     def test_strategy_not_modified_if_none_match_request(self, app_user):
         resp = app_user.get('/', status=304, headers={'If-None-Match':
-                                                      'None|None|None|None'})
+                                                      'None|None|None|None|None'})
         assert resp.status == '304 Not Modified'
 
     def test_strategy_ok_if_none_match_request_without_etag(self, app_user):
         from adhocracy_core.caching import HTTPCacheStrategyWeakAdapter
         HTTPCacheStrategyWeakAdapter.etags = tuple()  # braking test isolation
         resp = app_user.get('/', status=200, headers={'If-None-Match':
-                                                      'None|None|None|None'})
+                                                      'None|None|None|None|None'})
         assert resp.status == '200 OK'
 
 
