@@ -53,13 +53,11 @@ export class Service {
     }
 
     public invalidate(path : string) : void {
-        if (this.adhWebSocket.isConnected()) {
-            var cached = this.cache.get(path);
-            if (typeof cached !== "undefined") {
-                this.adhWebSocket.unregister(path, cached.wshandle);
-                this.cache.remove(path);
-                if (this.debug) { console.log("invalidate: " + path); };
-            }
+        var cached = this.cache.get(path);
+        if (typeof cached !== "undefined") {
+            this.adhWebSocket.unregister(path, cached.wshandle);
+            this.cache.remove(path);
+            if (this.debug) { console.log("invalidate: " + path); };
         }
     }
 
@@ -84,11 +82,9 @@ export class Service {
     }
 
     public invalidateAll() : void {
-        if (this.adhWebSocket.isConnected()) {
-            _.forEach(this.cache.keys(), (key : string) => {
-                this.invalidate(key);
-            });
-        }
+        _.forEach(this.cache.keys(), (key : string) => {
+            this.invalidate(key);
+        });
     }
 
     private getOrSetCached(path : string) : IHttpCacheItem {
