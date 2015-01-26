@@ -45,8 +45,6 @@ textarea {
     select,
     textarea {
         &.ng-invalid, &:invalid, &.is-invalid {
-            // scss-lint:disable NestingDepth
-
             @extend %error-spacing;
         }
     }
