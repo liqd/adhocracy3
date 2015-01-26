@@ -18,9 +18,10 @@
     }
 
     .facet-item {
-        cursor: pointer;
         line-height: 1;
         margin-bottom: 1em;
+        color: inherit;
+        text-decoration: inherit;
 
         &:hover, &:focus {
             color: $color-text-highlight-normal;
