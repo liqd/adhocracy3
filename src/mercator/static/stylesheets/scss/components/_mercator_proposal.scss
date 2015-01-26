@@ -138,9 +138,17 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         vertical-align: middle;
     }
 
+    &.mercator-propsal-list-item-meta-item-total-comments,
+    &.mercator-propsal-detail-meta-item-total-comments {
+        i {
+            color: $color-brand-three-normal;
+        }
+    }
+
     &.mercator-propsal-list-item-meta-item-supporters,
     &.mercator-propsal-detail-meta-item-total-supporters {
         i {
+            color: $color-brand-one-normal;
             font-size: 200%;
             vertical-align: text-top;
         }
@@ -185,6 +193,12 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
 .mercator-proposal-detail-meta {
     padding-bottom: 1.66666666em;
+
+    .mercator-propsal-detail-meta-item-total-comments {
+        i {
+            color: $color-text-highlight-introvert;
+        }
+    }
 }
 
 .mercator-proposal-detail-cover {
@@ -281,28 +295,17 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item {
     @include container;
-    background: $color-background-base-introvert;
     border-bottom: 2px solid $color-structure-normal;
     font-size: $font-size-plus;
     line-height: 1;
     padding: 1em 1.25em 1.125em 0.875em;
 
-    i[class*=icon-],
-    .mercator-propsal-list-item-meta-item-budget {
-        color: $color-text-highlight-introvert;
-    }
+    &.is-not-selected {
+        background: $color-background-base-introvert;
 
-    &.is-selected {
-        background: white;
-
-        .mercator-propsal-list-item-meta-item-total-comments i,
-        .mercator-propsal-detail-meta-item-total-comments i {
-            color: $color-brand-three-normal;
-        }
-
-        .mercator-propsal-list-item-meta-item-supporters i,
-        .mercator-propsal-detail-meta-item-total-supporters i {
-            color: $color-brand-one-normal;
+        i[class*=icon-],
+        .mercator-propsal-list-item-meta-item-budget {
+            color: $color-text-highlight-introvert;
         }
     }
 }
