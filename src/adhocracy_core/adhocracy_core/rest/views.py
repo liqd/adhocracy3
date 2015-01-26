@@ -651,7 +651,6 @@ class AssetRESTView(SimpleRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IAssetDownload,
-    http_cache=3600,  # FIXME how long should assets be cached?
 )
 class AssetDownloadRESTView(SimpleRESTView):
 
@@ -666,7 +665,15 @@ class AssetDownloadRESTView(SimpleRESTView):
     def get(self) -> dict:
         """Get asset data (unless deleted or hidden)."""
         file = retrieve_asset_file(self.context, self.request.registry)
-        return file.get_response(self.context, self.request.registry)
+        response = file.get_response(self.context, self.request.registry)
+        self.ensure_caching_headers(response)
+        return response
+
+    def ensure_caching_headers(self, response):
+        """Ensure cache headers for custom `response` objects."""
+        response.cache_control = self.request.response.cache_control
+        response.etag = self.request.response.etag
+        response.last_modified = self.request.response.last_modified
 
     def put(self) -> dict:
         raise HTTPMethodNotAllowed()

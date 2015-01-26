@@ -1418,6 +1418,30 @@ class TestAssetDownloadRESTView:
         from adhocracy_core.rest.views import AssetDownloadRESTView
         return AssetDownloadRESTView(context, request_)
 
+    def test_get_ensure_caching_headers_called(self, monkeypatch, request_,
+                                               context):
+        from adhocracy_core.rest import views
+        mock_file = Mock()
+        mock_retrieve = Mock(return_value=mock_file)
+        mock_response = Mock()
+        mock_file.get_response = Mock(return_value=mock_response)
+        monkeypatch.setattr(views, 'retrieve_asset_file', mock_retrieve)
+        inst = self.make_one(context, request_)
+        inst.ensure_caching_headers = Mock()
+        inst.get()
+        assert inst.ensure_caching_headers.called
+
+    def test_ensure_caching_headers(self, context, request_):
+        inst = self.make_one(context, request_)
+        request_.response = testing.DummyResource(cache_control='cache_control',
+                                                  etag='etag',
+                                                  last_modified='last_modified')
+        response = testing.DummyResource()
+        inst.ensure_caching_headers(response)
+        assert response.last_modified == 'last_modified'
+        assert response.etag == 'etag'
+        assert response.cache_control == 'cache_control'
+
     def test_get_valid_with_sheets(self, monkeypatch, request_, context):
         from adhocracy_core.rest import views
         mock_file = Mock()
