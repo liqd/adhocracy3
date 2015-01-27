@@ -92,10 +92,24 @@ rate-difference has the is-positive state. Can be is-negative.
 
 .rate {
     a {
+        color: $color-text-highlight-introvert;
+    }
+
+    .rate-pro {
         &.is-rate-button-active,
         &:hover,
-        &:focus {
-            color: $color-text-highlight-normal;
+        &:focus,
+        &:active {
+            color: $color-function-valid;
+        }
+    }
+
+    .rate-contra {
+        &.is-rate-button-active,
+        &:hover,
+        &:focus,
+        &:active {
+            color: $color-brand-three-normal;
         }
     }
 

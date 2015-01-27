@@ -215,8 +215,7 @@ parent: comment
 
     .comment-header-creator,
     .comment-header-date,
-    .comment-header-links,
-    .rate {
+    .comment-header-links {
         a, a:hover, a:focus, a:active {
             @include disguised-link;
         }
