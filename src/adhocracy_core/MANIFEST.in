@@ -1,2 +1,2 @@
 include *.txt *.ini *.cfg *.rst
-recursive-include adhocracy *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
+recursive-include adhocracy_core *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
