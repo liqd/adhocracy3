@@ -36,6 +36,7 @@ export var register = (angular, config, meta_api) => {
         var adhMetaApi : AdhMetaApi.MetaApiQuery;
         var adhPreliminaryNames : AdhPreliminaryNames.Service;
         var adhHttp : AdhHttp.Service<any>;
+        var adhCache;
         var adhUser : AdhUser.Service;
 
         var _proposalVersion : RIProposalVersion;
@@ -70,6 +71,7 @@ export var register = (angular, config, meta_api) => {
                 ) => {
                     return (new AdhUser.Service(
                         adhHttp,
+                        adhCache,
                         $q,
                         $http,
                         $rootScope,
