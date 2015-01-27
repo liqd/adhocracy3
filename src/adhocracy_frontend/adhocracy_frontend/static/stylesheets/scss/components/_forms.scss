@@ -318,7 +318,7 @@ This error concerns a single input.
 ---
 title: Form footer
 name: form-footer
-parent: widgets
+category: Inputs
 ---
 
 A generic form footer containing one CTA and a regular button
@@ -329,7 +329,7 @@ A generic form footer containing one CTA and a regular button
     <input
         type="submit"
         value="Submit"
-        class="m-call-to-actionform-footer-button-cta" />
+        class="m-call-to-action form-footer-button-cta" />
     <a href="" class="button form-footer-button">Cancel</a>
 </footer>
 ```
