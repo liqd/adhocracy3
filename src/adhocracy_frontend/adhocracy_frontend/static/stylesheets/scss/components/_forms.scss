@@ -313,3 +313,16 @@ This error concerns a single input.
 </div>
 ```
 */
+
+.form-footer {
+    border-top: 2px solid $color-structure-normal;
+    padding: 1em;
+
+    .form-footer-button-cta {
+        float: right;
+    }
+
+    .form-footer-button {
+        float: left;
+    }
+}
