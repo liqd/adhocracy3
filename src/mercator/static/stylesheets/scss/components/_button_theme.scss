@@ -4,13 +4,13 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
-
+    $button-height: 24/14;
     border: 0;
     color: $color-text-highlight-introvert;
     font-size: $font-size-normal;
     font-weight: $font-weight-normal;
-    line-height: 24 / 14;
-    height: 24 / 14 * 1em;
+    line-height: $button-height;
+    height: $button-height * 1em;
     text-transform: uppercase;
     min-width: 1px;
 
@@ -42,7 +42,7 @@ input[type="button"] {
     }
 
     &.m-call-to-action2 {
-        border: 2px solid $color-text-highlight-normal;
+        outline: 2px solid $color-text-highlight-normal;
 
         &:hover, &:focus {
             color: white;
