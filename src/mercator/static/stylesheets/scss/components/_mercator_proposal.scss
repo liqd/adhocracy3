@@ -123,6 +123,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     padding: 0 1em;
 }
 
+.mercator-proposal-form-footer {
+    border-top: 2px solid $color-structure-normal;
+}
+
 .mercator-proposal-detail-view {
     @include container;
 }
