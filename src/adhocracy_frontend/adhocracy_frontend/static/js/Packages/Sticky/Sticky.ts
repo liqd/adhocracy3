@@ -11,9 +11,7 @@ export var createDirective = (Modernizr : ModernizrStatic) => {
                 element.addClass("sticky");
             } else {
                 element.stick_in_parent({
-                    scrolling_parent: ".moving-column-body",
-                    recalc_every: 2000,
-                    bottoming: false
+                    scrollable: ".moving-column-body"
                 });
             }
         }
