@@ -1,3 +1,4 @@
+include RELEASE-VERSION version.py
 recursive-include src/mercator/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.ico *.jpg *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
 global-exclude *Ig.js

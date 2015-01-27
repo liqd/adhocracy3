@@ -1,5 +1,6 @@
 """"Adhocracy meta package for Mercator."""
 import os
+import version
 
 from setuptools import setup, find_packages
 
@@ -21,7 +22,7 @@ debug_requires = ['adhocracy_mercator[debug]',
 
 
 setup(name='mercator',
-      version='0.0.3',
+      version=version.get_git_version(),
       description='Adhocracy backend/frontend server for Mercator.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=["Programming Language :: Python",
