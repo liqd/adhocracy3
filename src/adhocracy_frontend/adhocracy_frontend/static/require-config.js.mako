@@ -30,7 +30,7 @@ require.config({
         angularElastic: "../lib/angular-elastic/elastic",
         angularScroll: "../lib/angular-scroll/angular-scroll.min",
         angularFlow: "../lib/ng-flow/dist/ng-flow",
-        angularMessages: "../lib/angular-messages/angular-messages.min",        
+        angularMessages: "../lib/angular-messages/angular-messages.min",
         flow: "../lib/flow.js/dist/flow",
         lodash: "../lib/lodash/dist/lodash",
         q: "../lib/q/q",
@@ -39,7 +39,7 @@ require.config({
         sticky: "../lib/sticky-kit/jquery.sticky-kit",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
         adhTemplates: "./templates",
-        polyfiller: "../lib/webshim/js-webshim/minified/polyfiller",
+        polyfiller: "../lib/webshim/js-webshim/minified/polyfiller"
     },
     shim: {
         jquery: {
