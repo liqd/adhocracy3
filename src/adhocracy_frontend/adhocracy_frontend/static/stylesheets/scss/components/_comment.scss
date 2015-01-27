@@ -251,11 +251,10 @@ parent: comment
 
 .comment-create-form {
     @include clearfix;
-    padding-bottom: 1em;
 }
 
 .comment-create-form-text {
-    margin-bottom: 0.45em;
+    margin-bottom: 1em;
 }
 
 /*doc

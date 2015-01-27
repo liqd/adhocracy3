@@ -1,7 +1,11 @@
 .listing-create-form {
     background-color: $color-structure-normal;
-    padding: 1em 1em 0.8em;
+    padding: 1em;
     overflow: hidden;
+
+    .form-footer {
+        padding: 0;
+    }
 }
 
 .comment-create-form-text {
