@@ -62,14 +62,15 @@ is selected, no state is applied.
     &:last-child {
         margin-bottom: 0;
     }
-
-    .comment-create-form-text {
-        background: $color-structure-normal;
-    }
 }
 
 .comment-content {
     line-height: 1.15;
+}
+
+.comment-children-create-form {
+    @extend .listing-create-form;
+    background: $color-background-base-introvert;
 }
 
 /*doc
