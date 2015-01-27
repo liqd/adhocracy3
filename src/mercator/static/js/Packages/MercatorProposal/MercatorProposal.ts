@@ -714,7 +714,6 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     }
 
     public link(scope, element, attrs, wrapper) {
-        var _self = this;
         var instance = super.link(scope, element, attrs, wrapper);
         instance.scope.data = <any>{};
         instance.scope.$watch("$viewContentLoaded", function() {
@@ -723,13 +722,15 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
                 $(".has-input-buttons").removeClass( "has-input-buttons").css({"display" : "inline-block"});
             }
         });
+        // Fix for later, if we want to add a webshim datepicker
+        /*var _self = this;
         instance.scope.$watch("data.organization_info.status_enum", function() {
             if (!Modernizr.inputtypes.date) {
                 _self.$timeout(() => {
                     element.find(":input[type='date']").updatePolyfill();
-                    });
+                });
             }
-        });
+        });*/
         return instance;
     }
 

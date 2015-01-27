@@ -80,6 +80,6 @@ require.config({
         },
         sticky: {
             deps: ["jquery"]
-        },
+        }
     }
 });

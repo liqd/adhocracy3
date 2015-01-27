@@ -174,11 +174,18 @@
                                 {{ "Please enter your organization country" | translate }}</span>
 
                             <input
-                                type="date"
+                                type="text"
                                 data-ng-model="data.organization_info.date_of_foreseen_registration"
                                 name="organization-info-date-of-foreseen-registration"
-                                placeholder="{{ 'Date of foreseen registration' | translate }}"
+                                data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
+                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)' | translate }}"
                                 required="required" />
+
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
+                                'pattern')">
+                                {{ "Please enter a valid date" | translate }}</span>
 
                             <span
                                 class="input-error"
