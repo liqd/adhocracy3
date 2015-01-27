@@ -6,7 +6,7 @@
     }
 
     .facet {
-        margin-bottom: 50 / 14 * 1em;
+        margin-bottom: 50px / $font-size-normal * 1em;
     }
 
     .facet-header {
@@ -14,7 +14,7 @@
         font-size: $font-size-small;
         font-weight: $font-weight-normal;
         line-height: 1.15;
-        margin: 0 0 20 / 14 * 1em;
+        margin: 0 0 (20px / $font-size-normal * 1em);
     }
 
     .facet-item {
