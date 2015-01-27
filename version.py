@@ -69,6 +69,7 @@ def write_release_version(version):
 def get_git_version(abbrev=4):
     """Try to get version from git and fallback to file. """
     # Read in the version that's currently in RELEASE-VERSION.
+
     release_version = read_release_version()
 
     # First try to get the current version using “git describe”.
