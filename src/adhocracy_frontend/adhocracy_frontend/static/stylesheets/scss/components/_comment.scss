@@ -52,12 +52,13 @@ is selected, no state is applied.
 
     .comment {
         @include triangle-tl;
+        padding-right: 0;
     }
 }
 
 .comment {
     margin-bottom: 2em;
-    padding-left: 0.95em;
+    padding: 0 1em;
 
     &:last-child {
         margin-bottom: 0;
@@ -195,7 +196,8 @@ parent: comment
 .comment-header {
     @include clearfix;
     @include text(introvert);
-    margin-bottom: 0.3em;
+    font-size: $font-size-small;
+    margin-bottom: 10px / $font-size-small * 1em;
 
     .comment-header-icon {
         @include border-radius(50%);
@@ -223,14 +225,19 @@ parent: comment
 
         a {
             color: $color-text-highlight-normal;
+            padding-right: 3px;
         }
     }
 
+    .comment-header-date {
+        padding-left: 3px;
+    }
+
     .comment-header-links {
-        padding-right: 2em;
+        padding-right: 20px / $font-size-small * 1em;
 
         a {
-            margin-left: 1em;
+            margin-left: 14px / $font-size-small * 1em;
         }
     }
 
