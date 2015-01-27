@@ -314,7 +314,29 @@ This error concerns a single input.
 ```
 */
 
+/*doc
+---
+title: Form footer
+name: form-footer
+parent: widgets
+---
+
+A generic form footer containing one CTA and a regular button
+
+```html_example
+
+<footer class="form-footer">
+    <input
+        type="submit"
+        value="Submit"
+        class="m-call-to-actionform-footer-button-cta" />
+    <a href="" class="button form-footer-button">Cancel</a>
+</footer>
+```
+*/
+
 .form-footer {
+    @include clearfix;
     border-top: 2px solid $color-structure-normal;
     padding: 1em;
 
