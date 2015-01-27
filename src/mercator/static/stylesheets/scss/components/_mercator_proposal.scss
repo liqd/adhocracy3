@@ -16,17 +16,26 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         padding-bottom: 0.8em;
     }
 
+    .form-inline label {
+        @include inline-block;
+        padding-right: 1em;
+    }
+
     fieldset {
         border: 0;
         padding: 0 0 0 1.6em;
     }
 
     .annotated-section {
-        width: 100% * 1 / 0.6289;
+        width: 157.5%;
 
         .annotated-section-annotation {
             background-color: $color-background-base-introvert;
         }
+    }
+
+    .m-call-to-action2 {
+        width: 100%;
     }
 }
 
@@ -35,18 +44,21 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-annotation {
+    padding: 1em;
     position: relative;
     z-index: 1;
 }
 
 .mercator-proposal-form-subheading,
 .mercator-proposal-form-heading,
-.mercator-proposal-form-sub-subheading {
+.mercator-proposal-form-sub-subheading,
+.mercator-proposal-form-annotation-heading {
     @include text(functional);
     margin: 0 0 0.8em;
 }
 
-.mercator-proposal-form-heading {
+.mercator-proposal-form-heading,
+.mercator-proposal-form-annotation-heading {
     border: 1px solid $color-structure-normal;
     border-width: 1px 0;
     font-weight: bold;
@@ -57,6 +69,13 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     &.active {
         color: $color-text-highlight-normal;
     }
+}
+
+.mercator-proposal-form-annotation-heading {
+    background: $color-background-base;
+    font-weight: normal;
+    margin: -0.8751em -0.8751em 0.8751em;
+    text-transform: uppercase;
 }
 
 .mercator-proposal-form-sub-subheading {
@@ -88,6 +107,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         &.active {
             background: white;
             text-decoration: underline;
+        }
+
+        &:first-child {
+            padding-top: 1px;
         }
     }
 
