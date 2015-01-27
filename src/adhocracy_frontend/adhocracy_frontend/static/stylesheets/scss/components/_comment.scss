@@ -47,8 +47,7 @@ is selected, no state is applied.
 ```
 */
 .comment-children {
-    margin-top: 0.6em;
-    border-left: 0.0833em solid $color-brand-one-normal;
+    border-left: 1px solid $color-brand-one-normal;
 
     .comment {
         @include triangle-tl;
@@ -67,6 +66,10 @@ is selected, no state is applied.
     .comment-create-form-text {
         background: $color-structure-normal;
     }
+}
+
+.comment-content {
+    line-height: 1.15;
 }
 
 /*doc
@@ -142,7 +145,7 @@ parent: comment
 */
 
 .comment-main {
-    padding-bottom: 1em;
+    padding-bottom: 20px / $font-size-normal * 1em;
 }
 
 .comment-title,
@@ -198,6 +201,7 @@ parent: comment
     @include text(introvert);
     font-size: $font-size-small;
     margin-bottom: 10px / $font-size-small * 1em;
+    padding-top: 3px / $font-size-small * 1em;
 
     .comment-header-icon {
         @include border-radius(50%);
@@ -222,10 +226,19 @@ parent: comment
         &:after {
             content: "|";
         }
+    }
 
-        a {
-            color: $color-text-highlight-normal;
-            padding-right: 3px;
+
+    .comment-header-creator a {
+        color: $color-text-highlight-normal;
+        padding-right: 3px;
+
+        &:hover, &:focus, &:active {
+            text-decoration: underline;
+        }
+
+        &:active {
+            color: $color-text-highlight-extrovert;
         }
     }
 
