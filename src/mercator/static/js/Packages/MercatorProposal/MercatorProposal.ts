@@ -393,7 +393,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.name = res.name;
                         scope.country = res.country;
                         scope.website = res.website;
-                        scope.date_of_foreseen_registration = moment(res.planned_date).format("YYYY-MM-DD");
+                        if (res.planned_date) {
+                            scope.date_of_foreseen_registration = moment(res.planned_date).format("YYYY-MM-DD");
+                        }
                         scope.how_can_we_help_you = res.help_request;
                         scope.status_other = res.status_other;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
