@@ -41,7 +41,7 @@ export class Service {
                 var token = _self.$window.localStorage.getItem("user-token");
                 if (token !== null && path !== null) {
                     _self.enableToken(token, path);
-                } else if (token === null && path === null) {
+                } else {
                     // $apply is necessary here to trigger a UI
                     // update.  the need for _.defer is explained
                     // here: http://stackoverflow.com/a/17958847
