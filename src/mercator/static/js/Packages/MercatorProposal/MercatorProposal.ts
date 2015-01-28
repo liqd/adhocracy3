@@ -909,14 +909,14 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalDetailView",
             ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, monent, $q) => {
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
                 var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalCreate",
             ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$timeout", "flowFactory", "moment", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $q) => {
-                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, moment, flowFactory, $q);
+                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
