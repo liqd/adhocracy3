@@ -37,14 +37,11 @@ export class Service {
 
         var updateTokenFromStorage = () => {
             if (_self.Modernizr.localstorage) {
-                if (_self.$window.localStorage.getItem("user-token") !== null &&
-                        _self.$window.localStorage.getItem("user-path") !== null) {
-                    _self.enableToken(
-                        _self.$window.localStorage.getItem("user-token"),
-                        _self.$window.localStorage.getItem("user-path")
-                    );
-                } else if (_self.$window.localStorage.getItem("user-token") === null &&
-                        _self.$window.localStorage.getItem("user-path") === null) {
+                var path = _self.$window.localStorage.getItem("user-path");
+                var token = _self.$window.localStorage.getItem("user-token");
+                if (token !== null && path !== null) {
+                    _self.enableToken(token, path);
+                } else if (token === null && path === null) {
                     // $apply is necessary here to trigger a UI
                     // update.  the need for _.defer is explained
                     // here: http://stackoverflow.com/a/17958847
