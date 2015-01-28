@@ -1,10 +1,7 @@
 <div class="mercator-proposal-list-item {{ selectedState }}" >
     <a href="{{ path | adhResourceUrl }}" class="mercator-proposal-list-item-link">
         <img class="mercator-proposal-list-item-image"
-            data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}"
-            width="105"
-            height="90"
-            alt="" />
+            data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}" alt="" />
         <div class="mercator-proposal-list-item-body">
             <p class="mercator-proposal-list-item-username">
                 {{data.user_info.first_name}}<span data-ng-if="data.organization_info.name">,</span>
