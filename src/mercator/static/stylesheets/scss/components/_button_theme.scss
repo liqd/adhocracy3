@@ -33,7 +33,7 @@ input[type="button"] {
     &.m-call-to-action2 {
         @include button-color($color-text-highlight-normal, $color-text-inverted);
         padding: 0 1em;
-        min-width: 110 / 14 * 1em;
+        min-width: 110px / $font-size-normal * 1em;
 
         &:hover, &:focus {
             background: $color-brand-two-extrovert;
