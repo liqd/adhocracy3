@@ -1,31 +1,33 @@
 <div class="mercator-proposal-list-item {{ selectedState }}" >
-    <img class="mercator-proposal-list-item-image" data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}" alt="" />
-    <div class="mercator-proposal-list-item-body">
-        <p class="mercator-proposal-list-item-username">
-            <adh-user-meta
-                data-ng-if="data.user_info"
-                data-path="{{data.user_info.path}}"
-                data-name="{{data.user_info.first_name}} {{data.user_info.last_name}}">
-            </adh-user-meta><span data-ng-if="data.organization_info.name">,</span>
-            {{data.organization_info.name}}
-        </p>
-        <h3 class="mercator-proposal-list-item-title"><a href="{{ path | adhResourceUrl }}">{{ data.introduction.title }}</a></h3>
-        <ul class="mercator-propsal-list-item-meta">
-            <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-date">
-                <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
-            </li>
-            <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-total-comments">
-                <i class="icon-speechbubbles"></i>
-                    {{ data.commentCountTotal }}
-            </li>
-            <li class="mercator-propsal-list-item-meta-item  mercator-propsal-list-item-meta-item-supporters">
-                <i class="icon-pointy-rectangle-left"></i>
-                {{ data.supporterCount }}
-                {{ "supporters" | translate }}
-            </li>
-            <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-budget">
-                {{ data.finance.budget | number}} &euro;
-            </li>
-        </ul>
-    </div>
+    <a href="{{ path | adhResourceUrl }}" class="mercator-proposal-list-item-link">
+        <img class="mercator-proposal-list-item-image"
+            data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}"
+            width="105"
+            height="90"
+            alt="" />
+        <div class="mercator-proposal-list-item-body">
+            <p class="mercator-proposal-list-item-username">
+                {{data.user_info.first_name}}<span data-ng-if="data.organization_info.name">,</span>
+                {{data.organization_info.name}}
+            </p>
+            <h3 class="mercator-proposal-list-item-title">{{ data.introduction.title }}</h3>
+            <ul class="mercator-propsal-list-item-meta">
+                <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-date">
+                    <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
+                </li>
+                <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-total-comments">
+                    <i class="icon-speechbubbles"></i>
+                        {{ data.commentCountTotal }}
+                </li>
+                <li class="mercator-propsal-list-item-meta-item  mercator-propsal-list-item-meta-item-supporters">
+                    <i class="icon-pointy-rectangle-left"></i>
+                    {{ data.supporterCount }}
+                    {{ "supporters" | translate }}
+                </li>
+                <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-budget">
+                    {{ data.finance.budget | number}} &euro;
+                </li>
+            </ul>
+        </div>
+    </a>
 </div>
