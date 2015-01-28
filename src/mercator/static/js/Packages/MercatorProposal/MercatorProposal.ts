@@ -1,3 +1,4 @@
+/// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
@@ -230,6 +231,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
         private flowFactory,
+        private moment : MomentStatic,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -391,7 +393,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.name = res.name;
                         scope.country = res.country;
                         scope.website = res.website;
-                        scope.date_of_foreseen_registration = res.planned_date;
+                        if (res.planned_date) {
+                            scope.date_of_foreseen_registration = moment(res.planned_date).format("YYYY-MM-DD");
+                        }
                         scope.how_can_we_help_you = res.help_request;
                         scope.status_other = res.status_other;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
@@ -707,9 +711,10 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhTopLevelState : AdhTopLevelState.Service,
         private $timeout : ng.ITimeoutService,
         flowFactory,
+        moment : MomentStatic,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 
@@ -751,9 +756,10 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
         flowFactory,
+        moment : MomentStatic,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 }
@@ -898,20 +904,21 @@ export var register = (angular) => {
                 ]  // correspond to exact mime types EG image/png
             };
         }])
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q) => {
-                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
+                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q) => {
-                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, $q);
+        .directive("adhMercatorProposalDetailView",
+            ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
+                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalCreate",
-            ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$timeout", "flowFactory", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, $q) => {
-                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, $q);
+            ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$timeout", "flowFactory", "moment", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $q) => {
+                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
