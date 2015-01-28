@@ -27,6 +27,26 @@ export var derive = function<R extends ResourcesBase.Resource>(oldVersion : R, s
 };
 
 
+export var hasEqualContent = function<R extends ResourcesBase.Resource>(resource1 : R, resource2 : R) : boolean {
+    // note: this assumes that both resources share the same set of sheets, as it's currently
+    // always used after derive.
+
+    var equal = true;
+    _.forOwn(resource1.data, (sheet, key) => {
+        var sheet2 = resource2.data[key];
+
+        if (key !== "adhocracy_core.sheets.versions.IVersionable") {
+            _.forOwn(sheet, (value, field) => {
+                if (!_.isEqual(value, sheet2[field])) {
+                    equal = false;
+                }
+            });
+        }
+    });
+    return equal;
+};
+
+
 /**
  * Create an IDag<Resource> out of given resources.
  *
