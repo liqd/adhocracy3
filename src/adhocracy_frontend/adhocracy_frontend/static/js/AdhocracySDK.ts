@@ -95,7 +95,13 @@
 
     var setHashFromUrl = (url : string) => {
         if (url.indexOf(origin) === 0) {
-            window.location.hash = "!" + url.substring(origin.length);
+            if (window.history && history.replaceState) {
+                var newurl = window.location.href.split("#")[0] + "#!" + url.substring(origin.length);
+                history.replaceState(null, null, newurl);
+            } else {
+                // IE 9 and other browsers without history support have a partially broken back button
+                window.location.hash = "!" + url.substring(origin.length);
+            }
         } else {
             throw "Embedded iframe got an src outside of origin.";
         }

@@ -202,7 +202,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-orgs-columns {
-    margin: 20 / 14 * 1em 0;
+    margin: (20px / $font-size-normal * 1em) 0;
     overflow: hidden;
     padding: 0;
 
@@ -305,7 +305,7 @@ $mercator-proposal-detail-nav-width: 2em;
         color: $color-text-introvert;
         font-variant: small-caps;
         line-height: 1.15;
-        margin: 0 0 15 / 14 * 1em;
+        margin: 0 0 (15px / $font-size-normal * 1em);
         text-transform: lowercase;
     }
 }
@@ -345,7 +345,7 @@ $mercator-proposal-detail-nav-width: 2em;
     .button-back-to-top {
         color: $color-text-introvert;
         float: left;
-        line-height: 24 / 14 * 1em;
+        line-height: 24px / $font-size-normal * 1em;
         text-decoration: none;
 
         &:hover, &:focus {
@@ -407,7 +407,7 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-budget-col {
     float: left;
-    margin-bottom: 20 / 14 * 1em;
+    margin-bottom: 20px / $font-size-normal * 1em;
     padding-right: 2em;
 
     &.budget {

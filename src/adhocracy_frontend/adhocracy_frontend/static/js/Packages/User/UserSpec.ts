@@ -82,7 +82,7 @@ export var register = () => {
                 it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", () => {
                     windowMock.localStorage.getItem.and.returnValue("huhu");
                     fn();
-                    expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
+                    expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu", true);
                 });
 
                 it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", (done) => {

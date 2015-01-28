@@ -131,6 +131,11 @@
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}" />
 
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
+
                         </fieldset>
 
                         <label>
@@ -169,11 +174,18 @@
                                 {{ "Please enter your organization country" | translate }}</span>
 
                             <input
-                                type="date"
+                                type="text"
                                 data-ng-model="data.organization_info.date_of_foreseen_registration"
                                 name="organization-info-date-of-foreseen-registration"
-                                placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}"
+                                data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
+                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)' | translate }}"
                                 required="required" />
+
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
+                                'pattern')">
+                                {{ "Please enter a valid date" | translate }}</span>
 
                             <span
                                 class="input-error"
@@ -182,10 +194,15 @@
                                 {{ "Please enter your registration date" | translate }}</span>
 
                             <input
-                                type="text"
+                                type="url"
                                 data-ng-model="data.organization_info.website"
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}"/>
+
+                             <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
 
                         </fieldset>
 
@@ -225,10 +242,15 @@
                                 {{ "Please enter your organization country" | translate }}</span>
 
                             <input
-                                type="text"
+                                type="url"
                                 data-ng-model="data.organization_info.website"
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}" />
+
+                             <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
 
                             <label>
                                 <span class="label-text">{{ "How can we help you? Please specify:" | translate }}</span>
@@ -718,6 +740,7 @@
                             type="number"
                             data-ng-model="data.finance.requested_funding"
                             name="finance-requested-funding"
+                            min="0"
                             max="50000"
                             required="required" />
 
@@ -725,6 +748,14 @@
                             class="input-error"
                             data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'required')">
                             {{ "Please enter requested funding" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'max')">
+                            {{ "Not more than 50,000€ are allowed" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'min')">
+                            {{ "Please insert a number higher than 0" | translate }}</span>
                     </label>
 
                     <label>

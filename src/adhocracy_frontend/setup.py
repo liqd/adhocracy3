@@ -1,5 +1,6 @@
 """Adhocracy frontend package."""
 import os
+import version
 
 from setuptools import setup, find_packages
 
@@ -19,7 +20,7 @@ debug_requires = ['adhocracy_core[debug]',
                   ]
 
 setup(name='adhocracy_frontend',
-      version='0.0',
+      version=version.get_git_version(),
       description='Adhocracy frontend package.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=["Programming Language :: Python",
