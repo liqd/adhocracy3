@@ -31,7 +31,7 @@
             <p>{{ "Or register" | translate }}
             <a href="/register">{{ "here" | translate }}</a></p>
         </div>
-        <a class="login-cancel">{{ "Cancel" | translate}}</a>
+        <a class="login-cancel" href="" ng-click="cancel()">{{ "Cancel" | translate}}</a>
         <div class="login-support">
             {{ "Having trouble with login?" | translate}} <br />
             <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20login">{{ supportEmail }}</a>
