@@ -279,7 +279,7 @@ States:
     width: 25%;
     z-index: 1;
     background-color: $color-structure-normal;
-    padding: 16 / 14 * 1em 20 / 14 * 1em;
+    padding: (16px / $font-size-normal * 1em) (20px / $font-size-normal * 1em);
 
     &.is-visible {
         left: 0;
