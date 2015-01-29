@@ -1,5 +1,7 @@
 """User wants to register and login"""
 
+from pytest import mark
+
 from adhocracy_core.testing import god_email
 from adhocracy_core.testing import god_login
 from adhocracy_core.testing import god_password
@@ -18,10 +20,12 @@ PASSWORD = "password"
 
 class TestUserLogin:
 
+    @mark.xfail(reason='Duplicate tpc_begin (issue #583)')
     def test_register(self, browser):
         register(browser, USER, MAIL, PASSWORD, expect_success=False)
         assert is_not_yet_activated(browser)
 
+    @mark.xfail(reason='failing of test_register')
     def test_no_login_without_activation(self, browser):
         login(browser, USER, PASSWORD, expect_success=False, visit_root=False)
         assert browser.is_text_present("User account not yet activated")
