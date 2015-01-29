@@ -9,31 +9,32 @@ class TestMercatorFilter(object):
 
     @fixture(scope='class')
     def sidebar(self, browser):
-        return browser.find_by_css(".moving-column-sidebar").first.find_by_tag("ul")
+        return browser.find_by_css('.moving-column-sidebar').first.find_by_tag('ul')
 
     @fixture(scope='class')
     def locations(self, browser, sidebar):
-        return [l.find_by_tag("a").first for l in sidebar[1].find_by_tag("li")]
+        return [l.find_by_tag('a').first for l in sidebar[1].find_by_tag('li')]
 
     @fixture(scope='class')
     def requested_fundings(self, browser, sidebar):
-        return [l.find_by_tag("a").first for l in sidebar[2].find_by_tag("li")]
+        return [l.find_by_tag('a').first for l in sidebar[2].find_by_tag('li')]
 
     @fixture(scope='class')
     def browser(self, browser, app):
         TestApp(app)
         browser.visit(browser.app_url + 'r/mercator/')
-        assert wait(lambda: browser.find_link_by_text("filters"))
+        assert wait(lambda: browser.find_link_by_text('filters'))
 
-        browser.find_link_by_text("filters").first.click()
-        assert wait(lambda: browser.find_by_css(".moving-column-sidebar").visible)
+        browser.find_link_by_text('filters').first.click()
+        assert wait(lambda: browser.find_by_css('.moving-column-sidebar').visible)
 
         return browser
 
     def test_filter_location(self, browser, locations, proposals):
         for location in locations:
             location.click()
-            assert wait(lambda: is_filtered(browser, proposals, location=location.text))
+            assert wait(lambda:
+                is_filtered(browser, proposals, location=location.text))
 
     def test_unfilter_location(self, browser, locations, proposals):
         locations[-1].click()
@@ -42,7 +43,9 @@ class TestMercatorFilter(object):
     def test_filter_requested_funding(self, browser, requested_fundings, proposals):
         for requested_funding in requested_fundings:
             requested_funding.click()
-            assert wait(lambda: is_filtered(browser, proposals, requested_funding=requested_funding.text))
+            assert wait(lambda:
+                is_filtered(browser, proposals,
+                            requested_funding=requested_funding.text))
 
     def test_unfilter_requested_funding(self, browser, requested_fundings, proposals):
         requested_fundings[-1].click()
@@ -53,15 +56,19 @@ class TestMercatorFilter(object):
             location.click()
             for requested_funding in requested_fundings:
                 requested_funding.click()
-                assert wait(lambda: is_filtered(browser, proposals, location=location.text, requested_funding=requested_funding.text))
+                assert wait(lambda:
+                    is_filtered(browser, proposals, location=location.text,
+                                requested_funding=requested_funding.text))
 
 
 
 def is_filtered(browser, proposals, location=None, requested_funding=None):
     try:
-        introduction_sheet = "adhocracy_mercator.sheets.mercator.IIntroduction"
-        title = lambda p: p[20]["body"]["data"][introduction_sheet]["title"]
-        expected_titles = [title(p) for p in proposals if _verify_location(location, p) and _verify_requested_funding(requested_funding, p)]
+        introduction_sheet = 'adhocracy_mercator.sheets.mercator.IIntroduction'
+        title = lambda p: p[20]['body']['data'][introduction_sheet]['title']
+        expected_titles = [title(p) for p in proposals
+            if _verify_location(location, p) and
+            _verify_requested_funding(requested_funding, p)]
 
         proposal_list = browser.find_by_css('.moving-column-body').first.\
                                 find_by_tag('ol').first
@@ -76,18 +83,18 @@ def is_filtered(browser, proposals, location=None, requested_funding=None):
 
 
 def _verify_location(location, proposal):
-    """Return whether the passed proposal is of given location."""
-    data = proposal[18]["body"]["data"]
-    data_location = data["adhocracy_mercator.sheets.mercator.ILocation"]
+    '''Return whether the passed proposal is of given location.'''
+    data = proposal[18]['body']['data']
+    data_location = data['adhocracy_mercator.sheets.mercator.ILocation']
 
-    if location == "Specific":
-        return data_location["location_is_specific"]
+    if location == 'Specific':
+        return data_location['location_is_specific']
 
-    elif location == "Online":
-        return data_location["location_is_online"]
+    elif location == 'Online':
+        return data_location['location_is_online']
 
-    elif location == "Linked to the Ruhr area":
-        return data_location["location_is_linked_to_ruhr"]
+    elif location == 'Linked to the Ruhr area':
+        return data_location['location_is_linked_to_ruhr']
 
     elif location is None:
         return True
@@ -96,21 +103,21 @@ def _verify_location(location, proposal):
 
 
 def _verify_requested_funding(requested_funding, proposal):
-    """Return whether the passed proposal is of given requested_funding."""
-    data = proposal[4]["body"]["data"]
-    finance = data["adhocracy_mercator.sheets.mercator.IFinance"]
+    '''Return whether the passed proposal is of given requested_funding.'''
+    data = proposal[4]['body']['data']
+    finance = data['adhocracy_mercator.sheets.mercator.IFinance']
 
-    if requested_funding == "0 - 5000 €":
-        return 0 <= finance["requested_funding"] <= 5000
+    if requested_funding == '0 - 5000 €':
+        return 0 <= finance['requested_funding'] <= 5000
 
-    elif requested_funding == "5000 - 10000 €":
-        return 5000 <= finance["requested_funding"] <= 10000
+    elif requested_funding == '5000 - 10000 €':
+        return 5000 <= finance['requested_funding'] <= 10000
 
-    elif requested_funding == "10000 - 20000 €":
-        return 10000 <= finance["requested_funding"] <= 20000
+    elif requested_funding == '10000 - 20000 €':
+        return 10000 <= finance['requested_funding'] <= 20000
 
-    elif requested_funding == "20000 - 50000 €":
-        return 20000 <= finance["requested_funding"] <= 50000
+    elif requested_funding == '20000 - 50000 €':
+        return 20000 <= finance['requested_funding'] <= 50000
 
     elif requested_funding is None:
         return True
