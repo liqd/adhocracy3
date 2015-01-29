@@ -46,7 +46,7 @@ a form for creating new elements. This form is then always visible.
 
 .listing-create-form {
     background-color: $color-structure-introvert;
-    padding: 1em (20px / 14px * 1em) (12px / $font-size-normal * 1em);
+    padding: 1em (20px / $font-size-normal * 1em) (12px / $font-size-normal * 1em);
     margin-bottom: 1em;
 
     .comment-create-form-text {
