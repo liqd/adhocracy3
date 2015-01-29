@@ -12,7 +12,6 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../Rate/Rate");
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-import AdhShareSocial = require("../ShareSocial/ShareSocial");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
@@ -323,7 +322,6 @@ export var register = (angular) => {
             AdhRate.moduleName,
             AdhAngularHelpers.moduleName,
             AdhResourceWidgets.moduleName,
-            AdhShareSocial.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])

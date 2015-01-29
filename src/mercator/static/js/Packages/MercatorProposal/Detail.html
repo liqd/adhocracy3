@@ -151,7 +151,7 @@
                                 <li>
                                     {{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}
                                 </li>
-                                <li>{ data.organization_info.how_can_we_help_you }}</li>
+                                <li>{{ data.organization_info.how_can_we_help_you }}</li>
                             </ul>
                         </div>
                         <div data-ng-switch-when="other">
@@ -182,7 +182,7 @@
                     <h3>{{ "Story behind the idea" | translate }}</h3>
                     <p>{{ data.story }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:story'}}">
-                        <i class="icon-speechbubble"></i> {{ data.stepsCommentCount }}
+                        <i class="icon-speechbubble"></i> {{ data.storyCommentCount }}
                     </a>
                 </section><!-- /.commentable-section -->
 

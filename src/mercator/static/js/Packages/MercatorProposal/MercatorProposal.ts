@@ -167,7 +167,7 @@ export interface IControllerScope extends IScope {
     showError : (fieldName : string, errorType : string) => boolean;
     showHeardFromError : () => boolean;
     showLocationError : () => boolean;
-    submitIfValid : () => void;
+    submitIfValid : (callCount? : number) => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
     mercatorProposalIntroductionForm? : any;
@@ -675,16 +675,22 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
             this.fill(data, mercatorProposalVersion);
 
-            return this.$q
-                .all(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
-                    return self.adhHttp.get(path).then((oldSubresource) => {
+            return AdhUtil.qFilter(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
+                    var deferred = self.$q.defer();
+                    self.adhHttp.get(path).then((oldSubresource) => {
                         var subresource = AdhResourceUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
                         subresource.parent = AdhUtil.parentPath(oldSubresource.path);
                         self.fill(data, subresource);
-                        mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
-                        return subresource;
+                        if (AdhResourceUtil.hasEqualContent(oldSubresource, subresource)) {
+                            mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = oldSubresource.path;
+                            deferred.reject();
+                        } else {
+                            mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
+                            deferred.resolve(subresource);
+                        }
                     });
-                }))
+                    return deferred.promise;
+                }), self.$q)
                 .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
 
         };
@@ -1018,8 +1024,12 @@ export var register = (angular) => {
                 });
             }
 
-            $scope.submitIfValid = () => {
+            $scope.submitIfValid = (callCount = 0) => {
                 var container = $element.parents("[data-du-scroll-container]");
+
+                if (callCount > 10) {
+                    throw "maximum number of post attempts reached!";
+                }
 
                 if ($scope.$flow && $scope.$flow.support) {
                     var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
@@ -1035,7 +1045,7 @@ export var register = (angular) => {
                         .catch((error) => {
                             if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
                                 $scope.data.introduction.nickInstance++;
-                                $scope.submitIfValid();
+                                $scope.submitIfValid(callCount + 1);
                             } else {
                                 container.scrollTopAnimated(0);
                             }

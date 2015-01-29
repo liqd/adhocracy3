@@ -337,7 +337,6 @@ A generic form footer containing one CTA and a regular button
 
 .form-footer {
     @include clearfix;
-    border-top: 2px solid $color-structure-normal;
     padding: 1em;
 
     .form-footer-button-cta {
