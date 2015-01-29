@@ -394,7 +394,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.country = res.country;
                         scope.website = res.website;
                         if (res.planned_date) {
-                            scope.date_of_foreseen_registration = moment(res.planned_date).format("YYYY-MM-DD");
+                            scope.date_of_foreseen_registration = this.moment(res.planned_date).format("YYYY-MM-DD");
                         }
                         scope.how_can_we_help_you = res.help_request;
                         scope.status_other = res.status_other;
@@ -589,6 +589,25 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         }
     }
 
+    private cleanOrganizationInfo(data) : void {
+
+        var fieldsMap = {
+            "registered_nonprofit": ["name", "country", "website"],
+            "planned_nonprofit" : ["name", "country", "website", "date_of_foreseen_registration"],
+            "support_needed" : ["name", "country", "website", "support_needed"],
+            "other" : ["status_other"]
+        };
+        var statusEnumSelected = fieldsMap[data.organization_info.status_enum];
+        var list = Object.keys(data.organization_info);
+        for ( var i = 0; i < list.length ; i++ ) {
+            if ( statusEnumSelected.indexOf(list[i]) === -1 ) {
+                if (list[i] !== "status_enum") {
+                   delete data.organization_info[list[i]];
+                }
+            }
+        }
+    }
+
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
@@ -613,6 +632,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             });
 
             this.fill(data, mercatorProposalVersion);
+
+            this.cleanOrganizationInfo(data);
+
 
             var subresources = _.map([
                 [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
@@ -674,6 +696,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
             mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
             this.fill(data, mercatorProposalVersion);
+
+            this.cleanOrganizationInfo(data);
 
             return AdhUtil.qFilter(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
                     var deferred = self.$q.defer();
