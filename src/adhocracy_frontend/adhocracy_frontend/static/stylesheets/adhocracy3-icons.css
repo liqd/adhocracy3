@@ -23,11 +23,16 @@
 [data-icon]:before { content: attr(data-icon); }
 
 [data-icon]:before,
+.icon-Discussion_Info_Icon:before,
+.icon-add:before,
+.icon-attention:before,
 .icon-ban-circle:before,
 .icon-calendar:before,
 .icon-document:before,
 .icon-documents:before,
+.icon-key:before,
 .icon-list:before,
+.icon-list-filled:before,
 .icon-mail:before,
 .icon-mail-filled:before,
 .icon-map-pin:before,
@@ -38,7 +43,9 @@
 .icon-reply:before,
 .icon-speechbubble:before,
 .icon-speechbubble-document:before,
+.icon-speechbubble-unfilled:before,
 .icon-speechbubbles:before,
+.icon-tick:before,
 .icon-triangle-inverse-down:before,
 .icon-triangle-inverse-up:before,
 .icon-triangle-up:before,
@@ -60,26 +67,33 @@
   font-smoothing: antialiased;
 }
 
-.icon-ban-circle:before { content: "\f100"; }
-.icon-calendar:before { content: "\f101"; }
-.icon-document:before { content: "\f102"; }
-.icon-documents:before { content: "\f103"; }
-.icon-list:before { content: "\f104"; }
-.icon-mail:before { content: "\f105"; }
-.icon-mail-filled:before { content: "\f106"; }
-.icon-map-pin:before { content: "\f107"; }
-.icon-minus:before { content: "\f108"; }
-.icon-pig:before { content: "\f109"; }
-.icon-pointy-rectangle-left:before { content: "\f10a"; }
-.icon-pointy-rectangle-right:before { content: "\f10b"; }
-.icon-reply:before { content: "\f10c"; }
-.icon-speechbubble:before { content: "\f10d"; }
-.icon-speechbubble-document:before { content: "\f10e"; }
-.icon-speechbubbles:before { content: "\f110"; }
-.icon-triangle-inverse-down:before { content: "\f111"; }
-.icon-triangle-inverse-up:before { content: "\f112"; }
-.icon-triangle-up:before { content: "\f113"; }
-.icon-user:before { content: "\f114"; }
-.icon-user-unfilled:before { content: "\f115"; }
-.icon-users:before { content: "\f116"; }
-.icon-x:before { content: "\f117"; }
+.icon-Discussion_Info_Icon:before { content: "\f134"; }
+.icon-add:before { content: "\f136"; }
+.icon-attention:before { content: "\f137"; }
+.icon-ban-circle:before { content: "\f138"; }
+.icon-calendar:before { content: "\f139"; }
+.icon-document:before { content: "\f13a"; }
+.icon-documents:before { content: "\f13b"; }
+.icon-key:before { content: "\f13c"; }
+.icon-list:before { content: "\f13d"; }
+.icon-list-filled:before { content: "\f13e"; }
+.icon-mail:before { content: "\f13f"; }
+.icon-mail-filled:before { content: "\f140"; }
+.icon-map-pin:before { content: "\f141"; }
+.icon-minus:before { content: "\f142"; }
+.icon-pig:before { content: "\f143"; }
+.icon-pointy-rectangle-left:before { content: "\f144"; }
+.icon-pointy-rectangle-right:before { content: "\f145"; }
+.icon-reply:before { content: "\f146"; }
+.icon-speechbubble:before { content: "\f147"; }
+.icon-speechbubble-document:before { content: "\f148"; }
+.icon-speechbubble-unfilled:before { content: "\f149"; }
+.icon-speechbubbles:before { content: "\f14a"; }
+.icon-tick:before { content: "\f152"; }
+.icon-triangle-inverse-down:before { content: "\f14b"; }
+.icon-triangle-inverse-up:before { content: "\f14c"; }
+.icon-triangle-up:before { content: "\f14d"; }
+.icon-user:before { content: "\f14e"; }
+.icon-user-unfilled:before { content: "\f14f"; }
+.icon-users:before { content: "\f150"; }
+.icon-x:before { content: "\f151"; }
