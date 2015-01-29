@@ -63,8 +63,10 @@ def is_filtered(browser, proposals, location=None, requested_funding=None):
         title = lambda p: p[20]["body"]["data"][introduction_sheet]["title"]
         expected_titles = [title(p) for p in proposals if _verify_location(location, p) and _verify_requested_funding(requested_funding, p)]
 
-        proposal_list = browser.find_by_css(".moving-column-body").first.find_by_tag("ol").first
-        actual_titles = [a.text for a in proposal_list.find_by_css("h3 a")]
+        proposal_list = browser.find_by_css('.moving-column-body').first.\
+                                find_by_tag('ol').first
+        actual_titles = [a.text for a in
+                proposal_list.find_by_css('.mercator-proposal-list-item-title')]
 
         return set(expected_titles) == set(actual_titles)
     except:
