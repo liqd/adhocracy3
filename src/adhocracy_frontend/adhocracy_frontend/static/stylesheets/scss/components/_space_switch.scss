@@ -35,6 +35,10 @@ Switch the space (content/user)
         &.is-active i {
             color: $color-text-highlight-normal;
         }
+
+        &:hover i, &:focus i {
+            color: $color-text-highlight-extrovert;
+        }
     }
 
     .separator {
