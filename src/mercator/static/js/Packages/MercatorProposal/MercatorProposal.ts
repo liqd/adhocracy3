@@ -167,7 +167,7 @@ export interface IControllerScope extends IScope {
     showError : (fieldName : string, errorType : string) => boolean;
     showHeardFromError : () => boolean;
     showLocationError : () => boolean;
-    submitIfValid : () => void;
+    submitIfValid : (callCount? : number) => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
     mercatorProposalIntroductionForm? : any;
@@ -1024,8 +1024,12 @@ export var register = (angular) => {
                 });
             }
 
-            $scope.submitIfValid = () => {
+            $scope.submitIfValid = (callCount = 0) => {
                 var container = $element.parents("[data-du-scroll-container]");
+
+                if (callCount > 10) {
+                    throw "maximum number of post attempts reached!";
+                }
 
                 if ($scope.$flow && $scope.$flow.support) {
                     var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
@@ -1041,7 +1045,7 @@ export var register = (angular) => {
                         .catch((error) => {
                             if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
                                 $scope.data.introduction.nickInstance++;
-                                $scope.submitIfValid();
+                                $scope.submitIfValid(callCount + 1);
                             } else {
                                 container.scrollTopAnimated(0);
                             }
