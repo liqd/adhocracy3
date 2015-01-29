@@ -321,18 +321,16 @@ $mercator-proposal-detail-nav-width: 2em;
         .mercator-propsal-list-item-meta-item-budget {
             color: $color-text-highlight-introvert;
         }
+
+        &:hover, &:focus {
+            background: white;
+        }
     }
 }
 
 .mercator-proposal-list-item-link {
     color: $color-text-introvert;
     text-decoration: none;
-
-    &:hover, &:focus {
-        .mercator-proposal-list-item-title {
-            color: $color-text-highlight-normal;
-        }
-    }
 }
 
 .mercator-proposal-detail-footer {
