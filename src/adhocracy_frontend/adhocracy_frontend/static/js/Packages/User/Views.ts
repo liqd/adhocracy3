@@ -21,6 +21,7 @@ export interface IScopeLogin {
     supportEmail : string;
 
     resetCredentials : () => void;
+    cancel : () => void;
     logIn : () => ng.IPromise<void>;
 }
 
@@ -38,6 +39,7 @@ export interface IScopeRegister {
     success : boolean;
 
     register : () => ng.IPromise<void>;
+    cancel : () => void;
 }
 
 
@@ -100,6 +102,10 @@ export var loginController = (
         $scope.credentials.password = "";
     };
 
+    $scope.cancel = () => {
+         adhTopLevelState.redirectToCameFrom("/");
+    };
+
     $scope.logIn = () => {
         return adhUser.logIn(
             $scope.credentials.nameOrEmail,
@@ -137,6 +143,10 @@ export var registerController = (
         email: "",
         password: "",
         passwordRepeat: ""
+    };
+
+    $scope.cancel = () => {
+         adhTopLevelState.redirectToCameFrom("/");
     };
 
     $scope.errors = [];
