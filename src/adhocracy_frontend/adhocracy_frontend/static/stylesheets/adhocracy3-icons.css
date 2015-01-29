@@ -23,7 +23,6 @@
 [data-icon]:before { content: attr(data-icon); }
 
 [data-icon]:before,
-.icon-Discussion_Info_Icon:before,
 .icon-add:before,
 .icon-attention:before,
 .icon-ban-circle:before,
@@ -67,7 +66,6 @@
   font-smoothing: antialiased;
 }
 
-.icon-Discussion_Info_Icon:before { content: "\f134"; }
 .icon-add:before { content: "\f136"; }
 .icon-attention:before { content: "\f137"; }
 .icon-ban-circle:before { content: "\f138"; }
