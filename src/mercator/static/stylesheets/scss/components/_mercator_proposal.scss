@@ -189,14 +189,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 }
 
-.mercator-proposal-detail-username a {
-    text-decoration: none;
-
-    &:hover, &:focus {
-        text-decoration: underline;
-    }
-}
-
 .mercator-proposal-detail-orgs-columns {
     margin: (20px / $font-size-normal * 1em) 0;
     overflow: hidden;
@@ -328,6 +320,17 @@ $mercator-proposal-detail-nav-width: 2em;
     }
 }
 
+.mercator-proposal-list-item-link {
+    color: $color-text-introvert;
+    text-decoration: none;
+
+    &:hover, &:focus {
+        .mercator-proposal-list-item-title {
+            color: $color-text-highlight-normal;
+        }
+    }
+}
+
 .mercator-proposal-detail-footer {
     border-top: 2px solid  $color-structure-normal;
     margin: 0 -1em;
@@ -358,15 +361,15 @@ $mercator-proposal-detail-nav-width: 2em;
     }
 }
 
+$image-margin: 11px;
+
 .mercator-proposal-list-item-image {
     float: left;
-    margin-right: 0.6875em;
+    margin-right: $image-margin;
+}
 
-    img {
-        float: left;
-        height: auto;
-        width: 6.5625em;
-    }
+.mercator-proposal-list-item-body {
+    margin-left: $thumbnail-width + $image-margin;
 }
 
 .mercator-proposal-list-item-username,
@@ -376,29 +379,12 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item-username {
     font-size: $font-size-small;
-
-    a {
-        text-decoration: none;
-
-        &:hover, &:focus {
-            text-decoration: underline;
-        }
-    }
 }
 
 .mercator-proposal-list-item-title {
     font-size: $font-size-plus;
-    font-weight: $font-weight-extrovert;
+    font-weight: $font-weight-normal;
     padding: 0.9375em 0;
-
-    a {
-        color: $color-text-normal;
-        text-decoration: none;
-
-        &:hover, &:focus {
-            color: $color-text-highlight-normal;
-        }
-    }
 }
 
 .mercator-proposal-budget-col {
