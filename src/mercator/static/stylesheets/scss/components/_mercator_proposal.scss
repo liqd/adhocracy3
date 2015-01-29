@@ -324,7 +324,7 @@ $mercator-proposal-detail-nav-width: 2em;
     color: $color-text-introvert;
     text-decoration: none;
 
-    &:hover {
+    &:hover, &:focus {
         .mercator-proposal-list-item-title {
             color: $color-text-highlight-normal;
         }
