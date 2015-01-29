@@ -50,7 +50,9 @@ def select_proposal(browser):
     correct proposal title."""
     proposal_list = browser.find_by_css(".moving-column-body").\
         first.find_by_tag("ol").first
-    proposal_title = proposal_list.find_by_css("h3 a").first
+    proposal_title = proposal_list.find_by_css(
+        '.mercator-proposal-list-item-title').first
+
     assert wait(lambda: proposal_title.html)
     proposal_title.click()
 
