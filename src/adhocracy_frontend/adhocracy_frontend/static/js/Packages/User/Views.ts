@@ -273,20 +273,26 @@ export var userProfileDirective = (
         scope: {
             path: "@"
         },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController, adhTopLevelState) => {
+            scope.column = column;
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
-
-            scope.showMessaging = () => {
-                column.showOverlay("messaging");
-            };
-
             if (scope.path) {
                 adhHttp.resolve(scope.path)
                     .then((res) => {
                         scope.userBasic = res.data[SIUserBasic.nick];
                     });
             }
-        }
+        },
+        controller: ["$scope", "adhTopLevelState", (scope, adhTopLevelState : AdhTopLevelState.Service,
+            column : AdhMovingColumns.MovingColumnController) => {
+            scope.showMessaging = () => {
+                if (scope.messageOptions.POST) {
+                    scope.column.showOverlay("messaging");
+                } else {
+                    adhTopLevelState.redirectToLogin();
+                }
+            };
+        }]
     };
 };
 
