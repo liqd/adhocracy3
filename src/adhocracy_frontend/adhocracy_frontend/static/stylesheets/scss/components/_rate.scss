@@ -33,7 +33,9 @@ $arrow-width: 1em;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
     color: white;
+    text-align: center;
     text-decoration: none;
+    min-width: 100px / $font-size-small * 1em;
 
     &:before {
         content: "";
@@ -57,12 +59,33 @@ $arrow-width: 1em;
         }
     }
 
+    .supporting .text-unsupport {
+        display: none;
+    }
+
     &:active,
     &.is-rate-button-active {
         background: $color-function-valid;
 
         &:before {
             border-right-color: $color-function-valid;
+        }
+
+        &:hover {
+            background: $color-brand-three-normal;
+
+        }
+
+        &:hover .supporting .text-unsupport {
+            display: block;
+        }
+
+        &:hover .supporting .text-supporting {
+            display: none;
+        }
+
+        &:hover:before {
+            border-right-color: $color-brand-three-normal;
         }
     }
 }
