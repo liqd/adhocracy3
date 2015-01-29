@@ -72,15 +72,15 @@ Login Dialog.
         <input type="text" name="name" placeholder="email or username" />
         <input type="password" name="password" placeholder="password" />
         <input type="submit" class="m-call-to-action" value="login" />
-        <div class="login-support">
-            Having trouble with login? <br />
-            <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20login">support@adhocracy.de</a>
+        <div class="login-info">
+            <p class="ng-binding">Or register <a href="">here</a></p>
         </div>
+        <div class="login-support ng-binding">
+            Having trouble with login? <br>
+            <a href="">support@unconfigured.domain</a>
+        </div>
+        <a class="login-cancel" href="">Cancel</a>
     </form>
-    <div class="login-description box-with-button">
-        <p>In case you do not have an account yet, sign up to a free account and participate!</p>
-        <a class="button">register</a>
-    </div>
 </div>
 ```
 */
@@ -103,15 +103,15 @@ Register Dialog.
         <input type="password" name="password" placeholder="password" />
         <input type="password" name="password_repeat" placeholder="password repeat" />
         <input type="submit" class="m-call-to-action" name="register" value="register" />
-        <div class="register-support">
-            Having trouble with registration? <br />
-            <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20registration">support@adhocracy.de</a>
+        <div class="register-info">
+            <p class="ng-binding">Or Login <a href="">here</a></p>
         </div>
+        <div class="register-support ng-binding">
+            Having trouble with Register? <br>
+            <a href="">support@unconfigured.domain</a>
+        </div>
+        <a class="register-cancel" href="">Cancel</a>
     </form>
-    <div class="box-with-button">
-        <p>You already have an account? Go to the LogIn window.</p>
-        <a class="button" href="">LogIn</a>
-    </div>
 </div>
 ```
 */
@@ -146,7 +146,7 @@ Register Dialog.
 
 .register-support,
 .login-support {
-    @include text(functional-introvert);
+    font-size: $font-size-small;
     text-align: center;
 }
 
@@ -160,10 +160,15 @@ Register Dialog.
 
 .register-info,
 .login-info {
-    margin-top: 24px / $font-size-normal * 1em;
+    font-size: $font-size-small;
+    margin: (24px / $font-size-small * 1em) 0 (28px / $font-size-small * 1em);
 
     a {
         text-decoration: none;
+    }
+
+    p {
+        margin: 0;
     }
 }
 
