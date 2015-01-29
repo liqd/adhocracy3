@@ -3,8 +3,9 @@
 
     &:before {
         content: "";
-        border-right: 1.0769em solid transparent;
-        border-top: 1.0769em solid $color-brand-one-normal;
+        border-right: 1em solid transparent;
+        border-top: 1em solid $color-brand-one-normal;
+        font-size: $font-size-small;
         height: 0;
         left: 0;
         position: absolute;

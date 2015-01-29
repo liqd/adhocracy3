@@ -47,25 +47,30 @@ is selected, no state is applied.
 ```
 */
 .comment-children {
-    margin-top: 0.6em;
-    border-left: 0.0833em solid $color-brand-one-normal;
+    border-left: 1px solid $color-brand-one-normal;
 
     .comment {
         @include triangle-tl;
+        padding-right: 0;
     }
 }
 
 .comment {
     margin-bottom: 2em;
-    padding-left: 0.95em;
+    padding: 0 1em;
 
     &:last-child {
         margin-bottom: 0;
     }
+}
 
-    .comment-create-form-text {
-        background: $color-structure-normal;
-    }
+.comment-content {
+    line-height: 1.15;
+}
+
+.comment-children-create-form {
+    @extend .listing-create-form;
+    background: $color-background-base-introvert;
 }
 
 /*doc
@@ -141,7 +146,7 @@ parent: comment
 */
 
 .comment-main {
-    padding-bottom: 1em;
+    padding-bottom: 20px / $font-size-normal * 1em;
 }
 
 .comment-title,
@@ -195,7 +200,9 @@ parent: comment
 .comment-header {
     @include clearfix;
     @include text(introvert);
-    margin-bottom: 0.3em;
+    font-size: $font-size-small;
+    margin-bottom: 10px / $font-size-small * 1em;
+    padding-top: 3px / $font-size-small * 1em;
 
     .comment-header-icon {
         @include border-radius(50%);
@@ -209,8 +216,7 @@ parent: comment
 
     .comment-header-creator,
     .comment-header-date,
-    .comment-header-links,
-    .rate {
+    .comment-header-links {
         a, a:hover, a:focus, a:active {
             @include disguised-link;
         }
@@ -220,17 +226,31 @@ parent: comment
         &:after {
             content: "|";
         }
+    }
 
-        a {
-            color: $color-text-highlight-normal;
+
+    .comment-header-creator a {
+        color: $color-text-highlight-normal;
+        padding-right: 3px;
+
+        &:hover, &:focus, &:active {
+            text-decoration: underline;
+        }
+
+        &:active {
+            color: $color-text-highlight-extrovert;
         }
     }
 
+    .comment-header-date {
+        padding-left: 3px;
+    }
+
     .comment-header-links {
-        padding-right: 2em;
+        padding-right: 20px / $font-size-small * 1em;
 
         a {
-            margin-left: 1em;
+            margin-left: 14px / $font-size-small * 1em;
         }
     }
 
@@ -251,11 +271,6 @@ parent: comment
 
 .comment-create-form {
     @include clearfix;
-    padding-bottom: 1em;
-}
-
-.comment-create-form-text {
-    margin-bottom: 0.45em;
 }
 
 /*doc
