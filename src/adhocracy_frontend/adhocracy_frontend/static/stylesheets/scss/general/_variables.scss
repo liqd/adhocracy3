@@ -52,8 +52,7 @@ $font-size-large: 21px;
 $font-size-huge: 40px;
 
 // em is relative to $font-size-normal
-$moving-column-menu-height-px: 24px;
-$moving-column-menu-height:  $moving-column-menu-height-px / $font-size-normal * 1em;
+$moving-column-menu-height:  24px / $font-size-normal * 1em;
 $moving-column-border-width: 0.4166em;
 $l-header-height: 2.8571em;
 $annotation-width: 34%;

@@ -230,7 +230,7 @@ States:
 .moving-column-icon {
     float: left;
     font-size: $font-size-plus;
-    line-height: $moving-column-menu-height-px / $font-size-plus;
+    line-height: 24px / $font-size-plus;
     vertical-align: middle;
 }
 
@@ -258,7 +258,7 @@ States:
 
         .moving-column-menu-nav-icon {
             font-size: $font-size-smaller;
-            line-height: $moving-column-menu-height-px / $font-size-smaller;
+            line-height: 24px / $font-size-smaller;
         }
     }
 }
