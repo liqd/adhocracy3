@@ -9,7 +9,7 @@
                         href=""
                         class="facet-item"
                         ng-class="{'is-active': item.enabled}"
-                        ng-click="toggleItem(facet, item)">
+                        ng-click="toggleItem(facet, item, $event)">
                         {{ item.name | translate }}
                     </a>
                 </li>
