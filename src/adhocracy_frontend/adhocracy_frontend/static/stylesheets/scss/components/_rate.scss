@@ -72,20 +72,20 @@ $arrow-width: 1em;
         }
 
         &:hover {
+            // scss-lint:disable NestingDepth
             background: $color-brand-three-normal;
 
-        }
+            .supporting .text-unsupport {
+                display: block;
+            }
 
-        &:hover .supporting .text-unsupport {
-            display: block;
-        }
+            .supporting .text-supporting {
+                display: none;
+            }
 
-        &:hover .supporting .text-supporting {
-            display: none;
-        }
-
-        &:hover:before {
-            border-right-color: $color-brand-three-normal;
+            &:before {
+                border-right-color: $color-brand-three-normal;
+            }
         }
     }
 }
