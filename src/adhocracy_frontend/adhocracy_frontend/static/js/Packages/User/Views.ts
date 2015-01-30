@@ -281,8 +281,10 @@ export var userProfileDirective = (
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
                     column.showOverlay("messaging");
-                } else {
+                } else if (!adhUser.loggedIn) {
                     adhTopLevelState.redirectToLogin();
+                } else {
+                    // FIXME
                 }
             };
 
