@@ -173,6 +173,14 @@ The menu should always have the same state as its columns.
     font-size: $font-size-normal;
 }
 
+.moving-column-collapsed a {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
 /*doc
 ---
 title: Moving Column Menu
