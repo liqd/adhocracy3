@@ -594,7 +594,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var fieldsMap = {
             "registered_nonprofit": ["name", "country", "website"],
             "planned_nonprofit" : ["name", "country", "website", "date_of_foreseen_registration"],
-            "support_needed" : ["name", "country", "website", "support_needed"],
+            "support_needed" : ["name", "country", "website", "how_can_we_help_you"],
             "other" : ["status_other"]
         };
         var statusEnumSelected = fieldsMap[data.organization_info.status_enum];
