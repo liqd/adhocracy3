@@ -599,15 +599,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             "support_needed" : ["name", "country", "website", "how_can_we_help_you"],
             "other" : ["status_other"]
         };
-        var statusEnumSelected = fieldsMap[data.organization_info.status_enum];
-        var list = Object.keys(data.organization_info);
-        for ( var i = 0; i < list.length ; i++ ) {
-            if ( statusEnumSelected.indexOf(list[i]) === -1 ) {
-                if (list[i] !== "status_enum") {
-                   delete data.organization_info[list[i]];
-                }
+        var allKeys = _.uniq(_.flatten(_.values(fieldsMap)));
+
+        _.forOwn(data.organization_info, (value, key, object) => {
+            if (_.contains(allKeys, key) && !(_.contains(fieldsMap[object.status_enum], key))) {
+                delete object[key];
             }
-        }
+        });
     }
 
     // NOTE: see _update.
