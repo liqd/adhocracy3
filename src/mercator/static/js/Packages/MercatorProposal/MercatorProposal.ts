@@ -590,7 +590,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     }
 
     private cleanOrganizationInfo(data) : void {
-
         var fieldsMap = {
             "registered_nonprofit": ["name", "country", "website"],
             "planned_nonprofit" : ["name", "country", "website", "date_of_foreseen_registration"],
@@ -634,7 +633,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             this.fill(data, mercatorProposalVersion);
 
             this.cleanOrganizationInfo(data);
-
 
             var subresources = _.map([
                 [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
