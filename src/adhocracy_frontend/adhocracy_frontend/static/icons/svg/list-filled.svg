@@ -10,11 +10,13 @@
 		</rdf:RDF>
 	</metadata>
 	<g id="layer1">
-		<g id="g3261" transform="matrix(1.0275904,0,0,1.030656,-1.6897604,-1.766401)">
-			<line id="line3263" stroke-linejoin="round" y2="9.6" fill="none" y1="40.4" stroke="#808080" stroke-linecap="round" stroke-miterlimit="10" x2="40.4" x1="9.6" stroke-width="2"/>
-			<g id="g3265">
-				<path id="path3267" fill="#808080" d="M25,3.7c11.7,0,21.3,9.6,21.3,21.3s-9.6,21.3-21.3,21.3-21.3-9.6-21.3-21.3,9.6-21.3,21.3-21.3m0-2c-12.9,0-23.3,10.4-23.3,23.3s10.4,23.3,23.3,23.3,23.3-10.4,23.3-23.3-10.4-23.3-23.3-23.3z"/>
-			</g>
+		<g id="g4223" fill="#808080" transform="matrix(1.0090607,0,0,1,-1.3064482,-1)">
+			<path id="path4225" d="M48.8,6.9h-36.1v8.3h36.1v-8.3z"/>
+			<path id="path4227" d="M9.8,6.9h-8.3v8.3h8.3v-8.3z"/>
+			<path id="path4229" d="M9.8,20.8h-8.3v8.3h8.3v-8.3z"/>
+			<path id="path4231" d="M9.8,34.8h-8.3v8.3h8.3v-8.3z"/>
+			<path id="path4233" d="M48.8,34.8h-36.1v8.3h36.1v-8.3z"/>
+			<path id="path4235" d="M46,20.8h-33.3v8.3h36.1v-8.3h-2.8z"/>
 		</g>
 	</g>
 </svg>

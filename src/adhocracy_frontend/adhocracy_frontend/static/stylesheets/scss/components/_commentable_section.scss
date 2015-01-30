@@ -20,7 +20,8 @@ A mixin to show comments somewhere
 
     i {
         display: block;
-        font-size: 120%;
+        font-size: 15px / $font-size-small * 1em;
+        line-height: 1;
     }
 }
 

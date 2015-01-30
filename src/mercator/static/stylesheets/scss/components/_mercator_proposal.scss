@@ -171,14 +171,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     &.mercator-propsal-detail-meta-item-total-supporters {
         i {
             color: $color-brand-one-normal;
-            font-size: 200%;
-            vertical-align: text-top;
-        }
-    }
-
-    &.mercator-propsal-detail-meta-item-budget {
-        i {
-            font-size: 160%;
         }
     }
 
@@ -239,8 +231,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 
     i {
-        font-size: 217%;
-        line-height: 0.8;
+        font-size: 23px / $font-size-small * 1em;
     }
 }
 
@@ -340,7 +331,9 @@ $mercator-proposal-detail-nav-width: 2em;
     padding: (10 / 14 * 1em) 1em;
 
     i {
-        font-size: 90%;
+        font-size: 10px / $font-size-normal * 1em;
+        margin-right: 2px;
+        vertical-align: middle;
     }
 
     .button-back-to-top {

@@ -1,16 +1,88 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="23.529px" height="25px" viewBox="0 0 23.529 25" enable-background="new 0 0 23.529 25" xml:space="preserve">
-<path fill="#818181" d="M13.391,13.235h-0.155c-0.939,0-1.729-0.328-2.349-0.974C9.804,11.131,8.7,8.787,8.823,5.882
-	c0.083-1.859,1.977-2.887,4.416-2.941V2.94l0.148,0.001c2.447,0.06,4.179,1.088,4.26,2.941c0.123,2.906-0.825,5.25-1.906,6.379
-	C15.122,12.907,14.331,13.235,13.391,13.235 M13.235,4.412c-1.671,0.027-2.897,0.434-2.941,1.471
-	c-0.103,2.419,0.726,4.556,1.499,5.362c0.335,0.35,0.756,0.521,1.287,0.521h0.155c0.528,0,0.95-0.171,1.287-0.521
-	c0.772-0.806,1.758-2.942,1.654-5.362C16.132,4.846,14.927,4.438,13.235,4.412"/>
-<path fill="#818181" d="M20.588,19.117H5.882v-0.734c0-3.829,3.756-5.148,6.965-5.148l0.253,0.004l0.135-0.003
-	c3.094,0,7.353,1.315,7.353,5.147V19.117z M7.353,17.647h11.764c-0.525-2.756-4.597-2.943-5.729-2.943l-0.152,0.002l-0.237-0.003
-	C11.878,14.703,7.874,14.89,7.353,17.647"/>
-<path fill="#818181" d="M23.529,22.059H2.941V0h20.588V22.059z M4.412,20.588h17.647V1.471H4.412V20.588z"/>
-<polygon fill="#818181" points="20.588,25 0,25 0,4.412 1.471,4.412 1.471,23.529 20.588,23.529 "/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2985"
+   viewBox="0 0 48 48"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   width="100%"
+   height="100%"
+   sodipodi:docname="users.svg">
+  <defs
+     id="defs16" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1054"
+     inkscape:window-height="1063"
+     id="namedview14"
+     showgrid="false"
+     inkscape:zoom="4.9166667"
+     inkscape:cx="24"
+     inkscape:cy="24"
+     inkscape:window-x="0"
+     inkscape:window-y="1095"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2985" />
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g3823"
+     transform="matrix(1.0179583,0,0,1.012733,-1.4489575,-1.318325)">
+    <path
+       id="path3825"
+       d="M 28.2,26.5 H 28 c -1.9,0 -3.4,-0.6 -4.4,-1.9 -2.1,-2.1 -4.2,-6.7 -4,-12.2 0.2,-3.6 3.8,-5.5 8.4,-5.7 h 0.2 c 4.6,0.2 8,2.1 8.2,5.7 0.2,5.5 -1.5,10.1 -3.6,12.2 -1.5,1.2 -3,1.9 -4.6,1.9 z M 27.7,9.6 c -3.2,0 -5.5,0.8 -5.7,2.7 -0.2,4.7 1.5,8.7 3,10.4 0.6,0.6 1.5,1.1 2.5,1.1 h 0.2 c 1.1,0 1.9,-0.4 2.5,-1.1 1.5,-1.5 3.4,-5.7 3.2,-10.3 0,-1.9 -2.3,-2.8 -5.7,-2.8 z"
+       inkscape:connector-curvature="0"
+       style="fill:#808080" />
+  </g>
+  <g
+     id="g3827"
+     transform="matrix(1.0179583,0,0,1.012733,-1.4489575,-1.318325)">
+    <path
+       id="path3829"
+       d="m 41.9,37.6 h -28 v -1.5 c 0,-7.4 7.2,-9.9 13.3,-9.9 h 0.6 c 5.9,0 14.1,2.5 14.1,9.9 v 1.5 z M 16.6,34.9 H 39.1 C 38,29.6 30.3,29.2 28.1,29.2 h -0.6 c -2.3,0 -9.9,0.4 -10.9,5.7 z"
+       inkscape:connector-curvature="0"
+       style="fill:#808080" />
+  </g>
+  <g
+     id="g3831"
+     transform="matrix(1.0179583,0,0,1.012733,-1.4489575,-1.318325)">
+    <path
+       id="path3833"
+       d="M 47.5,43.3 H 8.1 V 1.2 H 47.5 V 43.3 z M 10.9,40.4 H 44.6 V 3.9 H 10.9 v 36.5 z"
+       inkscape:connector-curvature="0"
+       style="fill:#808080" />
+  </g>
+  <g
+     id="g3835"
+     transform="matrix(1.0179583,0,0,1.012733,-1.4489575,-1.318325)">
+    <polygon
+       id="polygon3837"
+       points="5.4,46.1 41.9,46.1 41.9,48.8 2.5,48.8 2.5,9.6 5.4,9.6 "
+       style="fill:#808080" />
+  </g>
 </svg>
