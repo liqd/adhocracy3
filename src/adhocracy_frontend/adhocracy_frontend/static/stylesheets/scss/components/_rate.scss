@@ -33,7 +33,9 @@ $arrow-width: 1em;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
     color: white;
+    text-align: center;
     text-decoration: none;
+    min-width: 100px / $font-size-small * 1em;
 
     &:before {
         content: "";
@@ -57,12 +59,35 @@ $arrow-width: 1em;
         }
     }
 
+    .supporting .text-unsupport {
+        display: none;
+    }
+
     &:active,
     &.is-rate-button-active {
         background: $color-function-valid;
 
         &:before {
             border-right-color: $color-function-valid;
+        }
+
+        // :focus is sometimes set on click and then stays.
+        // That's why it is skipped here.
+        &:hover {
+            // scss-lint:disable NestingDepth
+            background: $color-brand-three-normal;
+
+            .supporting .text-unsupport {
+                display: block;
+            }
+
+            .supporting .text-supporting {
+                display: none;
+            }
+
+            &:before {
+                border-right-color: $color-brand-three-normal;
+            }
         }
     }
 }
