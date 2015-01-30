@@ -1,4 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+
+import _ = require("lodash");
+
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
