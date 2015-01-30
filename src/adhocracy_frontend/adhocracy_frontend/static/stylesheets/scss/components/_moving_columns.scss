@@ -169,7 +169,7 @@ The menu should always have the same state as its columns.
 
 .moving-column-body {
     border: 0 solid $color-structure-normal;
-    border-width: 0 0 $moving-column-border-width $moving-column-border-width;
+    border-width: 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
 }
 

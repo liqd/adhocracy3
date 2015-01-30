@@ -300,10 +300,15 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item {
     @include container;
+    display: block;
     border-bottom: 2px solid $color-structure-normal;
     font-size: $font-size-plus;
     line-height: 1;
     padding: 1em 1.25em 1.125em 0.875em;
+
+    // reset link styling
+    color: inherit;
+    text-decoration: none;
 
     &.is-not-selected {
         background: $color-background-base-introvert;
@@ -312,16 +317,9 @@ $mercator-proposal-detail-nav-width: 2em;
         .mercator-propsal-list-item-meta-item-budget {
             color: $color-text-highlight-introvert;
         }
-    }
-}
 
-.mercator-proposal-list-item-link {
-    color: $color-text-introvert;
-    text-decoration: none;
-
-    &:hover, &:focus {
-        .mercator-proposal-list-item-title {
-            color: $color-text-highlight-normal;
+        &:hover, &:focus {
+            background: white;
         }
     }
 }

@@ -63,15 +63,18 @@ export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendErro
  */
 export var logBackendBatchError = (
     response : ng.IHttpPromiseCallbackArg<{
-        code : number;
-        body : IBackendError;
-    }[]>
+        responses : {
+            code : number;
+            body : IBackendError;
+        }[];
+        updated_resources : any;
+    }>
 ) : void => {
     "use strict";
 
     renderBackendError(response);
 
-    var lastBatchItemResponse : IBackendError = response.data[response.data.length - 1].body;
+    var lastBatchItemResponse : IBackendError = response.data.responses[response.data.responses.length - 1].body;
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
     throw errors;
 };

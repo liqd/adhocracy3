@@ -74,7 +74,7 @@ export interface IFacetsScope extends ng.IScope {
     update : () => ng.IPromise<void>;
     enableItem : (IFacet, IFacetItem) => void;
     disableItem : (IFacet, IFacetItem) => void;
-    toggleItem : (IFacet, IFacetItem) => void;
+    toggleItem : (IFacet, IFacetItem, event) => void;
 }
 
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
@@ -218,7 +218,8 @@ export var facets = (adhConfig : AdhConfig.IService) => {
                     scope.update();
                 }
             };
-            scope.toggleItem = (facet : IFacet, item : IFacetItem) => {
+            scope.toggleItem = (facet : IFacet, item : IFacetItem, event) => {
+                event.stopPropagation();
                 if (item.enabled) {
                     scope.disableItem(facet, item);
                 } else {
