@@ -309,6 +309,7 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item {
     @include container;
+    border-right: $moving-column-border-width solid $color-structure-normal;
     border-bottom: 2px solid $color-structure-normal;
     font-size: $font-size-plus;
     line-height: 1;

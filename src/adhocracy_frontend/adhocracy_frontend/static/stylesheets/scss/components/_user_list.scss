@@ -28,6 +28,7 @@ A user list item within a listing widget
 .user-list-item-link {
     background: $color-background-base-introvert;
     border-bottom: 2px solid $color-structure-normal;
+    border-right: $moving-column-border-width solid $color-structure-normal;
     display: block;
     line-height: 1;
     overflow: hidden;

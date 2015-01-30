@@ -168,6 +168,7 @@ The menu should always have the same state as its columns.
 }
 
 .moving-column-body {
+    @include single-box-shadow(-$moving-column-border-width, 0, 0, 0, $color-structure-normal, true);
     border: 0 solid $color-structure-normal;
     border-width: 0 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
