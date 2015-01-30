@@ -71,6 +71,8 @@ $arrow-width: 1em;
             border-right-color: $color-function-valid;
         }
 
+        // :focus is sometimes set on click and then stays.
+        // That's why it is skipped here.
         &:hover {
             // scss-lint:disable NestingDepth
             background: $color-brand-three-normal;
