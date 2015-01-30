@@ -39,7 +39,7 @@ export class Service {
             if (_self.Modernizr.localstorage) {
                 var path = _self.$window.localStorage.getItem("user-path");
                 var token = _self.$window.localStorage.getItem("user-token");
-                if (token !== null && path !== null) {
+                if (token && path) {
                     _self.enableToken(token, path, true);
                 } else {
                     // $apply is necessary here to trigger a UI

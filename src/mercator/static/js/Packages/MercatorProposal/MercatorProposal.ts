@@ -1,4 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
+
+import _ = require("lodash");
+
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
@@ -394,7 +397,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.country = res.country;
                         scope.website = res.website;
                         if (res.planned_date) {
-                            scope.date_of_foreseen_registration = moment(res.planned_date).format("YYYY-MM-DD");
+                            scope.date_of_foreseen_registration = this.moment(res.planned_date).format("YYYY-MM-DD");
                         }
                         scope.how_can_we_help_you = res.help_request;
                         scope.status_other = res.status_other;
@@ -589,6 +592,22 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         }
     }
 
+    private cleanOrganizationInfo(data) : void {
+        var fieldsMap = {
+            "registered_nonprofit": ["name", "country", "website"],
+            "planned_nonprofit" : ["name", "country", "website", "date_of_foreseen_registration"],
+            "support_needed" : ["name", "country", "website", "how_can_we_help_you"],
+            "other" : ["status_other"]
+        };
+        var allKeys = _.uniq(_.flatten(_.values(fieldsMap)));
+
+        _.forOwn(data.organization_info, (value, key, object) => {
+            if (_.contains(allKeys, key) && !(_.contains(fieldsMap[object.status_enum], key))) {
+                delete object[key];
+            }
+        });
+    }
+
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data : IScopeData = this.initializeScope(instance.scope);
@@ -613,6 +632,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             });
 
             this.fill(data, mercatorProposalVersion);
+
+            this.cleanOrganizationInfo(data);
 
             var subresources = _.map([
                 [RIMercatorOrganizationInfo, RIMercatorOrganizationInfoVersion, "organization_info"],
@@ -674,6 +695,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
             mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
             this.fill(data, mercatorProposalVersion);
+
+            this.cleanOrganizationInfo(data);
 
             return AdhUtil.qFilter(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
                     var deferred = self.$q.defer();
