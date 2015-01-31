@@ -198,11 +198,10 @@ def reference_has_new_version_subscriber(event):
         is_versionable = IVersionable.providedBy(resource)
         is_forkable = IForkableVersionable.providedBy(resource)
         # versionable without new version: create a new version store appstruct
-        if is_versionable and new_version is None:
-            if not is_forkable:  # pragma: no branch
-                _assert_we_are_not_forking(resource, registry, event)
-            _update_versionable(resource, isheet, appstruct, root_versions,
-                                registry, creator)
+        if is_versionable and new_version is None and not is_forkable:
+            if _check_update_if_not_forking(resource, registry, event):
+                _update_versionable(resource, isheet, appstruct, root_versions,
+                                    registry, creator)
         # versionable with new version: use new version to store appstruct
         elif is_versionable and new_version is not None:
             new_version_sheet = get_sheet(new_version, isheet,
@@ -213,12 +212,27 @@ def reference_has_new_version_subscriber(event):
             sheet.set(appstruct)
 
 
-def _assert_we_are_not_forking(resource, registry, event):
-    """Assert that the last tag == resource to prevent forking."""
+def _check_update_if_not_forking(resource, registry, event):
+    """Check whether to autoupdate in resource is non-forkable.
+
+    If the given resource is the last version or there's no last version yet,
+    do autoupdate.
+
+    If it's not the last version, but references the same object (namely the
+    one which caused the autoupdate), don't update.
+
+    If it's not the last version, but doesn't references a different object,
+    throw an AutoUpdateNoForkAllowedError. This should only happen in batch
+    requests.
+    """
     last = get_last_version(resource, registry)
-    if last is None:
-        return
-    if resource is not last:
+    if last is None or last is resource:
+        return True
+    resource_ref = get_sheet(resource, event.isheet).get()[event.isheet_field]
+    last_ref = get_sheet(last, event.isheet).get()[event.isheet_field]
+    if last_ref == resource_ref:
+        return False
+    else:
         raise AutoUpdateNoForkAllowedError(resource, event)
 
 
