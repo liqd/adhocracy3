@@ -58,6 +58,7 @@ from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
+from adhocracy_core.utils import set_batchmode
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
@@ -281,6 +282,7 @@ class RESTView:
         validate_request_data(context, request,
                               schema=schema_class(),
                               extra_validators=validators)
+        set_batchmode(request.registry, False)
 
     def options(self) -> dict:
         """Return options for view.
