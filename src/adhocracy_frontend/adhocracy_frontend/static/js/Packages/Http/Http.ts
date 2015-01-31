@@ -318,6 +318,8 @@ export class Service<Content extends ResourcesBase.Resource> {
                     // double waitms (fuzzed for avoiding network congestion).
                     waitms *= 2 * (1 + (Math.random() / 2 - 0.25));
 
+                    console.log("Posting version as follower of " + nextOldVersionPath + " failed.");
+
                     // wait then retry
                     return _self.$timeout(
                         () => _self.getNewestVersionPathNoFork(dagPath)
