@@ -23,15 +23,21 @@ A section with a additional annotation, typically displayed in a second column.
 ```
 */
 .annotated-section {
-    @include pie-clearfix;
+    font-size: 0;
+
+    .annotated-section-body,
+    .annotated-section-annotation {
+        @include inline-block;
+        vertical-align: top;
+        font-size: $font-size-normal;
+    }
 
     .annotated-section-body {
-        float: left;
         width: 97% - $annotation-width;
+        margin-right: 3%;
     }
 
     .annotated-section-annotation {
-        float: right;
         margin-bottom: 2em;
         width: $annotation-width;
     }
