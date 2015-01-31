@@ -213,7 +213,6 @@ export var factory = (
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
         return new Service(postMessageToParent, $location, $window, $rootScope, adhConfig.trusted_domains, adhUser);
     } else {
-        console.log("Using dummy CrossWindowMessaging because we are not embedded.");
         return new Dummy();
     }
 };
