@@ -67,7 +67,11 @@ class BatchView(RESTView):
                 err = _JSONError([], status=item_response.code)
                 err.text = dumps(self._response_list_to_json(response_list))
                 raise err
-        return self._response_list_to_json(response_list)
+        response = self._response_list_to_json(response_list)
+        # Explicitly unset batchmode because registry is shared between
+        # requests
+        set_batchmode(self.request.registry, False)
+        return response
 
     @view_config(name='batch',
                  request_method='OPTIONS')
