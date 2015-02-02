@@ -62,7 +62,7 @@ def cachebust_query_params(request):
 
 
 def require_config_view(request):
-    """Return the embeddee HTML."""
+    """Return require config."""
     query_params = cachebust_query_params(request)
     config = config_view(request)
     result = render(
@@ -71,6 +71,7 @@ def require_config_view(request):
             'minify': not config['debug'],
         }, request=request)
     response = Response(result)
+    response.content_type = 'application/javascript'
     return response
 
 
