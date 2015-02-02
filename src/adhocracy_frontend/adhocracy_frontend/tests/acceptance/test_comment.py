@@ -17,7 +17,7 @@ EDIT = 'Edit'
 REPLY = 'Reply'
 SAVE = 'save'
 
-@fixture(scope="module")
+@fixture(scope='module')
 def user():
     name = get_random_string(n=5)
     password = 'password'
@@ -57,7 +57,7 @@ class TestComment:
 
         browser.reload()
 
-        assert wait(lambda: browser.find_by_css('.comment-content')\
+        assert wait(lambda: browser.find_by_css('.comment-content')
                                    .first.text == 'edited')
 
     def test_edit_twice(self, browser):
