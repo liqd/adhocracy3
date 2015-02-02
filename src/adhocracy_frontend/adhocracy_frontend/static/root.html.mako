@@ -14,7 +14,7 @@
             <img src="/static/icons/png/attention.png"/>
             <div>
                 <h1>Non-supported browser!</h1>
-                <p>Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein
+                <p>FIXME: Needs real text. Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein
                 Musterbuch zu erstellen.</p>
             </div>
         </div>
