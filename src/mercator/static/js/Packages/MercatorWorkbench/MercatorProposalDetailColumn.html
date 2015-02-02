@@ -27,7 +27,7 @@
     <adh-social-share
         data-ng-switch-when="overlays"
         data-ng-if="overlay === 'share'"
-        data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
+        data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
             <a href="" class="button" data-ng-click="ctrl.hideOverlay('share')">{{ 'cancel' | translate }}</a>
     </adh-social-share>
 </div>
