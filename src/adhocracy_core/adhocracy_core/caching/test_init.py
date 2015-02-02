@@ -394,16 +394,16 @@ class TestIntegrationCaching:
         assert resp.headers['Vary'] == 'X-User-Path, X-User-Token'
         assert resp.headers['etag'] == '"None|None|None|None|None"'
 
-    def test_strategy_not_modified_if_modified_since_request(self, app_user,
-                                                             context):
+    def test_strategy_modified_if_modified_since_request(self, app_user,
+                                                         context):
         from datetime import datetime
         context.modification_date = datetime(2015, 1, 1)
         resp = app_user.get('/', status=200, headers={'If-Modified-Since':
                                                       'Fri, 23 Jan 2000 15:19:22 GMT'})
         assert resp.status == '200 OK'
 
-    def test_strategy_modified_if_modified_since_request(self, app_user,
-                                                          context):
+    def test_strategy_not_modified_if_modified_since_request(self, app_user,
+                                                             context):
         from datetime import datetime
         context.modification_date = datetime(2000, 1, 23)
         resp = app_user.get('/', status=304, headers={'If-Modified-Since':
