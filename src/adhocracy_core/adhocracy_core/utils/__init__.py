@@ -330,13 +330,13 @@ def get_changelog_metadata(resource, registry) -> ChangelogMetadata:
     return changelog
 
 
-def set_batchmode(registry: Registry):
+def set_batchmode(registry: Registry, batch_mode=True):
     """Set 'batchmode' marker for the current request.
 
     This is called by :class:`adhocracy_core.rest.batchview.BatchView`.
     Other code can check :func:`is_batchmode` to modify behavior.
     """
-    registry.__is_batchmode__ = True
+    registry.__is_batchmode__ = batch_mode
 
 
 def is_batchmode(registry: Registry) -> bool:
