@@ -10,7 +10,7 @@
     </head>
     <body>
         <!--[if lt IE 9]>
-        <div class="unsuported-browser">
+        <div class="unsupported-browser">
             <img src="/static/icons/png/attention.png"/>
             <div>
                 <h1>Non-supported browser!</h1>
