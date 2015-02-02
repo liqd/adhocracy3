@@ -185,6 +185,11 @@ export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : AdhM
                     } else {
                         delete sheet[fieldName];
                     }
+                    // workaround, as normal users can not set `hidden` field
+                    // FIXME: use more appropriate place, e.g. expose in meta api
+                    if (sheetName === "adhocracy_core.sheets.metadata.IMetadata" && fieldName === "hidden") {
+                        delete sheet[fieldName];
+                    }
                 }
             }
 
