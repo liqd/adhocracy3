@@ -213,7 +213,7 @@ def reference_has_new_version_subscriber(event):
 
 
 def _check_update_if_not_forking(resource, registry, event):
-    """Check whether to autoupdate in resource is non-forkable.
+    """Check whether to autoupdate if resource is non-forkable.
 
     If the given resource is the last version or there's no last version yet,
     do autoupdate.
@@ -221,7 +221,7 @@ def _check_update_if_not_forking(resource, registry, event):
     If it's not the last version, but references the same object (namely the
     one which caused the autoupdate), don't update.
 
-    If it's not the last version, but doesn't references a different object,
+    If it's not the last version, but references a different object,
     throw an AutoUpdateNoForkAllowedError. This should only happen in batch
     requests.
     """
