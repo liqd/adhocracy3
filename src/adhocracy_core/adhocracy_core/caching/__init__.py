@@ -120,7 +120,7 @@ class HTTPCacheStrategyBaseAdapter:
         if last_modified is None:  # pragma: no coverage
             return
         modified_since = self.request.if_modified_since
-        if last_modified >= modified_since:  # pragma: no branch
+        if last_modified <= modified_since:  # pragma: no branch
             raise HTTPNotModified()
 
     def _check_condition_none_match(self):
