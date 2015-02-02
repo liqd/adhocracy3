@@ -11,10 +11,12 @@
     <body>
         <!--[if lt IE 9]>
         <div class="unsuported-browser">
-            <img src="/static/icons/svg/attention.svg"/>
-            <h1>Non-supported browser!</h1>
-            <p>Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein
-            Musterbuch zu erstellen.</p>
+            <img src="/static/icons/png/attention.png"/>
+            <div>
+                <h1>Non-supported browser!</h1>
+                <p>Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein
+                Musterbuch zu erstellen.</p>
+            </div>
         </div>
         <![endif]-->
         <!--[if gt IE 8]><!-->

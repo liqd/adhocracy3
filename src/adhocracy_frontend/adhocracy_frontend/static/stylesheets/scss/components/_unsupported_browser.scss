@@ -1,0 +1,23 @@
+.unsuported-browser {
+    @include clearfix;
+    background: $color-structure-normal;
+    padding: 1em;
+
+    h1 {
+        font-size: $font-size-plus;
+        font-weight: $font-weight-normal;
+        margin: 0 0 (5px / $font-size-plus * 1em);
+    }
+
+    div {
+        margin-left: 56px;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    img {
+        float: left;
+    }
+}
