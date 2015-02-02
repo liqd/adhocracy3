@@ -38,43 +38,47 @@
 
                     <div class="row">
                         <div class="cols-2">
-                            <input
-                                type="text"
-                                data-ng-change="changefield()"
-                                data-ng-model="data.user_info.first_name"
-                                name="user-info-first-name"
-                                placeholder="{{ 'Name' | translate }}"
-                                required="required" />
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.user-info-first-name', 'required')">
-                                {{ "Please enter your first name" | translate }}</span>
+                            <label>
+                                <span class="label-text">{{ 'Name' | translate }}</span>
+                                <input
+                                    type="text"
+                                    data-ng-change="changefield()"
+                                    data-ng-model="data.user_info.first_name"
+                                    name="user-info-first-name"
+                                    required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.user-info-first-name', 'required')">
+                                    {{ "Please enter your first name" | translate }}</span>
+                            </label>
                         </div>
                         <div class="cols-2">
-                            <input
-                                type="text"
-                                data-ng-model="data.user_info.last_name"
-                                name="user-info-last-name"
-                                placeholder="{{ 'Lastname' | translate }}"
-                                required="required" />
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.user-info-last-name', 'required')">
-                                {{ "Please enter your last name" | translate }}</span>
+                            <label>
+                                <span class="label-text">{{ 'Lastname' | translate }}</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.user_info.last_name"
+                                    name="user-info-last-name"
+                                    required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.user-info-last-name', 'required')">
+                                    {{ "Please enter your last name" | translate }}</span>
+                            </label>
                         </div>
                     </div>
-                    <country-select
-                        data-ng-change="changefield()"
-                        data-ng-model="data.user_info.country"
-                        data-name="user-info-country"
-                        data-required="required"></country-select>
-
-                    <span
-                        class="input-error"
-                        data-ng-if="showError('mercatorProposalBasicForm.user-info-country', 'required')">
-                        {{ "Please select a country" | translate }}</span>
+                    <label>
+                        <span class="label-text">{{ 'Country' | translate }}</span>
+                        <country-select
+                            data-ng-change="changefield()"
+                            data-ng-model="data.user_info.country"
+                            data-name="user-info-country"
+                            data-required="required"></country-select>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.user-info-country', 'required')">
+                            {{ "Please select a country" | translate }}</span>
+                    </label>
 
                     <h3 class="mercator-proposal-form-subheading">{{ "Organisation Info:" | translate }}</h3>
 
