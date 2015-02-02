@@ -3,6 +3,7 @@
         <i class="icon-document moving-column-icon"></i>
         <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ 'edit' | translate }}</a>
         <a href="" data-ng-click="ctrl.toggleOverlay('abuse')">{{ 'report' | translate }}</a>
+        <a href="" data-ng-click="ctrl.toggleOverlay('share')">{{ 'share' | translate }}</a>
 
         <div class="moving-column-menu-nav">
             <a href="{{ platformUrl | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
@@ -22,4 +23,9 @@
         data-ng-if="overlay === 'abuse'"
         data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
+
+    <div data-ng-switch-when="overlays" data-ng-if="overlay === 'share'">
+        <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
+        <a href="" class="button" data-ng-click="ctrl.hideOverlay('share')">{{ 'cancel' | translate }}</a>
+    </div>
 </div>
