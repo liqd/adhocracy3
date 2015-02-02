@@ -12,7 +12,7 @@ from pyramid.traversal import resource_path
 from zope.component import ComponentLookupError
 
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import raise_colander_style_error
 
@@ -178,7 +178,7 @@ class Messenger():
             sender=from_email)
 
     def _get_user_email(self, user: IResource) -> str:
-        return get_sheet_field(user, IUserBasic, 'email', self.registry)
+        return get_sheet_field(user, IUserExtended, 'email', self.registry)
 
 
 def includeme(config):

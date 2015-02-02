@@ -72,6 +72,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:admin', 'edit_group'),
             (Allow, 'role:admin', 'edit_some_sheets'),
             (Allow, 'role:admin', 'edit_sheet'),  # edit sheets default
+            (Allow, 'role:admin', 'manage_principals'),
             (Allow, 'role:admin', 'view_userextended'),
             (Allow, 'role:admin', 'edit_userextended'),
             # God role

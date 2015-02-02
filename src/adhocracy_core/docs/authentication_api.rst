@@ -336,6 +336,7 @@ Other users, even if logged in, cannot::
     >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
     False
 
+
 User Logout
 -----------
 
