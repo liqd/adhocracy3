@@ -19,9 +19,6 @@ export var socialShare = (adhConfig : AdhConfig.IService, $location : ng.ILocati
                     facebook : {
                         perma_option: "off"
                     },
-                    fbshare : {
-                        status: "on"
-                    },
                     twitter : {
                         tweet_text: attrs.tweetText ? attrs.tweetText : document.title,
                         perma_option: "off"
