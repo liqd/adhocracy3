@@ -1,6 +1,5 @@
 from urllib.parse import urlencode
 
-from pytest import mark
 from pytest import fixture
 
 from adhocracy_core.testing import god_login
@@ -18,7 +17,7 @@ EDIT = 'Edit'
 REPLY = 'Reply'
 SAVE = 'save'
 
-@fixture(scope="module")
+@fixture(scope='module')
 def user():
     name = get_random_string(n=5)
     password = 'password'
@@ -58,7 +57,7 @@ class TestComment:
 
         browser.reload()
 
-        assert wait(lambda: browser.find_by_css('.comment-content')\
+        assert wait(lambda: browser.find_by_css('.comment-content')
                                    .first.text == 'edited')
 
     def test_edit_twice(self, browser):
@@ -68,13 +67,13 @@ class TestComment:
         edit_comment(browser, comment, 'edited 2')
         assert comment.find_by_css('.comment-content div').first.text == 'edited 2'
 
-    @mark.xfail
     def test_multi_edits(self, browser):
         parent = browser.find_by_css('.comment').first
         reply = parent.find_by_css('.comment').first
         edit_comment(browser, reply, 'somereply edited')
         edit_comment(browser, parent, 'edited')
-        assert parent.find_by_css('.comment-content').first.text == 'edited'
+        content = parent.find_by_css('.comment-content')
+        assert wait(lambda: content.first.text == 'edited')
 
     def test_author(self, browser):
         comment = browser.find_by_css('.comment').first
