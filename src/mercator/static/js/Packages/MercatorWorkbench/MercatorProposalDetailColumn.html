@@ -24,10 +24,8 @@
         data-url="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
     </adh-report-abuse>
 
-    <adh-social-share
-        data-ng-switch-when="overlays"
-        data-ng-if="overlay === 'share'"
-        data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}">
-            <a href="" class="button" data-ng-click="ctrl.hideOverlay('share')">{{ 'cancel' | translate }}</a>
-    </adh-social-share>
+    <div data-ng-switch-when="overlays" data-ng-if="overlay === 'share'">
+        <adh-social-share data-uri="{{ proposalUrl | adhResourceUrl | adhCanonicalUrl }}"></adh-social-share>
+        <a href="" class="button" data-ng-click="ctrl.hideOverlay('share')">{{ 'cancel' | translate }}</a>
+    </div>
 </div>
