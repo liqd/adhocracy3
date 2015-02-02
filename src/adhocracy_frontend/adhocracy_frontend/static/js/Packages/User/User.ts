@@ -1,6 +1,7 @@
 import _ = require("lodash");
 
 import AdhHttp = require("../Http/Http");
+import AdhCache = require("../Http/Cache");
 
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
@@ -24,6 +25,7 @@ export class Service {
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
+        private adhCache : AdhCache.Service,
         private $q : ng.IQService,
         private $http : ng.IHttpService,
         private $rootScope : ng.IScope,
@@ -73,6 +75,7 @@ export class Service {
             .then((resource) => {
                 _self.data = resource.data[SIUserBasic.nick];
                 _self.loggedIn = true;
+                _self.adhCache.invalidateAll();
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
@@ -107,6 +110,8 @@ export class Service {
         _self.userPath = undefined;
         _self.data = undefined;
         _self.loggedIn = false;
+
+        _self.adhCache.invalidateAll();
     }
 
     public logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
@@ -178,5 +183,5 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName,
         ])
-        .service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
+        .service("adhUser", ["adhHttp", "adhCache", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
 };

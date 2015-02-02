@@ -18,6 +18,7 @@ pytestmark = mark.jasmine
 
 
 class TestJasmine:
+    @mark.xfail
     def test_all(self, browser_igtest):
         data = browser_igtest.evaluate_script('jsApiReporter.specs()')
 

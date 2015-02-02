@@ -26,41 +26,53 @@
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalBasicForm" id="mercator-proposal-basic">
 
-            <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
-
             <div class="annotated-section">
 
+                <div class="annotated-section-annotation mercator-proposal-form-annotation">
+                    <h3 class="mercator-proposal-form-annotation-heading">{{ "Disclaimer" | translate }}</h3>
+                    {{"Dicslaimer: be aware that everything will be shown
+                    publicly on the platform. Please make sure that you
+                    publish your proposal before leaving the page,
+                    cause your changes will be lost.before leaving, " | translate}}
+                </div>
+
                 <div class="annotated-section-body">
+
+                    <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
 
                     <h3 class="mercator-proposal-form-subheading">{{ "User Info:" | translate }}</h3>
 
                     <h4 class="mercator-proposal-form-sub-subheading">{{ "Proposal pitch" | translate }}</h4>
 
-                    <input
-                        type="text"
-                        data-ng-change="changefield()"
-                        data-ng-model="data.user_info.first_name"
-                        name="user-info-first-name"
-                        placeholder="{{ 'Name' | translate }}"
-                        required="required" />
+                    <div class="row">
+                        <div class="cols-2">
+                            <input
+                                type="text"
+                                data-ng-change="changefield()"
+                                data-ng-model="data.user_info.first_name"
+                                name="user-info-first-name"
+                                placeholder="{{ 'Name' | translate }}"
+                                required="required" />
 
-                    <span
-                        class="input-error"
-                        data-ng-if="showError('mercatorProposalBasicForm.user-info-first-name', 'required')">
-                        {{ "Please enter your first name" | translate }}</span>
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.user-info-first-name', 'required')">
+                                {{ "Please enter your first name" | translate }}</span>
+                        </div>
+                        <div class="cols-2">
+                            <input
+                                type="text"
+                                data-ng-model="data.user_info.last_name"
+                                name="user-info-last-name"
+                                placeholder="{{ 'Lastname' | translate }}"
+                                required="required" />
 
-                    <input
-                        type="text"
-                        data-ng-model="data.user_info.last_name"
-                        name="user-info-last-name"
-                        placeholder="{{ 'Lastname' | translate }}"
-                        required="required" />
-
-                    <span
-                        class="input-error"
-                        data-ng-if="showError('mercatorProposalBasicForm.user-info-last-name', 'required')">
-                        {{ "Please enter your last name" | translate }}</span>
-
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.user-info-last-name', 'required')">
+                                {{ "Please enter your last name" | translate }}</span>
+                        </div>
+                    </div>
                     <country-select
                         data-ng-change="changefield()"
                         data-ng-model="data.user_info.country"
@@ -119,6 +131,11 @@
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}" />
 
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
+
                         </fieldset>
 
                         <label>
@@ -157,11 +174,18 @@
                                 {{ "Please enter your organization country" | translate }}</span>
 
                             <input
-                                type="date"
+                                type="text"
                                 data-ng-model="data.organization_info.date_of_foreseen_registration"
                                 name="organization-info-date-of-foreseen-registration"
-                                placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}"
+                                data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
+                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)' | translate }}"
                                 required="required" />
+
+                            <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
+                                'pattern')">
+                                {{ "Please enter a valid date" | translate }}</span>
 
                             <span
                                 class="input-error"
@@ -170,10 +194,15 @@
                                 {{ "Please enter your registration date" | translate }}</span>
 
                             <input
-                                type="text"
+                                type="url"
                                 data-ng-model="data.organization_info.website"
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}"/>
+
+                             <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
 
                         </fieldset>
 
@@ -213,10 +242,15 @@
                                 {{ "Please enter your organization country" | translate }}</span>
 
                             <input
-                                type="text"
+                                type="url"
                                 data-ng-model="data.organization_info.website"
                                 name="organization-info-website"
                                 placeholder="{{ 'Website' | translate }}" />
+
+                             <span
+                                class="input-error"
+                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                {{ "Please enter a valid url" | translate }}</span>
 
                             <label>
                                 <span class="label-text">{{ "How can we help you? Please specify:" | translate }}</span>
@@ -341,12 +375,14 @@
                                 current image:
                                 <img class="mercator-proposal-detail-view-image"
                                      data-ng-src="{{ data.introduction.picture | adhImageUri }}"
-                                     style="width: 100%; height: 203px"/>
+                                     style="width: 100%; height: 203px"
+                                     alt="{{ 'current image' | translate }}" />
                             </div>
                             <button
                                 type="button"
                                 data-flow-btn=""
-                                data-flow-attrs="{accept:'image/*'}">
+                                data-flow-attrs="{accept:'image/*'}"
+                                class="m-call-to-action2">
                                 <span data-ng-if="$flow.files.length > 0">{{ "Change Image" | translate }}</span>
                                 <span data-ng-if="!$flow.files.length || $flow.files.length == 0">{{ "Choose Image" | translate }}</span>
                             </button>
@@ -375,7 +411,7 @@
                                 </span>
                             </div>
                             <div class="picture-upload-file" ng-if="$flow.files.length > 0" data-ng-repeat="file in $flow.files">
-                                <img data-flow-img="file" height="120" /><br/>{{file.name}}
+                                <img data-flow-img="file" height="120" alt="{{ 'selected image' | translate }}" /><br/>{{file.name}}
                             </div>
                         </div>
                     </label>
@@ -402,7 +438,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        {{ "description:" | translate }}
+                        <span class="label-text">{{ "description:" | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.description.description"
@@ -444,25 +480,29 @@
                             {{ "Specific Location" | translate }}
                         </label>
 
-                        <div data-ng-show="data.location.location_is_specific" >
-                            <input
-                                type="text"
-                                data-ng-model="data.location.location_specific_1"
-                                name="location-location-specific-1"
-                                placeholder="{{ 'City, Country' | translate }}"
-                                data-ng-required="data.location.location_is_specific" />
-
-                            <input
-                                type="text"
-                                data-ng-model="data.location.location_specific_2"
-                                name="location-location-specific-2"
-                                placeholder="{{ 'City, Country' | translate }}" />
-
-                            <input
-                                type="text"
-                                data-ng-model="data.location.location_specific_3"
-                                name="location-location-specific-3"
-                                placeholder="{{ 'City, Country' | translate }}" />
+                        <div data-ng-show="data.location.location_is_specific" class="row">
+                            <div class="cols-3">
+                                <input
+                                    type="text"
+                                    data-ng-model="data.location.location_specific_1"
+                                    name="location-location-specific-1"
+                                    placeholder="{{ 'City, Country' | translate }}"
+                                    data-ng-required="data.location.location_is_specific" />
+                            </div>
+                            <div class="cols-3">
+                                <input
+                                    type="text"
+                                    data-ng-model="data.location.location_specific_2"
+                                    name="location-location-specific-2"
+                                    placeholder="{{ 'City, Country' | translate }}" />
+                            </div>
+                            <div class="cols-3">
+                                <input
+                                    type="text"
+                                    data-ng-model="data.location.location_specific_3"
+                                    name="location-location-specific-3"
+                                    placeholder="{{ 'City, Country' | translate }}" />
+                            </div>
                         </div>
 
                         <label>
@@ -700,6 +740,7 @@
                             type="number"
                             data-ng-model="data.finance.requested_funding"
                             name="finance-requested-funding"
+                            min="0"
                             max="50000"
                             required="required" />
 
@@ -707,6 +748,14 @@
                             class="input-error"
                             data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'required')">
                             {{ "Please enter requested funding" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'max')">
+                            {{ "Not more than 50,000€ are allowed" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'min')">
+                            {{ "Please insert a number higher than 0" | translate }}</span>
                     </label>
 
                     <label>
@@ -716,7 +765,7 @@
 
                     <span class="label-text">{{ "Granted?" | translate }}</span>
 
-                    <div data-ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
+                    <div class="form-inline" data-ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
                         mercatorProposalForm.$submitted }">
 
                         <label>
@@ -790,7 +839,7 @@
                             placeholder="{{ '300 c. Max.' | translate }}"></textarea>
                     </label>
 
-                    {{ "How did you hear about “Advocate Europe”?" | translate }}
+                    <span class="label-text">{{ "How did you hear about “Advocate Europe”?" | translate }}</span>
 
                     <div data-ng-class="{ 'is-invalid': showHeardFromError() }">
 
@@ -842,7 +891,7 @@
                             {{ "Please select one" | translate }}</span>
                     </div><!-- /.ng-invalid -->
 
-                    {{ "DISCLAIMER*:" | translate }}
+                    <span class="label-text">{{ "DISCLAIMER*:" | translate }}</span>
                     <label data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
                         <input
                             type="checkbox"
@@ -857,12 +906,15 @@
 
         </section>
 
-        <input
-            type="submit"
-            name="submit"
-            value="{{ 'submit' | translate }}"
-            class="m-call-to-action" />
+        <footer class="form-footer">
+            <input
+                type="submit"
+                name="submit"
+                value="{{ 'publish' | translate }}"
+                class="m-call-to-action form-footer-button-cta" />
 
-        <a class="button" href="" data-ng-click="cancel()">{{ "Cancel" | translate }}</a>
+            <a href="" data-ng-click="cancel()" class="button form-footer-button">
+            {{ "Cancel" | translate }}</a>
+        </footer>
     </form>
 </div><!-- /.mercator-proposal-form-container -->

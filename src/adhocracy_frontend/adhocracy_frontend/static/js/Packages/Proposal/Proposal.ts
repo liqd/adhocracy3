@@ -362,9 +362,9 @@ export class Service {
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 
                 return transaction.commit()
-                    .then((batchResult) => {
+                    .then((postedResources) => {
                         // return the latest proposal Version
-                        return batchResult.postedResources[postProposalVersion.index];
+                        return postedResources[postProposalVersion.index];
                     });
             });
     }

@@ -16,7 +16,7 @@
         % endfor
 
         <script type="text/javascript">
-            require(["Adhocracy", "text!/config.json", "text!${meta_api}"], function(Adh, config_string, meta_api_string) {
+            require(["Adhocracy", "text!${config}", "text!${meta_api}"], function(Adh, config_string, meta_api_string) {
                 var config = JSON.parse(config_string);
                 var meta_api = JSON.parse(meta_api_string);
                 $(document).ready(function() {

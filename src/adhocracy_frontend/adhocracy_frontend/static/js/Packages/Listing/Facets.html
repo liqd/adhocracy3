@@ -1,10 +1,19 @@
-{{ "Filter list" | translate }}
-<ul>
-    <li data-ng-repeat="facet in facets">{{ facet.name | translate }}
-        <ul>
-            <li data-ng-repeat="item in facet.items">
-                <a href="" data-ng-click="toggleItem(facet, item)">{{ item.name | translate }}</a> <span ng-if="item.enabled">(enabled)</span>
-            </li>
-        </ul>
-    </li>
-</ul>
+<div class="facets">
+    <ul>
+        <li data-ng-repeat="facet in facets" class="facet">
+            <h3 class="facet-header">{{ facet.name | translate }}</h3>
+            <ul>
+                <li
+                    data-ng-repeat="item in facet.items">
+                    <a
+                        href=""
+                        class="facet-item"
+                        ng-class="{'is-active': item.enabled}"
+                        ng-click="toggleItem(facet, item)">
+                        {{ item.name | translate }}
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div><!-- /.facets -->

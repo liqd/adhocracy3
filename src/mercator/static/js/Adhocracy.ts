@@ -10,16 +10,16 @@ import angular = require("angular");
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
 import angularAria = require("angularAria");  if (angularAria) { ; };
 import angularMessages = require("angularMessages");  if (angularMessages) { ; };
+import angularCache = require("angularCache");  if (angularCache) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 import angularFlow = require("angularFlow");  if (angularFlow) { ; };
-import jqueryPlaceholderShim = require("jqueryPlaceholderShim");  if (jqueryPlaceholderShim) { ; };
-import angularPlaceholderShim = require("angularPlaceholderShim");  if (angularPlaceholderShim) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
+import webshim = require("polyfiller");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
 import AdhConfig = require("./Packages/Config/Config");
@@ -51,6 +51,10 @@ import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
 import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
+webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
+webshim.setOptions("forms-ext", {"replaceUI": true});
+webshim.setOptions({"waitReady": false});
+webshim.polyfill("forms forms-ext");
 
 var loadComplete = () : void => {
     var w = (<any>window);
@@ -70,13 +74,13 @@ export var init = (config : AdhConfig.IService, meta_api) => {
 
     var appDependencies = [
         "monospaced.elastic",
-        "placeholderShim",
         "pascalprecht.translate",
         "ngAnimate",
         "ngAria",
         "ngMessages",
         "duScroll",
         "flow",
+        "angular-data.DSCacheFactory",
         AdhComment.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
