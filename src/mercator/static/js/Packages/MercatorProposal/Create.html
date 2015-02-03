@@ -239,17 +239,18 @@
                                     data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
                                     {{ "Please enter your organization country" | translate }}</span>
                             </label>
-                            <input
-                                type="url"
-                                data-ng-model="data.organization_info.website"
-                                name="organization-info-website"
-                                placeholder="{{ 'Website' | translate }}" />
+                            <label>
+                                <span class="label-text">{{ 'Website' | translate }}</span>
+                                <input
+                                    type="url"
+                                    data-ng-model="data.organization_info.website"
+                                    name="organization-info-website" />
 
-                             <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
-                                {{ "Please enter a valid url" | translate }}</span>
-
+                                 <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                    {{ "Please enter a valid url" | translate }}</span>
+                            </label>
                             <label>
                                 <span class="label-text">{{ "How can we help you? Please specify:" | translate }}</span>
                                 <input
