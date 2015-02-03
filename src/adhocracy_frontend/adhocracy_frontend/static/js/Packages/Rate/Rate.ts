@@ -58,8 +58,6 @@ export interface IRateScope extends ng.IScope {
     auditTrail : { subject: string; rate: number }[];
     auditTrailVisible : boolean;
     isActive : (value : number) => boolean;
-    isActiveClass : (value : number) => string;  // css class name if RateValue is active, or "" otherwise.
-    differenceClass : () => string;  // css class name is-positive, is-negative or "" otherwise.
     toggleShowDetails() : void;
     cast(value : number) : void;
     toggle() : void;
@@ -255,19 +253,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             scope.isActive = (rate : number) : boolean =>
                 typeof scope.myRateResource !== "undefined" &&
                     rate === adapter.rate(scope.myRateResource);
-
-            scope.isActiveClass = (rate : number) : string =>
-                scope.isActive(rate) ? "is-rate-button-active" : "";
-
-            scope.differenceClass = () => {
-                var netRate = scope.rates.pro - scope.rates.contra;
-                if (netRate > 0) {
-                    return "is-positive";
-                } else if (netRate < 0) {
-                    return "is-negative";
-                }
-                return "";
-            };
 
             scope.toggleShowDetails = () => {
                 if (scope.auditTrailVisible) {
