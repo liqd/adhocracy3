@@ -13,11 +13,19 @@ Further reading
 Softwarestack
 -------------
 
-server (backend):
+Server (backend):
+
+- `Python 3 <http://www.python.org>`_ (programming language)
+
+- `Pyramid <http://pylonsproject.org>`_  (web framework)
 
 - `substance D <http://docs.pylonsproject.org/projects/substanced/en/latest>`_ (application framework/server)
 
-- `Pyramid <http://pylonsproject.org>`_  (web framework)
+- `hypatia <https://github.com/Pylons/hypatia>`_ (search)
+
+- `ZODB <http://zodb.org>`_ (database)
+
+- `colander <http://docs.pylonsproject.org/projects/colander/en/latest/>`_ (data schema)
 
 - `Autobahn|Python <http://autobahn.ws/python/>`_ (websocket servers)
 
@@ -27,19 +35,10 @@ server (backend):
 - `asyncio <https://pypi.python.org/pypi/asyncio>`_ (required in Python 3.3
   for Autobahn; comes pre-packaged with Python 3.4)
 
-- `hypatia <https://github.com/Pylons/hypatia>`_ (search)
-
-- `colander <http://docs.pylonsproject.org/projects/colander/en/latest/>`_ (data schema)
-
-- `deform <http://docs.pylonsproject.org/projects/deform/en/latest/>`_ (form generation)
-
-- `ZODB <http://zodb.org>`_ (database)
-
 - `buildout <http://www.buildout.org/en/latest/>`_ (build system)
 
-- `python 3 <http://www.python.org>`_ (programming language)
 
-client (frontend):
+Client (frontend):
 
 - `JavaScript` (programming language)
 
@@ -49,9 +48,15 @@ client (frontend):
 
 - `AngularJS <http://angularjs.org/>`_ (application framework)
 
+- `JQuery <https://jquery.com/>`_ (javascript helper library)
+
+- `Lodash <https://lodash.com/>`_ (functional javascript helper library)
+
 - `Splinter <http://splinter.cobrateam.info/>`_ (acceptance and frontend tests)
 
 - `Jasmine <https://jasmine.github.io/>`_ (unit tests)
 
 - `Sass <http://sass-lang.com/>`_/`Compass <http://compass-style.org/>`_
   (CSS preprocessor)
+
+- `Grunt <http://gruntjs.com/>`_ (build system)
