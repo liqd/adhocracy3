@@ -86,14 +86,14 @@
                         data-ng-class="{ 'is-invalid': mercatorProposalBasicForm['organization-info-status-enum'].$invalid
                             && mercatorProposalForm.$submitted }">
 
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 data-ng-model="data.organization_info.status_enum"
                                 name="organization-info-status-enum"
                                 value="registered_nonprofit"
                                 required="required" />
-                                <span class="label-text">{{ "We’re a registered non-profit, e.g. NGO" | translate }}</span>
+                                {{ "We’re a registered non-profit, e.g. NGO" | translate }}
                         </label>
 
                         <fieldset
@@ -136,14 +136,14 @@
                             </label>
                         </fieldset>
 
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 data-ng-model="data.organization_info.status_enum"
                                 name="organization-info-status-enum"
                                 value="planned_nonprofit"
                                 required="required" />
-                            <span class="label-text">{{ "A non-profit registration is planned or in process" | translate }}</span>
+                            {{ "A non-profit registration is planned or in process" | translate }}
                         </label>
 
                         <fieldset
@@ -204,14 +204,14 @@
                                     {{ "Please enter a valid url" | translate }}</span>
                             </label>
                         </fieldset>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 data-ng-model="data.organization_info.status_enum"
                                 name="organization-info-status-enum"
                                 value="support_needed"
                                 required="required" />
-                            <span class="label-text">{{ "We’d like to try to realise the idea, but will need help with registering a non-profit" | translate }}</span>
+                            {{ "We’d like to try to realise the idea, but will need help with registering a non-profit" | translate }}
                         </label>
 
                         <fieldset
@@ -261,14 +261,14 @@
 
                         </fieldset>
 
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="radio"
                                 data-ng-model="data.organization_info.status_enum"
                                 name="organization-info-status-enum" value="other"
                                 required="required" />
 
-                            <span class="label-text">{{ "Other." | translate }}</span>
+                            {{ "Other." | translate }}
                             <span
                                 data-ng-if="data.organization_info.status_enum == 'other'">
                                 {{ "Please specify:" | translate }}</span>
@@ -472,12 +472,12 @@
                     <!-- FIXME: red border should show on dirty -->
                     <div
                         data-ng-class="{ 'is-invalid': showLocationError() }">
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_specific"
                                 name="location-location-is-specific" />
-                            <span class="label-text">{{ "Specific Location" | translate }}</span>
+                            {{ "Specific Location" | translate }}
                         </label>
 
                         <div data-ng-show="data.location.location_is_specific" class="row">
@@ -505,19 +505,19 @@
                             </div>
                         </div>
 
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_online"
                                 name="location-location-is-online" />
-                            <span class="label-text">{{ "Online" | translate }}</span>
+                            {{ "Online" | translate }}
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_linked_to_ruhr"
                                 name="location-location-is-linked-to-ruhr" />
-                            <span class="label-text">{{ "Linkage to the Ruhr area" | translate }}</span>
+                            {{ "Linkage to the Ruhr area" | translate }}
                         </label>
 
                     </div><!-- /.ng-invalid -->
@@ -841,39 +841,39 @@
 
                     <div data-ng-class="{ 'is-invalid': showHeardFromError() }">
 
-                        <label>
+                        <label class="label-text">
                             <input type="checkbox"
                                 data-ng-model="data.heard_from.colleague"
                                 name="heard-from-colleague" />
-                            <span class="label-text">{{ "Colleague" | translate }}</span>
+                            {{ "Colleague" | translate }}
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.website"
                                 name="heard-from-website" />
-                            <span class="label-text">{{ "Website" | translate }}</span>
+                            {{ "Website" | translate }}
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.newsletter"
                                 name="heard-from-newsletter" />
-                            <span class="label-text">{{ "Newsletter" | translate }}</span>
+                            {{ "Newsletter" | translate }}
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.facebook"
                                 name="heard-from-facebook" />
-                            <span class="label-text">{{ "Facebook" | translate }}</span>
+                            {{ "Facebook" | translate }}
                         </label>
-                        <label>
+                        <label class="label-text">
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.other"
                                 name="heard-from-other" />
-                            <span class="label-text">{{ "Other." | translate }}</span>
+                            {{ "Other." | translate }}
                             <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
                         </label>
                         <input
@@ -890,13 +890,13 @@
                     </div><!-- /.ng-invalid -->
 
                     <span class="label-text">{{ "DISCLAIMER*:" | translate }}</span>
-                    <label data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
+                    <label class="label-text" data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
                         <input
                             type="checkbox"
                             data-ng-model="data.accept_disclaimer"
                             name="accept-disclaimer"
                             required="required"/>
-                        <span class="label-text">{{ "I accept that all will be publically visible and available on the platform." | translate }}</span>
+                        {{ "I accept that all will be publically visible and available on the platform." | translate }}
                     </label>
 
                 </div><!--/.annotated-section-body -->
