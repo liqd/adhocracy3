@@ -2,12 +2,12 @@
 
     <nav class="mercator-proposal-form-nav" data-adh-sticky="">
         <ol>
-            <li data-du-scrollspy="mercator-proposal-basic"><a href="#mercator-proposal-basic" data-du-smooth-scroll="">{{ "Basic"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-introduction" data-offset="50"><a href="#mercator-proposal-introduction" data-du-smooth-scroll="">{{ "Introduction"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-detail" data-offset="50"><a href="#mercator-proposal-detail" data-du-smooth-scroll="">{{ "In Detail"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-motivation" data-offset="50"><a href="#mercator-proposal-motivation" data-du-smooth-scroll="">{{ "Motivation"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-finance" data-offset="50"><a href="#mercator-proposal-finance" data-du-smooth-scroll="">{{ "Finance"}}</a></li>
-            <li data-du-scrollspy="mercator-proposal-extra" data-offset="50"><a href="#mercator-proposal-extra" data-offset="250" data-du-smooth-scroll="">{{ "Extra"}}</a></li>
+            <li data-du-scrollspy="mercator-proposal-basic"><a href="#mercator-proposal-basic" data-du-smooth-scroll="">{{ "Basic" | translate }}</a></li>
+            <li data-du-scrollspy="mercator-proposal-introduction" data-offset="50"><a href="#mercator-proposal-introduction" data-du-smooth-scroll="">{{ "Introduction" | translate }}</a></li>
+            <li data-du-scrollspy="mercator-proposal-detail" data-offset="50"><a href="#mercator-proposal-detail" data-du-smooth-scroll="">{{ "In Detail" | translate }}</a></li>
+            <li data-du-scrollspy="mercator-proposal-motivation" data-offset="50"><a href="#mercator-proposal-motivation" data-du-smooth-scroll="">{{ "Motivation" | translate }}</a></li>
+            <li data-du-scrollspy="mercator-proposal-finance" data-offset="50"><a href="#mercator-proposal-finance" data-du-smooth-scroll="">{{ "Finance" | translate }}</a></li>
+            <li data-du-scrollspy="mercator-proposal-extra" data-offset="50"><a href="#mercator-proposal-extra" data-offset="250" data-du-smooth-scroll="">{{ "Extra" | translate }}</a></li>
         </ol>
     </nav>
 
@@ -32,7 +32,7 @@
 
                     <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
 
-                    <h3 class="mercator-proposal-form-subheading">{{ "User Info:" | translate }}</h3>
+                    <h3 class="mercator-proposal-form-subheading">{{ "User Info" | translate }}:</h3>
 
                     <h4 class="mercator-proposal-form-sub-subheading">{{ "Proposal pitch" | translate }}</h4>
 
@@ -76,7 +76,7 @@
                         data-ng-if="showError('mercatorProposalBasicForm.user-info-country', 'required')">
                         {{ "Please select a country" | translate }}</span>
 
-                    <h3 class="mercator-proposal-form-subheading">{{ "Organisation Info:" | translate }}</h3>
+                    <h3 class="mercator-proposal-form-subheading">{{ "Organisation Info" | translate }}:</h3>
 
                     <div
                         data-ng-class="{ 'ng-invalid': mercatorProposalBasicForm['organization-info-status-enum'].$invalid
@@ -99,7 +99,7 @@
                                 type="text"
                                 data-ng-model="data.organization_info.name"
                                 name="organization-info-name"
-                                placeholder="{{ 'Name of organisation *' | translate }}"
+                                placeholder="{{ 'Name of organisation' | translate }} *"
                                 required="required" />
 
                             <span
@@ -147,7 +147,7 @@
                                 type="text"
                                 data-ng-model="data.organization_info.name"
                                 name="organization-info-name"
-                                placeholder="{{ 'Name of initiative or organisation *' | translate }}"
+                                placeholder="{{ 'Name of initiative or organisation' | translate }} *"
                                 required="required" />
 
                             <span
@@ -170,7 +170,7 @@
                                 data-ng-model="data.organization_info.date_of_foreseen_registration"
                                 name="organization-info-date-of-foreseen-registration"
                                 data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
-                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)*' | translate }}"
+                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)' | translate }}*"
                                 required="required" />
 
                             <span
@@ -205,7 +205,7 @@
                                 name="organization-info-status-enum"
                                 value="support_needed"
                                 required="required" />
-                            {{ "We’d like to try to realise the idea, but will need help with registering a non-profit" | translate }}
+                            {{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}
                         </label>
 
                         <fieldset
@@ -215,7 +215,7 @@
                                 type="text"
                                 data-ng-model="data.organization_info.name"
                                 name="organization-info-name"
-                                placeholder="{{ 'Name of initiative *' | translate }}"
+                                placeholder="{{ 'Name of initiative' | translate }} *"
                                 required="required" />
 
                             <span
@@ -265,7 +265,7 @@
                             {{ "Other." | translate }}
                             <span
                                 data-ng-if="data.organization_info.status_enum == 'other'">
-                                {{ "Please specify:" | translate }}</span>
+                                {{ "Please specify" | translate }}:</span>
                         </label>
 
                         <fieldset data-ng-if="data.organization_info.status_enum == 'other'">
@@ -296,11 +296,8 @@
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    <h3 class="mercator-proposal-form-annotation-heading">{{ "Disclaimer" | translate }}</h3>
-                    {{"Dicslaimer: be aware that everything will be shown
-                    publicly on the platform. Please make sure that you
-                    publish your proposal before leaving the page,
-                    cause your changes will be lost.before leaving, " | translate}}
+                    <h3 class="mercator-proposal-form-annotation-heading">{{ "disclaimer" | translate }}</h3>
+                    {{"Dicslaimer: be aware that everything will be shown publicly on the platform. Please make sure that you publish your proposal before leaving the page, cause your changes will be lost.before leaving, " | translate}}
                 </div>
 
             </div><!-- /.annotated-section -->
@@ -319,7 +316,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "Title:" | translate }}</span>
+                        <span class="label-text">{{ "title" | translate }}:</span>
                         <input
                             type="text"
                             data-ng-model="data.introduction.title"
@@ -335,7 +332,7 @@
                     </label>
 
                     <label>
-                        <span class="label-text">{{ "Teaser:" | translate }}</span>
+                        <span class="label-text">{{ "Teaser" | translate }}:</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.introduction.teaser"
@@ -412,9 +409,7 @@
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "Are you sure you are allowed to use this picture?" | translate }}
-                    {{"Image must be of type" | translate }} <span ng-repeat="fo in $flow.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>,
-                    <br/>{{"no bigger than" | translate }} {{$flow.opts.maximumByteSize/1000000}}MB,
-                    <br/>{{"not less than" | translate }} {{$flow.opts.minimumWidth}}px {{"wide" | translate}}
+                    {{ "IMAGE_INFO" | translate:$flow.opts }}
                 </div>
             </div><!-- /.annotated-section -->
         </section>
@@ -432,7 +427,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "description:" | translate }}</span>
+                        <span class="label-text">{{ "description" | translate }}:</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.description.description"
@@ -449,10 +444,7 @@
 
                 </div><!-- /.form_body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "Tell others what your idea is for and what it is. Think about why you are doing it,
-                    what you want to achieve and what you will do, who will benefit from your endeavour and
-                    which impact you will have. (This paragraph will appear on the main page and at the top
-                    of your contribution)." | translate }}
+                    {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want to achieve and what you will do, who will benefit from your endeavour and which impact you will have. (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
                 </div>
             </div><!-- /.annotated-section -->
 
@@ -504,7 +496,7 @@
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_online"
                                 name="location-location-is-online" />
-                            {{ "Online" | translate }}
+                            {{ "online" | translate }}
                         </label>
                         <label>
                             <input
@@ -522,9 +514,7 @@
 
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want
-                    to achieve and what you will do, who will benefit from your endeavour and which impact you will have.
-                    (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
+                    {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want to achieve and what you will do, who will benefit from your endeavour and which impact you will have. (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
                 </div>
 
             </div><!-- /.annotated-section -->
@@ -553,8 +543,7 @@
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the
-                    “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
+                    {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
                 </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!-- /.annotated-section -->
         </section>
@@ -571,8 +560,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "What would be a successful outcome of your project or initiative?
-                        What is the aim you want to reach?" | translate }}</span>
+                        <span class="label-text">{{ "What would be a successful outcome of your project or initiative? What is the aim you want to reach?" | translate }}</span>
 
                         <textarea
                             data-msd-elastic=""
@@ -590,13 +578,7 @@
 
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    What is different in a year after starting your
-                    endeavour? What will have changed? What
-                    will a beneficiary of your idea tell you about it
-                    in a year from today? What is different in a
-                    year after starting your endeavour? What will
-                    have changed? What will a beneficiary of your
-                    idea tell you about it in a year from today?
+                    {{ "What is different in a year after starting your endeavour? What will have changed? What will a beneficiary of your idea tell you about it in a year from today? What is different in a year after starting your endeavour? What will have changed? What will a beneficiary of your idea tell you about it in a year from today?" | translate }}
                 </div>
 
             </div><!-- /.annotated-section -->
@@ -623,12 +605,7 @@
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "How will your realize your project or initia-
-                        tive? Which steps will you take? Describe, as
-                        practically as possible, the approach and
-                        method you plan to choose for this activity or
-                        initiative. "  | translate }}
-
+                    {{ "How will your realize your project or initiative? Which steps will you take? Describe, as practically as possible, the approach and method you plan to choose for this activity or initiative."  | translate }}
                 </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
 
             </div><!-- /.annotated-section -->
@@ -656,9 +633,7 @@
                 </div><!--/.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    {{ "Which value does your idea provide for Europe? What makes your idea different from others?
-                    If you can realize it, can you then imagine transferring it to other countries, sectors or
-                    organisations?" | translate }}
+                    {{ "Which value does your idea provide for Europe? What makes your idea different from others? If you can realize it, can you then imagine transferring it to other countries, sectors or organisations?" | translate }}
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
 
             </div><!-- /.annotated-section -->
@@ -668,8 +643,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "Please list your partner organisations and team members with their relevant
-                        experiences/skills." | translate }}</span>
+                        <span class="label-text">{{ "Please list your partner organisations and team members with their relevant experiences/skills." | translate }}</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.partners"
@@ -687,9 +661,7 @@
                 </div><!--/.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
 
-                    {{ "How was the partnership established and does it involve organisations that have never been
-                    previously involved in a similar constellation? Describe relevant experiences of your team members."
-                    | translate }}
+                    {{ "How was the partnership established and does it involve organisations that have never been previously involved in a similar constellation? Describe relevant experiences of your team members." | translate }}
 
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
 
@@ -709,7 +681,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "Total budget:" | translate }}</span>
+                        <span class="label-text">{{ "Total budget" | translate }}:</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.budget"
@@ -730,7 +702,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "Requested Funding:" | translate }}</span>
+                        <span class="label-text">{{ "Requested Funding" | translate }}:</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.requested_funding"
@@ -797,13 +769,7 @@
             </div><!--/.annotated-section -->
             <div class="annotated-section">
                <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    Once we review all submitted entries,
-                    we might come back to you and ask
-                    for a more detailed financial plan.
-                    You can see the template here (link
-                    to file that we will provide) and
-                    already use it while preparing your
-                    application.
+                    {{ "Once we review all submitted entries, we might come back to you and ask for a more detailed financial plan. You can see the template here (link to file that we will provide) and already use it while preparing your application." | translate }}
                </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
 
             </div><!--/.annotated-section -->
@@ -868,7 +834,7 @@
                                 data-ng-model="data.heard_from.other"
                                 name="heard-from-other" />
                             {{ "Other." | translate }}
-                            <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
+                            <span data-ng-if="data.heard_from.other">{{ "Please specify" | translate }}:</span>
                         </label>
                         <input
                             type="text"
@@ -883,7 +849,7 @@
                             {{ "Please select one" | translate }}</span>
                     </div><!-- /.ng-invalid -->
 
-                    <span class="label-text">{{ "DISCLAIMER*:" | translate }}</span>
+                    <span class="label-text">{{ "disclaimer" | translate }}*:</span>
                     <label data-ng-class="{ 'ng-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
                         <input
                             type="checkbox"
@@ -896,10 +862,7 @@
                 </div><!--/.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
-                    Which kind of advice, comments, or lessons
-                    do you wish to receive from others on the
-                    platform regarding your idea or project pro-
-                    posal?
+                    {{ "Which kind of advice, comments, or lessons do you wish to receive from others on the platform regarding your idea or project proposal?" | translate }}
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!--/.annotated-section -->
 
@@ -913,7 +876,7 @@
                 class="m-call-to-action form-footer-button-cta" />
 
             <a href="" data-ng-click="cancel()" class="button form-footer-button">
-            {{ "Cancel" | translate }}</a>
+            {{ "CANCEL" | translate }}</a>
         </footer>
     </form>
 </div><!-- /.mercator-proposal-form-container -->
