@@ -32,7 +32,7 @@
 
                     <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">{{ "1. Basic" | translate }}</h2>
 
-                    <h3 class="mercator-proposal-form-subheading">{{ "User Info:" | translate }}</h3>
+                    <h3 class="mercator-proposal-form-subheading">{{ "User Info" | translate }}:</h3>
 
                     <h4 class="mercator-proposal-form-sub-subheading">{{ "Proposal pitch" | translate }}</h4>
 
@@ -76,7 +76,7 @@
                         data-ng-if="showError('mercatorProposalBasicForm.user-info-country', 'required')">
                         {{ "Please select a country" | translate }}</span>
 
-                    <h3 class="mercator-proposal-form-subheading">{{ "Organisation Info:" | translate }}</h3>
+                    <h3 class="mercator-proposal-form-subheading">{{ "Organisation Info" | translate }}:</h3>
 
                     <div
                         data-ng-class="{ 'ng-invalid': mercatorProposalBasicForm['organization-info-status-enum'].$invalid
@@ -99,7 +99,7 @@
                                 type="text"
                                 data-ng-model="data.organization_info.name"
                                 name="organization-info-name"
-                                placeholder="{{ 'Name of organisation *' | translate }}"
+                                placeholder="{{ 'Name of organisation' | translate }} *"
                                 required="required" />
 
                             <span
@@ -147,7 +147,7 @@
                                 type="text"
                                 data-ng-model="data.organization_info.name"
                                 name="organization-info-name"
-                                placeholder="{{ 'Name of initiative or organisation *' | translate }}"
+                                placeholder="{{ 'Name of initiative or organisation' | translate }} *"
                                 required="required" />
 
                             <span
@@ -170,7 +170,7 @@
                                 data-ng-model="data.organization_info.date_of_foreseen_registration"
                                 name="organization-info-date-of-foreseen-registration"
                                 data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
-                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)*' | translate }}"
+                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)' | translate }}*"
                                 required="required" />
 
                             <span
@@ -215,7 +215,7 @@
                                 type="text"
                                 data-ng-model="data.organization_info.name"
                                 name="organization-info-name"
-                                placeholder="{{ 'Name of initiative *' | translate }}"
+                                placeholder="{{ 'Name of initiative' | translate }} *"
                                 required="required" />
 
                             <span
@@ -265,7 +265,7 @@
                             {{ "Other." | translate }}
                             <span
                                 data-ng-if="data.organization_info.status_enum == 'other'">
-                                {{ "Please specify:" | translate }}</span>
+                                {{ "Please specify" | translate }}:</span>
                         </label>
 
                         <fieldset data-ng-if="data.organization_info.status_enum == 'other'">
@@ -319,7 +319,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "Title:" | translate }}</span>
+                        <span class="label-text">{{ "title" | translate }}:</span>
                         <input
                             type="text"
                             data-ng-model="data.introduction.title"
@@ -335,7 +335,7 @@
                     </label>
 
                     <label>
-                        <span class="label-text">{{ "Teaser:" | translate }}</span>
+                        <span class="label-text">{{ "Teaser" | translate }}:</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.introduction.teaser"
@@ -430,7 +430,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "description:" | translate }}</span>
+                        <span class="label-text">{{ "description" | translate }}:</span>
                         <textarea
                             data-msd-elastic=""
                             data-ng-model="data.description.description"
@@ -707,7 +707,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "Total budget:" | translate }}</span>
+                        <span class="label-text">{{ "Total budget" | translate }}:</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.budget"
@@ -728,7 +728,7 @@
                 <div class="annotated-section-body">
 
                     <label>
-                        <span class="label-text">{{ "Requested Funding:" | translate }}</span>
+                        <span class="label-text">{{ "Requested Funding" | translate }}:</span>
                         <input
                             type="number"
                             data-ng-model="data.finance.requested_funding"
@@ -866,7 +866,7 @@
                                 data-ng-model="data.heard_from.other"
                                 name="heard-from-other" />
                             {{ "Other." | translate }}
-                            <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
+                            <span data-ng-if="data.heard_from.other">{{ "Please specify" | translate }}:</span>
                         </label>
                         <input
                             type="text"
@@ -881,7 +881,7 @@
                             {{ "Please select one" | translate }}</span>
                     </div><!-- /.ng-invalid -->
 
-                    <span class="label-text">{{ "DISCLAIMER*:" | translate }}</span>
+                    <span class="label-text">{{ "DISCLAIMER" | translate }}*:</span>
                     <label data-ng-class="{ 'ng-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
                         <input
                             type="checkbox"
