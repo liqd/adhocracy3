@@ -1,8 +1,18 @@
-Adhocracy3 Prototype
-=====================
+Adhocracy customizations for advocate-europe
+============================================
 
-An `Adhocracy2 <https://adhocracy.de/>`_ rewrite  based on "The Supergraph"
-conceptual work and with extensibility in mind.
+This repository contains the source code of the Adhocracy 3 backend and
+frontend cores as well as customizations for the advocate-europe project.
+
+Note::
+
+    This isn't meant for general consumption at this stage. Many expected
+    things do not work yet!
+
+This project (i.e. all files in this repository if not declared otherwise) is
+licensed under the GNU Affero General Public License (AGPLv3), see
+LICENSE.txt.
+
 
 Further reading
 ---------------
