@@ -15,14 +15,14 @@
                         data-ng-if="poolOptions.POST"
                         data-ng-click="createComment()">
                         <i class="icon-reply"></i>
-                        {{ "Reply" | translate }}</a>
+                        {{ "reply" | translate }}</a>
                     <a href=""
                         data-ng-if="commentItemOptions.POST"
                         data-ng-click="edit()">
-                        {{ "Edit" | translate }}</a>
+                        {{ "edit" | translate }}</a>
                     <a href="#" data-ng-click="report()" data-ng-if="report">
                         <i class="icon-ban-circle"></i>
-                        {{ "Report" | translate }}
+                        {{ "report" | translate }}
                     </a>
                 </span>
                 <adh-rate data-refers-to="{{data.path}}"
