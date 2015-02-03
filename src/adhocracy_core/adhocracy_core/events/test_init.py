@@ -72,11 +72,11 @@ class ItemNewVersionAddedUnitTest(unittest.TestCase):
 class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
 
     def _make_one(self, *arg, **kwargs):
-        from adhocracy_core.events import SheetReferencedItemHasNewVersion
-        return SheetReferencedItemHasNewVersion(*arg, **kwargs)
+        from adhocracy_core.events import SheetReferenceNewVersion
+        return SheetReferenceNewVersion(*arg, **kwargs)
 
     def test_create(self):
-        from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+        from adhocracy_core.interfaces import ISheetReferenceNewVersion
         from adhocracy_core.interfaces import ISheet
         context = testing.DummyResource()
         isheet = ISheet
@@ -93,8 +93,8 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
                               root_versions=root_versions,
                               is_batchmode=is_batchmode)
 
-        assert ISheetReferencedItemHasNewVersion.providedBy(inst)
-        assert verifyObject(ISheetReferencedItemHasNewVersion, inst)
+        assert ISheetReferenceNewVersion.providedBy(inst)
+        assert verifyObject(ISheetReferenceNewVersion, inst)
 
 
 def test_sheet_back_reference_added():

@@ -1,5 +1,5 @@
 """Internal Exceptions."""
-from adhocracy_core.events import ISheetReferencedItemHasNewVersion
+from adhocracy_core.events import ISheetReferenceNewVersion
 
 
 class ConfigurationError(Exception):
@@ -29,7 +29,7 @@ class AutoUpdateNoForkAllowedError(NoForkAllowedError):
     more information.
     """
 
-    def __init__(self, resource, event: ISheetReferencedItemHasNewVersion):
+    def __init__(self, resource, event: ISheetReferenceNewVersion):
         super().__init__(resource)
         self.event = event
         """Event causing the auto update process."""

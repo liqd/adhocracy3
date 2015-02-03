@@ -31,8 +31,8 @@ def create_new_reference_event(context,
                                is_batchmode=False,
                                ):
     from zope.interface import verify
-    from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
-    event = testing.DummyResource(__provides__= ISheetReferencedItemHasNewVersion,
+    from adhocracy_core.interfaces import ISheetReferenceNewVersion
+    event = testing.DummyResource(__provides__= ISheetReferenceNewVersion,
                                   object=context,
                                   isheet=isheet,
                                   isheet_field=isheet_field,
@@ -43,7 +43,7 @@ def create_new_reference_event(context,
                                   root_versions=root_versions or [],
                                   is_batchmode=is_batchmode,
                                   )
-    assert verify.verifyObject(ISheetReferencedItemHasNewVersion, event)
+    assert verify.verifyObject(ISheetReferenceNewVersion, event)
     return event
 
 

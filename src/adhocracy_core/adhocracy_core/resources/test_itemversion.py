@@ -2,7 +2,7 @@ import unittest
 
 from pyramid import testing
 
-from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import IItemVersion
@@ -81,7 +81,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
 
     def test_create_new_version_with_referencing_resources(self):
         events = create_event_listener(self.config,
-                                       ISheetReferencedItemHasNewVersion)
+                                       ISheetReferenceNewVersion)
         creator = self._make_one()
 
         version_0 = self._make_one()

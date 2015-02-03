@@ -20,7 +20,7 @@ from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import ISheetReferenceModified
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.resources.principal import IGroup
@@ -343,15 +343,15 @@ def includeme(config):
     config.add_subscriber(itemversion_created_subscriber,
                           IItemVersionNewVersionAdded)
     config.add_subscriber(autoupdate_versionable_has_new_version,
-                          ISheetReferencedItemHasNewVersion,
+                          ISheetReferenceNewVersion,
                           interface=IItemVersion,
                           isheet=ISheetReferenceAutoUpdateMarker)
     config.add_subscriber(autoupdate_non_versionable_has_new_version,
-                          ISheetReferencedItemHasNewVersion,
+                          ISheetReferenceNewVersion,
                           interface=IPool,
                           isheet=ISheetReferenceAutoUpdateMarker)
     config.add_subscriber(autoupdate_non_versionable_has_new_version,
-                          ISheetReferencedItemHasNewVersion,
+                          ISheetReferenceNewVersion,
                           interface=ISimple,
                           isheet=ISheetReferenceAutoUpdateMarker)
     config.add_subscriber(tag_created_and_added_or_modified_subscriber,

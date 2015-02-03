@@ -389,7 +389,7 @@ class IItemVersionNewVersionAdded(IObjectEvent):
     creator = Attribute('User resource object of the authenticated User')
 
 
-class ISheetReferencedItemHasNewVersion(IObjectEvent):
+class ISheetReferenceNewVersion(IObjectEvent):
 
     """An event type sent when a referenced ItemVersion has a new follower."""
 

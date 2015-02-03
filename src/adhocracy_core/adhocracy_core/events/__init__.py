@@ -11,7 +11,7 @@ from zope.interface import Interface
 from zope.interface.interfaces import IInterface
 
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
-from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ILocalRolesModfied
@@ -84,8 +84,8 @@ class ItemVersionNewVersionAdded:
         self.creator = creator
 
 
-@implementer(ISheetReferencedItemHasNewVersion)
-class SheetReferencedItemHasNewVersion:
+@implementer(ISheetReferenceNewVersion)
+class SheetReferenceNewVersion:
 
     """ An event type sent when a referenced ItemVersion has a new follower.
 
