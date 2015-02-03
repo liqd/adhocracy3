@@ -276,5 +276,6 @@ Can assign users to groups, and roles to users::
    [...'adhocracy_core.sheets.principal.IPasswordAuthentication',
     'adhocracy_core.sheets.principal.IPermissions',
     'adhocracy_core.sheets.principal.IUserBasic',
+    'adhocracy_core.sheets.principal.IUserExtended',
     'adhocracy_core.sheets.rate.ICanRate'...]
 

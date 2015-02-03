@@ -54,6 +54,8 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:creator', 'add_paragraphversion'),
             (Allow, 'role:creator', 'edit_some_sheets'),  # put request default
             (Allow, 'role:creator', 'edit_metadata'),
+            (Allow, 'role:creator', 'view_userextended'),
+            (Allow, 'role:creator', 'edit_userextended'),
             # Manager role
             (Allow, 'role:manager', 'hide_resource'),
             (Allow, 'role:manager', 'edit_some_sheets'),
@@ -71,6 +73,8 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:admin', 'edit_some_sheets'),
             (Allow, 'role:admin', 'edit_sheet'),  # edit sheets default
             (Allow, 'role:admin', 'manage_principals'),
+            (Allow, 'role:admin', 'view_userextended'),
+            (Allow, 'role:admin', 'edit_userextended'),
             # God role
             (Allow, 'role:god', ALL_PERMISSIONS),
             ]
@@ -177,8 +181,9 @@ def _add_initial_user_and_group(context, registry):
     users = find_service(context, 'principals', 'users')
     password_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
     appstruct = {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
-                 {'name': user_name,
-                  'email': user_email},
+                 {'name': user_name},
+                 adhocracy_core.sheets.principal.IUserExtended.__identifier__:
+                 {'email': user_email},
                  adhocracy_core.sheets.principal.IPermissions.__identifier__:
                  {'groups': [group]},
                  password_sheet.__identifier__:

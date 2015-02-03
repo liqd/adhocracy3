@@ -150,9 +150,8 @@ def send_registration_mail(context: IUser,
             args=args)
     except SMTPException as err:
         msg = 'Cannot send registration mail: {}'.format(str(err))
-        raise_colander_style_error(adhocracy_core.sheets.principal.IUserBasic,
-                                   'email',
-                                   msg)
+        raise_colander_style_error(
+            adhocracy_core.sheets.principal.IUserExtended, 'email', msg)
 
 
 def _generate_activation_path() -> str:
@@ -165,6 +164,7 @@ user_metadata = pool_metadata._replace(
     content_class=User,
     after_creation=[send_registration_mail] + pool_metadata.after_creation,
     basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
+                  adhocracy_core.sheets.principal.IUserExtended,
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,

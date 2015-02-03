@@ -529,7 +529,9 @@ def add_user(root, login: str=None, password: str=None, email: str=None,
     passwd_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
     appstructs =\
         {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
-         {'name': login, 'email': email},
+         {'name': login},
+         adhocracy_core.sheets.principal.IUserExtended.__identifier__:
+         {'email': email},
          adhocracy_core.sheets.principal.IPermissions.__identifier__:
          {'roles': roles},
          passwd_sheet.__identifier__:

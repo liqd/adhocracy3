@@ -10,7 +10,7 @@ Prerequisites
 Some imports to work with rest api calls::
 
     >>> from pprint import pprint
-    >>> from adhocracy_core.testing import god_header
+    >>> from adhocracy_core.testing import admin_header, contributor_header, god_header
 
 Start Adhocracy testapp::
 
@@ -27,6 +27,8 @@ Test that the relevant resources and sheets exist:
     True
     >>> 'adhocracy_core.sheets.principal.IUserBasic' in resp_data['sheets']
     True
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['sheets']
+    True
     >>> 'adhocracy_core.sheets.principal.IPasswordAuthentication' in resp_data['sheets']
     True
 
@@ -40,7 +42,8 @@ path of the new user::
     >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy_core.sheets.principal.IUserBasic': {
-    ...                  'name': 'Anna Müller',
+    ...                  'name': 'Anna Müller'},
+    ...              'adhocracy_core.sheets.principal.IUserExtended': {
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
@@ -58,7 +61,7 @@ single spaces, preceded and followed by non-whitespace (no whitespace at
 begin or end, multiple subsequent spaces are forbidden,
 tabs and newlines are forbidden).
 
-The "email" field must be a valid email address.
+The "email" field in the "IUserExtended" sheet must be a valid email address.
 
 Creating a new user will not automatically log them in. First, the backend
 will send a registration message to the specified email address. Once the user
@@ -71,7 +74,8 @@ E.g. when we try to register a user with an empty password::
     >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy_core.sheets.principal.IUserBasic': {
-    ...                  'name': 'Other User',
+    ...                  'name': 'Other User'},
+    ...              'adhocracy_core.sheets.principal.IUserExtended': {
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': ''}}}
@@ -102,7 +106,8 @@ registered::
     >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy_core.sheets.principal.IUserBasic': {
-    ...                  'name': 'New user with old password',
+    ...                  'name': 'New user with old email'},
+    ...              'adhocracy_core.sheets.principal.IUserExtended': {
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
@@ -111,27 +116,28 @@ registered::
     >>> pprint(resp_data)
     {'errors': [{'description': 'The user login email is not unique',
                  'location': 'body',
-                 'name': 'data.adhocracy_core.sheets.principal.IUserBasic.email'}],
+                 'name': 'data.adhocracy_core.sheets.principal.IUserExtended.email'}],
      'status': 'error'}
 
 *Note:* in the future, the registration request may contain additional
-personal data for the user. This data will probably be collected in one or
-several additional sheets, e.g.::
+personal data for the user. This data will probably be added to the
+"IUserBasic" sheets, if it's generally public, to the "IUserExtended" sheet
+otherwise (or maybe it'll be store in additional new sheets); e.g.::
 
     'data': {
         'adhocracy_core.sheets.principal.IUserBasic': {
             'name': 'Anna Müller',
-            'email': 'anna@example.org'},
+            'forename': '...',
+            'surname': '...'},
         'adhocracy_core.sheets.principal.IPasswordAuthentication': {
             'password': '...'},
-        'adhocracy_core.sheets.principal.IUserDetails': {
-          'forename': '...',
-          'surname': '...',
-          'day_of_birth': '...',
-          'street': '...',
-          'town': '...',
-          'postcode': '...',
-          'gender': '...'
+        'adhocracy_core.sheets.principal.IUserExtended': {
+            'email': 'anna@example.org',
+            'day_of_birth': '...',
+            'street': '...',
+            'town': '...',
+            'postcode': '...',
+            'gender': '...'
         }
      }
 
@@ -306,6 +312,44 @@ they expire by default after 30 days, but configurations may change this.)
 Once they are expired, they will be considered as invalid so any further
 requests made by the user will lead to errors. To resolve this,
 the user must log in again.
+
+Viewing Users
+-------------
+
+Without proper authorization, only very limited information on each user is
+visible::
+
+    >>> resp_data = testapp.get (user_path).json
+    >>> resp_data['data']['adhocracy_core.sheets.principal.IUserBasic']
+    {'name': 'Anna Müller'}
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['data']
+    False
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    False
+
+Only admins and the user herself can view extended information such as her
+email address::
+
+    >>> resp_data = testapp.get (user_path, headers=admin_header).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.principal.IUserExtended'])
+    {'email': 'anna@example.org', 'tzname': 'UTC'}
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    True
+    >>> headers = {'X-User-Path': user_path,
+    ...            'X-User-Token': user_token_via_username}
+    >>> resp_data = testapp.get (user_path, headers=headers).json
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['data']
+    True
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    True
+
+Other users, even if logged in, cannot::
+
+    >>> resp_data = testapp.get (user_path, headers=contributor_header).json
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['data']
+    False
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    False
 
 
 User Logout
