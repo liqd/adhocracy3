@@ -305,7 +305,7 @@ class ITag(ISimple):
     """Tag to link specific versions."""
 
 
-class IItemVersion(ISimple):
+class IItemVersion(IResource):
 
     """Versionable resource, created during a Participation Process."""
 
