@@ -18,6 +18,7 @@
   "IMAGE_ERROR_BIG": "Image must be smaller than {{maximumByteSize / 1000000}}MB",
   "IMAGE_ERROR_NARROW": "Image must be greater than {{minimumWidth}}px wide",
   "IMAGE_ERROR_TYPE": "Image must be of type {{acceptedFileTypes | join}}",
+  "IMAGE_INFO": "Image must be of type {{acceptedFileTypes | join}}, no bigger than {{maximumByteSize/1000000}}MB, and not less than {{minimumWidth}}px wide.}}",
   "internal error: unknown view mode:": "internal error: unknown view mode:",
   "login": "login",
   "Log in!": "Log in!",

@@ -16,14 +16,13 @@ input[type="button"] {
     text-transform: uppercase;
     min-width: 1px;
 
-    &.has-focus, &:focus,
-    &.is-hover, &:hover {
+    &:focus,
+    &:hover {
         background: transparent;
         color: $color-text-highlight-normal;
     }
 
     &:disabled,
-    &.is-disabled,
     &.ng-disabled {
         @include opacity(0.5);
         cursor: default;
