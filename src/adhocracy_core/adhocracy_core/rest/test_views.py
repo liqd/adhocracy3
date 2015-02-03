@@ -1222,7 +1222,9 @@ class TestValidateActivationPathUnitTest:
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
-        return testing.DummyResource(__provides__=IMetadata)
+        user = testing.DummyResource(__provides__=IMetadata)
+        user.activate = Mock()
+        return user
 
     def _call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_activation_path
@@ -1234,6 +1236,7 @@ class TestValidateActivationPathUnitTest:
             user_with_metadata
         self._call_fut(context, request)
         assert request.validated['user'] == user_with_metadata
+        assert user_with_metadata.activate.called
 
     def test_not_found(self, request, context, mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = None

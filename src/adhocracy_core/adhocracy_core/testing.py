@@ -541,7 +541,7 @@ def add_user(root, login: str=None, password: str=None, email: str=None,
                                    registry=registry,
                                    run_after_creation=False,
                                    )
-    user.active = True
+    user.activate()
     return user
 
 
