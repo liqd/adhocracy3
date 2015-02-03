@@ -981,7 +981,7 @@ def validate_activation_path(context, request: Request):
         request.errors.add('body', 'path',
                            'Unknown or expired activation path')
     else:
-        user.active = True
+        user.activate()
         request.validated['user'] = user
     if user is not None:
         user.activation_path = None  # activation path can only be used once

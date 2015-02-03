@@ -54,16 +54,7 @@ path of the new user::
     >>> user_path
     '.../principals/users/00...
 
-Like every resource the user has a metadata sheet with creation information::
-    >>> resp_data = testapp.get(user_path).json
-    >>> resp_metadata = resp_data['data']['adhocracy_core.sheets.metadata.IMetadata']
-
-Even though he is not logged in yet, the creator points to his user resource::
-
-    >>> resp_metadata['creator']
-    '.../principals/users/00...
-
-The "name" field in the "IUserBasic" sheet is a non-empty string that
+The "name" field in the "IUserBasic" schema is a non-empty string that
 can contain any characters except '@' (to make user names distinguishable
 from email addresses). The username must not contain any whitespace except
 single spaces, preceded and followed by non-whitespace (no whitespace at
@@ -154,6 +145,14 @@ otherwise (or maybe it'll be store in additional new sheets); e.g.::
 Account Activation
 ------------------
 
+Before they have confirmed their email address, new users are invisible
+(hidden). They won't show up in user listings, and retrieving information
+about them manually leads to a *410 Gone* response (see :ref:`deletion`)::
+
+    >>> resp_data = testapp.get(user_path, status=410).json
+    >>> resp_data['reason']
+    'hidden'
+
 On user registration, the backend sends a mail with an activation link
 to the specified email address and sends a 2xx HTTP response to the
 frontend, so the frontend can tell the user to expect an email.  The
@@ -203,6 +202,22 @@ If the link is expired, user activation is no longer possible for security
 reasons and the user has to call support or register again, using a different
 email. (More user-friendly options are planned but haven't been implemented
 yet!)
+
+Since the user account has been activated, the public part of the user
+information is now visible to everybody::
+
+    >>> resp_data = testapp.get(user_path).json
+    >>> resp_data['data']['adhocracy_core.sheets.principal.IUserBasic']['name']
+    'Anna Müller'
+
+Like every resource, the user has a metadata sheet with creation information.
+In the case of users, the creator is the user themselves::
+
+    >>> resp_metadata = resp_data['data']['adhocracy_core.sheets.metadata.IMetadata']
+    >>> resp_metadata['creator']
+    '.../principals/users/00...
+    >>> resp_metadata['creator'] == user_path
+    True
 
 
 User Login
