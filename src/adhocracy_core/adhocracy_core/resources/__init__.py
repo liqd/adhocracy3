@@ -121,6 +121,8 @@ class ResourceFactory:
             registry (Registry or None): Registry passed to creation eventes.
                 If None :func:`pyramid.threadlocal.get_current_registry` is
                 called. Default is None.
+            request (Request or None): passed to
+                :class:`adhocracy_core.interfaces.IResourceSheetModified'events
             **kwargs: Arbitary keyword arguments. Will be passed along with
                        'creator' to the `after_creation` hook as 3rd argument
                       `options`.

@@ -531,7 +531,8 @@ class PoolRESTView(SimpleRESTView):
                                         self.context,
                                         creator=creator,
                                         appstructs=appstructs,
-                                        request=self.request)
+                                        request=self.request,
+                                        )
         return self.build_post_response(resource)
 
     @view_config(request_method='PUT',
