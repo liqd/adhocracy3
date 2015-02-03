@@ -412,9 +412,7 @@
                 </div><!-- /.annotated-section-body -->
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "Are you sure you are allowed to use this picture?" | translate }}
-                    {{"Image must be of type" | translate }} <span ng-repeat="fo in $flow.opts.acceptedFileTypes">{{fo}}{{$last ? '' : ', '}}</span>,
-                    <br/>{{"no bigger than" | translate }} {{$flow.opts.maximumByteSize/1000000}}MB,
-                    <br/>{{"not less than" | translate }} {{$flow.opts.minimumWidth}}px {{"wide" | translate}}
+                    {{ "IMAGE_INFO" | translate:$flow.opts }}
                 </div>
             </div><!-- /.annotated-section -->
         </section>
