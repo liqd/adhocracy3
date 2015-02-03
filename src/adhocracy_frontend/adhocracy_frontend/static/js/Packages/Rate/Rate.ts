@@ -138,10 +138,11 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
              * but only if it exists.
              */
             var fetchMyRate = (poolPath : string, object : string, subject : string) : ng.IPromise<void> => {
-                var query : any = {};
-                query.content_type = RIRateVersion.content_type;
-                query.depth = 2;
-                query.tag = "LAST";
+                var query : any = {
+                    content_type: RIRateVersion.content_type,
+                    depth: 2,
+                    tag: "LAST"
+                };
                 query[SIRate.nick + ":subject"] = subject;
                 query[SIRate.nick + ":object"] = object;
 
@@ -158,12 +159,13 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
              * Get aggregates rates of all users and write results to scope.rates.
              */
             var fetchAggregatedRates = (poolPath : string, object : string) : ng.IPromise<void> => {
-                var query : any = {};
-                query.content_type = RIRateVersion.content_type;
-                query.depth = 2;
-                query.tag = "LAST";
-                query.count = "true";
-                query.aggregateby = "rate";
+                var query : any = {
+                    content_type: RIRateVersion.content_type,
+                    depth: 2,
+                    tag: "LAST",
+                    count: "true",
+                    aggregateby: "rate"
+                };
                 query[SIRate.nick + ":object"] = object;
 
                 return adhHttp.get(poolPath, query).then((poolRsp) => {
@@ -180,10 +182,11 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
              * Promises a void that is resolved once the scope is updated.
              */
             var fetchAuditTrail = (poolPath : string, object : string) : ng.IPromise<void> => {
-                var query : any = {};
-                query.content_type = RIRateVersion.content_type;
-                query.depth = 2;
-                query.tag = "LAST";
+                var query : any = {
+                    content_type: RIRateVersion.content_type,
+                    depth: 2,
+                    tag: "LAST"
+                };
                 query[SIRate.nick + ":object"] = object;
 
                 return adhHttp.get(poolPath, query)
