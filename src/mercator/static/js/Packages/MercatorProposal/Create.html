@@ -93,45 +93,47 @@
                                 name="organization-info-status-enum"
                                 value="registered_nonprofit"
                                 required="required" />
-                                {{ "We’re a registered non-profit, e.g. NGO" | translate }}
+                                <span class="label-text">{{ "We’re a registered non-profit, e.g. NGO" | translate }}</span>
                         </label>
 
                         <fieldset
                             data-ng-if="data.organization_info.status_enum == 'registered_nonprofit'">
 
-                            <input
-                                type="text"
-                                data-ng-model="data.organization_info.name"
-                                name="organization-info-name"
-                                placeholder="{{ 'Name of organisation *' | translate }}"
-                                required="required" />
+                            <label>
+                                <span class="label-text">{{ 'Name of organisation *' | translate }}</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.organization_info.name"
+                                    name="organization-info-name"
+                                    required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">
+                                    {{ "Please enter your organization name" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "Organization country" | translate }}</span>
+                                <country-select
+                                    data-ng-model="data.organization_info.country"
+                                    data-name="organization-info-country"
+                                    data-required="required"></country-select>
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
+                                    {{ "Please enter your organization country" | translate }}</span>
+                            </label>
 
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">
-                                {{ "Please enter your organization name" | translate }}</span>
-
-                            <country-select
-                                data-ng-model="data.organization_info.country"
-                                data-name="organization-info-country"
-                                data-required="required"></country-select>
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
-                                {{ "Please enter your organization country" | translate }}</span>
-
-                            <input
-                                type="url"
-                                data-ng-model="data.organization_info.website"
-                                name="organization-info-website"
-                                placeholder="{{ 'Website' | translate }}" />
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
-                                {{ "Please enter a valid url" | translate }}</span>
-
+                            <label>
+                                <span class="label-text">{{ 'Website' | translate }}</span>
+                                <input
+                                    type="url"
+                                    data-ng-model="data.organization_info.website"
+                                    name="organization-info-website" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                    {{ "Please enter a valid url" | translate }}</span>
+                            </label>
                         </fieldset>
 
                         <label>
@@ -141,67 +143,67 @@
                                 name="organization-info-status-enum"
                                 value="planned_nonprofit"
                                 required="required" />
-                            {{ "A non-profit registration is planned or in process" | translate }}
+                            <span class="label-text">{{ "A non-profit registration is planned or in process" | translate }}</span>
                         </label>
 
                         <fieldset
                             data-ng-if="data.organization_info.status_enum == 'planned_nonprofit'">
 
-                            <input
-                                type="text"
-                                data-ng-model="data.organization_info.name"
-                                name="organization-info-name"
-                                placeholder="{{ 'Name of initiative or organisation *' | translate }}"
-                                required="required" />
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">
-                                {{ "Please enter your organization name" | translate }}</span>
-
-                            <country-select
-                                data-ng-model="data.organization_info.country"
-                                data-name="organization-info-country"
-                                data-required="required"></country-select>
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
-                                {{ "Please enter your organization country" | translate }}</span>
-
-                            <input
-                                type="text"
-                                data-ng-model="data.organization_info.date_of_foreseen_registration"
-                                name="organization-info-date-of-foreseen-registration"
-                                data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
-                                placeholder="{{ 'Date of foreseen registration (yyyy-mm-dd)*' | translate }}"
-                                required="required" />
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
-                                'pattern')">
-                                {{ "Please enter a valid date (yyyy-mm-dd)" | translate }}</span>
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
-                                'required')">
-                                {{ "Please enter your registration date" | translate }}</span>
-
-                            <input
-                                type="url"
-                                data-ng-model="data.organization_info.website"
-                                name="organization-info-website"
-                                placeholder="{{ 'Website' | translate }}"/>
-
-                             <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
-                                {{ "Please enter a valid url" | translate }}</span>
-
+                            <label>
+                                <span class="label-text">{{ 'Name of initiative or organisation *' | translate }}</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.organization_info.name"3
+                                    name="organization-info-name"
+                                    required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">
+                                    {{ "Please enter your organization name" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "Organization country" | translate }}</span>
+                                <country-select
+                                    data-ng-model="data.organization_info.country"
+                                    data-name="organization-info-country"
+                                    data-required="required"></country-select>
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
+                                    {{ "Please enter your organization country" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ 'Date of foreseen registration *' | translate }}</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.organization_info.date_of_foreseen_registration"
+                                    name="organization-info-date-of-foreseen-registration"
+                                    data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
+                                    placeholder="yyyy-mm-dd"
+                                    required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
+                                    'pattern')">
+                                    {{ "Please enter a valid date (yyyy-mm-dd)" | translate }}</span>
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
+                                    'required')">
+                                    {{ "Please enter your registration date" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ 'Website' | translate }}</span>
+                                <input
+                                    type="url"
+                                    data-ng-model="data.organization_info.website"
+                                    name="organization-info-website" />
+                                 <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-website', 'url')">
+                                    {{ "Please enter a valid url" | translate }}</span>
+                            </label>
                         </fieldset>
-
                         <label>
                             <input
                                 type="radio"
@@ -209,34 +211,34 @@
                                 name="organization-info-status-enum"
                                 value="support_needed"
                                 required="required" />
-                            {{ "We’d like to try to realise the idea, but will need help with registering a non-profit" | translate }}
+                            <span class="label-text">{{ "We’d like to try to realise the idea, but will need help with registering a non-profit" | translate }}</span>
                         </label>
 
                         <fieldset
-                             data-ng-if="data.organization_info.status_enum == 'support_needed'">
-
-                            <input
-                                type="text"
-                                data-ng-model="data.organization_info.name"
-                                name="organization-info-name"
-                                placeholder="{{ 'Name of initiative *' | translate }}"
-                                required="required" />
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">{
-                                { "Please enter your organization name" | translate }}</span>
-
-                            <country-select
-                                data-ng-model="data.organization_info.country"
-                                data-name="organization-info-country"
-                                data-required="required"></country-select>
-
-                            <span
-                                class="input-error"
-                                data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
-                                {{ "Please enter your organization country" | translate }}</span>
-
+                            data-ng-if="data.organization_info.status_enum == 'support_needed'">
+                            <label>
+                                <span class="label-text">{{ 'Name of initiative *' | translate }}</span>
+                                <input
+                                    type="text"
+                                    data-ng-model="data.organization_info.name"
+                                    name="organization-info-name"
+                                    required="required" />
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">{
+                                    { "Please enter your organization name" | translate }}</span>
+                            </label>
+                            <label>
+                                <span class="label-text">{{ "Organization country" | translate }}</span>
+                                <country-select
+                                    data-ng-model="data.organization_info.country"
+                                    data-name="organization-info-country"
+                                    data-required="required"></country-select>
+                                <span
+                                    class="input-error"
+                                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
+                                    {{ "Please enter your organization country" | translate }}</span>
+                            </label>
                             <input
                                 type="url"
                                 data-ng-model="data.organization_info.website"
@@ -266,7 +268,7 @@
                                 name="organization-info-status-enum" value="other"
                                 required="required" />
 
-                            {{ "Other." | translate }}
+                            <span class="label-text">{{ "Other." | translate }}</span>
                             <span
                                 data-ng-if="data.organization_info.status_enum == 'other'">
                                 {{ "Please specify:" | translate }}</span>
@@ -475,7 +477,7 @@
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_specific"
                                 name="location-location-is-specific" />
-                            {{ "Specific Location" | translate }}
+                            <span class="label-text">{{ "Specific Location" | translate }}</span>
                         </label>
 
                         <div data-ng-show="data.location.location_is_specific" class="row">
@@ -508,14 +510,14 @@
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_online"
                                 name="location-location-is-online" />
-                            {{ "Online" | translate }}
+                            <span class="label-text">{{ "Online" | translate }}</span>
                         </label>
                         <label>
                             <input
                                 type="checkbox"
                                 data-ng-model="data.location.location_is_linked_to_ruhr"
                                 name="location-location-is-linked-to-ruhr" />
-                            {{ "Linkage to the Ruhr area" | translate }}
+                            <span class="label-text">{{ "Linkage to the Ruhr area" | translate }}</span>
                         </label>
 
                     </div><!-- /.ng-invalid -->
@@ -774,7 +776,7 @@
                                 name="finance-granted"
                                 data-ng-value="true"
                                 required="required" />
-                            {{ "yes" | translate }}
+                            <span class="label-text">{{ "yes" | translate }}</span>
                         </label>
                         <label>
                             <input
@@ -783,7 +785,7 @@
                                 name="finance-granted"
                                 data-ng-value="false"
                                 required="required" />
-                            {{ "no" | translate }}
+                            <span class="label-text">{{ "no" | translate }}</span>
                         </label>
 
                     </div><!-- /.ng-invalid -->
@@ -843,35 +845,35 @@
                             <input type="checkbox"
                                 data-ng-model="data.heard_from.colleague"
                                 name="heard-from-colleague" />
-                            {{ "Colleague" | translate }}
+                            <span class="label-text">{{ "Colleague" | translate }}</span>
                         </label>
                         <label>
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.website"
                                 name="heard-from-website" />
-                            {{ "Website" | translate }}
+                            <span class="label-text">{{ "Website" | translate }}</span>
                         </label>
                         <label>
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.newsletter"
                                 name="heard-from-newsletter" />
-                            {{ "Newsletter" | translate }}
+                            <span class="label-text">{{ "Newsletter" | translate }}</span>
                         </label>
                         <label>
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.facebook"
                                 name="heard-from-facebook" />
-                            {{ "Facebook" | translate }}
+                            <span class="label-text">{{ "Facebook" | translate }}</span>
                         </label>
                         <label>
                             <input
                                 type="checkbox"
                                 data-ng-model="data.heard_from.other"
                                 name="heard-from-other" />
-                            {{ "Other." | translate }}
+                            <span class="label-text">{{ "Other." | translate }}</span>
                             <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
                         </label>
                         <input
@@ -894,7 +896,7 @@
                             data-ng-model="data.accept_disclaimer"
                             name="accept-disclaimer"
                             required="required"/>
-                        {{ "I accept that all will be publically visible and available on the platform." | translate }}
+                        <span class="label-text">{{ "I accept that all will be publically visible and available on the platform." | translate }}</span>
                     </label>
 
                 </div><!--/.annotated-section-body -->
