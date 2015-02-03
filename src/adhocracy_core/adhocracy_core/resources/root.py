@@ -188,7 +188,7 @@ def _add_initial_user_and_group(context, registry):
                                    run_after_creation=False,
                                    registry=registry)
 
-    user.active = True
+    user.activate()
 
 
 root_metadata = pool_metadata._replace(

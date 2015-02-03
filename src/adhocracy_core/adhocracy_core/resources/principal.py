@@ -19,6 +19,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import get_sheet
 import adhocracy_core.sheets.metadata
@@ -104,6 +105,19 @@ class User(Pool):
         self.roles = []
         self.group_ids = []
         """Readonly :term:`group_id`s for this user."""
+        self.hidden = True
+
+    def activate(self, active: bool=True):
+        """
+        Activate or deactivate the user.
+
+        Inactivate users are always hidden.
+        """
+        self.active = active
+        sheet = get_sheet(self, IMetadata)
+        appstruct = sheet.get()
+        appstruct['hidden'] = not active
+        sheet.set(appstruct)
 
 
 def send_registration_mail(context: IUser,
