@@ -47,7 +47,6 @@ var pkgLocation = "/Rate";
 
 export interface IRateScope extends ng.IScope {
     refersTo : string;
-    postPoolPath : string;
     rates : {
         pro : number;
         contra : number;
@@ -60,7 +59,6 @@ export interface IRateScope extends ng.IScope {
     toggleShowDetails() : void;
     cast(value : number) : void;
     toggle() : void;
-    assureUserRateExists() : ng.IPromise<void>;
     postUpdate() : ng.IPromise<void>;
     optionsPostPool : AdhHttp.IOptions;
     ready : boolean;
@@ -108,6 +106,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
         },
         link: (scope : IRateScope) : void => {
             var myRateResource : RIRateVersion;
+            var postPoolPath : string;
 
             /**
              * initialise rates
@@ -133,8 +132,8 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             };
 
             var updatePostPoolPath = () : ng.IPromise<void> => {
-                return fetchPostPoolPath(scope.refersTo).then((postPoolPath) => {
-                    scope.postPoolPath = postPoolPath;
+                return fetchPostPoolPath(scope.refersTo).then((path) => {
+                    postPoolPath = path;
                 });
             };
 
@@ -163,7 +162,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             };
 
             var updateMyRate = () : ng.IPromise<void> => {
-                return fetchRate(scope.postPoolPath, scope.refersTo, adhUser.userPath).then((rate) => {
+                return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((rate) => {
                     myRateResource = rate;
                 });
             };
@@ -187,7 +186,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             };
 
             var updateAggregatedRates = () : ng.IPromise<void> => {
-                return fetchAggregatedRates(scope.postPoolPath, scope.refersTo).then((rates) => {
+                return fetchAggregatedRates(postPoolPath, scope.refersTo).then((rates) => {
                     scope.rates.pro = rates["1"] || 0;
                     scope.rates.contra = rates["-1"] || 0;
                     scope.rates.neutral = rates["0"] || 0;
@@ -245,9 +244,30 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             };
 
             var updateAuditTrail = () : ng.IPromise<void> => {
-                return fetchAuditTrail(scope.postPoolPath, scope.refersTo).then((auditTrail)  => {
+                return fetchAuditTrail(postPoolPath, scope.refersTo).then((auditTrail)  => {
                     scope.auditTrail = auditTrail;
                 });
+            };
+
+            var assureUserRateExists = () : ng.IPromise<void> => {
+                if (typeof myRateResource !== "undefined") {
+                    return $q.when();
+                } else {
+                    return adhHttp
+                        .withTransaction((transaction) : ng.IPromise<void> => {
+                            var item : AdhHttp.ITransactionResult =
+                                transaction.post(postPoolPath, new RIRate({ preliminaryNames: adhPreliminaryNames }));
+                            var version : AdhHttp.ITransactionResult =
+                                transaction.get(item.first_version_path);
+
+                            return transaction.commit()
+                                .then((responses) : void => {
+                                    myRateResource = <RIRateVersion>responses[version.index];
+                                    adapter.subject(myRateResource, adhUser.userPath);
+                                    adapter.object(myRateResource, scope.refersTo);
+                                });
+                        });
+                }
             };
 
             scope.isActive = (rate : number) : boolean =>
@@ -275,7 +295,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             /*
             var castSimple = (rate : number) : void => {
                 if (!scope.isActive(rate)) {
-                    scope.assureUserRateExists()
+                    assureUserRateExists()
                         .then(() => {
                             adapter.rate(myRateResource, rate);
                             scope.postUpdate();
@@ -292,7 +312,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
              * but it works.
              */
             var castToggle = (rate : number) : void => {
-                scope.assureUserRateExists()
+                assureUserRateExists()
                     .then(() => {
                         var oldRate : number = myRateResource.data[SIRate.nick].rate;
 
@@ -320,27 +340,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
                 }
             };
 
-            scope.assureUserRateExists = () : ng.IPromise<void> => {
-                if (typeof myRateResource !== "undefined") {
-                    return $q.when();
-                } else {
-                    return adhHttp
-                        .withTransaction((transaction) : ng.IPromise<void> => {
-                            var item : AdhHttp.ITransactionResult =
-                                transaction.post(scope.postPoolPath, new RIRate({ preliminaryNames: adhPreliminaryNames }));
-                            var version : AdhHttp.ITransactionResult =
-                                transaction.get(item.first_version_path);
-
-                            return transaction.commit()
-                                .then((responses) : void => {
-                                    myRateResource = <RIRateVersion>responses[version.index];
-                                    adapter.subject(myRateResource, adhUser.userPath);
-                                    adapter.object(myRateResource, scope.refersTo);
-                                });
-                        });
-                }
-            };
-
             scope.postUpdate = () : ng.IPromise<void> => {
                 if (typeof myRateResource === "undefined") {
                     throw "internal error?!";
@@ -360,7 +359,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             updatePostPoolPath()
                 .then(() => $q.all([updateMyRate(), updateAggregatedRates()]))
                 .then(() => {
-                    adhPermissions.bindScope(scope, scope.postPoolPath, "optionsPostPool");
+                    adhPermissions.bindScope(scope, postPoolPath, "optionsPostPool");
                     scope.ready = true;
                     adhDone();
                 });
