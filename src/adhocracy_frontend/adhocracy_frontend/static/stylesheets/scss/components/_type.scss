@@ -60,8 +60,8 @@ category: Type
 
 A hyperlink. It may have the following states:
 
--   has-focus
--   is-hover
+-   :hover
+-   :focus
 
 ```html_example
 <a href="#">internal link</a>
@@ -73,9 +73,7 @@ a {
     color: $color-text-highlight-normal;
 
     &:hover,
-    &.is-hover,
-    &:focus,
-    &.has-focus {
+    &:focus {
         color: $color-text-highlight-introvert;
     }
 }
