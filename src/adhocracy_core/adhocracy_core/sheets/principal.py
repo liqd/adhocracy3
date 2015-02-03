@@ -21,17 +21,22 @@ from adhocracy_core.schema import Roles
 
 class IGroup(ISheet):
 
-    """Market interface for the group sheet."""
+    """Marker interface for the group sheet."""
 
 
 class IUserBasic(ISheet):
 
-    """Market interface for the userbasic sheet."""
+    """Marker interface for the basic user sheet."""
+
+
+class IUserExtended(ISheet):
+
+    """Marker interface for the extended user sheet."""
 
 
 class IPermissions(ISheet):
 
-    """Market interface for the permissions sheet."""
+    """Marker interface for the permissions sheet."""
 
 
 class PermissionsGroupsReference(SheetToSheet):
@@ -109,17 +114,15 @@ def deferred_validate_user_email(node: colander.SchemaNode, kw: dict)\
 
 class UserBasicSchema(colander.MappingSchema):
 
-    """Userbasic sheet data structure.
+    """Basic user sheet data structure.
 
-    `email`: email address
+    This sheet must only store public information, as everyone can see it.
+
     `name`: visible name
-    `tzname`: time zone
     """
 
-    email = Email(validator=deferred_validate_user_email)
     name = SingleLine(missing=colander.required,
                       validator=deferred_validate_user_name)
-    tzname = TimeZoneName()
 
 
 userbasic_metadata = sheet_metadata_defaults._replace(
@@ -127,6 +130,30 @@ userbasic_metadata = sheet_metadata_defaults._replace(
     schema_class=UserBasicSchema,
     sheet_class=AttributeStorageSheet,
     permission_create='create_sheet_userbasic',
+)
+
+
+class UserExtendedSchema(colander.MappingSchema):
+
+    """Extended user sheet data structure.
+
+    Sensitive information (not for everyone's eyes) should be stored here.
+
+    `email`: email address
+    `tzname`: time zone
+    """
+
+    email = Email(validator=deferred_validate_user_email)
+    tzname = TimeZoneName()
+
+
+userextended_metadata = sheet_metadata_defaults._replace(
+    isheet=IUserExtended,
+    schema_class=UserExtendedSchema,
+    sheet_class=AttributeStorageSheet,
+    permission_create='create_sheet_userbasic',
+    permission_view='view_userextended',
+    permission_edit='edit_userextended',
 )
 
 
@@ -151,7 +178,7 @@ def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
 
 class PermissionsSchema(colander.MappingSchema):
 
-    """Userbasic sheet data structure.
+    """Permissions sheet data structure.
 
     `groups`: groups this user joined
     """
@@ -177,6 +204,7 @@ class PermissionsAttributeStorageSheet(AttributeStorageSheet):
 permissions_metadata = sheet_metadata_defaults._replace(
     isheet=IPermissions,
     schema_class=PermissionsSchema,
+    permission_view='view_userextended',
     permission_create='manage_principals',
     permission_edit='manage_principals',
     sheet_class=PermissionsAttributeStorageSheet,
@@ -256,6 +284,7 @@ password_metadata = sheet_metadata_defaults._replace(
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_metadata, config.registry)
+    add_sheet_to_registry(userextended_metadata, config.registry)
     add_sheet_to_registry(password_metadata, config.registry)
     add_sheet_to_registry(group_metadata, config.registry)
     add_sheet_to_registry(permissions_metadata, config.registry)

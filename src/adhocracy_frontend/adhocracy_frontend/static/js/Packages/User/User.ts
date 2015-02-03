@@ -5,11 +5,11 @@ import AdhCache = require("../Http/Cache");
 
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+import SIUserExtended = require("../../Resources_/adhocracy_core/sheets/principal/IUserExtended");
 
 
 export interface IUserBasic {
     name? : string;
-    email? : string;
     tzname? : string;
 }
 
@@ -181,7 +181,9 @@ export class Service {
             "data": {}
         };
         resource.data[SIUserBasic.nick] = {
-            "name": username,
+            "name": username
+        };
+        resource.data[SIUserExtended.nick] = {
             "email": email
         };
         resource.data[SIPasswordAuthentication.nick] = {

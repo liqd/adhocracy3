@@ -276,7 +276,7 @@ export var register = () => {
                 it("posts a valid user resource", () => {
                     var data = adhHttpMock.post.calls.mostRecent().args[1].data;
                     expect(data["adhocracy_core.sheets.principal.IUserBasic"].name).toBe("username");
-                    expect(data["adhocracy_core.sheets.principal.IUserBasic"].email).toBe("email");
+                    expect(data["adhocracy_core.sheets.principal.IUserExtended"].email).toBe("email");
                     expect(data["adhocracy_core.sheets.principal.IPasswordAuthentication"].password).toBe("password");
                 });
             });

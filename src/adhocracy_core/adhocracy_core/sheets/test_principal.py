@@ -85,9 +85,7 @@ class TestUserBasicSchemaSchema:
 
     def test_deserialize_all(self):
         inst = self.make_one()
-        cstruct = {'email': 'test@test.de',
-                   'name': 'login',
-                   'tzname': 'Europe/Berlin'}
+        cstruct = {'name': 'login'}
         assert inst.deserialize(cstruct) == cstruct
 
     def test_deserialize_name_missing(self):
@@ -107,6 +105,24 @@ class TestUserBasicSchemaSchema:
     def test_name_has_deferred_validator(self):
         inst = self.make_one()
         assert isinstance(inst['name'].validator, colander.deferred)
+
+
+class TestUserExtendedSchemaSchema:
+
+    def make_one(self):
+        from adhocracy_core.sheets.principal import UserExtendedSchema
+        return UserExtendedSchema()
+
+    def test_deserialize_all(self):
+        inst = self.make_one()
+        cstruct = {'email': 'test@test.de',
+                   'tzname': 'Europe/Berlin'}
+        assert inst.deserialize(cstruct) == cstruct
+
+    def test_deserialize_email(self):
+        inst = self.make_one()
+        assert inst.deserialize(
+            {'email': 'test@test.de'}) == {'email': 'test@test.de'}
 
     def test_email_has_deferred_validator(self):
         inst = self.make_one()
@@ -198,10 +214,31 @@ class TestUserBasicSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'name': '',
-                              'email': '',
-                              'tzname': 'UTC',
-                              }
+        assert inst.get() == {'name': ''}
+
+
+class TestUserExtendedSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import userextended_metadata
+        return userextended_metadata
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IUserExtended
+        from adhocracy_core.sheets.principal import UserExtendedSchema
+        from adhocracy_core.sheets import GenericResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, GenericResourceSheet)
+        assert inst.meta.isheet == IUserExtended
+        assert inst.meta.schema_class == UserExtendedSchema
+        assert inst.meta.permission_create == 'create_sheet_userbasic'
+        assert inst.meta.permission_view == 'view_userextended'
+        assert inst.meta.permission_edit == 'edit_userextended'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'email': '', 'tzname': 'UTC'}
 
 
 def test_includeme_register_userbasic_sheet(config):
@@ -294,7 +331,7 @@ class TestPermissionsSheet:
         assert inst.meta.schema_class == PermissionsSchema
         assert inst.meta.permission_create == 'manage_principals'
         assert inst.meta.permission_edit == 'manage_principals'
-        assert inst.meta.permission_view == 'view'
+        assert inst.meta.permission_view == 'view_userextended'
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
