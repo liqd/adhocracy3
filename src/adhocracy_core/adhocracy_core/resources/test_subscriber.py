@@ -354,6 +354,7 @@ class TestAutoupdateVersionableHasNewVersion:
         assert registry.content.create.call_args[1]['registry'] == event.registry
         assert registry.content.create.call_args[1]['creator'] is event.creator
         assert registry.content.create.call_args[1]['parent'] is item
+        assert registry.content.create.call_args[1]['is_batchmode'] == event.is_batchmode
         assert registry.content.create.call_args[1]['appstructs'] ==\
             {IDummySheetAutoUpdate.__identifier__: {'elements': [1, 3]},
              IVersionable.__identifier__: {'follows': [version]}}

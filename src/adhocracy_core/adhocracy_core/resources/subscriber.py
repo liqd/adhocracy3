@@ -246,14 +246,16 @@ def _create_new_version(event, appstruct) -> IResource:
     appstructs = _get_writable_appstructs(event.object, event.registry)
     appstructs[IVersionable.__identifier__]['follows'] = [event.object]
     appstructs[event.isheet.__identifier__] = appstruct
+    registry = event.registry
     iresource = get_iresource(event.object)
-    root_versions = event.root_versions
-    new_version = event.registry.content.create(iresource.__identifier__,
-                                                parent=event.object.__parent__,
-                                                appstructs=appstructs,
-                                                creator=event.creator,
-                                                registry=event.registry,
-                                                root_versions=root_versions)
+    new_version = registry.content.create(iresource.__identifier__,
+                                          parent=event.object.__parent__,
+                                          appstructs=appstructs,
+                                          creator=event.creator,
+                                          registry=event.registry,
+                                          root_versions=event.root_versions,
+                                          is_batchmode=event.is_batchmode,
+                                          )
     return new_version
 
 
