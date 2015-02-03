@@ -86,10 +86,12 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
         root_versions = [context]
         registry = testing.DummyResource()
         creator = testing.DummyResource()
+        is_batchmode = True
 
         inst = self._make_one(context, isheet, isheet_field, old_version,
                               new_version, registry, creator,
-                              root_versions=root_versions)
+                              root_versions=root_versions,
+                              is_batchmode=is_batchmode)
 
         assert ISheetReferencedItemHasNewVersion.providedBy(inst)
         assert verifyObject(ISheetReferencedItemHasNewVersion, inst)

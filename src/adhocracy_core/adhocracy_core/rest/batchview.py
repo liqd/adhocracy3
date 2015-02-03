@@ -59,7 +59,7 @@ class BatchView(RESTView):
         """Create new resource and get response data."""
         response_list = []
         path_map = {}
-        set_batchmode(self.request.registry)
+        set_batchmode(self.request)
         for item in self.request.validated:
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
@@ -68,9 +68,6 @@ class BatchView(RESTView):
                 err.text = dumps(self._response_list_to_json(response_list))
                 raise err
         response = self._response_list_to_json(response_list)
-        # Explicitly unset batchmode because registry is shared between
-        # requests
-        set_batchmode(self.request.registry, False)
         return response
 
     @view_config(name='batch',
@@ -158,6 +155,7 @@ class BatchView(RESTView):
             keywords_args['content_type'] = 'application/json'
 
         request = Request.blank(path, **keywords_args)
+        set_batchmode(request)
         self.copy_attr_if_exists('root', request)
         self.copy_attr_if_exists('__cached_principals__', request)
         self.copy_header_if_exists('X-User-Path', request)

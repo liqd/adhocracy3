@@ -42,7 +42,8 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _make_one(self, follows=[], appstructs={}, creator=None):
+    def _make_one(self, follows=[], appstructs={}, creator=None,
+                  is_batchmode=False):
         from adhocracy_core.sheets.versions import IVersionable
         parent = self.context
         follow = {IVersionable.__identifier__: {'follows': follows}}
@@ -53,7 +54,9 @@ class ItemVersionIntegrationTest(unittest.TestCase):
             parent=parent,
             appstructs=appstructs,
             creator=creator,
-            registry=self.config.registry)
+            registry=self.config.registry,
+            is_batchmode=is_batchmode,
+        )
         return itemversion
 
     def test_registry_factory(self):
@@ -84,10 +87,11 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         version_0 = self._make_one()
         other_version_0 = self._make_one()
         self.objectmap.connect(other_version_0, version_0, SheetToSheet)
-        self._make_one(follows=[version_0], creator=creator)
+        self._make_one(follows=[version_0], creator=creator, is_batchmode=True)
 
         assert len(events) == 1
         assert events[0].creator == creator
+        assert events[0].is_batchmode
 
     def test_autoupdate_with_referencing_items(self):
         # for more tests see adhocracy_core.resources.subscriber

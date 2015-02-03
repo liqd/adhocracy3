@@ -404,6 +404,8 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
                               'of the roots should be updated)')
     registry = Attribute('The pyramid registry')
     creator = Attribute('User resource object of the authenticated User')
+    is_batchmode = Attribute('Flag to do sheet autoupdates in batch request '
+                             'mode.')
 
 
 class ISheetReferenceModified(IObjectEvent):  # pragma: no cover

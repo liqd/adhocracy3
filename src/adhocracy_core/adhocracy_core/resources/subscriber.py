@@ -35,7 +35,6 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_last_version
-from adhocracy_core.utils import is_batchmode
 from adhocracy_core.sheets.versions import IVersionable
 import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.rate
@@ -210,7 +209,7 @@ def _get_appstruct_for_new_version(event, sheet) -> dict:
 
 
 def _get_last_itemversion_created_in_transaction(event) -> IResource:
-    if is_batchmode(event.registry):
+    if event.is_batchmode:
         new_version = get_last_new_version(event.registry, event.object)
     else:
         new_version = get_following_new_version(event.registry, event.object)

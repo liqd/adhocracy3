@@ -101,6 +101,9 @@ class SheetReferencedItemHasNewVersion:
                                 these root resources should ignore
                                 this event. Optional.
     :param creator(adhocracy_core.resource.principal.IUser':
+
+    :param is_batchmode(bool): Flag to do sheet autoupdates in batch request
+                               mode. Defaults to False.
     """
 
     def __init__(self,
@@ -111,7 +114,9 @@ class SheetReferencedItemHasNewVersion:
                  new_version,
                  registry,
                  creator,
-                 root_versions=[]):
+                 root_versions=[],
+                 is_batchmode=False,
+                 ):
         self.object = object
         self.isheet = isheet
         self.isheet_field = isheet_field
@@ -120,6 +125,7 @@ class SheetReferencedItemHasNewVersion:
         self.registry = registry
         self.creator = creator
         self.root_versions = root_versions
+        self.is_batchmode = is_batchmode
 
 
 @implementer(ISheetBackReferenceRemoved)

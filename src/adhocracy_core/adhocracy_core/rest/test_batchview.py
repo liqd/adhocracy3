@@ -68,12 +68,14 @@ class TestBatchView:
         return json.dumps([cstruct])
 
     def test_post_empty(self, context, request):
+        from adhocracy_core.utils import is_batchmode
         inst = self._make_one(context, request)
         assert inst.post() == {'responses': [],
                                'updated_resources': {'changed_descendants': [],
                                                      'created': [],
                                                      'modified': [],
                                                      'removed': []}}
+        assert is_batchmode(request)
 
     def test_post_successful_subrequest(self, context, request, mock_invoke_subrequest):
         request.body = self._make_json_with_subrequest_cstructs()
@@ -88,6 +90,25 @@ class TestBatchView:
                                                   'created': [],
                                                   'modified': [],
                                                   'removed': []}}
+
+    def test_post_copy_special_request_attributes_headers_to_subrequest(
+            self, context, request, mock_invoke_subrequest):
+        from adhocracy_core.utils import is_batchmode
+        request.body = self._make_json_with_subrequest_cstructs()
+        request.__cached_principals__ = [1]
+        request.headers['X-User-Path'] = 2
+        request.headers['X-User-Token'] = 3
+        inst = self._make_one(context, request)
+        paths = {'path': '/pool/item',
+                 'first_version_path': '/pool/item/v1'}
+        mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
+                                                               json=paths,)
+        inst.post()
+        subrequest  = mock_invoke_subrequest.call_args[0][0]
+        assert is_batchmode(subrequest)
+        assert subrequest.__cached_principals__ == [1]
+        assert subrequest.headers.get('X-User-Path') == 2
+        assert subrequest.headers.get('X-User-Token') == 3
 
     def test_post_successful_subrequest_with_updated_resources(
             self, context, request, mock_invoke_subrequest):

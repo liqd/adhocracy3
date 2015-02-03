@@ -27,7 +27,9 @@ def create_new_reference_event(context,
                                creator=None,
                                old_version=None,
                                new_version=None,
-                               root_versions=None):
+                               root_versions=None,
+                               is_batchmode=False,
+                               ):
     from zope.interface import verify
     from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
     event = testing.DummyResource(__provides__= ISheetReferencedItemHasNewVersion,
@@ -38,7 +40,9 @@ def create_new_reference_event(context,
                                   new_version=new_version,
                                   registry=registry,
                                   creator=creator,
-                                  root_versions=root_versions or [])
+                                  root_versions=root_versions or [],
+                                  is_batchmode=is_batchmode,
+                                  )
     assert verify.verifyObject(ISheetReferencedItemHasNewVersion, event)
     return event
 
@@ -299,10 +303,8 @@ class TestAutoupdateVersionableHasNewVersion:
            request. So we just take the last created item version.
         """
         from pyramid.traversal import resource_path
-        from adhocracy_core.utils import set_batchmode
-        set_batchmode(registry, True)
         event = create_new_reference_event(version, registry, old_version=2,
-                                           new_version=3)
+                                           new_version=3, is_batchmode=True)
         add_and_register_sheet(version, mock_sheet, registry)
         last_version = testing.DummyResource()
         add_and_register_sheet(last_version, mock_sheet, registry)

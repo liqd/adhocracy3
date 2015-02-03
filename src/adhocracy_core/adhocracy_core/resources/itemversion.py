@@ -37,6 +37,7 @@ def notify_new_itemversion_created(context, registry, options):
     new_version = context
     root_versions = options.get('root_versions', [])
     creator = options.get('creator', None)
+    is_batchmode = options.get('is_batchmode', False)
     old_versions = []
     versionable = get_sheet(context, IVersionable, registry=registry)
     follows = versionable.get()['follows']
@@ -48,7 +49,8 @@ def notify_new_itemversion_created(context, registry, options):
                                                         new_version,
                                                         root_versions,
                                                         registry,
-                                                        creator)
+                                                        creator,
+                                                        is_batchmode)
 
         # Update LAST tag in parent item
         _update_last_tag(context, registry, old_versions)
@@ -65,7 +67,9 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                     new_version,
                                                     root_versions,
                                                     registry,
-                                                    creator):
+                                                    creator,
+                                                    is_batchmode,
+                                                    ):
     graph = find_graph(old_version)
     references = graph.get_back_references(old_version,
                                            base_reftype=SheetToSheet)
@@ -77,7 +81,9 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                  new_version,
                                                  registry,
                                                  creator,
-                                                 root_versions=root_versions)
+                                                 root_versions=root_versions,
+                                                 is_batchmode=is_batchmode,
+                                                 )
         registry.notify(event)
 
 
