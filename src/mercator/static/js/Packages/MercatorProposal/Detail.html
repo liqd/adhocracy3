@@ -85,7 +85,7 @@
                     <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">{{ "project is granted" | translate }}</strong></p>
 
                     <ul class="inline-boxes">
-                        <li data-ng-if="data.location.location_is_online">{{ "ONLINE" | translate }}</li>
+                        <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "online" | translate }}</li>
                         <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
                         <li data-ng-if="data.location.location_specific_2">{{ data.location.location_specific_2 }}</li>
                         <li data-ng-if="data.location.location_specific_3">{{ data.location.location_specific_3 }}</li>
