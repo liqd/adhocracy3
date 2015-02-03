@@ -174,8 +174,10 @@ export var register = () => {
             });
         });
 
-        describe("rateController", () => {
+        describe("directive", () => {
+            var directive;
             var adapterMock;
+            var adhConfigMock;
             var adhPermissionsMock;
             var adhPreliminaryNamesMock;
             var realFetchAggregatedRates;
@@ -195,21 +197,22 @@ export var register = () => {
                 realFetchAuditTrail = AdhRate.fetchAuditTrail;
                 spyOn(AdhRate, "fetchAuditTrail").and.returnValue(q.when());
 
+                adhConfigMock = <any>{};
+
                 // only used in untested functions
                 adhPreliminaryNamesMock = undefined;
 
-                AdhRate.rateController(
-                    adapterMock,
-                    scopeMock,
+                directive = AdhRate.directiveFactory("", adapterMock)(
                     <any>q,
+                    adhConfigMock,
                     httpMock,
                     adhPermissionsMock,
                     userMock,
                     adhPreliminaryNamesMock,
-                    null)
-                    .then(done, (reason) => {
-                        expect(reason).toBe(undefined);
-                    });
+                    null,
+                    done);
+
+                directive.link(scopeMock);
             });
 
             afterEach(() => {
