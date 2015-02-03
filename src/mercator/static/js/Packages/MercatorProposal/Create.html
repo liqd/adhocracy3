@@ -79,7 +79,7 @@
                     <h3 class="mercator-proposal-form-subheading">{{ "Organisation Info:" | translate }}</h3>
 
                     <div
-                        data-ng-class="{ 'is-invalid': mercatorProposalBasicForm['organization-info-status-enum'].$invalid
+                        data-ng-class="{ 'ng-invalid': mercatorProposalBasicForm['organization-info-status-enum'].$invalid
                             && mercatorProposalForm.$submitted }">
 
                         <label>
@@ -363,7 +363,7 @@
                             data-flow-init=""
                             data-flow-object="$flow"
                             data-ng-model="data.introduction.imageUpload"
-                            data-ng-class="{ 'is-invalid': mercatorProposalIntroductionForm['introduction-picture-upload'].$invalid }"
+                            data-ng-class="{ 'ng-invalid': mercatorProposalIntroductionForm['introduction-picture-upload'].$invalid }"
                             name="introduction-picture-upload">
                             <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
                                 current image:
@@ -465,7 +465,7 @@
 
                     <!-- FIXME: red border should show on dirty -->
                     <div
-                        data-ng-class="{ 'is-invalid': showLocationError() }">
+                        data-ng-class="{ 'ng-invalid': showLocationError() }">
                         <label>
                             <input
                                 type="checkbox"
@@ -760,7 +760,7 @@
 
                     <span class="label-text">{{ "Granted?" | translate }}</span>
 
-                    <div class="form-inline" data-ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
+                    <div class="form-inline" data-ng-class="{ 'ng-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
                         mercatorProposalForm.$submitted }">
 
                         <label>
@@ -833,7 +833,7 @@
 
                     <span class="label-text">{{ "How did you hear about “Advocate Europe”?" | translate }}</span>
 
-                    <div data-ng-class="{ 'is-invalid': showHeardFromError() }">
+                    <div data-ng-class="{ 'ng-invalid': showHeardFromError() }">
 
                         <label>
                             <input type="checkbox"
@@ -884,7 +884,7 @@
                     </div><!-- /.ng-invalid -->
 
                     <span class="label-text">{{ "DISCLAIMER*:" | translate }}</span>
-                    <label data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
+                    <label data-ng-class="{ 'ng-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
                         <input
                             type="checkbox"
                             data-ng-model="data.accept_disclaimer"
