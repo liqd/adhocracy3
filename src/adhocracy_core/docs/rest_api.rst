@@ -993,6 +993,77 @@ this comment version::
     True
 
 
+Rates
+-----
+
+We can rate objects that provide the `adhocracy_core.sheets.rate.IRateable`
+sheet (or a subclass of it), e.g. comment versions. Rateables have their own
+post pool, so we ask the comment where to send rates about it::
+
+    >>> resp = testapp.get(snd_commvers_path)
+    >>> rateable_post_pool = resp.json['data']['adhocracy_core.sheets.rate.IRateable']['post_pool']
+
+`IRate` objects are versionable too, so we first have to create a `IRate`
+resource and then post a `IRateVersion` resource below it::
+
+    >>> rate = {'content_type': 'adhocracy_core.resources.rate.IRate',
+    ...         'data': {}}
+    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=god_header)
+    >>> rate_path = resp.json["path"]
+    >>> first_ratevers_path = resp.json['first_version_path']
+    >>> ratevers = {'content_type': 'adhocracy_core.resources.rate.IRateVersion',
+    ...             'data': {
+    ...                 'adhocracy_core.sheets.rate.IRate': {
+    ...                     'subject': 'http://localhost/principals/users/0000000/',
+    ...                     'object': snd_commvers_path,
+    ...                     'rate': '1'},
+    ...                 'adhocracy_core.sheets.versions.IVersionable': {
+    ...                     'follows': [first_ratevers_path]}},
+    ...             'root_versions': [first_ratevers_path]}
+    >>> resp = testapp.post_json(rate_path, ratevers, headers=god_header)
+    >>> snd_ratevers_path = resp.json['path']
+    >>> snd_ratevers_path
+    '...adhocracy/Proposals/kommunismus/rates/rate_0000000/VERSION_0000001/'
+
+If we want to change our rate, we can post a new version::
+
+    >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['rate'] = '0'
+    >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [snd_ratevers_path]
+    >>> ratevers['root_versions'] = [snd_ratevers_path]
+    >>> resp = testapp.post_json(rate_path, ratevers, headers=god_header)
+    >>> third_ratevers_path = resp.json['path']
+    >>> third_ratevers_path != snd_ratevers_path
+    True
+
+But creating a second rate is not allowed to prevent people from voting
+multiple times::
+
+    >>> resp = testapp.post_json(rateable_post_pool, rate, headers=god_header)
+    >>> rate2_path = resp.json["path"]
+    >>> first_rate2vers_path = resp.json['first_version_path']
+    >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [first_rate2vers_path]
+    >>> ratevers['root_versions'] = [first_rate2vers_path]
+    >>> resp_data = testapp.post_json(rate2_path, ratevers, headers=god_header,
+    ...                               status=400).json
+    >>> resp_data['errors'][0]['name']
+    'data.adhocracy_core.sheets.rate.IRate.object'
+    >>> resp_data['errors'][0]['description']
+    'Another rate by the same user already exists'
+
+The *subject* of a rate must always be the user that is currently logged in --
+it's not possible to vote for other users::
+
+    >>> ratevers['data']['adhocracy_core.sheets.rate.IRate']['subject'] = 'http://localhost/principals/users/0000001/'
+    >>> ratevers['data']['adhocracy_core.sheets.versions.IVersionable']['follows'] = [third_ratevers_path]
+    >>> ratevers['root_versions'] = [third_ratevers_path]
+    >>> resp_data = testapp.post_json(rate_path, ratevers, headers=god_header,
+    ...                               status=400).json
+    >>> resp_data['errors'][0]['name']
+    'data.adhocracy_core.sheets.rate.IRate.subject'
+    >>> resp_data['errors'][0]['description']
+    'Must be the currently logged-in user'
+
+
 Batch requests
 --------------
 
