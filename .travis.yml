@@ -8,3 +8,5 @@ script:
   - "./bin/py.test_run_all"
 git:
   depth: 3000
+notifications:
+  email: false
