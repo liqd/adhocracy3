@@ -4,12 +4,12 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
@@ -53,9 +53,9 @@ export interface IRateScope extends ng.IScope {
     auditTrail : { subject: string; rate: number }[];
     auditTrailVisible : boolean;
     toggleShowDetails() : void;
-    cast(value : number) : void;
-    toggle() : void;
-    postUpdate() : ng.IPromise<void>;
+    cast(value : number) : ng.IPromise<void>;
+    uncast() : ng.IPromise<void>;
+    toggle(value : number) : ng.IPromise<void>;
     optionsPostPool : AdhHttp.IOptions;
     ready : boolean;
 }
@@ -249,74 +249,48 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
-            /**
-             * the current implementation does not allow withdrawing of
-             * rates, so if you click on "pro" twice in a row, the second time
-             * will have no effect.  the work-around is for the user to rate
-             * something "neutral".  an alternative behavior is cast_toggle
-             * defined below.
-             */
-            /*
-            var castSimple = (rate : number) : void => {
-                if (rate !== scope.myRate) {
-                    assureUserRateExists()
-                        .then(() => {
-                            adapter.rate(myRateResource, rate);
-                            scope.postUpdate();
-                        });
-                }
-            };
-            */
-
             scope.rates = (rate : number) : number => {
                 return rates[rate.toString()] || 0;
             };
 
-            /**
-             * if the design has no neutral button, un-upping can be
-             * implemented as changeing the vote to 'neutral'.  this requires
-             * the total votes count to disregard neutral votes in its filter
-             * query, and has negative implications on backend performance,
-             * but it works.
-             */
-            var castToggle = (rate : number) : void => {
-                assureUserRateExists()
-                    .then(() => {
-                        if (rate !== 0 && scope.myRate === rate) {
-                            rate = 0;
-                        }
-                        adapter.rate(myRateResource, rate);
-                        scope.postUpdate();
-                    });
+            // NOTE: In the future we might want to delete the rate instead.
+            // For now, uncasting is simply implemented by casting a "neutral" rate.
+            scope.uncast = () : ng.IPromise<void> => {
+                return scope.cast(0);
             };
 
-            scope.cast = (rate : number) : void => {
+            scope.cast = (rate : number) : ng.IPromise<void> => {
                 if (!scope.optionsPostPool.POST) {
-                    adhTopLevelState.redirectToLogin();
+                    if (!adhUser.loggedIn) {
+                        adhTopLevelState.redirectToLogin();
+                    } else {
+                        // FIXME
+                    }
+                    return $q.reject("Permission Error");
                 }
-                castToggle(rate);
-            };
+                return assureUserRateExists().then((version) => {
+                    var newVersion = AdhResourceUtil.derive(version, {
+                        preliminaryNames: adhPreliminaryNames
+                    });
 
+                    adapter.rate(newVersion, rate);
+                    adapter.object(newVersion, scope.refersTo);
+                    adapter.subject(newVersion, adhUser.userPath);
 
-            scope.toggle = () : void => {
-                if (scope.myRate === 1) {
-                    scope.cast(0);
-                } else {
-                    scope.cast(1);
-                }
-            };
-
-            scope.postUpdate = () : ng.IPromise<void> => {
-                if (typeof myRateResource === "undefined") {
-                    throw "internal error?!";
-                } else {
-                    return adhHttp
-                        .postNewVersionNoFork(myRateResource.path, myRateResource)
-                        .then((response : { value: RIRate }) => {
+                    return adhHttp.postNewVersionNoFork(version.path, newVersion)
+                        .then(() => {
                             scope.auditTrailVisible = false;
                             return $q.all([updateMyRate(), updateAggregatedRates()]);
                         })
-                        .then(() => { return; });
+                        .then(() => undefined);
+                });
+            };
+
+            scope.toggle = (rate : number) : ng.IPromise<void> => {
+                if (rate === scope.myRate) {
+                    return scope.uncast();
+                } else {
+                    return scope.cast(rate);
                 }
             };
 
