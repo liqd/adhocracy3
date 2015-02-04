@@ -34,7 +34,8 @@ input[type="button"] {
         padding: 0 1em;
         min-width: 110px / $font-size-normal * 1em;
 
-        &:hover:not(:disabled):not(.ng-disabled), &:focus:not(:disabled):not(.ng-disabled) {
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
             background: $color-brand-two-extrovert;
         }
 
