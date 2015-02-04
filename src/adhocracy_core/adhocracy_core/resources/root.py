@@ -46,7 +46,6 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:contributor', 'add_externalresource'),
             (Allow, 'role:contributor', 'message_to_user'),
             # Creator role
-            (Allow, 'role:contributor', 'view'),
             (Allow, 'role:creator', 'add_commentversion'),
             (Allow, 'role:creator', 'add_rateversion'),
             (Allow, 'role:creator', 'add_proposalversion'),
@@ -56,12 +55,13 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:creator', 'edit_metadata'),
             (Allow, 'role:creator', 'view_userextended'),
             (Allow, 'role:creator', 'edit_userextended'),
+            (Allow, 'role:creator', 'add_mercator_proposal_version'),
             # Manager role
+            (Allow, 'role:manager', 'view'),
             (Allow, 'role:manager', 'hide_resource'),
             (Allow, 'role:manager', 'edit_some_sheets'),
             (Allow, 'role:manager', 'edit_metadata'),
             # Admin role
-            (Allow, 'role:manager', 'hide_resource'),
             (Allow, 'role:admin', 'view'),
             (Allow, 'role:admin', 'view_sensitive'),  # sensitive info that
                                                       # only admins should see
