@@ -6,3 +6,5 @@ install:
   - "PATH=${PATH}/bin ./bin/buildout"
 script:
   - "./bin/py.test_run_all"
+git:
+  depth: 3000
