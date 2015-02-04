@@ -175,6 +175,7 @@ export var register = () => {
                     <any>q,
                     adhConfigMock,
                     httpMock,
+                    null,
                     adhPermissionsMock,
                     userMock,
                     adhPreliminaryNamesMock,

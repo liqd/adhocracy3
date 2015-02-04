@@ -7,6 +7,8 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
+import AdhUtil = require("../Util/Util");
+import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -87,6 +89,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     $q : ng.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhWebSocket : AdhWebSocket.Service,
     adhPermissions : AdhPermissions.Service,
     adhUser : AdhUser.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
@@ -101,11 +104,13 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             postPoolSheet : "@",
             postPoolField : "@"
         },
-        link: (scope : IRateScope) : void => {
+        link: (scope : IRateScope, element) : void => {
             var myRateResource : RIRateVersion;
+            var webSocketHandle : number;
             var postPoolPath : string;
             var rates : {[key : string]: number};
             var lock : boolean;
+            var storeMyRateResource : (resource : RIRateVersion) => void;
 
             /**
              * Promise rate of specified subject.  Reject if none could be found.
@@ -134,7 +139,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var updateMyRate = () : ng.IPromise<void> => {
                 if (adhUser.loggedIn) {
                     return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
-                        myRateResource = resource;
+                        storeMyRateResource(resource);
                         scope.myRate = adapter.rate(resource);
                     }, () => undefined);
                 } else {
@@ -232,9 +237,24 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
                         return transaction.commit()
                             .then((responses) => {
-                                myRateResource = <RIRateVersion>responses[version.index];
+                                storeMyRateResource(<RIRateVersion>responses[version.index]);
                                 return myRateResource;
                             });
+                    });
+                }
+            };
+
+            storeMyRateResource = (resource : RIRateVersion) => {
+                myRateResource = resource;
+
+                if (typeof webSocketHandle === "undefined") {
+                    var itemPath = AdhUtil.parentPath(resource.path);
+                    webSocketHandle = adhWebSocket.register(itemPath, (message) => {
+                        updateMyRate();
+                        updateAggregatedRates();
+                    });
+                    element.on("$destroy", () => {
+                        adhWebSocket.unregister(itemPath, webSocketHandle);
                     });
                 }
             };
@@ -329,12 +349,14 @@ export var register = (angular) => {
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhTopLevelState.moduleName,
-            AdhUser.moduleName
+            AdhUser.moduleName,
+            AdhWebSocket.moduleName
         ])
         .directive("adhRate", [
             "$q",
             "adhConfig",
             "adhHttp",
+            "adhWebSocket",
             "adhPermissions",
             "adhUser",
             "adhPreliminaryNames",
@@ -345,6 +367,7 @@ export var register = (angular) => {
             "$q",
             "adhConfig",
             "adhHttp",
+            "adhWebSocket",
             "adhPermissions",
             "adhUser",
             "adhPreliminaryNames",
