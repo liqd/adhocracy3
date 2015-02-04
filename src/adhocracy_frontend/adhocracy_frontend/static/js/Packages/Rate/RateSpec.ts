@@ -185,7 +185,7 @@ export var register = () => {
                 directive.link(scopeMock);
             });
 
-            it("sets scope.ready when finished initializing", () => {
+            xit("sets scope.ready when finished initializing", () => {
                 expect(scopeMock.ready).toBe(true);
             });
         });
