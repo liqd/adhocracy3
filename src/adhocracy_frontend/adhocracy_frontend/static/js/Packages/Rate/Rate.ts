@@ -47,11 +47,11 @@ var pkgLocation = "/Rate";
 
 export interface IRateScope extends ng.IScope {
     refersTo : string;
+    myRate : number;
     rates(rate : number) : number;
     allRateResources : RIRateVersion[];
     auditTrail : { subject: string; rate: number }[];
     auditTrailVisible : boolean;
-    isActive : (value : number) => boolean;
     toggleShowDetails() : void;
     cast(value : number) : void;
     toggle() : void;
@@ -237,10 +237,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
-            scope.isActive = (rate : number) : boolean =>
-                typeof myRateResource !== "undefined" &&
-                    rate === adapter.rate(myRateResource);
-
             scope.toggleShowDetails = () => {
                 if (scope.auditTrailVisible) {
                     scope.auditTrailVisible = false;
@@ -261,7 +257,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
              */
             /*
             var castSimple = (rate : number) : void => {
-                if (!scope.isActive(rate)) {
+                if (rate !== scope.myRate) {
                     assureUserRateExists()
                         .then(() => {
                             adapter.rate(myRateResource, rate);
@@ -285,9 +281,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var castToggle = (rate : number) : void => {
                 assureUserRateExists()
                     .then(() => {
-                        var oldRate : number = myRateResource.data[SIRate.nick].rate;
-
-                        if (rate !== 0 && oldRate === rate) {
+                        if (rate !== 0 && scope.myRate === rate) {
                             rate = 0;
                         }
                         adapter.rate(myRateResource, rate);
@@ -304,7 +298,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
 
             scope.toggle = () : void => {
-                if (scope.isActive(1)) {
+                if (scope.myRate === 1) {
                     scope.cast(0);
                 } else {
                     scope.cast(1);
