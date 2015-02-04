@@ -267,23 +267,24 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                         // FIXME
                     }
                     return $q.reject("Permission Error");
-                }
-                return assureUserRateExists().then((version) => {
-                    var newVersion = AdhResourceUtil.derive(version, {
-                        preliminaryNames: adhPreliminaryNames
+                } else {
+                    return assureUserRateExists().then((version) => {
+                        var newVersion = AdhResourceUtil.derive(version, {
+                            preliminaryNames: adhPreliminaryNames
+                        });
+
+                        adapter.rate(newVersion, rate);
+                        adapter.object(newVersion, scope.refersTo);
+                        adapter.subject(newVersion, adhUser.userPath);
+
+                        return adhHttp.postNewVersionNoFork(version.path, newVersion)
+                            .then(() => {
+                                scope.auditTrailVisible = false;
+                                return $q.all([updateMyRate(), updateAggregatedRates()]);
+                            })
+                            .then(() => undefined);
                     });
-
-                    adapter.rate(newVersion, rate);
-                    adapter.object(newVersion, scope.refersTo);
-                    adapter.subject(newVersion, adhUser.userPath);
-
-                    return adhHttp.postNewVersionNoFork(version.path, newVersion)
-                        .then(() => {
-                            scope.auditTrailVisible = false;
-                            return $q.all([updateMyRate(), updateAggregatedRates()]);
-                        })
-                        .then(() => undefined);
-                });
+                }
             };
 
             scope.toggle = (rate : number) : ng.IPromise<void> => {
