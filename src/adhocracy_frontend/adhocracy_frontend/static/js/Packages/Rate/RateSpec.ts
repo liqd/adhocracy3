@@ -155,47 +155,16 @@ export var register = () => {
             });
         });
 
-        describe("resetRates", () => {
-            beforeEach(() => {
-                httpMock = mkHttpMock();
-                rateResources = mkRateResources();
-                postPoolResource = mkPostPoolResource(rateResources);
-                rateableResource = mkRateableResource();
-                scopeMock = mkScopeMock();
-                userMock = mkUserMock();
-            });
-
-            it("clears rates and user rate in scope.", () => {
-                AdhRate.resetRates(scopeMock);
-                expect(scopeMock.rates.pro).toBe(0);
-                expect(scopeMock.rates.contra).toBe(0);
-                expect(scopeMock.rates.neutral).toBe(0);
-                expect(scopeMock.thisUserRate).toBeUndefined();
-            });
-        });
-
         describe("directive", () => {
             var directive;
             var adapterMock;
             var adhConfigMock;
             var adhPermissionsMock;
             var adhPreliminaryNamesMock;
-            var realFetchAggregatedRates;
-            var realFetchMyRate;
-            var realFetchAuditTrail;
 
             beforeEach((done) => {
                 adapterMock = jasmine.createSpyObj("adapterMock", ["subject", "object", "rate", "rateablePostPoolPath"]);
                 adhPermissionsMock = jasmine.createSpyObj("adhPermissionsMock", ["bindScope"]);
-
-                realFetchAggregatedRates = AdhRate.fetchAggregatedRates;
-                spyOn(AdhRate, "fetchAggregatedRates").and.returnValue(q.when());
-
-                realFetchMyRate = AdhRate.fetchMyRate;
-                spyOn(AdhRate, "fetchMyRate").and.returnValue(q.when());
-
-                realFetchAuditTrail = AdhRate.fetchAuditTrail;
-                spyOn(AdhRate, "fetchAuditTrail").and.returnValue(q.when());
 
                 adhConfigMock = <any>{};
 
@@ -213,12 +182,6 @@ export var register = () => {
                     done);
 
                 directive.link(scopeMock);
-            });
-
-            afterEach(() => {
-                AdhRate.fetchAggregatedRates = realFetchAggregatedRates;
-                AdhRate.fetchMyRate = realFetchMyRate;
-                AdhRate.fetchAuditTrail = realFetchAuditTrail;
             });
 
             it("sets scope.ready when finished initializing", () => {
