@@ -131,9 +131,14 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             var updateMyRate = () : ng.IPromise<void> => {
-                return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((rate) => {
-                    myRateResource = rate;
-                });
+                if (adhUser.loggedIn) {
+                    return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
+                        myRateResource = resource;
+                        scope.myRate = adapter.rate(resource);
+                    }, () => undefined);
+                } else {
+                    return $q.when();
+                }
             };
 
             /**
