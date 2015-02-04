@@ -74,15 +74,20 @@
                 </section><!-- /.commentable-section -->
 
                 <section class="commentable-section">
-                    <div class="mercator-proposal-budget-col">
+                    <div class="mercator-proposal-budget-col requested">
                         <strong>{{ data.finance.requested_funding | number }} &euro;</strong>
                         {{ "requested" | translate }}
                     </div>
-                    <div class="mercator-proposal-budget-col budget">
+                    <div class="mercator-proposal-budget-col">
                         <strong>{{ data.finance.budget | number }} &euro;</strong>
                         {{ "budget" | translate }}
                     </div>
-                    <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">{{ "project is granted" | translate }}</strong></p>
+                    <div class="mercator-proposal-budget-col" data-ng-if="data.finance.granted">
+                        <span>
+                            <strong class="color-highlight-valid">{{ "Granted" | translate }}</strong>
+                            {{ "project" | translate }}
+                        </span>
+                    </div>
 
                     <ul class="inline-boxes">
                         <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "online" | translate }}</li>
