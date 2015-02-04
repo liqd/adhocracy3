@@ -221,24 +221,20 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 });
             };
 
-            var assureUserRateExists = () : ng.IPromise<void> => {
+            var assureUserRateExists = () : ng.IPromise<RIRateVersion> => {
                 if (typeof myRateResource !== "undefined") {
-                    return $q.when();
+                    return $q.when(myRateResource);
                 } else {
-                    return adhHttp
-                        .withTransaction((transaction) : ng.IPromise<void> => {
-                            var item : AdhHttp.ITransactionResult =
-                                transaction.post(postPoolPath, new RIRate({ preliminaryNames: adhPreliminaryNames }));
-                            var version : AdhHttp.ITransactionResult =
-                                transaction.get(item.first_version_path);
+                    return adhHttp.withTransaction((transaction) => {
+                        var item = transaction.post(postPoolPath, adapter.createItem({preliminaryNames: adhPreliminaryNames}));
+                        var version = transaction.get(item.first_version_path);
 
-                            return transaction.commit()
-                                .then((responses) : void => {
-                                    myRateResource = <RIRateVersion>responses[version.index];
-                                    adapter.subject(myRateResource, adhUser.userPath);
-                                    adapter.object(myRateResource, scope.refersTo);
-                                });
-                        });
+                        return transaction.commit()
+                            .then((responses) => {
+                                myRateResource = <RIRateVersion>responses[version.index];
+                                return myRateResource;
+                            });
+                    });
                 }
             };
 
