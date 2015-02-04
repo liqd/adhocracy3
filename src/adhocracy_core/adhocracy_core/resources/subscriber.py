@@ -169,7 +169,7 @@ def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
     sheet.set({'groups': groups}, registry=registry)
 
 
-def autoupdate_versionable_has_new_version(event: ISheetReferenceNewVersion):
+def autoupdate_versionable_has_new_version(event):
     """Auto updated versionable resource if a reference has new version.
 
     :raises AutoUpdateNoForkAllowedError: if a fork is created but not allowed
