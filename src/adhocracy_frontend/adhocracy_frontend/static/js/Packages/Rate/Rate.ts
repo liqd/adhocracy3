@@ -144,7 +144,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     if (pool.data[SIPool.nick].elements.length > 0) {
                         return adhHttp.get(pool.data[SIPool.nick].elements[0]);
                     } else {
-                        throw "Not Found";
+                        return $q.reject("Not Found");
                     }
                 });
             };
