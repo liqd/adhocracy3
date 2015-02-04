@@ -60,7 +60,6 @@ intro_image_meta = asset_meta._replace(
     basic_sheets=list(
         set(asset_meta.basic_sheets) - {IAssetMetadata, }
         | {adhocracy_mercator.sheets.mercator.IIntroImageMetadata, }),
-    permission_add='add_mercator_proposal_version',
 )
 
 
