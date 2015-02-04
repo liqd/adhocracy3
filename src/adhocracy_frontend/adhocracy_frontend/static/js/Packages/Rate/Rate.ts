@@ -98,6 +98,100 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     adhTopLevelState : AdhTopLevelState.Service,
     adhDone
 ) => {
+    "use strict";
+
+    /**
+     * Promise rate of specified subject.  Reject if none could be found.
+     *
+     * NOTE: This will return the first match. The backend must make sure that
+     * there is never more than one rate item per subject-object pair.
+     */
+    var fetchRate = (poolPath : string, object : string, subject : string) : ng.IPromise<RIRateVersion> => {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST"
+        };
+        query[SIRate.nick + ":subject"] = subject;
+        query[SIRate.nick + ":object"] = object;
+
+        return adhHttp.get(poolPath, query).then((pool) => {
+            if (pool.data[SIPool.nick].elements.length > 0) {
+                return adhHttp.get(pool.data[SIPool.nick].elements[0]);
+            } else {
+                return $q.reject("Not Found");
+            }
+        });
+    };
+
+    /**
+     * Promise aggregates rates of all users.
+     */
+    var fetchAggregatedRates = (poolPath : string, object : string) : ng.IPromise<{[key : string]: number}> => {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST",
+            count: "true",
+            aggregateby: "rate"
+        };
+        query[SIRate.nick + ":object"] = object;
+
+        return adhHttp.get(poolPath, query).then((pool) => {
+            return pool.data[SIPool.nick].aggregateby.rate;
+        });
+    };
+
+    /**
+     * Collect detailed information about poolPath specific to ratings for object.
+     */
+    var fetchAuditTrail = (poolPath : string, object : string) : ng.IPromise<any> => {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST"
+        };
+        query[SIRate.nick + ":object"] = object;
+
+        return adhHttp.get(poolPath, query)
+            .then((poolRsp) => {
+                var ratePaths : string[] = poolRsp.data[SIPool.nick].elements;
+                var rates : RIRateVersion[] = [];
+                var users : RIUser[] = [];
+                var auditTrail : { subject: string; rate: number }[] = [];
+
+                adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
+                    var gets : AdhHttp.ITransactionResult[] = ratePaths.map((path) => transaction.get(path));
+
+                    return transaction.commit()
+                        .then((responses) => {
+                            gets.map((transactionResult) => {
+                                rates.push(<any>responses[transactionResult.index]);
+                            });
+                        });
+                }).then(() => {
+                    return adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
+                        var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => transaction.get(adapter.subject(rate)));
+
+                        return transaction.commit()
+                            .then((responses) => {
+                                gets.map((transactionResult) => {
+                                    users.push(<any>responses[transactionResult.index]);
+                                });
+                            });
+                    });
+                }).then(() => {
+                    _.forOwn(ratePaths, (ratePath, ix) => {
+                        auditTrail[ix] = {
+                            subject: users[ix].data[SIUserBasic.nick].name,  // (use adapter for user, too?)
+                            rate: adapter.rate(rates[ix])
+                        };
+                    });
+                    return auditTrail;
+                });
+            });
+    };
+
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + template,
@@ -112,30 +206,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var lock : boolean;
             var storeMyRateResource : (resource : RIRateVersion) => void;
 
-            /**
-             * Promise rate of specified subject.  Reject if none could be found.
-             *
-             * NOTE: This will return the first match. The backend must make sure that
-             * there is never more than one rate item per subject-object pair.
-             */
-            var fetchRate = (poolPath : string, object : string, subject : string) : ng.IPromise<RIRateVersion> => {
-                var query : any = {
-                    content_type: RIRateVersion.content_type,
-                    depth: 2,
-                    tag: "LAST"
-                };
-                query[SIRate.nick + ":subject"] = subject;
-                query[SIRate.nick + ":object"] = object;
-
-                return adhHttp.get(poolPath, query).then((pool) => {
-                    if (pool.data[SIPool.nick].elements.length > 0) {
-                        return adhHttp.get(pool.data[SIPool.nick].elements[0]);
-                    } else {
-                        return $q.reject("Not Found");
-                    }
-                });
-            };
-
             var updateMyRate = () : ng.IPromise<void> => {
                 if (adhUser.loggedIn) {
                     return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
@@ -147,78 +217,10 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
-            /**
-             * Promise aggregates rates of all users.
-             */
-            var fetchAggregatedRates = (poolPath : string, object : string) : ng.IPromise<{[key : string]: number}> => {
-                var query : any = {
-                    content_type: RIRateVersion.content_type,
-                    depth: 2,
-                    tag: "LAST",
-                    count: "true",
-                    aggregateby: "rate"
-                };
-                query[SIRate.nick + ":object"] = object;
-
-                return adhHttp.get(poolPath, query).then((pool) => {
-                    return pool.data[SIPool.nick].aggregateby.rate;
-                });
-            };
-
             var updateAggregatedRates = () : ng.IPromise<void> => {
                 return fetchAggregatedRates(postPoolPath, scope.refersTo).then((r) => {
                     rates = r;
                 });
-            };
-
-            /**
-             * Collect detailed information about poolPath specific to ratings for object.
-             */
-            var fetchAuditTrail = (poolPath : string, object : string) : ng.IPromise<any> => {
-                var query : any = {
-                    content_type: RIRateVersion.content_type,
-                    depth: 2,
-                    tag: "LAST"
-                };
-                query[SIRate.nick + ":object"] = object;
-
-                return adhHttp.get(poolPath, query)
-                    .then((poolRsp) => {
-                        var ratePaths : string[] = poolRsp.data[SIPool.nick].elements;
-                        var rates : RIRateVersion[] = [];
-                        var users : RIUser[] = [];
-                        var auditTrail : { subject: string; rate: number }[] = [];
-
-                        adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
-                            var gets : AdhHttp.ITransactionResult[] = ratePaths.map((path) => transaction.get(path));
-
-                            return transaction.commit()
-                                .then((responses) => {
-                                    gets.map((transactionResult) => {
-                                        rates.push(<any>responses[transactionResult.index]);
-                                    });
-                                });
-                        }).then(() => {
-                            return adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
-                                var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => transaction.get(adapter.subject(rate)));
-
-                                return transaction.commit()
-                                    .then((responses) => {
-                                        gets.map((transactionResult) => {
-                                            users.push(<any>responses[transactionResult.index]);
-                                        });
-                                    });
-                            });
-                        }).then(() => {
-                            _.forOwn(ratePaths, (ratePath, ix) => {
-                                auditTrail[ix] = {
-                                    subject: users[ix].data[SIUserBasic.nick].name,  // (use adapter for user, too?)
-                                    rate: adapter.rate(rates[ix])
-                                };
-                            });
-                            return auditTrail;
-                        });
-                    });
             };
 
             var updateAuditTrail = () : ng.IPromise<void> => {
