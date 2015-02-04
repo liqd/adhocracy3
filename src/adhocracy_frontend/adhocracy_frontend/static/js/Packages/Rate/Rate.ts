@@ -86,7 +86,8 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
 }
 
 
-export var directiveFactory = (template : string, adapter : IRateAdapter<any>) => (
+// FIXME: This is currently not generic but tied to RIRateVersion
+export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
     $q : ng.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -143,7 +144,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
              * NOTE: This will return the first match. The backend must make sure that
              * there is never more than one rate item per subject-object pair.
              */
-            var fetchRate = (poolPath : string, object : string, subject : string) : ng.IPromise<any> => {
+            var fetchRate = (poolPath : string, object : string, subject : string) : ng.IPromise<RIRateVersion> => {
                 var query : any = {
                     content_type: RIRateVersion.content_type,
                     depth: 2,
@@ -170,7 +171,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<any>) =
             /**
              * Promise aggregates rates of all users.
              */
-            var fetchAggregatedRates = (poolPath : string, object : string) : ng.IPromise<any> => {
+            var fetchAggregatedRates = (poolPath : string, object : string) : ng.IPromise<{[key : string]: number}> => {
                 var query : any = {
                     content_type: RIRateVersion.content_type,
                     depth: 2,
