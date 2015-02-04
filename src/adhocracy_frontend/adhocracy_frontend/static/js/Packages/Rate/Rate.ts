@@ -100,9 +100,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + template,
         scope: {
-            refersTo: "@",
-            postPoolSheet : "@",
-            postPoolField : "@"
+            refersTo: "@"
         },
         link: (scope : IRateScope, element) : void => {
             var myRateResource : RIRateVersion;
@@ -373,5 +371,5 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhDone",
-            directiveFactory("/Like.html", new Adapter.RateAdapter())]);
+            directiveFactory("/Like.html", new Adapter.LikeAdapter())]);
 };
