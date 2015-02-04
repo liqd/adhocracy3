@@ -1,0 +1,8 @@
+language: python
+python:
+  - "3.4"
+install:
+  - "python bootstrap.py"
+  - "PATH=${PATH}/bin ./bin/buildout"
+script:
+  - "./bin/py.test_run_all"
