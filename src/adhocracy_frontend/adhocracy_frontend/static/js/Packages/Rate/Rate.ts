@@ -105,6 +105,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var myRateResource : RIRateVersion;
             var postPoolPath : string;
             var rates : {[key : string]: number};
+            var lock : boolean;
 
             /**
              * Promise rate of specified subject.  Reject if none could be found.
@@ -260,6 +261,10 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             scope.cast = (rate : number) : ng.IPromise<void> => {
+                if (lock) {
+                    return $q.reject("locked");
+                }
+
                 if (!scope.optionsPostPool.POST) {
                     if (!adhUser.loggedIn) {
                         adhTopLevelState.redirectToLogin();
@@ -268,6 +273,8 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     }
                     return $q.reject("Permission Error");
                 } else {
+                    lock = true;
+
                     return assureUserRateExists().then((version) => {
                         var newVersion = AdhResourceUtil.derive(version, {
                             preliminaryNames: adhPreliminaryNames
@@ -283,6 +290,8 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                                 return $q.all([updateMyRate(), updateAggregatedRates()]);
                             })
                             .then(() => undefined);
+                    }).finally<void>(() => {
+                        lock = false;
                     });
                 }
             };
