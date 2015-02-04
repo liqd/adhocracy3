@@ -110,22 +110,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var postPoolPath : string;
 
             /**
-             * Take the rateable in object and promise its post_pool.
-             */
-            var fetchPostPoolPath = (object : string) : ng.IPromise<string> => {
-                return adhHttp.get(object)
-                    .then((rateable : ResourcesBase.Resource) => {
-                        return adapter.rateablePostPoolPath(rateable);
-                    });
-            };
-
-            var updatePostPoolPath = () : ng.IPromise<void> => {
-                return fetchPostPoolPath(scope.refersTo).then((path) => {
-                    postPoolPath = path;
-                });
-            };
-
-            /**
              * Promise rate of specified subject.  Reject if none could be found.
              *
              * NOTE: This will return the first match. The backend must make sure that
@@ -343,7 +327,10 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             scope.auditTrailVisible = false;
-            updatePostPoolPath()
+            adhHttp.get(scope.refersTo)
+                .then((rateable) => {
+                    postPoolPath = adapter.rateablePostPoolPath(rateable);
+                })
                 .then(() => $q.all([updateMyRate(), updateAggregatedRates()]))
                 .then(() => {
                     adhPermissions.bindScope(scope, postPoolPath, "optionsPostPool");
