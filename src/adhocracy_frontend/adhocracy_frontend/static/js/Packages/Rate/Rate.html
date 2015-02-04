@@ -2,9 +2,9 @@
     <span
         class="rate-difference"
         data-ng-class="{
-            'is-negative': rates.pro < rates.contra,
-            'is-positive': rates.pro > rates.contra}">
-        {{rates.pro - rates.contra | signum}}
+            'is-negative': rates(1) < rates(-1),
+            'is-positive': rates(1) > rates(-1)}">
+        {{rates(1) - rates(-1) | signum}}
     </span>
     <a
         href=""

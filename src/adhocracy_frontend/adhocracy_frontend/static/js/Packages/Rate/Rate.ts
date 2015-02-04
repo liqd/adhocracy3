@@ -47,11 +47,7 @@ var pkgLocation = "/Rate";
 
 export interface IRateScope extends ng.IScope {
     refersTo : string;
-    rates : {
-        pro : number;
-        contra : number;
-        neutral : number;
-    };
+    rates(rate : number) : number;
     allRateResources : RIRateVersion[];
     auditTrail : { subject: string; rate: number }[];
     auditTrailVisible : boolean;
@@ -108,6 +104,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         link: (scope : IRateScope) : void => {
             var myRateResource : RIRateVersion;
             var postPoolPath : string;
+            var rates : {[key : string]: number};
 
             /**
              * Promise rate of specified subject.  Reject if none could be found.
@@ -158,10 +155,8 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             var updateAggregatedRates = () : ng.IPromise<void> => {
-                return fetchAggregatedRates(postPoolPath, scope.refersTo).then((rates) => {
-                    scope.rates.pro = rates["1"] || 0;
-                    scope.rates.contra = rates["-1"] || 0;
-                    scope.rates.neutral = rates["0"] || 0;
+                return fetchAggregatedRates(postPoolPath, scope.refersTo).then((r) => {
+                    rates = r;
                 });
             };
 
@@ -275,6 +270,10 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
             */
+
+            scope.rates = (rate : number) : number => {
+                return rates[rate.toString()] || 0;
+            };
 
             /**
              * if the design has no neutral button, un-upping can be
