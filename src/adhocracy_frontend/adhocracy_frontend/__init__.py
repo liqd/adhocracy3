@@ -89,7 +89,7 @@ def root_view(request):
                                         'lib/requirejs/require.js'),
                 '/static/require-config.js',
                 request.cachebusted_url('adhocracy_frontend:build/'
-                                        'lib/jquery/dist/jquery.js'),
+                                        'lib/jquery/dist/jquery.min.js'),
                 ],
          'meta_api': '/static/meta_api.json%s' % (
              '?' + query_params if query_params else ''),
