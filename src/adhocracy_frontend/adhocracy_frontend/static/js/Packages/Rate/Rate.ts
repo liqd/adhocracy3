@@ -110,19 +110,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var postPoolPath : string;
 
             /**
-             * initialise rates
-             */
-            var resetRates = () : void => {
-                scope.rates = {
-                    pro: 0,
-                    contra: 0,
-                    neutral: 0
-                };
-
-                delete myRateResource;
-            };
-
-            /**
              * Take the rateable in object and promise its post_pool.
              */
             var fetchPostPoolPath = (object : string) : ng.IPromise<string> => {
@@ -355,7 +342,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
-            resetRates();
             scope.auditTrailVisible = false;
             updatePostPoolPath()
                 .then(() => $q.all([updateMyRate(), updateAggregatedRates()]))
