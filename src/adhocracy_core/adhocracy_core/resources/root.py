@@ -55,6 +55,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:creator', 'edit_metadata'),
             (Allow, 'role:creator', 'view_userextended'),
             (Allow, 'role:creator', 'edit_userextended'),
+            (Allow, 'role:creator', 'add_mercator_proposal_version'),
             # Manager role
             (Allow, 'role:manager', 'view'),
             (Allow, 'role:manager', 'hide_resource'),

@@ -156,6 +156,12 @@ class TestMercatorProposalPermissionsContributor:
         resp = _batch_post_full_sample_proposal(app_contributor)
         assert resp.status_code == 200
 
+    def test_cannot_create_other_users_proposal_version(self, app_contributor,
+                                                        app_god):
+        _post_proposal_item(app_god, path='/', name='proposal_other')
+        postable_types = app_contributor.get_postable_types('/proposal_other')
+        assert postable_types == []
+
     def test_non_god_creator_is_set(self, app_contributor):
         """Regression test issue #362"""
         from adhocracy_core.sheets.metadata import IMetadata

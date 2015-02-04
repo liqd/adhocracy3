@@ -13,7 +13,6 @@ class TestMercatorForm:
         select_proposal(browser)
         assert not browser.is_text_present("edit")
 
-    @mark.xfail
     def test_edit_proposal_other_user(self, browser_with_proposal, user):
         browser = browser_with_proposal
 
