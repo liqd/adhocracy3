@@ -175,7 +175,7 @@ Class to add styling to a label when the label itself is used as a container.
 */
 
 .label-text {
-    display: block;
+    @include inline-block;
     padding-bottom: 0.5em;
 }
 
