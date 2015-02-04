@@ -51,15 +51,17 @@ export interface IRateScope extends ng.IScope {
     refersTo : string;
     myRate : number;
     rates(rate : number) : number;
-    allRateResources : RIRateVersion[];
-    auditTrail : { subject: string; rate: number }[];
-    auditTrailVisible : boolean;
-    toggleShowDetails() : void;
+    optionsPostPool : AdhHttp.IOptions;
+    ready : boolean;
+
     cast(value : number) : ng.IPromise<void>;
     uncast() : ng.IPromise<void>;
     toggle(value : number) : ng.IPromise<void>;
-    optionsPostPool : AdhHttp.IOptions;
-    ready : boolean;
+
+    // not currently used in the UI
+    auditTrail : { subject: string; rate: number }[];
+    auditTrailVisible : boolean;
+    toggleShowDetails() : void;
 }
 
 
