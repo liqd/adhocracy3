@@ -91,25 +91,25 @@ class TestValidateLinearHistoryNoFork:
                                 'are: /last_version'
 
     def test_batchmode_value_last_version_is_last_version(
-            self, node, last_version, mock_tag_sheet, registry):
+            self, node, last_version, mock_tag_sheet, request):
         from adhocracy_core.utils import set_batchmode
-        set_batchmode(registry)
+        set_batchmode(request)
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         assert self._call_fut(node, [last_version]) is None
 
     def test_batchmode_value_last_versions_is_not_last_version(
-            self, node, last_version, mock_tag_sheet, registry):
+            self, node, last_version, mock_tag_sheet, request):
         from adhocracy_core.utils import set_batchmode
-        set_batchmode(registry)
+        set_batchmode(request)
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         other_version = object()
         with raises(colander.Invalid):
             self._call_fut(node, [other_version])
 
     def test_batchmode_value_last_versions_is_not_last_version_but_last_new_version_exists(
-            self, node, last_version, mock_tag_sheet, registry, changelog):
+            self, node, last_version, mock_tag_sheet, registry, changelog, request):
         from adhocracy_core.utils import set_batchmode
-        set_batchmode(registry)
+        set_batchmode(request)
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         other_version = object()
         registry._transaction_changelog['/'] = changelog['/']._replace(last_version=other_version)

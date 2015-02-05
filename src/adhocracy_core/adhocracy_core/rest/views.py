@@ -467,7 +467,7 @@ class SimpleRESTView(ResourceRESTView):
                           request=self.request)
 
         appstruct = {}
-        if not is_batchmode(self.request.registry):
+        if not is_batchmode(self.request):
             appstruct[
                 'updated_resources'] = self._build_updated_resources_dict()
 
@@ -508,7 +508,7 @@ class PoolRESTView(SimpleRESTView):
             schema = ResourceResponseSchema().bind(request=self.request,
                                                    context=resource)
 
-        if not is_batchmode(self.request.registry):
+        if not is_batchmode(self.request):
             appstruct[
                 'updated_resources'] = self._build_updated_resources_dict()
         return schema.serialize(appstruct)
@@ -531,7 +531,8 @@ class PoolRESTView(SimpleRESTView):
                                         self.context,
                                         creator=creator,
                                         appstructs=appstructs,
-                                        request=self.request)
+                                        request=self.request,
+                                        )
         return self.build_post_response(resource)
 
     @view_config(request_method='PUT',
@@ -579,6 +580,7 @@ class ItemRESTView(PoolRESTView):
         This is needed to make :class:`adhocray_core.rest.batchview.BatchView`
         work.
         """
+        batchmode = is_batchmode(self.request)
         validated = self.request.validated
         iresource = validated['content_type']
         resource_type = iresource.__identifier__
@@ -597,7 +599,9 @@ class ItemRESTView(PoolRESTView):
                                             appstructs=appstructs,
                                             creator=creator,
                                             root_versions=root_versions,
-                                            request=self.request)
+                                            request=self.request,
+                                            is_batchmode=batchmode,
+                                            )
         return self.build_post_response(resource)
 
 

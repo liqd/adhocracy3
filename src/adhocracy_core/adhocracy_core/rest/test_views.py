@@ -704,6 +704,8 @@ class TestItemRESTView:
         assert inst.get() == wanted
 
     def test_post_valid(self, request, context):
+        from adhocracy_core.utils import set_batchmode
+        set_batchmode(request)
         request.root = context
         # Little cheat to prevent the POST validator from kicking in --
         # we're working with already-validated data here
@@ -727,7 +729,8 @@ class TestItemRESTView:
                                        creator=None,
                                        appstructs={},
                                        root_versions=[],
-                                       request=request)
+                                       request=request,
+                                       is_batchmode=True)
         assert wanted == response
 
     def test_post_valid_item(self, request, context):
