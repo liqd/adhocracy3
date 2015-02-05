@@ -249,6 +249,7 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-detail-nav {
     @extend .jump-navigation;
+    padding-top: 1em;
     text-align: center;
     width: $mercator-proposal-detail-nav-width;
     float: left;
@@ -273,7 +274,7 @@ $mercator-proposal-detail-nav-width: 2em;
         color: $color-text-introvert;
         font-size: $font-size-normal;
         margin: 0 0 1em;
-        padding: 0;
+        padding: 1em 0 0;
 
         &.active {
             color: $color-text-highlight-normal;
@@ -292,11 +293,6 @@ $mercator-proposal-detail-nav-width: 2em;
         margin: 0 0 (15px / $font-size-normal * 1em);
         text-transform: lowercase;
     }
-}
-
-.mercator-proposal-detail-nav,
-.mercator-proposal-chapters {
-    padding-top: 1em;
 }
 
 .mercator-proposal-list-item {
