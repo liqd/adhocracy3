@@ -13,8 +13,8 @@ from adhocracy_frontend.tests.acceptance.shared import logout
 from adhocracy_frontend.tests.acceptance.shared import login
 
 
-EDIT = 'Edit'
-REPLY = 'Reply'
+EDIT = 'edit'
+REPLY = 'reply'
 SAVE = 'save'
 
 @fixture(scope='module')
@@ -63,9 +63,11 @@ class TestComment:
     def test_edit_twice(self, browser):
         comment = browser.find_by_css('.comment').first
         edit_comment(browser, comment, 'edited 1')
-        assert comment.find_by_css('.comment-content div').first.text == 'edited 1'
+        assert wait(lambda: comment.find_by_css('.comment-content div')
+                    .first.text == 'edited 1')
         edit_comment(browser, comment, 'edited 2')
-        assert comment.find_by_css('.comment-content div').first.text == 'edited 2'
+        assert wait(lambda: comment.find_by_css('.comment-content div')
+                    .first.text == 'edited 2')
 
     def test_multi_edits(self, browser):
         parent = browser.find_by_css('.comment').first
