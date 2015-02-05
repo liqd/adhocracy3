@@ -117,11 +117,7 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
 
 
 def _batch_post_full_sample_proposal(app_user) -> TestResponse:
-    from adhocracy_mercator.resources.mercator import IMercatorProposal
-    from adhocracy_core.sheets.name import IName
-
     subrequests = _create_proposal()
-
     resp = app_user.batch(subrequests)
     return resp
 
@@ -146,11 +142,11 @@ class TestMercatorProposalPermissionsAnonymous:
 @mark.functional
 class TestMercatorProposalPermissionsContributor:
 
-    def test_contributor_can_create_proposal_item(self, app_contributor):
+    def test_can_create_proposal_item(self, app_contributor):
         resp = _post_proposal_item(app_contributor, path='/', name='proposal1')
         assert resp.status_code == 200
 
-    def test_contributor_can_create_proposal_version(self, app_contributor):
+    def test_can_create_proposal_version(self, app_contributor):
         from adhocracy_mercator.resources import mercator
         possible_types = mercator.mercator_proposal_meta.element_types
         postable_types = app_contributor.get_postable_types('/proposal1')
@@ -159,6 +155,12 @@ class TestMercatorProposalPermissionsContributor:
     def test_can_create_proposal_per_batch(self, app_contributor):
         resp = _batch_post_full_sample_proposal(app_contributor)
         assert resp.status_code == 200
+
+    def test_cannot_create_other_users_proposal_version(self, app_contributor,
+                                                        app_god):
+        _post_proposal_item(app_god, path='/', name='proposal_other')
+        postable_types = app_contributor.get_postable_types('/proposal_other')
+        assert postable_types == []
 
     def test_non_god_creator_is_set(self, app_contributor):
         """Regression test issue #362"""
