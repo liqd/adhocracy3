@@ -10,6 +10,8 @@ from adhocracy_core.testing import god_login
 from adhocracy_core.testing import god_password
 from adhocracy_core.testing import annotator_password
 from adhocracy_core.testing import annotator_login
+from selenium.common.exceptions import NoSuchElementException
+
 
 # FIXME: root_uri must be constructed from etc/*.ini, not hard-coded here!
 root_uri = 'http://localhost:6542'
@@ -28,10 +30,22 @@ def get_random_string(n=10, whitespace=False) -> str:
 def wait(condition, step=0.1, max_steps=10) -> bool:
     """Wait for a condition to become true."""
     for i in range(max_steps - 1):
-        if condition():
-            return True
-        else:
-            sleep(step)
+        try:
+            result = condition()
+            if hasattr(result, 'visible'):
+                if result.visible:
+                    return True
+                else:
+                    sleep(step)
+            else:
+                if result:
+                    return True
+                else:
+                    sleep(step)
+        except ValueError:
+            pass
+        except NoSuchElementException:
+            pass
     return condition()
 
 
