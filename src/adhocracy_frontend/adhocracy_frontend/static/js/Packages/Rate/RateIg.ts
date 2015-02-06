@@ -76,6 +76,7 @@ export var register = (angular, config, meta_api) => {
                         adhConfig,
                         adhHttp,
                         adhCache,
+                        null,
                         $q,
                         $http,
                         $rootScope,

@@ -24,4 +24,9 @@ export interface IService {
     cachebust_suffix : string;
     debug : boolean;
     terms_url : string;
+    piwik_enabled : string;
+    piwik_host : string;
+    piwik_site_id : string;
+    piwik_use_cookies : boolean;
+    piwik_track_user_id : boolean;
 }

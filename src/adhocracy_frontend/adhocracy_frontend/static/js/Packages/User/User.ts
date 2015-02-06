@@ -4,6 +4,7 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhCache = require("../Http/Cache");
 import AdhLocale = require("../Locale/Locale");
+import AdhTracking = require("../Tracking/Tracking");
 
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
@@ -30,6 +31,7 @@ export class Service {
         private adhConfig : AdhConfig.IService,
         private adhHttp : AdhHttp.Service<any>,
         private adhCache : AdhCache.Service,
+        private adhTracking : AdhTracking.Service,
         private $q : ng.IQService,
         private $http : ng.IHttpService,
         private $rootScope : ng.IScope,
@@ -126,6 +128,7 @@ export class Service {
         _self.userPath = userPath;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.$http.defaults.headers.common["X-User-Path"] = userPath;
+        _self.adhTracking.setUser(userPath);
 
         return _self.loadUser(userPath);
     }
@@ -157,6 +160,7 @@ export class Service {
         _self.userPath = undefined;
         _self.data = undefined;
         _self.loggedIn = false;
+        _self.adhTracking.setUser(null);
 
         _self.adhCache.invalidateAll();
     }
@@ -233,5 +237,7 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhLocale.moduleName,
         ])
-        .service("adhUser", ["adhConfig", "adhHttp", "adhCache", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
+        .service("adhUser", [
+            "adhConfig", "adhHttp", "adhCache", "adhTracking",
+            "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
 };

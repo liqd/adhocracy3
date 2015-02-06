@@ -27,6 +27,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhEventManager = require("../EventManager/EventManager");
+import AdhTracking = require("../Tracking/Tracking");
 import AdhUser = require("../User/User");
 
 var pkgLocation = "/TopLevelState";
@@ -94,11 +95,14 @@ export class Provider {
         };
         this.spaceDefaults = {};
 
-        this.$get = ["adhEventManagerClass", "adhUser", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
-            (adhEventManagerClass, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
-                return new Service(self, adhEventManagerClass, adhUser, $location, $rootScope, $http, $q, $injector,
-                                   $templateRequest);
-            }];
+        this.$get = [
+            "adhEventManagerClass", "adhTracking", "adhUser",
+            "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
+            (adhEventManagerClass, adhTracking, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+                return new Service(
+                    self, adhEventManagerClass, adhTracking, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest);
+            }
+        ];
     }
 
     public when(prefix : string, factory : (...args : any[]) => IAreaInput);
@@ -144,6 +148,7 @@ export class Service {
     constructor(
         private provider : Provider,
         adhEventManagerClass : typeof AdhEventManager.EventManager,
+        private adhTracking : AdhTracking.Service,
         private adhUser : AdhUser.Service,
         private $location : ng.ILocationService,
         private $rootScope : ng.IScope,
@@ -350,6 +355,7 @@ export class Service {
                 this.$location.search(key2, ret.search[key2]);
             }
         }
+        this.adhTracking.trackPageView(this.$location.absUrl());
     }
 
     private _set(key : string, value) : boolean {
@@ -542,6 +548,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEventManager.moduleName,
+            AdhTracking.moduleName,
             AdhUser.moduleName
         ])
         .provider("adhTopLevelState", Provider)
