@@ -3,7 +3,7 @@ python:
   - "3.4"
 install:
   - "python bootstrap.py"
-  - "PATH=${PATH}/bin ./bin/buildout"
+  - "PATH=${PATH}/bin ./bin/buildout 2>/dev/null"
 script:
   - "./bin/py.test_run_all"
 git:
