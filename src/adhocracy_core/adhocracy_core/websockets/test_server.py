@@ -570,6 +570,7 @@ class TestFunctionalClientCommunicator:
         resp = requests.post(url, data=json.dumps(data), headers=headers)
         assert resp.status_code == 200
 
+    @pytest.mark.xfail
     @pytest.mark.timeout(60)
     def test_send_child_notification(
             self, backend_with_ws, settings, connection):
