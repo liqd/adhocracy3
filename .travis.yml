@@ -4,8 +4,12 @@ python:
 install:
   - "python bootstrap.py"
   - "PATH=${PATH}/bin ./bin/buildout 2>/dev/null"
+env:
+  - TEST_SUITE=src/mercator/tests
+  - TEST_SUITE=src/adhocracy_frontend/adhocracy_frontend/tests
+  - TEST_SUITE=src/adhocracy_core src/adhocracy_mercator src/adhocracy_sample
 script:
-  - "./bin/py.test_run_all"
+  - "./bin/py.test --capture=fd --timeout=60 $TEST_SUITE"
 git:
   depth: 3000
 notifications:
