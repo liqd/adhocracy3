@@ -57,3 +57,4 @@ src/mercator/build
 /wheelhouse
 /share
 .fontcustom-manifest.json
+RELEASE-VERSION

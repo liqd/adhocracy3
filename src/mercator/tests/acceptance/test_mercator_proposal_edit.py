@@ -13,7 +13,7 @@ class TestMercatorForm:
         select_proposal(browser)
         assert not browser.is_text_present("edit")
 
-    @mark.xfail
+    @mark.xfail(reason="Duplicate tcp_begin issue 583")
     def test_edit_proposal_other_user(self, browser_with_proposal, user):
         browser = browser_with_proposal
 
@@ -22,7 +22,7 @@ class TestMercatorForm:
 
         assert not browser.is_text_present("edit")
 
-    @mark.xfail
+    @mark.xfail(reason="Image is missing")
     def test_resubmitting_proposal(self, browser_with_proposal):
         browser = browser_with_proposal
 
@@ -50,7 +50,9 @@ def select_proposal(browser):
     correct proposal title."""
     proposal_list = browser.find_by_css(".moving-column-body").\
         first.find_by_tag("ol").first
-    proposal_title = proposal_list.find_by_css("h3 a").first
+    proposal_title = proposal_list.find_by_css(
+        '.mercator-proposal-list-item-title').first
+
     assert wait(lambda: proposal_title.html)
     proposal_title.click()
 

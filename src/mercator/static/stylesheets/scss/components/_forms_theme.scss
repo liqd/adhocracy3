@@ -2,7 +2,6 @@ $input-margin-bottom: 24px;
 $error-line-height: $font-size-normal;
 
 %error-spacing {
-    @extend .error-state;
     margin-bottom: 0;
 
     + .input-error,
@@ -25,10 +24,11 @@ textarea {
     color: $color-text-highlight-introvert;
     margin-bottom: $input-margin-bottom;
 
-    &.ng-dirty, &.is-dirty {
-        &.ng-invalid, &:invalid, &.is-invalid {
-            @extend %error-spacing;
-        }
+    &.ng-dirty.ng-invalid {
+        @extend %error-spacing;
+        border-color: $color-function-invalid;
+        color: $color-function-invalid;
+        outline: 1px solid $color-function-invalid;
     }
 }
 
@@ -40,11 +40,12 @@ textarea {
     input[type="date"],
     input[type="time"],
     input[type="number"],
+    input,
     label,
     div,
     select,
     textarea {
-        &.ng-invalid, &:invalid, &.is-invalid {
+        &.ng-invalid {
             @extend %error-spacing;
         }
     }

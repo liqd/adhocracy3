@@ -66,13 +66,14 @@
             <p>{{ "I already have an account. Log in" | translate }}
             <a href="/login">{{ "here" | translate }}</a></p>
         </div>
+        <a class="register-cancel" href="" ng-click="cancel()">{{ "CANCEL" | translate}}</a>
         <div class="register-support">
             {{ "Having trouble with registration?" | translate}} <br />
             <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>
         </div>
     </form>
 
-    <div data-ng-if="success" class="register-success textbox">
+    <div data-ng-if="success" class="register-success">
         <p>{{ "Thank you for your registration. We sent you an email with an activation link. In case you do not recieve that email, please also check your spam folder." | translate }}</p>
         <p>{{ "CALL_FOR_ACTIVATION" | translate:{siteName: siteName} }}</p>
     </div>

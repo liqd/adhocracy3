@@ -1,4 +1,6 @@
 """Rate sheet."""
+from pyramid.traversal import resource_path
+from substanced.util import find_catalog
 from zope.interface import implementer
 import colander
 
@@ -16,6 +18,7 @@ from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import get_user
 
 
 class IRate(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
@@ -80,7 +83,7 @@ class ICanRate(ISheet):
 
 class RateSubjectReference(SheetToSheet):
 
-    """Reference from comment version to the commented-on item version."""
+    """Reference from rate to rater."""
 
     source_isheet = IRate
     source_isheet_field = 'subject'
@@ -89,7 +92,7 @@ class RateSubjectReference(SheetToSheet):
 
 class RateObjectReference(SheetToSheet):
 
-    """Reference from comment version to the commented-on item version."""
+    """Reference from rate to rated resource."""
 
     source_isheet = IRate
     source_isheet_field = 'object'
@@ -106,17 +109,55 @@ class RateSchema(colander.MappingSchema):
 
     def validator(self, node, value):
         """
-        Ask the validator registered for *object* whether *rate* is valid.
+        Validate the rate.
 
-        In this way, `IRateable` subclasses can modify the range of allowed
-        ratings by registering their own `IRateValidator` adapter.
+        This performs 3 checks:
+
+        1. Validate that the subject is the user who is currently logged-in.
+
+        2. Ensure that no other rate for the same subject/object combination
+           exists, except predecessors of this version.
+
+        3. Ask the validator registered for *object* whether *rate* is valid.
+           In this way, `IRateable` subclasses can modify the range of allowed
+           ratings by registering their own `IRateValidator` adapter.
         """
-        registry = node.bindings['request'].registry
-        validator = registry.getAdapter(value['object'], IRateValidator)
-        if not validator.validate(value['rate']):
-            rate_node = node['rate']
-            raise colander.Invalid(rate_node,
-                                   msg=validator.helpful_error_message())
+        request = node.bindings['request']
+        self._validate_subject_is_current_user(node, value, request)
+        self._ensure_rate_is_unique(node, value, request)
+        self._query_registered_object_validator(node, value, request)
+
+    def _validate_subject_is_current_user(self, node, value, request):
+        user = get_user(request)
+        if user is None or user != value['subject']:
+            err = colander.Invalid(node)
+            err['subject'] = 'Must be the currently logged-in user'
+            raise err
+
+    def _ensure_rate_is_unique(self, node, value, request):
+        # Other rates with the same subject and object may occur below the
+        # current context (earlier versions of the same rate item).
+        # If they occur elsewhere, an error is thrown.
+        adhocracy_catalog = find_catalog(request.context, 'adhocracy')
+        index = adhocracy_catalog['reference']
+        query = index.eq(IRate, 'subject', value['subject'])
+        query &= index.eq(IRate, 'object', value['object'])
+        system_catalog = find_catalog(request.context, 'system')
+        path_index = system_catalog['path']
+        query &= path_index.noteq(resource_path(request.context), depth=None)
+        elements = query.execute(resolver=None)
+        if elements:
+            err = colander.Invalid(node)
+            err['object'] = 'Another rate by the same user already exists'
+            raise err
+
+    def _query_registered_object_validator(self, node, value, request):
+        registry = request.registry
+        rate_validator = registry.getAdapter(value['object'], IRateValidator)
+        if not rate_validator.validate(value['rate']):
+            err = colander.Invalid(node)
+            err['rate'] = rate_validator.helpful_error_message()
+            raise err
 
 
 rate_meta = sheet_metadata_defaults._replace(isheet=IRate,

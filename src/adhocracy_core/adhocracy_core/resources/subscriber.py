@@ -13,11 +13,15 @@ from substanced.util import find_service
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IItemVersion
+from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import ISimple
+from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import ISheetReferenceModified
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.resources.principal import IGroup
@@ -29,11 +33,10 @@ from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_following_new_version
 from adhocracy_core.utils import get_last_new_version
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_last_version
-from adhocracy_core.utils import is_batchmode
 from adhocracy_core.sheets.versions import IVersionable
-from adhocracy_core.sheets.versions import IForkableVersionable
 import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.rate
 
@@ -132,7 +135,7 @@ def _add_changelog(registry: Registry, resource: IResource, key: str,
         return False
 
 
-def create_transaction_changelog():
+def create_transaction_changelog() -> dict:
     """Return dict that maps resource path to :class:`ChangelogMetadata`."""
     metadata = lambda: changelog_metadata
     return defaultdict(metadata)
@@ -147,13 +150,13 @@ def clear_transaction_changelog_after_commit_hook(success: bool,
 
 def user_created_and_added_subscriber(event):
     """Add default group to user."""
-    group = _get_default_group(event.object, event.registry)
+    group = _get_default_group(event.object)
     if group is None:  # ease testing,
         return
     _add_user_to_group(event.object, group, event.registry)
 
 
-def _get_default_group(context, registry: Registry) -> IGroup:
+def _get_default_group(context) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
     default_group = groups.get('authenticated', None)
     return default_group
@@ -166,78 +169,98 @@ def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
     sheet.set({'groups': groups}, registry=registry)
 
 
-def reference_has_new_version_subscriber(event):
-    """Auto updated resource if a referenced Item has a new version.
+def autoupdate_versionable_has_new_version(event):
+    """Auto updated versionable resource if a reference has new version.
 
     :raises AutoUpdateNoForkAllowedError: if a fork is created but not allowed
     """
-    resource = event.object
-    root_versions = event.root_versions
-    isheet = event.isheet
+    if not _is_in_root_version_subtree(event):
+        return
+    sheet = get_sheet(event.object, event.isheet, event.registry)
+    if not sheet.meta.editable:
+        return
+    appstruct = _get_updated_appstruct(event, sheet)
+    new_version = _get_last_version_created_in_transaction(event)
+    if new_version is None:
+        if _new_version_needed_and_not_forking(event):
+            _create_new_version(event, appstruct)
+    else:
+        new_version_sheet = get_sheet(new_version, event.isheet,
+                                      event.registry)
+        new_version_sheet.set(appstruct)
+
+
+def _is_in_root_version_subtree(event: ISheetReferenceNewVersion) -> bool:
+    if event.root_versions == []:
+        return True
+    graph = find_graph(event.object)
+    return graph.is_in_subtree(event.object, event.root_versions)
+
+
+def _get_updated_appstruct(event: ISheetReferenceNewVersion,
+                           sheet: ISheet) -> dict:
+    appstruct = sheet.get()
+    field = appstruct[event.isheet_field]
+    if isinstance(field, Sequence):
+        old_version_index = field.index(event.old_version)
+        field.pop(old_version_index)
+        field.insert(old_version_index, event.new_version)
+    else:
+        appstruct[event.isheet_field] = event.new_version
+    return appstruct
+
+
+def _get_last_version_created_in_transaction(event: ISheetReferenceNewVersion)\
+        -> IItemVersion:
+    if event.is_batchmode:
+        new_version = get_last_new_version(event.registry, event.object)
+    else:
+        new_version = get_following_new_version(event.registry, event.object)
+    return new_version
+
+
+def _new_version_needed_and_not_forking(event: ISheetReferenceNewVersion)\
+        -> bool:
+    """Check whether to autoupdate if resource is non-forkable.
+
+    If the given resource is the last version or there's no last version yet,
+    do autoupdate.
+
+    If it's not the last version, but references the same object (namely the
+    one which caused the autoupdate), don't update.
+
+    If it's not the last version, but references a different object,
+    throw an AutoUpdateNoForkAllowedError. This should only happen in batch
+    requests.
+    """
+    last = get_last_version(event.object, event.registry)
+    if last is None or last is event.object:
+        return True
+    value = get_sheet_field(event.object, event.isheet, event.isheet_field,
+                            event.registry)
+    last_value = get_sheet_field(last, event.isheet, event.isheet_field,
+                                 event.registry)
+    if last_value == value:
+        return False
+    else:
+        raise AutoUpdateNoForkAllowedError(event.object, event)
+
+
+def _create_new_version(event, appstruct) -> IResource:
+    appstructs = _get_writable_appstructs(event.object, event.registry)
+    appstructs[IVersionable.__identifier__]['follows'] = [event.object]
+    appstructs[event.isheet.__identifier__] = appstruct
     registry = event.registry
-    creator = event.creator
-    sheet = get_sheet(resource, isheet, registry=registry)
-    autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
-    editable = sheet.meta.editable
-    graph = find_graph(resource)
-    if root_versions and not graph.is_in_subtree(resource, root_versions):
-        return
-    if autoupdate and editable:
-        appstruct = sheet.get()
-        field = appstruct[event.isheet_field]
-        if isinstance(field, Sequence):
-            old_version_index = field.index(event.old_version)
-            field.pop(old_version_index)
-            field.insert(old_version_index, event.new_version)
-        else:
-            appstruct[event.isheet_field] = event.new_version
-        if is_batchmode(registry):
-            new_version = get_last_new_version(registry, resource)
-        else:
-            new_version = get_following_new_version(registry, resource)
-        is_versionable = IVersionable.providedBy(resource)
-        is_forkable = IForkableVersionable.providedBy(resource)
-        # versionable without new version: create a new version store appstruct
-        if is_versionable and new_version is None:
-            if not is_forkable:  # pragma: no branch
-                _assert_we_are_not_forking(resource, registry, event)
-            _update_versionable(resource, isheet, appstruct, root_versions,
-                                registry, creator)
-        # versionable with new version: use new version to store appstruct
-        elif is_versionable and new_version is not None:
-            new_version_sheet = get_sheet(new_version, isheet,
-                                          registry=registry)
-            new_version_sheet.set(appstruct)
-        # non versionable: store appstruct directly
-        else:
-            sheet.set(appstruct)
-
-
-def _assert_we_are_not_forking(resource, registry, event):
-    """Assert that the last tag == resource to prevent forking."""
-    last = get_last_version(resource, registry)
-    if last is None:
-        return
-    if resource is not last:
-        raise AutoUpdateNoForkAllowedError(resource, event)
-
-
-def _update_versionable(resource, isheet, appstruct, root_versions, registry,
-                        creator) -> IResource:
-    appstructs = _get_writable_appstructs(resource, registry)
-    # FIXME the need to switch between forkable and non-forkable is bad
-    is_forkable = IForkableVersionable.providedBy(resource)
-    iversionable = IForkableVersionable if is_forkable else IVersionable
-    appstructs[iversionable.__identifier__]['follows'] = [resource]
-    appstructs[isheet.__identifier__] = appstruct
-    iresource = get_iresource(resource)
-    new_resource = registry.content.create(iresource.__identifier__,
-                                           parent=resource.__parent__,
-                                           appstructs=appstructs,
-                                           creator=creator,
-                                           registry=registry,
-                                           options=root_versions)
-    return new_resource
+    iresource = get_iresource(event.object)
+    new_version = registry.content.create(iresource.__identifier__,
+                                          parent=event.object.__parent__,
+                                          appstructs=appstructs,
+                                          creator=event.creator,
+                                          registry=event.registry,
+                                          root_versions=event.root_versions,
+                                          is_batchmode=event.is_batchmode,
+                                          )
+    return new_version
 
 
 def _get_writable_appstructs(resource, registry) -> dict:
@@ -249,6 +272,17 @@ def _get_writable_appstructs(resource, registry) -> dict:
         if editable or creatable:  # pragma: no branch
             appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
+
+
+def autoupdate_non_versionable_has_new_version(event):
+    """Auto update non versionable resources if a reference has new version."""
+    if not _is_in_root_version_subtree(event):
+        return
+    sheet = get_sheet(event.object, event.isheet, event.registry)
+    if not sheet.meta.editable:
+        return
+    appstruct = _get_updated_appstruct(event, sheet)
+    sheet.set(appstruct)
 
 
 def metadata_modified_subscriber(event):
@@ -312,8 +346,17 @@ def includeme(config):
                           ISheetReferenceModified)
     config.add_subscriber(itemversion_created_subscriber,
                           IItemVersionNewVersionAdded)
-    config.add_subscriber(reference_has_new_version_subscriber,
-                          ISheetReferencedItemHasNewVersion,
+    config.add_subscriber(autoupdate_versionable_has_new_version,
+                          ISheetReferenceNewVersion,
+                          interface=IItemVersion,
+                          isheet=ISheetReferenceAutoUpdateMarker)
+    config.add_subscriber(autoupdate_non_versionable_has_new_version,
+                          ISheetReferenceNewVersion,
+                          interface=IPool,
+                          isheet=ISheetReferenceAutoUpdateMarker)
+    config.add_subscriber(autoupdate_non_versionable_has_new_version,
+                          ISheetReferenceNewVersion,
+                          interface=ISimple,
                           isheet=ISheetReferenceAutoUpdateMarker)
     config.add_subscriber(tag_created_and_added_or_modified_subscriber,
                           IResourceCreatedAndAdded,

@@ -3,13 +3,12 @@
         <li data-ng-repeat="facet in facets" class="facet">
             <h3 class="facet-header">{{ facet.name | translate }}</h3>
             <ul>
-                <li
-                    data-ng-repeat="item in facet.items">
+                <li data-ng-repeat="item in facet.items">
                     <a
                         href=""
                         class="facet-item"
-                        ng-class="{'is-active': item.enabled}"
-                        ng-click="toggleItem(facet, item)">
+                        data-ng-class="{'is-active': item.enabled}"
+                        data-ng-click="toggleItem(facet, item, $event)">
                         {{ item.name | translate }}
                     </a>
                 </li>

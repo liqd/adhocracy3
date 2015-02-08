@@ -529,7 +529,9 @@ def add_user(root, login: str=None, password: str=None, email: str=None,
     passwd_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
     appstructs =\
         {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
-         {'name': login, 'email': email},
+         {'name': login},
+         adhocracy_core.sheets.principal.IUserExtended.__identifier__:
+         {'email': email},
          adhocracy_core.sheets.principal.IPermissions.__identifier__:
          {'roles': roles},
          passwd_sheet.__identifier__:
@@ -541,7 +543,7 @@ def add_user(root, login: str=None, password: str=None, email: str=None,
                                    registry=registry,
                                    run_after_creation=False,
                                    )
-    user.active = True
+    user.activate()
     return user
 
 
@@ -753,6 +755,8 @@ class AppUser:
     def get_postable_types(self, path: str) -> []:
         """Send options request and return the postable content types."""
         resp = self.options(path)
+        if 'POST' not in resp.json:
+            return []
         post_request_body = resp.json['POST']['request_body']
         type_names = sorted([r['content_type'] for r in post_request_body])
         iresources = [self._resolver.resolve(t) for t in type_names]
@@ -793,6 +797,12 @@ def app_contributor(app):
 def app_editor(app):
     """Return backend test app wrapper with editor authentication."""
     return AppUser(app, base_path='/adhocracy', header=editor_header)
+
+
+@fixture(scope='class')
+def app_manager(app):
+    """Return backend test app wrapper with manager authentication."""
+    return AppUser(app, base_path='/adhocracy', header=manager_header)
 
 
 @fixture(scope='class')

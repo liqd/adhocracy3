@@ -5,11 +5,11 @@ import AdhCache = require("../Http/Cache");
 
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+import SIUserExtended = require("../../Resources_/adhocracy_core/sheets/principal/IUserExtended");
 
 
 export interface IUserBasic {
     name? : string;
-    email? : string;
     tzname? : string;
 }
 
@@ -37,14 +37,11 @@ export class Service {
 
         var updateTokenFromStorage = () => {
             if (_self.Modernizr.localstorage) {
-                if (_self.$window.localStorage.getItem("user-token") !== null &&
-                        _self.$window.localStorage.getItem("user-path") !== null) {
-                    _self.enableToken(
-                        _self.$window.localStorage.getItem("user-token"),
-                        _self.$window.localStorage.getItem("user-path")
-                    );
-                } else if (_self.$window.localStorage.getItem("user-token") === null &&
-                        _self.$window.localStorage.getItem("user-path") === null) {
+                var path = _self.$window.localStorage.getItem("user-path");
+                var token = _self.$window.localStorage.getItem("user-token");
+                if (token && path) {
+                    _self.enableToken(token, path, true);
+                } else {
                     // $apply is necessary here to trigger a UI
                     // update.  the need for _.defer is explained
                     // here: http://stackoverflow.com/a/17958847
@@ -63,13 +60,23 @@ export class Service {
         updateTokenFromStorage();
     }
 
-    private enableToken(token : string, userPath : string) : ng.IPromise<void> {
-        var _self : Service = this;
+    // FIXME: type should be ng.IPromise<void> - probably wrong in DefinitelyTyped
+    private checkSessionValidity() : ng.IPromise<any> {
+        var deferred = this.$q.defer();
 
-        _self.token = token;
-        _self.userPath = userPath;
-        _self.$http.defaults.headers.common["X-User-Token"] = token;
-        _self.$http.defaults.headers.common["X-User-Path"] = userPath;
+        this.adhHttp.options(this.userPath).then((options) => {
+            if (options.PUT) {
+                deferred.resolve();
+            } else {
+                deferred.reject("Session expired or invalid");
+            }
+        });
+
+        return deferred.promise;
+    }
+
+    private loadUser(userPath) {
+        var _self : Service = this;
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
@@ -82,6 +89,27 @@ export class Service {
                 _self.deleteToken();
                 throw "failed to fetch user resource";
             });
+    }
+
+    private enableToken(token : string, userPath : string, checkValidity : boolean = false) : ng.IPromise<void> {
+        var _self : Service = this;
+
+        _self.token = token;
+        _self.userPath = userPath;
+        _self.$http.defaults.headers.common["X-User-Token"] = token;
+        _self.$http.defaults.headers.common["X-User-Path"] = userPath;
+
+        if (checkValidity) {
+            return this.checkSessionValidity().then(
+                () => {
+                    _self.loadUser(userPath);
+                },
+                (reason) => {
+                    _self.deleteToken();
+                });
+        } else {
+            return _self.loadUser(userPath);
+        }
     }
 
     private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
@@ -153,7 +181,9 @@ export class Service {
             "data": {}
         };
         resource.data[SIUserBasic.nick] = {
-            "name": username,
+            "name": username
+        };
+        resource.data[SIUserExtended.nick] = {
             "email": email
         };
         resource.data[SIPasswordAuthentication.nick] = {

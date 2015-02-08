@@ -20,7 +20,8 @@ A mixin to show comments somewhere
 
     i {
         display: block;
-        font-size: 120%;
+        font-size: 15px / $font-size-small * 1em;
+        line-height: 1;
     }
 }
 
@@ -47,8 +48,8 @@ displayed as a button in a second column.
 */
 
 .commentable-section {
-    margin-bottom: 30 / 14 * 1em;
-    padding-right: 36 / 14 * 1em;
+    margin-bottom: 30px / $font-size-normal * 1em;
+    padding-right: 36px / $font-size-normal * 1em;
     position: relative;
 
     > p {

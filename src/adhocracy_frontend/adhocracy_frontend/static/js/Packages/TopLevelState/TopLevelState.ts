@@ -436,6 +436,13 @@ export class Service {
         this.$location.replace();
         this.$location.url("/login");
     }
+
+    public redirectToSpaceHome(space) : void {
+        // FIXME : This only works in resource area, needs to be refactored
+        var spaceDefaults = this.provider.getSpaceDefaults(space);
+        var area = this.getArea();
+        this.$location.url("/" + area.prefix + spaceDefaults["resourceUrl"]);
+    }
 }
 
 
@@ -472,7 +479,11 @@ export var spaceSwitch = (
         link: (scope) => {
             adhTopLevelState.bind("space", scope, "currentSpace");
             scope.setSpace = (space : string) => {
-                adhTopLevelState.set("space", space);
+                if (scope.currentSpace === space) {
+                    adhTopLevelState.redirectToSpaceHome(space);
+                } else {
+                    adhTopLevelState.set("space", space);
+                }
             };
         }
     };

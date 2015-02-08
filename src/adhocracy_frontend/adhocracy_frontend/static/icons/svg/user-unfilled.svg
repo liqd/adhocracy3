@@ -1,14 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="13.123px" height="15px" viewBox="0 0 13.123 15" enable-background="new 0 0 13.123 15" xml:space="preserve">
-<path fill="#818181" d="M6.562,9.376H6.411c-0.846,0-1.556-0.293-2.111-0.874C3.045,7.194,2.731,4.713,2.812,2.814
-	c0.106-2.46,2.847-2.797,3.75-2.812L6.418,0l0.144,0.002c0.926,0.016,3.645,0.364,3.75,2.812c0.081,1.898-0.384,4.378-1.638,5.688
-	C8.118,9.083,7.407,9.376,6.562,9.376 M6.562,0.939C5.326,0.959,3.81,1.371,3.75,2.814C3.646,5.241,4.176,7.019,4.976,7.854
-	c0.376,0.393,0.846,0.584,1.435,0.584h0.151c0.589,0,1.059-0.191,1.435-0.585c0.801-0.835,1.482-2.614,1.378-5.04
-	C9.313,1.371,7.811,0.959,6.562,0.939"/>
-<path fill="#818181" d="M13.123,15H0v-0.469c0-3.549,3.174-4.22,6.185-4.22c0.15,0,0.234,0.003,0.234,0.003l0.143-0.001
-	c1.051,0,6.562-0.362,6.562,4.218V15z M0.937,14.063h11.249c-0.361-3.235-4.769-2.813-5.624-2.813l-0.128,0.001l-0.249-0.002
-	C5,11.249,1.273,10.91,0.937,14.063"/>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg2985" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<metadata id="metadata2990">
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<dc:format>image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+				<dc:title/>
+			</cc:Work>
+		</rdf:RDF>
+	</metadata>
+	<g id="layer1">
+		<g id="g3466" transform="translate(-1.2142853,-1)">
+			<g id="g3468">
+				<path id="path3470" fill="#808080" d="m25.1,31h-0.5c-2.7,0-5-0.9-6.8-2.7-4.1-4.3-5-12.2-4.7-18.3,0.5-7.9,9-9,11.9-9h-0.5,0.5c2.9,0,11.7,1.1,11.9,9,0.2,6.1-1.1,14-5.2,18.3-1.6,1.5-3.9,2.7-6.6,2.7zm0-27.1c-4.1,0-8.8,1.4-9,6.1-0.2,7.9,1.4,13.5,3.8,16.2,1.1,1.4,2.7,1.8,4.5,1.8h0.5c1.8,0,3.4-0.7,4.5-1.8,2.5-2.7,4.7-8.3,4.5-16.2,0-4.7-4.7-6.1-8.8-6.1z"/>
+			</g>
+			<g id="g3472">
+				<path id="path3474" fill="#808080" d="M46.1,49h-42.2v-1.6c0-11.3,10.1-13.5,19.8-13.5h0.7,0.5c3.4,0,21-1.1,21,13.5v1.6h0.2zm-39-3.2h36.1c-1.1-10.4-15.3-9-18-9h-1.4c-3.6,0-15.6-1.1-16.7,9z"/>
+			</g>
+		</g>
+	</g>
 </svg>

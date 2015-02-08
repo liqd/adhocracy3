@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
-from pytest import mark
 from pytest import fixture
+from pytest import mark
 
 from adhocracy_core.testing import god_login
 from adhocracy_frontend.tests.acceptance.shared import wait
@@ -14,11 +14,11 @@ from adhocracy_frontend.tests.acceptance.shared import logout
 from adhocracy_frontend.tests.acceptance.shared import login
 
 
-EDIT = 'Edit'
-REPLY = 'Reply'
+EDIT = 'edit'
+REPLY = 'reply'
 SAVE = 'save'
 
-@fixture(scope="module")
+@fixture(scope='module')
 def user():
     name = get_random_string(n=5)
     password = 'password'
@@ -39,13 +39,13 @@ class TestComment:
         comment = create_comment(browser, rest_url, '')
         assert comment is None
 
-    def test_nested_replies(self, browser, n=7):
+    def test_nested_replies(self, browser, n=3):
         for i in range(n):
             comment = browser.find_by_css('.comment').last
             reply = create_reply_comment(browser, comment, 'nested reply %d' % i)
             assert reply is not None
 
-    def test_multiple_replies(self, browser, n=10):
+    def test_multiple_replies(self, browser, n=3):
         comment = browser.find_by_css('.comment').first
         for i in range(n):
             reply = create_reply_comment(browser, comment, 'multiple reply %d' % i)
@@ -58,23 +58,26 @@ class TestComment:
 
         browser.reload()
 
-        assert wait(lambda: browser.find_by_css('.comment-content')\
+        assert wait(lambda: browser.find_by_css('.comment-content')
                                    .first.text == 'edited')
 
+    @mark.xfail(reason='Random timeouts')
     def test_edit_twice(self, browser):
         comment = browser.find_by_css('.comment').first
         edit_comment(browser, comment, 'edited 1')
-        assert comment.find_by_css('.comment-content div').first.text == 'edited 1'
+        assert wait(lambda: comment.find_by_css('.comment-content div')
+                    .first.text == 'edited 1')
         edit_comment(browser, comment, 'edited 2')
-        assert comment.find_by_css('.comment-content div').first.text == 'edited 2'
+        assert wait(lambda: comment.find_by_css('.comment-content div')
+                    .first.text == 'edited 2')
 
-    @mark.xfail
     def test_multi_edits(self, browser):
         parent = browser.find_by_css('.comment').first
         reply = parent.find_by_css('.comment').first
         edit_comment(browser, reply, 'somereply edited')
         edit_comment(browser, parent, 'edited')
-        assert parent.find_by_css('.comment-content').first.text == 'edited'
+        content = parent.find_by_css('.comment-content')
+        assert wait(lambda: content.first.text == 'edited')
 
     def test_author(self, browser):
         comment = browser.find_by_css('.comment').first
@@ -91,6 +94,7 @@ class TestComment:
         comment = browser.find_by_css('.comment').last
         assert not _get_button(browser, comment, REPLY)
 
+    @mark.xfail(reason='Random timeouts')
     def test_edit_other_user(self, browser, rest_url, user):
         login(browser, user[0], user[1])
         _visit_url(browser, rest_url)
@@ -98,6 +102,7 @@ class TestComment:
         comment = browser.find_by_css('.comment').first
         assert not _get_button(browser, comment, EDIT)
 
+    @mark.xfail(reason='Random timeouts')
     def test_reply_other_user(self, browser):
         comment = browser.find_by_css('.comment').first
         reply = create_reply_comment(browser, comment, 'other user reply')

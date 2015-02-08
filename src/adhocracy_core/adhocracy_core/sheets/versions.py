@@ -47,7 +47,7 @@ def validate_linear_history_no_fork(node: colander.SchemaNode, value: list):
     """
     context = node.bindings['context']
     request = node.bindings['request']
-    if is_batchmode(request.registry):
+    if is_batchmode(request):
         last_new_version = get_last_new_version(request.registry, context)
         if last_new_version is not None:
             # Store ths last new version created in this transaction

@@ -51,6 +51,7 @@ def test_user_meta():
     assert meta.permission_add == 'add_user'
     assert meta.is_implicit_addable is False
     assert meta.basic_sheets == [adhocracy_core.sheets.principal.IUserBasic,
+                                 adhocracy_core.sheets.principal.IUserExtended,
                                  adhocracy_core.sheets.principal.IPermissions,
                                  adhocracy_core.sheets.metadata.IMetadata,
                                  adhocracy_core.sheets.pool.IPool,

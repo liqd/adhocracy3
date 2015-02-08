@@ -34,9 +34,9 @@ A normal button that triggers an action.
 
 It may have the following states:
 
--   has-focus
--   is-hover
--   is-disabled
+-   :focus
+-   :hover
+-   ng-disabled or :disabled
 
 ```html_example
 <a class="button">Link</a>
@@ -86,16 +86,12 @@ input[type="button"] {
         outline: 0;
     }
 
-    &.has-focus, &:focus {
-        @include button-color($color-text-highlight-introvert, $color-text-inverted);
-    }
-
-    &.is-hover, &:hover {
+    &:hover,
+    &:focus {
         @include button-color($color-text-highlight-introvert, $color-text-inverted);
     }
 
     &:disabled,
-    &.is-disabled,
     &.ng-disabled {
         @include button-color($color-text-introvert, $color-structure-introvert);
         cursor: default;

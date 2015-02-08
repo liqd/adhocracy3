@@ -169,8 +169,16 @@ The menu should always have the same state as its columns.
 
 .moving-column-body {
     border: 0 solid $color-structure-normal;
-    border-width: 0 0 $moving-column-border-width $moving-column-border-width;
+    border-width: 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
+}
+
+.moving-column-collapsed a {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 /*doc
@@ -229,8 +237,8 @@ States:
 
 .moving-column-icon {
     float: left;
-    font-size: 166.5%;
-    line-height: 1.2;
+    font-size: $font-size-plus;
+    line-height: 24px / $font-size-plus;
     vertical-align: middle;
 }
 
@@ -257,16 +265,8 @@ States:
         }
 
         .moving-column-menu-nav-icon {
-            font-size: 145%;
-            line-height: (2 * 0.145);
-        }
-
-        .moving-column-menu-nav-icon, .moving-column-menu-nav-icon:before {
-            @include inline-block;
-        }
-
-        .moving-column-menu-nav-icon:before {
-            line-height: 1.45;
+            font-size: $font-size-smaller;
+            line-height: 24px / $font-size-smaller;
         }
     }
 }
@@ -279,7 +279,7 @@ States:
     width: 25%;
     z-index: 1;
     background-color: $color-structure-normal;
-    padding: 16 / 14 * 1em 20 / 14 * 1em;
+    padding: (16px / $font-size-normal * 1em) (20px / $font-size-normal * 1em);
 
     &.is-visible {
         left: 0;

@@ -19,6 +19,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import get_sheet
 import adhocracy_core.sheets.metadata
@@ -104,6 +105,19 @@ class User(Pool):
         self.roles = []
         self.group_ids = []
         """Readonly :term:`group_id`s for this user."""
+        self.hidden = True
+
+    def activate(self, active: bool=True):
+        """
+        Activate or deactivate the user.
+
+        Inactivate users are always hidden.
+        """
+        self.active = active
+        sheet = get_sheet(self, IMetadata)
+        appstruct = sheet.get()
+        appstruct['hidden'] = not active
+        sheet.set(appstruct)
 
 
 def send_registration_mail(context: IUser,
@@ -136,9 +150,8 @@ def send_registration_mail(context: IUser,
             args=args)
     except SMTPException as err:
         msg = 'Cannot send registration mail: {}'.format(str(err))
-        raise_colander_style_error(adhocracy_core.sheets.principal.IUserBasic,
-                                   'email',
-                                   msg)
+        raise_colander_style_error(
+            adhocracy_core.sheets.principal.IUserExtended, 'email', msg)
 
 
 def _generate_activation_path() -> str:
@@ -151,6 +164,7 @@ user_metadata = pool_metadata._replace(
     content_class=User,
     after_creation=[send_registration_mail] + pool_metadata.after_creation,
     basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
+                  adhocracy_core.sheets.principal.IUserExtended,
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,
