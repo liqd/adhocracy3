@@ -72,7 +72,7 @@ def login_god(browser, **kwargs):
 
 
 def login_annotator(browser, **kwargs):
-    """Login god user."""
+    """Login annotator user."""
     login(browser, annotator_login, annotator_password, **kwargs)
 
 
