@@ -184,6 +184,12 @@ export class MovingColumnController {
         this.lastId = 0;
     }
 
+    public clear() : void {
+        this.$scope._alerts = {};
+        this.$scope.overlay = undefined;
+        this.$scope._showSidebar = false;
+    }
+
     public alert(message : string, mode : string = "info", duration : number = 3000) : void {
         var id = this.lastId++;
         this.$timeout(() => this.removeAlert(id), duration);
