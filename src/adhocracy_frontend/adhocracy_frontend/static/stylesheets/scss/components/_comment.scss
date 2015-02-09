@@ -68,7 +68,8 @@ is selected, no state is applied.
     line-height: 1.15;
 }
 
-.comment-children-create-form {
+.comment-children-create-form,
+.comment-children-edit-form {
     @extend .listing-create-form;
     background: $color-background-base-introvert;
 }
@@ -149,11 +150,6 @@ parent: comment
     padding-bottom: 20px / $font-size-normal * 1em;
 }
 
-.comment-title,
-.comment-meta {
-    @include text(meta);
-}
-
 .comment-title {
     a, a:hover, a:focus, a:active {
         color: inherit;
@@ -163,38 +159,6 @@ parent: comment
 
 .comment-content-edit-text {
     margin-bottom: 0.5em;
-}
-
-.comment-meta {
-    @include clearfix;
-}
-
-.comment-action {
-    color: $color-text-introvert;
-    font-weight: bold;
-    text-transform: lowercase;
-    text-decoration: none;
-
-    &:hover, &:focus, &:active {
-        color: darken($color-text-introvert, 10%);
-    }
-
-    &.m-comment-reply {
-        text-transform: uppercase;
-
-        &:hover, &:focus, &:active {
-            color: $color-text-highlight-introvert;
-        }
-    }
-}
-
-.comment-action,
-.comment-count {
-    margin-left: 1em;
-}
-
-.comment-actions {
-    float: right;
 }
 
 .comment-header {
@@ -271,6 +235,20 @@ parent: comment
 
 .comment-create-form {
     @include clearfix;
+}
+
+.comment-create-form-text,
+.comment-edit-form-text {
+    background: $color-text-inverted;
+    min-height: 5.8em;
+}
+
+.comment-edit-form-text {
+    min-height: 1px;
+}
+
+.comment-create-form-button-submit {
+    float: right;
 }
 
 /*doc
