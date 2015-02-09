@@ -54,7 +54,7 @@ class TestComment:
     def test_edit(self, browser):
         comment = browser.find_by_css('.comment').first
         edit_comment(browser, comment, 'edited')
-        assert comment.find_by_css('.comment-content div').first.text == 'edited'
+        assert comment.find_by_css('.comment-edit-form-text').first.text == 'edited'
 
         browser.reload()
 
@@ -163,7 +163,7 @@ def edit_comment(browser, comment, content):
     assert edit
     edit.click()
 
-    comment.find_by_css('textarea').first.fill(content)
+    comment.find_by_css('.comment-edit-form-text').first.fill(content)
     save = _get_button(browser, comment, SAVE)
     assert save
     save.click()
