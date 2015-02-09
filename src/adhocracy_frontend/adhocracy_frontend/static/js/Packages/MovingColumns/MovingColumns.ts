@@ -263,6 +263,18 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var clearMovingColumnDirective = () => {
+    return {
+        restrict: "A",
+        link: (scope, element) => {
+            element.click(() => {
+                scope.$emit("adhMovingColumn.clear");
+            });
+        }
+    };
+};
+
+
 export var moduleName = "adhMovingColumns";
 
 export var register = (angular) => {
@@ -271,6 +283,7 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName,
             AdhShareSocial.moduleName
         ])
+        .directive("adhClearMovingColumn", clearMovingColumnDirective)
         .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
         .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
 };
