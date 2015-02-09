@@ -176,11 +176,12 @@ export interface IMovingColumnScope extends ng.IScope {
 export class MovingColumnController {
     private lastId : number;
 
-    constructor(protected $timeout : ng.ITimeoutService, public $scope : IMovingColumnScope) {
+    constructor(protected $timeout : ng.ITimeoutService, public $scope : IMovingColumnScope, private $element) {
         $scope.ctrl = this;
         $scope._alerts = {};
         $scope.shared = {};
 
+        $element.on("adhMovingColumn.clear", () => this.clear());
         $scope.$on("adhMovingColumn.clear", () => this.clear());
 
         this.lastId = 0;
@@ -247,7 +248,7 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
         scope: true,
         transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
-        controller: ["$timeout", "$scope", MovingColumnController]
+        controller: ["$timeout", "$scope", "$element", MovingColumnController]
     };
 };
 
