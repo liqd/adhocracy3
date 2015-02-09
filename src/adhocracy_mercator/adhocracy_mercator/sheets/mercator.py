@@ -414,6 +414,25 @@ def index_requested_funding(resource: IResource, default) -> str:
     return default
 
 
+def index_budget(resource: IResource, default) -> str:
+    """
+    Return search index keyword based on the "budget" field.
+
+    The returned values are the same values as per the "requested_funding"
+    field, or "above_50000" if the total budget value is more than 50,000 euro.
+    """
+    # FIXME: Why is finance '' in the first pass of that function
+    # during MercatorProposal create?
+    finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
+    if finance is None or finance == '':
+            return default
+    funding = get_sheet_field(finance, IFinance, 'budget')
+    for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
+        if funding <= limit:
+            return [str(limit)]
+    return 'above_50000'
+
+
 class ExperienceSchema(colander.MappingSchema):
 
     """Data structure for additional fields."""
@@ -468,4 +487,8 @@ def includeme(config):
     config.add_indexview(index_requested_funding,
                          catalog_name='adhocracy',
                          index_name='mercator_requested_funding',
+                         context=IMercatorSubResources)
+    config.add_indexview(index_budget,
+                         catalog_name='adhocracy',
+                         index_name='mercator_budget',
                          context=IMercatorSubResources)
