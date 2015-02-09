@@ -174,9 +174,9 @@ class Graph(Persistent):
             if targets is None:
                 continue
             node = schema[field_name]
-            if not hasattr(node, 'reftype'):
+            reftype = getattr(node, 'reftype', None)
+            if reftype is None:
                 continue
-            reftype = schema[field_name].reftype
             if IResource.providedBy(targets):
                 targets = [targets]
             self.set_references(source, targets, reftype, registry)
