@@ -132,9 +132,15 @@ export var movingColumns = (
 
             var move = (newCls) => {
                 if (newCls !== cls) {
-                    element.removeClass(cls);
-                    element.addClass(newCls);
-                    triggerClearEvents(newCls, cls);
+                    if (typeof cls !== "undefined") {
+                        element.removeClass(cls);
+                    }
+                    if (typeof newCls !== "undefined") {
+                        element.addClass(newCls);
+                    }
+                    if (typeof cls !== "undefined" && typeof newCls !== "undefined") {
+                        triggerClearEvents(newCls, cls);
+                    }
                     cls = newCls;
                     resize();
                 }
