@@ -315,7 +315,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
                     text: scope.message.text
                 }).then(() => {
                     column.hideOverlay();
-                    column.alert("Message was send", "success");
+                    column.alert("TR__MESSAGE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
                 });
