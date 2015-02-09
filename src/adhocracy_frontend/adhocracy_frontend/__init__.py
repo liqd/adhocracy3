@@ -78,7 +78,7 @@ def require_config_view(request):
 def root_view(request):
     """Return the embeddee HTML."""
     debug = config_view(request)['debug']
-    css_path = 'stylesheets/min/a3.css' if debug else 'stylesheets/a3.css'
+    css_path = 'stylesheets/a3.css' if debug else 'stylesheets/min/a3.css'
     query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/root.html.mako',
