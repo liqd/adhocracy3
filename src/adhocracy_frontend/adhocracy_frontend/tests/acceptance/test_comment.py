@@ -76,8 +76,8 @@ class TestComment:
         reply = parent.find_by_css('.comment').first
         edit_comment(browser, reply, 'somereply edited')
         edit_comment(browser, parent, 'edited')
-        content = parent.find_by_css('.comment-content')
-        assert wait(lambda: content.first.text == 'edited')
+        assert wait(lambda: parent.find_by_css('.comment-content')
+                                  .first.text == 'edited')
 
     def test_author(self, browser):
         comment = browser.find_by_css('.comment').first
