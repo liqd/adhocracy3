@@ -207,7 +207,7 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                         $scope.isAnonymous = false;
                     });
             } else {
-                $translate("guest").then((translated) => {
+                $translate("TR__GUEST").then((translated) => {
                     $scope.userBasic = {
                         name: translated
                     };

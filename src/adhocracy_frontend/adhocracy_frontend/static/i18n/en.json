@@ -41,6 +41,7 @@
   "username": "username",
   "CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can procede using {{siteName}}",
   "USERS_PROPOSALS": "{{name}}'s proposals",
+  "TR__GUEST": "guest",
   "TR__MESSAGE_STATUS_OK": "Message was sent",
   "TR__REPORT_ABUSE_STATUS_OK": "The moderators have been notified"
 }
