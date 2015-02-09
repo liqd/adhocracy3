@@ -132,17 +132,17 @@ export var movingColumns = (
 
             var move = (newCls) => {
                 if (newCls !== cls) {
+                    if (typeof cls !== "undefined" && typeof newCls !== "undefined") {
+                        triggerClearEvents(newCls, cls);
+                    }
                     if (typeof cls !== "undefined") {
                         element.removeClass(cls);
                     }
                     if (typeof newCls !== "undefined") {
                         element.addClass(newCls);
+                        cls = newCls;
+                        resize();
                     }
-                    if (typeof cls !== "undefined" && typeof newCls !== "undefined") {
-                        triggerClearEvents(newCls, cls);
-                    }
-                    cls = newCls;
-                    resize();
                 }
             };
 
