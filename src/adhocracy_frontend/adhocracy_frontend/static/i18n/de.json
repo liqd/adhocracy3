@@ -38,5 +38,7 @@
     "username": "Nutzername",
     "Shorter than minimum length 6": "Kürzer als minimale Länge 6",
     "User doesn't exist or password is wrong": "Nutzer*in existiert nicht oder Passwort ist falsch",
-    "CALL_FOR_ACTIVATION": "Nachdem Sie auf den Aktivierungslink geklickt haben, können Sie {{siteName}} verwenden."
+    "CALL_FOR_ACTIVATION": "Nachdem Sie auf den Aktivierungslink geklickt haben, können Sie {{siteName}} verwenden.",
+    "TR__MESSAGE_STATUS_OK": "Nachricht wurde versendet",
+    "TR__REPORT_ABUSE_STATUS_OK": "Die Moderator*innen wurden benachrichtigt"
 }
