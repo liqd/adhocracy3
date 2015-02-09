@@ -181,6 +181,8 @@ export class MovingColumnController {
         $scope._alerts = {};
         $scope.shared = {};
 
+        $scope.$on("adhMovingColumn.clear", () => this.clear());
+
         this.lastId = 0;
     }
 
