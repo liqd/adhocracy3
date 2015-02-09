@@ -161,10 +161,12 @@ export var register = () => {
             var adhConfigMock;
             var adhPermissionsMock;
             var adhPreliminaryNamesMock;
+            var adhRateEventHandlerMock;
 
             beforeEach((done) => {
                 adapterMock = jasmine.createSpyObj("adapterMock", ["subject", "object", "rate", "rateablePostPoolPath"]);
                 adhPermissionsMock = jasmine.createSpyObj("adhPermissionsMock", ["bindScope"]);
+                adhRateEventHandlerMock = jasmine.createSpyObj("adhRateEventHandlerMock", ["on", "off", "trigger"]);
 
                 adhConfigMock = <any>{};
 
@@ -173,6 +175,7 @@ export var register = () => {
 
                 directive = AdhRate.directiveFactory("", adapterMock)(
                     <any>q,
+                    adhRateEventHandlerMock,
                     adhConfigMock,
                     httpMock,
                     null,

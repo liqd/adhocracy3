@@ -1,6 +1,7 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhEventHandler = require("../EventHandler/EventHandler");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -89,6 +90,7 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
 // FIXME: This is currently not generic but tied to RIRateVersion
 export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
     $q : ng.IQService,
+    adhRateEventHandler : AdhEventHandler.EventHandler,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhWebSocket : AdhWebSocket.Service,
@@ -347,6 +349,7 @@ export var moduleName = "adhRate";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhEventHandler.moduleName,
             AdhHttp.moduleName,
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
@@ -354,8 +357,10 @@ export var register = (angular) => {
             AdhUser.moduleName,
             AdhWebSocket.moduleName
         ])
+        .service("adhRateEventHandler", ["adhEventHandlerClass", (cls) => new cls()])
         .directive("adhRate", [
             "$q",
+            "adhRateEventHandler",
             "adhConfig",
             "adhHttp",
             "adhWebSocket",
@@ -367,6 +372,7 @@ export var register = (angular) => {
             directiveFactory("/Rate.html", new Adapter.RateAdapter())])
         .directive("adhLike", [
             "$q",
+            "adhRateEventHandler",
             "adhConfig",
             "adhHttp",
             "adhWebSocket",
