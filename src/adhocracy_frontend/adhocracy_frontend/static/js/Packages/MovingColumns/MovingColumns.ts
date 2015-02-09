@@ -119,12 +119,22 @@ export var movingColumns = (
                 }, 1);
             };
 
+            var triggerClearEvents = (newCls : string, oldCls : string) : void => {
+                var columns = element.find(".moving-column");
+                for (var i = 0; i < columns.length; i++) {
+                    if (newCls.split("-")[i + 1] === "hide" && oldCls.split("-")[i + 1] !== "hide") {
+                        columns.eq(i).trigger("adhMovingColumn.clear");
+                    }
+                }
+            };
+
             $($window).resize(resizeNoTransition);
 
             var move = (newCls) => {
                 if (newCls !== cls) {
                     element.removeClass(cls);
                     element.addClass(newCls);
+                    triggerClearEvents(newCls, cls);
                     cls = newCls;
                     resize();
                 }
