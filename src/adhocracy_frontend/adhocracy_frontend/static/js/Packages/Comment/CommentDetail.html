@@ -42,10 +42,8 @@
                 <a href="" class="button form-footer-button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "CANCEL" | translate }}</a>
             </footer>
         </div>
-        <div class="comment-content">
-            <div data-ng-switch-default="">
-                {{data.content}}
-            </div>
+        <div class="comment-content" data-ng-switch-default="">
+            {{data.content}}
         </div>
     </div>
 
