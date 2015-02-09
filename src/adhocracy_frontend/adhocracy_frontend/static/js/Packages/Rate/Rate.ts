@@ -25,26 +25,19 @@ var pkgLocation = "/Rate";
 
 
 /**
- * Motivation and UI
- * ~~~~~~~~~~~~~~~~~
+ * Generic rate directive
  *
- * The UI should show the rating button as follows::
+ * This module provides a generic code for rate widgets. It is generic in that
+ * it can be used with different adapters and templates.
  *
- *     Count:  Pros  Cons  Neutrals
- *      +13    14    1     118
+ * FIXME: The code is currently tied to RIRateVersion
  *
- * The words "Props", "Cons", Neutrals" are buttons.  If the user clicks
- * on any one, it becomes active, and all other buttons become inactive.
- * Initially, all buttons are inactive.
- *
- * The current design: Once any of the buttons is activated, the rating
- * cannot be taken back.  The user can only click on "neutral" if she
- * wants to change her mind about having an opinion.
- *
- * The final design: if an active button is clicked, it becomes inactive,
- * and the rating object will be deleted.  (FIXME: This requires a
- * deletion semantics, which should also become a section in this
- * document.)
+ * An interesting detail is that the rate item is only created on the server
+ * when a user casts a rate for the first time.  This does pose a special
+ * challange for keeping multiple rate directives on the same page in sync
+ * because there is not resource on the server that we could register
+ * websockets on.  For this reason, there is the adhRateEventHandler service
+ * that is used to sync these directives locally.
  */
 
 
@@ -87,7 +80,6 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
 }
 
 
-// FIXME: This is currently not generic but tied to RIRateVersion
 export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
     $q : ng.IQService,
     adhRateEventHandler : AdhEventHandler.EventHandler,
