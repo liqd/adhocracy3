@@ -203,6 +203,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         link: (scope : IRateScope, element) : void => {
             var myRateResource : RIRateVersion;
             var webSocketHandle : number;
+            var rateEventHandle : number;
             var postPoolPath : string;
             var rates : {[key : string]: number};
             var lock : boolean;
@@ -310,6 +311,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
                         return adhHttp.postNewVersionNoFork(version.path, newVersion)
                             .then(() => {
+                                adhRateEventHandler.trigger(scope.refersTo);
                                 scope.auditTrailVisible = false;
                                 return $q.all([updateMyRate(), updateAggregatedRates()]);
                             })
@@ -327,6 +329,15 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     return scope.cast(rate);
                 }
             };
+
+            // sync with other local rate buttons
+            rateEventHandle = adhRateEventHandler.on(scope.refersTo, () => {
+                updateMyRate();
+                updateAggregatedRates();
+            });
+            element.on("$destroy", () => {
+                adhRateEventHandler.off(scope.refersTo, rateEventHandle);
+            });
 
             scope.auditTrailVisible = false;
             adhHttp.get(scope.refersTo)
