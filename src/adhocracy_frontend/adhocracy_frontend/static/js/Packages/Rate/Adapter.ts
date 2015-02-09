@@ -57,13 +57,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     }
 
     rateablePostPoolPath(resource : ResourcesBase.Resource) : string {
-        if (resource.data.hasOwnProperty(SIRateable.nick)) {
-            return resource.data[SIRateable.nick].post_pool;
-        } else if (resource.data.hasOwnProperty(SILikeable.nick)) {
-            return resource.data[SILikeable.nick].post_pool;
-        } else {
-            throw "could not find any sub-sheet of IRateable!";
-        }
+        return resource.data[SIRateable.nick].post_pool;
     }
 
     subject(resource : RIRateVersion) : string;
@@ -110,5 +104,12 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
 
     modificationDate(resource : RIRateVersion) : string {
         return resource.data[SIMetadata.nick].modification_date;
+    }
+}
+
+
+export class LikeAdapter extends RateAdapter {
+    rateablePostPoolPath(resource : ResourcesBase.Resource) : string {
+        return resource.data[SILikeable.nick].post_pool;
     }
 }

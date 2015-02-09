@@ -81,13 +81,13 @@ input[type="button"] {
     height: 2em + 2 * $border-width;  // fix height in firefox
     padding: 0 0.5em;
 
-    &:active,
-    &:focus {
+    &:active:not(:disabled):not(.ng-disabled),
+    &:focus:not(:disabled):not(.ng-disabled) {
         outline: 0;
     }
 
-    &:hover,
-    &:focus {
+    &:hover:not(:disabled):not(.ng-disabled),
+    &:focus:not(:disabled):not(.ng-disabled) {
         @include button-color($color-text-highlight-introvert, $color-text-inverted);
     }
 

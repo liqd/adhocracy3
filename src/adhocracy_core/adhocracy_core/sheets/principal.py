@@ -240,15 +240,16 @@ class PasswordAuthenticationSheet(GenericResourceSheet):
         password = appstruct.get('password', '')
         if not password:
             return
-        if not hasattr(self.context, 'password'):
-            self.context.password = ''
-        if not hasattr(self.context, 'pwd_manager'):
-            self.context.pwd_manager = BCRYPTPasswordManager()
-        self.context.password = self.context.pwd_manager.encode(password)
+        manager = getattr(self.context, 'pwd_manager', None)
+        if manager is None:
+            manager = BCRYPTPasswordManager()
+            self.context.pwd_manager = manager
+        password_encoded = self.context.pwd_manager.encode(password)
+        self.context.password = password_encoded
 
     def _get_data_appstruct(self, params: dict={}):
-        password = getattr(self.context, 'password', '')
-        return {'password': password}
+        password_encoded = getattr(self.context, 'password', '')
+        return {'password': password_encoded}
 
     def check_plaintext_password(self, password: str) -> bool:
         """ Check if `password` matches the stored encrypted password.

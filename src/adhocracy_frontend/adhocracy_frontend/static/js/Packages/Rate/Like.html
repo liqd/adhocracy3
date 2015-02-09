@@ -1,10 +1,10 @@
 <div class="like" data-ng-if="ready">
     <span class="like-difference">
-        {{rates.pro | signum}}
+        {{rates(1) | signum}}
     </span>
-    <a href="" class="{{isActiveClass(1)}} like-button" data-ng-click="toggle()">
-        <span data-ng-if="!isActiveClass(1)">{{ "Support" | translate }}</span>
-        <span data-ng-if="isActiveClass(1)" class="supporting">
+    <a href="" class="like-button" data-ng-class="{'is-rate-button-active': myRate === 1}" data-ng-click="toggle(1)">
+        <span data-ng-if="myRate !== 1">{{ "Support" | translate }}</span>
+        <span data-ng-if="myRate === 1" class="supporting">
             <span class="text-supporting">{{ "Supporting" | translate }}</span>
             <span class="text-unsupport">{{ "Unsupport" | translate }}</span>
         </span>

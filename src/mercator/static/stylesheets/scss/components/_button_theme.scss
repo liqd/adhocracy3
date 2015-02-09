@@ -16,16 +16,19 @@ input[type="button"] {
     text-transform: uppercase;
     min-width: 1px;
 
-    &:focus,
-    &:hover {
+    &:focus:not(:disabled):not(.ng-disabled),
+    &:hover:not(:disabled):not(.ng-disabled) {
         background: transparent;
         color: $color-text-highlight-normal;
     }
 
     &:disabled,
     &.ng-disabled {
-        @include opacity(0.5);
-        cursor: default;
+        &, &:focus, &:hover {
+            @include opacity(0.5);
+            background: transparent;
+            cursor: default;
+        }
     }
 
     &.m-call-to-action,
@@ -34,11 +37,12 @@ input[type="button"] {
         padding: 0 1em;
         min-width: 110px / $font-size-normal * 1em;
 
-        &:hover, &:focus {
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
             background: $color-brand-two-extrovert;
         }
 
-        &:active {
+        &:active:not(:disabled):not(.ng-disabled) {
             background-color: $color-brand-four-normal;
         }
     }
@@ -46,7 +50,8 @@ input[type="button"] {
     &.m-call-to-action2 {
         outline: 2px solid $color-text-highlight-normal;
 
-        &:hover, &:focus {
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
             color: white;
         }
     }

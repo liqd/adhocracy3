@@ -1,15 +1,18 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhEventHandler = require("../EventHandler/EventHandler");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
+import AdhUtil = require("../Util/Util");
+import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
@@ -22,51 +25,37 @@ var pkgLocation = "/Rate";
 
 
 /**
- * Motivation and UI
- * ~~~~~~~~~~~~~~~~~
+ * Generic rate directive
  *
- * The UI should show the rating button as follows::
+ * This module provides a generic code for rate widgets. It is generic in that
+ * it can be used with different adapters and templates.
  *
- *     Count:  Pros  Cons  Neutrals
- *      +13    14    1     118
+ * FIXME: The code is currently tied to RIRateVersion
  *
- * The words "Props", "Cons", Neutrals" are buttons.  If the user clicks
- * on any one, it becomes active, and all other buttons become inactive.
- * Initially, all buttons are inactive.
- *
- * The current design: Once any of the buttons is activated, the rating
- * cannot be taken back.  The user can only click on "neutral" if she
- * wants to change her mind about having an opinion.
- *
- * The final design: if an active button is clicked, it becomes inactive,
- * and the rating object will be deleted.  (FIXME: This requires a
- * deletion semantics, which should also become a section in this
- * document.)
+ * An interesting detail is that the rate item is only created on the server
+ * when a user casts a rate for the first time.  This does pose a special
+ * challange for keeping multiple rate directives on the same page in sync
+ * because there is not resource on the server that we could register
+ * websockets on.  For this reason, there is the adhRateEventHandler service
+ * that is used to sync these directives locally.
  */
 
 
 export interface IRateScope extends ng.IScope {
     refersTo : string;
-    postPoolPath : string;
-    rates : {
-        pro : number;
-        contra : number;
-        neutral : number;
-    };
-    myRateResource : RIRateVersion;
-    allRateResources : RIRateVersion[];
-    auditTrail : { subject: string; rate: number }[];
-    auditTrailVisible : boolean;
-    isActive : (value : number) => boolean;
-    isActiveClass : (value : number) => string;  // css class name if RateValue is active, or "" otherwise.
-    differenceClass : () => string;  // css class name is-positive, is-negative or "" otherwise.
-    toggleShowDetails() : void;
-    cast(value : number) : void;
-    toggle() : void;
-    assureUserRateExists() : ng.IPromise<void>;
-    postUpdate() : ng.IPromise<void>;
+    myRate : number;
+    rates(rate : number) : number;
     optionsPostPool : AdhHttp.IOptions;
     ready : boolean;
+
+    cast(value : number) : ng.IPromise<void>;
+    uncast() : ng.IPromise<void>;
+    toggle(value : number) : ng.IPromise<void>;
+
+    // not currently used in the UI
+    auditTrail : { subject: string; rate: number }[];
+    auditTrailVisible : boolean;
+    toggleShowDetails() : void;
 }
 
 
@@ -91,320 +80,269 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
 }
 
 
-/**
- * initialise rates
- */
-export var resetRates = ($scope : IRateScope) : void => {
-    $scope.rates = {
-        pro: 0,
-        contra: 0,
-        neutral: 0
+export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
+    $q : ng.IQService,
+    adhRateEventHandler : AdhEventHandler.EventHandler,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhWebSocket : AdhWebSocket.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhUser : AdhUser.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhDone
+) => {
+    "use strict";
+
+    /**
+     * Promise rate of specified subject.  Reject if none could be found.
+     *
+     * NOTE: This will return the first match. The backend must make sure that
+     * there is never more than one rate item per subject-object pair.
+     */
+    var fetchRate = (poolPath : string, object : string, subject : string) : ng.IPromise<RIRateVersion> => {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST"
+        };
+        query[SIRate.nick + ":subject"] = subject;
+        query[SIRate.nick + ":object"] = object;
+
+        return adhHttp.get(poolPath, query).then((pool) => {
+            if (pool.data[SIPool.nick].elements.length > 0) {
+                return adhHttp.get(pool.data[SIPool.nick].elements[0]);
+            } else {
+                return $q.reject("Not Found");
+            }
+        });
     };
 
-    delete $scope.myRateResource;
-};
+    /**
+     * Promise aggregates rates of all users.
+     */
+    var fetchAggregatedRates = (poolPath : string, object : string) : ng.IPromise<{[key : string]: number}> => {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST",
+            count: "true",
+            aggregateby: "rate"
+        };
+        query[SIRate.nick + ":object"] = object;
 
-
-/**
- * Take the rateable in $scope.refersTo, finds the post_pool of its
- * rateable, and stores it to '$scope.postPoolPath'.  Promises a void
- * that is resolved once the scope is updated.
- */
-export var fetchPostPoolPath = (
-    adapter : IRateAdapter<any>,
-    $scope : IRateScope,
-    adhHttp : AdhHttp.Service<any>
-) : ng.IPromise<void> => {
-    return adhHttp.get($scope.refersTo)
-        .then((rateable : ResourcesBase.Resource) => {
-            $scope.postPoolPath = adapter.rateablePostPoolPath(rateable);
+        return adhHttp.get(poolPath, query).then((pool) => {
+            return pool.data[SIPool.nick].aggregateby.rate;
         });
-};
+    };
 
+    /**
+     * Collect detailed information about poolPath specific to ratings for object.
+     */
+    var fetchAuditTrail = (poolPath : string, object : string) : ng.IPromise<any> => {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST"
+        };
+        query[SIRate.nick + ":object"] = object;
 
-/**
- * Get rate of specified user and write results to $scope.myRateResource,
- * but only if it exists.
- */
-export var fetchMyRate = (
-    $scope : IRateScope,
-    adhHttp : AdhHttp.Service<any>,
-    poolPath : string,
-    object : string,
-    subject : string
-) : ng.IPromise<void> => {
-    var query : any = {};
-    query.content_type = RIRateVersion.content_type;
-    query.depth = 2;
-    query.tag = "LAST";
-    query[SIRate.nick + ":subject"] = subject;
-    query[SIRate.nick + ":object"] = object;
+        return adhHttp.get(poolPath, query)
+            .then((poolRsp) => {
+                var ratePaths : string[] = poolRsp.data[SIPool.nick].elements;
+                var rates : RIRateVersion[] = [];
+                var users : RIUser[] = [];
+                var auditTrail : { subject: string; rate: number }[] = [];
 
-    return adhHttp.get(poolPath, query).then((poolRsp) => {
-        if (poolRsp.data[SIPool.nick].elements.length > 0) {
-            return adhHttp.get(poolRsp.data[SIPool.nick].elements[0]).then((rateRsp) => {
-                $scope.myRateResource = rateRsp;
-            });
-        }
-    });
-};
-
-
-/**
- * Get aggregates rates of all users and write results to $scope.rates.
- */
-export var fetchAggregatedRates = (
-    $scope : IRateScope,
-    adhHttp : AdhHttp.Service<any>,
-    poolPath : string,
-    object : string
-) : ng.IPromise<void> => {
-    var query : any = {};
-    query.content_type = RIRateVersion.content_type;
-    query.depth = 2;
-    query.tag = "LAST";
-    query.count = "true";
-    query.aggregateby = "rate";
-    query[SIRate.nick + ":object"] = object;
-
-    return adhHttp.get(poolPath, query).then((poolRsp) => {
-        var rates = poolRsp.data[SIPool.nick].aggregateby.rate;
-        $scope.rates.pro = rates["1"] || 0;
-        $scope.rates.contra = rates["-1"] || 0;
-        $scope.rates.neutral = rates["0"] || 0;
-    });
-};
-
-
-/**
- * Collect detailed information about $scope.postPoolPath specific to
- * ratings for $scope.refersTo.  Updates '$scope.auditTrail'.
- * Promises a void that is resolved once the scope is updated.
- */
-export var fetchAuditTrail = (
-    adapter : IRateAdapter<any>,
-    $scope : IRateScope,
-    $q : ng.IQService,
-    adhHttp : AdhHttp.Service<any>
-) : ng.IPromise<void> => {
-    var query : any = {};
-    query.content_type = RIRateVersion.content_type;
-    query.depth = 2;
-    query.tag = "LAST";
-    query[SIRate.nick + ":object"] = $scope.refersTo;
-
-    return adhHttp.get($scope.postPoolPath, query)
-        .then((poolRsp) => {
-            var ratePaths : string[] = poolRsp.data[SIPool.nick].elements;
-            var rates : RIRateVersion[] = [];
-            var users : RIUser[] = [];
-            var auditTrail : { subject: string; rate: number }[] = [];
-
-            adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
-                var gets : AdhHttp.ITransactionResult[] = ratePaths.map((path) => transaction.get(path));
-
-                return transaction.commit()
-                    .then((responses) => {
-                        gets.map((transactionResult) => {
-                            rates.push(<any>responses[transactionResult.index]);
-                        });
-                    });
-            }).then(() => {
-                return adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
-                    var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => transaction.get(adapter.subject(rate)));
+                adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
+                    var gets : AdhHttp.ITransactionResult[] = ratePaths.map((path) => transaction.get(path));
 
                     return transaction.commit()
                         .then((responses) => {
                             gets.map((transactionResult) => {
-                                users.push(<any>responses[transactionResult.index]);
+                                rates.push(<any>responses[transactionResult.index]);
                             });
                         });
+                }).then(() => {
+                    return adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
+                        var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => transaction.get(adapter.subject(rate)));
+
+                        return transaction.commit()
+                            .then((responses) => {
+                                gets.map((transactionResult) => {
+                                    users.push(<any>responses[transactionResult.index]);
+                                });
+                            });
+                    });
+                }).then(() => {
+                    _.forOwn(ratePaths, (ratePath, ix) => {
+                        auditTrail[ix] = {
+                            subject: users[ix].data[SIUserBasic.nick].name,  // (use adapter for user, too?)
+                            rate: adapter.rate(rates[ix])
+                        };
+                    });
+                    return auditTrail;
                 });
-            }).then(() => {
-                _.forOwn(ratePaths, (ratePath, ix) => {
-                    auditTrail[ix] = {
-                        subject: users[ix].data[SIUserBasic.nick].name,  // (use adapter for user, too?)
-                        rate: adapter.rate(rates[ix])
-                    };
-                });
-                $scope.auditTrail = auditTrail;
-            });
-        });
-};
-
-
-/**
- * controller for rate widget.  promises a void in order to notify
- * the unit test suite that it is done setting up its state.  (the
- * widget will ignore this promise.)
- */
-export var rateController = (
-    adapter : IRateAdapter<any>,
-    $scope : IRateScope,
-    $q : ng.IQService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    adhUser : AdhUser.Service,
-    adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhTopLevelState : AdhTopLevelState.Service
-) : ng.IPromise<void> => {
-
-    $scope.isActive = (rate : number) : boolean =>
-        typeof $scope.myRateResource !== "undefined" &&
-            rate === adapter.rate($scope.myRateResource);
-
-    $scope.isActiveClass = (rate : number) : string =>
-        $scope.isActive(rate) ? "is-rate-button-active" : "";
-
-    $scope.differenceClass = () => {
-        var netRate = $scope.rates.pro - $scope.rates.contra;
-        if (netRate > 0) {
-            return "is-positive";
-        } else if (netRate < 0) {
-            return "is-negative";
-        }
-        return "";
-    };
-
-    $scope.toggleShowDetails = () => {
-        if ($scope.auditTrailVisible) {
-            $scope.auditTrailVisible = false;
-            delete $scope.auditTrail;
-        } else {
-            $q.all([
-                fetchMyRate($scope, adhHttp, $scope.postPoolPath, $scope.refersTo, adhUser.userPath),
-                fetchAggregatedRates($scope, adhHttp, $scope.postPoolPath, $scope.refersTo),
-                fetchAuditTrail(adapter, $scope, $q, adhHttp)
-            ]).then(() => {
-                $scope.auditTrailVisible = true;
-            });
-        }
-    };
-
-    /**
-     * the current implementation does not allow withdrawing of
-     * rates, so if you click on "pro" twice in a row, the second time
-     * will have no effect.  the work-around is for the user to rate
-     * something "neutral".  an alternative behavior is cast_toggle
-     * defined below.
-     */
-    /*
-    var castSimple = (rate : number) : void => {
-        if (!$scope.isActive(rate)) {
-            $scope.assureUserRateExists()
-                .then(() => {
-                    adapter.rate($scope.myRateResource, rate);
-                    $scope.postUpdate();
-                });
-        }
-    };
-    */
-
-    /**
-     * if the design has no neutral button, un-upping can be
-     * implemented as changeing the vote to 'neutral'.  this requires
-     * the total votes count to disregard neutral votes in its filter
-     * query, and has negative implications on backend performance,
-     * but it works.
-     */
-    var castToggle = (rate : number) : void => {
-        $scope.assureUserRateExists()
-            .then(() => {
-                var oldRate : number = $scope.myRateResource.data[SIRate.nick].rate;
-
-                if (rate !== 0 && oldRate === rate) {
-                    rate = 0;
-                }
-                adapter.rate($scope.myRateResource, rate);
-                $scope.postUpdate();
             });
     };
 
-    $scope.cast = (rate : number) : void => {
-        if (!$scope.optionsPostPool.POST) {
-            adhTopLevelState.redirectToLogin();
-        }
-        castToggle(rate);
-    };
-
-
-    $scope.toggle = () : void => {
-        if ($scope.isActive(1)) {
-            $scope.cast(0);
-        } else {
-            $scope.cast(1);
-        }
-    };
-
-    $scope.assureUserRateExists = () : ng.IPromise<void> => {
-        if (typeof $scope.myRateResource !== "undefined") {
-            return $q.when();
-        } else {
-            return adhHttp
-                .withTransaction((transaction) : ng.IPromise<void> => {
-                    var item : AdhHttp.ITransactionResult =
-                        transaction.post($scope.postPoolPath, new RIRate({ preliminaryNames: adhPreliminaryNames }));
-                    var version : AdhHttp.ITransactionResult =
-                        transaction.get(item.first_version_path);
-
-                    return transaction.commit()
-                        .then((responses) : void => {
-                            $scope.myRateResource = <RIRateVersion>responses[version.index];
-                            adapter.subject($scope.myRateResource, adhUser.userPath);
-                            adapter.object($scope.myRateResource, $scope.refersTo);
-                        });
-                });
-        }
-    };
-
-    $scope.postUpdate = () : ng.IPromise<void> => {
-        if (typeof $scope.myRateResource === "undefined") {
-            throw "internal error?!";
-        } else {
-            return adhHttp
-                .postNewVersionNoFork($scope.myRateResource.path, $scope.myRateResource)
-                .then((response : { value: RIRate }) => {
-                    $scope.auditTrailVisible = false;
-                    return $q.all([
-                        fetchMyRate($scope, adhHttp, $scope.postPoolPath, $scope.refersTo, adhUser.userPath),
-                        fetchAggregatedRates($scope, adhHttp, $scope.postPoolPath, $scope.refersTo)
-                    ]);
-                })
-                .then(() => { return; });
-        }
-    };
-
-    resetRates($scope);
-    $scope.auditTrailVisible = false;
-    return fetchPostPoolPath(adapter, $scope, adhHttp)
-        .then(() => $q.all([
-            fetchMyRate($scope, adhHttp, $scope.postPoolPath, $scope.refersTo, adhUser.userPath),
-            fetchAggregatedRates($scope, adhHttp, $scope.postPoolPath, $scope.refersTo)
-        ]))
-        .then(() => {
-            adhPermissions.bindScope($scope, $scope.postPoolPath, "optionsPostPool");
-            $scope.ready = true;
-        });
-};
-
-
-export var createDirective = (
-    template : string,
-    adapter : IRateAdapter<any>,
-    adhConfig : AdhConfig.IService
-) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + template,
         scope: {
-            refersTo: "@",
-            postPoolSheet : "@",
-            postPoolField : "@"
+            refersTo: "@"
         },
-        controller:
-            ["$scope", "$q", "adhHttp", "adhPermissions", "adhUser", "adhPreliminaryNames", "adhTopLevelState",
-                ($scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames, adhTopLevelState) =>
-                    rateController(adapter, $scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames, adhTopLevelState)]
+        link: (scope : IRateScope, element) : void => {
+            var myRateResource : RIRateVersion;
+            var webSocketHandle : number;
+            var rateEventHandle : number;
+            var postPoolPath : string;
+            var rates : {[key : string]: number};
+            var lock : boolean;
+            var storeMyRateResource : (resource : RIRateVersion) => void;
+
+            var updateMyRate = () : ng.IPromise<void> => {
+                if (adhUser.loggedIn) {
+                    return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
+                        storeMyRateResource(resource);
+                        scope.myRate = adapter.rate(resource);
+                    }, () => undefined);
+                } else {
+                    return $q.when();
+                }
+            };
+
+            var updateAggregatedRates = () : ng.IPromise<void> => {
+                return fetchAggregatedRates(postPoolPath, scope.refersTo).then((r) => {
+                    rates = r;
+                });
+            };
+
+            var updateAuditTrail = () : ng.IPromise<void> => {
+                return fetchAuditTrail(postPoolPath, scope.refersTo).then((auditTrail)  => {
+                    scope.auditTrail = auditTrail;
+                });
+            };
+
+            var assureUserRateExists = () : ng.IPromise<RIRateVersion> => {
+                if (typeof myRateResource !== "undefined") {
+                    return $q.when(myRateResource);
+                } else {
+                    return adhHttp.withTransaction((transaction) => {
+                        var item = transaction.post(postPoolPath, adapter.createItem({preliminaryNames: adhPreliminaryNames}));
+                        var version = transaction.get(item.first_version_path);
+
+                        return transaction.commit()
+                            .then((responses) => {
+                                storeMyRateResource(<RIRateVersion>responses[version.index]);
+                                return myRateResource;
+                            });
+                    });
+                }
+            };
+
+            storeMyRateResource = (resource : RIRateVersion) => {
+                myRateResource = resource;
+
+                if (typeof webSocketHandle === "undefined") {
+                    var itemPath = AdhUtil.parentPath(resource.path);
+                    webSocketHandle = adhWebSocket.register(itemPath, (message) => {
+                        updateMyRate();
+                        updateAggregatedRates();
+                    });
+                    element.on("$destroy", () => {
+                        adhWebSocket.unregister(itemPath, webSocketHandle);
+                    });
+                }
+            };
+
+            scope.toggleShowDetails = () => {
+                if (scope.auditTrailVisible) {
+                    scope.auditTrailVisible = false;
+                    delete scope.auditTrail;
+                } else {
+                    $q.all([updateMyRate(), updateAggregatedRates(), updateAuditTrail()]).then(() => {
+                        scope.auditTrailVisible = true;
+                    });
+                }
+            };
+
+            scope.rates = (rate : number) : number => {
+                return rates[rate.toString()] || 0;
+            };
+
+            // NOTE: In the future we might want to delete the rate instead.
+            // For now, uncasting is simply implemented by casting a "neutral" rate.
+            scope.uncast = () : ng.IPromise<void> => {
+                return scope.cast(0);
+            };
+
+            scope.cast = (rate : number) : ng.IPromise<void> => {
+                if (lock) {
+                    return $q.reject("locked");
+                }
+
+                if (!scope.optionsPostPool.POST) {
+                    if (!adhUser.loggedIn) {
+                        adhTopLevelState.redirectToLogin();
+                    } else {
+                        // FIXME
+                    }
+                    return $q.reject("Permission Error");
+                } else {
+                    lock = true;
+
+                    return assureUserRateExists().then((version) => {
+                        var newVersion = AdhResourceUtil.derive(version, {
+                            preliminaryNames: adhPreliminaryNames
+                        });
+
+                        adapter.rate(newVersion, rate);
+                        adapter.object(newVersion, scope.refersTo);
+                        adapter.subject(newVersion, adhUser.userPath);
+
+                        return adhHttp.postNewVersionNoFork(version.path, newVersion)
+                            .then(() => {
+                                adhRateEventHandler.trigger(scope.refersTo);
+                                scope.auditTrailVisible = false;
+                                return $q.all([updateMyRate(), updateAggregatedRates()]);
+                            })
+                            .then(() => undefined);
+                    }).finally<void>(() => {
+                        lock = false;
+                    });
+                }
+            };
+
+            scope.toggle = (rate : number) : ng.IPromise<void> => {
+                if (rate === scope.myRate) {
+                    return scope.uncast();
+                } else {
+                    return scope.cast(rate);
+                }
+            };
+
+            // sync with other local rate buttons
+            rateEventHandle = adhRateEventHandler.on(scope.refersTo, () => {
+                updateMyRate();
+                updateAggregatedRates();
+            });
+            element.on("$destroy", () => {
+                adhRateEventHandler.off(scope.refersTo, rateEventHandle);
+            });
+
+            scope.auditTrailVisible = false;
+            adhHttp.get(scope.refersTo)
+                .then((rateable) => {
+                    postPoolPath = adapter.rateablePostPoolPath(rateable);
+                })
+                .then(() => $q.all([updateMyRate(), updateAggregatedRates()]))
+                .then(() => {
+                    adhPermissions.bindScope(scope, postPoolPath, "optionsPostPool");
+                    scope.ready = true;
+                    adhDone();
+                });
+        }
     };
 };
 
@@ -414,22 +352,37 @@ export var moduleName = "adhRate";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhEventHandler.moduleName,
             AdhHttp.moduleName,
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhTopLevelState.moduleName,
-            AdhUser.moduleName
+            AdhUser.moduleName,
+            AdhWebSocket.moduleName
         ])
-        .directive("adhRate", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
-            createDirective(
-                "/Rate.html",
-                new Adapter.RateAdapter(),
-                adhConfig
-            )])
-        .directive("adhLike", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
-            createDirective(
-                "/Like.html",
-                new Adapter.RateAdapter(),
-                adhConfig
-            )]);
+        .service("adhRateEventHandler", ["adhEventHandlerClass", (cls) => new cls()])
+        .directive("adhRate", [
+            "$q",
+            "adhRateEventHandler",
+            "adhConfig",
+            "adhHttp",
+            "adhWebSocket",
+            "adhPermissions",
+            "adhUser",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhDone",
+            directiveFactory("/Rate.html", new Adapter.RateAdapter())])
+        .directive("adhLike", [
+            "$q",
+            "adhRateEventHandler",
+            "adhConfig",
+            "adhHttp",
+            "adhWebSocket",
+            "adhPermissions",
+            "adhUser",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhDone",
+            directiveFactory("/Like.html", new Adapter.LikeAdapter())]);
 };
