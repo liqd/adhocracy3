@@ -133,14 +133,12 @@ parent: comment
             </div>
         </div>
     </div>
-    <div class="comment-content">
-        <textarea class="comment-content-edit-text">Lorem ipsum Non nulla ullamco magna tempor adipisicing nisi eu deserunt sit deserunt ut culpa velit ea proident.</textarea>
-    </div>
-    <div class="comment-meta">
-        <div class="comment-actions">
-            <a href="#" class="comment-action">Speichern</a>
-            <a href="#" class="comment-action">Abbrechen</a>
-        </div>
+    <div class="comment-children-edit-form">
+        <textarea class="comment-edit-form-text"></textarea>
+        <footer class="form-footer">
+            <input class="comment-create-form-button-submit m-call-to-action form-footer-button-cta" type="submit" value="Submit">
+            <a href="" class="button form-footer-button">CANCEL</a>
+        </footer>
     </div>
 </div>
 ```
@@ -259,10 +257,12 @@ parent: comment
 ---
 
 ```html_example
-<form class="comment-create-form">
-    <textarea></textarea>
-    <input type="submit" value="create" />
-    <a href="">Cancel</a>
+<div class="comment-children-create-form">
+    <textarea class="comment-create-form-text"></textarea>
+    <footer class="form-footer">
+        <input class="comment-create-form-button-submit m-call-to-action form-footer-button-cta" type="submit" value="Submit">
+        <a href="" class="button form-footer-button">CANCEL</a>
+    </footer>
 </form>
 ```
 */
