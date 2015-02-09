@@ -54,7 +54,7 @@ class TestComment:
     def test_edit(self, browser):
         comment = browser.find_by_css('.comment').first
         edit_comment(browser, comment, 'edited')
-        assert comment.find_by_css('.comment-edit-form-text').first.text == 'edited'
+        assert comment.find_by_css('.comment-content').first.text == 'edited'
 
         browser.reload()
 
@@ -65,10 +65,10 @@ class TestComment:
     def test_edit_twice(self, browser):
         comment = browser.find_by_css('.comment').first
         edit_comment(browser, comment, 'edited 1')
-        assert wait(lambda: comment.find_by_css('.comment-content div')
+        assert wait(lambda: comment.find_by_css('.comment-content')
                     .first.text == 'edited 1')
         edit_comment(browser, comment, 'edited 2')
-        assert wait(lambda: comment.find_by_css('.comment-content div')
+        assert wait(lambda: comment.find_by_css('.comment-content')
                     .first.text == 'edited 2')
 
     def test_multi_edits(self, browser):
@@ -164,7 +164,7 @@ def edit_comment(browser, comment, content):
     edit.click()
 
     comment.find_by_css('.comment-edit-form-text').first.fill(content)
-    save = _get_button(browser, comment, SAVE)
+    save = comment.find_by_css('.comment-children-edit-form .form-footer-button-cta').first
     assert save
     save.click()
     browser.is_text_present(content, wait_time=10)
