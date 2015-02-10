@@ -5,6 +5,7 @@ from os import urandom
 from smtplib import SMTPException
 
 from pyramid.registry import Registry
+from pyramid.settings import asbool
 from pyramid.traversal import find_resource
 from pyramid.request import Request
 from substanced.util import find_service
@@ -123,7 +124,17 @@ class User(Pool):
 def send_registration_mail(context: IUser,
                            registry: Registry,
                            options: dict={}):
-    """Send a registration mail to validate the email of a user account."""
+    """
+    Send a registration mail to validate the email of a user account.
+
+    But if the "adhocracy.skip_registration_mail" parameter is true, no mail
+    is sent and the account is instead activated immediately. This can be
+    useful for testing.
+    """
+    if asbool(registry.settings.get('adhocracy.skip_registration_mail',
+                                    'false')):
+        context.activate()
+        return
     # FIXME subject should be configurable
     name = context.name
     email = context.email

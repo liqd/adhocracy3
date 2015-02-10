@@ -408,18 +408,14 @@ class TestGroupsAndRolesFinder:
 class TestIntegrationSendRegistrationMail:
 
     @fixture
-    def integration(self, config):
-        config.include('pyramid_mailer.testing')
-        config.include('pyramid_mako')
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_core.messaging')
-
-    @fixture
     def sample_user(self):
+        from zope.interface import directlyProvides
         from adhocracy_core.resources.principal import User
+        from adhocracy_core.sheets.metadata import IMetadata
         user = User()
         user.name = 'Anna Müller'
         user.email = 'anna@example.org'
+        directlyProvides(user, IMetadata)
         return user
 
     @mark.usefixtures('integration')
@@ -451,3 +447,11 @@ class TestIntegrationSendRegistrationMail:
             send_registration_mail(context=sample_user, registry=registry)
         assert 'Cannot send' in err_info.exconly()
         assert 'bad luck' in err_info.exconly()
+
+    @mark.usefixtures('integration')
+    def test_send_registration_mail_skip(self, registry, sample_user):
+        from adhocracy_core.resources.principal import send_registration_mail
+        registry.settings['adhocracy.skip_registration_mail'] = 'true'
+        send_registration_mail(context=sample_user, registry=registry)
+        assert sample_user.active is True
+        assert sample_user.activation_path is None
