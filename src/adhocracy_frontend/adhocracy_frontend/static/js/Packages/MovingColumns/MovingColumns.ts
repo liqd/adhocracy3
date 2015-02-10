@@ -119,30 +119,14 @@ export var movingColumns = (
                 }, 1);
             };
 
-            var triggerClearEvents = (newCls : string, oldCls : string) : void => {
-                var columns = element.find(".moving-column");
-                for (var i = 0; i < columns.length; i++) {
-                    if (newCls.split("-")[i + 1] === "hide" && oldCls.split("-")[i + 1] !== "hide") {
-                        columns.eq(i).trigger("adhMovingColumn.clear");
-                    }
-                }
-            };
-
             $($window).resize(resizeNoTransition);
 
             var move = (newCls) => {
                 if (newCls !== cls) {
-                    if (typeof cls !== "undefined" && typeof newCls !== "undefined") {
-                        triggerClearEvents(newCls, cls);
-                    }
-                    if (typeof cls !== "undefined") {
-                        element.removeClass(cls);
-                    }
-                    if (typeof newCls !== "undefined") {
-                        element.addClass(newCls);
-                        cls = newCls;
-                        resize();
-                    }
+                    element.removeClass(cls);
+                    element.addClass(newCls);
+                    cls = newCls;
+                    resize();
                 }
             };
 
@@ -192,13 +176,10 @@ export interface IMovingColumnScope extends ng.IScope {
 export class MovingColumnController {
     private lastId : number;
 
-    constructor(protected $timeout : ng.ITimeoutService, public $scope : IMovingColumnScope, private $element) {
+    constructor(protected $timeout : ng.ITimeoutService, public $scope : IMovingColumnScope) {
         $scope.ctrl = this;
         $scope._alerts = {};
         $scope.shared = {};
-
-        $element.on("adhMovingColumn.clear", () => this.clear());
-        $scope.$on("adhMovingColumn.clear", () => this.clear());
 
         this.lastId = 0;
     }
@@ -264,19 +245,7 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
         scope: true,
         transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
-        controller: ["$timeout", "$scope", "$element", MovingColumnController]
-    };
-};
-
-
-export var clearMovingColumnDirective = () => {
-    return {
-        restrict: "A",
-        link: (scope, element) => {
-            element.click(() => {
-                scope.$emit("adhMovingColumn.clear");
-            });
-        }
+        controller: ["$timeout", "$scope", MovingColumnController]
     };
 };
 
@@ -289,7 +258,6 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName,
             AdhShareSocial.moduleName
         ])
-        .directive("adhClearMovingColumn", clearMovingColumnDirective)
         .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
         .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
 };

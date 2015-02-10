@@ -1,11 +1,7 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
         <i class="icon-document moving-column-icon"></i>
-        <a
-            data-ng-if="proposalItemOptions.POST"
-            data-adh-clear-moving-column=""
-            href="{{ proposalUrl | adhResourceUrl:'edit' }}"
-        >{{ 'edit' | translate }}</a>
+        <a data-ng-if="proposalItemOptions.POST" href="{{ proposalUrl | adhResourceUrl:'edit' }}">{{ 'edit' | translate }}</a>
         <a href="" data-ng-click="ctrl.toggleOverlay('abuse')">{{ 'report' | translate }}</a>
         <a href="" data-ng-click="ctrl.toggleOverlay('share')">{{ 'share' | translate }}</a>
 
