@@ -6,7 +6,10 @@ install:
   - "PATH=${PATH}/bin ./bin/buildout 2>/dev/null"
 script:
   - "./bin/py.test_run_all"
+  - "./bin/py.test_run_unittests_with_coverage"
 git:
   depth: 3000
 notifications:
   email: false
+after_success:
+  - "./bin/coveralls"
