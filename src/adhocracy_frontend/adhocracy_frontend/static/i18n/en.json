@@ -18,7 +18,7 @@
   "IMAGE_ERROR_BIG": "Image must be smaller than {{maximumByteSize / 1000000}}MB",
   "IMAGE_ERROR_NARROW": "Image must be greater than {{minimumWidth}}px wide",
   "IMAGE_ERROR_TYPE": "Image must be of type {{acceptedFileTypes | join}}",
-  "IMAGE_INFO": "Image must be of type {{acceptedFileTypes | join}}, no bigger than {{maximumByteSize/1000000}}MB, and not less than {{minimumWidth}}px wide.}}",
+  "IMAGE_INFO": "Image must be of type {{acceptedFileTypes | join}}, no bigger than {{maximumByteSize/1000000}}MB, and not less than {{minimumWidth}}px wide.",
   "internal error: unknown view mode:": "internal error: unknown view mode:",
   "login": "login",
   "Log in!": "Log in!",
@@ -40,5 +40,8 @@
   "title": "title",
   "username": "username",
   "CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can procede using {{siteName}}",
-  "USERS_PROPOSALS": "{{name}}'s proposals"
+  "USERS_PROPOSALS": "{{name}}'s proposals",
+  "TR__GUEST": "guest",
+  "TR__MESSAGE_STATUS_OK": "Message was sent",
+  "TR__REPORT_ABUSE_STATUS_OK": "The moderators have been notified"
 }

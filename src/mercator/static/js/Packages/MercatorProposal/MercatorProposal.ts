@@ -1009,43 +1009,46 @@ export var register = (angular) => {
                 }
             };
 
-            if ($scope.$flow && $scope.$flow.support) {
-                var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+            // $scope.$flow is set in parent link() function, so it is not available yet
+            _.defer(() => {
+                if ($scope.$flow && $scope.$flow.support) {
+                    var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
 
-                // validate image upload
-                $scope.$flow.on("fileAdded", (file, event) => {
-                    // We can only check some constraints after the image has
-                    // been loaded asynchronously.  So we always return false in
-                    // order to keep flow.js from adding the image and then add
-                    // it manually after successful validation.
+                    // validate image upload
+                    $scope.$flow.on("fileAdded", (file, event) => {
+                        // We can only check some constraints after the image has
+                        // been loaded asynchronously.  So we always return false in
+                        // order to keep flow.js from adding the image and then add
+                        // it manually after successful validation.
 
-                    // FIXME: possible compatibility issue
-                    var _URL = $window.URL || $window.webkitURL;
+                        // FIXME: possible compatibility issue
+                        var _URL = $window.URL || $window.webkitURL;
 
-                    var img = new Image();
-                    img.src = _URL.createObjectURL(file.file);
-                    img.onload = () => {
-                        imgUploadController.$setDirty();
-                        imgUploadController.$setValidity("required", true);
-                        imgUploadController.$setValidity("tooBig", file.size <= $scope.$flow.opts.maximumByteSize);
-                        imgUploadController.$setValidity(
-                            "wrongType", $scope.$flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
-                        imgUploadController.$setValidity("tooNarrow", img.width >= $scope.$flow.opts.minimumWidth);
+                        var img = new Image();
+                        img.src = _URL.createObjectURL(file.file);
+                        img.onload = () => {
+                            imgUploadController.$setDirty();
+                            imgUploadController.$setValidity("required", true);
+                            imgUploadController.$setValidity("tooBig", file.size <= $scope.$flow.opts.maximumByteSize);
+                            imgUploadController.$setValidity(
+                                "wrongType", $scope.$flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
+                            imgUploadController.$setValidity("tooNarrow", img.width >= $scope.$flow.opts.minimumWidth);
 
-                        if (imgUploadController.$valid) {
-                            $scope.$flow.files[0] = file;
-                        } else {
-                            $scope.$flow.cancel();
-                            imgUploadController.$setValidity("required", imageExists());
-                        }
+                            if (imgUploadController.$valid) {
+                                $scope.$flow.files[0] = file;
+                            } else {
+                                $scope.$flow.cancel();
+                                imgUploadController.$setValidity("required", imageExists());
+                            }
+
+                            $scope.$apply();
+                        };
 
                         $scope.$apply();
-                    };
-
-                    $scope.$apply();
-                    return false;
-                });
-            }
+                        return false;
+                    });
+                }
+            });
 
             $scope.submitIfValid = (callCount = 0) => {
                 var container = $element.parents("[data-du-scroll-container]");
