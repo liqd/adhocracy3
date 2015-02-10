@@ -1,6 +1,7 @@
 [run]
 branch = True
 omit =
+    *version.py
     *test*py
     *bootstrap.py*
     # indirectly tested via websocket fixture:
