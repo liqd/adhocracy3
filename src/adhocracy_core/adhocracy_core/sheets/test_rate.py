@@ -1,3 +1,6 @@
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
@@ -72,112 +75,178 @@ class TestRateSheet:
                               }
 
 
+class DummyQuery:
+
+    def __init__(self, result=[]):
+        self.result = result
+
+    def __iand__(self, other):
+        return self
+
+    def execute(self, **kwargs):
+        return self.result
+
+
+class DummyIndex:
+
+    def __init__(self, result=[]):
+        self.result = result
+
+    def eq(self, *args, **kwargs):
+        return DummyQuery(self.result)
+
+    def noteq(self, *args, **kwargs):
+        return DummyQuery(self.result)
+
+
 @mark.usefixtures('integration')
 class TestRateSchema:
 
     @fixture
-    def subject(self):
-        from adhocracy_core.sheets.rate import ICanRate
-        return testing.DummyResource(__provides__=ICanRate)
-
-    def test_deserialize_valid(self, context, cornice_request, subject):
+    def schema_with_mock_ensure_rate(self, cornice_request, context):
         from adhocracy_core.sheets.rate import RateSchema
         schema = RateSchema().bind(request=cornice_request, context=context)
+        schema._ensure_rate_is_unique = Mock()
+        return schema
+
+    @fixture
+    def subject(self, monkeypatch):
+        from adhocracy_core.sheets import rate
+        from adhocracy_core.sheets.rate import ICanRate
+        subject = testing.DummyResource(__provides__=ICanRate)
+        mock_get_user = Mock(return_value=subject)
+        monkeypatch.setattr(rate, 'get_user', mock_get_user)
+        return subject
+
+    def test_deserialize_valid(self, context, schema_with_mock_ensure_rate,
+                               subject):
         context['subject'] = subject
         object = _make_rateable()
         context['object'] = object
         data = {'subject': '/subject', 'object': '/object', 'rate': '1'}
-        assert schema.deserialize(data) == {'subject': subject,
-                                            'object': object,
-                                            'rate': 1}
+        assert schema_with_mock_ensure_rate.deserialize(data) == {
+            'subject': subject, 'object': object, 'rate': 1}
 
-    def test_deserialize_valid_minus_one(self, context, cornice_request,
+    def test_deserialize_valid_minus_one(self, context,
+                                         schema_with_mock_ensure_rate,
                                          subject):
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
         context['subject'] = subject
         object = _make_rateable()
         context['object'] = object
         data = {'subject': '/subject', 'object': '/object', 'rate': '-1'}
-        assert schema.deserialize(data) == {'subject': subject,
-                                            'object': object,
-                                            'rate': -1}
+        assert schema_with_mock_ensure_rate.deserialize(data) == {
+            'subject': subject, 'object': object, 'rate': -1}
 
-    def test_deserialize_invalid_rate(self, context, cornice_request, subject):
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
+    def test_deserialize_invalid_rate(self, context,
+                                      schema_with_mock_ensure_rate, subject):
         context['subject'] = subject
         object = _make_rateable()
         context['object'] = object
         data = {'subject': '/subject', 'object': '/object', 'rate': '77'}
         with raises(colander.Invalid):
-            schema.deserialize(data)
+            schema_with_mock_ensure_rate.deserialize(data)
 
-    def test_deserialize_invalid_subject(self, context, cornice_request):
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
+    def test_deserialize_invalid_subject(self, context,
+                                         schema_with_mock_ensure_rate):
         subject = testing.DummyResource()
         context['subject'] = subject
         object = _make_rateable()
         context['object'] = object
         data = {'subject': '/subject', 'object': '/object', 'rate': '0'}
         with raises(colander.Invalid):
-            schema.deserialize(data)
+            schema_with_mock_ensure_rate.deserialize(data)
 
     def test_deserialize_invalid_subject_missing(self, context,
-                                                 cornice_request):
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
+                                                 schema_with_mock_ensure_rate):
         object = _make_rateable()
         context['object'] = object
         data = {'subject': '', 'object': '/object', 'rate': '0'}
         with raises(colander.Invalid):
-            schema.deserialize(data)
+            schema_with_mock_ensure_rate.deserialize(data)
 
-    def test_deserialize_invalid_object(self, context, cornice_request,
+    def test_deserialize_subject_isnt_current_user(
+            self, context, monkeypatch, schema_with_mock_ensure_rate):
+        from adhocracy_core.sheets import rate
+        from adhocracy_core.sheets.rate import ICanRate
+        subject = testing.DummyResource(__provides__=ICanRate)
+        user = testing.DummyResource(__provides__=ICanRate)
+        mock_get_user = Mock(return_value=user)
+        monkeypatch.setattr(rate, 'get_user', mock_get_user)
+        context['subject'] = subject
+        object = _make_rateable()
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '0'}
+        with raises(colander.Invalid):
+            schema_with_mock_ensure_rate.deserialize(data)
+
+    def test_deserialize_invalid_object(self, context,
+                                        schema_with_mock_ensure_rate,
                                         subject):
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
         context['subject'] = subject
         object = testing.DummyResource()
         context['object'] = object
         data = {'subject': '/subject', 'object': '/object', 'rate': '0'}
         with raises(colander.Invalid):
-            schema.deserialize(data)
+            schema_with_mock_ensure_rate.deserialize(data)
 
-    def test_deserialize_invalid_object_missing(self, context, cornice_request,
-                                        subject):
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
+    def test_deserialize_invalid_object_missing(self, context,
+                                        schema_with_mock_ensure_rate, subject):
         context['subject'] = subject
         data = {'subject': '/subject', 'object': '', 'rate': '0'}
         with raises(colander.Invalid):
-            schema.deserialize(data)
+            schema_with_mock_ensure_rate.deserialize(data)
 
-    def test_deserialize_valid_likeable(self, context, cornice_request,
+    def test_deserialize_valid_likeable(self, context,
+                                        schema_with_mock_ensure_rate,
                                         subject):
         from adhocracy_core.sheets.rate import ILikeable
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
         context['subject'] = subject
         object = _make_rateable(ILikeable)
         context['object'] = object
         data = {'subject': '/subject', 'object': '/object', 'rate': '1'}
-        assert schema.deserialize(data) == {'subject': subject,
-                                            'object': object,
-                                            'rate': 1}
+        assert schema_with_mock_ensure_rate.deserialize(data) == {
+            'subject': subject, 'object': object, 'rate': 1}
 
-    def test_deserialize_invalid_rate_with_likeable(self, context,
-                                                    cornice_request, subject):
+    def test_deserialize_invalid_rate_with_likeable(
+            self, context, schema_with_mock_ensure_rate, subject):
         from adhocracy_core.sheets.rate import ILikeable
-        from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
         context['subject'] = subject
         object = _make_rateable(ILikeable)
         context['object'] = object
         data = {'subject': '/subject', 'object': '/object', 'rate': '-1'}
         with raises(colander.Invalid):
-            assert schema.deserialize(data)
+            schema_with_mock_ensure_rate.deserialize(data)
+
+    def test_ensure_rate_is_unique_ok(self, monkeypatch, cornice_request,
+                                      context, subject):
+        from adhocracy_core.sheets.rate import RateSchema
+        from adhocracy_core.sheets import rate
+        mock_find_catalog = Mock(return_value={'reference': DummyIndex(),
+                                               'path': DummyIndex()})
+        monkeypatch.setattr(rate, 'find_catalog', mock_find_catalog)
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        object = _make_rateable()
+        node = Mock()
+        value = {'subject': subject, 'object': object, 'rate': '1'}
+        result = schema._ensure_rate_is_unique(node, value, cornice_request)
+        assert result is None
+
+    def test_ensure_rate_is_unique_error(self, monkeypatch, cornice_request,
+                                         context, subject):
+        from adhocracy_core.sheets.rate import RateSchema
+        from adhocracy_core.sheets import rate
+        from adhocracy_core.utils import named_object
+        mock_find_catalog = Mock(
+            return_value={'reference': DummyIndex(['dummy']),
+                          'path': DummyIndex()})
+        monkeypatch.setattr(rate, 'find_catalog', mock_find_catalog)
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        object = _make_rateable()
+        node = Mock()
+        node.children = [named_object('object')]
+        value = {'subject': subject, 'object': object, 'rate': '1'}
+        with raises(colander.Invalid):
+            schema._ensure_rate_is_unique(node, value, cornice_request)
 
 
 @mark.usefixtures('integration')

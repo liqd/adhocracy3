@@ -15,10 +15,7 @@
                 {{data.finance.requested_funding | number}} &euro;
             </li>
             <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-rate">
-                <adh-like data-refers-to="{{path}}"
-                    data-post-pool-sheet="adhocracy.sheets.rate.ILikeable"
-                    data-post-pool-field="post_pool">
-                </adh-like>
+                <adh-like data-refers-to="{{path}}"></adh-like>
             </li>
         </ul>
         <h1 class="mercator-proposal-cover-header">{{ data.introduction.title }}
@@ -262,13 +259,7 @@
 
                 <a class="button-back-to-top" data-du-smooth-scroll="" href="#mercator-detail-view-top">
                 <i class="icon-triangle-up"></i> {{ "Back To Top" | translate }}</a>
-                <!-- FIXME: dummy [here you should see a second manifestation of the
-                support butten in the cover section.  obviously, if one of
-                them is clicked, the other should change automatically.] -->
-                <div class="like">
-                    <span class="like-difference">+1</span>
-                    <a href="" class="is-rate-button-active like-button">{{ "not functioning!" | translate }}</a>
-                </div>
+                <adh-like data-refers-to="{{path}}"></adh-like>
 
             </footer>
 

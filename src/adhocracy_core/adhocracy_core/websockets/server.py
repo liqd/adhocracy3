@@ -171,10 +171,10 @@ class ClientCommunicator(WebSocketServerProtocol):
                 connection.sync()
 
     def _get_zodb_connection(self) -> Connection:
-        if not hasattr(self, '_zodb_connection'):
+        connection = getattr(self, '_zodb_connection', None)
+        if connection is None:
             connection = self.zodb_database.open()
             self._zodb_connection = connection
-        connection = self._zodb_connection
         connection.sync()
         return connection
 

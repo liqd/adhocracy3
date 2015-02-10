@@ -20,7 +20,7 @@ export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : A
                     remark: scope.remark
                 }).then(() => {
                     column.hideOverlay("abuse");
-                    column.alert("The moderators have been notified", "success");
+                    column.alert("TR__REPORT_ABUSE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
                 });

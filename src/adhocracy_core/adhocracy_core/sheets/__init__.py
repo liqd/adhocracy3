@@ -88,11 +88,15 @@ class GenericResourceSheet(PropertySheet):
 
     @property
     def _data(self):
-        if not hasattr(self.context, '_sheets'):
-            self.context._sheets = PersistentMapping()
-        if self._data_key not in self.context._sheets:
-            self.context._sheets[self._data_key] = PersistentMapping()
-        return self.context._sheets[self._data_key]
+        sheets_data = getattr(self.context, '_sheets', None)
+        if sheets_data is None:
+            sheets_data = PersistentMapping()
+            setattr(self.context, '_sheets', sheets_data)
+        data = sheets_data.get(self._data_key, None)
+        if data is None:
+            data = PersistentMapping()
+            sheets_data[self._data_key] = data
+        return data
 
     def _get_reference_appstruct(self, params: dict={}) -> iter:
         references = self._get_references()
