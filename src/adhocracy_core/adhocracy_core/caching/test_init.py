@@ -348,7 +348,7 @@ class TestIntegrationCaching:
         strategies = dict(registry.getAdapters((context, request_),
                                                IHTTPCacheStrategy))
         assert isinstance(strategies['GET'], HTTPCacheStrategyWeakAdapter)
-        assert isinstance(strategies['OPTIONS'], HTTPCacheStrategyWeakAdapter)
+        assert isinstance(strategies['HEAD'], HTTPCacheStrategyWeakAdapter)
 
     def test_registered_strategies_iassetdownload(self, registry, request_):
         from adhocracy_core.interfaces import IHTTPCacheStrategy
@@ -358,7 +358,7 @@ class TestIntegrationCaching:
         strategies = dict(registry.getAdapters((context, request_),
                                                IHTTPCacheStrategy))
         assert isinstance(strategies['GET'], HTTPCacheStrategyWeakAssetDownloadAdapter)
-        assert isinstance(strategies['OPTIONS'], HTTPCacheStrategyWeakAssetDownloadAdapter)
+        assert isinstance(strategies['HEAD'], HTTPCacheStrategyWeakAssetDownloadAdapter)
 
     def test_registered_strategy_modifies_headers(self, app_user):
         resp = app_user.get('/', status=200)

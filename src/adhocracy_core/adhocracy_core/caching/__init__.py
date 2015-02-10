@@ -259,7 +259,7 @@ def includeme(config):
     register_cache_strategy(HTTPCacheStrategyWeakAdapter,
                             IResource,
                             config.registry,
-                            'OPTIONS')
+                            'HEAD')
     register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
                             IAssetDownload,
                             config.registry,
@@ -267,4 +267,4 @@ def includeme(config):
     register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
                             IAssetDownload,
                             config.registry,
-                            'OPTIONS')
+                            'HEAD')
