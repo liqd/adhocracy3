@@ -13,7 +13,24 @@
     }
 
     .user-profile-info-button {
-        display: block;
+        @include inline-block;
+
+        &:hover .user-profile-info-icon,
+        &:focus .user-profile-info-icon {
+            color: $color-brand-three-normal;
+        }
+
+        &:active .user-profile-info-icon {
+            color: $color-text-highlight-normal;
+        }
+
+        &:active .user-profile-info-icon-active {
+            display: block;
+        }
+
+        &:active .user-profile-info-icon-inactive {
+            display: none;
+        }
     }
 
     .user-profile-info-icon {
@@ -21,17 +38,8 @@
         line-height: 1;
         font-size: 400%;
 
-        &:hover, &:focus {
-            color: $color-brand-three-normal;
-        }
-
-        &:before {
-            display: block;
-        }
-
-        &:active:before {
-            color: $color-text-highlight-normal;
-            content: "\f106";
+        &.user-profile-info-icon-active {
+            display: none;
         }
     }
 
