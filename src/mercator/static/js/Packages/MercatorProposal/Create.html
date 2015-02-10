@@ -1,5 +1,4 @@
 <div class="mercator-proposal-form-container">
-
     <nav class="mercator-proposal-form-nav" data-adh-sticky="">
         <ol>
             <li data-du-scrollspy="mercator-proposal-basic"><a href="#mercator-proposal-basic" data-du-smooth-scroll="">{{ "TR__MERCATOR_PROPOSAL_BASIC" | translate }}</a></li>
@@ -27,9 +26,7 @@
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalBasicForm" id="mercator-proposal-basic">
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
-
                     <h2 data-du-scrollspy="mercator-proposal-basic" class="mercator-proposal-form-heading">1. {{ "TR__MERCATOR_PROPOSAL_BASIC" | translate }}</h2>
 
                     <h3 class="mercator-proposal-form-subheading">{{ "TR__MERCATOR_PROPOSAL_USER_INFO" | translate }}:</h3>
@@ -295,27 +292,22 @@
                         class="input-error"
                         data-ng-if="showError('mercatorProposalBasicForm.organization-info-status-enum', 'required')">
                         {{ "TR__ERROR_REQUIRED_RADIO" | translate }}</span>
-
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     <h3 class="mercator-proposal-form-annotation-heading">{{ "TR__DISCLAIMER" | translate }}</h3>
                     {{"TR__MERCATOR_PROPOSAL_DISCLAIMER" | translate}}
                 </div>
-
             </div><!-- /.annotated-section -->
-
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalIntroductionForm" id="mercator-proposal-introduction">
-
             <h2
                 data-du-scrollspy="mercator-proposal-introduction"
                 class="mercator-proposal-form-heading"
                 data-offset="50">2. {{ "TR__MERCATOR_PROPOSAL_INTRODUCTION" | translate }}</h2>
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
 
                     <label>
@@ -349,9 +341,7 @@
                             data-ng-if="showError('mercatorProposalIntroductionForm.introduction-teaser', 'required')">
                             {{ "TR__ERROR_REQUIRED_TEASER" | translate }}</span>
                     </label>
-
                 </div><!-- /.annotated-section-body -->
-
             </div><!-- /.annotated-section -->
 
             <div class="annotated-section" data-ng-if="$flow.support">
@@ -410,6 +400,7 @@
                         </div>
                     </label>
                 </div><!-- /.annotated-section-body -->
+
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__IMAGE_INFO_COPYRIGHT" | translate }}
                     {{ "TR__IMAGE_INFO" | translate:$flow.opts }}
@@ -417,18 +408,14 @@
             </div><!-- /.annotated-section -->
         </section>
 
-
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalDetailForm" id="mercator-proposal-detail">
-
             <h2
                 data-du-scrollspy="mercator-proposal-detail"
                 class="mercator-proposal-form-heading"
                 data-offset="50">3. {{ "TR__MERCATOR_PROPOSAL_DETAIL" | translate }}</h2>
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
-
                     <label>
                         <span class="label-text">{{ "TR__DESCRIPTION" | translate }}:</span>
                         <textarea
@@ -444,18 +431,15 @@
                             data-ng-if="showError('mercatorProposalDetailForm.description-description', 'required')">
                             {{ "TR__ERROR_REQUIRED_DESCRIPTION" | translate }}</span>
                     </label>
-
                 </div><!-- /.form_body -->
+
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_DETAIL_ANNOTATION" | translate }}
                 </div>
             </div><!-- /.annotated-section -->
 
-
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
-
                     <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}</span>
 
                     <!-- FIXME: red border should show on dirty -->
@@ -508,24 +492,21 @@
                                 name="location-location-is-linked-to-ruhr" />
                             {{ "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR" | translate }}
                         </label>
-
                     </div><!-- /.ng-invalid -->
+
                     <span
                         class="input-error"
                         data-ng-if="showLocationError()">
                         {{ "TR__ERROR_REQUIRED_RADIO" | translate }}</span>
-
                 </div><!-- /.annotated-section-body -->
+
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_LOCATION_ANNOTATION" | translate }}
                 </div>
-
             </div><!-- /.annotated-section -->
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
-
                     <label>
                         <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_STORY_LABEL" | translate }}</span>
                         <textarea
@@ -540,9 +521,7 @@
                             class="input-error"
                             data-ng-if="showError('mercatorProposalDetailForm.story', 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
-
                     </label>
-
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
@@ -552,14 +531,12 @@
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalMotivationForm" id="mercator-proposal-motivation">
-
             <h2
                 data-du-scrollspy="mercator-proposal-motivation"
                 class="mercator-proposal-form-heading"
                 data-offset="50">4. {{ "TR__MERCATOR_PROPOSAL_MOTIVATION" | translate }}</h2>
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
 
                     <label>
@@ -578,15 +555,14 @@
                             data-ng-if="showError('mercatorProposalMotivationForm.outcome', 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
-
                 </div><!-- /.annotated-section-body -->
+
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_OUTCOME_ANNOTATION" | translate }}
                 </div>
-
             </div><!-- /.annotated-section -->
-            <div class="annotated-section">
 
+            <div class="annotated-section">
                 <div class="annotated-section-body">
 
                     <label>
@@ -604,17 +580,14 @@
                             data-ng-if="showError('mercatorProposalMotivationForm.steps', 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
-
                 </div><!-- /.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_STEPS_ANNOTATION"  | translate }}
                 </div><!-- /.annotated-section-annotation mercator-proposal-form-annotation -->
-
             </div><!-- /.annotated-section -->
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
 
                     <label>
@@ -632,17 +605,14 @@
                             data-ng-if="showError('mercatorProposalMotivationForm.value', 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
-
                 </div><!--/.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_VALUE_ANNOTATION" | translate }}
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
-
             </div><!-- /.annotated-section -->
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
 
                     <label>
@@ -660,27 +630,22 @@
                             data-ng-if="showError('mercatorProposalMotivationForm.partners', 'required')">
                             {{ "TR__ERROR_REQUIRED_TEXT" | translate }}</span>
                     </label>
-
                 </div><!--/.annotated-section-body -->
+
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
 
                     {{ "TR__MERCATOR_PROPOSAL_PARTNERS_ANNOTATION" | translate }}
-
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
-
             </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
-
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalFinanceForm" id="mercator-proposal-finance">
-
             <h2
                 data-du-scrollspy="mercator-proposal-finance"
                 class="mercator-proposal-form-heading"
                 data-offset="50">5. {{ "TR__MERCATOR_PROPOSAL_FINANCE" | translate }}</h2>
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
 
                     <label>
@@ -696,12 +661,10 @@
                             data-ng-if="showError('mercatorProposalFinanceForm.finance-budget', 'required')">
                             {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_TOTAL_BUDGET" | translate }}</span>
                     </label>
-
                 </div><!--/.annotated-section-body -->
-
             </div><!--/.annotated-section -->
-            <div class="annotated-section">
 
+            <div class="annotated-section">
                 <div class="annotated-section-body">
 
                     <label>
@@ -762,33 +725,29 @@
                             class="input-error"
                             data-ng-if="showError('mercatorProposalFinanceForm.finance-granted', 'required')">
                             {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_FINANCE_GRANTED" | translate }}</span>
-
                 </div><!--/.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__INFO_MAX_EURO_50000" | translate }}
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
-
             </div><!--/.annotated-section -->
+
             <div class="annotated-section">
                 <div class="annotated-section-body"></div>
+
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERACTOR_PROPOSAL_FINANCE_PLAN_ANNOTATION" | translate }}
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
-
             </div><!--/.annotated-section -->
-
         </section>
 
         <section class="mercator-proposal-form-section" data-ng-form="" name="mercatorProposalExtraForm" id="mercator-proposal-extra">
-
             <h2
                 data-du-scrollspy="mercator-proposal-extra"
                 class="mercator-proposal-form-heading"
                 data-offset="50">6. {{ "TR__MERCATOR_PROPOSAL_EXTRA" | translate }}</h2>
 
             <div class="annotated-section">
-
                 <div class="annotated-section-body">
 
                     <label>
@@ -862,14 +821,12 @@
                             required="required"/>
                         {{ "TR__MERCATOR_PROPOSAL_ACCEPT_PUBLISH" | translate }}
                     </label>
-
                 </div><!--/.annotated-section-body -->
 
                 <div class="annotated-section-annotation mercator-proposal-form-annotation">
                     {{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_ANNOTATION" | translate }}
                 </div><!--/.annotated-section-annotation mercator-proposal-form-annotation -->
             </div><!--/.annotated-section -->
-
         </section>
 
         <footer class="form-footer mercator-proposal-form-footer">
