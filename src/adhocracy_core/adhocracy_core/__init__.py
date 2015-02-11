@@ -31,14 +31,18 @@ def root_factory(request):
 
 
 def add_after_commit_hooks(request):
-    """Add after commit hook to notify the websocket server."""
+    """Add after commit hooks."""
     # FIXME this is a quick hack
+    from adhocracy_core.caching import purge_varnish_after_commit_hook
     from adhocracy_core.websockets.client import \
         send_messages_after_commit_hook
     from adhocracy_core.resources.subscriber import\
         clear_transaction_changelog_after_commit_hook
     current_transaction = transaction.get()
     registry = request.registry
+    # Order matters here
+    current_transaction.addAfterCommitHook(purge_varnish_after_commit_hook,
+                                           args=(registry,))
     current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
                                            args=(registry,))
     current_transaction.addAfterCommitHook(
@@ -51,8 +55,6 @@ def includeme(config):
     config.include('pyramid_zodbconn')
     config.include('pyramid_exclog')
     config.include('pyramid_mako')
-    config.hook_zca()  # enable global adapter lookup (used by adhocracy.utils)
-    authz_policy = RoleACLAuthorizationPolicy()
     config.hook_zca()  # global adapter lookup (used by adhocracy_core.utils)
     authz_policy = RoleACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)

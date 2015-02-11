@@ -428,3 +428,97 @@ class TestIntegrationCaching:
         assert resp.status == '200 OK'
 
 
+class TestPurgeVarnishAfterCommitHook:
+
+    @fixture
+    def registry_for_varnish(self, registry_with_changelog):
+        registry_with_changelog.settings[
+            'adhocracy.varnish_url'] = 'http://localhost'
+        return registry_with_changelog
+
+    def _monkeypatch_requests(self, monkeypatch, status_code=200,
+                              side_effect=None):
+        from adhocracy_core import caching
+        from requests import Response
+        mock_requests = mock.Mock()
+        mock_response = mock.Mock(spec=Response)
+        mock_response.status_code = status_code
+        mock_requests.request = mock.Mock(return_value=mock_response,
+                                          side_effect=side_effect)
+        monkeypatch.setattr(caching, 'requests', mock_requests)
+        return mock_requests
+
+    def test_empty_changelog(self, monkeypatch, registry_for_varnish):
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(monkeypatch)
+        purge_varnish_after_commit_hook(True, registry_for_varnish)
+        assert not mock_requests.request.called
+
+    def test_non_empty_changelog(self, monkeypatch, registry_for_varnish,
+                                 changelog_meta, context):
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(monkeypatch)
+        registry_for_varnish._transaction_changelog[
+            '/'] = changelog_meta._replace(resource=context, modified=True)
+        purge_varnish_after_commit_hook(True, registry_for_varnish)
+        assert mock_requests.request.called
+        assert mock_requests.request.call_args[0] == ('PURGE',
+                                                      'http://localhost/')
+
+    def test_non_empty_changelog_but_unchanged_resource(
+            self, monkeypatch, registry_for_varnish, changelog_meta, context):
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(monkeypatch)
+        registry_for_varnish._transaction_changelog[
+            '/'] = changelog_meta._replace(resource=context)
+        purge_varnish_after_commit_hook(True, registry_for_varnish)
+        assert not mock_requests.request.called
+
+    def test_success_false(
+            self, monkeypatch, registry_for_varnish, changelog_meta, context):
+        """Nothing should happen if the transaction was unsuccessful."""
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(monkeypatch)
+        registry_for_varnish._transaction_changelog[
+            '/'] = changelog_meta._replace(resource=context, modified=True)
+        purge_varnish_after_commit_hook(False, registry_for_varnish)
+        assert not mock_requests.request.called
+
+    def test_no_varnish_url(self, monkeypatch, registry_with_changelog,
+                            changelog_meta, context):
+        """Nothing should happen if no varnish_url is configured."""
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(monkeypatch)
+        registry_with_changelog._transaction_changelog[
+            '/'] = changelog_meta._replace(resource=context, modified=True)
+        purge_varnish_after_commit_hook(True, registry_with_changelog)
+        assert not mock_requests.request.called
+
+    def test_unexpected_status_code(self, monkeypatch, registry_for_varnish,
+                                 changelog_meta, context):
+        from adhocracy_core import caching
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(monkeypatch,
+                                                   status_code=444)
+        mock_logger = mock.Mock()
+        monkeypatch.setattr(caching, 'logger', mock_logger)
+        registry_for_varnish._transaction_changelog[
+            '/'] = changelog_meta._replace(resource=context, modified=True)
+        purge_varnish_after_commit_hook(True, registry_for_varnish)
+        assert mock_requests.request.called
+        assert mock_logger.warning.called
+
+    def test_exception_raised(self, monkeypatch, registry_for_varnish,
+                              changelog_meta, context):
+        from requests.exceptions import RequestException
+        from adhocracy_core import caching
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(
+            monkeypatch, side_effect=RequestException('Nope!'))
+        mock_logger = mock.Mock()
+        monkeypatch.setattr(caching, 'logger', mock_logger)
+        registry_for_varnish._transaction_changelog[
+            '/'] = changelog_meta._replace(resource=context, modified=True)
+        purge_varnish_after_commit_hook(True, registry_for_varnish)
+        assert mock_requests.request.called
+        assert mock_logger.error.called

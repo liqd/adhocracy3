@@ -195,7 +195,7 @@ class PermissionsAttributeStorageSheet(AttributeStorageSheet):
 
     def _store_references(self, appstruct, registry):
         super()._store_references(appstruct, registry)
-        if 'groups' in appstruct:
+        if 'groups' in appstruct:  # pragma: no branch
             groups = appstruct['groups']
             group_ids = [resource_path(g) for g in groups]
             self.context.group_ids = group_ids
