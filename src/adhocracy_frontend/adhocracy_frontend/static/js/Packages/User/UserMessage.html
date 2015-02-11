@@ -3,36 +3,36 @@
         novalidate="novalidate"
         name="messageForm">
         <!-- FIXME: replace "Username" -->
-        <p>{{ "Message to" | translate }} Username</p>
+        <p>{{ "TR__MESSAGE_TO" | translate }} Username</p>
         <input
             class="user-message-subject"
             type="text"
             name="subject"
-            placeholder="{{ 'Subject' | translate }}:"
+            placeholder="{{ 'TR__SUBJECT' | translate }}:"
             data-ng-model="message.title"
             required="required" />
         <span
             class="input-error"
             data-ng-show="messageForm.subject.$invalid  && messageForm.$submitted">
-            {{ "Please enter a subject" | translate }}</span>
+            {{ "TR__ERROR_REQUIRED_SUBJECT" | translate }}</span>
         <textarea
             class="user-message-text"
             name="message"
-            placeholder="{{ 'Content' | translate }}:"
+            placeholder="{{ 'TR__CONTENT' | translate }}:"
             data-ng-model="message.text"
             required="required"></textarea>
         <span
             class="input-error"
             data-ng-show="messageForm.message.$invalid  && messageForm.$submitted">
-            {{ "Please enter a message" | translate }}</span>
+            {{ "TR__ERROR_REQUIRED_MESSAGE" | translate }}</span>
 
         <footer class="form-footer">
             <input
                 type="submit"
-                value="{{ 'Send' | translate }}"
+                value="{{ 'TR__MESSAGE_SEND' | translate }}"
                 data-ng-click="messageSend()"
                 class="m-call-to-action form-footer-button-cta" />
-            <a href="" class="button form-footer-button" data-ng-click="cancel()" >{{ "CANCEL" | translate }}</a>
+            <a href="" class="button form-footer-button" data-ng-click="cancel()" >{{ "TR__CANCEL" | translate }}</a>
         </footer>
     </form>
 </div>

@@ -35,7 +35,7 @@ if __name__ == '__main__':
             json.dump(
                 data,
                 fh,
-                indent=2,
+                indent=4,
                 sort_keys=True,
                 separators=(',', ': '),
                 ensure_ascii=False)
