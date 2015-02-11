@@ -33,6 +33,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx.ext.pngmath',
               'repoze.sphinx.autointerface',
+              'sphinx_autodoc_annotation',
               'sphinx.ext.graphviz']
 
 # Add any paths that contain templates here, relative to this directory.
