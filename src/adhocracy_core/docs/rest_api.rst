@@ -283,6 +283,7 @@ request should look like::
 
 ..     >>> pprint(resp_data['PUT']['request_body'])
 ..     {'data': {...'adhocracy_core.sheets.name.IName': {}...}}
+
 FIXME: PUT is missing, because the current test pool resource type has not
 editable sheet.
 
@@ -371,7 +372,7 @@ The response object has 3 top-level entries:
   contains a reference to its creator.
 
   The subkey 'removed' lists any resources that have been removed
-  by marking them as deleted or hidden (see :ref:`deletion`)::
+  by marking them as deleted or hidden (see :doc:`deletion`)::
 
       >>> resp_data['updated_resources']['removed']
       []

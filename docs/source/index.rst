@@ -17,8 +17,8 @@ Contents
    api/index
    style_guide/index
    attic/index
-   adhocracy
    CHANGES
+   glossary
 
 
 Indices and tables

@@ -335,4 +335,4 @@ Deleting and Hiding Assets
 --------------------------
 
 Assets can be deleted or censored ("hidden") in the usual way, see
-:ref:`deletion`.
+:doc:`deletion`.

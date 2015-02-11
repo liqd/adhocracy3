@@ -156,8 +156,8 @@ Separation of Responsibility for adhocracy packages
     --------------------------------------------------------------------------------------
     registry* (provide resource/isheet metadata, create resources/isheet, ...)
     -------------------------------------------------------------------------------------------
-    resources      Resource types mapped to sheets, to follow the https://en.wikipedia.org/wiki/Open/closed_principle 
-                   The basic Resource types are: resource, simple, pool, item/itemversion, tag
+    resources Resource types mapped to sheets, to follow the https://en.wikipedia.org/wiki/Open/closed_principle
+    The basic Resource types are: resource, simple, pool, item/itemversion, tag
     resources.root setup the initial object hierarchy in the database, acl (permission list)
     resources.subscribers  (autoupdate for itemversions)
     sheets         save/edit/get an isolated set of data 
@@ -169,12 +169,12 @@ Separation of Responsibility for adhocracy packages
     interfaces (basic interfaces for classes, resource/sheet types)
     utils (helper functions to be used in multiple modules)
     events (various types of events are send during runtime. 
-            You can subscribe them to modifiy the behavior. 
-            Do this in an submodule called 'subribers' of the module with the proper responsibility.
-            (For example to reindex a resource add an subsriber ot catalog.subsribers)
+    You can subscribe them to modifiy the behavior.
+    Do this in an submodule called 'subribers' of the module with the proper responsibility.
+    (For example to reindex a resource add an subsriber ot catalog.subsribers)
     schema (data types, basic data structures)
     evolution (migrate old object hierarchy in database) 
-   set initial  object hierarcy in database
+    set initial  object hierarcy in database
     messaging
     templates  
     websockets
@@ -183,7 +183,9 @@ Separation of Responsibility for adhocracy packages
     mv: caching to rest.caching
 
     Note: Responsibility for metadata is not yet fully supported by the registry
-         * = drop in dependency
+
+         \* = drop in dependency
+
          every module:
             must not import from upper level
             must not import from same level

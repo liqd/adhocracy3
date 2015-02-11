@@ -42,4 +42,4 @@ The 'remark' is optional, it may be omitted or empty.
 Censorship
 ----------
 
-See :ref:`deletion` for an example of hiding (censoring) bad content.
+See :doc:`deletion` for an example of hiding (censoring) bad content.

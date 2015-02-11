@@ -10,6 +10,11 @@ API
    websockets
    authorization
    permissions
+   assets_and_images
+   caching_strategy
+   deletion
+   messaging
+   abuse
 
 
 
