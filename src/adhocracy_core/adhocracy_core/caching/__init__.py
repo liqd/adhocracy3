@@ -1,18 +1,28 @@
 """Adapter and helper functions to set the http response caching headers."""
+import logging
+
+from pyramid.httpexceptions import HTTPNotModified
+from pyramid.interfaces import IRequest
+from pyramid.registry import Registry
+from pyramid.traversal import resource_path
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
+from requests.exceptions import RequestException
+import requests
+
 from adhocracy_core.interfaces import HTTPCacheMode
 from adhocracy_core.interfaces import IHTTPCacheStrategy
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.utils import get_reason_if_blocked
-from pyramid.httpexceptions import HTTPNotModified
-from pyramid.interfaces import IRequest
-from pyramid.registry import Registry
+from adhocracy_core.utils import exception_to_str
+from adhocracy_core.utils import extract_events_from_changelog_metadata
 
 
 DISABLED_VIEWS_OR_METHODS = ['PATCH', 'POST', 'PUT']
+
+logger = logging.getLogger(__name__)
 
 
 def set_cache_header(context: IResource, request: IRequest):
@@ -248,6 +258,33 @@ class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
     def __init__(self, context, request):
         parent = context.__parent__  # reuse parent cache header
         super().__init__(parent, request)
+
+
+def purge_varnish_after_commit_hook(success: bool, registry: Registry):
+    """Send PURGE requests for all changed resources to Varnish."""
+    varnish_url = registry.settings.get('adhocracy.varnish_url')
+    if not (success and varnish_url):
+        return
+    changelog_metadata = registry._transaction_changelog.values()
+    errcount = 0
+    for meta in changelog_metadata:
+        events = extract_events_from_changelog_metadata(meta)
+        if events:  # resource has changed in some ways
+            path = resource_path(meta.resource)
+            try:
+                resp = requests.request('PURGE', varnish_url + path)
+                if resp.status_code != 200:
+                    logger.warning(
+                        'Varnish responded %s to purge request for %s',
+                        resp.status_code, path)
+            except RequestException as err:
+                logger.error(
+                    'Couldn\'t send purge request for %s to Varnish: %s',
+                    path, exception_to_str(err))
+                errcount += 1
+                if errcount >= 3:  # pragma: no cover
+                    logger.error('Giving up on purge requests')
+                    return
 
 
 def includeme(config):
