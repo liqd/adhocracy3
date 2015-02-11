@@ -484,6 +484,16 @@ class TestPurgeVarnishAfterCommitHook:
         purge_varnish_after_commit_hook(False, registry_for_varnish)
         assert not mock_requests.request.called
 
+    def test_no_varnish_url(self, monkeypatch, registry_with_changelog,
+                            changelog_meta, context):
+        """Nothing should happen if no varnish_url is configured."""
+        from adhocracy_core.caching import purge_varnish_after_commit_hook
+        mock_requests = self._monkeypatch_requests(monkeypatch)
+        registry_with_changelog._transaction_changelog[
+            '/'] = changelog_meta._replace(resource=context, modified=True)
+        purge_varnish_after_commit_hook(True, registry_with_changelog)
+        assert not mock_requests.request.called
+
     def test_unexpected_status_code(self, monkeypatch, registry_for_varnish,
                                  changelog_meta, context):
         from adhocracy_core import caching

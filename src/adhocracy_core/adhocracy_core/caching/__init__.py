@@ -261,33 +261,30 @@ class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
 
 
 def purge_varnish_after_commit_hook(success: bool, registry: Registry):
-    """
-    Send PURGE requests for all changed resources to Varnish.
-
-    Note that is hook must only be added if 'adhocracy.varnish_url' is defined!
-    """
-    varnish_url = registry.settings['adhocracy.varnish_url']
-    if success:
-        changelog_metadata = registry._transaction_changelog.values()
-        errcount = 0
-        for meta in changelog_metadata:
-            events = extract_events_from_changelog_metadata(meta)
-            if events:  # resource has changed in some ways
-                path = resource_path(meta.resource)
-                try:
-                    resp = requests.request('PURGE', varnish_url + path)
-                    if resp.status_code != 200:
-                        logger.warning(
-                            'Varnish responded %s to purge request for %s',
-                            resp.status_code, path)
-                except RequestException as err:
-                    logger.error(
-                        'Couldn\'t send purge request for %s to Varnish: %s',
-                        path, exception_to_str(err))
-                    errcount += 1
-                    if errcount >= 3:  # pragma: no cover
-                        logger.error('Giving up on purge requests')
-                        return
+    """Send PURGE requests for all changed resources to Varnish."""
+    varnish_url = registry.settings.get('adhocracy.varnish_url')
+    if not (success and varnish_url):
+        return
+    changelog_metadata = registry._transaction_changelog.values()
+    errcount = 0
+    for meta in changelog_metadata:
+        events = extract_events_from_changelog_metadata(meta)
+        if events:  # resource has changed in some ways
+            path = resource_path(meta.resource)
+            try:
+                resp = requests.request('PURGE', varnish_url + path)
+                if resp.status_code != 200:
+                    logger.warning(
+                        'Varnish responded %s to purge request for %s',
+                        resp.status_code, path)
+            except RequestException as err:
+                logger.error(
+                    'Couldn\'t send purge request for %s to Varnish: %s',
+                    path, exception_to_str(err))
+                errcount += 1
+                if errcount >= 3:  # pragma: no cover
+                    logger.error('Giving up on purge requests')
+                    return
 
 
 def includeme(config):
