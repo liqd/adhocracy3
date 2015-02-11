@@ -426,7 +426,9 @@ export class Service<Content extends ResourcesBase.Resource> {
 export class Busy {
     public count : number;
 
-    constructor() {
+    constructor(
+        private $q : ng.IQService
+    ) {
         this.count = 0;
     }
 
@@ -436,13 +438,13 @@ export class Busy {
                 this.count += 1;
                 return config;
             },
-            response: (r) => {
+            response: (response) => {
                 this.count -= 1;
-                return r;
+                return response;
             },
-            responseError: (r) => {
+            responseError: (rejection) => {
                 this.count -= 1;
-                return r;
+                return this.$q.reject(rejection);
             }
         };
     }
@@ -474,7 +476,7 @@ export var register = (angular, config, metaApi) => {
                 $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
             }
         }])
-        .service("adhHttpBusy", Busy)
+        .service("adhHttpBusy", ["$q", Busy])
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
