@@ -147,7 +147,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhDone.register(angular);
     AdhEmbed.register(angular);
     AdhEventManager.register(angular);
-    AdhHttp.register(angular, meta_api);
+    AdhHttp.register(angular, config, meta_api);
     AdhInject.register(angular);
     AdhListing.register(angular);
     AdhLocale.register(angular);
