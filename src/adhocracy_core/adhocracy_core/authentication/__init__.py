@@ -35,9 +35,11 @@ class TokenMangerAnnotationStorage:
 
     @property
     def token_to_user_id_timestamp(self):
-        if not hasattr(self.context, self.annotation_key):
-            setattr(self.context, self.annotation_key, PersistentDict())
-        return getattr(self.context, self.annotation_key)
+        tokens = getattr(self.context, self.annotation_key, None)
+        if tokens is None:
+            tokens = PersistentDict()
+            setattr(self.context, self.annotation_key, tokens)
+        return tokens
 
     def create_token(self, userid: str, secret='', hashalg='sha512') -> str:
         """Create authentication token for user_id.

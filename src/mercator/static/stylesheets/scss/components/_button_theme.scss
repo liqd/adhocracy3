@@ -4,22 +4,55 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
-    @include button-color($color-text-inverted, $color-text-highlight-normal);
-
+    $button-height: 24px / $font-size-normal;
+    background: transparent;
     border: 0;
+    color: $color-text-highlight-introvert;
+    font-size: $font-size-normal;
     font-weight: $font-weight-normal;
-    line-height: 2;
-    height: 2em;
+    line-height: $button-height;
+    height: $button-height * 1em;
+    padding: 0;
+    text-transform: uppercase;
+    min-width: 1px;
 
-    &.has-focus, &:focus,
-    &.is-hover, &:hover {
-        @include button-color($color-text-inverted, $color-text-highlight-introvert);
+    &:focus:not(:disabled):not(.ng-disabled),
+    &:hover:not(:disabled):not(.ng-disabled) {
+        background: transparent;
+        color: $color-text-highlight-normal;
     }
 
     &:disabled,
-    &.is-disabled,
     &.ng-disabled {
-        @include opacity(0.5);
-        cursor: default;
+        &, &:focus, &:hover {
+            @include opacity(0.5);
+            background: transparent;
+            cursor: default;
+        }
+    }
+
+    &.m-call-to-action,
+    &.m-call-to-action2 {
+        @include button-color($color-text-highlight-normal, $color-text-inverted);
+        padding: 0 1em;
+        min-width: 110px / $font-size-normal * 1em;
+
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
+            background: $color-brand-two-extrovert;
+        }
+
+        &:active:not(:disabled):not(.ng-disabled) {
+            background-color: $color-brand-four-normal;
+        }
+    }
+
+    &.m-call-to-action2 {
+        outline: 2px solid $color-text-highlight-normal;
+
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
+            color: white;
+        }
     }
 }

@@ -1,8 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="15.586px" height="18.086px" viewBox="0 0 15.586 18.086" enable-background="new 0 0 15.586 18.086" xml:space="preserve">
-<path d="M7.781,0c1.232,0.016,3.965,0.077,4.079,2.771c0.116,2.695-0.076,7.99-3.888,7.99H7.775c-3.811,0-4.003-5.295-3.888-7.99
-	C4.004,0.077,6.734,0.016,7.968,0H7.781z"/>
-<path d="M7.806,12.428c0,0,7.78-0.309,7.78,5.658H7.781H0c0-6.043,7.781-5.658,7.781-5.658H7.806z"/>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg2985" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<metadata id="metadata2990">
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<dc:format>image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+				<dc:title/>
+			</cc:Work>
+		</rdf:RDF>
+	</metadata>
+	<g id="layer1">
+		<g id="g3639" fill="#808080" transform="matrix(1,0,0,1.0157183,-1.1,-1.2902318)">
+			<path id="path3641" d="m25.1,1.5c5.1,0,9.6,3,9.9,9.7s-0.3,16.9-9.8,16.9-10.3-10.2-10.1-16.9c0.3-6.7,6-9.9,10.5-9.8l-0.5,0.1z"/>
+			<path id="path3643" d="m25.1,33.5s19.8,0.1,19.8,14.9h-19.8-19.8c0-15,19.7-14.9,19.8-14.9z"/>
+		</g>
+	</g>
 </svg>

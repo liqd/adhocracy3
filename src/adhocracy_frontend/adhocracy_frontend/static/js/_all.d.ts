@@ -11,6 +11,7 @@ declare module "angular" {
 declare module "angularAnimate" {}
 declare module "angularAria" {}
 declare module "angularMessages" {}
+declare module "angularCache" {}
 declare module "angularTranslate" {}
 declare module "angularTranslateLoader" {}
 declare module "angularElastic" {}
@@ -118,5 +119,8 @@ declare class FlowOpts {
 
 declare module "socialSharePrivacy" {}
 declare module "adhTemplates" {}
-declare module "angularPlaceholderShim" {}
-declare module "jqueryPlaceholderShim" {}
+declare module "polyfiller" {
+    export function polyfill(options : string) : void;
+    export function setOptions(options : any) : void;
+    export function setOptions(options1 : any, options2 : any) : void;
+}

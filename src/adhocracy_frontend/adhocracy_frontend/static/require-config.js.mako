@@ -24,13 +24,13 @@ require.config({
         angular: "../lib/angular/angular",
         angularAnimate: "../lib/angular-animate/angular-animate",
         angularAria: "../lib/angular-aria/angular-aria",
+        angularCache: "../lib/angular-cache/dist/angular-cache.min",
         angularTranslate: "../lib/angular-translate/angular-translate",
         angularTranslateLoader: "../lib/angular-translate-loader-static-files/angular-translate-loader-static-files",
         angularElastic: "../lib/angular-elastic/elastic",
         angularScroll: "../lib/angular-scroll/angular-scroll.min",
         angularFlow: "../lib/ng-flow/dist/ng-flow",
         angularMessages: "../lib/angular-messages/angular-messages.min",
-        angularPlaceholderShim: "../lib/angular-placeholder-shim/angular-placeholder-shim",
         flow: "../lib/flow.js/dist/flow",
         lodash: "../lib/lodash/dist/lodash",
         q: "../lib/q/q",
@@ -38,7 +38,8 @@ require.config({
         moment: "../lib/moment/min/moment-with-locales",
         sticky: "../lib/sticky-kit/jquery.sticky-kit",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
-        jqueryPlaceholderShim: "../lib/jquery-html5-placeholder-shim/jquery.html5-placeholder-shim"
+        adhTemplates: "./templates",
+        polyfiller: "../lib/webshim/js-webshim/minified/polyfiller"
     },
     shim: {
         jquery: {
@@ -56,6 +57,9 @@ require.config({
         angularMessages: {
             deps: ["angular"]
         },
+        angularCache: {
+            deps: ["angular"]
+        },
         angularTranslate: {
             deps: ["angular"]
         },
@@ -64,9 +68,6 @@ require.config({
         },
         angularElastic: {
             deps: ["angular"]
-        },
-        angularPlaceholderShim: {
-            deps: ["angular", "jqueryPlaceholderShim"]
         },
         angularScroll: {
             deps: ["angular"]
@@ -79,6 +80,6 @@ require.config({
         },
         sticky: {
             deps: ["jquery"]
-        },
+        }
     }
 });

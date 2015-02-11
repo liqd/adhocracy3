@@ -11,7 +11,14 @@
     <div
         class="moving-column-sidebar"
         data-ng-class="{'is-visible': _showSidebar}"
-        aria-visible="{{_showSidebar}}">
+        aria-visible="{{_showSidebar}}"
+        data-ng-click="ctrl.hideSidebar()">
+        <a
+            title="{{ 'TR__CLOSE' | translate }}"
+            href=""
+            class="moving-column-sidebar-close"
+            data-ng-click="ctrl.hideSidebar()">
+            <i class="icon-x"></i></a>
         <adh-inject data-transclusion-id="sidebar"></adh-inject>
     </div>
 
@@ -21,7 +28,7 @@
     </div>
     <ul class="moving-column-alerts">
         <li data-ng-repeat="(id, alert) in _alerts" class="moving-column-alert m-{{alert.mode}}" data-ng-click="ctrl.removeAlert(id)">
-            {{ alert.message }}
+            {{ alert.message | translate }}
         </li>
     </ul>
 </div>

@@ -1,8 +1,23 @@
 <div class="rate" data-ng-if="ready">
     <span
-        class="rate-difference {{differenceClass()}}">
-        {{rates.pro - rates.contra | signum}}
+        class="rate-difference"
+        data-ng-class="{
+            'is-negative': rates(1) < rates(-1),
+            'is-positive': rates(1) > rates(-1)}">
+        {{rates(1) - rates(-1) | signum}}
     </span>
-    <a href="" class="rate-pro {{isActiveClass(1)}}" data-ng-click="cast(1)"><i class="icon-triangle-inverse-up" title='{{"Vote up" | translate}}'></i></a>
-    <a href="" class="rate-contra {{isActiveClass(-1)}}" data-ng-click="cast(-1)"><i class="icon-triangle-inverse-down" title='{{"Vote down" | translate}}'></i></a>
+    <a
+        href=""
+        class="rate-pro"
+        data-ng-class="{'is-rate-button-active': myRate === 1}"
+        data-ng-click="toggle(1)">
+        <i class="icon-triangle-inverse-up" title="{{'TR__RATE_VOTE_UP' | translate}}"></i>
+    </a>
+    <a
+        href=""
+        class="rate-contra"
+        data-ng-class="{'is-rate-button-active': myRate === -1}"
+        data-ng-click="toggle(-1)">
+        <i class="icon-triangle-inverse-down" title="{{'TR__RATE_VOTE_DOWN' | translate}}"></i>
+    </a>
 </div>

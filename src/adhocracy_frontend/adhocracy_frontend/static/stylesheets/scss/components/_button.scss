@@ -34,9 +34,9 @@ A normal button that triggers an action.
 
 It may have the following states:
 
--   has-focus
--   is-hover
--   is-disabled
+-   :focus
+-   :hover
+-   ng-disabled or :disabled
 
 ```html_example
 <a class="button">Link</a>
@@ -81,21 +81,17 @@ input[type="button"] {
     height: 2em + 2 * $border-width;  // fix height in firefox
     padding: 0 0.5em;
 
-    &:active,
-    &:focus {
+    &:active:not(:disabled):not(.ng-disabled),
+    &:focus:not(:disabled):not(.ng-disabled) {
         outline: 0;
     }
 
-    &.has-focus, &:focus {
-        @include button-color($color-text-highlight-introvert, $color-text-inverted);
-    }
-
-    &.is-hover, &:hover {
+    &:hover:not(:disabled):not(.ng-disabled),
+    &:focus:not(:disabled):not(.ng-disabled) {
         @include button-color($color-text-highlight-introvert, $color-text-inverted);
     }
 
     &:disabled,
-    &.is-disabled,
     &.ng-disabled {
         @include button-color($color-text-introvert, $color-structure-introvert);
         cursor: default;

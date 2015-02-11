@@ -62,7 +62,7 @@ def cachebust_query_params(request):
 
 
 def require_config_view(request):
-    """Return the embeddee HTML."""
+    """Return require config."""
     query_params = cachebust_query_params(request)
     config = config_view(request)
     result = render(
@@ -71,16 +71,19 @@ def require_config_view(request):
             'minify': not config['debug'],
         }, request=request)
     response = Response(result)
+    response.content_type = 'application/javascript'
     return response
 
 
 def root_view(request):
     """Return the embeddee HTML."""
+    debug = config_view(request)['debug']
+    css_path = 'stylesheets/a3.css' if debug else 'stylesheets/min/a3.css'
     query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/root.html.mako',
         {'css': [request.cachebusted_url('adhocracy_frontend:build/'
-                                         'stylesheets/a3.css'),
+                                         + css_path),
                  request.cachebusted_url('adhocracy_frontend:build/'
                                          'stylesheets/adhocracy3-icons.css'),
                  ],
@@ -88,9 +91,11 @@ def root_view(request):
                                         'lib/requirejs/require.js'),
                 '/static/require-config.js',
                 request.cachebusted_url('adhocracy_frontend:build/'
-                                        'lib/jquery/dist/jquery.js'),
+                                        'lib/jquery/dist/jquery.min.js'),
                 ],
          'meta_api': '/static/meta_api.json%s' % (
+             '?' + query_params if query_params else ''),
+         'config': '/config.json%s' % (
              '?' + query_params if query_params else ''),
          },
         request=request)
@@ -116,8 +121,13 @@ def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config.include('pyramid_cachebust')
     config.include('pyramid_mako')
+    if config.get_settings()['cachebust.enabled'] == 'true':
+        cache_max_age = 30 * 24 * 60 * 60  # 30 days
+    else:
+        cache_max_age = 0
     config.add_route('config_json', 'config.json')
-    config.add_view(config_view, route_name='config_json', renderer='json')
+    config.add_view(config_view, route_name='config_json', renderer='json',
+                    http_cache=(cache_max_age, {'public': True}))
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')
@@ -130,10 +140,6 @@ def includeme(config):
     # AdhocracySDK shall not be cached the way other static files are cached
     config.add_route('adhocracy_sdk', 'AdhocracySDK.js')
     config.add_view(adhocracy_sdk_view, route_name='adhocracy_sdk')
-    if config.get_settings()['cachebust.enabled'] == 'true':
-        cache_max_age = 36000
-    else:
-        cache_max_age = 0
     config.add_static_view('static', 'adhocracy_frontend:build/',
                            cache_max_age=cache_max_age)
     config.add_subscriber(add_cors_headers_subscriber, NewResponse)

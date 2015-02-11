@@ -1,0 +1,43 @@
+/*doc
+---
+title: Unsupported Browser
+name: unsupported-browser
+category: Widgets
+---
+
+Banner showing up if the browser is not supported.
+
+```html_example
+<div class="unsupported-browser">
+    <img src="/static/icons/png/attention.png"/>
+    <div>
+        <h1>Non-supported browser!</h1>
+        <p>FIXME: Needs real text. Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein
+        Musterbuch zu erstellen.</p>
+    </div>
+</div>
+```
+*/
+.unsupported-browser {
+    @include clearfix;
+    background: $color-structure-normal;
+    padding: 1em;
+
+    h1 {
+        font-size: $font-size-plus;
+        font-weight: $font-weight-normal;
+        margin: 0 0 (5px / $font-size-plus * 1em);
+    }
+
+    div {
+        margin-left: 56px;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    img {
+        float: left;
+    }
+}

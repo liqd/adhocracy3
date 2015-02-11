@@ -1,0 +1,18 @@
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg2985" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<metadata id="metadata2990">
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<dc:format>image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+				<dc:title/>
+			</cc:Work>
+		</rdf:RDF>
+	</metadata>
+	<g id="layer1">
+		<g id="g4512" stroke-linejoin="round" transform="matrix(0.95987034,0,0,0.96015936,-0.07429323,-0.003984)" stroke="#808080" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" fill="none">
+			<circle id="circle4514" d="m 10.7,25 c 0,1.270255 -1.0297455,2.3 -2.3000004,2.3 -1.2702549,0 -2.2999999,-1.029745 -2.2999999,-2.3 0,-1.270255 1.029745,-2.3 2.2999999,-2.3 C 9.6702545,22.7 10.7,23.729745 10.7,25 z" cy="25" cx="8.4" r="2.3"/>
+			<path id="path4516" d="M45.8,21.7h-22.2c-0.6-1.7-1.5-3.3-2.9-4.8-4.6-4.6-11.9-4.6-16.2,0s-4.6,11.9,0,16.2c4.6,4.6,11.9,4.6,16.2,0,1.5-1.5,2.3-3.1,2.9-5h7.3l1.7,1.7,2.1-2.1,2.3,2.3,2.3-2.3,2.3,2.3,2.3-2.3,1.1,1.3,4-4-3.2-3.3z"/>
+		</g>
+	</g>
+</svg>

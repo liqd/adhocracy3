@@ -15,41 +15,32 @@
                         data-ng-if="poolOptions.POST"
                         data-ng-click="createComment()">
                         <i class="icon-reply"></i>
-                        {{ "Reply" | translate }}</a>
+                        {{ "TR__REPLY" | translate }}</a>
                     <a href=""
                         data-ng-if="commentItemOptions.POST"
                         data-ng-click="edit()">
-                        {{ "Edit" | translate }}</a>
+                        {{ "TR__EDIT" | translate }}</a>
                     <a href="#" data-ng-click="report()" data-ng-if="report">
                         <i class="icon-ban-circle"></i>
-                        {{ "Report" | translate }}
+                        {{ "TR__REPORT" | translate }}
                     </a>
                 </span>
-                <adh-rate data-refers-to="{{data.path}}"
-                          data-post-pool-sheet="adhocracy.sheets.rate.IRateable"
-                          data-post-pool-field="post_pool">
-                </adh-rate>
+                <adh-rate data-refers-to="{{data.path}}"></adh-rate>
             </div>
         </div>
-        <div data-ng-switch-when="1">
+
+        <div class="comment-children-edit-form" data-ng-switch-when="1">
             <div class="form-error" data-ng-repeat="error in errors">
                 <p>{{ error | translate }}</p>
             </div>
+            <textarea class="comment-edit-form-text" data-msd-elastic="" data-ng-model="data.content"></textarea>
+            <footer class="form-footer">
+                <a href="" class="button m-call-to-action form-footer-button-cta" data-ng-click="submit()">{{ "TR__SAVE" | translate }}</a>
+                <a href="" class="button form-footer-button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
+            </footer>
         </div>
-        <div class="comment-content">
-            <textarea class="comment-content-edit-text" data-msd-elastic="" data-ng-switch-when="1" data-ng-model="data.content"></textarea>
-            <div data-ng-switch-default="">
-                {{data.content}}
-            </div>
-        </div>
-        <div class="comment-meta">
-            <adh-social-share data-uri="{{ data.path | adhResourceUrl | adhCanonicalUrl }}" data-tweet-text="huhu"></adh-social-share>
-
-            <div class="comment-actions">
-                <span data-ng-switch-default=""></span>
-                <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="submit()">{{ "Save" | translate }}</a>
-                <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="cancel()">{{ "Cancel" | translate }}</a>
-            </div>
+        <div class="comment-content" data-ng-switch-default="">
+            {{data.content}}
         </div>
     </div>
 

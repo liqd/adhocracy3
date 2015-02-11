@@ -1,3 +1,5 @@
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+
 import _ = require("lodash");
 
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -5,7 +7,6 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import ResourcesBase = require("../../ResourcesBase");
 import Resources_ = require("../../Resources_");
 
-import AdhHttp = require("./Http");
 import AdhMetaApi = require("./MetaApi");
 
 
@@ -139,19 +140,16 @@ export var importContent = <Content extends ResourcesBase.Resource>(
  * far.
  */
 export var importBatchContent = <Content extends ResourcesBase.Resource>(
-    batchResponse,
+    responses,
     metaApi : AdhMetaApi.MetaApiQuery,
     preliminaryNames : AdhPreliminaryNames.Service
-) : AdhHttp.IBatchResult => {
+) : Content[] => {
 
-    return {
-        postedResources: batchResponse.data.responses.map((response) => {
-            response.data = response.body;
-            delete response.body;
-            return importContent(response, metaApi, preliminaryNames);
-        }),
-        updated: batchResponse.data.updated_resources
-    };
+    return responses.map((response) => {
+        response.data = response.body;
+        delete response.body;
+        return importContent(response, metaApi, preliminaryNames);
+    });
 };
 
 
@@ -185,6 +183,11 @@ export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : AdhM
                     if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
                         keepSheet = true;
                     } else {
+                        delete sheet[fieldName];
+                    }
+                    // workaround, as normal users can not set `hidden` field
+                    // FIXME: use more appropriate place, e.g. expose in meta api
+                    if (sheetName === "adhocracy_core.sheets.metadata.IMetadata" && fieldName === "hidden") {
                         delete sheet[fieldName];
                     }
                 }

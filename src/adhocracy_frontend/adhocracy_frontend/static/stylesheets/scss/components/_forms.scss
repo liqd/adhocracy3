@@ -9,22 +9,21 @@ Inputs are all elements that allow users to input data.
 
 They can have the following states:
 
--   is-empty
--   has-focus
--   is-invalid
--   is-disabled
--   is-dirty
+-   ng-invalid
+-   ng-disabled or :disabled
+-   ng-dirty
+-   :focus
 
 Is-invalid should generally only change the presentation of the input widget if
 it is also dirty or the form has been submitted.
 
 ```html_example
-<input type="text" placeholder="required and dirty" required="required" class="is-dirty" />
-<input type="text" placeholder="invalid and dirty" class="is-invalid is-dirty" />
-<input type="text" placeholder="invalid and prestine" class="is-invalid" />
+<input type="text" placeholder="required and dirty" required="required" class="ng-dirty" />
+<input type="text" placeholder="invalid and dirty" class="ng-invalid ng-dirty" />
+<input type="text" placeholder="invalid and prestine" class="ng-invalid" />
 <input type="text" disabled="disabled" placeholder="disabled" />
 <form class="ng-submitted">
-    <input type="text" placeholder="invalid in submitted form" class="is-invalid" />
+    <input type="text" placeholder="invalid in submitted form" class="ng-invalid" />
 </form>
 ```
 */
@@ -73,15 +72,9 @@ Textinput that represents a title.
 */
 
 .error-state {
-    border-color: lightcoral;
-    outline: 1px solid lightcoral;
-
-    &.has-focus,
-    &:focus {
-        border-color: $color-function-invalid;
-        color: $color-function-invalid;
-        outline: 1px solid $color-function-invalid;
-    }
+    border-color: $color-function-invalid;
+    color: $color-function-invalid;
+    outline: 1px solid $color-function-invalid;
 }
 
 input[type="text"],
@@ -110,25 +103,23 @@ textarea {
         font-size: $font-size-large;
     }
 
-    &.has-focus,
     &:focus {
         border-color: $color-text-highlight-normal;
         outline: 1px solid $color-text-highlight-normal;
     }
 
-    &.ng-dirty, &.is-dirty {
-        &.ng-invalid, &:invalid, &.is-invalid {
-            @extend .error-state;
-        }
+    &.ng-dirty.ng-invalid {
+        @extend .error-state;
     }
 
-    &.is-disabled,
     &.ng-disabled,
     &:disabled {
         border-color: $color-structure-normal;
         outline: 1px solid $color-structure-normal;
     }
 }
+
+
 
 .ng-submitted {
     input[type="text"],
@@ -142,7 +133,7 @@ textarea {
     div,
     select,
     textarea {
-        &.ng-invalid, &:invalid, &.is-invalid {
+        &.ng-invalid {
             @extend .error-state;
         }
     }
@@ -184,7 +175,7 @@ Class to add styling to a label when the label itself is used as a container.
 */
 
 .label-text {
-    display: block;
+    @include inline-block;
     padding-bottom: 0.5em;
 }
 
@@ -313,3 +304,36 @@ This error concerns a single input.
 </div>
 ```
 */
+
+/*doc
+---
+title: Form footer
+name: form-footer
+category: Inputs
+---
+
+A generic form footer containing one CTA and a regular button
+
+```html_example
+
+<footer class="form-footer">
+    <input
+        type="submit"
+        value="Submit"
+        class="m-call-to-action form-footer-button-cta" />
+    <a href="" class="button form-footer-button">Cancel</a>
+</footer>
+```
+*/
+
+.form-footer {
+    @include clearfix;
+
+    .form-footer-button-cta {
+        float: right;
+    }
+
+    .form-footer-button {
+        float: left;
+    }
+}

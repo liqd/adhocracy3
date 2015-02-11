@@ -33,7 +33,9 @@ $arrow-width: 1em;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
     color: white;
+    text-align: center;
     text-decoration: none;
+    min-width: 100px / $font-size-small * 1em;
 
     &:before {
         content: "";
@@ -57,12 +59,35 @@ $arrow-width: 1em;
         }
     }
 
+    .supporting .text-unsupport {
+        display: none;
+    }
+
     &:active,
     &.is-rate-button-active {
         background: $color-function-valid;
 
         &:before {
             border-right-color: $color-function-valid;
+        }
+
+        // :focus is sometimes set on click and then stays.
+        // That's why it is skipped here.
+        &:hover {
+            // scss-lint:disable NestingDepth
+            background: $color-brand-three-normal;
+
+            .supporting .text-unsupport {
+                display: block;
+            }
+
+            .supporting .text-supporting {
+                display: none;
+            }
+
+            &:before {
+                border-right-color: $color-brand-three-normal;
+            }
         }
     }
 }
@@ -84,18 +109,32 @@ rate-difference has the is-positive state. Can be is-negative.
     <span class="rate-difference is-positive">
         1
     </span>
-    <a href="" class="rate-pro is-rate-button-active" data-ng-click="cast(1)"><i class="icon-triangle-inverse-up" title='{{"Vote up" | translate}}'></i></a>
-    <a href="" class="rate-contra" data-ng-click="cast(-1)"><i class="icon-triangle-inverse-down" title='{{"Vote down" | translate}}'></i></a>
+    <a href="" class="rate-pro is-rate-button-active" data-ng-click="cast(1)"><i class="icon-triangle-inverse-up" title="Vote up"></i></a>
+    <a href="" class="rate-contra" data-ng-click="cast(-1)"><i class="icon-triangle-inverse-down" title="Vote down"></i></a>
 </div>
 ```
 */
 
 .rate {
     a {
+        color: $color-text-highlight-introvert;
+    }
+
+    .rate-pro {
         &.is-rate-button-active,
         &:hover,
-        &:focus {
-            color: $color-text-highlight-normal;
+        &:focus,
+        &:active {
+            color: $color-function-valid;
+        }
+    }
+
+    .rate-contra {
+        &.is-rate-button-active,
+        &:hover,
+        &:focus,
+        &:active {
+            color: $color-brand-three-normal;
         }
     }
 

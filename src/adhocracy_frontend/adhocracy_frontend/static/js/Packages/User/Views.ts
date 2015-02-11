@@ -1,5 +1,7 @@
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhMovingColumns = require("../MovingColumns/MovingColumns");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import AdhUser = require("./User");
@@ -19,6 +21,7 @@ export interface IScopeLogin {
     supportEmail : string;
 
     resetCredentials : () => void;
+    cancel : () => void;
     logIn : () => ng.IPromise<void>;
 }
 
@@ -36,6 +39,7 @@ export interface IScopeRegister {
     success : boolean;
 
     register : () => ng.IPromise<void>;
+    cancel : () => void;
 }
 
 
@@ -98,6 +102,10 @@ export var loginController = (
         $scope.credentials.password = "";
     };
 
+    $scope.cancel = () => {
+         adhTopLevelState.redirectToCameFrom("/");
+    };
+
     $scope.logIn = () => {
         return adhUser.logIn(
             $scope.credentials.nameOrEmail,
@@ -137,6 +145,10 @@ export var registerController = (
         passwordRepeat: ""
     };
 
+    $scope.cancel = () => {
+         adhTopLevelState.redirectToCameFrom("/");
+    };
+
     $scope.errors = [];
     $scope.supportEmail = adhConfig.support_email;
 
@@ -155,7 +167,10 @@ export var registerDirective = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", registerController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", registerController],
+        link: (scope) => {
+            scope.registerForm.password_repeat.$error.passwords_match = (scope.input.password !== scope.input.passwordRepeat);
+        }
     };
 };
 
@@ -190,19 +205,11 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                         $scope.isAnonymous = false;
-
-                        if (typeof $scope.name !== "undefined") {
-                            $scope.userBasic.name = $scope.name;
-                        };
                     });
             } else {
-                $translate("guest").then((translated) => {
+                $translate("TR__GUEST").then((translated) => {
                     $scope.userBasic = {
                         name: translated
-                    };
-
-                    if (typeof $scope.name !== "undefined") {
-                        $scope.userBasic.name = $scope.name;
                     };
                 });
                 $scope.isAnonymous = true;
@@ -231,34 +238,63 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             path: "@",
             me: "=?"
         },
-        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+        controller: ["adhHttp", "$scope", "adhTopLevelState", (adhHttp : AdhHttp.Service<any>, $scope,
+            adhTopLevelState : AdhTopLevelState.Service) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                     });
             }
+            adhTopLevelState.on("userUrl", (userUrl) => {
+                if (!userUrl) {
+                    $scope.selectedState = "";
+                } else if (userUrl === $scope.path) {
+                    $scope.selectedState = "is-selected";
+                } else {
+                    $scope.selectedState = "is-not-selected";
+                }
+            });
         }]
     };
 };
 
 
-export var userProfileDirective = (adhConfig : AdhConfig.IService) => {
+export var userProfileDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhUser : AdhUser.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserProfile.html",
         transclude: true,
+        require: "^adhMovingColumn",
         scope: {
             path: "@"
         },
-        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
-            if ($scope.path) {
-                adhHttp.resolve($scope.path)
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+
+            scope.showMessaging = () => {
+                if (scope.messageOptions.POST) {
+                    column.showOverlay("messaging");
+                } else if (!adhUser.loggedIn) {
+                    adhTopLevelState.redirectToLogin();
+                } else {
+                    // FIXME
+                }
+            };
+
+            if (scope.path) {
+                adhHttp.resolve(scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data[SIUserBasic.nick];
+                        scope.userBasic = res.data[SIUserBasic.nick];
                     });
             }
-        }]
+        }
     };
 };
 
@@ -279,7 +315,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
                     text: scope.message.text
                 }).then(() => {
                     column.hideOverlay();
-                    column.alert("Message was send", "success");
+                    column.alert("TR__MESSAGE_STATUS_OK", "success");
                 }, () => {
                     // FIXME
                 });
@@ -298,6 +334,7 @@ export var moduleName = "adhUserViews";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhPermissions.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
@@ -332,7 +369,7 @@ export var register = (angular) => {
         }])
         .directive("adhListUsers", ["adhUser", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
-        .directive("adhUserProfile", ["adhConfig", userProfileDirective])
+        .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", loginDirective])
         .directive("adhRegister", ["adhConfig", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])

@@ -2,7 +2,7 @@
 from pyramid.traversal import find_interface
 
 from adhocracy_core.events import ItemVersionNewVersionAdded
-from adhocracy_core.events import SheetReferencedItemHasNewVersion
+from adhocracy_core.events import SheetReferenceNewVersion
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResource
@@ -37,6 +37,7 @@ def notify_new_itemversion_created(context, registry, options):
     new_version = context
     root_versions = options.get('root_versions', [])
     creator = options.get('creator', None)
+    is_batchmode = options.get('is_batchmode', False)
     old_versions = []
     versionable = get_sheet(context, IVersionable, registry=registry)
     follows = versionable.get()['follows']
@@ -48,7 +49,8 @@ def notify_new_itemversion_created(context, registry, options):
                                                         new_version,
                                                         root_versions,
                                                         registry,
-                                                        creator)
+                                                        creator,
+                                                        is_batchmode)
 
         # Update LAST tag in parent item
         _update_last_tag(context, registry, old_versions)
@@ -65,19 +67,23 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                     new_version,
                                                     root_versions,
                                                     registry,
-                                                    creator):
+                                                    creator,
+                                                    is_batchmode,
+                                                    ):
     graph = find_graph(old_version)
     references = graph.get_back_references(old_version,
                                            base_reftype=SheetToSheet)
     for source, isheet, isheet_field, target in references:
-        event = SheetReferencedItemHasNewVersion(source,
-                                                 isheet,
-                                                 isheet_field,
-                                                 old_version,
-                                                 new_version,
-                                                 registry,
-                                                 creator,
-                                                 root_versions=root_versions)
+        event = SheetReferenceNewVersion(source,
+                                         isheet,
+                                         isheet_field,
+                                         old_version,
+                                         new_version,
+                                         registry,
+                                         creator,
+                                         root_versions=root_versions,
+                                         is_batchmode=is_batchmode,
+                                         )
         registry.notify(event)
 
 

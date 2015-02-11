@@ -1,0 +1,35 @@
+.facets {
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .facet {
+        margin-bottom: 50px / $font-size-normal * 1em;
+    }
+
+    .facet-header {
+        color: $color-text-introvert;
+        font-size: $font-size-small;
+        font-weight: $font-weight-normal;
+        line-height: 1.15;
+        margin: 0 0 (20px / $font-size-normal * 1em);
+    }
+
+    .facet-item {
+        display: block;
+        line-height: 1;
+        margin-bottom: 1em;
+        color: inherit;
+        text-decoration: inherit;
+
+        &:hover, &:focus {
+            color: $color-text-highlight-normal;
+        }
+
+        &.is-active, &:active {
+            color: $color-function-valid;
+        }
+    }
+}

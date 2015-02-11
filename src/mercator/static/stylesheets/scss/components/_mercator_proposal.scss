@@ -13,12 +13,11 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
     label {
         display: block;
-        padding-bottom: 0.8em;
     }
 
-    input[type="submit"] {
-        font-size: $font-size-huge;
-        width: 100%;
+    .form-inline label {
+        @include inline-block;
+        padding-right: 1em;
     }
 
     fieldset {
@@ -27,11 +26,15 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 
     .annotated-section {
-        width: 100% * 1 / 0.6289;
+        width: 157.5%;
 
         .annotated-section-annotation {
             background-color: $color-background-base-introvert;
         }
+    }
+
+    .m-call-to-action2 {
+        width: 100%;
     }
 }
 
@@ -40,18 +43,20 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-annotation {
+    padding: 1em;
     position: relative;
-    z-index: 1;
 }
 
 .mercator-proposal-form-subheading,
 .mercator-proposal-form-heading,
-.mercator-proposal-form-sub-subheading {
+.mercator-proposal-form-sub-subheading,
+.mercator-proposal-form-annotation-heading {
     @include text(functional);
     margin: 0 0 0.8em;
 }
 
-.mercator-proposal-form-heading {
+.mercator-proposal-form-heading,
+.mercator-proposal-form-annotation-heading {
     border: 1px solid $color-structure-normal;
     border-width: 1px 0;
     font-weight: bold;
@@ -62,6 +67,13 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     &.active {
         color: $color-text-highlight-normal;
     }
+}
+
+.mercator-proposal-form-annotation-heading {
+    background: $color-background-base;
+    font-weight: normal;
+    margin: -0.8751em -0.8751em 0.8751em;
+    text-transform: uppercase;
 }
 
 .mercator-proposal-form-sub-subheading {
@@ -94,6 +106,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
             background: white;
             text-decoration: underline;
         }
+
+        &:first-child {
+            padding-top: 1px;
+        }
     }
 
     a {
@@ -103,6 +119,11 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
 .mercator-proposal-form-section {
     padding: 0 1em;
+}
+
+.mercator-proposal-form-footer {
+    border-top: 2px solid $color-structure-normal;
+    padding: 1em;
 }
 
 .mercator-proposal-detail-view {
@@ -149,14 +170,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     &.mercator-propsal-detail-meta-item-total-supporters {
         i {
             color: $color-brand-one-normal;
-            font-size: 200%;
-            vertical-align: text-top;
-        }
-    }
-
-    &.mercator-propsal-detail-meta-item-budget {
-        i {
-            font-size: 160%;
         }
     }
 
@@ -171,16 +184,8 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 }
 
-.mercator-proposal-detail-username a {
-    text-decoration: none;
-
-    &:hover, &:focus {
-        text-decoration: underline;
-    }
-}
-
 .mercator-proposal-detail-orgs-columns {
-    margin: 20 / 14 * 1em 0;
+    margin: (20px / $font-size-normal * 1em) 0;
     overflow: hidden;
     padding: 0;
 
@@ -225,8 +230,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 
     i {
-        font-size: 217%;
-        line-height: 0.8;
+        font-size: 23px / $font-size-small * 1em;
     }
 }
 
@@ -244,6 +248,7 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-detail-nav {
     @extend .jump-navigation;
+    padding-top: 1em;
     text-align: center;
     width: $mercator-proposal-detail-nav-width;
     float: left;
@@ -267,7 +272,7 @@ $mercator-proposal-detail-nav-width: 2em;
         color: $color-text-introvert;
         font-size: $font-size-normal;
         margin: 0 0 1em;
-        padding: 0;
+        padding: 1em 0 0;
 
         &.active {
             color: $color-text-highlight-normal;
@@ -283,22 +288,22 @@ $mercator-proposal-detail-nav-width: 2em;
         color: $color-text-introvert;
         font-variant: small-caps;
         line-height: 1.15;
-        margin: 0 0 15 / 14 * 1em;
+        margin: 0 0 (15px / $font-size-normal * 1em);
         text-transform: lowercase;
     }
 }
 
-.mercator-proposal-detail-nav,
-.mercator-proposal-chapters {
-    padding-top: 1em;
-}
-
 .mercator-proposal-list-item {
     @include container;
+    display: block;
     border-bottom: 2px solid $color-structure-normal;
     font-size: $font-size-plus;
     line-height: 1;
     padding: 1em 1.25em 1.125em 0.875em;
+
+    // reset link styling
+    color: inherit;
+    text-decoration: none;
 
     &.is-not-selected {
         background: $color-background-base-introvert;
@@ -306,6 +311,10 @@ $mercator-proposal-detail-nav-width: 2em;
         i[class*=icon-],
         .mercator-propsal-list-item-meta-item-budget {
             color: $color-text-highlight-introvert;
+        }
+
+        &:hover, &:focus {
+            background: white;
         }
     }
 }
@@ -317,13 +326,15 @@ $mercator-proposal-detail-nav-width: 2em;
     padding: (10 / 14 * 1em) 1em;
 
     i {
-        font-size: 90%;
+        font-size: 10px / $font-size-normal * 1em;
+        margin-right: 2px;
+        vertical-align: middle;
     }
 
     .button-back-to-top {
         color: $color-text-introvert;
         float: left;
-        line-height: 24 / 14 * 1em;
+        line-height: 24px / $font-size-normal * 1em;
         text-decoration: none;
 
         &:hover, &:focus {
@@ -340,15 +351,20 @@ $mercator-proposal-detail-nav-width: 2em;
     }
 }
 
+.mercator-proposal-form-footer,
+.mercator-proposal-detail-footer {
+    padding-bottom: 500px;
+}
+
+$image-margin: 11px;
+
 .mercator-proposal-list-item-image {
     float: left;
-    margin-right: 0.6875em;
+    margin-right: $image-margin;
+}
 
-    img {
-        float: left;
-        height: auto;
-        width: 6.5625em;
-    }
+.mercator-proposal-list-item-body {
+    margin-left: $thumbnail-width + $image-margin;
 }
 
 .mercator-proposal-list-item-username,
@@ -358,38 +374,22 @@ $mercator-proposal-detail-nav-width: 2em;
 
 .mercator-proposal-list-item-username {
     font-size: $font-size-small;
-
-    a {
-        text-decoration: none;
-
-        &:hover, &:focus {
-            text-decoration: underline;
-        }
-    }
 }
 
 .mercator-proposal-list-item-title {
     font-size: $font-size-plus;
-    font-weight: $font-weight-extrovert;
+    font-weight: $font-weight-normal;
     padding: 0.9375em 0;
-
-    a {
-        color: $color-text-normal;
-        text-decoration: none;
-
-        &:hover, &:focus {
-            color: $color-text-highlight-normal;
-        }
-    }
 }
 
 .mercator-proposal-budget-col {
+    color: $color-text-introvert;
     float: left;
-    margin-bottom: 20 / 14 * 1em;
+    margin-bottom: 20px / $font-size-normal * 1em;
     padding-right: 2em;
 
-    &.budget {
-        color: $color-text-introvert;
+    &.requested {
+        color: $color-text-normal;
     }
 
     strong {
@@ -407,4 +407,8 @@ $mercator-proposal-detail-nav-width: 2em;
 .picture-upload-file img {
     height: auto;
     max-width: 100%;
+}
+
+.inline-box-online {
+    text-transform: uppercase;
 }

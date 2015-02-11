@@ -1,5 +1,5 @@
 <div data-ng-switch="transclusionId">
-    <a data-ng-switch-when="menu" href="{{ platformUrl | adhResourceUrl }}">{{ "Cancel" | translate }}</a>
+    <a data-ng-switch-when="menu" href="{{ platformUrl | adhResourceUrl }}">{{ "TR__CANCEL" | translate }}</a>
 
     <adh-resource-wrapper
         data-ng-switch-when="body"
@@ -9,6 +9,6 @@
             data-path="@preliminary"
             data-mode="edit"
             data-pool-path="{{platformUrl}}">
-        <adh-mercator-proposal-create>
+        </adh-mercator-proposal-create>
     </adh-resource-wrapper>
 </div>

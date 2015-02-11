@@ -4,10 +4,10 @@
         <a
             href=""
             data-ng-click="ctrl.toggleOverlay('messaging')"
-            data-ng-if="messageOptions.POST">{{ "Messaging" | translate }}</a>
+            data-ng-if="messageOptions.POST">{{ "TR__MESSAGING" | translate }}</a>
 
         <div class="moving-column-menu-nav">
-            <a href="{{ '/principals/users/' | adhResourceUrl }}" title="{{ 'close' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+            <a href="{{ '/principals/users/' | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
     </div>
 
@@ -18,7 +18,7 @@
         <adh-user-profile
             data-path="{{userUrl}}">
             <section class="mercator-user-profile-proposal-list">
-                <h3>{{ "USERS_PROPOSALS" | translate:userBasic }}</h3>
+                <h3 class="mercator-user-profile-proposal-list-heading">{{ "TR__USERS_PROPOSALS" | translate:userBasic }}</h3>
                 <adh-mercator-user-proposal-listing
                     data-path="{{path}}">
                 </adh-mercator-user-proposal-listing>

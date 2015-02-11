@@ -13,6 +13,7 @@ export var register = () => {
         describe("Service", () => {
             var adhUser;
             var adhHttpMock;
+            var adhCacheMock;
             var httpMock;
             var rootScopeMock;
             var windowMock;
@@ -28,6 +29,12 @@ export var register = () => {
                         "adhocracy_core.sheets.principal.IUserBasic": {}
                     }
                 }));
+
+                adhCacheMock = {
+                    invalidate: (path) => undefined,
+                    invalidateAll: () => undefined,
+                    memoize: (path, subkey, closure) => closure()
+                };
 
                 httpMock = <any>jasmine.createSpyObj("httpMock", ["post"]);
                 httpMock.defaults = {
@@ -52,7 +59,8 @@ export var register = () => {
                     localstorage: true
                 };
 
-                adhUser = new AdhUser.Service(adhHttpMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+                adhUser = new AdhUser.Service(
+                    adhHttpMock, adhCacheMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {
@@ -74,7 +82,7 @@ export var register = () => {
                 it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", () => {
                     windowMock.localStorage.getItem.and.returnValue("huhu");
                     fn();
-                    expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
+                    expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu", true);
                 });
 
                 it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", (done) => {
@@ -268,7 +276,7 @@ export var register = () => {
                 it("posts a valid user resource", () => {
                     var data = adhHttpMock.post.calls.mostRecent().args[1].data;
                     expect(data["adhocracy_core.sheets.principal.IUserBasic"].name).toBe("username");
-                    expect(data["adhocracy_core.sheets.principal.IUserBasic"].email).toBe("email");
+                    expect(data["adhocracy_core.sheets.principal.IUserExtended"].email).toBe("email");
                     expect(data["adhocracy_core.sheets.principal.IPasswordAuthentication"].password).toBe("password");
                 });
             });

@@ -305,7 +305,7 @@ class ITag(ISimple):
     """Tag to link specific versions."""
 
 
-class IItemVersion(ISimple):
+class IItemVersion(IResource):
 
     """Versionable resource, created during a Participation Process."""
 
@@ -389,7 +389,7 @@ class IItemVersionNewVersionAdded(IObjectEvent):
     creator = Attribute('User resource object of the authenticated User')
 
 
-class ISheetReferencedItemHasNewVersion(IObjectEvent):
+class ISheetReferenceNewVersion(IObjectEvent):
 
     """An event type sent when a referenced ItemVersion has a new follower."""
 
@@ -404,6 +404,8 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
                               'of the roots should be updated)')
     registry = Attribute('The pyramid registry')
     creator = Attribute('User resource object of the authenticated User')
+    is_batchmode = Attribute('Flag to do sheet autoupdates in batch request '
+                             'mode.')
 
 
 class ISheetReferenceModified(IObjectEvent):  # pragma: no cover

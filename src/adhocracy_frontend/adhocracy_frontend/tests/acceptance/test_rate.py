@@ -23,7 +23,7 @@ class TestRate:
             total = rateable.find_by_css('.rate-difference').first
             return total.text == '+1'
 
-        assert wait(check_result)
+        assert wait(check_result, max_steps=20)
 
     def test_downvote(self, browser):
         rateable = browser.find_by_css('.comment').first
@@ -34,7 +34,7 @@ class TestRate:
             total = rateable.find_by_css('.rate-difference').first
             return total.text == '-1'
 
-        assert wait(check_result)
+        assert wait(check_result, max_steps=20)
 
     def test_neutralvote(self, browser):
         rateable = browser.find_by_css('.comment').first
@@ -45,7 +45,7 @@ class TestRate:
             total = rateable.find_by_css('.rate-difference').first
             return total.text == '0'
 
-        assert wait(check_result)
+        assert wait(check_result, max_steps=20)
 
     @mark.skipif(True, reason='Functionality tested here is currently not in '\
                               'the front end.')

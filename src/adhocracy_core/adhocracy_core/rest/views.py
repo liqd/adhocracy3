@@ -467,7 +467,7 @@ class SimpleRESTView(ResourceRESTView):
                           request=self.request)
 
         appstruct = {}
-        if not is_batchmode(self.request.registry):
+        if not is_batchmode(self.request):
             appstruct[
                 'updated_resources'] = self._build_updated_resources_dict()
 
@@ -508,7 +508,7 @@ class PoolRESTView(SimpleRESTView):
             schema = ResourceResponseSchema().bind(request=self.request,
                                                    context=resource)
 
-        if not is_batchmode(self.request.registry):
+        if not is_batchmode(self.request):
             appstruct[
                 'updated_resources'] = self._build_updated_resources_dict()
         return schema.serialize(appstruct)
@@ -531,7 +531,8 @@ class PoolRESTView(SimpleRESTView):
                                         self.context,
                                         creator=creator,
                                         appstructs=appstructs,
-                                        request=self.request)
+                                        request=self.request,
+                                        )
         return self.build_post_response(resource)
 
     @view_config(request_method='PUT',
@@ -579,6 +580,7 @@ class ItemRESTView(PoolRESTView):
         This is needed to make :class:`adhocray_core.rest.batchview.BatchView`
         work.
         """
+        batchmode = is_batchmode(self.request)
         validated = self.request.validated
         iresource = validated['content_type']
         resource_type = iresource.__identifier__
@@ -597,7 +599,9 @@ class ItemRESTView(PoolRESTView):
                                             appstructs=appstructs,
                                             creator=creator,
                                             root_versions=root_versions,
-                                            request=self.request)
+                                            request=self.request,
+                                            is_batchmode=batchmode,
+                                            )
         return self.build_post_response(resource)
 
 
@@ -651,7 +655,6 @@ class AssetRESTView(SimpleRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IAssetDownload,
-    http_cache=3600,  # FIXME how long should assets be cached?
 )
 class AssetDownloadRESTView(SimpleRESTView):
 
@@ -666,7 +669,15 @@ class AssetDownloadRESTView(SimpleRESTView):
     def get(self) -> dict:
         """Get asset data (unless deleted or hidden)."""
         file = retrieve_asset_file(self.context, self.request.registry)
-        return file.get_response(self.context, self.request.registry)
+        response = file.get_response(self.context, self.request.registry)
+        self.ensure_caching_headers(response)
+        return response
+
+    def ensure_caching_headers(self, response):
+        """Ensure cache headers for custom `response` objects."""
+        response.cache_control = self.request.response.cache_control
+        response.etag = self.request.response.etag
+        response.last_modified = self.request.response.last_modified
 
     def put(self) -> dict:
         raise HTTPMethodNotAllowed()
@@ -981,7 +992,7 @@ def validate_activation_path(context, request: Request):
         request.errors.add('body', 'path',
                            'Unknown or expired activation path')
     else:
-        user.active = True
+        user.activate()
         request.validated['user'] = user
     if user is not None:
         user.activation_path = None  # activation path can only be used once

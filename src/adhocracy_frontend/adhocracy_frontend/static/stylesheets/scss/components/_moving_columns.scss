@@ -124,6 +124,18 @@ The menu should always have the same state as its columns.
             display: block;
         }
     }
+
+    &.is-collapse {
+        background-color: $color-background-base;
+        border: 2px solid $color-structure-normal;
+        border-width: 2px 0 2px 2px;
+        font-size: $font-size-small;
+        text-align: center;
+
+        .moving-column-icon {
+            float: none;
+        }
+    }
 }
 
 %moving-column-single-width {
@@ -157,8 +169,16 @@ The menu should always have the same state as its columns.
 
 .moving-column-body {
     border: 0 solid $color-structure-normal;
-    border-width: 0 0 $moving-column-border-width $moving-column-border-width;
+    border-width: 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
+}
+
+.moving-column-collapsed a {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 /*doc
@@ -217,8 +237,8 @@ States:
 
 .moving-column-icon {
     float: left;
-    font-size: 166.5%;
-    line-height: 1.2;
+    font-size: $font-size-plus;
+    line-height: 24px / $font-size-plus;
     vertical-align: middle;
 }
 
@@ -245,28 +265,21 @@ States:
         }
 
         .moving-column-menu-nav-icon {
-            font-size: 145%;
-            line-height: (2 * 0.145);
-        }
-
-        .moving-column-menu-nav-icon, .moving-column-menu-nav-icon:before {
-            @include inline-block;
-        }
-
-        .moving-column-menu-nav-icon:before {
-            line-height: 1.45;
+            font-size: $font-size-smaller;
+            line-height: 24px / $font-size-smaller;
         }
     }
 }
 
 .moving-column-sidebar {
     @include transition(left 0.5s);
+    border-top: 1px solid $color-structure-border;
     display: none;
-    left: -30%;
-    width: 30%;
+    left: -25%;
+    width: 25%;
     z-index: 1;
-    background-color: $color-structure-introvert;
-    padding: 0.5em;
+    background-color: $color-structure-normal;
+    padding: (16px / $font-size-normal * 1em) (20px / $font-size-normal * 1em);
 
     &.is-visible {
         left: 0;
@@ -277,11 +290,24 @@ States:
     &.is-visible-remove {
         display: block;
     }
+
+    .moving-column-sidebar-close {
+        color: $color-text-introvert;
+        position: absolute;
+        right: 1em;
+        text-decoration: none;
+        top: 1em;
+
+        &:hover, &:focus {
+            color: $color-text-extrovert;
+        }
+    }
 }
 
 .moving-column-mask {
     @include opacity(0.5);
     background-color: black;
+    z-index: 2;
 }
 
 /*doc
@@ -306,6 +332,7 @@ A list of alert messages to notify users in the moving column
     margin: 0;
     padding: 0;
     list-style: none;
+    z-index: 3;
 }
 
 .moving-column-alert {
@@ -331,6 +358,7 @@ A list of alert messages to notify users in the moving column
     background: $color-structure-normal;
     border-top: 1px solid $color-structure-border;
     padding: 1em;
+    z-index: 3;
 
     textarea,
     input[type="text"] {

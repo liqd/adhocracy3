@@ -1,8 +1,13 @@
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+
+import _ = require("lodash");
+
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import ResourcesBase = require("../../ResourcesBase");
 
+import AdhCache = require("./Cache");
 import AdhConvert = require("./Convert");
 import AdhError = require("./Error");
 import AdhHttp = require("./Http");
@@ -29,6 +34,7 @@ export class Transaction {
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
+        private adhCache : AdhCache.Service,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
         private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService
@@ -96,7 +102,9 @@ export class Transaction {
         };
     }
 
-    public commit() : ng.IPromise<AdhHttp.IBatchResult> {
+    public commit() : ng.IPromise<ResourcesBase.Resource[]> {
+        var _self = this;
+
         this.checkNotCommitted();
         this.committed = true;
         var conv = (request) => {
@@ -107,7 +115,11 @@ export class Transaction {
         };
 
         return this.adhHttp.postRaw("/batch", this.requests.map(conv)).then(
-            (response) => AdhConvert.importBatchContent(response, this.adhMetaApi, this.adhPreliminaryNames),
+            (response) => {
+                var imported = AdhConvert.importBatchContent(response.data.responses, this.adhMetaApi, this.adhPreliminaryNames);
+                _self.adhCache.invalidateUpdated(response.data.updated_resources, _.pluck(imported, "path"));
+                return imported;
+            },
             AdhError.logBackendBatchError);
     }
 }

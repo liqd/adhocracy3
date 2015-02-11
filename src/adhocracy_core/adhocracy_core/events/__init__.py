@@ -11,7 +11,7 @@ from zope.interface import Interface
 from zope.interface.interfaces import IInterface
 
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
-from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ILocalRolesModfied
@@ -84,8 +84,8 @@ class ItemVersionNewVersionAdded:
         self.creator = creator
 
 
-@implementer(ISheetReferencedItemHasNewVersion)
-class SheetReferencedItemHasNewVersion:
+@implementer(ISheetReferenceNewVersion)
+class SheetReferenceNewVersion:
 
     """ An event type sent when a referenced ItemVersion has a new follower.
 
@@ -101,6 +101,9 @@ class SheetReferencedItemHasNewVersion:
                                 these root resources should ignore
                                 this event. Optional.
     :param creator(adhocracy_core.resource.principal.IUser':
+
+    :param is_batchmode(bool): Flag to do sheet autoupdates in batch request
+                               mode. Defaults to False.
     """
 
     def __init__(self,
@@ -111,7 +114,9 @@ class SheetReferencedItemHasNewVersion:
                  new_version,
                  registry,
                  creator,
-                 root_versions=[]):
+                 root_versions=[],
+                 is_batchmode=False,
+                 ):
         self.object = object
         self.isheet = isheet
         self.isheet_field = isheet_field
@@ -120,6 +125,7 @@ class SheetReferencedItemHasNewVersion:
         self.registry = registry
         self.creator = creator
         self.root_versions = root_versions
+        self.is_batchmode = is_batchmode
 
 
 @implementer(ISheetBackReferenceRemoved)

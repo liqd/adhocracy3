@@ -1,6 +1,7 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhShareSocial = require("../ShareSocial/ShareSocial");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 export var pkgLocation = "/MovingColumns";
@@ -23,7 +24,7 @@ export var movingColumns = (
 
             var maxShowWidth = 55 * fontSize;
             var minShowWidth = 35 * fontSize;
-            var collapseWidth = 3 * fontSize;
+            var collapseWidth = 2 * fontSize;
             var spacing = Math.ceil(0.3 * fontSize);
 
             var clearStates = (element) => {
@@ -183,6 +184,12 @@ export class MovingColumnController {
         this.lastId = 0;
     }
 
+    public clear() : void {
+        this.$scope._alerts = {};
+        this.$scope.overlay = undefined;
+        this.$scope._showSidebar = false;
+    }
+
     public alert(message : string, mode : string = "info", duration : number = 3000) : void {
         var id = this.lastId++;
         this.$timeout(() => this.removeAlert(id), duration);
@@ -248,7 +255,8 @@ export var moduleName = "adhMovingColumns";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhTopLevelState.moduleName
+            AdhTopLevelState.moduleName,
+            AdhShareSocial.moduleName
         ])
         .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
         .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
