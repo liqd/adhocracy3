@@ -27,8 +27,10 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 3. build-essential libssl-dev libbz2-dev libyaml-dev libncurses5-dev
 4. graphviz
 5. ruby ruby-dev
+
 If you don't use the custom compiled python (see below) you need some
 some basic dependencies to build PIL (python image library):
+
 6. libjpeg8-dev zlib1g-dev (http://pillow.readthedocs.org/en/latest/installation.html)
 
 create SSH key and upload to github ::

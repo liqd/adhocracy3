@@ -52,8 +52,8 @@ marker vs. property sheet interfaces
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 property sheet interfaces are called e.g.
-"adhocracy.propertysheet.ILikeable", marker interfaces e.g.
-"adhocracy.content.IProposal".
+"adhocracy_core.propertysheet.ILikeable", marker interfaces e.g.
+"adhocracy_core.content.IProposal".
 
 backend implementation: the goal is that schemas should be defined in
 a maximally concise way.  colander schema, management view, rest view,
@@ -86,7 +86,7 @@ be other resources). it has the following structure:
 { content-type: ..., path: ..., data: ... }
 
 content-type is a string that contains the type stored under data.  it
-may be "adhocracy.content.I*" or the typeof-string-representation of a
+may be "adhocracy_core.content.I*" or the typeof-string-representation of a
 javascript primitive type.  in this case, the data attribute will
 contain a json literal, not an object or a list of objects.  (what
 about 'Object'?  'Function'?)
@@ -109,7 +109,7 @@ depends entirely on the data model, except that it may contain further
 lazily fetchable resources.
 
 note now that the content-type may NOT be
-"adhocracy.propertysheet.I*": a resource (as it's usually a supergraph
+"adhocracy_core.propertysheet.I*": a resource (as it's usually a supergraph
 node) implements a marker interface, and contains all data required by
 all property sheet interfaces subsumed in that marker interface.
 marker interfaces can be viewed as property sheet interface sets.

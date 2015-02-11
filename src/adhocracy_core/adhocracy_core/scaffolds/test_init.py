@@ -1,4 +1,4 @@
-"""Test adhocracy.scaffolds."""
+"""Test adhocracy_core.scaffolds."""
 
 
 def test_Adhocracyextensiontemplate_create():
