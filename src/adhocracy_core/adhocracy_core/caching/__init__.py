@@ -278,14 +278,14 @@ def purge_varnish_after_commit_hook(success: bool, registry: Registry):
                     resp = requests.request('PURGE', varnish_url + path)
                     if resp.status_code != 200:
                         logger.warning(
-                            'Varnish responded %i to purge request for %s',
+                            'Varnish responded %s to purge request for %s',
                             resp.status_code, path)
                 except RequestException as err:
                     logger.error(
                         'Couldn\'t send purge request for %s to Varnish: %s',
                         path, exception_to_str(err))
                     errcount += 1
-                    if errcount >= 3:
+                    if errcount >= 3:  # pragma: no cover
                         logger.error('Giving up on purge requests')
                         return
 
