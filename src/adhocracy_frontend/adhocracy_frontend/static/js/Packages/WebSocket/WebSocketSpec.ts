@@ -17,20 +17,20 @@ export var register = () => {
     describe("WebSocket", () => {
         describe("Service", () => {
             var service;
-            var adhEventHandlerClassMock;
-            var adhEventHandlerMocks;
+            var adhEventManagerClassMock;
+            var adhEventManagerMocks;
             var adhRawWebSocketMock;
 
             beforeEach(() => {
-                adhEventHandlerClassMock = function() {
-                    this.on = jasmine.createSpy("adhEventHandler.on");
-                    this.off = jasmine.createSpy("adhEventHandler.off");
-                    this.trigger = jasmine.createSpy("adhEventHandler.trigger");
-                    adhEventHandlerMocks.push(this);
+                adhEventManagerClassMock = function() {
+                    this.on = jasmine.createSpy("adhEventManager.on");
+                    this.off = jasmine.createSpy("adhEventManager.off");
+                    this.trigger = jasmine.createSpy("adhEventManager.trigger");
+                    adhEventManagerMocks.push(this);
                 };
                 adhRawWebSocketMock = jasmine.createSpyObj("adhRawWebSocketFactory", ["send", "addEventListener"]);
-                adhEventHandlerMocks = [];
-                service = new AdhWebSocket.Service(config, adhEventHandlerClassMock, () => adhRawWebSocketMock);
+                adhEventManagerMocks = [];
+                service = new AdhWebSocket.Service(config, adhEventManagerClassMock, () => adhRawWebSocketMock);
             });
 
             it("calls the send method of web socket on every register to different resources", () => {
@@ -68,7 +68,7 @@ export var register = () => {
                 expect(() => service.unregister("/adhocracy/somethingelse", 0)).toThrow();
             });
 
-            it("calls eventHandler.trigger on event", () => {
+            it("calls eventManager.trigger on event", () => {
                 var resource = "/adhocracy/sidty";
                 var msg = {
                     resource: resource,
@@ -79,7 +79,7 @@ export var register = () => {
                 adhRawWebSocketMock.onmessage({
                     data: JSON.stringify(msg)
                 });
-                expect(adhEventHandlerMocks[0].trigger).toHaveBeenCalledWith(resource, msg);
+                expect(adhEventManagerMocks[0].trigger).toHaveBeenCalledWith(resource, msg);
             });
 
             it("throws an exception on error", () => {
@@ -95,7 +95,7 @@ export var register = () => {
                     })
                 })).toThrow();
 
-                expect(adhEventHandlerMocks[0].trigger).not.toHaveBeenCalled();
+                expect(adhEventManagerMocks[0].trigger).not.toHaveBeenCalled();
             });
 
             it("resends all subscriptions on WebSocket open", () => {

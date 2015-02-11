@@ -10,7 +10,7 @@ export var register = () => {
         describe("Service", () => {
             var adhTopLevelState : AdhTopLevelState.Service;
             var areaInput;
-            var eventHandlerMockClass;
+            var eventManagerMockClass;
             var locationMock;
             var rootScopeMock;
             var injectorMock;
@@ -35,14 +35,14 @@ export var register = () => {
                 injectorMock = jasmine.createSpyObj("injectorMock", ["invoke"]);
                 injectorMock.invoke.and.returnValue(areaInput);
 
-                eventHandlerMockClass = <any>function() {
+                eventManagerMockClass = <any>function() {
                     this.on = on;
                     this.off = off;
                     this.trigger = trigger;
                 };
 
                 adhTopLevelState = <any>new AdhTopLevelState.Service(
-                    providerMock, eventHandlerMockClass, null, locationMock, rootScopeMock, null, <any>q, injectorMock, null);
+                    providerMock, eventManagerMockClass, null, locationMock, rootScopeMock, null, <any>q, injectorMock, null);
 
                 spyOn(adhTopLevelState, "toLocation");
 
@@ -259,12 +259,12 @@ export var register = () => {
                 });
             });
 
-            it("dispatches calls to set() to eventHandler", () => {
+            it("dispatches calls to set() to eventManager", () => {
                 adhTopLevelState.set("content2Url", "some/path");
                 expect(trigger).toHaveBeenCalledWith(":content2Url", "some/path");
             });
 
-            it("dispatches calls to on() to eventHandler", () => {
+            it("dispatches calls to on() to eventManager", () => {
                 var callback = (url) => undefined;
                 adhTopLevelState.on("content2Url", callback);
                 expect(on).toHaveBeenCalledWith(":content2Url", callback);
