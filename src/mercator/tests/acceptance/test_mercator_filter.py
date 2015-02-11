@@ -13,11 +13,11 @@ class TestMercatorFilter(object):
 
     @fixture(scope='class')
     def locations(self, browser, sidebar):
-        return [l.find_by_tag('a').first for l in sidebar[1].find_by_tag('li')]
+        return sidebar[1].find_by_tag('li')
 
     @fixture(scope='class')
     def budgets(self, browser, sidebar):
-        return [l.find_by_tag('a').first for l in sidebar[2].find_by_tag('li')]
+        return sidebar[2].find_by_tag('li')
 
     @fixture(scope='class')
     def browser(self, browser, app):
@@ -32,33 +32,32 @@ class TestMercatorFilter(object):
 
     def test_filter_location(self, browser, locations, proposals):
         for location in locations:
-            location.click()
+            location.find_by_css('a').first.click()
             assert wait(lambda:
-                is_filtered(browser, proposals, location=location.text))
+                is_filtered(browser, proposals, location=location))
 
     def test_unfilter_location(self, browser, locations, proposals):
-        locations[-1].click()
+        locations[-1].find_by_css('a').first.click()
         assert wait(lambda: is_filtered(browser, proposals))
 
     def test_filter_budget(self, browser, budgets, proposals):
         for budget in budgets:
-            budget.click()
+            budget.find_by_css('a').first.click()
             assert wait(lambda:
-                is_filtered(browser, proposals,
-                            budget=budget.text))
+                is_filtered(browser, proposals, budget=budget))
 
     def test_unfilter_budget(self, browser, budgets, proposals):
-        budgets[-1].click()
+        budgets[-1].find_by_css('a').first.click()
         assert wait(lambda: is_filtered(browser, proposals))
 
     def test_filter_combinations(self, browser, locations, budgets, proposals):
         for location in locations:
-            location.click()
+            location.find_by_css('a').first.click()
             for budget in budgets:
-                budget.click()
+                budget.find_by_css('a').first.click()
                 assert wait(lambda:
-                    is_filtered(browser, proposals, location=location.text,
-                                budget=budget.text))
+                    is_filtered(browser, proposals, location=location,
+                                budget=budget))
 
 
 
@@ -87,17 +86,17 @@ def _verify_location(location, proposal):
     data = proposal[18]['body']['data']
     data_location = data['adhocracy_mercator.sheets.mercator.ILocation']
 
-    if location == 'Specific':
+    if location is None:
+        return True
+
+    elif location.has_class('facet-item-specific'):
         return data_location['location_is_specific']
 
-    elif location == 'Online':
+    elif location.has_class('facet-item-online'):
         return data_location['location_is_online']
 
-    elif location == 'Linked to the Ruhr area':
+    elif location.has_class('facet-item-linked_to_ruhr'):
         return data_location['location_is_linked_to_ruhr']
-
-    elif location is None:
-        return True
 
     return False
 
@@ -107,22 +106,22 @@ def _verify_budget(budget, proposal):
     data = proposal[4]['body']['data']
     finance = data['adhocracy_mercator.sheets.mercator.IFinance']
 
-    if budget == '0 - 5000 €':
+    if budget is None:
+        return True
+
+    elif budget.has_class('facet-item-5000'):
         return 0 <= finance['budget'] <= 5000
 
-    elif budget == '5000 - 10000 €':
+    elif budget.has_class('facet-item-10000'):
         return 5000 <= finance['budget'] <= 10000
 
-    elif budget == '10000 - 20000 €':
+    elif budget.has_class('facet-item-20000'):
         return 10000 <= finance['budget'] <= 20000
 
-    elif budget == '20000 - 50000 €':
+    elif budget.has_class('facet-item-50000'):
         return 20000 <= finance['budget'] <= 50000
 
-    elif budget == '50000 € +':
+    elif budget.has_class('facet-item-above_50000'):
         return finance['budget'] >= 50000
-
-    elif budget is None:
-        return True
 
     return False
