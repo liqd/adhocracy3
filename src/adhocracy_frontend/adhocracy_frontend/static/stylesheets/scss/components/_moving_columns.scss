@@ -307,6 +307,7 @@ States:
 .moving-column-mask {
     @include opacity(0.5);
     background-color: black;
+    z-index: 2;
 }
 
 /*doc
@@ -331,6 +332,7 @@ A list of alert messages to notify users in the moving column
     margin: 0;
     padding: 0;
     list-style: none;
+    z-index: 3;
 }
 
 .moving-column-alert {
@@ -356,6 +358,7 @@ A list of alert messages to notify users in the moving column
     background: $color-structure-normal;
     border-top: 1px solid $color-structure-border;
     padding: 1em;
+    z-index: 3;
 
     textarea,
     input[type="text"] {

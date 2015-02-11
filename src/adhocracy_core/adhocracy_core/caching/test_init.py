@@ -211,16 +211,63 @@ class TestHTTPCacheStrategyBaseAdapter:
         assert dummyinst.set_vary.called
 
 
-def test_etag_userid_without_authenticated_user(context, request_):
+def test_etag_blocked_context_is_blocked(context):
+    from . import etag_blocked
+    context.hidden = True
+    assert etag_blocked(context, None) == 'hidden'
+
+
+def test_etag_blocked_context_is_non_blocked(context):
+    from . import etag_blocked
+    assert etag_blocked(context, None) == 'None'
+
+
+def test_etag_userid_with_authenticated_user(context):
+    from . import etag_userid
+    request = testing.DummyResource(authenticated_userid='userid')
+    assert etag_userid(context, request) == 'userid'
+
+
+def test_etag_userid_without_authenticated_user(context):
     from . import etag_userid
     request = testing.DummyResource(authenticated_userid=None)
     assert etag_userid(context, request) == 'None'
 
 
-def test_etag_userid_with_authenticated_user(context, request_):
+def test_etag_userid_with_authenticated_user(context):
     from . import etag_userid
     request = testing.DummyResource(authenticated_userid='userid')
     assert etag_userid(context, request) == 'userid'
+
+
+@fixture
+def context_with_counters(context):
+    from BTrees.Length import Length
+    context.__changed_descendants_counter__ = Length()
+    context.__changed_backrefs_counter__ = Length()
+    return context
+
+
+def test_etag_descendants_with_counter(context_with_counters):
+    from . import etag_descendants
+    context_with_counters.__changed_descendants_counter__.change(1)
+    assert etag_descendants(context_with_counters, None) == '1'
+
+
+def test_etag_descendants_without_counter(context):
+    from . import etag_descendants
+    assert etag_descendants(context, None) == 'None'
+
+
+def test_etag_backrefs_with_counter(context_with_counters):
+    from . import etag_backrefs
+    context_with_counters.__changed_backrefs_counter__.change(1)
+    assert etag_backrefs(context_with_counters, None) == '1'
+
+
+def test_etag_changed_backrefs_without_counter(context):
+    from . import etag_backrefs
+    assert etag_backrefs(context, None) == 'None'
 
 
 class TestHTTPCacheStrategyWeakAdapter:
@@ -234,13 +281,29 @@ class TestHTTPCacheStrategyWeakAdapter:
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IHTTPCacheStrategy
         from . import etag_backrefs, etag_descendants, etag_modified, \
-            etag_userid
+            etag_userid, etag_blocked
         assert verifyObject(IHTTPCacheStrategy, inst)
         assert inst.browser_max_age == 0
         assert inst.proxy_max_age == 31104000
         assert inst.vary == ('X-User-Path', 'X-User-Token')
         assert inst.etags == (etag_backrefs, etag_descendants, etag_modified,
-                              etag_userid)
+                              etag_userid, etag_blocked)
+
+
+class TestHTTPCacheStrategyWeakAssetDownloadAdapter:
+
+    @fixture
+    def inst(self, context):
+        from . import HTTPCacheStrategyWeakAssetDownloadAdapter
+        return HTTPCacheStrategyWeakAssetDownloadAdapter(context, None)
+
+    def test_create(self, inst):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IHTTPCacheStrategy
+        from . import etag_modified, etag_userid, etag_blocked
+        assert verifyObject(IHTTPCacheStrategy, inst)
+        assert inst.browser_max_age == 60 * 5
+        assert inst.etags == (etag_modified, etag_userid, etag_blocked)
 
 
 @fixture()
@@ -285,8 +348,17 @@ class TestIntegrationCaching:
         strategies = dict(registry.getAdapters((context, request_),
                                                IHTTPCacheStrategy))
         assert isinstance(strategies['GET'], HTTPCacheStrategyWeakAdapter)
-        assert isinstance(strategies['OPTIONS'], HTTPCacheStrategyWeakAdapter)
         assert isinstance(strategies['HEAD'], HTTPCacheStrategyWeakAdapter)
+
+    def test_registered_strategies_iassetdownload(self, registry, request_):
+        from adhocracy_core.interfaces import IHTTPCacheStrategy
+        from . import HTTPCacheStrategyWeakAssetDownloadAdapter
+        from adhocracy_core.resources.asset import IAssetDownload
+        context = testing.DummyResource(__provides__=IAssetDownload)
+        strategies = dict(registry.getAdapters((context, request_),
+                                               IHTTPCacheStrategy))
+        assert isinstance(strategies['GET'], HTTPCacheStrategyWeakAssetDownloadAdapter)
+        assert isinstance(strategies['HEAD'], HTTPCacheStrategyWeakAssetDownloadAdapter)
 
     def test_registered_strategy_modifies_headers(self, app_user):
         resp = app_user.get('/', status=200)
@@ -310,7 +382,7 @@ class TestIntegrationCaching:
              HTTPCacheMode.without_proxy_cache.name
         resp = app_user.get('/', status=200)
         assert resp.headers['Cache-control'] == 'max-age=0, must-revalidate'
-        assert resp.headers['etag'] == '"None|None|None|None"'
+        assert resp.headers['etag'] == '"None|None|None|None|None"'
 
     def test_strategy_with_mode_proxy_cache_get(self, app_user, registry):
         from adhocracy_core.interfaces import HTTPCacheMode
@@ -320,14 +392,22 @@ class TestIntegrationCaching:
         assert resp.headers['Cache-control'] ==\
                'max-age=0, proxy-revalidate, s-maxage=31104000'
         assert resp.headers['Vary'] == 'X-User-Path, X-User-Token'
-        assert resp.headers['etag'] == '"None|None|None|None"'
+        assert resp.headers['etag'] == '"None|None|None|None|None"'
+
+    def test_strategy_modified_if_modified_since_request(self, app_user,
+                                                         context):
+        from datetime import datetime
+        context.modification_date = datetime(2015, 1, 1)
+        resp = app_user.get('/', status=200, headers={'If-Modified-Since':
+                                                      'Fri, 23 Jan 2000 15:19:22 GMT'})
+        assert resp.status == '200 OK'
 
     def test_strategy_not_modified_if_modified_since_request(self, app_user,
                                                              context):
         from datetime import datetime
-        context.modification_date = datetime(2015, 1, 1)
+        context.modification_date = datetime(2000, 1, 23)
         resp = app_user.get('/', status=304, headers={'If-Modified-Since':
-                                                      'Fri, 23 Jan 2000 15:19:22 GMT'})
+                                                      'Fri, 23 Jan 2000 00:00:00 GMT'})
         assert resp.status == '304 Not Modified'
 
     def test_strategy_ok_if_modified_since_request_without_modification_date(
@@ -337,14 +417,14 @@ class TestIntegrationCaching:
 
     def test_strategy_not_modified_if_none_match_request(self, app_user):
         resp = app_user.get('/', status=304, headers={'If-None-Match':
-                                                      'None|None|None|None'})
+                                                      'None|None|None|None|None'})
         assert resp.status == '304 Not Modified'
 
     def test_strategy_ok_if_none_match_request_without_etag(self, app_user):
         from adhocracy_core.caching import HTTPCacheStrategyWeakAdapter
         HTTPCacheStrategyWeakAdapter.etags = tuple()  # braking test isolation
         resp = app_user.get('/', status=200, headers={'If-None-Match':
-                                                      'None|None|None|None'})
+                                                      'None|None|None|None|None'})
         assert resp.status == '200 OK'
 
 
