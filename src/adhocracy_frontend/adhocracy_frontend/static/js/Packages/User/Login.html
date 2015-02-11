@@ -6,35 +6,35 @@
         <input
             type="text"
             name="nameOrEmail"
-            placeholder="{{ 'email or username' | translate }}"
+            placeholder="{{ 'TR__EMAIL_OR_USERNAME' | translate }}"
             required="required"
             data-ng-model="credentials.nameOrEmail" />
         <span class="input-error" data-ng-show="loginForm.nameOrEmail.$error.required && loginForm.nameOrEmail.$dirty">
-            {{ "email or username is required." | translate }}
+            {{ "TR__ERROR_REQUIRED_EMAIL_OR_USERNAME" | translate }}
         </span>
         <input
             type="password"
             name="password"
-            placeholder="{{ 'password' | translate }}"
+            placeholder="{{ 'TR__PASSWORD' | translate }}"
             required="required"
             data-ng-model="credentials.password" />
         <span class="input-error" data-ng-show="loginForm.password.$error.required && loginForm.password.$dirty">
-            {{ "password is required." | translate }}
+            {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
         </span>
         <input
             type="submit"
-            value="{{ 'login' | translate }}"
+            value="{{ 'TR__LOGIN' | translate }}"
             class="m-call-to-action"
             data-ng-click="logIn()"
             data-ng-disabled="loginForm.$invalid" />
         <div class="login-info">
-            <p>{{ "Or register" | translate }}
-            <a href="/register">{{ "here" | translate }}</a></p>
+            <p>{{ "TR__OR_REGISTER" | translate }}
+            <a href="/register">{{ "TR__LINK_HERE" | translate }}</a></p>
         </div>
         <div class="login-support">
-            {{ "Having trouble with login?" | translate}} <br />
+            {{ "TR__LOGIN_SUPPORT" | translate}} <br />
             <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20login">{{ supportEmail }}</a>
         </div>
-        <a class="login-cancel" href="" ng-click="cancel()">{{ "CANCEL" | translate}}</a>
+        <a class="login-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate}}</a>
     </form>
 </div>

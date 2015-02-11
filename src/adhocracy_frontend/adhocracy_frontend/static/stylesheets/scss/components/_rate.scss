@@ -109,8 +109,8 @@ rate-difference has the is-positive state. Can be is-negative.
     <span class="rate-difference is-positive">
         1
     </span>
-    <a href="" class="rate-pro is-rate-button-active" data-ng-click="cast(1)"><i class="icon-triangle-inverse-up" title='{{"Vote up" | translate}}'></i></a>
-    <a href="" class="rate-contra" data-ng-click="cast(-1)"><i class="icon-triangle-inverse-down" title='{{"Vote down" | translate}}'></i></a>
+    <a href="" class="rate-pro is-rate-button-active" data-ng-click="cast(1)"><i class="icon-triangle-inverse-up" title="Vote up"></i></a>
+    <a href="" class="rate-contra" data-ng-click="cast(-1)"><i class="icon-triangle-inverse-down" title="Vote down"></i></a>
 </div>
 ```
 */

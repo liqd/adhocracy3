@@ -264,7 +264,7 @@ export var countrySelect = () => {
                 attr.star = (attr.required === "required") ? "*" : "";
                 return "<select data-ng-model=\"value\" name=\"{{name}}\"" +
                 "       data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\">" +
-                "           <option value=\"\" selected>{{ 'Country' | translate }}" + attr.star + "</option>" +
+                "           <option value=\"\" selected>{{ 'TR__COUNTRY' | translate }}" + attr.star + "</option>" +
                 "</select>";
             },
         link: (scope) => {
