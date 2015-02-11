@@ -467,7 +467,7 @@ class SimpleRESTView(ResourceRESTView):
                           request=self.request)
 
         appstruct = {}
-        if not is_batchmode(self.request):
+        if not is_batchmode(self.request):  # pragma: no branch
             appstruct[
                 'updated_resources'] = self._build_updated_resources_dict()
 

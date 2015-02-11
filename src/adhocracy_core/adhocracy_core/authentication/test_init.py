@@ -207,15 +207,23 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         result = inst.effective_principals(self.request)
         assert result == [Everyone]
 
-    def test_effective_principals_called_twice_during_one_request(self):
-        """The result is cached for one request!"""
+    def test_effective_principals_set_cache(self):
+        from pyramid.security import Authenticated
         from pyramid.security import Everyone
-        inst = self._make_one('')
+        self.request.headers = self.token_and_user_id_headers
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.return_value = self.userid
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager,
+                              groupfinder=lambda x, y: [])
         inst.effective_principals(self.request)
-        def groupfinder(userid, request):
-            return ['group']
-        inst = self._make_one('', groupfinder=groupfinder)
-        assert inst.effective_principals(self.request) == [Everyone]
+        assert self.request.__cached_principals__ == [Everyone, Authenticated,
+                                                      self.userid]
+
+    def test_effective_principals_get_cache(self):
+        """The result is cached for one request!"""
+        self.request.__cached_principals__ = ['cached']
+        inst = self._make_one('')
+        assert inst.effective_principals(self.request) == ['cached']
 
     def test_remember_without_tokenmanager_without_user_locator(self):
         inst = self._make_one('', get_tokenmanager=lambda x: None)
