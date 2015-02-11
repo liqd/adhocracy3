@@ -423,6 +423,43 @@ export class Service<Content extends ResourcesBase.Resource> {
 }
 
 
+export class Busy {
+    public count : number;
+
+    constructor() {
+        this.count = 0;
+    }
+
+    public createInterceptor() {
+        return {
+            request: (config) => {
+                this.count += 1;
+                return config;
+            },
+            response: (r) => {
+                this.count -= 1;
+                return r;
+            },
+            responseError: (r) => {
+                this.count -= 1;
+                return r;
+            }
+        };
+    }
+}
+
+
+export var busyDirective = (adhBusy : Busy) => {
+    return {
+        restrict: "E",
+        template: "{{busy.count}}",
+        link: (scope) => {
+            scope.busy = adhBusy;
+        }
+    };
+};
+
+
 export var moduleName = "adhHttp";
 
 export var register = (angular, metaApi) => {
@@ -432,6 +469,11 @@ export var register = (angular, metaApi) => {
             AdhWebSocket.moduleName,
             "angular-data.DSCacheFactory",
         ])
+        .config(["$httpProvider", ($httpProvider) => {
+            $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
+        }])
+        .service("adhHttpBusy", Busy)
+        .directive("adhHttpBusy", ["adhHttpBusy", busyDirective])
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
         .service("adhCache", ["adhWebSocket", "DSCacheFactory", AdhCache.Service])
