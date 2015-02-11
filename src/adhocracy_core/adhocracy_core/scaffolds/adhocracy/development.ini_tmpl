@@ -44,8 +44,8 @@ adhocracy.abuse_handler_mail = abuse_handler@unconfigured.domain
 adhocracy.message_user_subject = Adhocracy Info: {}
 # If true, new user accounts are activated immediately without email verification
 adhocracy.skip_registration_mail = false
-# Mode to set http cache headers for resources, valid entries: no-cache, without-proxy-cache, with-proxy-cache
-adhocracy_core.caching.http.mode = no-cache
+# Mode to set http cache headers for resources, valid entries: no_cache, without_proxy_cache, with_proxy_cache
+adhocracy_core.caching.http.mode = no_cache
 
 mail.queue_path = %(here)s/../var/mail
 # Configure the following fields for sending mails via SMTP
