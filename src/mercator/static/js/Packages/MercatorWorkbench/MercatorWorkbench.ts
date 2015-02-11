@@ -148,11 +148,11 @@ export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLe
             scope.contentType = RIMercatorProposalVersion.content_type;
             scope.shared.facets = [{
                 key: "mercator_location",
-                name: "TR__MERCATOR_PROPOSAL_LOCATION",
+                name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
                 items: [
                     {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
-                    {key: "online", name: "TR__MERCATOR_PROPOSAL_ONLINE"},
-                    {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LINKED_TO_RUHR"}
+                    {key: "online", name: "TR__ONLINE"},
+                    {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
                 ]
             }, {
                 key: "mercator_budget",
