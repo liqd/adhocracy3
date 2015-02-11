@@ -148,15 +148,15 @@ export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLe
             scope.contentType = RIMercatorProposalVersion.content_type;
             scope.shared.facets = [{
                 key: "mercator_location",
-                name: "TR__MERACTOR_PROPOSAL_LOCATION",
+                name: "TR__MERCATOR_PROPOSAL_LOCATION",
                 items: [
-                    {key: "specific", name: "TR__MERACTOR_PROPOSAL_SPECIFIC"},
-                    {key: "online", name: "TR__MERACTOR_PROPOSAL_ONLINE"},
-                    {key: "linked_to_ruhr", name: "TR__MERACTOR_PROPOSAL_LINKED_TO_RUHR"}
+                    {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
+                    {key: "online", name: "TR__MERCATOR_PROPOSAL_ONLINE"},
+                    {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LINKED_TO_RUHR"}
                 ]
             }, {
                 key: "mercator_budget",
-                name: "TR__MERACTOR_PROPOSAL_TOTAL_BUDGET",
+                name: "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET",
                 items: [
                     {key: "5000", name: "0 - 5000 €"},
                     {key: "10000", name: "5000 - 10000 €"},
