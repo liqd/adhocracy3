@@ -449,10 +449,10 @@ export class Busy {
 }
 
 
-export var busyDirective = (adhBusy : Busy) => {
+export var busyDirective = (adhConfig : AdhConfig.IService, adhBusy : Busy) => {
     return {
         restrict: "E",
-        template: "{{busy.count}}",
+        template: adhConfig.debug ? "{{busy.count}}" : "",
         link: (scope) => {
             scope.busy = adhBusy;
         }
@@ -462,7 +462,7 @@ export var busyDirective = (adhBusy : Busy) => {
 
 export var moduleName = "adhHttp";
 
-export var register = (angular, metaApi) => {
+export var register = (angular, config, metaApi) => {
     angular
         .module(moduleName, [
             AdhPreliminaryNames.moduleName,
@@ -470,10 +470,12 @@ export var register = (angular, metaApi) => {
             "angular-data.DSCacheFactory",
         ])
         .config(["$httpProvider", ($httpProvider) => {
-            $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
+            if (config.debug) {
+                $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
+            }
         }])
         .service("adhHttpBusy", Busy)
-        .directive("adhHttpBusy", ["adhHttpBusy", busyDirective])
+        .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
         .service("adhCache", ["adhWebSocket", "DSCacheFactory", AdhCache.Service])
