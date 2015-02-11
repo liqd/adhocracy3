@@ -17,6 +17,7 @@ test_requires = ['adhocracy_core[test]',
                  ]
 
 debug_requires = ['adhocracy_core[debug]',
+                  'transifex-client',
                   ]
 
 setup(name='adhocracy_frontend',
