@@ -13,6 +13,7 @@ Contents
 
    installation
    development
+   translation
    api/index
    style_guide/index
    attic/index

@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[adhocracy3mercator.main]
+file_filter = adhocracy_frontend/static/i18n/<lang>.json
+source_file = adhocracy_frontend/static/i18n/en.json
+source_lang = en
+type = KEYVALUEJSON
