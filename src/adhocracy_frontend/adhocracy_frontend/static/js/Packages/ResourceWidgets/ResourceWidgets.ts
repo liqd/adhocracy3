@@ -16,7 +16,7 @@
 
 import _ = require("lodash");
 
-import AdhEventHandler = require("../EventHandler/EventHandler");
+import AdhEventManager = require("../EventManager/EventManager");
 import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
@@ -40,7 +40,7 @@ export interface IResourceWrapperController {
      * submit
      * : resolve promise with a list of resources
      */
-    eventHandler : AdhEventHandler.EventHandler;
+    eventManager : AdhEventManager.EventManager;
 
     /**
      * registers a promise that will eventually be resolved with a list of
@@ -49,17 +49,17 @@ export interface IResourceWrapperController {
     registerResourceDirective(promise : ng.IPromise<ResourcesBase.Resource[]>) : void;
 
     /**
-     * triggers a "setMode" event on eventHandler
+     * triggers a "setMode" event on eventManager
      */
     triggerSetMode(mode : Mode) : void;
 
     /**
-     * triggers a "cancel" event on eventHandler
+     * triggers a "cancel" event on eventManager
      */
     triggerCancel() : void;
 
     /**
-     * triggers a "submit" event on eventHandler. This will cause the
+     * triggers a "submit" event on eventManager. This will cause the
      * resourceWidgets to resolve the promises registered via
      * registerResourceDirective. When all promises have been resolved,
      * all promised resources will be posted to the server via deepPost.
@@ -67,7 +67,7 @@ export interface IResourceWrapperController {
     triggerSubmit() : ng.IPromise<void>;
 
     /**
-     * triggers a "clear" event on eventHandler.
+     * triggers a "clear" event on eventManager.
      */
     triggerClear() : void;
 }
@@ -91,12 +91,12 @@ export interface IResourceWrapperController {
 export var resourceWrapper = () => {
     return {
         restrict: "E",
-        controller: ["$scope", "$attrs", "$q", "$parse", "adhEventHandlerClass", "adhHttp", function(
+        controller: ["$scope", "$attrs", "$q", "$parse", "adhEventManagerClass", "adhHttp", function(
             $scope : ng.IScope,
             $attrs : ng.IAttributes,
             $q : ng.IQService,
             $parse : ng.IParseService,
-            adhEventHandlerClass,
+            adhEventManagerClass,
             adhHttp : AdhHttp.Service<any>
         ) {
             var self : IResourceWrapperController = this;
@@ -124,7 +124,7 @@ export var resourceWrapper = () => {
                 }
             };
 
-            self.eventHandler = new adhEventHandlerClass();
+            self.eventManager = new adhEventManagerClass();
 
             self.registerResourceDirective = (promise : ng.IPromise<ResourcesBase.Resource[]>) => {
                 resourcePromises.push(promise);
@@ -132,16 +132,16 @@ export var resourceWrapper = () => {
 
             self.triggerSetMode = (mode : Mode) => {
                 resetResourcePromises();
-                self.eventHandler.trigger("setMode", mode);
+                self.eventManager.trigger("setMode", mode);
             };
 
             self.triggerCancel = () => {
-                self.eventHandler.trigger("cancel");
+                self.eventManager.trigger("cancel");
                 triggerCallback("onCancel");
             };
 
             self.triggerSubmit = () => {
-                self.eventHandler.trigger("submit");
+                self.eventManager.trigger("submit");
                 return $q.all(resourcePromises)
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
@@ -158,7 +158,7 @@ export var resourceWrapper = () => {
             };
 
             self.triggerClear = () => {
-                self.eventHandler.trigger("clear");
+                self.eventManager.trigger("clear");
             };
         }]
     };
@@ -264,13 +264,13 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             deferred: self.$q.defer()
         };
 
-        var setModeID = wrapper.eventHandler.on("setMode", (mode : Mode) =>
+        var setModeID = wrapper.eventManager.on("setMode", (mode : Mode) =>
             self.setMode(instance, mode));
 
-        var submitID = wrapper.eventHandler.on("submit", () =>
+        var submitID = wrapper.eventManager.on("submit", () =>
             self.provide(instance).then((resources) => instance.deferred.resolve(resources)));
 
-        var cancelID = wrapper.eventHandler.on("cancel", () => {
+        var cancelID = wrapper.eventManager.on("cancel", () => {
             if (scope.mode === Mode.edit) {
                 return self.update(instance).then(() => {
                     self.setMode(instance, Mode.display);
@@ -280,15 +280,15 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             }
         });
 
-        var clearID = wrapper.eventHandler.on("clear", () =>
+        var clearID = wrapper.eventManager.on("clear", () =>
             self.clear(instance));
 
         scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
         scope.$on("$delete", () => {
-            wrapper.eventHandler.off("setMode", setModeID);
-            wrapper.eventHandler.off("submit", submitID);
-            wrapper.eventHandler.off("cancel", cancelID);
-            wrapper.eventHandler.off("clear", clearID);
+            wrapper.eventManager.off("setMode", setModeID);
+            wrapper.eventManager.off("submit", submitID);
+            wrapper.eventManager.off("cancel", cancelID);
+            wrapper.eventManager.off("clear", clearID);
             instance.deferred.resolve([]);
         });
 
@@ -416,7 +416,7 @@ export var moduleName = "adhResourceWidgets";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEventHandler.moduleName,
+            AdhEventManager.moduleName,
             AdhHttp.moduleName,
             AdhPreliminaryNames.moduleName
         ])

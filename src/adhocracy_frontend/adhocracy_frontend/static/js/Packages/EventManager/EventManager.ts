@@ -5,7 +5,7 @@
  * should rather inject the class itself and create an instance where
  * you need it.  This way you can avoid conflicting event names.
  */
-export class EventHandler {
+export class EventManager {
     private handlers : {[event : string]: {[id : number]: (arg : any) => void}} = {};
     private nextID : number = 0;
 
@@ -41,10 +41,10 @@ export class EventHandler {
 }
 
 
-export var moduleName = "adhEventHandler";
+export var moduleName = "adhEventManager";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [])
-        .value("adhEventHandlerClass", EventHandler);
+        .value("adhEventManagerClass", EventManager);
 };

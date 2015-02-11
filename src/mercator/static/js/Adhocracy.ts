@@ -28,7 +28,7 @@ import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossW
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
-import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
+import AdhEventManager = require("./Packages/EventManager/EventManager");
 import AdhHttp = require("./Packages/Http/Http");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
@@ -158,7 +158,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhDateTime.register(angular);
     AdhDone.register(angular);
     AdhEmbed.register(angular);
-    AdhEventHandler.register(angular);
+    AdhEventManager.register(angular);
     AdhHttp.register(angular, meta_api);
     AdhInject.register(angular);
     AdhListing.register(angular);
