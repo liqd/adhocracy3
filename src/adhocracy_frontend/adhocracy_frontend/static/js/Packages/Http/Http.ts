@@ -425,19 +425,17 @@ export class Service<Content extends ResourcesBase.Resource> {
 
 export class Busy {
     public count : number;
-    public total : number;
 
     constructor(
         private $q : ng.IQService
     ) {
-        this.count = this.total =  0;
+        this.count = 0;
     }
 
     public createInterceptor() {
         return {
             request: (config) => {
                 this.count += 1;
-                this.total += 1;
                 return config;
             },
             response: (response) => {
