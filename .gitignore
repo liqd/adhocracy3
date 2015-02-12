@@ -15,7 +15,7 @@ __pycache__
 .sass-cache
 .idea
 /bin
-/docs/build
+/docs/_build
 /docs/styleguide/*
 /etc/compass.min.rb
 /etc/compass.rb

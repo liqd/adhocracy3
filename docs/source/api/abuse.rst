@@ -1,1 +1,0 @@
-../../../src/adhocracy_core/docs/abuse.rst
