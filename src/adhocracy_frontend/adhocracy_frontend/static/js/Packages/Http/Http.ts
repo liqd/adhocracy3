@@ -425,17 +425,19 @@ export class Service<Content extends ResourcesBase.Resource> {
 
 export class Busy {
     public count : number;
+    public total : number;
 
     constructor(
         private $q : ng.IQService
     ) {
-        this.count = 0;
+        this.count = this.total =  0;
     }
 
     public createInterceptor() {
         return {
             request: (config) => {
                 this.count += 1;
+                this.total += 1;
                 return config;
             },
             response: (response) => {
@@ -454,7 +456,8 @@ export class Busy {
 export var busyDirective = (adhConfig : AdhConfig.IService, adhBusy : Busy) => {
     return {
         restrict: "E",
-        template: adhConfig.debug ? "{{busy.count}}" : "",
+        template: adhConfig.debug ? "<div class='ad-busy'><div class='bar' style='width:{{100 - busy.count / busy.total \
+        * 100 | number:0}}%'></div></div>" : "",
         link: (scope) => {
             scope.busy = adhBusy;
         }
