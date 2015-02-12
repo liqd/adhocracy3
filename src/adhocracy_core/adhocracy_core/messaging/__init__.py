@@ -1,4 +1,4 @@
-"""Messaging support."""
+"""Send messages to Principals."""
 from collections.abc import Sequence
 from logging import getLogger
 

@@ -1,4 +1,4 @@
-"""The Resource used by the the pyramid root factory."""
+"""Root type to create initial object hierarchy and set global Permissions."""
 from pyramid.registry import Registry
 from pyramid.security import Allow
 from pyramid.security import ALL_PERMISSIONS

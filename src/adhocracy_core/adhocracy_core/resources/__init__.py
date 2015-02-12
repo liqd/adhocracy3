@@ -1,4 +1,4 @@
-"""Resource type configuration and default factory."""
+"""Resource types mapped to sheets (OpenClosePrinciple), object hierarchy."""
 from datetime import datetime
 
 from pyramid.path import DottedNameResolver

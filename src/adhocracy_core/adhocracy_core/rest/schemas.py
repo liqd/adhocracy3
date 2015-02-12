@@ -1,4 +1,4 @@
-"""Cornice colander schemas und validators to validate request data."""
+"""Data structures / validation specific to rest api requests."""
 from hypatia.interfaces import IIndexSort
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver

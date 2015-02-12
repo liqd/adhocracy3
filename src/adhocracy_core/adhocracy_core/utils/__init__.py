@@ -1,4 +1,4 @@
-"""Helper functions."""
+"""Helper functions shared between modules."""
 from collections import namedtuple
 from collections.abc import Sequence
 from datetime import datetime

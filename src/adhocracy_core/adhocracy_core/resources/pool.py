@@ -1,4 +1,4 @@
-"""Pool resource type and zodb persistent IPool implementation."""
+"""Basic type with children typically to create process structures."""
 import datetime
 from substanced.folder import Folder
 from substanced.util import find_service

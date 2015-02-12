@@ -1,4 +1,4 @@
-"""Utilities for working with the version/reference graph (DAG)."""
+"""Set/Get Resource References / versions graph (DAG) helpers."""
 
 from collections import namedtuple
 from collections.abc import Iterable

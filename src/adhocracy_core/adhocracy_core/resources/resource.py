@@ -1,4 +1,4 @@
-"""Basic zodb persistent implementation for IResrouce."""
+"""Resource base implementation with zodb persistence."""
 from persistent import Persistent
 from zope.interface import implementer
 from BTrees.Length import Length

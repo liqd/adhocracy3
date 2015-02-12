@@ -1,4 +1,4 @@
-"""Token based pyramid authentication policy."""
+"""Authentication with support for token http headers."""
 import hashlib
 from datetime import datetime
 

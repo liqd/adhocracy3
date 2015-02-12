@@ -1,4 +1,4 @@
-"""Content registry."""
+"""Create resources, get sheets/metadata, permission checks."""
 from copy import copy
 
 from pyramid.request import Request

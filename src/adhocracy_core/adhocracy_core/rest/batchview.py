@@ -1,4 +1,4 @@
-"""Rest API view for batch API."""
+"""POST batch requests processing."""
 from json import dumps
 from json import loads
 from logging import getLogger

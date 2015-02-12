@@ -1,4 +1,6 @@
-"""Subscriber to track changed resources during one transaction."""
+"""Autoupdate resources."""
+# TODO move changelog subscribers to different package
+
 from collections import defaultdict
 from collections import Sequence
 from logging import getLogger

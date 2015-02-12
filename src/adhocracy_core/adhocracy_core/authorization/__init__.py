@@ -1,4 +1,4 @@
-"""ACL Authorization with support for rules mapped to adhocracy principals."""
+"""Authorization with roles/local roles mapped to adhocracy principals."""
 from collections import defaultdict
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import ACLPermitsResult

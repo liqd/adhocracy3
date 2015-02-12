@@ -1,9 +1,4 @@
-"""Rest API configuration.
-
-.. automodule:: adhocracy_core.rest.views
-.. automodule:: adhocracy_core.rest.exceptions
-
-"""
+"""Configure rest api packages."""
 
 
 def includeme(config):  # pragma: no cover

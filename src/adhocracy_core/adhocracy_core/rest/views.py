@@ -1,4 +1,4 @@
-"""Rest API views."""
+"""GET/POST/PUT requests processing."""
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime

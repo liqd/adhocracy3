@@ -1,4 +1,7 @@
-"""Adhocracy sheets."""
+"""Set/Get and isolated sets of resource data."""
+
+# TODO move colander sheet data serialization here
+
 from itertools import chain
 from logging import getLogger
 
@@ -31,7 +34,9 @@ logger = getLogger(__name__)
 @implementer(IResourceSheet)
 class GenericResourceSheet(PropertySheet):
 
-    """Generic sheet for resources to get/set the sheet data structure."""
+    """Generic sheet for to get/set resource data as context annotation."""
+
+    # TODO rename to AnnotationStorageSheet
 
     request = None
     """Pyramid request object, just to fulfill the interface."""

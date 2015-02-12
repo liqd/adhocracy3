@@ -1,4 +1,4 @@
-"""Colander schema extensions."""
+"""Basic data structures and validation."""
 from collections import Sequence
 from collections import OrderedDict
 from datetime import datetime

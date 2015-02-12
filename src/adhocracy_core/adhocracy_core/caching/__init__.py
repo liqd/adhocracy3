@@ -1,4 +1,4 @@
-"""Adapter and helper functions to set the http response caching headers."""
+"""HTTP Caching headers, handle conditional requests."""
 import logging
 
 from pyramid.httpexceptions import HTTPNotModified

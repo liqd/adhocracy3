@@ -1,4 +1,4 @@
-"""Setup pyramid wsgi app."""
+"""Configure, add dependency packages/modules, start application."""
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
 from substanced.db import RootAdded

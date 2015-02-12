@@ -1,4 +1,4 @@
-"""ItemVersion resource type."""
+"""Basic versionable type typically for process content."""
 from pyramid.traversal import find_interface
 
 from adhocracy_core.events import ItemVersionNewVersionAdded

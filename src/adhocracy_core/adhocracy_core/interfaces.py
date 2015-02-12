@@ -1,4 +1,4 @@
-"""Basic Interfaces used by all packages."""
+"""Interfaces for plugable dependencies, basic metadata structures."""
 from collections import Iterable
 from collections import namedtuple
 from collections import OrderedDict

@@ -1,4 +1,4 @@
-""" Events when adding with ItemVersions and Items.
+"""Hooks to modify runtime behavior (use 'subscriber.py' in you package).
 
 In addition we have the normal substanced events:
 https://substanced.readthedocs.org/en/latest/api.html#module-substanced.event

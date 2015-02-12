@@ -1,4 +1,4 @@
-"""Rest API exceptions."""
+"""HTTP Exception (500, 310, 404,..) processing."""
 import json
 import logging
 import colander

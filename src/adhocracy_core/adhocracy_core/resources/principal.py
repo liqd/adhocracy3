@@ -1,4 +1,4 @@
-"""Resources to handle users and groups."""
+"""Principal types (user/group) and helpers to search/get user information."""
 from base64 import b64encode
 from logging import getLogger
 from os import urandom

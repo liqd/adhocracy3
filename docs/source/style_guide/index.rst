@@ -11,3 +11,4 @@ Style Guide
    js_guidelines.rst
    generic_widgets.rst
    fe_structure.rst
+   backend_structure.rst

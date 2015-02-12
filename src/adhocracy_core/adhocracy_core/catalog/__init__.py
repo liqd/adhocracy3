@@ -1,4 +1,4 @@
-""" Catalog utilities."""
+"""Search / store indexd resources data."""
 from substanced import catalog
 from substanced.catalog.factories import IndexFactory
 from substanced.interfaces import IIndexingActionProcessor
