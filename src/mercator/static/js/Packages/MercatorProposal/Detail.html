@@ -63,14 +63,14 @@
                     data-du-scrollspy="mercator-detail-view-brief-proposal"
                     data-offset="50">{{ "TR__MERCATOR_PROPOSAL_PITCH" | translate }}</h2>
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('introduction')}}">
                     <p>{{ data.introduction.teaser }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:introduction'}}">
                         <i class="icon-speechbubble"></i> {{ data.introduction.commentCount }}
                     </a>
                 </section><!-- /.commentable-section -->
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('finance')}}">
                     <div class="mercator-proposal-budget-col requested">
                         <strong>{{ data.finance.requested_funding | number }} &euro;</strong>
                         {{ "TR__MERCATOR_PROPOSAL_REQUESTED" | translate }}
@@ -102,7 +102,7 @@
             </section><!-- /.chapter -->
 
             <section class="chapter" id="mercator-proposal-detail-whos">
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('organization_info')}}">
                     <h2 class="chapter-header"
                         data-du-scrollspy="mercator-proposal-detail-whos"
                         data-offset="50">{{ "TR__MERCATOR_PROPOSAL_WHO_BEHIND" | translate }}</h2>
@@ -172,7 +172,7 @@
                     data-du-scrollspy="mercator-detail-view-detailed-proposal"
                     data-offset="50">{{ "TR__MERCATOR_PROPOSAL_DETAIL" | translate }}</h2>
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('description')}}">
                     <h3>{{ "TR__DESCRIPTION" | translate }}</h3>
                     <p>{{ data.description.description }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:description'}}">
@@ -180,7 +180,7 @@
                     </a>
                 </section><!-- /.commentable-section -->
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('story')}}">
                     <h3>{{ "TR__MERCATOR_PROPOSAL_STORY_LABEL" | translate }}</h3>
                     <p>{{ data.story }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:story'}}">
@@ -195,7 +195,7 @@
                     data-du-scrollspy="mercator-detail-view-goals-and-vision"
                     data-offset="50">{{ "TR__MERCATOR_PROPOSAL_MOTIVATION" | translate }}</h2>
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('outcome')}}">
                     <h3>{{ "TR__MERCATOR_PROPOSAL_OUTCOME_LABEL" | translate }}</h3>
                     <p>{{ data.outcome }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:outcome'}}">
@@ -203,7 +203,7 @@
                     </a>
                 </section><!-- /.commentable-section -->
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('steps')}}">
                     <h3>{{ "TR__MERCATOR_PROPOSAL_STEPS_LABEL" | translate }}</h3>
                     <p>{{ data.steps }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:steps'}}">
@@ -211,7 +211,7 @@
                     </a>
                 </section><!-- /.commentable-section -->
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('value')}}">
                     <h3>{{ "TR__MERCATOR_PROPOSAL_VALUE_LABEL" | translate }}</h3>
                     <p>{{ data.value }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:value'}}">
@@ -219,7 +219,7 @@
                     </a>
                 </section><!-- /.commentable-section -->
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('partners')}}">
                     <h3>{{ "TR__MERCATOR_PROPOSAL_PARTNERS_LABEL" | translate }}</h3>
                     <p>{{ data.partners }}</p>
                     <a class="commentable-section-show-comments" href="{{ path | adhResourceUrl:'comments:partners'}}">
@@ -234,7 +234,7 @@
                     data-du-scrollspy="mercator-detail-view-additional"
                     data-offset="50">{{ "TR__MERCATOR_PROPOSAL_EXTRA" | translate }}</h2>
 
-                <section class="commentable-section">
+                <section class="commentable-section {{subResourceSelectedState('experience')}}">
                     <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
                     <p>{{ data.experience }}</p>
 
