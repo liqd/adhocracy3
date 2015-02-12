@@ -53,19 +53,22 @@ States:
 */
 
 .commentable-section {
-    margin-bottom: 30px / $font-size-normal * 1em;
-    padding-right: 36px / $font-size-normal * 1em;
+    padding: 1em (48px / $font-size-normal * 1em) (30px / $font-size-normal * 1em);
     position: relative;
 
     > p {
         margin-bottom: 0;
     }
 
+    &.is-not-selected {
+        background: $color-background-base-introvert;
+    }
+
     .commentable-section-show-comments {
         @include show-comments;
         max-width: 36 / 14 * 1em;
         position: absolute;
-        right: 0;
+        right: 1em;
         top: 0;
     }
 }
