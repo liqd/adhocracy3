@@ -53,7 +53,7 @@ States:
 */
 
 .commentable-section {
-    padding: 1em (48px / $font-size-normal * 1em) (30px / $font-size-normal * 1em);
+    padding: 1em (48px / $font-size-normal * 1em) (30px / $font-size-normal * 1em) (30px / $font-size-normal * 1em);
     position: relative;
 
     > p {
@@ -69,6 +69,6 @@ States:
         max-width: 36 / 14 * 1em;
         position: absolute;
         right: 1em;
-        top: 0;
+        top: 1em;
     }
 }
