@@ -82,14 +82,15 @@ def test_group_meta():
 def integration(config):
     config.include('pyramid_mailer.testing')
     config.include('pyramid_mako')
-    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.events')
+    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.registry')
     config.include('adhocracy_core.messaging')
     config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_core.sheets.name')
     config.include('adhocracy_core.sheets.principal')
     config.include('adhocracy_core.resources.principal')
+    config.include('adhocracy_core.resources.subscriber')
 
 
 @mark.usefixtures('integration')
