@@ -50,7 +50,7 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
 
     def setUp(self):
         from pyramid.testing import DummyResource
-        from adhocracy_core.resources.subscriber import changelog_metadata
+        from adhocracy_core.changelog import changelog_metadata
         self._client = DummyClient()
         self._registry = DummyResource()
         self._registry.ws_client = self._client

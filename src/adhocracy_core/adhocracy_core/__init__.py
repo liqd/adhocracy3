@@ -36,8 +36,7 @@ def add_after_commit_hooks(request):
     from adhocracy_core.caching import purge_varnish_after_commit_hook
     from adhocracy_core.websockets.client import \
         send_messages_after_commit_hook
-    from adhocracy_core.resources.subscriber import\
-        clear_transaction_changelog_after_commit_hook
+    from adhocracy_core.changelog import clear_changelog_after_commit_hook
     current_transaction = transaction.get()
     registry = request.registry
     # Order matters here
@@ -45,8 +44,8 @@ def add_after_commit_hooks(request):
                                            args=(registry,))
     current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
                                            args=(registry,))
-    current_transaction.addAfterCommitHook(
-        clear_transaction_changelog_after_commit_hook, args=(registry,))
+    current_transaction.addAfterCommitHook(clear_changelog_after_commit_hook,
+                                           args=(registry,))
 
 
 def includeme(config):
@@ -69,6 +68,7 @@ def includeme(config):
     config.include('.evolution')
     config.include('.events')
     config.include('.registry')
+    config.include('.changelog')
     config.include('.graph')
     config.include('.catalog')
     config.include('.caching')

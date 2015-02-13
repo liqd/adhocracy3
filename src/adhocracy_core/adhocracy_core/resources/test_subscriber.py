@@ -69,148 +69,6 @@ def event(changelog, context):
     return event
 
 
-class TestResourceCreatedAndAddedSubscriber:
-
-    def _call_fut(self, event):
-        from adhocracy_core.resources.subscriber import resource_created_and_added_subscriber
-        return resource_created_and_added_subscriber(event)
-
-    def test_call(self, event, changelog):
-        self._call_fut(event)
-        assert changelog['/'].created is True
-
-
-class TestItemVersionCreated:
-
-    def _call_fut(self, event):
-        from adhocracy_core.resources.subscriber import itemversion_created_subscriber
-        return itemversion_created_subscriber(event)
-
-    def test_call_with_version_has_no_follows(self, event, changelog):
-        event.new_version = None
-        self._call_fut(event)
-        assert changelog['/'].followed_by is None
-
-    def test_call_with_version_has_follows(self, event, changelog):
-        event.new_version = testing.DummyResource()
-        self._call_fut(event)
-        assert changelog['/'].followed_by is event.new_version
-
-
-class TestResourceModifiedSubscriber:
-
-    @fixture
-    def context(self, context):
-        from BTrees.Length import Length
-        root = testing.DummyResource()
-        root.__changed_descendants_counter__ = Length()
-        root['parent'] = testing.DummyResource()
-        root['parent'].__changed_descendants_counter__ = Length()
-        root['parent']['child'] = context
-        return context
-
-    def _call_fut(self, event):
-        from adhocracy_core.resources.subscriber import resource_modified_subscriber
-        return resource_modified_subscriber(event)
-
-    def test_set_modified_changelog(self, event, changelog):
-        self._call_fut(event)
-        assert changelog['/parent/child'].modified is True
-
-    def test_dont_set_changed_descendants_for_context(self, event, changelog):
-        self._call_fut(event)
-        assert changelog['/parent/child'].changed_descendants is False
-
-    def test_set_changed_descendants_changelog_for_parents(self, event,
-                                                           changelog):
-        self._call_fut(event)
-        assert changelog['/parent'].changed_descendants is True
-        assert changelog['/'].changed_descendants is True
-
-    def test_set_changed_descendants_only_once(self, event, changelog):
-        """Stop iterating all parents if `changed_descendants` is already set"""
-        changelog['/parent'] = \
-            changelog['parent']._replace(changed_descendants=True)
-        self._call_fut(event)
-        assert changelog['/parent'].changed_descendants is True
-        assert changelog['/'].changed_descendants is False
-
-    def test_increment_changed_descendants_counter_for_parents(self, event,
-                                                               changelog):
-        self._call_fut(event)
-        assert changelog['/parent'].resource.\
-                   __changed_descendants_counter__() == 1
-        assert changelog['/'].resource.__changed_descendants_counter__() == 1
-
-
-class TestResourceBackreferenceModifiedSubscriber:
-
-    @fixture
-    def context(self, context):
-        from BTrees.Length import Length
-        root = testing.DummyResource()
-        root.__changed_descendants_counter__ = Length()
-        root['parent'] = testing.DummyResource()
-        root['parent'].__changed_descendants_counter__ = Length()
-        root['parent']['child'] = context
-        context.__changed_backrefs_counter__ = Length()
-        return context
-
-    def _call_fut(self, event):
-        from .subscriber import resource_backreference_modified_subscriber
-        return resource_backreference_modified_subscriber(event)
-
-    def test_set_changed_backrefs_changelog(self, event, changelog):
-        self._call_fut(event)
-        assert changelog['/parent/child'].changed_backrefs is True
-
-    def test_set_changed_backrefs_counter(self, event, changelog):
-        self._call_fut(event)
-        assert changelog['/parent/child'].resource.\
-                   __changed_backrefs_counter__() == 1
-
-    def test_set_changed_descendants_changelog_for_parents(self, event,
-                                                           changelog):
-        self._call_fut(event)
-        assert changelog['/parent'].changed_descendants is True
-        assert changelog['/'].changed_descendants is True
-
-    def test_increment_changed_descendants_counter_for_parents(self, event,
-                                                               changelog):
-        self._call_fut(event)
-        assert changelog['/parent'].resource.__changed_descendants_counter__() == 1
-        assert changelog['/'].resource.__changed_descendants_counter__() == 1
-
-
-def test_create_transaction_changelog():
-    from adhocracy_core.interfaces import ChangelogMetadata
-    from adhocracy_core.resources.subscriber import create_transaction_changelog
-    changelog = create_transaction_changelog()
-    changelog_metadata = changelog['/resource/path']
-    assert isinstance(changelog_metadata, ChangelogMetadata)
-
-
-def test_clear_transaction_changelog_exists(registry, changelog):
-    from adhocracy_core.resources.subscriber import clear_transaction_changelog_after_commit_hook
-    registry._transaction_changelog = changelog
-    changelog['/'] = object()
-    clear_transaction_changelog_after_commit_hook(True, registry)
-    assert len(registry._transaction_changelog) == 0
-
-
-def test_clear_transaction_changelog_does_not_exists(registry):
-    from adhocracy_core.resources.subscriber import clear_transaction_changelog_after_commit_hook
-    assert clear_transaction_changelog_after_commit_hook(True, registry) is None
-
-
-def test_default_changelog_metadata():
-    from adhocracy_core.resources.subscriber import changelog_metadata
-    assert changelog_metadata.modified is False
-    assert changelog_metadata.created is False
-    assert changelog_metadata.followed_by is None
-    assert changelog_metadata.resource is None
-
-
 class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
@@ -535,18 +393,9 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_add_transaction_changelog(registry):
-    assert hasattr(registry, '_transaction_changelog')
-
-
-@mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.resources import subscriber
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-    assert subscriber.resource_created_and_added_subscriber.__name__ in handlers
-    assert subscriber.itemversion_created_subscriber.__name__ in handlers
-    assert subscriber.resource_modified_subscriber.__name__ in handlers
     assert subscriber.autoupdate_non_versionable_has_new_version.__name__ in handlers
     assert subscriber.autoupdate_versionable_has_new_version.__name__ in handlers
     assert subscriber.user_created_and_added_subscriber.__name__ in handlers
-    assert subscriber.resource_backreference_modified_subscriber.__name__ in handlers

@@ -1,30 +1,19 @@
 """Autoupdate resources."""
-# TODO move changelog subscribers to different package
 
-from collections import defaultdict
 from collections import Sequence
 from logging import getLogger
 
 from pyramid.registry import Registry
-from pyramid.traversal import resource_path
-from pyramid.traversal import find_interface
-from pyramid.traversal import lineage
-
 from substanced.util import find_service
-from adhocracy_core.interfaces import ChangelogMetadata
+
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
-from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferenceNewVersion
-from adhocracy_core.interfaces import ISheetReferenceModified
-from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
@@ -39,94 +28,7 @@ from adhocracy_core.utils import get_last_version
 from adhocracy_core.sheets.versions import IVersionable
 
 
-changelog_metadata = ChangelogMetadata(False, False, None, None, None,
-                                       False, False, VisibilityChange.visible)
 logger = getLogger(__name__)
-
-
-def resource_created_and_added_subscriber(event):
-    """Add created message to the transaction_changelog."""
-    _add_changelog(event.registry, event.object, key='created', value=True)
-
-
-def resource_modified_subscriber(event):
-    """Add modified message to the transaction_changelog."""
-    _add_changelog(event.registry, event.object, key='modified', value=True)
-    _add_changed_descendants_to_all_parents(event.registry, event.object)
-
-
-def _add_changed_descendants_to_all_parents(registry, resource):
-    for parent in lineage(resource.__parent__):
-        changed_descendants_is_changed = _add_changelog(
-            registry, parent, key='changed_descendants', value=True)
-        if changed_descendants_is_changed:
-            _increment_changed_descendants_counter(parent)
-        else:
-            break
-
-
-def _increment_changed_descendants_counter(context):
-    counter = getattr(context, '__changed_descendants_counter__', None)
-    if counter is not None:  # pragma: no branch
-        counter.change(1)
-
-
-def resource_backreference_modified_subscriber(event):
-    """Add changed_backrefs message to the transaction_changelog."""
-    changed_backrefs_is_modified = _add_changelog(event.registry, event.object,
-                                                  key='changed_backrefs',
-                                                  value=True)
-    if changed_backrefs_is_modified:
-        _increment_changed_backrefs_counter(event.object)
-    _add_changed_descendants_to_all_parents(event.registry, event.object)
-
-
-def _increment_changed_backrefs_counter(context):
-    counter = getattr(context, '__changed_backrefs_counter__', None)
-    if counter is not None:  # pragma: no branch
-        counter.change(1)
-
-
-def itemversion_created_subscriber(event):
-    """Add new `follwed_by` and `last_version` to the transaction_changelog."""
-    if event.new_version is None:
-        return
-    _add_changelog(event.registry, event.object, key='followed_by',
-                   value=event.new_version)
-    item = find_interface(event.object, IItem)
-    _add_changelog(event.registry, item, key='last_version',
-                   value=event.new_version)
-
-
-def _add_changelog(registry: Registry, resource: IResource, key: str,
-                   value: object) -> bool:
-    """Add metadata `key/value` to the transaction changelog if needed.
-
-    Return: True if new metadata value was added else False (no value change)
-    """
-    changelog = registry._transaction_changelog
-    path = resource_path(resource)
-    metadata = changelog[path]
-    old_value = getattr(metadata, key)
-    if old_value is not value:
-        changelog[path] = metadata._replace(**{'resource': resource,
-                                               key: value})
-        return True
-    else:
-        return False
-
-
-def create_transaction_changelog() -> dict:
-    """Return dict that maps resource path to :class:`ChangelogMetadata`."""
-    metadata = lambda: changelog_metadata
-    return defaultdict(metadata)
-
-
-def clear_transaction_changelog_after_commit_hook(success: bool,
-                                                  registry: Registry):
-    """Delete all entries in the transaction changelog."""
-    changelog = getattr(registry, '_transaction_changelog', dict())
-    changelog.clear()
 
 
 def user_created_and_added_subscriber(event):
@@ -269,17 +171,7 @@ def autoupdate_non_versionable_has_new_version(event):
 
 
 def includeme(config):
-    """Add transaction changelog to the registry and register subscribers."""
-    changelog = create_transaction_changelog()
-    config.registry._transaction_changelog = changelog
-    config.add_subscriber(resource_created_and_added_subscriber,
-                          IResourceCreatedAndAdded)
-    config.add_subscriber(resource_modified_subscriber,
-                          IResourceSheetModified)
-    config.add_subscriber(resource_backreference_modified_subscriber,
-                          ISheetReferenceModified)
-    config.add_subscriber(itemversion_created_subscriber,
-                          IItemVersionNewVersionAdded)
+    """Register subscribers."""
     config.add_subscriber(autoupdate_versionable_has_new_version,
                           ISheetReferenceNewVersion,
                           interface=IItemVersion,

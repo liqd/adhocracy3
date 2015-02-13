@@ -22,117 +22,77 @@ def context(pool, catalog):
     return pool
 
 
-def test_reindex_tagged_with_removed_and_added_elements(context, catalog):
-    from adhocracy_core.interfaces import ISheet
+@fixture
+def event(context):
+    return testing.DummyResource(object=context)
+
+
+def test_reindex_tagged_with_removed_and_added_elements(event, catalog):
     from .subscriber import reindex_tagged
-    registry = testing.DummyResource()
     added = testing.DummyResource()
     removed = testing.DummyResource()
-    old = {'elements': [removed]}
-    new = {'elements': [added]}
-    event = testing.DummyResource(object=context,
-                                  isheet=ISheet,
-                                  registry=registry,
-                                  old_appstruct=old,
-                                  new_appstruct=new)
+    event.old_appstruct = {'elements': [removed]}
+    event.new_appstruct = {'elements': [added]}
     reindex_tagged(event)
     assert catalog['adhocracy'].reindex_resource.call_count == 2
 
 
-def test_reindex_rate_index(context, catalog):
+def test_reindex_rate_index(event, catalog):
     from .subscriber import reindex_rate
-    event = testing.DummyResource(object=context)
     reindex_rate(event)
     assert catalog['adhocracy'].reindex_resource.call_count == 1
 
 
-class TestReindexPrivateVisibility:
+@fixture
+def mock_reindex(monkeypatch):
+    from . import subscriber
+    mock_reindex = Mock(spec=subscriber._reindex_resource_and_descendants)
+    monkeypatch.setattr(subscriber,
+                        '_reindex_resource_and_descendants',
+                        mock_reindex)
+    return mock_reindex
 
-    @fixture
-    def mock_reindex(self, monkeypatch):
-        from . import subscriber
-        mock_reindex = Mock(spec=subscriber._reindex_resource_and_descendants)
-        monkeypatch.setattr(subscriber,
-                            '_reindex_resource_and_descendants',
-                            mock_reindex)
-        return mock_reindex
 
-    def call_fut(self, event):
-        from .subscriber import reindex_private_visibility
-        return reindex_private_visibility(event)
+@fixture
+def mock_visibility(monkeypatch):
+    from . import subscriber
+    mock_visibility = Mock(spec=subscriber.get_visibility_change)
+    monkeypatch.setattr(subscriber,
+                        'get_visibility_change',
+                        mock_visibility)
+    return mock_visibility
 
-    def test_newly_hidden(self, context, registry_with_changelog,
-                          mock_reindex):
-        from adhocracy_core.events import ResourceSheetModified
-        from adhocracy_core.interfaces import VisibilityChange
-        from adhocracy_core.sheets.metadata import IMetadata
-        old_appstruct = {'deleted': False, 'hidden': False}
-        new_appstruct = {'deleted': False, 'hidden': True}
-        event = ResourceSheetModified(object=context,
-                                      isheet=IMetadata,
-                                      registry=registry_with_changelog,
-                                      old_appstruct=old_appstruct,
-                                      new_appstruct=new_appstruct,
-                                      request=None)
-        self.call_fut(event)
-        assert mock_reindex.called
-        assert (registry_with_changelog._transaction_changelog['/'].visibility
-                is VisibilityChange.concealed)
 
-    def test_newly_undeleted(self, context, registry_with_changelog,
-                             mock_reindex):
-        from adhocracy_core.events import ResourceSheetModified
-        from adhocracy_core.interfaces import VisibilityChange
-        from adhocracy_core.sheets.metadata import IMetadata
-        old_appstruct = {'deleted': True, 'hidden': False}
-        new_appstruct = {'deleted': False, 'hidden': False}
-        event = ResourceSheetModified(object=context,
-                                      isheet=IMetadata,
-                                      registry=registry_with_changelog,
-                                      old_appstruct=old_appstruct,
-                                      new_appstruct=new_appstruct,
-                                      request=None)
-        self.call_fut(event)
-        assert mock_reindex.called
-        assert (registry_with_changelog._transaction_changelog['/'].visibility
-                is VisibilityChange.revealed)
+def test_reindex_visibility_concealed(event, mock_reindex, mock_visibility):
+    from adhocracy_core.interfaces import VisibilityChange
+    from .subscriber import reindex_visibility
+    mock_visibility.return_value = VisibilityChange.concealed
+    reindex_visibility(event)
+    assert mock_reindex.called
 
-    def test_no_change_invisible(self, context, registry_with_changelog,
-                                 mock_reindex):
-        from adhocracy_core.events import ResourceSheetModified
-        from adhocracy_core.interfaces import VisibilityChange
-        from adhocracy_core.sheets.metadata import IMetadata
-        old_appstruct = {'deleted': False, 'hidden': True}
-        new_appstruct = {'deleted': False, 'hidden': True}
-        event = ResourceSheetModified(object=context,
-                                      isheet=IMetadata,
-                                      registry=registry_with_changelog,
-                                      old_appstruct=old_appstruct,
-                                      new_appstruct=new_appstruct,
-                                      request=None)
-        self.call_fut(event)
-        assert not mock_reindex.called
-        assert (registry_with_changelog._transaction_changelog['/'].visibility
-                is VisibilityChange.invisible)
 
-    def test_no_change_visible(self, context, registry_with_changelog, request,
-                               mock_reindex):
-        from adhocracy_core.events import ResourceSheetModified
-        from adhocracy_core.interfaces import VisibilityChange
-        from adhocracy_core.sheets.metadata import IMetadata
-        old_appstruct = {'deleted': False, 'hidden': False}
-        new_appstruct = {'deleted': False, 'hidden': False}
-        request.has_permission = Mock(return_value=True)
-        event = ResourceSheetModified(object=context,
-                                      isheet=IMetadata,
-                                      registry=registry_with_changelog,
-                                      old_appstruct=old_appstruct,
-                                      new_appstruct=new_appstruct,
-                                      request=request)
-        self.call_fut(event)
-        assert not mock_reindex.called
-        assert (registry_with_changelog._transaction_changelog['/'].visibility
-                is VisibilityChange.visible)
+def test_reindex_visibility_revealed(event, mock_reindex, mock_visibility):
+    from adhocracy_core.interfaces import VisibilityChange
+    from .subscriber import reindex_visibility
+    mock_visibility.return_value = VisibilityChange.revealed
+    reindex_visibility(event)
+    assert mock_reindex.called
+
+
+def test_reindex_visibility_invisible(event, mock_reindex, mock_visibility):
+    from adhocracy_core.interfaces import VisibilityChange
+    from .subscriber import reindex_visibility
+    mock_visibility.return_value = VisibilityChange.invisible
+    reindex_visibility(event)
+    assert not mock_reindex.called
+
+
+def test_reindex_visibility_visible(event, mock_reindex, mock_visibility):
+    from adhocracy_core.interfaces import VisibilityChange
+    from .subscriber import reindex_visibility
+    mock_visibility.return_value = VisibilityChange.visible
+    reindex_visibility(event)
+    assert not mock_reindex.called
 
 
 class TestReindexResourceAndDescendants:
@@ -182,7 +142,7 @@ def test_register_subscriber(registry):
     from adhocracy_core.catalog import subscriber
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
     assert subscriber.reindex_tagged.__name__ in handlers
-    assert subscriber.reindex_private_visibility.__name__ in handlers
+    assert subscriber.reindex_visibility.__name__ in handlers
     assert subscriber.reindex_rate.__name__ in handlers
 
 

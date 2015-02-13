@@ -360,3 +360,44 @@ class TestRaiseColanderStyleError:
                             "location": "body"}]}
 
 
+class TestGetVisibilityChange:
+
+    @fixture
+    def event(self, context):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.sheets.metadata import IMetadata
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=None,
+                                      old_appstruct={},
+                                      new_appstruct={},
+                                      request=None)
+        return event
+
+    def call_fut(self, event):
+        from . import get_visibility_change
+        return get_visibility_change(event)
+
+    def test_newly_hidden(self, event):
+        from adhocracy_core.interfaces import VisibilityChange
+        event.old_appstruct = {'deleted': False, 'hidden': False}
+        event.new_appstruct = {'deleted': False, 'hidden': True}
+        assert self.call_fut(event) == VisibilityChange.concealed
+
+    def test_newly_undeleted(self, event):
+        from adhocracy_core.interfaces import VisibilityChange
+        event.old_appstruct = {'deleted': True, 'hidden': False}
+        event.new_appstruct = {'deleted': False, 'hidden': False}
+        assert self.call_fut(event) == VisibilityChange.revealed
+
+    def test_no_change_invisible(self, event):
+        from adhocracy_core.interfaces import VisibilityChange
+        event.old_appstruct = {'deleted': False, 'hidden': True}
+        event.new_appstruct = {'deleted': False, 'hidden': True}
+        assert self.call_fut(event) == VisibilityChange.invisible
+
+    def test_no_change_visible(self, event):
+        from adhocracy_core.interfaces import VisibilityChange
+        event.old_appstruct = {'deleted': False, 'hidden': False}
+        event.new_appstruct = {'deleted': False, 'hidden': False}
+        assert self.call_fut(event) == VisibilityChange.visible

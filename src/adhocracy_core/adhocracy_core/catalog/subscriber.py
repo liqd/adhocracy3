@@ -4,7 +4,8 @@ Read :mod:`substanced.catalog.subscribers` for default reindex subscribers.
 """
 
 from pyramid.traversal import resource_path
-from adhocracy_core.resources.subscriber import _add_changelog
+
+from adhocracy_core.utils import get_visibility_change
 from substanced.util import find_catalog
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import VisibilityChange
@@ -33,14 +34,11 @@ def reindex_rate(event):
     adhocracy_catalog.reindex_resource(event.object)
 
 
-def reindex_private_visibility(event):
+def reindex_visibility(event):
     """Reindex the private_visibility index for all descendants if modified."""
-    visibility = _determine_visibility_change(event)
+    visibility = get_visibility_change(event)
     if visibility in [VisibilityChange.concealed, VisibilityChange.revealed]:
         _reindex_resource_and_descendants(event.object)
-    # TODO move changelog update to an specialised subscriber
-    _add_changelog(event.registry, event.object, key='visibility',
-                   value=visibility)
 
 
 def _reindex_resource_and_descendants(resource: IResource):
@@ -55,25 +53,6 @@ def _reindex_resource_and_descendants(resource: IResource):
         adhocracy_catalog.reindex_resource(res)
 
 
-def _determine_visibility_change(event) -> VisibilityChange:
-    is_deleted = event.new_appstruct['deleted']
-    is_hidden = event.new_appstruct['hidden']
-    was_deleted = event.old_appstruct['deleted']
-    was_hidden = event.old_appstruct['hidden']
-    was_visible = not (was_hidden or was_deleted)
-    is_visible = not (is_hidden or is_deleted)
-    if was_visible:
-        if is_visible:
-            return VisibilityChange.visible
-        else:
-            return VisibilityChange.concealed
-    else:
-        if is_visible:
-            return VisibilityChange.revealed
-        else:
-            return VisibilityChange.invisible
-
-
 def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tagged,
@@ -82,7 +61,7 @@ def includeme(config):
     config.add_subscriber(reindex_tagged,
                           IResourceSheetModified,
                           isheet=ITag)
-    config.add_subscriber(reindex_private_visibility,
+    config.add_subscriber(reindex_visibility,
                           IResourceSheetModified,
                           isheet=IMetadata)
     config.add_subscriber(reindex_rate,

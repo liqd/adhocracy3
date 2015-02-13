@@ -1222,8 +1222,8 @@ class TestValidateActivationPathUnitTest:
     def user_with_metadata(self, config):
         from adhocracy_core.sheets.metadata import IMetadata
         config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.resources.subscriber')
         config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.changelog')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
         user = testing.DummyResource(__provides__=IMetadata)

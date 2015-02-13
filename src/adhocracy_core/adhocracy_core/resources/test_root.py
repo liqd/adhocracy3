@@ -16,6 +16,7 @@ def test_root_meta():
 def integration(config):
     config.include('adhocracy_core.registry')
     config.include('adhocracy_core.events')
+    config.include('adhocracy_core.changelog')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.resources.asset')

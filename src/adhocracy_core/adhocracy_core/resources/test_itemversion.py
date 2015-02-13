@@ -30,6 +30,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         config = testing.setUp()
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
+        config.include('adhocracy_core.changelog')
         config.include('adhocracy_core.catalog')
         config.include('adhocracy_core.sheets')
         config.include('adhocracy_core.resources.itemversion')

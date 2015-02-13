@@ -123,6 +123,7 @@ def test_index_creator_creator_does_not_exists(context, mock_metadata_sheet):
 def integration(config):
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.events')
+    config.include('adhocracy_core.changelog')
     config.include('adhocracy_core.sheets.metadata')
 
 

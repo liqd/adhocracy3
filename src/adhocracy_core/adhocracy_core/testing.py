@@ -240,7 +240,7 @@ def cornice_request():
 @fixture
 def changelog_meta() -> ChangelogMetadata:
     """ Return changelog metadata."""
-    from adhocracy_core.resources.subscriber import changelog_metadata
+    from adhocracy_core.changelog import changelog_metadata
     return changelog_metadata
 
 

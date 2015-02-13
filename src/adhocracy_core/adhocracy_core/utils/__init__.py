@@ -30,6 +30,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import VisibilityChange
+from adhocracy_core.interfaces import IResourceSheetModified
 
 
 def append_if_not_none(lst: list, element: object):
@@ -423,3 +424,23 @@ def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
     if test_changed_descendants and meta.changed_descendants:
         events.append('changed_descendants')
     return events
+
+
+def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
+    """Return changed visbility for `event.object`."""
+    is_deleted = event.new_appstruct['deleted']
+    is_hidden = event.new_appstruct['hidden']
+    was_deleted = event.old_appstruct['deleted']
+    was_hidden = event.old_appstruct['hidden']
+    was_visible = not (was_hidden or was_deleted)
+    is_visible = not (is_hidden or is_deleted)
+    if was_visible:
+        if is_visible:
+            return VisibilityChange.visible
+        else:
+            return VisibilityChange.concealed
+    else:
+        if is_visible:
+            return VisibilityChange.revealed
+        else:
+            return VisibilityChange.invisible

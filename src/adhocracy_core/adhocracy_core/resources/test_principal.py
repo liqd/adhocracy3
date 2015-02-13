@@ -85,6 +85,7 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.changelog')
     config.include('adhocracy_core.messaging')
     config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_core.sheets.name')
