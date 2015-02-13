@@ -153,7 +153,7 @@ Generate html documentation
 
 Recreate api documentation source files::
 
-    bin/sphinx-apidoc -fo docs/source src/adhocracy  **/test*
+    bin/sphinx_api_adhocracy
 
 Generate html documentation::
 

@@ -1,4 +1,4 @@
-"""Set/Get and isolated sets of resource data."""
+"""Set/Get an isolated set of resource data."""
 
 # TODO move colander sheet data serialization here
 
