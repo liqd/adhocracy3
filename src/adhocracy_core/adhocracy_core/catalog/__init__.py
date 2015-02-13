@@ -1,30 +1,7 @@
-"""Search / store indexed resources data."""
-from substanced import catalog
-from substanced.catalog.factories import IndexFactory
-from substanced.interfaces import IIndexingActionProcessor
+"""Configure search catalogs."""
 from zope.interface import Interface
-
-from .index import ReferenceIndex
-
-
-class Reference(IndexFactory):
-    index_type = ReferenceIndex
-
-
-class AdhocracyCatalogIndexes:
-
-    """Default indexes for the adhocracy catalog.
-
-    Indexes starting with `private_` are private (not queryable from the
-    frontend).
-    """
-
-    tag = catalog.Keyword()
-    private_visibility = catalog.Keyword()  # visible / deleted / hidden
-    rate = catalog.Field()
-    rates = catalog.Field()
-    creator = catalog.Field()
-    reference = Reference()
+from substanced import catalog
+from substanced.interfaces import IIndexingActionProcessor
 
 
 def includeme(config):
@@ -39,6 +16,6 @@ def includeme(config):
                                     (Interface,),
                                     IIndexingActionProcessor)
     config.scan('substanced.catalog')
-    config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
-    config.scan('adhocracy_core.catalog.index')
+    config.scan('.index')
+    config.include('.adhocracy')
     config.include('.subscriber')

@@ -120,6 +120,7 @@ Modules API and separation of responsibility
     adhocracy_core.sheets.AttributeStorageSheet
     adhocracy_core.sheets.GenericResourceSheet
     adhocracy_core.catalog
+    adhocracy_core.catalog.adhocracy
     adhocracy_core.catalog.subscriber
     adhocracy_core.evolution
     adhocracy_core.authorization
