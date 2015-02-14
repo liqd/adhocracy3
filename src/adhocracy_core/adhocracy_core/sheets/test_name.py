@@ -12,9 +12,9 @@ class TestNameSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.name import IName
         from adhocracy_core.sheets.name import NameSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IName
         assert inst.meta.schema_class == NameSchema
         assert inst.meta.editable is False

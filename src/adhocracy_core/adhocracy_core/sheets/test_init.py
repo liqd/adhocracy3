@@ -8,7 +8,7 @@ import colander
 
 @fixture
 def sheet_meta(sheet_meta):
-    from adhocracy_core.sheets import GenericResourceSheet
+    from adhocracy_core.sheets import AnnotationStorageSheet
     from adhocracy_core.interfaces import ISheet
     class SheetASchema(colander.MappingSchema):
         count = colander.SchemaNode(colander.Int(),
@@ -16,7 +16,7 @@ def sheet_meta(sheet_meta):
                                     default=0)
     meta = sheet_meta._replace(isheet=ISheet,
                                schema_class=SheetASchema,
-                               sheet_class=GenericResourceSheet,
+                               sheet_class=AnnotationStorageSheet,
                                readable=True,
                                editable=True,
                                creatable=True)
@@ -53,8 +53,8 @@ class TestResourcePropertySheet:
         return context
 
     def make_one(self, sheet_meta, context):
-        from adhocracy_core.sheets import GenericResourceSheet
-        return GenericResourceSheet(sheet_meta, context)
+        from adhocracy_core.sheets import AnnotationStorageSheet
+        return AnnotationStorageSheet(sheet_meta, context)
 
     def test_create_valid(self, sheet_meta, context):
         from zope.interface.verify import verifyObject

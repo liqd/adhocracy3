@@ -206,9 +206,9 @@ class TestUserBasicSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserBasic
         from adhocracy_core.sheets.principal import UserBasicSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IUserBasic
         assert inst.meta.schema_class == UserBasicSchema
         assert inst.meta.permission_create == 'create_sheet_userbasic'
@@ -228,9 +228,9 @@ class TestUserExtendedSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserExtended
         from adhocracy_core.sheets.principal import UserExtendedSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IUserExtended
         assert inst.meta.schema_class == UserExtendedSchema
         assert inst.meta.permission_create == 'create_sheet_userbasic'
@@ -369,9 +369,9 @@ class TestGroupSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.sheets.principal import GroupSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IGroup
         assert inst.meta.schema_class == GroupSchema
 

@@ -32,11 +32,9 @@ logger = getLogger(__name__)
 
 
 @implementer(IResourceSheet)
-class GenericResourceSheet(PropertySheet):
+class AnnotationStorageSheet(PropertySheet):
 
     """Generic sheet for to get/set resource data as context annotation."""
-
-    # TODO rename to AnnotationStorageSheet
 
     request = None
     """Pyramid request object, just to fulfill the interface."""
@@ -225,7 +223,7 @@ class GenericResourceSheet(PropertySheet):
 
 sheet_metadata_defaults = sheet_metadata._replace(
     isheet=ISheet,
-    sheet_class=GenericResourceSheet,
+    sheet_class=AnnotationStorageSheet,
     schema_class=colander.MappingSchema,
     permission_view='view',
     permission_edit='edit_sheet',

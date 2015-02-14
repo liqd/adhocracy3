@@ -80,10 +80,10 @@ class TestResourceContentRegistry:
         assert inst.sheets_edit == {IResource: [mock_sheet]}
 
     def test_get_sheet_isheet_provided_and_registered(self, inst, sheet_meta):
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         context = testing.DummyResource(__provides__=ISheet)
         inst.sheets_meta[ISheet] = sheet_meta._replace(
-            sheet_class=GenericResourceSheet)
+            sheet_class=AnnotationStorageSheet)
         sheet = inst.get_sheet(context, ISheet)
         assert sheet.context is context
 

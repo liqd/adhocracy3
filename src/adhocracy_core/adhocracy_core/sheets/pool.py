@@ -9,7 +9,7 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.sheets import GenericResourceSheet
+from adhocracy_core.sheets import AnnotationStorageSheet
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
@@ -28,7 +28,7 @@ FilterElementsResult = namedtuple('FilterElementsResult',
                                   ['elements', 'count', 'aggregateby'])
 
 
-class PoolSheet(GenericResourceSheet):
+class PoolSheet(AnnotationStorageSheet):
 
     """Generic pool resource sheet."""
 

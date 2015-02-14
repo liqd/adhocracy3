@@ -37,10 +37,10 @@ class TestRateableSheet:
         return rateable_meta.sheet_class(rateable_meta, context)
 
     def test_create(self, inst):
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         from adhocracy_core.sheets.rate import IRateable
         from adhocracy_core.sheets.rate import RateableSchema
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IRateable
         assert inst.meta.schema_class == RateableSchema
         assert inst.meta.create_mandatory is False
@@ -62,9 +62,9 @@ class TestRateSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.rate import IRate
         from adhocracy_core.sheets.rate import RateSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IRate
         assert inst.meta.schema_class == RateSchema
         assert inst.meta.create_mandatory
