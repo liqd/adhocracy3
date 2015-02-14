@@ -79,6 +79,27 @@ class TestResourceContentRegistry:
     def test_sheets_edit(self, inst, mock_sheet):
         assert inst.sheets_edit == {IResource: [mock_sheet]}
 
+    def test_get_sheet_isheet_provided_and_registered(self, inst, sheet_meta):
+        from adhocracy_core.sheets import GenericResourceSheet
+        context = testing.DummyResource(__provides__=ISheet)
+        inst.sheets_meta[ISheet] = sheet_meta._replace(
+            sheet_class=GenericResourceSheet)
+        sheet = inst.get_sheet(context, ISheet)
+        assert sheet.context is context
+
+    def test_get_sheet_isheet_not_provided(self, inst, sheet_meta):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        context = testing.DummyResource()
+        inst.sheets_meta[ISheet] = sheet_meta
+        with raises(RuntimeConfigurationError):
+            inst.get_sheet(context, ISheet)
+
+    def test_get_sheet_isheet_not_registered(self, inst):
+        context = testing.DummyResource(__provides__=ISheet)
+        del inst.sheets_meta[ISheet]
+        with raises(KeyError):
+            inst.get_sheet(context, ISheet)
+
     def test_get_sheets_all(self, inst, context, mock_sheet):
         assert inst.get_sheets_all(context) == [mock_sheet]
         assert mock_sheet.context is context

@@ -241,8 +241,6 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
     """
     assert metadata.isheet.isOrExtends(ISheet)
     isheet = metadata.isheet
-    if hasattr(registry, 'content'):
-        registry.content.sheets_meta[isheet] = metadata
     if metadata.create_mandatory:
         assert metadata.creatable and metadata.create_mandatory
     schema = metadata.schema_class()
@@ -251,15 +249,7 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
         assert child.default != colander.drop
     assert issubclass(schema.__class__, colander.MappingSchema)
     _assert_schema_preserves_super_type_data_structure(schema)
-
-    def generic_resource_property_sheet_adapter(context):
-        return metadata.sheet_class(metadata, context)
-
-    registry.registerAdapter(generic_resource_property_sheet_adapter,
-                             required=(isheet,),
-                             provided=IResourceSheet,
-                             name=isheet.__identifier__
-                             )
+    registry.content.sheets_meta[isheet] = metadata
 
 
 def _assert_schema_preserves_super_type_data_structure(

@@ -138,15 +138,21 @@ def create_pool_with_graph() -> testing.DummyResource:
     return context
 
 
-def add_and_register_sheet(context, mock_sheet, registry):
-    """Add `mock_sheet` to `context`and register adapter."""
+def register_sheet(context, mock_sheet, registry, isheet=None) -> Mock:
+    """Register `mock_sheet` for `context`. You can ony use this only once.
+
+    If you need to register multiple mock_sheets in you test add side effects:
+    `registry.content.get_sheet.side_effects = [sheet1, sheet2]`.
+    You can also set single sheets directly:
+    `registry.content.get_sheet.return_value = sheet1
+    """
     from zope.interface import alsoProvides
-    from adhocracy_core.interfaces import IResourceSheet
-    isheet = mock_sheet.meta.isheet
-    alsoProvides(context, isheet)
-    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
+    if isheet is not None:
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=isheet)
+    if context is not None:
+        alsoProvides(context, mock_sheet.meta.isheet)
+    registry.content.get_sheet.return_value = mock_sheet
+    return mock_sheet
 
 
 def create_event_listener(config: Configurator, ievent: IInterface) -> list:
@@ -341,11 +347,19 @@ def mock_resource_registry() -> Mock:
     mock.get_sheets_read.return_value = []
     mock.get_sheets_edit.return_value = []
     mock.get_sheets_create.return_value = []
+    mock.get_sheet.return_value = None
     mock.sheets_read = {}
     mock.sheets_edit = {}
     mock.sheets_create = {}
     mock.sheets_create_mandatory = {}
     return mock
+
+
+@fixture
+def registry_with_content(registry, mock_resource_registry):
+    """Return registry with resource registry attribute named content."""
+    registry.content = mock_resource_registry
+    return registry
 
 
 @fixture

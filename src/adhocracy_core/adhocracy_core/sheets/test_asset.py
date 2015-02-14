@@ -8,6 +8,7 @@ from pytest import raises
 def test_includeme_register_has_asset_pool_sheet(config):
     from adhocracy_core.sheets.asset import IHasAssetPool
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.registry')
     config.include('adhocracy_core.sheets.asset')
     context = testing.DummyResource(__provides__=IHasAssetPool)
     assert get_sheet(context, IHasAssetPool)
@@ -57,9 +58,10 @@ class TestIHasAssetPoolSheet:
         assert data['asset_pool'] == mock_asset_pool
 
 
-def test_includeme_register_asset_metadata_sheet(config):
+def test_includeme_register_asset_metadata_sheet(config, registry):
     from adhocracy_core.sheets.asset import IAssetMetadata
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.registry')
     config.include('adhocracy_core.sheets.asset')
     context = testing.DummyResource(__provides__=IAssetMetadata)
     assert get_sheet(context, IAssetMetadata)
@@ -245,6 +247,8 @@ class TestAssetFileDownload:
 
 
 class TestRetrieveAssetFile:
+     # TODO Why do we need this test? If a sheet is not registered something
+     # is really broken and we get and internal error anyway.
 
     def test_retrieve_asset_file_successfully(self, monkeypatch, registry):
         from adhocracy_core import utils
@@ -256,8 +260,11 @@ class TestRetrieveAssetFile:
         context = testing.DummyResource(__provides__=IAssetData)
         assert retrieve_asset_file(context, registry) == 'dummy'
 
-    def test_retrieve_asset_file_missing_sheet(self, registry):
+    def test_retrieve_asset_file_missing_sheet(self, registry_with_content):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
         from adhocracy_core.sheets.asset import retrieve_asset_file
         context = testing.DummyResource()
-        with raises(RuntimeError):
-            retrieve_asset_file(context, registry)
+        registry_with_content.content.get_sheet.side_effect =\
+            RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            retrieve_asset_file(context, registry_with_content)

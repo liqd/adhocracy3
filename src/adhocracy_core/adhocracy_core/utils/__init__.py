@@ -83,15 +83,13 @@ def get_sheet(context, isheet: IInterface, registry: Registry=None)\
         -> IResourceSheet:
     """Get sheet adapter for the `isheet` interface.
 
-    :raises zope.component.ComponentLookupError:
-        if there is no sheet adapter registered for `isheet`.
+    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
+        if there is no `isheet` sheet registered for context.
 
     """
-    # FIXME return cached sheet instance instead of creating a new one
     if registry is None:
         registry = get_current_registry(context)
-    return registry.getAdapter(context, IResourceSheet,
-                               name=isheet.__identifier__)
+    return registry.content.get_sheet(context, isheet)
 
 
 def get_all_taggedvalues(iface: IInterface) -> dict:

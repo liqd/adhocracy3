@@ -27,6 +27,7 @@ class TestDocumentSheet:
 def test_includeme_register_document_sheet(config):
     from adhocracy_core.sheets.document import IDocument
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.registry')
     config.include('adhocracy_core.sheets.document')
     context = testing.DummyResource(__provides__=IDocument)
     assert get_sheet(context, IDocument)
@@ -56,6 +57,7 @@ class TestParagraphSheet:
 def test_includeme_register_paragraph_sheet(config):
     from adhocracy_core.sheets.document import IParagraph
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.registry')
     config.include('adhocracy_core.sheets.document')
     context = testing.DummyResource(__provides__=IParagraph)
     assert get_sheet(context, IParagraph)
@@ -85,6 +87,7 @@ class TestSectionSheet:
 def test_includeme_register_section_sheet(config):
     from adhocracy_core.sheets.document import ISection
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.registry')
     config.include('adhocracy_core.sheets.document')
     context = testing.DummyResource(__provides__=ISection)
     assert get_sheet(context, ISection)

@@ -22,7 +22,7 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
-from adhocracy_core import utils
+from adhocracy_core.utils import get_sheet_field
 
 
 class IHasAssetPool(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -184,14 +184,8 @@ class AssetFileDownload(Persistent):
 
 def retrieve_asset_file(context: IResource, registry: Registry=None):
     """Retrieve asset file from content."""
-    if IAssetData.providedBy(context):
-        asset_data_sheet = utils.get_sheet(context,
-                                           IAssetData,
-                                           registry=registry)
-        return asset_data_sheet.get()['data']
-    else:
-        raise RuntimeError(
-            'Context provides no IAssetData: {}'.format(context))
+    data = get_sheet_field(context, IAssetData, 'data', registry=registry)
+    return data
 
 
 def includeme(config):

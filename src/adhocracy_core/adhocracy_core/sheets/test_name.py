@@ -28,6 +28,7 @@ class TestNameSheet:
 def test_includeme_register_name_sheet(config):
     from adhocracy_core.sheets.name import IName
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.registry')
     config.include('adhocracy_core.sheets.name')
     context = testing.DummyResource(__provides__=IName)
     inst = get_sheet(context, IName)

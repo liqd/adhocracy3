@@ -7,7 +7,7 @@ from pyramid import testing
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy_core.testing import add_and_register_sheet
+from adhocracy_core.testing import register_sheet
 
 
 class IDummySheetAutoUpdate(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -72,10 +72,9 @@ def event(changelog, context):
 class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
-    def registry(self, registry, mock_resource_registry, changelog):
-        registry.content = mock_resource_registry
-        registry._transaction_changelog = changelog
-        return registry
+    def registry(self, registry_with_content, changelog):
+        registry_with_content._transaction_changelog = changelog
+        return registry_with_content
 
     @fixture
     def mock_sheet(self, mock_sheet):
@@ -104,7 +103,7 @@ class TestAutoupdateVersionableHasNewVersion:
         """Ingore event if isheet ist not editable."""
         event = create_new_reference_event(version, registry)
         mock_sheet.meta = mock_sheet.meta._replace(editable=False)
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         self._call_fut(event)
         assert registry.content.create.called is False
 
@@ -114,7 +113,7 @@ class TestAutoupdateVersionableHasNewVersion:
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3,
                                            isheet_field='elements')
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         registry._transaction_changelog['/'] = \
             changelog_meta._replace(created=True)
@@ -128,7 +127,7 @@ class TestAutoupdateVersionableHasNewVersion:
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3,
                                            isheet_field='element')
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'element': 2}
         registry._transaction_changelog['/'] = \
             changelog_meta._replace(created=True)
@@ -141,9 +140,9 @@ class TestAutoupdateVersionableHasNewVersion:
         """Update followed_by version created in transaction."""
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3)
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         followedby = testing.DummyResource()
-        add_and_register_sheet(followedby, mock_sheet, registry)
+        register_sheet(followedby, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         registry._transaction_changelog['/'] =\
             changelog_meta._replace(followed_by=followedby)
@@ -161,9 +160,9 @@ class TestAutoupdateVersionableHasNewVersion:
         from pyramid.traversal import resource_path
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3, is_batchmode=True)
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         last_version = testing.DummyResource()
-        add_and_register_sheet(last_version, mock_sheet, registry)
+        register_sheet(last_version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         registry._transaction_changelog[resource_path(item)] =\
             changelog_meta._replace(last_version=last_version)
@@ -199,7 +198,7 @@ class TestAutoupdateVersionableHasNewVersion:
         from adhocracy_core.sheets.versions import IVersionable
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3)
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         mock_get_last_version.return_value = version
         registry.content.get_sheets_all.return_value = [mock_sheet,
@@ -231,13 +230,13 @@ class TestAutoupdateVersionableHasNewVersion:
         """If creating a new version, do not copy readonly sheets"""
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3)
-        add_and_register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
-        add_and_register_sheet(version, mock_sheet_readonly, registry)
         mock_get_last_version.return_value = version
         registry.content.get_sheets_all.return_value = [mock_sheet,
                                                         mock_versionable_sheet,
                                                         mock_sheet_readonly]
+        registry.content.get_sheet.side_effect = [mock_sheet,
+                                                  mock_sheet_readonly]
         self._call_fut(event)
         assert mock_sheet_readonly.meta.isheet.__identifier__ not in \
                registry.content.create.call_args[1]['appstructs']
@@ -250,10 +249,10 @@ class TestAutoupdateVersionableHasNewVersion:
         """
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3)
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         last = testing.DummyResource()
-        add_and_register_sheet(last, mock_sheet, registry)
+        register_sheet(last, mock_sheet, registry)
         mock_get_last_version.return_value = last
         registry.content.get_sheets_all.return_value = [mock_sheet,
                                                         mock_versionable_sheet]
@@ -269,10 +268,10 @@ class TestAutoupdateVersionableHasNewVersion:
         from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3)
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         last = testing.DummyResource()
-        add_and_register_sheet(last, mock_sheet, registry)
+        register_sheet(last, mock_sheet, registry)
         mock_sheet.get.side_effect = [{'elements': [1, 2]}, {'elements': [11]},
                                       {'elements': [22]}]
         mock_get_last_version.return_value = last
@@ -286,9 +285,9 @@ class TestAutoupdateVersionableHasNewVersion:
 
 class TestAutoupdateNoneVersionableHasNewVersion:
 
-    def registry(self, registry, mock_resource_registry):
-        registry.content = mock_resource_registry
-        return registry
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
 
     @fixture
     def mock_sheet(self, mock_sheet):
@@ -309,7 +308,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         version.__graph__ = mock_graph
         event = create_new_reference_event(version, registry,
                                            root_versions=[root_version])
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         self._call_fut(event)
         mock_graph.is_in_subtree.assert_called_once_with(version, [root_version])
         assert not mock_sheet.set.called
@@ -318,7 +317,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         """Ingore event if isheet ist not editable."""
         event = create_new_reference_event(version, registry)
         mock_sheet.meta = mock_sheet.meta._replace(editable=False)
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         self._call_fut(event)
         assert not mock_sheet.set.called
 
@@ -327,7 +326,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3,
                                            isheet_field='elements')
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
@@ -337,13 +336,17 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         event = create_new_reference_event(version, registry, old_version=2,
                                            new_version=3,
                                            isheet_field='elements')
-        add_and_register_sheet(version, mock_sheet, registry)
+        register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
 
 
 class TestAddDefaultGroupToUserSubscriber:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
 
     @fixture
     def principals(self, pool, service):
@@ -368,7 +371,7 @@ class TestAddDefaultGroupToUserSubscriber:
         user = principals['users']['000000']
         event.object = user
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
-        add_and_register_sheet(event.object, mock_sheet, registry)
+        register_sheet(event.object, mock_sheet, registry)
         mock_sheet.get.return_value = {'groups': []}
         self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'groups': [default_group]}
@@ -380,7 +383,7 @@ class TestAddDefaultGroupToUserSubscriber:
         user = principals['users']['000000']
         event.object = user
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
-        add_and_register_sheet(event.object, mock_sheet, registry)
+        register_sheet(event.object, mock_sheet, registry)
         mock_sheet.get.return_value = {'groups': []}
         self.call_fut(event)
         assert mock_sheet.set.called is False

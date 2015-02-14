@@ -4,13 +4,15 @@ from copy import copy
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
 from pyramid.decorator import reify
+from pyramid.traversal import resource_path
 from substanced.content import ContentRegistry
 from substanced.content import add_content_type
 from substanced.content import add_service_type
 from zope.interface.interfaces import IInterface
 
-from adhocracy_core.utils import get_iresource
+from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.utils import get_iresource
 
 
 resolver = DottedNameResolver()
@@ -69,6 +71,20 @@ class ResourceContentRegistry(ContentRegistry):
                         all_addables.append(resource_meta_)
             resources_addables[iresource] = all_addables
         return resources_addables
+
+    def get_sheet(self, context: object, isheet: IInterface) -> ISheet:
+        """Get sheet for `context` and set the 'context' attribute.
+
+        :raise adhocracy_core.exceptions.RuntimeConfigurationError:
+           if there is no `isheet` sheet registered for context.
+        """
+        if not isheet.providedBy(context):
+            msg = 'Sheet {0} is not provided by resource {1}'\
+                .format(isheet.__identifier__, resource_path(context))
+            raise RuntimeConfigurationError(msg)
+        meta = self.sheets_meta[isheet]
+        sheet = meta.sheet_class(meta, context)
+        return sheet
 
     def get_sheets_all(self, context: object) -> list:
         """Get all sheets for `context` and set the 'context' attribute."""

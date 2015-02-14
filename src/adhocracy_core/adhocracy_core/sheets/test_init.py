@@ -209,32 +209,23 @@ class TestResourcePropertySheet:
 class TestAddSheetToRegistry:
 
     @fixture
-    def context(self):
-        from adhocracy_core.interfaces import ISheet
-        return testing.DummyResource(__provides__=ISheet)
+    def registry(self, registry_with_content):
+        return registry_with_content
 
     def _call_fut(self, sheet_meta, registry):
         from adhocracy_core.sheets import add_sheet_to_registry
         return add_sheet_to_registry(sheet_meta, registry)
 
-    def test_register_valid_sheet_sheet_adapter(self, sheet_meta, registry, context):
-        from adhocracy_core.utils import get_sheet
-        self._call_fut(sheet_meta, registry)
-        sheet = get_sheet(context, sheet_meta.isheet)
-        assert sheet_meta.isheet == sheet.meta.isheet
-
-    def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry, mock_resource_registry, context):
-        registry.content = mock_resource_registry
+    def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry):
         self._call_fut(sheet_meta, registry)
         assert registry.content.sheets_meta == {sheet_meta.isheet: sheet_meta}
 
-    def test_register_valid_sheet_sheet_meta_replace_exiting(self, sheet_meta, registry, context):
-        from adhocracy_core.utils import get_sheet
+    def test_register_valid_sheet_sheet_meta_replace_exiting(self, sheet_meta,
+                                                             registry):
         self._call_fut(sheet_meta, registry)
         meta_b = sheet_meta._replace(permission_view='META_B')
         self._call_fut(meta_b, registry)
-        sheet = get_sheet(context, sheet_meta.isheet)
-        assert sheet.meta == meta_b
+        assert registry.content.sheets_meta == {sheet_meta.isheet: meta_b}
 
     def test_register_non_valid_readonly_and_createmandatory(self, sheet_meta, registry):
         meta = sheet_meta._replace(editable=False,
