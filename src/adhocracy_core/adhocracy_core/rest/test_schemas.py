@@ -759,3 +759,38 @@ class TestAddGetPoolRequestExtraFields:
         registry.content.resolve_isheet_field_from_dotted_string.side_effect = ValueError
         with raises(colander.Invalid):
             self._call_fut(cstruct, schema, None, registry)
+
+
+class TestPostMessageUserViewRequestSchema:
+
+    @fixture
+    def request(self, context):
+        request = testing.DummyRequest()
+        request.root = context
+        return request
+
+    def make_one(self):
+        from .schemas import POSTMessageUserViewRequestSchema
+        return POSTMessageUserViewRequestSchema()
+
+    def test_deserialize_valid(self, request, context):
+        from pyramid.traversal import resource_path
+        from adhocracy_core.sheets.principal import IUserExtended
+        inst = self.make_one().bind(request=request, context=context)
+        context['user'] = testing.DummyResource(__provides__=IUserExtended)
+        cstrut = {'recipient': resource_path(context['user']),
+                  'title': 'title',
+                  'text': 'text'}
+        assert inst.deserialize(cstrut) == {'recipient': context['user'],
+                                            'title': 'title',
+                                            'text': 'text'}
+
+    def test_deserialize_recipient_is_no_user(self, request, context):
+        from pyramid.traversal import resource_path
+        inst = self.make_one().bind(request=request, context=context)
+        context['user'] = testing.DummyResource()
+        cstrut = {'recipient': resource_path(context['user']),
+                  'title': 'title',
+                  'text': 'text'}
+        with raises(colander.Invalid):
+            inst.deserialize(cstrut)

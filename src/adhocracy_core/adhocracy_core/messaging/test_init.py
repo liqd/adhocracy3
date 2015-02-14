@@ -177,9 +177,6 @@ class TestSendMessageToUser():
 
     def _mock_get_sheet_field(self, context, sheet, field_name, registry):
         result = getattr(context, field_name)
-        if result == 'raise':
-            from zope.component import ComponentLookupError
-            raise ComponentLookupError('Bad luck!')
         return result
 
     def test_send_message_to_user(self, monkeypatch, registry):
@@ -205,22 +202,3 @@ class TestSendMessageToUser():
         assert 'From: sender@example.org' in msgtext
         assert 'Subject: Adhocracy Info: Important Adhocracy notice' in msgtext
         assert 'To: recipient@example.org' in msgtext
-
-    def test_send_message_recipient_is_not_a_user(self, monkeypatch, registry):
-        from adhocracy_core import messaging
-        from adhocracy_core.resources.principal import IUser
-        import colander
-        recipient = Mock()
-        recipient.email = 'raise'
-        sender = Mock(spec=IUser)
-        sender.email = 'sender@example.org'
-        monkeypatch.setattr(messaging, 'get_sheet_field',
-                            self._mock_get_sheet_field)
-        messenger = registry.messenger
-        messenger.message_user_subject = 'Adhocracy Info: {}'
-        with raises(colander.Invalid):
-            messenger.send_message_to_user(
-                recipient=recipient,
-                title='Important Adhocracy notice',
-                text='Surprisingly enough, all is well.',
-                from_user=sender)
