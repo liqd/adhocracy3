@@ -6,6 +6,13 @@ class ConfigurationError(Exception):
 
     """Raise when wrong values are supplied to the resources/sheet metadata."""
 
+    def __init__(self, details=''):
+        self.details = details
+        """Arbitrary error description."""
+
+    def __repr__(self):
+        return self.details
+
 
 class RuntimeConfigurationError(ConfigurationError):
 
