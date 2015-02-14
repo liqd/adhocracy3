@@ -1,42 +1,25 @@
-var annotatorLogin = "annotator";
-var annotatorPassword = "password";
+"use strict";
+
+var UserPages = require("./UserPages.js");
 
 var restUrl = "http://localhost:6542/";
 
 
-var LoginPage = function() {
-    this.loginInput = element(by.name("nameOrEmail"));
-    this.passwordInput = element(by.name("password"));
-    this.submitButton = element(by.css(".login [type=\"submit\"]"));
-
-    this.get = function() {
-        browser.get("/login");
-    };
-
-    this.login = function(username, password) {
-        this.loginInput.sendKeys(username);
-        this.passwordInput.sendKeys(password);
-        this.submitButton.click();
-        browser.waitForAngular();
-    };
-};
-
-
-
-var login = function(username, password) {
-    var loginPage = new LoginPage();
-    loginPage.get();
-    loginPage.login(username, password);
-};
-
-
-var loginAnnotator = function() {
-    login(annotatorLogin, annotatorPassword);
+var hasClass = function (element, cls) {
+    return element.getAttribute("class").then(function (classes) {
+        return classes.split(" ").indexOf(cls) !== -1;
+    });
 };
 
 
 module.exports = {
     restUrl: restUrl,
-    login: login,
-    loginAnnotator: loginAnnotator
+    register: UserPages.register,
+    login: UserPages.login,
+    logout: UserPages.logout,
+    isLoggedIn: UserPages.isLoggedIn,
+    loginAnnotator: UserPages.loginAnnotator,
+    annotatorName: UserPages.annotatorName,
+    loginContributor: UserPages.loginContributor,
+    hasClass: hasClass
 }
