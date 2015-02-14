@@ -7,7 +7,7 @@ exports.config = {
         core: "../src/adhocracy_frontend/adhocracy_frontend/tests/acceptance/*Spec.js",
         mercator: "../src/mercator/tests/acceptance/*Spec.js"
     },
-    baseUrl: "http://localhost:6552",
+    baseUrl: "http://localhost:9090",
     sauceUser: "liqd",
     sauceKey: "77600374-1617-4d7b-b1b6-9fd82ddfe89c",
 

@@ -5,7 +5,7 @@ exports.config = {
         core: "../src/adhocracy_frontend/adhocracy_frontend/tests/acceptance/*Spec.js",
         mercator: "../src/mercator/tests/acceptance/*Spec.js"
     },
-    baseUrl: "http://localhost:6552",
+    baseUrl: "http://localhost:9090",
     directConnect: true,
     capabilities: {
         "browserName": "chrome"

@@ -2,7 +2,7 @@
 
 var UserPages = require("./UserPages.js");
 
-var restUrl = "http://localhost:6542/";
+var restUrl = "http://localhost:9080/";
 
 
 var hasClass = function (element, cls) {
