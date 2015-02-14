@@ -44,9 +44,15 @@ class PoolSheet(AnnotationStorageSheet):
 
 class FilteringPoolSheet(PoolSheet):
 
-    """Resource sheet that allows filtering and aggregating pools."""
+    """Pool resource sheet that allows filtering and aggregating elements."""
 
     def _get_reference_appstruct(self, params: dict={}) -> dict:
+        """Get appstruct with references according to `params` query.
+
+        :param params: Query parameter to modify the returned references.
+        This data structure is specified in
+        :class:`adhocracy_core.rest.schemas.GETPoolRequestSchema`
+        """
         depth = self._build_depth(params)
         ifaces = self._build_iface_filter(params)
         arbitraries = self._get_arbitrary_filters(params)
