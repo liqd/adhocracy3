@@ -1,4 +1,5 @@
 """Pool Sheet."""
+from copy import deepcopy
 from collections.abc import Iterable
 from collections import namedtuple
 
@@ -163,6 +164,21 @@ class FilteringPoolSheet(PoolSheet):
                     aggregateby[aggregate_filter][str(value)] = len(
                         value_elements)
         return FilterElementsResult(elements, count, aggregateby)
+
+    def _get_schema_for_cstruct(self, request, params: dict):
+        """Return extended schema to serialize cstruct.
+
+        :param params: dictionary with optionally key 'elements' and
+        value 'content'. If set do not serialize the references path only but
+        the full resource cstruct.
+        """
+        schema = super()._get_schema_for_cstruct(request, params)
+        if params.get('elements', None) == 'content':
+            elements = schema['elements']
+            typ_copy = deepcopy(elements.children[0].typ)
+            typ_copy.serialization_form = 'content'
+            elements.children[0].typ = typ_copy
+        return schema
 
 
 class IPool(ISheet):

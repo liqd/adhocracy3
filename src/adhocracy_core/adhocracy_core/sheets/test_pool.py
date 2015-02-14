@@ -50,6 +50,11 @@ class TestPoolSchema:
 class TestFilteringPoolSheet:
 
     @fixture
+    def request(self, cornice_request, registry_with_content):
+        cornice_request.registry = registry_with_content
+        return cornice_request
+
+    @fixture
     def meta(self):
         from adhocracy_core.sheets.pool import pool_metadata
         return pool_metadata
@@ -157,6 +162,26 @@ class TestFilteringPoolSheet:
         reference_filters = {'sheet.ISheet1.reference:field1': None}
         filters.update(reference_filters)
         assert inst._get_reference_filters(filters) == reference_filters
+
+    def test_get_cstruct_with_params_content(self, meta, context, request):
+        inst = meta.sheet_class(meta, context)
+        inst.get = Mock()
+        child = testing.DummyResource()
+        inst.get.return_value = {'elements': [child]}
+        cstruct = inst.get_cstruct(request, params={'elements': 'content'})
+        assert cstruct['elements'] == \
+            [{'content_type': 'adhocracy_core.interfaces.IResource',
+              'data': {},
+              'path': 'http://example.com/'}]
+
+    def test_get_cstruct_without_params_content(self, meta, context, request):
+        inst = meta.sheet_class(meta, context)
+        inst.get = Mock()
+        child = testing.DummyResource()
+        inst.get.return_value = {'elements': [child]}
+        cstruct = inst.get_cstruct(request)
+        assert cstruct['elements'] == ['http://example.com/']
+
 
 
 @mark.usefixtures('integration')

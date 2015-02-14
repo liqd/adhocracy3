@@ -1,6 +1,4 @@
-"""Set/Get an isolated set of resource data."""
-
-# TODO move colander sheet data serialization here
+"""Data structures/validation, set/get for an isolated set of resource data."""
 
 from itertools import chain
 from logging import getLogger
@@ -236,6 +234,27 @@ class AnnotationStorageSheet(PropertySheet):
                                           new,
                                           request)
             registry.notify(event)
+
+    def get_cstruct(self, request: Request, params: dict={}):
+        """Return cstruct data.
+
+        Bind `request` and `context` to colander schema.
+        Get sheet appstruct data and serialize.
+        """
+        schema = self._get_schema_for_cstruct(request, params)
+        appstruct = self.get(params=params)
+        cstruct = schema.serialize(appstruct)
+        return cstruct
+
+    def _get_schema_for_cstruct(self, request, params: dict):
+        """Return customized schema to serialize cstruct data.
+
+        This might be overridden in subclasses.
+        """
+        schema = self.schema.bind(context=self.context,
+                                  request=request)
+        return schema
+
 
 @implementer(IResourceSheet)
 class AttributeStorageSheet(AnnotationStorageSheet):

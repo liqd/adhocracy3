@@ -26,6 +26,10 @@ def sheet_meta(sheet_meta):
 class TestResourcePropertySheet:
 
     @fixture
+    def request_(self):
+        return testing.DummyResource()
+
+    @fixture
     def mock_node_unique_references(self):
         from adhocracy_core.schema import UniqueReferences
         from adhocracy_core.schema import SheetReference
@@ -204,6 +208,11 @@ class TestResourcePropertySheet:
         assert events[0].registry == config.registry
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
+
+    def test_get_cstruct(self, sheet_meta, request_, context):
+        inst = self.make_one(sheet_meta, context)
+        inst.set({'count': 2})
+        assert inst.get_cstruct(request_) == {'count': '2'}
 
 
 class TestAddSheetToRegistry:

@@ -141,6 +141,16 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         of the returned dictionary, e.g. query parameters in a GET request
         """
 
+    def get_cstruct(request, params: dict={}):
+        """Return cstruct data.
+
+        Bind `request` and `context` to colander schema.
+        Get sheet appstruct data and serialize.
+
+        :param params: optional parameters that can modify the appearance
+        of the returned dictionary, e.g. query parameters in a GET request
+        """
+
 
 RESOURCE_METADATA = OrderedDict({
     'content_name': '',

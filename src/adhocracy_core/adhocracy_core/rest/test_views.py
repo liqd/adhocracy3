@@ -441,7 +441,7 @@ class TestResourceRESTView:
         assert wanted == response
 
     def test_get_valid_with_sheets(self, request_, context, mock_sheet):
-        mock_sheet.get.return_value = {'name': 1}
+        mock_sheet.get_cstruct.return_value = {'name': '1'}
         mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
         inst = self.make_one(context, request_)
@@ -543,6 +543,7 @@ class TestPoolRESTView:
     def test_get_valid_pool_sheet_with_query_params(self, request, context, mock_sheet):
         from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
+        mock_sheet.get_cstruct.return_value = {}
         request.registry.content.get_sheets_read.return_value = [mock_sheet]
         request.validated['param1'] = 1
 
@@ -550,25 +551,7 @@ class TestPoolRESTView:
         response = inst.get()
 
         assert response['data'] == {IPool.__identifier__: {}}
-        assert mock_sheet.get.call_args[1] == {'params': {'param1': 1}}
-
-    def test_get_valid_pool_sheet_with_elements_content_param(self, request, context, mock_sheet):
-        from adhocracy_core.sheets.pool import IPool
-        from adhocracy_core.sheets.pool import PoolSchema
-        child = testing.DummyResource(__provides__=IResource)
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
-        mock_sheet.get.return_value = {'elements': [child]}
-        mock_sheet.schema = PoolSchema()
-        request.registry.content.get_sheets_read.return_value = [mock_sheet]
-        request.validated['elements'] = 'content'
-
-        inst = self.make_one(context, request)
-        response = inst.get()
-
-        response_elements_child = response['data'][IPool.__identifier__]['elements'][0]
-        assert 'path' in response_elements_child
-        assert 'content_type' in response_elements_child
-        assert 'data' in response_elements_child
+        assert mock_sheet.get_cstruct.call_args[1] == {'params': {'param1': 1}}
 
     def test_post_valid(self, request, context):
         request.root = context

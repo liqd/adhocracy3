@@ -63,7 +63,6 @@ from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
-import adhocracy_core.sheets.pool
 
 
 logger = getLogger(__name__)
@@ -418,28 +417,9 @@ class ResourceRESTView(RESTView):
         data_cstruct = {}
         for sheet in sheets_view:
             key = sheet.meta.isheet.__identifier__
-            schema = sheet.schema.bind(context=self.context,
-                                       request=self.request)
-            appstruct = sheet.get(params=queryparams)
-            if sheet.meta.isheet is adhocracy_core.sheets.pool.IPool:
-                _set_pool_sheet_elements_serialization_form(schema,
-                                                            queryparams)
-                # FIXME? readd the get_cstruct method but with parameters
-                # 'request'/'context'. Then we can handle this stuff at
-                #  one place, the pool sheet package.
-            cstruct = schema.serialize(appstruct)
+            cstruct = sheet.get_cstruct(self.request, params=queryparams)
             data_cstruct[key] = cstruct
         return data_cstruct
-
-
-def _set_pool_sheet_elements_serialization_form(schema: MappingSchema,
-                                                queryparams: dict):
-    if queryparams.get('elements', 'path') != 'content':
-        return
-    elements_node = schema['elements']
-    elements_typ_copy = deepcopy(elements_node.children[0].typ)
-    elements_typ_copy.serialization_form = 'content'
-    elements_node.children[0].typ = elements_typ_copy
 
 
 @view_defaults(
