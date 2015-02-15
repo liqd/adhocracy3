@@ -9,7 +9,7 @@
         <base href="/" />
     </head>
     <body>
-        <!--[if lt IE 9]>
+        <!--[if lt IE 10]>
         <div class="unsupported-browser">
             <img src="/static/icons/png/attention.png"/>
             <div>
@@ -19,7 +19,7 @@
             </div>
         </div>
         <![endif]-->
-        <!--[if gt IE 8]><!-->
+        <!--[if gt IE 9]><!-->
         <adh-view></adh-view>
         % for url in js:
             <script type="text/javascript" src="${url}"></script>
