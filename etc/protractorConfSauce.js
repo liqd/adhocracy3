@@ -4,8 +4,7 @@ var name = ((pr === "false") ? "" : "#" + pr + " ") + process.env.TRAVIS_COMMIT;
 
 exports.config = {
     suites: {
-        core: "../src/adhocracy_frontend/adhocracy_frontend/tests/acceptance/*Spec.js",
-        mercator: "../src/mercator/tests/acceptance/*Spec.js"
+        core: "../src/adhocracy_frontend/adhocracy_frontend/tests/acceptance/*Spec.js"
     },
     baseUrl: "http://localhost:9090",
     sauceUser: "liqd",
