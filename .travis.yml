@@ -4,11 +4,11 @@ python:
   - "3.4"
 install:
   - "python bootstrap.py --setuptools-version=12.0.4"
-  - "PATH=${PATH}/bin ./bin/buildout 2>/dev/null"
+  - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout 2>/dev/null"
 script:
   - "./bin/py.test_run_unittests_with_coverage"
   - "./bin/py.test_run_all"
-  - "./bin/protractor etc/protractorConfSauce.js"
+  - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/protractor etc/protractorConfSauce.js"
 git:
   depth: 3000
 notifications:
