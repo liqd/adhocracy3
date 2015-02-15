@@ -5,7 +5,9 @@ Adhocracy customizations for advocate-europe
     :target: http://travis-ci.org/liqd/adhocracy3.mercator
 .. image:: https://coveralls.io/repos/liqd/adhocracy3.mercatorz/badge.png?branch=master
     :target: https://coveralls.io/r/liqd/adhocracy3.mercator
-
+.. image:: https://readthedocs.org/projects/adhocracy3mercator/badge/?version=latest
+    :target: https://coveralls.io/r/liqd/adhocracy3.mercator
+    
 This repository contains the source code of the Adhocracy 3 backend and
 frontend cores as well as customizations for the advocate-europe project.
 
