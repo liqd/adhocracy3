@@ -9,13 +9,10 @@ var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
 var MercatorProposalDetailPage = function() {
     this.column = element(by.tagName("adh-mercator-proposal-detail-column"));
     this.coverCommentsButton = element(by.css('.mercator-proposal-cover-show-comments'));
-
-    this.getEditButton = function() {
-        this.column.element(by.cssContainingText("a", "edit"));
-    };
+    this.editButton = this.column.element(by.cssContainingText("a", "edit"));
 
     this.getEditPage = function() {
-        this.getEditButton().click();
+        this.editButton.click();
         return new MercatorProposalFormPage();
     };
 };

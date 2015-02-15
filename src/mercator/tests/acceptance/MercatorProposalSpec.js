@@ -66,6 +66,7 @@ describe("mercator proposal form", function() {
         shared.loginAnnotator();
 
         var list = new MercatorProposalListing().get();
+        browser.waitForAngular();
         var form = list.getDetailPage(0).getEditPage();
         form.userInfoLastName.clear();
         expect(form.isValid()).toBe(false);
@@ -78,21 +79,20 @@ describe("mercator proposal form", function() {
         form.submitButton.click();
         expect(browser.getCurrentUrl()).not.toContain("@edit");
         browser.waitForAngular();
-        browser.pause();
         expect(element(by.tagName("adh-mercator-proposal-detail-view")).element(by.tagName("adh-user-meta")).getText()).toContain("pita rasta");
     });
 
     it("disallows anonymous to edit existing proposals (depends on submit)", function() {
         var list = new MercatorProposalListing().get();
-        var editButton = list.getDetailPage(0).getEditButton();
-        expect(editButton).toBe(undefined);
+        var editButton = list.getDetailPage(0).editButton;
+        expect(editButton.isPresent()).toBe(false);
     });
 
     it("disallows other users to edit existing proposals (depends on submit)", function() {
         shared.loginContributor();
         var list = new MercatorProposalListing().get();
-        var editButton = list.getDetailPage(0).getEditButton();
-        expect(editButton).toBe(undefined);
+        var editButton = list.getDetailPage(0).editButton;
+        expect(editButton.isPresent()).toBe(false);
     });
 });
 
