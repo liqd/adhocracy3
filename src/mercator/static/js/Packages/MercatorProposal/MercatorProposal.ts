@@ -167,6 +167,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     subResourceSelectedState : (key : string) => string;
     commentableUrl : string;
     $flow? : Flow;
+    create : boolean;
 }
 
 export interface IControllerScope extends IScope {
@@ -247,6 +248,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public createDirective() : ng.IDirective {
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
+        directive.scope.create = "@";
         directive.controller = ["adhTopLevelState", "$scope", (adhTopLevelState : AdhTopLevelState.Service, $scope : IScope) => {
             adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
@@ -595,13 +597,15 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     family_name: data.user_info.last_name,
                     country: data.user_info.country
                 });
-                resource.data[SIMercatorHeardFrom.nick] = new SIMercatorHeardFrom.Sheet({
-                    heard_from_colleague: data.heard_from.colleague,
-                    heard_from_website: data.heard_from.website,
-                    heard_from_newsletter: data.heard_from.newsletter,
-                    heard_from_facebook: data.heard_from.facebook,
-                    heard_elsewhere: (data.heard_from.other ? data.heard_from.other_specify : "")
-                });
+                if (typeof data.heard_from !== "undefined") {
+                    resource.data[SIMercatorHeardFrom.nick] = new SIMercatorHeardFrom.Sheet({
+                        heard_from_colleague: data.heard_from.colleague,
+                        heard_from_website: data.heard_from.website,
+                        heard_from_newsletter: data.heard_from.newsletter,
+                        heard_from_facebook: data.heard_from.facebook,
+                        heard_elsewhere: (data.heard_from.other ? data.heard_from.other_specify : "")
+                    });
+                }
                 resource.data[SIMercatorSubResources.nick] = new SIMercatorSubResources.Sheet(<any>{});
                 break;
         }
