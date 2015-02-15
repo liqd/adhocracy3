@@ -13,5 +13,14 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_add_transaction_changelog(registry):
-    assert hasattr(registry, '_transaction_changelog')
+def test_add_changelog(registry):
+    assert hasattr(registry, 'changelog')
+
+
+@mark.usefixtures('integration')
+def test_clear_changelog(context, registry, changelog):
+    from . import clear_changelog_after_commit_hook
+    changelog['/'] = changelog['/']._replace(resource=context)
+    registry.changelog = changelog
+    clear_changelog_after_commit_hook(True, registry)
+    assert changelog['/'].resource is None

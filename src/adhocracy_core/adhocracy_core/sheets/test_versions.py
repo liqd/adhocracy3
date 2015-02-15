@@ -52,7 +52,7 @@ class TestValidateLinearHistoryNoFork:
 
     @fixture
     def request(self, registry_with_content, changelog):
-        registry_with_content._transaction_changelog = changelog
+        registry_with_content.changelog = changelog
         request = testing.DummyResource(registry=registry_with_content,
                                         validated={})
         return request
@@ -112,7 +112,7 @@ class TestValidateLinearHistoryNoFork:
         set_batchmode(request)
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         other_version = object()
-        registry._transaction_changelog['/'] = changelog['/']._replace(last_version=other_version)
+        registry.changelog['/'] = changelog['/']._replace(last_version=other_version)
         self._call_fut(node, [other_version])
 
 

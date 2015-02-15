@@ -64,7 +64,7 @@ def item(version):
 @fixture
 def event(changelog, context):
     registry = testing.DummyResource()
-    registry._transaction_changelog = changelog
+    registry.changelog = changelog
     event = testing.DummyResource(object=context, registry=registry)
     return event
 
@@ -73,7 +73,7 @@ class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
     def registry(self, registry_with_content, changelog):
-        registry_with_content._transaction_changelog = changelog
+        registry_with_content.changelog = changelog
         return registry_with_content
 
     @fixture
@@ -115,8 +115,7 @@ class TestAutoupdateVersionableHasNewVersion:
                                            isheet_field='elements')
         register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
-        registry._transaction_changelog['/'] = \
-            changelog_meta._replace(created=True)
+        registry.changelog['/'] = changelog_meta._replace(created=True)
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
         assert registry.content.create.called is False
@@ -129,8 +128,7 @@ class TestAutoupdateVersionableHasNewVersion:
                                            isheet_field='element')
         register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'element': 2}
-        registry._transaction_changelog['/'] = \
-            changelog_meta._replace(created=True)
+        registry.changelog['/'] = changelog_meta._replace(created=True)
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'element': 3}
         assert registry.content.create.called is False
@@ -144,8 +142,7 @@ class TestAutoupdateVersionableHasNewVersion:
         followedby = testing.DummyResource()
         register_sheet(followedby, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
-        registry._transaction_changelog['/'] =\
-            changelog_meta._replace(followed_by=followedby)
+        registry.changelog['/'] = changelog_meta._replace(followed_by=followedby)
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
         assert registry.content.create.called is False
@@ -164,7 +161,7 @@ class TestAutoupdateVersionableHasNewVersion:
         last_version = testing.DummyResource()
         register_sheet(last_version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
-        registry._transaction_changelog[resource_path(item)] =\
+        registry.changelog[resource_path(item)] =\
             changelog_meta._replace(last_version=last_version)
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}

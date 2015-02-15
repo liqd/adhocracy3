@@ -307,7 +307,7 @@ class RESTView:
     def _build_updated_resources_dict(self) -> dict:
         """Utility method used by several subclasses."""
         result = defaultdict(list)
-        changelog_meta = self.request.registry._transaction_changelog.values()
+        changelog_meta = self.request.registry.changelog.values()
         for meta in changelog_meta:
             events = extract_events_from_changelog_metadata(meta)
             for event in events:

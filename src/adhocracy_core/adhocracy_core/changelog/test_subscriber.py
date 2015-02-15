@@ -9,7 +9,7 @@ from pyramid import testing
 @fixture
 def event(changelog, context):
     registry = testing.DummyResource()
-    registry._transaction_changelog = changelog
+    registry.changelog = changelog
     event = testing.DummyResource(object=context, registry=registry)
     return event
 

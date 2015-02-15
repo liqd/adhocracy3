@@ -73,7 +73,7 @@ def _add_changelog(registry: Registry, resource: IResource, key: str,
 
     Return: True if new metadata value was added else False (no value change)
     """
-    changelog = registry._transaction_changelog
+    changelog = registry.changelog
     path = resource_path(resource)
     metadata = changelog[path]
     old_value = getattr(metadata, key)

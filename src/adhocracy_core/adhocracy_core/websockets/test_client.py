@@ -54,7 +54,7 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
         self._client = DummyClient()
         self._registry = DummyResource()
         self._registry.ws_client = self._client
-        self._registry._transaction_changelog = dict()
+        self._registry.changelog = dict()
         self._changelog_metadata = changelog_metadata
 
     def test_send_messages_after_commit_hook_success_and_empty_changelog(self):
@@ -70,7 +70,7 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
     def test_send_messages_after_commit_hook_success_and_non_empty_changelog(self):
         from pyramid.testing import DummyResource
         from adhocracy_core.websockets.client import send_messages_after_commit_hook
-        self._registry._transaction_changelog['/'] = \
+        self._registry.changelog['/'] = \
             self._changelog_metadata._replace(modified=True,
                                               resource=DummyResource())
         send_messages_after_commit_hook(success=True, registry=self._registry)

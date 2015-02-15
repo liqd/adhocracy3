@@ -108,7 +108,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         referenced_v0 = self._make_one()
         referenceing_v0 = self._make_one(appstructs={ISection.__identifier__:
                                                      {'subsections': [referenced_v0]}})
-        self.config.registry._transaction_changelog.clear()
+        self.config.registry.changelog.clear()
         referenced_v1 = self._make_one(follows=[referenced_v0])
 
         referencing_v0_versions = get_sheet(referenceing_v0, IVersionable).get()

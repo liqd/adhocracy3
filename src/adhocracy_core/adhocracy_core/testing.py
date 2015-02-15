@@ -299,7 +299,7 @@ def changelog(changelog_meta):
 @fixture
 def registry_with_changelog(registry, changelog):
     """Return registry with transaction_changelog."""
-    registry._transaction_changelog = changelog
+    registry.changelog = changelog
     return registry
 
 
@@ -336,7 +336,7 @@ def mock_objectmap() -> Mock:
 
 
 @fixture
-def mock_resource_registry() -> Mock:
+def mock_content_registry() -> Mock:
     """Mock :class:`adhocracy_core.content.ResourceContentRegistry`."""
     from adhocracy_core.content import ResourceContentRegistry
     mock = Mock(spec=ResourceContentRegistry)
@@ -356,9 +356,9 @@ def mock_resource_registry() -> Mock:
 
 
 @fixture
-def registry_with_content(registry, mock_resource_registry):
-    """Return registry with resource registry attribute named content."""
-    registry.content = mock_resource_registry
+def registry_with_content(registry, mock_content_registry):
+    """Return registry with content registry attribute."""
+    registry.content = mock_content_registry
     return registry
 
 

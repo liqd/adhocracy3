@@ -325,7 +325,7 @@ def get_last_version(resource: IItemVersion,
 def get_changelog_metadata(resource, registry) -> ChangelogMetadata:
     """Return transaction changelog for `resource`."""
     path = resource_path(resource)
-    changelog = registry._transaction_changelog[path]
+    changelog = registry.changelog[path]
     return changelog
 
 

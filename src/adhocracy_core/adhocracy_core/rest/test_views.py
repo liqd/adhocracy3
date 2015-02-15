@@ -254,7 +254,7 @@ class TestRESTView:
 
     @fixture
     def request(self, cornice_request, changelog):
-        cornice_request.registry._transaction_changelog = changelog
+        cornice_request.registry.changelog = changelog
         return cornice_request
 
     def make_one(self, context, request):
@@ -281,8 +281,8 @@ class TestRESTView:
     def test__build_updated_resources_dict_one_resource(
             self, request, context, changelog_meta):
         res = testing.DummyResource()
-        request.registry._transaction_changelog[
-            res] = changelog_meta._replace(resource=res, created=True)
+        request.registry.changelog[res] = changelog_meta._replace(resource=res,
+                                                                  created=True)
         inst = self.make_one(context, request)
         result = inst._build_updated_resources_dict()
         assert result == {'created': [res]}
@@ -290,9 +290,8 @@ class TestRESTView:
     def test__build_updated_resources_dict_one_resource_two_events(
             self, request, context, changelog_meta):
         res = testing.DummyResource()
-        request.registry._transaction_changelog[
-            res] = changelog_meta._replace(
-            resource=res,  created=True, changed_descendants=True)
+        request.registry.changelog[res] = changelog_meta._replace(
+            resource=res, created=True, changed_descendants=True)
         inst = self.make_one(context, request)
         result = inst._build_updated_resources_dict()
         assert result == {'changed_descendants': [res], 'created': [res]}
@@ -301,10 +300,10 @@ class TestRESTView:
             self, request, context, changelog_meta):
         res1 = testing.DummyResource()
         res2 = testing.DummyResource()
-        request.registry._transaction_changelog[
-            res1] = changelog_meta._replace(resource=res1, created=True)
-        request.registry._transaction_changelog[
-            res2] = changelog_meta._replace(resource=res2, created=True)
+        request.registry.changelog[res1] = \
+            changelog_meta._replace(resource=res1, created=True)
+        request.registry.changelog[res2] =\
+            changelog_meta._replace(resource=res2, created=True)
         inst = self.make_one(context, request)
         result = inst._build_updated_resources_dict()
         assert list(result.keys()) == ['created']
@@ -639,7 +638,7 @@ class TestItemRESTView:
     @fixture
     def request(self, cornice_request, mock_content_registry, changelog):
         cornice_request.registry.content = mock_content_registry
-        cornice_request.registry._transaction_changelog = changelog
+        cornice_request.registry.changelog = changelog
         return cornice_request
 
     def make_one(self, context, request):
