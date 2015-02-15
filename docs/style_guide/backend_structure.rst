@@ -117,8 +117,6 @@ Modules API and separation of responsibility
     adhocracy_core.resources.principal
     adhocracy_core.resources.subscriber
     adhocracy_core.sheets
-    adhocracy_core.sheets.AttributeStorageSheet
-    adhocracy_core.sheets.GenericResourceSheet
     adhocracy_core.catalog
     adhocracy_core.catalog.adhocracy
     adhocracy_core.catalog.subscriber
@@ -136,10 +134,20 @@ Modules API and separation of responsibility
     adhocracy_core.events
     adhocracy_core.schema
     adhocracy_core.exceptions
-    adhocracy_core.scaffolds
 
-TODO: changelog
+.. rubric:: Other stuff
+
+.. autosummary::
+
+    adhocracy_core.scaffolds
+    adhocracy_core.scripts
+
+
 TODO: mark pluggable dependency modules
+
+TODO: move scripts to adhocracy_core.scripts
+
+TODO: move index functions to adhocracy_core.catalogs.adhocracy
 
 
 Modules import rules
