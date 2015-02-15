@@ -1,3 +1,4 @@
+sudo: false
 language: python
 python:
   - "3.4"
@@ -13,3 +14,7 @@ notifications:
   email: false
 after_success:
   - "./bin/coveralls"
+cache:
+  directories:
+    - eggs
+    - node_modules
