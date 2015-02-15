@@ -842,6 +842,63 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.data  = {};
+            adhHttp.get(scope.path).then((proposal) => {
+                scope.data.user_info = {
+                    first_name: proposal.data[SIMercatorUserInfo.nick].personal_name,
+                    last_name: proposal.data[SIMercatorUserInfo.nick].personal_name,
+                    country: proposal.data[SIMetaData.nick].item_creation_date,
+                    path: proposal.data[SIMetaData.nick].creator
+                };
+                adhHttp.get(proposal.data[SIMercatorSubResources.nick].introduction).then((introduction) => {
+                    scope.data.introduction = {
+                        picture: introduction.data[SIMercatorIntroduction.nick].picture,
+                        title: introduction.data[SIMercatorIntroduction.nick].title
+                    };
+                });
+                adhHttp.get(proposal.data[SIMercatorSubResources.nick].organization_info).then((organization_info) => {
+                    scope.data.organization_info = {
+                        name: organization_info.data[SIMercatorOrganizationInfo.nick].name
+                    };
+                });
+                adhHttp.get(proposal.data[SIMercatorSubResources.nick].finance).then((finance) => {
+                    scope.data.finance = {
+                        budget: finance.data[SIMercatorFinance.nick].budget
+                    };
+                });
+            });
+            adhHttp.get(AdhUtil.parentPath(scope.path), {
+                content_type: "adhocracy_core.resources.rate.IRateVersion",
+                tag: "LAST",
+                rate: 1,
+                depth: 3,
+                count: "true",
+                elements: "omit"
+            }).then((result) => {
+                scope.data.supporterCount = parseInt(result.data[SIPool.nick].count, 10);
+            });
+            adhHttp.get(AdhUtil.parentPath(scope.path), {
+                content_type: "adhocracy_core.resources.comment.ICommentVersion",
+                tag: "LAST",
+                depth: 4,
+                count: "true",
+                elements: "omit"
+            }).then((result) => {
+                scope.data.commentCountTotal = parseInt(result.data[SIPool.nick].count, 10);
+            });
+        }
+    };
+};
+
+
 export var imageUriFilter = () => {
     return (path? : string, format : string = "detail") : string => {
         if (path) {
@@ -966,6 +1023,7 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
+        .directive("adhMercatorProposalListItem", ["adhConfig", "adhHttp", listItem])
         .filter("adhImageUri", imageUriFilter)
         .controller("mercatorProposalFormController", ["$scope", "$element", "$window", ($scope : IControllerScope, $element, $window) => {
             var heardFromCheckboxes = [
