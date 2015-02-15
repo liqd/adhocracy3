@@ -174,7 +174,7 @@ def pool_graph(config):
     from adhocracy_core.resources.pool import Pool
     from adhocracy_core.resources.root import _add_graph
     from adhocracy_core.resources.root import _add_objectmap_to_app_root
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.graph')
     context = Pool()
@@ -337,8 +337,8 @@ def mock_objectmap() -> Mock:
 
 @fixture
 def mock_resource_registry() -> Mock:
-    """Mock :class:`adhocracy_core.registry.ResourceContentRegistry`."""
-    from adhocracy_core.registry import ResourceContentRegistry
+    """Mock :class:`adhocracy_core.content.ResourceContentRegistry`."""
+    from adhocracy_core.content import ResourceContentRegistry
     mock = Mock(spec=ResourceContentRegistry)
     mock.sheets_meta = {}
     mock.resources_meta = {}

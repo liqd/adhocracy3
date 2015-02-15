@@ -52,7 +52,7 @@ Usage of external dependencies
    * :mod:`substanced.evolution` (migration, see :mod:`adhocracy_core.evolution`)
    * :mod:`substanced.catalog` (search, extended by :mod:`adhocracy_core.catalog`)
    * :mod:`substanced.workflow` (state machines mapped to resource types)
-   * :mod:`substanced.content` (provide content types factories, extendend by :mod:`adhocracy_core.registry`)
+   * :mod:`substanced.content` (provide content types factories, extendend by :mod:`adhocracy_core.content`)
    * :mod:`substanced.objectmap` (reference resources, extented by :mod:`adhocracy_core.graph`)
    * :mod:`substanced.scripts` (command line utilities)
    * :mod:`substanced.folder` (Persistent implemention for :class:`adhocracy_core.interfaces.IPool` resources)
@@ -100,7 +100,7 @@ Modules API and separation of responsibility
 
 .. autosummary::
 
-    adhocracy_core.registry
+    adhocracy_core.content
 
 .. rubric:: Data, Authorization, Principals Level
 

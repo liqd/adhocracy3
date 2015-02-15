@@ -67,7 +67,7 @@ def includeme(config):
     config.include('.authentication')
     config.include('.evolution')
     config.include('.events')
-    config.include('.registry')
+    config.include('.content')
     config.include('.changelog')
     config.include('.graph')
     config.include('.catalog')

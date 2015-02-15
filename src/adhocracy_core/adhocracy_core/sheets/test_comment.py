@@ -5,7 +5,7 @@ from pytest import fixture
 def test_includeme_register_comment_sheet(config):
     from adhocracy_core.sheets.comment import IComment
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.comment')
     context = testing.DummyResource(__provides__=IComment)
     assert get_sheet(context, IComment)

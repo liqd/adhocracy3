@@ -32,19 +32,19 @@ class TestAddResourceTypeToRegistry:
         return add_resource_type_to_registry(*args)
 
     def test_add_iresource_but_missing_content_registry(self, config, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         del config.registry.content
         with raises(AssertionError):
             self.make_one(resource_meta, config)
 
     def test_add_resource_type(self, config, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         self.make_one(resource_meta, config)
         resource = config.registry.content.create(IResource.__identifier__)
         assert IResource.providedBy(resource)
 
     def test_add_resource_type_metadata(self, config, registry, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         iresource = IResource
         resource_type = iresource.__identifier__
         self.make_one(resource_meta, config)
@@ -54,7 +54,7 @@ class TestAddResourceTypeToRegistry:
                resource_meta  # adhocracy uses interfaces for content types ids
 
     def test_add_resource_type_metadata_with_content_name(self, config, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         type_id = IResource.__identifier__
         metadata_a = resource_meta._replace(content_name='Name')
         self.make_one(metadata_a, config)

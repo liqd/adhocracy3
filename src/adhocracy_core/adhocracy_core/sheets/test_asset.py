@@ -8,7 +8,7 @@ from pytest import raises
 def test_includeme_register_has_asset_pool_sheet(config):
     from adhocracy_core.sheets.asset import IHasAssetPool
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.asset')
     context = testing.DummyResource(__provides__=IHasAssetPool)
     assert get_sheet(context, IHasAssetPool)
@@ -61,7 +61,7 @@ class TestIHasAssetPoolSheet:
 def test_includeme_register_asset_metadata_sheet(config, registry):
     from adhocracy_core.sheets.asset import IAssetMetadata
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.asset')
     context = testing.DummyResource(__provides__=IAssetMetadata)
     assert get_sheet(context, IAssetMetadata)

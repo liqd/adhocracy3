@@ -314,8 +314,8 @@ class TestRESTView:
 class TestResourceRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request_(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request_):
@@ -452,9 +452,9 @@ class TestSimpleRESTView:
 
     @fixture
     def request(self, cornice_request, registry_with_changelog,
-                mock_resource_registry):
+                mock_content_registry):
         cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -509,9 +509,9 @@ class TestPoolRESTView:
 
     @fixture
     def request(self, cornice_request, registry_with_changelog,
-                mock_resource_registry):
+                mock_content_registry):
         cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -589,9 +589,9 @@ class TestUsersRESTView:
 
     @fixture
     def request(self, cornice_request, registry_with_changelog,
-                mock_resource_registry):
+                mock_content_registry):
         cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -637,8 +637,8 @@ class TestUsersRESTView:
 class TestItemRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry, changelog):
-        cornice_request.registry.content = mock_resource_registry
+    def request(self, cornice_request, mock_content_registry, changelog):
+        cornice_request.registry.content = mock_content_registry
         cornice_request.registry._transaction_changelog = changelog
         return cornice_request
 
@@ -802,8 +802,8 @@ class TestItemRESTView:
 class TestMetaApiView:
 
     @fixture
-    def request(self, cornice_request,  mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request(self, cornice_request,  mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     @fixture
@@ -1203,7 +1203,7 @@ class TestValidateActivationPathUnitTest:
     def user_with_metadata(self, config):
         from adhocracy_core.sheets.metadata import IMetadata
         config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         config.include('adhocracy_core.changelog')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
@@ -1338,8 +1338,8 @@ class TestMessageUserView:
 class TestAssetsServiceRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -1367,8 +1367,8 @@ class TestAssetsServiceRESTView:
 class TestAssetRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request_(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request_):
@@ -1398,8 +1398,8 @@ class TestAssetRESTView:
 class TestAssetDownloadRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request_(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request_):

@@ -84,7 +84,7 @@ def integration(config):
     config.include('pyramid_mako')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.changelog')
     config.include('adhocracy_core.messaging')
     config.include('adhocracy_core.sheets.metadata')
@@ -371,7 +371,7 @@ class UserLocatorAdapterIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
-        self.config.include('adhocracy_core.registry')
+        self.config.include('adhocracy_core.content')
         self.config.include('adhocracy_core.resources.principal')
         self.context = testing.DummyResource()
         self.registry = self.config.registry

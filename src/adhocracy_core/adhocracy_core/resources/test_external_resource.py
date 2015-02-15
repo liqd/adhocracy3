@@ -21,7 +21,7 @@ def test_external_resource_meta():
 @fixture
 def integration(config):
     config.include('adhocracy_core.events')
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.resources.external_resource')

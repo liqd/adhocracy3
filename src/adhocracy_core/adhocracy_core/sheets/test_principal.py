@@ -72,7 +72,7 @@ class TestPasswordSheet:
 def test_includeme_register_password_sheet(config):
     from adhocracy_core.sheets.principal import IPasswordAuthentication
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IPasswordAuthentication)
     assert get_sheet(context, IPasswordAuthentication)
@@ -245,7 +245,7 @@ class TestUserExtendedSheet:
 def test_includeme_register_userbasic_sheet(config):
     from adhocracy_core.sheets.principal import IUserBasic
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IUserBasic)
     assert get_sheet(context, IUserBasic)
@@ -353,7 +353,7 @@ class TestPermissionsSheet:
 def test_includeme_register_permissions_sheet(config):
     from adhocracy_core.sheets.principal import IPermissions
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IPermissions)
     assert get_sheet(context, IPermissions)
@@ -385,7 +385,7 @@ class TestGroupSheet:
 def test_includeme_register_group_sheet(config):
     from adhocracy_core.sheets.principal import IGroup
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IGroup)
     inst = get_sheet(context, IGroup)

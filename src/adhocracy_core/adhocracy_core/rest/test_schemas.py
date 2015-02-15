@@ -142,9 +142,9 @@ class TestPOSTResourceRequestSchema:
 class TestDeferredValidatePostContentType:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request):
+    def request(self, mock_content_registry, cornice_request):
         cornice_request.body = '{}'
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def _call_fut(self, node, kw):
@@ -165,9 +165,9 @@ class TestDeferredValidatePostContentType:
 class TestAddPostRequestSubSchemas:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request):
+    def request(self, mock_content_registry, cornice_request):
         cornice_request.body = '{}'
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def _call_fut(self, node, kw):
@@ -223,11 +223,11 @@ class TestAddPostRequestSubSchemas:
 class TestPOSTItemRequestSchemaUnitTest:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request, context, resource_meta):
+    def request(self, mock_content_registry, cornice_request, context, resource_meta):
         cornice_request.body = '{}'
-        mock_resource_registry.get_resources_meta_addable.return_value = \
+        mock_content_registry.get_resources_meta_addable.return_value = \
             [resource_meta]
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         cornice_request.root = context
         return cornice_request
 
@@ -284,9 +284,9 @@ class TestPUTResourceRequestSchema:
 class TestAddPutRequestSubSchemasUnitTest:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request):
+    def request(self, mock_content_registry, cornice_request):
         cornice_request.body = '{}'
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def _call_fut(self, node, kw):
@@ -677,8 +677,8 @@ class TestAddGetPoolRequestExtraFields:
         return pool_graph_catalog
 
     @fixture
-    def registry(self, mock_resource_registry):
-        return testing.DummyResource(content=mock_resource_registry)
+    def registry(self, mock_content_registry):
+        return testing.DummyResource(content=mock_content_registry)
 
     def _call_fut(self, *args):
         from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields

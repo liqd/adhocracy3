@@ -21,7 +21,7 @@ def context(pool, service):
 @fixture
 def integration(config):
     config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.rate')
 
 

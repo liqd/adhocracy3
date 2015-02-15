@@ -171,7 +171,7 @@ class TestVersionsSheet:
 def test_includeme_register_version_sheet(config):
     from adhocracy_core.utils import get_sheet
     from adhocracy_core.sheets.versions import IVersions
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.versions')
     context = testing.DummyResource(__provides__=IVersions)
     assert get_sheet(context, IVersions)
@@ -231,7 +231,7 @@ class TestVersionableSheet:
 def test_includeme_register_versionable_sheet(config):
     from adhocracy_core.utils import get_sheet
     from adhocracy_core.sheets.versions import IVersionable
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.versions')
     context = testing.DummyResource(__provides__=IVersionable)
     assert get_sheet(context, IVersionable)

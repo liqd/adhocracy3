@@ -147,7 +147,7 @@ class SheetBackReferenceRemoved:
         """:class:`adhocracy_core.graph.Reference` that was targeting `object`.
         """
         self.registry = registry
-        """:class:`pyramid.registry.Registry`"""
+        """:class:`pyramid.content.Registry`"""
 
 
 @implementer(ISheetBackReferenceAdded)
@@ -169,7 +169,7 @@ class SheetBackReferenceAdded:
         """:class:`adhocracy_core.graph.Reference` that is targeting `object`.
         """
         self.registry = registry
-        """:class:`pyramid.registry.Registry`"""
+        """:class:`pyramid.content.Registry`"""
 
 
 @implementer(ILocalRolesModfied)

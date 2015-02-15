@@ -53,7 +53,7 @@ class TestResourceContentRegistry:
         return request
 
     def make_one(self, registry):
-        from adhocracy_core.registry import ResourceContentRegistry
+        from adhocracy_core.content import ResourceContentRegistry
         return ResourceContentRegistry(registry)
 
     def test_create(self, inst):
@@ -232,10 +232,10 @@ class TestResourceContentRegistry:
 
 @fixture
 def integration(config):
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
 
 
 @mark.usefixtures('integration')
 def test_includeme_register_pool_sheet(config):
-    from adhocracy_core.registry import ResourceContentRegistry
+    from adhocracy_core.content import ResourceContentRegistry
     assert isinstance(config.registry.content, ResourceContentRegistry)

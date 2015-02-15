@@ -304,7 +304,7 @@ class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
     def setUp(self):
         from substanced.interfaces import IService
         config = testing.setUp()
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         config.include('adhocracy_core.resources.principal')
         config.include('adhocracy_core.authentication')
         self.config = config

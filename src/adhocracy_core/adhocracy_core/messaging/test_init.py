@@ -9,7 +9,7 @@ from pytest import raises
 def integration(config):
     config.include('pyramid_mailer.testing')
     config.include('pyramid_mako')
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.messaging')
 
 
@@ -68,7 +68,7 @@ class TestSendMailToQueue():
 
     def test_send_mail_to_queue(self, config, registry):
         config.include('pyramid_mailer.testing')
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         registry.settings['adhocracy.use_mail_queue'] = 'true'
         config.include('adhocracy_core.messaging')
         assert registry.messenger.use_mail_queue is True

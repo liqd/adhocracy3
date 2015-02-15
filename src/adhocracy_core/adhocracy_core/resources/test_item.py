@@ -63,7 +63,7 @@ def make_forkable_itemversion(parent=None, follows=[]):
 
 @fixture
 def integration(config):
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')

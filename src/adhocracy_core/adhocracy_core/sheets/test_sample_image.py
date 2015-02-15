@@ -34,7 +34,7 @@ def test_sample_image_mime_type_validator():
 def test_includeme_register_sample_image_sheet(config):
     from adhocracy_core.sheets.sample_image import ISampleImageMetadata
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.sample_image')
     context = testing.DummyResource(__provides__=ISampleImageMetadata)
     inst = get_sheet(context, ISampleImageMetadata)
