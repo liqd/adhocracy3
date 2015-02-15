@@ -3,6 +3,7 @@
 
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 
@@ -28,11 +29,15 @@ export class Service {
     private cache;
     private debug = false;
 
+    private nonResourceUrls;
+
     constructor(
+        private adhConfig : AdhConfig.IService,
         private adhWebSocket : AdhWebSocket.Service,
         private DSCacheFactory
     ) {
         this.setupCache(DSCacheFactory, adhWebSocket);
+        this.nonResourceUrls = _.map(AdhHttp.nonResourcePaths, (path) => adhConfig.rest_url + "/" + path);
     }
 
     private setupCache(DSCacheFactory, adhWebSocket) {
@@ -55,7 +60,9 @@ export class Service {
     public invalidate(path : string) : void {
         var cached = this.cache.get(path);
         if (typeof cached !== "undefined") {
-            this.adhWebSocket.unregister(path, cached.wshandle);
+            if (typeof cached.wshandle !== "undefined") {
+                this.adhWebSocket.unregister(path, cached.wshandle);
+            }
             this.cache.remove(path);
             if (this.debug) { console.log("invalidate: " + path); };
         }
@@ -90,9 +97,12 @@ export class Service {
     private getOrSetCached(path : string) : IHttpCacheItem {
         var cached = this.cache.get(path);
         if (typeof cached === "undefined") {
-            var wshandle = this.adhWebSocket.register(path, (msg) => {
-                this.invalidate(path);
-            });
+            var wshandle;
+            if (!(_.contains(this.nonResourceUrls, path))) {
+                wshandle = this.adhWebSocket.register(path, (msg) => {
+                    this.invalidate(path);
+                });
+            }
             cached = {
                 wshandle: wshandle,
                 promises: {}
