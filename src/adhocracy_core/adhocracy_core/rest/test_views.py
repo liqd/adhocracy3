@@ -1476,6 +1476,21 @@ class TestShowRequestBody:
         assert len(result) < len(cornice_request.body)
         assert result.endswith('...')
 
+    def test_password_is_hidden(self, cornice_request):
+        import json
+        from adhocracy_core.rest.views import _show_request_body
+        cornice_request.body = json.dumps({'name': 'foo', 'password': 'bar'})
+        result = _show_request_body(cornice_request)
+        assert '"<hidden>"' in result
+        assert 'bar' not in result
+
+    def test_other_content_type(self, cornice_request):
+        """Just the request body is returned in case of other content types."""
+        from adhocracy_core.rest.views import _show_request_body
+        cornice_request.content_type = 'text/plain'
+        cornice_request.body = 'password: foofoo'
+        result = _show_request_body(cornice_request)
+        assert result == cornice_request.body
 
 @fixture()
 def integration(config):
