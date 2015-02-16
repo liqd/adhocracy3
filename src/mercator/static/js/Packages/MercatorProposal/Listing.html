@@ -8,13 +8,8 @@
     data-no-create-form="true"
     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}">
     <div data-ng-switch="transclusionId">
-        <adh-resource-wrapper
-            data-ng-switch-when="element-id">
-            <adh-mercator-proposal
-                 data-ng-if="element"
-                 data-path="{{element}}"
-                 data-mode="display">
-            </adh-mercator-proposal>
-        </adh-resource-wrapper>
+        <adh-mercator-proposal
+            data-path="{{element}}">
+        </adh-mercator-proposal>
     </div>
 </adh-listing>
