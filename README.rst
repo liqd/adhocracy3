@@ -21,10 +21,7 @@ licensed under the GNU Affero General Public License (AGPLv3), see
 LICENSE.txt.
 
 
-Further reading
----------------
-
-- ./docs/source/installation.rst
+Further reading :doc:`installation`
 
 
 Softwarestack
