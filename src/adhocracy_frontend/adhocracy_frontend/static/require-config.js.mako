@@ -32,7 +32,7 @@ require.config({
         angularFlow: "../lib/ng-flow/dist/ng-flow",
         angularMessages: "../lib/angular-messages/angular-messages.min",
         flow: "../lib/flow.js/dist/flow",
-        lodash: "../lib/lodash/dist/lodash",
+        lodash: "../lib/lodash/lodash.min",
         q: "../lib/q/q",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
         moment: "../lib/moment/min/moment-with-locales",
