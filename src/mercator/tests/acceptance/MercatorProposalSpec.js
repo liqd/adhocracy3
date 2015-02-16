@@ -72,9 +72,6 @@ describe("mercator proposal form", function() {
         expect(form.isValid()).toBe(false);
         form.userInfoLastName.sendKeys("rasta");
 
-        // FIXME: remove heardFrom filling after fixing #544
-        form.heardFromColleague.click();
-
         form.acceptDisclaimer.click();
         form.submitButton.click();
         expect(browser.getCurrentUrl()).not.toContain("@edit");

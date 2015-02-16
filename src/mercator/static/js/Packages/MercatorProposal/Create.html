@@ -790,57 +790,59 @@
                             placeholder="{{ 'TR__MAX_CHARS_300' | translate }}"></textarea>
                     </label>
 
-                    <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }}</span>
+                    <div data-ng-if="create === 'true'">
+                        <span class="label-text">{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }}</span>
 
-                    <div data-ng-class="{ 'ng-invalid': showHeardFromError() }">
+                        <div data-ng-class="{ 'ng-invalid': showHeardFromError() }">
 
-                        <label class="label-text">
-                            <input type="checkbox"
-                                data-ng-model="data.heard_from.colleague"
-                                name="heard-from-colleague" />
-                            {{ "TR__COLLEAGUE" | translate }}
-                        </label>
-                        <label class="label-text">
+                            <label class="label-text">
+                                <input type="checkbox"
+                                    data-ng-model="data.heard_from.colleague"
+                                    name="heard-from-colleague" />
+                                {{ "TR__COLLEAGUE" | translate }}
+                            </label>
+                            <label class="label-text">
+                                <input
+                                    type="checkbox"
+                                    data-ng-model="data.heard_from.website"
+                                    name="heard-from-website" />
+                                {{ "TR__WEBSITE" | translate }}
+                            </label>
+                            <label class="label-text">
+                                <input
+                                    type="checkbox"
+                                    data-ng-model="data.heard_from.newsletter"
+                                    name="heard-from-newsletter" />
+                                {{ "TR__NEWSLETTER" | translate }}
+                            </label>
+                            <label class="label-text">
+                                <input
+                                    type="checkbox"
+                                    data-ng-model="data.heard_from.facebook"
+                                    name="heard-from-facebook" />
+                                {{ "TR__FACEBOOK" | translate }}
+                            </label>
+                            <label class="label-text">
+                                <input
+                                    type="checkbox"
+                                    data-ng-model="data.heard_from.other"
+                                    name="heard-from-other" />
+                                {{ "TR__OTHER" | translate }}<span data-ng-if="data.heard_from.other">.
+                                    {{ "TR__PLEASE_SPECIFY" | translate }}:</span>
+                            </label>
                             <input
-                                type="checkbox"
-                                data-ng-model="data.heard_from.website"
-                                name="heard-from-website" />
-                            {{ "TR__WEBSITE" | translate }}
-                        </label>
-                        <label class="label-text">
-                            <input
-                                type="checkbox"
-                                data-ng-model="data.heard_from.newsletter"
-                                name="heard-from-newsletter" />
-                            {{ "TR__NEWSLETTER" | translate }}
-                        </label>
-                        <label class="label-text">
-                            <input
-                                type="checkbox"
-                                data-ng-model="data.heard_from.facebook"
-                                name="heard-from-facebook" />
-                            {{ "TR__FACEBOOK" | translate }}
-                        </label>
-                        <label class="label-text">
-                            <input
-                                type="checkbox"
-                                data-ng-model="data.heard_from.other"
-                                name="heard-from-other" />
-                            {{ "TR__OTHER" | translate }}<span data-ng-if="data.heard_from.other">.
-                                {{ "TR__PLEASE_SPECIFY" | translate }}:</span>
-                        </label>
-                        <input
-                            type="text"
-                            data-ng-if="data.heard_from.other"
-                            data-ng-model="data.heard_from.other_specify"
-                            name="heard-from-other-specify"
-                            data-ng-required="data.heard_from.other" />
+                                type="text"
+                                data-ng-if="data.heard_from.other"
+                                data-ng-model="data.heard_from.other_specify"
+                                name="heard-from-other-specify"
+                                data-ng-required="data.heard_from.other" />
 
-                        <span
-                            class="input-error"
-                            data-ng-if="showHeardFromError()">
-                            {{ "TR__ERROR_REQUIRED_CHECKBOXES" | translate }}</span>
-                    </div><!-- /.ng-invalid -->
+                            <span
+                                class="input-error"
+                                data-ng-if="showHeardFromError()">
+                                {{ "TR__ERROR_REQUIRED_CHECKBOXES" | translate }}</span>
+                        </div><!-- /.ng-invalid -->
+                    </div>
 
                     <span class="label-text">{{ "TR__DISCLAIMER" | translate }}*:</span>
                     <label class="label-text" data-ng-class="{ 'ng-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
