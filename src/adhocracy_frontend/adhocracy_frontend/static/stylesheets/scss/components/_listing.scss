@@ -32,7 +32,7 @@ a form for creating new elements. This form is then always visible.
 // starting animations
 .listing-element {
     &.ng-enter {
-        @include transition(all 3s);
+        @include transition(all 0.3s);
         @include opacity(0.5);
         background: greenyellow;
 

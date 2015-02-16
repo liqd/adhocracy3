@@ -89,3 +89,15 @@ Open the javascript front-end with your web browser::
 Shutdown everything nicely::
 
     ./bin/supervisorctl shutdown
+
+
+Run test suites
+---------------
+
+Run pytest suite::
+
+    bin/py.test_run_all
+
+Run protractor acceptance tests::
+
+    bin/protractor etc/protractorConf.js
