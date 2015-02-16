@@ -7,8 +7,8 @@ from pytest import mark
 
 def test_create_adhocracy_catalog_indexes():
     from substanced.catalog import Keyword
-    from . import AdhocracyCatalogIndexes
-    from . import Reference
+    from adhocracy_core.catalog.adhocracy import AdhocracyCatalogIndexes
+    from adhocracy_core.catalog.adhocracy import Reference
     inst = AdhocracyCatalogIndexes()
     assert isinstance(inst.tag, Keyword)
     assert isinstance(inst.reference, Reference)
@@ -17,7 +17,7 @@ def test_create_adhocracy_catalog_indexes():
 @fixture
 def integration(config):
     config.include('adhocracy_core.events')
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
 

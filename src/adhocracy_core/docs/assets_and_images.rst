@@ -156,7 +156,7 @@ references it. But first we have to create a proposal::
 Now we can upload a sample picture::
 
     >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
-    ...     'python.jpg', open('docs/source/_static/python.jpg', 'rb').read())]
+    ...     'python.jpg', open('docs/_static/python.jpg', 'rb').read())]
     >>> request_body = {
     ...    'content_type': 'adhocracy_core.resources.sample_image.ISampleImage',
     ...    'data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type':
@@ -292,7 +292,7 @@ irreversibly discarded once a replacement blob is uploaded.
 Lets replace the uploaded python with another one::
 
     >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
-    ...     'python2.jpg', open('docs/source/_static/python2.jpg', 'rb').read())]
+    ...     'python2.jpg', open('docs/_static/python2.jpg', 'rb').read())]
     >>> request_body = {
     ...    'content_type': 'adhocracy_core.resources.sample_image.ISampleImage',
     ...    'data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type':
@@ -335,4 +335,4 @@ Deleting and Hiding Assets
 --------------------------
 
 Assets can be deleted or censored ("hidden") in the usual way, see
-:ref:`deletion`.
+:doc:`deletion`.

@@ -1,4 +1,4 @@
-"""Messaging support."""
+"""Send messages to Principals."""
 from collections.abc import Sequence
 from logging import getLogger
 
@@ -9,12 +9,10 @@ from pyramid.settings import asbool
 from pyramid_mailer.interfaces import IMailer
 from pyramid_mailer.message import Message
 from pyramid.traversal import resource_path
-from zope.component import ComponentLookupError
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import raise_colander_style_error
 
 logger = getLogger(__name__)
 
@@ -164,10 +162,7 @@ class Messenger():
                              from_user: IResource):
         """Send a message to a specific user."""
         from_email = self._get_user_email(from_user)
-        try:
-            recipient_email = self._get_user_email(recipient)
-        except ComponentLookupError:
-            raise_colander_style_error(None, 'recipient', 'Not a user')
+        recipient_email = self._get_user_email(recipient)
         logger.debug('Sending message entitled "%s" from %s to %s', title,
                      from_email, recipient_email)
         self.render_and_send_mail(

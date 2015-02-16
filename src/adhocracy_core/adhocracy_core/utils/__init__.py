@@ -1,4 +1,4 @@
-"""Helper functions."""
+"""Helper functions shared between modules."""
 from collections import namedtuple
 from collections.abc import Sequence
 from datetime import datetime
@@ -30,6 +30,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import VisibilityChange
+from adhocracy_core.interfaces import IResourceSheetModified
 
 
 def append_if_not_none(lst: list, element: object):
@@ -82,15 +83,13 @@ def get_sheet(context, isheet: IInterface, registry: Registry=None)\
         -> IResourceSheet:
     """Get sheet adapter for the `isheet` interface.
 
-    :raises zope.component.ComponentLookupError:
-        if there is no sheet adapter registered for `isheet`.
+    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
+        if there is no `isheet` sheet registered for context.
 
     """
-    # FIXME return cached sheet instance instead of creating a new one
     if registry is None:
         registry = get_current_registry(context)
-    return registry.getAdapter(context, IResourceSheet,
-                               name=isheet.__identifier__)
+    return registry.content.get_sheet(context, isheet)
 
 
 def get_all_taggedvalues(iface: IInterface) -> dict:
@@ -244,7 +243,7 @@ def exception_to_str(err: Exception):
 
 
 def get_user(request: Request) -> object:
-    """"Return resource object of the authenticated user.
+    """Return resource object of the authenticated user.
 
     This requires that :func:`pyramid.request.Request.authenticated_userid`
     returns a resource path.
@@ -326,7 +325,7 @@ def get_last_version(resource: IItemVersion,
 def get_changelog_metadata(resource, registry) -> ChangelogMetadata:
     """Return transaction changelog for `resource`."""
     path = resource_path(resource)
-    changelog = registry._transaction_changelog[path]
+    changelog = registry.changelog[path]
     return changelog
 
 
@@ -423,3 +422,23 @@ def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
     if test_changed_descendants and meta.changed_descendants:
         events.append('changed_descendants')
     return events
+
+
+def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
+    """Return changed visbility for `event.object`."""
+    is_deleted = event.new_appstruct['deleted']
+    is_hidden = event.new_appstruct['hidden']
+    was_deleted = event.old_appstruct['deleted']
+    was_hidden = event.old_appstruct['hidden']
+    was_visible = not (was_hidden or was_deleted)
+    is_visible = not (is_hidden or is_deleted)
+    if was_visible:
+        if is_visible:
+            return VisibilityChange.visible
+        else:
+            return VisibilityChange.concealed
+    else:
+        if is_visible:
+            return VisibilityChange.revealed
+        else:
+            return VisibilityChange.invisible

@@ -6,15 +6,19 @@ from unittest.mock import Mock
 
 
 @fixture
-def mock_metadata_sheet(context, mock_sheet, registry):
-    from adhocracy_core.testing import add_and_register_sheet
+def mock_metadata_sheet(context, mock_sheet, registry_with_content):
+    from adhocracy_core.testing import register_sheet
     from .metadata import IMetadata
     mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
-    add_and_register_sheet(context, mock_sheet, registry)
+    register_sheet(context, mock_sheet, registry_with_content)
     return mock_sheet
 
 
 class TestResourceModifiedMetadataSubscriber:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
 
     def _call_fut(self, event):
         from adhocracy_core.sheets.metadata import resource_modified_metadata_subscriber
@@ -123,6 +127,8 @@ def test_index_creator_creator_does_not_exists(context, mock_metadata_sheet):
 def integration(config):
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.events')
+    config.include('adhocracy_core.changelog')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.metadata')
 
 

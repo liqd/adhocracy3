@@ -1,4 +1,5 @@
-"""Adhocracy sheets."""
+"""Data structures/validation, set/get for an isolated set of resource data."""
+
 from itertools import chain
 from logging import getLogger
 
@@ -29,9 +30,9 @@ logger = getLogger(__name__)
 
 
 @implementer(IResourceSheet)
-class GenericResourceSheet(PropertySheet):
+class AnnotationStorageSheet(PropertySheet):
 
-    """Generic sheet for resources to get/set the sheet data structure."""
+    """Generic sheet for to get/set resource data as context annotation."""
 
     request = None
     """Pyramid request object, just to fulfill the interface."""
@@ -68,12 +69,17 @@ class GenericResourceSheet(PropertySheet):
 
     @property
     def _default_appstruct(self) -> dict:
+        """Bind `context` to schema and return schema node default values."""
         # context might have changed, so we don`t bind it until needed
         schema = self.schema.bind(context=self.context)
         items = [(n.name, n.default) for n in schema]
         return dict(items)
 
     def _get_data_appstruct(self, params: dict={}) -> iter:
+        """Return non references data.
+
+        This might be overridden in subclasses.
+        """
         for key in self._data_keys:
             if key in self._data:
                 yield (key, self._data[key])
@@ -88,6 +94,10 @@ class GenericResourceSheet(PropertySheet):
 
     @property
     def _data(self):
+        """Return dictionary to store data.
+
+        This might be overridden in subclasses.
+        """
         sheets_data = getattr(self.context, '_sheets', None)
         if sheets_data is None:
             sheets_data = PersistentMapping()
@@ -99,6 +109,10 @@ class GenericResourceSheet(PropertySheet):
         return data
 
     def _get_reference_appstruct(self, params: dict={}) -> iter:
+        """Return reference data.
+
+        This might be overridden in subclasses.
+        """
         references = self._get_references()
         for key, node in self._reference_nodes.items():
             node_references = references.get(key, None)
@@ -134,6 +148,10 @@ class GenericResourceSheet(PropertySheet):
                 yield(key, node_backrefs)
 
     def _get_backrefs(self, node: Reference) -> dict:
+        """Return backreference data.
+
+        This might be overridden in subclasses.
+        """
         if not self._graph:
             return {}
         isheet = node.reftype.getTaggedValue('source_isheet')
@@ -217,10 +235,43 @@ class GenericResourceSheet(PropertySheet):
                                           request)
             registry.notify(event)
 
+    def get_cstruct(self, request: Request, params: dict={}):
+        """Return cstruct data.
+
+        Bind `request` and `context` (self.context) to colander schema
+        (self.schema). Get sheet appstruct data and serialize.
+
+        :param params: optional parameters that can modify the appearance
+        of the returned dictionary, e.g. query parameters in a GET request
+        """
+        schema = self._get_schema_for_cstruct(request, params)
+        appstruct = self.get(params=params)
+        cstruct = schema.serialize(appstruct)
+        return cstruct
+
+    def _get_schema_for_cstruct(self, request, params: dict):
+        """Return customized schema to serialize cstruct data.
+
+        This might be overridden in subclasses.
+        """
+        schema = self.schema.bind(context=self.context,
+                                  request=request)
+        return schema
+
+
+@implementer(IResourceSheet)
+class AttributeStorageSheet(AnnotationStorageSheet):
+
+    """Sheet class that stores data as context attributes."""
+
+    @property
+    def _data(self):
+        return self.context.__dict__
+
 
 sheet_metadata_defaults = sheet_metadata._replace(
     isheet=ISheet,
-    sheet_class=GenericResourceSheet,
+    sheet_class=AnnotationStorageSheet,
     schema_class=colander.MappingSchema,
     permission_view='view',
     permission_edit='edit_sheet',
@@ -236,8 +287,6 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
     """
     assert metadata.isheet.isOrExtends(ISheet)
     isheet = metadata.isheet
-    if hasattr(registry, 'content'):
-        registry.content.sheets_meta[isheet] = metadata
     if metadata.create_mandatory:
         assert metadata.creatable and metadata.create_mandatory
     schema = metadata.schema_class()
@@ -246,15 +295,7 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
         assert child.default != colander.drop
     assert issubclass(schema.__class__, colander.MappingSchema)
     _assert_schema_preserves_super_type_data_structure(schema)
-
-    def generic_resource_property_sheet_adapter(context):
-        return metadata.sheet_class(metadata, context)
-
-    registry.registerAdapter(generic_resource_property_sheet_adapter,
-                             required=(isheet,),
-                             provided=IResourceSheet,
-                             name=isheet.__identifier__
-                             )
+    registry.content.sheets_meta[isheet] = metadata
 
 
 def _assert_schema_preserves_super_type_data_structure(
@@ -283,12 +324,3 @@ def includeme(config):  # pragma: no cover
     config.include('.rate')
     config.include('.asset')
     config.include('.sample_image')
-
-
-class AttributeStorageSheet(GenericResourceSheet):
-
-    """Sheet class that stores data as context attributes."""
-
-    @property
-    def _data(self):
-        return self.context.__dict__

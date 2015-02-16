@@ -1,4 +1,4 @@
-"""Pool resource type and zodb persistent IPool implementation."""
+"""Basic Pool to give the client a endpoint to post specific resource types."""
 
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.resources.pool import pool_metadata

@@ -1,4 +1,5 @@
 """Pool Sheet."""
+from copy import deepcopy
 from collections.abc import Iterable
 from collections import namedtuple
 
@@ -9,7 +10,7 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.sheets import GenericResourceSheet
+from adhocracy_core.sheets import AnnotationStorageSheet
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
@@ -28,7 +29,7 @@ FilterElementsResult = namedtuple('FilterElementsResult',
                                   ['elements', 'count', 'aggregateby'])
 
 
-class PoolSheet(GenericResourceSheet):
+class PoolSheet(AnnotationStorageSheet):
 
     """Generic pool resource sheet."""
 
@@ -44,9 +45,15 @@ class PoolSheet(GenericResourceSheet):
 
 class FilteringPoolSheet(PoolSheet):
 
-    """Resource sheet that allows filtering and aggregating pools."""
+    """Pool resource sheet that allows filtering and aggregating elements."""
 
     def _get_reference_appstruct(self, params: dict={}) -> dict:
+        """Get appstruct with references according to `params` query.
+
+        :param params: Query parameter to modify the returned references.
+        This data structure is specified in
+        :class:`adhocracy_core.rest.schemas.GETPoolRequestSchema`
+        """
         depth = self._build_depth(params)
         ifaces = self._build_iface_filter(params)
         arbitraries = self._get_arbitrary_filters(params)
@@ -157,6 +164,21 @@ class FilteringPoolSheet(PoolSheet):
                     aggregateby[aggregate_filter][str(value)] = len(
                         value_elements)
         return FilterElementsResult(elements, count, aggregateby)
+
+    def _get_schema_for_cstruct(self, request, params: dict):
+        """Return extended schema to serialize cstruct.
+
+        :param params: dictionary with optionally key 'elements' and
+        value 'content'. If set do not serialize the references path only but
+        the full resource cstruct.
+        """
+        schema = super()._get_schema_for_cstruct(request, params)
+        if params.get('elements', None) == 'content':
+            elements = schema['elements']
+            typ_copy = deepcopy(elements.children[0].typ)
+            typ_copy.serialization_form = 'content'
+            elements.children[0].typ = typ_copy
+        return schema
 
 
 class IPool(ISheet):

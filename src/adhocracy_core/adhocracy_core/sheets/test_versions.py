@@ -51,9 +51,9 @@ class TestValidateLinearHistoryNoFork:
         return context['last_version']
 
     @fixture
-    def request(self, registry, changelog):
-        registry._transaction_changelog = changelog
-        request = testing.DummyResource(registry=registry,
+    def request(self, registry_with_content, changelog):
+        registry_with_content.changelog = changelog
+        request = testing.DummyResource(registry=registry_with_content,
                                         validated={})
         return request
 
@@ -65,11 +65,11 @@ class TestValidateLinearHistoryNoFork:
         return node
 
     @fixture
-    def mock_tag_sheet(self, tag, mock_sheet, registry):
-        from adhocracy_core.testing import add_and_register_sheet
+    def mock_tag_sheet(self, tag, mock_sheet, registry_with_content):
+        from adhocracy_core.testing import register_sheet
         from .tags import ITag
         mock_sheet.meta = mock_sheet.meta._replace(isheet=ITag)
-        add_and_register_sheet(tag, mock_sheet, registry)
+        register_sheet(tag, mock_sheet, registry_with_content)
         return mock_sheet
 
     def _call_fut(self, node, value):
@@ -112,7 +112,7 @@ class TestValidateLinearHistoryNoFork:
         set_batchmode(request)
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         other_version = object()
-        registry._transaction_changelog['/'] = changelog['/']._replace(last_version=other_version)
+        registry.changelog['/'] = changelog['/']._replace(last_version=other_version)
         self._call_fut(node, [other_version])
 
 
@@ -171,6 +171,7 @@ class TestVersionsSheet:
 def test_includeme_register_version_sheet(config):
     from adhocracy_core.utils import get_sheet
     from adhocracy_core.sheets.versions import IVersions
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.versions')
     context = testing.DummyResource(__provides__=IVersions)
     assert get_sheet(context, IVersions)
@@ -230,6 +231,7 @@ class TestVersionableSheet:
 def test_includeme_register_versionable_sheet(config):
     from adhocracy_core.utils import get_sheet
     from adhocracy_core.sheets.versions import IVersionable
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.versions')
     context = testing.DummyResource(__provides__=IVersionable)
     assert get_sheet(context, IVersionable)

@@ -8,7 +8,7 @@ from pytest import fixture
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.testing import add_and_register_sheet
+from adhocracy_core.testing import register_sheet
 
 
 ############
@@ -288,9 +288,9 @@ def test_deferred_content_type_default_call_without_iresource():
 class TestGetSheetCstructs:
 
     @fixture
-    def request(self, mock_resource_registry):
+    def request(self, mock_content_registry):
         request = testing.DummyRequest()
-        request.registry.content = mock_resource_registry
+        request.registry.content = mock_content_registry
         return request
 
     def _call_fut(self, context, request):
@@ -300,13 +300,13 @@ class TestGetSheetCstructs:
     def test_call_with_context_without_sheets(self, context, request):
         assert self._call_fut(context, request) == {}
 
-    def test_call_with_context_with_sheets(self, context, request, mock_resource_registry, mock_sheet):
+    def test_call_with_context_with_sheets(self, context, request, mock_content_registry, mock_sheet):
         mock_sheet.get.return_value = {}
         mock_sheet.schema = colander.MappingSchema()
         isheet = mock_sheet.meta.isheet
-        mock_resource_registry.get_sheets_read.return_value = [mock_sheet]
+        mock_content_registry.get_sheets_read.return_value = [mock_sheet]
         assert self._call_fut(context, request) == {isheet.__identifier__: {}}
-        assert mock_resource_registry.get_sheets_read.call_args[0] == (context, request)
+        assert mock_content_registry.get_sheets_read.call_args[0] == (context, request)
 
 
 class TestResourceObjectUnitTests:
@@ -316,9 +316,9 @@ class TestResourceObjectUnitTests:
         return ResourceObject(**kwargs)
 
     @fixture
-    def request(self, context, mock_resource_registry):
+    def request(self, context, mock_content_registry):
         request = testing.DummyRequest()
-        request.registry.content = mock_resource_registry
+        request.registry.content = mock_content_registry
         request.root = context
         return request
 
@@ -983,12 +983,13 @@ class TestPostPoolMappingSchema:
         inst = inst.bind(context=context['right'], request=request_)
         assert inst.deserialize({'references': [request_.application_url + '/right/child']})
 
-    def test_bind_context_with_valid_backreference_post_context_and_deserialize(self, context, mock_sheet, registry, request_):
+    def test_bind_context_with_valid_backreference_post_context_and_deserialize(
+            self, context, mock_sheet, registry_with_content, request_):
         from adhocracy_core.interfaces import IPostPoolSheet
         inst = self._make_one()
 
         referenced = context['right']['child']
-        add_and_register_sheet(referenced, mock_sheet, registry)
+        register_sheet(referenced, mock_sheet, registry_with_content)
         mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
 
         _add_reference_node(inst, target_isheet=IPostPoolSheet)
@@ -996,12 +997,13 @@ class TestPostPoolMappingSchema:
 
         assert inst.deserialize({'reference': request_.application_url + '/right/child'})
 
-    def test_bind_context_with_nonvalid_backreference_post_context_and_deserialize(self, context, mock_sheet, registry, request_):
+    def test_bind_context_with_nonvalid_backreference_post_context_and_deserialize(
+            self, context, mock_sheet, registry_with_content, request_):
         from adhocracy_core.interfaces import IPostPoolSheet
         inst = self._make_one()
 
         referenced = context['right']['child']
-        add_and_register_sheet(referenced, mock_sheet, registry)
+        register_sheet(referenced, mock_sheet, registry_with_content)
         mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
 
         _add_reference_node(inst, target_isheet=IPostPoolSheet)

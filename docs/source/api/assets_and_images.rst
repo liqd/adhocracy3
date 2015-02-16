@@ -1,1 +1,0 @@
-../../../src/adhocracy_core/docs/assets_and_images.rst

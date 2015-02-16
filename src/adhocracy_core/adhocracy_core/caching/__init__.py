@@ -265,7 +265,7 @@ def purge_varnish_after_commit_hook(success: bool, registry: Registry):
     varnish_url = registry.settings.get('adhocracy.varnish_url')
     if not (success and varnish_url):
         return
-    changelog_metadata = registry._transaction_changelog.values()
+    changelog_metadata = registry.changelog.values()
     errcount = 0
     for meta in changelog_metadata:
         events = extract_events_from_changelog_metadata(meta)

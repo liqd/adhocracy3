@@ -283,6 +283,7 @@ request should look like::
 
 ..     >>> pprint(resp_data['PUT']['request_body'])
 ..     {'data': {...'adhocracy_core.sheets.name.IName': {}...}}
+
 FIXME: PUT is missing, because the current test pool resource type has not
 editable sheet.
 
@@ -371,7 +372,7 @@ The response object has 3 top-level entries:
   contains a reference to its creator.
 
   The subkey 'removed' lists any resources that have been removed
-  by marking them as deleted or hidden (see :ref:`deletion`)::
+  by marking them as deleted or hidden (see :doc:`deletion`)::
 
       >>> resp_data['updated_resources']['removed']
       []
@@ -1378,7 +1379,7 @@ sorting to sort the result::
 
 *Note* All resource in the result set must have a value in the chosen sort
 filter. For example if you use *rates* you have to limit the result to resources
-with :class:`adhocracy_core.sheet.rate.IRateable` sheet.
+with :class:`adhocracy_core.sheets.rate.IRateable` sheet.
 
 Not supported filters cannot be used for sorting::
 
@@ -1436,16 +1437,16 @@ versions of all sections::
 *<custom>* filter: depending on the backend configuration there are additional
 custom filters:
 
-* *rate* the rate value of resources with :class:`adhocracy_core.sheet.rate.IRate`
+* *rate* the rate value of resources with :class:`adhocracy_core.sheets.rate.IRate`
   sheet. This is mostly useful for the requests with the *aggregated* filter.
   Supports sorting.
 
-* *rates* the aggregated value of all :class:`adhocracy_core.sheet.rate.IRate`
-  resources referencing a resource with :class:`adhocracy_core.sheet.rate.IRateable`.
+* *rates* the aggregated value of all :class:`adhocracy_core.sheets.rate.IRate`
+  resources referencing a resource with :class:`adhocracy_core.sheets.rate.IRateable`.
   Supports sorting.
 
 * *name* the identifier value of all resources (last part in the resource url).
-  This is the same value like the name in the :class:`adhocracy_core.sheet.name.IName`
+  This is the same value like the name in the :class:`adhocracy_core.sheets.name.IName`
   sheet.
   Supports sorting.
 

@@ -5,10 +5,11 @@ from pyramid import testing
 from pytest import fixture
 from pytest import raises
 from pytest import mark
-
 import colander
 
+from adhocracy_core.testing import register_sheet
 from adhocracy_core.sheets.rate import IRateable
+
 
 
 @fixture
@@ -20,6 +21,7 @@ def context(pool, service):
 @fixture
 def integration(config):
     config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.rate')
 
 
@@ -35,10 +37,10 @@ class TestRateableSheet:
         return rateable_meta.sheet_class(rateable_meta, context)
 
     def test_create(self, inst):
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         from adhocracy_core.sheets.rate import IRateable
         from adhocracy_core.sheets.rate import RateableSchema
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IRateable
         assert inst.meta.schema_class == RateableSchema
         assert inst.meta.create_mandatory is False
@@ -60,9 +62,9 @@ class TestRateSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.rate import IRate
         from adhocracy_core.sheets.rate import RateSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IRate
         assert inst.meta.schema_class == RateSchema
         assert inst.meta.create_mandatory
@@ -274,41 +276,40 @@ class TestRateValidators:
 
 
 @fixture
-def mock_rate_sheet(context, mock_sheet, registry):
-    from adhocracy_core.testing import add_and_register_sheet
+def mock_rate_sheet(mock_sheet):
+    from copy import deepcopy
     from .rate import IRate
+    mock_sheet = deepcopy(mock_sheet)
     mock_sheet.meta = mock_sheet.meta._replace(isheet=IRate)
-    add_and_register_sheet(context, mock_sheet, registry)
     return mock_sheet
 
 
 @fixture
-def mock_rateable_sheet(context, mock_sheet, registry):
+def mock_rateable_sheet(mock_sheet):
     from copy import deepcopy
-    from adhocracy_core.testing import add_and_register_sheet
     from .rate import IRateable
     mock_sheet = deepcopy(mock_sheet)
     mock_sheet.meta = mock_sheet.meta._replace(isheet=IRateable)
-    add_and_register_sheet(context, mock_sheet, registry)
     return mock_sheet
 
 
-def test_index_rate(context, mock_rate_sheet):
+def test_index_rate(context, mock_rate_sheet, registry_with_content):
     from .rate import index_rate
-    from .rate import IRate
-    context['rateable'] = testing.DummyResource(__provides__=IRate)
+    context['rateable'] = testing.DummyResource()
+    register_sheet(context['rateable'], mock_rate_sheet, registry_with_content)
     mock_rate_sheet.get.return_value = {'rate': 1}
     assert index_rate(context['rateable'], None) == 1
 
 
-def test_index_rates(context, mock_rate_sheet, mock_rateable_sheet):
+def test_index_rates(context, mock_rate_sheet, mock_rateable_sheet,
+                     registry_with_content):
     from .rate import index_rates
-    from .rate import IRate
-    from .rate import IRateable
-    context['rates']['rate'] = testing.DummyResource(__provides__=IRate)
+    context['rates']['rate'] = testing.DummyResource()
     mock_rate_sheet.get.return_value = {'rate': 1}
-    context['rateable'] = testing.DummyResource(__provides__=IRateable)
+    context['rateable'] = testing.DummyResource()
     mock_rateable_sheet.get.return_value = {'rates': [context['rates']['rate']]}
+    registry_with_content.content.get_sheet.side_effect = [mock_rateable_sheet,
+                                                           mock_rate_sheet]
     assert index_rates(context['rateable'], None) == 1
 
 

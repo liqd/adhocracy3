@@ -1,4 +1,4 @@
-"""Rest API views."""
+"""GET/POST/PUT requests processing."""
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
@@ -63,7 +63,6 @@ from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
-import adhocracy_core.sheets.pool
 
 
 logger = getLogger(__name__)
@@ -308,7 +307,7 @@ class RESTView:
     def _build_updated_resources_dict(self) -> dict:
         """Utility method used by several subclasses."""
         result = defaultdict(list)
-        changelog_meta = self.request.registry._transaction_changelog.values()
+        changelog_meta = self.request.registry.changelog.values()
         for meta in changelog_meta:
             events = extract_events_from_changelog_metadata(meta)
             for event in events:
@@ -418,28 +417,9 @@ class ResourceRESTView(RESTView):
         data_cstruct = {}
         for sheet in sheets_view:
             key = sheet.meta.isheet.__identifier__
-            schema = sheet.schema.bind(context=self.context,
-                                       request=self.request)
-            appstruct = sheet.get(params=queryparams)
-            if sheet.meta.isheet is adhocracy_core.sheets.pool.IPool:
-                _set_pool_sheet_elements_serialization_form(schema,
-                                                            queryparams)
-                # FIXME? readd the get_cstruct method but with parameters
-                # 'request'/'context'. Then we can handle this stuff at
-                #  one place, the pool sheet package.
-            cstruct = schema.serialize(appstruct)
+            cstruct = sheet.get_cstruct(self.request, params=queryparams)
             data_cstruct[key] = cstruct
         return data_cstruct
-
-
-def _set_pool_sheet_elements_serialization_form(schema: MappingSchema,
-                                                queryparams: dict):
-    if queryparams.get('elements', 'path') != 'content':
-        return
-    elements_node = schema['elements']
-    elements_typ_copy = deepcopy(elements_node.children[0].typ)
-    elements_typ_copy.serialization_form = 'content'
-    elements_node.children[0].typ = elements_typ_copy
 
 
 @view_defaults(

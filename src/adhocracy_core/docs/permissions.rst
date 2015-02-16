@@ -34,7 +34,7 @@ Start Adhocracy testapp::
     >>> groups = rest_url + '/principals/groups/'
 
 Create participation process structure by god (sysadmin)
-(like :class:`adhocracy_core.interfaces.IIPool` subtypes) ::
+(like :class:`adhocracy_core.interfaces.IPool` subtypes) ::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}

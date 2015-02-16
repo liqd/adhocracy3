@@ -9,7 +9,7 @@ from substanced.interfaces import IUserLocator
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
-from adhocracy_core.sheets import GenericResourceSheet
+from adhocracy_core.sheets import AnnotationStorageSheet
 from adhocracy_core.sheets import AttributeStorageSheet
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import Password
@@ -226,7 +226,7 @@ class PasswordAuthenticationSchema(colander.MappingSchema):
     password = Password(missing=colander.required)
 
 
-class PasswordAuthenticationSheet(GenericResourceSheet):
+class PasswordAuthenticationSheet(AnnotationStorageSheet):
 
     """Sheet for password based user authentication.
 

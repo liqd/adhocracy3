@@ -166,7 +166,7 @@ def send_messages_after_commit_hook(success, registry):
     """Send transaction changelog messages to the websocket client."""
     ws_client = get_ws_client(registry)
     if success and ws_client is not None:
-        changelog_metadata = registry._transaction_changelog.values()
+        changelog_metadata = registry.changelog.values()
         ws_client.send_messages(changelog_metadata)
 
 

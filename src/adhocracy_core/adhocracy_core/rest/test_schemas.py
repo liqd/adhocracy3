@@ -143,9 +143,9 @@ class TestPOSTResourceRequestSchema:
 class TestDeferredValidatePostContentType:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request):
+    def request(self, mock_content_registry, cornice_request):
         cornice_request.body = '{}'
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def _call_fut(self, node, kw):
@@ -166,9 +166,9 @@ class TestDeferredValidatePostContentType:
 class TestAddPostRequestSubSchemas:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request):
+    def request(self, mock_content_registry, cornice_request):
         cornice_request.body = '{}'
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def _call_fut(self, node, kw):
@@ -224,11 +224,11 @@ class TestAddPostRequestSubSchemas:
 class TestPOSTItemRequestSchemaUnitTest:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request, context, resource_meta):
+    def request(self, mock_content_registry, cornice_request, context, resource_meta):
         cornice_request.body = '{}'
-        mock_resource_registry.get_resources_meta_addable.return_value = \
+        mock_content_registry.get_resources_meta_addable.return_value = \
             [resource_meta]
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         cornice_request.root = context
         return cornice_request
 
@@ -285,9 +285,9 @@ class TestPUTResourceRequestSchema:
 class TestAddPutRequestSubSchemasUnitTest:
 
     @fixture
-    def request(self, mock_resource_registry, cornice_request):
+    def request(self, mock_content_registry, cornice_request):
         cornice_request.body = '{}'
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def _call_fut(self, node, kw):
@@ -684,8 +684,8 @@ class TestAddGetPoolRequestExtraFields:
         return pool_graph_catalog
 
     @fixture
-    def registry(self, mock_resource_registry):
-        return testing.DummyResource(content=mock_resource_registry)
+    def registry(self, mock_content_registry):
+        return testing.DummyResource(content=mock_content_registry)
 
     def _call_fut(self, *args):
         from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
@@ -766,3 +766,38 @@ class TestAddGetPoolRequestExtraFields:
         registry.content.resolve_isheet_field_from_dotted_string.side_effect = ValueError
         with raises(colander.Invalid):
             self._call_fut(cstruct, schema, None, registry)
+
+
+class TestPostMessageUserViewRequestSchema:
+
+    @fixture
+    def request(self, context):
+        request = testing.DummyRequest()
+        request.root = context
+        return request
+
+    def make_one(self):
+        from .schemas import POSTMessageUserViewRequestSchema
+        return POSTMessageUserViewRequestSchema()
+
+    def test_deserialize_valid(self, request, context):
+        from pyramid.traversal import resource_path
+        from adhocracy_core.sheets.principal import IUserExtended
+        inst = self.make_one().bind(request=request, context=context)
+        context['user'] = testing.DummyResource(__provides__=IUserExtended)
+        cstrut = {'recipient': resource_path(context['user']),
+                  'title': 'title',
+                  'text': 'text'}
+        assert inst.deserialize(cstrut) == {'recipient': context['user'],
+                                            'title': 'title',
+                                            'text': 'text'}
+
+    def test_deserialize_recipient_is_no_user(self, request, context):
+        from pyramid.traversal import resource_path
+        inst = self.make_one().bind(request=request, context=context)
+        context['user'] = testing.DummyResource()
+        cstrut = {'recipient': resource_path(context['user']),
+                  'title': 'title',
+                  'text': 'text'}
+        with raises(colander.Invalid):
+            inst.deserialize(cstrut)

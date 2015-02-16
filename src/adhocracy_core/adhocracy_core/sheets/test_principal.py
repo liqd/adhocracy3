@@ -72,6 +72,7 @@ class TestPasswordSheet:
 def test_includeme_register_password_sheet(config):
     from adhocracy_core.sheets.principal import IPasswordAuthentication
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IPasswordAuthentication)
     assert get_sheet(context, IPasswordAuthentication)
@@ -205,9 +206,9 @@ class TestUserBasicSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserBasic
         from adhocracy_core.sheets.principal import UserBasicSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IUserBasic
         assert inst.meta.schema_class == UserBasicSchema
         assert inst.meta.permission_create == 'create_sheet_userbasic'
@@ -227,9 +228,9 @@ class TestUserExtendedSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserExtended
         from adhocracy_core.sheets.principal import UserExtendedSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IUserExtended
         assert inst.meta.schema_class == UserExtendedSchema
         assert inst.meta.permission_create == 'create_sheet_userbasic'
@@ -244,6 +245,7 @@ class TestUserExtendedSheet:
 def test_includeme_register_userbasic_sheet(config):
     from adhocracy_core.sheets.principal import IUserBasic
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IUserBasic)
     assert get_sheet(context, IUserBasic)
@@ -274,10 +276,10 @@ class TestPermissionsSchemaSchema:
     def permissions_sheet(self, context, registry, mock_sheet):
         import copy
         from adhocracy_core.sheets.principal import IPermissions
-        from adhocracy_core.testing import add_and_register_sheet
+        from adhocracy_core.testing import register_sheet
         mock_sheet = copy.deepcopy(mock_sheet)
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
-        add_and_register_sheet(context, mock_sheet, registry)
+        register_sheet(context, mock_sheet, registry)
         return mock_sheet
 
     def make_one(self):
@@ -351,6 +353,7 @@ class TestPermissionsSheet:
 def test_includeme_register_permissions_sheet(config):
     from adhocracy_core.sheets.principal import IPermissions
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IPermissions)
     assert get_sheet(context, IPermissions)
@@ -366,9 +369,9 @@ class TestGroupSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.sheets.principal import GroupSchema
-        from adhocracy_core.sheets import GenericResourceSheet
+        from adhocracy_core.sheets import AnnotationStorageSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, GenericResourceSheet)
+        assert isinstance(inst, AnnotationStorageSheet)
         assert inst.meta.isheet == IGroup
         assert inst.meta.schema_class == GroupSchema
 
@@ -382,6 +385,7 @@ class TestGroupSheet:
 def test_includeme_register_group_sheet(config):
     from adhocracy_core.sheets.principal import IGroup
     from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IGroup)
     inst = get_sheet(context, IGroup)

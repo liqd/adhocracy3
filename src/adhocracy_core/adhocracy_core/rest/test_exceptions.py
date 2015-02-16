@@ -120,16 +120,16 @@ class TestHandleError410:
         assert inst.json_body['reason'] == 'hidden'
 
     def test_with_detail_and_imetadata(self, error, request_, mock_sheet,
-                                       registry):
+                                       registry_with_content):
         from datetime import datetime
-        from adhocracy_core.testing import add_and_register_sheet
+        from adhocracy_core.testing import register_sheet
         from adhocracy_core.sheets.metadata import IMetadata
         resource = testing.DummyResource(__provides__=[IMetadata])
         user = testing.DummyResource(__name__='/user')
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
         mock_sheet.get.return_value = {'modification_date': datetime.today(),
                                        'modified_by': user}
-        add_and_register_sheet(resource, mock_sheet, registry)
+        register_sheet(resource, mock_sheet, registry_with_content)
         error.detail = 'hidden'
         request_.context = resource
         inst = self.make_one(error, request_)

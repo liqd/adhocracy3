@@ -1,4 +1,4 @@
-"""Rest API configuration."""
+"""Configure rest api packages."""
 
 
 def includeme(config):  # pragma: no cover

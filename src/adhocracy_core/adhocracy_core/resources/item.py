@@ -1,4 +1,4 @@
-"""Default item resource."""
+"""Basic Pool for specific Itemversions typically to create process content."""
 from copy import copy
 
 from adhocracy_core.interfaces import IItemVersion

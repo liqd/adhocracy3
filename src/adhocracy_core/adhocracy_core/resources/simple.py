@@ -1,4 +1,4 @@
-"""Simple resource type."""
+"""Basic simple type without children and non versionable."""
 from adhocracy_core.interfaces import ISimple
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.metadata

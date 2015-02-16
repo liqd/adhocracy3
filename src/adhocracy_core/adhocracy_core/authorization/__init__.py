@@ -1,4 +1,4 @@
-"""ACL Authorization with support for rules mapped to adhocracy principals."""
+"""Authorization with roles/local roles mapped to adhocracy principals."""
 from collections import defaultdict
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import ACLPermitsResult
@@ -48,7 +48,7 @@ def set_local_roles(resource, new_local_roles: dict, registry: Registry=None):
 
     If the resource's `local roles` and the ``new_local_roles`` differ,
     set the ``new_local_roles`` via setattr and send a
-    :class:`adhocracy.interfaces.ILocalRolesModified` to notify others.
+    :class:`adhocracy_core.interfaces.ILocalRolesModified` to notify others.
     """
     _assert_values_have_set_type(new_local_roles)
     old_local_roles = getattr(resource, '__local_roles__', None)

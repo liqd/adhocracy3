@@ -1,4 +1,4 @@
-""" Evolve scripts to migrate legacy objects in existing databases."""
+"""Scripts to migrate legacy objects in existing databases."""
 import logging
 
 from substanced.evolution import add_evolution_step

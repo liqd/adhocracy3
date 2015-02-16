@@ -4,8 +4,7 @@ Permission system
 Principals
 ..........
 
-There are two types of :term:`principals`: users and groups.
-
+There are two types of principals users and groups (:term:`principal`).
 On the technical level, roles are also called principles.
 
 groups (set of users):
@@ -15,14 +14,14 @@ groups (set of users):
    - gods (initial custom group, no permission checks)
    - admins (custom group)
    - managers (custom group)
-   ...
+   - ...
 
 users:
    - god (initial user)
-   ...
+   - ...
 
-Principals are mapped to a set of global permission :term:`roles` and
-:term:`local roles` (only for a specific context).
+Principals are mapped to a set of global permissions(:term:`role`)
+and local permissions for a specific context (:term:`local role`)
 
 
 Roles (mapping to permissions)
@@ -91,9 +90,10 @@ Customizing
 
 1. map users to group
 2. map roles to principals
-3. use workflow system to  locally add :term:`local roles` mapped to principals
-4. locally add :term:`local roles` (change permission to allow others to edit)
+3. use workflow system to locally add roles to principals.
+4. locally add :term:`local role`s (change permission to allow others to edit)
 5. map permissions to roles:
+
     - use only configuration for this
     - default mapping should just work for most use cases
 

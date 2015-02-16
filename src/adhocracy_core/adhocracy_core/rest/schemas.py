@@ -1,4 +1,4 @@
-"""Cornice colander schemas und validators to validate request data."""
+"""Data structures / validation specific to rest api requests."""
 from hypatia.interfaces import IIndexSort
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
@@ -7,6 +7,7 @@ from substanced.util import find_catalog
 import colander
 
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Email
@@ -26,6 +27,7 @@ from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.sheets.principal import IUserExtended
 
 
 resolver = DottedNameResolver()
@@ -239,11 +241,19 @@ class POSTReportAbuseViewRequestSchema(colander.Schema):
     remark = Text(missing='')
 
 
+class MessageUserReference(SheetToSheet):
+
+    """Dummy reference to validate user resources."""
+
+    target_isheet = IUserExtended
+
+
 class POSTMessageUserViewRequestSchema(colander.Schema):
 
     """Schema for messages to a user."""
 
-    recipient = Resource(missing=colander.required)
+    recipient = Reference(missing=colander.required,
+                          reftype=MessageUserReference)
     title = SingleLine(missing=colander.required)
     text = Text(missing=colander.required)
 

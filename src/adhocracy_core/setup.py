@@ -22,6 +22,7 @@ requires = [
     'autobahn',
     'websocket-client',
     'Pillow',
+    'requests',
 ]
 
 if sys.version_info < (3, 4):
@@ -36,7 +37,6 @@ test_requires = [
     'pytest-pyramid',
     'pytest-timeout',
     'coverage',
-    'requests',
     'python-coveralls',
 ]
 

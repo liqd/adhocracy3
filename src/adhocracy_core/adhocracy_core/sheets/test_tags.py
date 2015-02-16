@@ -41,7 +41,7 @@ class TestTagsSheet:
 def test_includeme_register_tags_sheet(config):
     from adhocracy_core.sheets.tags import ITags
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
@@ -72,7 +72,7 @@ class TestTagSheet:
 def test_includeme_register_tag_sheet(config):
     from adhocracy_core.sheets.tags import ITag
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')

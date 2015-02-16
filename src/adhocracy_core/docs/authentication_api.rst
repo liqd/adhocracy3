@@ -147,7 +147,7 @@ Account Activation
 
 Before they have confirmed their email address, new users are invisible
 (hidden). They won't show up in user listings, and retrieving information
-about them manually leads to a *410 Gone* response (see :ref:`deletion`)::
+about them manually leads to a *410 Gone* response (see :doc:`deletion`)::
 
     >>> resp_data = testapp.get(user_path, status=410).json
     >>> resp_data['reason']

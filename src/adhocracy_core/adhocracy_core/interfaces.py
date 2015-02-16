@@ -1,4 +1,4 @@
-"""Basic Interfaces used by all packages."""
+"""Interfaces for plugable dependencies, basic metadata structures."""
 from collections import Iterable
 from collections import namedtuple
 from collections import OrderedDict
@@ -136,6 +136,16 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     def get(params: dict={}) -> dict:
         """ Get ``appstruct`` dictionary data.
+
+        :param params: optional parameters that can modify the appearance
+        of the returned dictionary, e.g. query parameters in a GET request
+        """
+
+    def get_cstruct(request, params: dict={}):
+        """Return cstruct data.
+
+        Bind `request` and `context` (self.context) to colander schema
+        (self.schema). Get sheet appstruct data and serialize.
 
         :param params: optional parameters that can modify the appearance
         of the returned dictionary, e.g. query parameters in a GET request

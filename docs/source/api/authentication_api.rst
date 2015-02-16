@@ -1,1 +1,0 @@
-../../../src/adhocracy_core/docs/authentication_api.rst

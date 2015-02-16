@@ -1,4 +1,4 @@
-"""Tag resource type."""
+"""TAG type to label itemversions."""
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.resource import resource_metadata_defaults

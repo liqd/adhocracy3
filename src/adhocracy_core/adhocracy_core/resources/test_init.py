@@ -7,6 +7,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import sheet_metadata
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.testing import create_event_listener
+from adhocracy_core.testing import register_sheet
 
 
 class ISheetY(ISheet):
@@ -15,15 +16,6 @@ class ISheetY(ISheet):
 
 class ISheetX(ISheet):
     pass
-
-
-def register_sheet(isheet, mock_sheet, registry):
-    from adhocracy_core.interfaces import IResourceSheet
-    mock_sheet.meta = mock_sheet.meta._replace(isheet=isheet)
-    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
-    return mock_sheet
 
 
 @fixture
@@ -40,19 +32,19 @@ class TestAddResourceTypeToRegistry:
         return add_resource_type_to_registry(*args)
 
     def test_add_iresource_but_missing_content_registry(self, config, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         del config.registry.content
         with raises(AssertionError):
             self.make_one(resource_meta, config)
 
     def test_add_resource_type(self, config, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         self.make_one(resource_meta, config)
         resource = config.registry.content.create(IResource.__identifier__)
         assert IResource.providedBy(resource)
 
     def test_add_resource_type_metadata(self, config, registry, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         iresource = IResource
         resource_type = iresource.__identifier__
         self.make_one(resource_meta, config)
@@ -62,7 +54,7 @@ class TestAddResourceTypeToRegistry:
                resource_meta  # adhocracy uses interfaces for content types ids
 
     def test_add_resource_type_metadata_with_content_name(self, config, resource_meta):
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
         type_id = IResource.__identifier__
         metadata_a = resource_meta._replace(content_name='Name')
         self.make_one(metadata_a, config)
@@ -70,6 +62,10 @@ class TestAddResourceTypeToRegistry:
 
 
 class TestResourceFactory:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
 
     def make_one(self, resource_meta):
         from adhocracy_core.resources import ResourceFactory
@@ -127,82 +123,90 @@ class TestResourceFactory:
         with raises(AttributeError):
             inst.test
 
-    def test_call_with_non_exisiting_sheet_appstructs_data(self, resource_meta):
-        from zope.component import ComponentLookupError
+    def test_call_with_non_exisiting_sheet_appstructs_data(
+            self, resource_meta, registry):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
         meta = resource_meta
         appstructs = {ISheetY.__identifier__: {'count': 0}}
-        with raises(ComponentLookupError):
-            self.make_one(meta)(appstructs=appstructs)
+        registry.content.get_sheet.side_effect = RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            self.make_one(meta)(appstructs=appstructs, registry=registry)
 
-    def test_call_with_creatable_appstructs_data(self, resource_meta, registry, mock_sheet):
+    def test_call_with_creatable_appstructs_data(self, resource_meta, registry,
+                                                 mock_sheet):
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[ISheetY])
-        dummy_sheet = register_sheet(ISheetY, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, ISheetY)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
 
         self.make_one(meta)(appstructs=appstructs)
 
-        assert dummy_sheet.set.call_args[0] == ({'count': 0},)
-        assert dummy_sheet.set.call_args[1]['send_event'] is False
+        assert mock_sheet.set.call_args[0] == ({'count': 0},)
+        assert mock_sheet.set.call_args[1]['send_event'] is False
 
-    def test_call_with_not_creatable_appstructs_data(self, resource_meta, registry, mock_sheet):
+    def test_call_with_not_creatable_appstructs_data(self, resource_meta,
+                                                     registry, mock_sheet):
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[ISheetY])
-        dummy_sheet = register_sheet(ISheetY, mock_sheet, registry)
-        dummy_sheet.meta = sheet_metadata._replace(creatable=False)
+        register_sheet(None, mock_sheet, registry, ISheetY)
+        mock_sheet.meta = sheet_metadata._replace(creatable=False)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
 
         self.make_one(meta)(appstructs=appstructs)
 
-        assert not dummy_sheet.set.called
+        assert not mock_sheet.set.called
 
-    def test_call_with_parent_and_appstructs_name_data(self, resource_meta, registry, pool, mock_sheet):
+    def test_call_with_parent_and_appstructs_name_data(
+            self, resource_meta, registry, pool, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IName])
-        dummy_sheet = register_sheet(IName, mock_sheet, registry)
-        dummy_sheet.set.return_value = False
+        register_sheet(None, mock_sheet, registry, IName)
+        mock_sheet.set.return_value = False
         appstructs = {IName.__identifier__: {'name': 'child'}}
 
         self.make_one(meta)(parent=pool, appstructs=appstructs)
 
         assert 'child' in pool
-        assert dummy_sheet.set.called
+        assert mock_sheet.set.called
 
     def test_call_with_parent_and_no_name_appstruct(self, resource_meta, pool):
         meta = resource_meta
         with raises(KeyError):
             self.make_one(meta)(parent=pool, appstructs={})
 
-    def test_call_with_parent_and_name_appstruct(self, resource_meta, registry, pool, mock_sheet):
+    def test_call_with_parent_and_name_appstruct(self, resource_meta, registry,
+                                                 pool, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IName])
         appstructs = {IName.__identifier__: {'name': 'name'}}
-        register_sheet(IName, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, IName)
         inst = self.make_one(meta)(parent=pool, appstructs=appstructs)
 
         assert inst.__parent__ == pool
         assert inst.__name__ in pool
         assert inst.__name__ == 'name'
 
-    def test_call_with_parent_and_non_unique_name_appstruct(self, resource_meta, registry, pool, mock_sheet):
+    def test_call_with_parent_and_non_unique_name_appstruct(
+            self, resource_meta, registry, pool, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IName])
         appstructs = {IName.__identifier__: {'name': 'name'}}
-        register_sheet(IName, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, IName)
         pool['name'] = testing.DummyResource()
 
         with raises(KeyError):
             self.make_one(meta)(parent=pool, appstructs=appstructs)
 
-    def test_call_with_parent_and_empty_name_data(self, resource_meta, pool, registry, mock_sheet):
+    def test_call_with_parent_and_empty_name_data(self, resource_meta, pool,
+                                                  registry, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IName])
         appstructs = {'adhocracy_core.sheets.name.IName': {'name': ''}}
-        register_sheet(IName, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, IName)
 
         with raises(KeyError):
             self.make_one(meta)(parent=pool, appstructs=appstructs)
@@ -233,82 +237,87 @@ class TestResourceFactory:
         assert 'Service' in pool
         assert resource.__is_service__
 
-    def test_without_creator_and_resource_implements_imetadata(self, resource_meta, registry, mock_sheet):
+    def test_without_creator_and_resource_implements_imetadata(
+            self, resource_meta, registry, mock_sheet):
         from datetime import datetime
         from adhocracy_core.sheets.metadata import IMetadata
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IMetadata])
-        dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, IMetadata)
 
         self.make_one(meta)()
 
-        set_appstructs = dummy_sheet.set.call_args[0][0]
+        set_appstructs = mock_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] is None
         assert set_appstructs['modified_by'] is None
         today = datetime.utcnow().date()
         assert set_appstructs['creation_date'].date() == today
         assert set_appstructs['item_creation_date'] == set_appstructs['creation_date']
         assert set_appstructs['modification_date'].date() == today
-        set_send_event = dummy_sheet.set.call_args[1]['send_event']
+        set_send_event = mock_sheet.set.call_args[1]['send_event']
         assert set_send_event is False
 
-    def test_without_parent_and_resource_implements_imetadata_and_itemversion(self, resource_meta, registry, mock_sheet):
+    def test_without_parent_and_resource_implements_imetadata_and_itemversion(
+            self, resource_meta, registry, mock_sheet):
         from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.interfaces import IItemVersion
         meta = resource_meta._replace(iresource=IItemVersion,
                                       basic_sheets=[IMetadata])
-        dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, IMetadata)
 
         self.make_one(meta)()
 
-        set_appstructs = dummy_sheet.set.call_args[0][0]
+        set_appstructs = mock_sheet.set.call_args[0][0]
         assert set_appstructs['item_creation_date'] == set_appstructs['creation_date']
 
-    def test_with_parent_and_resource_implements_imetadata_and_itemversion(self, item, resource_meta, registry, mock_sheet):
+    def test_with_parent_and_resource_implements_imetadata_and_itemversion(
+            self, item, resource_meta, registry, mock_sheet):
         from datetime import datetime
         from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.interfaces import IItemVersion
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IItemVersion,
                                       basic_sheets=[IMetadata, IName])
-        dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
-        register_sheet(IName, mock_sheet, registry)
+        registry.content.get_sheet.side_effect = [mock_sheet, mock_sheet,
+                                                  mock_sheet, mock_sheet]
         item_creation_date = datetime.today()
-        dummy_sheet.get.return_value = {'creation_date': item_creation_date}
+        mock_sheet.get.return_value = {'creation_date': item_creation_date}
 
         self.make_one(meta)(parent=item, appstructs={IName.__identifier__: {'name': 'N'}})
 
-        set_appstructs = dummy_sheet.set.call_args[0][0]
+        set_appstructs = mock_sheet.set.call_args[0][0]
         assert set_appstructs['item_creation_date'] == item_creation_date
 
-    def test_with_creator_and_resource_implements_imetadata(self, resource_meta, registry, mock_sheet):
+    def test_with_creator_and_resource_implements_imetadata(
+            self, resource_meta, registry, mock_sheet):
         from adhocracy_core.sheets.metadata import IMetadata
         from pyramid.traversal import resource_path
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IMetadata])
-        dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, IMetadata)
         authenticated_user = testing.DummyResource()
 
         resource = self.make_one(meta)(creator=authenticated_user)
 
-        set_appstructs = dummy_sheet.set.call_args[0][0]
+        set_appstructs = mock_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == authenticated_user
         assert set_appstructs['modified_by'] == authenticated_user
         userid = resource_path(authenticated_user)
         assert resource.__local_roles__ == {userid: {'role:creator'}}
 
-    def test_with_creator_and_resource_implements_imetadata_and_iuser(self, resource_meta, registry, mock_sheet):
+    def test_with_creator_and_resource_implements_imetadata_and_iuser(
+            self, resource_meta, registry, mock_sheet):
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.sheets.metadata import IMetadata
         from pyramid.traversal import resource_path
         meta = resource_meta._replace(iresource=IUser,
                                       basic_sheets=[IMetadata])
-        dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
+        register_sheet(None, mock_sheet, registry, IMetadata)
         authenticated_user = object()
 
         created_user = self.make_one(meta)(creator=authenticated_user)
 
-        set_appstructs = dummy_sheet.set.call_args[0][0]
+        set_appstructs = mock_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == created_user
         assert set_appstructs['modified_by'] == created_user
         userid = resource_path(created_user)

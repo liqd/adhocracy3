@@ -1,4 +1,4 @@
-"""Resource type configuration and default factory."""
+"""Resource types mapped to sheets (OpenClosePrinciple), object hierarchy."""
 from datetime import datetime
 
 from pyramid.path import DottedNameResolver
@@ -196,7 +196,7 @@ class ResourceFactory:
     def _get_metadata(self, resource: IResource, creator: IResource,
                       registry: Registry) -> dict:
         # FIXME: bad SRP, there are two places responsible to set the default
-        # date, here and in adhocracy.schema.Date
+        # date, here and in adhocracy_core.schema.Date
         now = datetime.utcnow().replace(tzinfo=UTC)
         creator = creator if creator is not None else None
         metadata = {'creator': creator,

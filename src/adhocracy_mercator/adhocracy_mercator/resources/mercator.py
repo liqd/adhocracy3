@@ -441,7 +441,7 @@ mercator_proposal_meta = item_metadata._replace(
 
 
 def includeme(config):
-    """Add resource type to registry."""
+    """Add resource type to content."""
     add_resource_type_to_registry(mercator_proposal_meta, config)
     add_resource_type_to_registry(mercator_proposal_version_meta, config)
     add_resource_type_to_registry(organization_info_meta, config)

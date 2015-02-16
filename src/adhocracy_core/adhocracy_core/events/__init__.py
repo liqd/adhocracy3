@@ -1,4 +1,4 @@
-""" Events when adding with ItemVersions and Items.
+"""Hooks to modify runtime behavior (use 'subscriber.py' in you package).
 
 In addition we have the normal substanced events:
 https://substanced.readthedocs.org/en/latest/api.html#module-substanced.event
@@ -147,7 +147,7 @@ class SheetBackReferenceRemoved:
         """:class:`adhocracy_core.graph.Reference` that was targeting `object`.
         """
         self.registry = registry
-        """:class:`pyramid.registry.Registry`"""
+        """:class:`pyramid.content.Registry`"""
 
 
 @implementer(ISheetBackReferenceAdded)
@@ -169,7 +169,7 @@ class SheetBackReferenceAdded:
         """:class:`adhocracy_core.graph.Reference` that is targeting `object`.
         """
         self.registry = registry
-        """:class:`pyramid.registry.Registry`"""
+        """:class:`pyramid.content.Registry`"""
 
 
 @implementer(ILocalRolesModfied)

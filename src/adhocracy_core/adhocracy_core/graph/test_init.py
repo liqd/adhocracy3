@@ -350,8 +350,8 @@ class TestGraphGetBackReferences:
 class TestGraphSetReferencesForIsheet:
 
     @fixture
-    def registry(self, mock_resource_registry, sheet_meta):
-        registry = testing.DummyResource(content=mock_resource_registry)
+    def registry(self, mock_content_registry, sheet_meta):
+        registry = testing.DummyResource(content=mock_content_registry)
         registry.content.sheets_meta = {ISheet: sheet_meta}
         return registry
 
@@ -639,7 +639,7 @@ class TestGraphIsInSubtree:
 
 def test_includeme_register_graph(config, context):
     from adhocracy_core.graph import Graph
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.graph')
     graph = config.registry.content.create('Graph', context)
     assert isinstance(graph, Graph)

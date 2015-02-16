@@ -1,4 +1,4 @@
-"""Utilities for working with the version/reference graph (DAG)."""
+"""Set/Get Resource References / versions graph (DAG) helpers."""
 
 from collections import namedtuple
 from collections.abc import Iterable
@@ -164,7 +164,7 @@ class Graph(Persistent):
                            key - isheet field name
                            value - reference targets
         :param registry: Pyramid Registry with
-                         :class:`adhocracy_core.registry.ResourceContentRegistry`
+                         :class:`adhocracy_core.content.ResourceContentRegistry`
                          attribute named `content`.
         """
         sheet_meta = registry.content.sheets_meta[isheet]

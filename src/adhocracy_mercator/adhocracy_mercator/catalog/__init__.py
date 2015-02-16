@@ -1,7 +1,7 @@
 """ Catalog utilities."""
 from substanced.catalog import Keyword
 
-from adhocracy_core.catalog import AdhocracyCatalogIndexes
+from adhocracy_core.catalog.adhocracy import AdhocracyCatalogIndexes
 
 
 class MercatorCatalogIndexes(AdhocracyCatalogIndexes):

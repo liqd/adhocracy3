@@ -138,15 +138,21 @@ def create_pool_with_graph() -> testing.DummyResource:
     return context
 
 
-def add_and_register_sheet(context, mock_sheet, registry):
-    """Add `mock_sheet` to `context`and register adapter."""
+def register_sheet(context, mock_sheet, registry, isheet=None) -> Mock:
+    """Register `mock_sheet` for `context`. You can ony use this only once.
+
+    If you need to register multiple mock_sheets in you test add side effects:
+    `registry.content.get_sheet.side_effects = [sheet1, sheet2]`.
+    You can also set single sheets directly:
+    `registry.content.get_sheet.return_value = sheet1
+    """
     from zope.interface import alsoProvides
-    from adhocracy_core.interfaces import IResourceSheet
-    isheet = mock_sheet.meta.isheet
-    alsoProvides(context, isheet)
-    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
+    if isheet is not None:
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=isheet)
+    if context is not None:
+        alsoProvides(context, mock_sheet.meta.isheet)
+    registry.content.get_sheet.return_value = mock_sheet
+    return mock_sheet
 
 
 def create_event_listener(config: Configurator, ievent: IInterface) -> list:
@@ -168,7 +174,7 @@ def pool_graph(config):
     from adhocracy_core.resources.pool import Pool
     from adhocracy_core.resources.root import _add_graph
     from adhocracy_core.resources.root import _add_objectmap_to_app_root
-    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.graph')
     context = Pool()
@@ -240,7 +246,7 @@ def cornice_request():
 @fixture
 def changelog_meta() -> ChangelogMetadata:
     """ Return changelog metadata."""
-    from adhocracy_core.resources.subscriber import changelog_metadata
+    from adhocracy_core.changelog import changelog_metadata
     return changelog_metadata
 
 
@@ -293,7 +299,7 @@ def changelog(changelog_meta):
 @fixture
 def registry_with_changelog(registry, changelog):
     """Return registry with transaction_changelog."""
-    registry._transaction_changelog = changelog
+    registry.changelog = changelog
     return registry
 
 
@@ -330,9 +336,9 @@ def mock_objectmap() -> Mock:
 
 
 @fixture
-def mock_resource_registry() -> Mock:
-    """Mock :class:`adhocracy_core.registry.ResourceContentRegistry`."""
-    from adhocracy_core.registry import ResourceContentRegistry
+def mock_content_registry() -> Mock:
+    """Mock :class:`adhocracy_core.content.ResourceContentRegistry`."""
+    from adhocracy_core.content import ResourceContentRegistry
     mock = Mock(spec=ResourceContentRegistry)
     mock.sheets_meta = {}
     mock.resources_meta = {}
@@ -341,11 +347,19 @@ def mock_resource_registry() -> Mock:
     mock.get_sheets_read.return_value = []
     mock.get_sheets_edit.return_value = []
     mock.get_sheets_create.return_value = []
+    mock.get_sheet.return_value = None
     mock.sheets_read = {}
     mock.sheets_edit = {}
     mock.sheets_create = {}
     mock.sheets_create_mandatory = {}
     return mock
+
+
+@fixture
+def registry_with_content(registry, mock_content_registry):
+    """Return registry with content registry attribute."""
+    registry.content = mock_content_registry
+    return registry
 
 
 @fixture

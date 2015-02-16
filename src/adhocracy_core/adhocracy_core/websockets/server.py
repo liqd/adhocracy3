@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 class ClientTracker():
 
-    """"Keeps track of the clients that want notifications."""
+    """Keeps track of the clients that want notifications."""
 
     def __init__(self):
         self._clients2resource_paths = defaultdict(set)

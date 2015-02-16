@@ -10,6 +10,7 @@ import pytest
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.testing import register_sheet
 
 
 class IResourceX(IResource):
@@ -37,15 +38,12 @@ def mock_authpolicy(registry):
 
 
 @fixture
-def mock_password_sheet(registry):
-    from adhocracy_core.interfaces import IResourceSheet
+def mock_password_sheet(registry_with_content, sheet_meta):
     from adhocracy_core.sheets.principal import IPasswordAuthentication
     from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
-    isheet = IPasswordAuthentication
     sheet = Mock(spec=PasswordAuthenticationSheet)
-    registry.registerAdapter(lambda x: sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
+    sheet.meta = sheet_meta._replace(isheet=IPasswordAuthentication)
+    register_sheet(None, sheet, registry_with_content)
     return sheet
 
 
@@ -256,7 +254,7 @@ class TestRESTView:
 
     @fixture
     def request(self, cornice_request, changelog):
-        cornice_request.registry._transaction_changelog = changelog
+        cornice_request.registry.changelog = changelog
         return cornice_request
 
     def make_one(self, context, request):
@@ -283,8 +281,8 @@ class TestRESTView:
     def test__build_updated_resources_dict_one_resource(
             self, request, context, changelog_meta):
         res = testing.DummyResource()
-        request.registry._transaction_changelog[
-            res] = changelog_meta._replace(resource=res, created=True)
+        request.registry.changelog[res] = changelog_meta._replace(resource=res,
+                                                                  created=True)
         inst = self.make_one(context, request)
         result = inst._build_updated_resources_dict()
         assert result == {'created': [res]}
@@ -292,9 +290,8 @@ class TestRESTView:
     def test__build_updated_resources_dict_one_resource_two_events(
             self, request, context, changelog_meta):
         res = testing.DummyResource()
-        request.registry._transaction_changelog[
-            res] = changelog_meta._replace(
-            resource=res,  created=True, changed_descendants=True)
+        request.registry.changelog[res] = changelog_meta._replace(
+            resource=res, created=True, changed_descendants=True)
         inst = self.make_one(context, request)
         result = inst._build_updated_resources_dict()
         assert result == {'changed_descendants': [res], 'created': [res]}
@@ -303,10 +300,10 @@ class TestRESTView:
             self, request, context, changelog_meta):
         res1 = testing.DummyResource()
         res2 = testing.DummyResource()
-        request.registry._transaction_changelog[
-            res1] = changelog_meta._replace(resource=res1, created=True)
-        request.registry._transaction_changelog[
-            res2] = changelog_meta._replace(resource=res2, created=True)
+        request.registry.changelog[res1] = \
+            changelog_meta._replace(resource=res1, created=True)
+        request.registry.changelog[res2] =\
+            changelog_meta._replace(resource=res2, created=True)
         inst = self.make_one(context, request)
         result = inst._build_updated_resources_dict()
         assert list(result.keys()) == ['created']
@@ -316,8 +313,8 @@ class TestRESTView:
 class TestResourceRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request_(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request_):
@@ -443,7 +440,7 @@ class TestResourceRESTView:
         assert wanted == response
 
     def test_get_valid_with_sheets(self, request_, context, mock_sheet):
-        mock_sheet.get.return_value = {'name': 1}
+        mock_sheet.get_cstruct.return_value = {'name': '1'}
         mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
         request_.registry.content.get_sheets_read.return_value = [mock_sheet]
         inst = self.make_one(context, request_)
@@ -454,9 +451,9 @@ class TestSimpleRESTView:
 
     @fixture
     def request(self, cornice_request, registry_with_changelog,
-                mock_resource_registry):
+                mock_content_registry):
         cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -511,9 +508,9 @@ class TestPoolRESTView:
 
     @fixture
     def request(self, cornice_request, registry_with_changelog,
-                mock_resource_registry):
+                mock_content_registry):
         cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -545,6 +542,7 @@ class TestPoolRESTView:
     def test_get_valid_pool_sheet_with_query_params(self, request, context, mock_sheet):
         from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
+        mock_sheet.get_cstruct.return_value = {}
         request.registry.content.get_sheets_read.return_value = [mock_sheet]
         request.validated['param1'] = 1
 
@@ -552,25 +550,7 @@ class TestPoolRESTView:
         response = inst.get()
 
         assert response['data'] == {IPool.__identifier__: {}}
-        assert mock_sheet.get.call_args[1] == {'params': {'param1': 1}}
-
-    def test_get_valid_pool_sheet_with_elements_content_param(self, request, context, mock_sheet):
-        from adhocracy_core.sheets.pool import IPool
-        from adhocracy_core.sheets.pool import PoolSchema
-        child = testing.DummyResource(__provides__=IResource)
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
-        mock_sheet.get.return_value = {'elements': [child]}
-        mock_sheet.schema = PoolSchema()
-        request.registry.content.get_sheets_read.return_value = [mock_sheet]
-        request.validated['elements'] = 'content'
-
-        inst = self.make_one(context, request)
-        response = inst.get()
-
-        response_elements_child = response['data'][IPool.__identifier__]['elements'][0]
-        assert 'path' in response_elements_child
-        assert 'content_type' in response_elements_child
-        assert 'data' in response_elements_child
+        assert mock_sheet.get_cstruct.call_args[1] == {'params': {'param1': 1}}
 
     def test_post_valid(self, request, context):
         request.root = context
@@ -608,9 +588,9 @@ class TestUsersRESTView:
 
     @fixture
     def request(self, cornice_request, registry_with_changelog,
-                mock_resource_registry):
+                mock_content_registry):
         cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_resource_registry
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -656,9 +636,9 @@ class TestUsersRESTView:
 class TestItemRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry, changelog):
-        cornice_request.registry.content = mock_resource_registry
-        cornice_request.registry._transaction_changelog = changelog
+    def request(self, cornice_request, mock_content_registry, changelog):
+        cornice_request.registry.content = mock_content_registry
+        cornice_request.registry.changelog = changelog
         return cornice_request
 
     def make_one(self, context, request):
@@ -821,8 +801,8 @@ class TestItemRESTView:
 class TestMetaApiView:
 
     @fixture
-    def request(self, cornice_request,  mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request(self, cornice_request,  mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     @fixture
@@ -1066,9 +1046,9 @@ class TestValidateLoginNameUnitTest:
 class TestValidateLoginPasswordUnitTest:
 
     @fixture
-    def request(self, cornice_request, registry):
+    def request(self, cornice_request, registry_with_content):
         from adhocracy_core.sheets.principal import IPasswordAuthentication
-        cornice_request.registry = registry
+        cornice_request.registry = registry_with_content
         user = testing.DummyResource(__provides__=IPasswordAuthentication)
         cornice_request.validated['user'] = user
         cornice_request.validated['password'] = 'lalala'
@@ -1222,7 +1202,8 @@ class TestValidateActivationPathUnitTest:
     def user_with_metadata(self, config):
         from adhocracy_core.sheets.metadata import IMetadata
         config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.content')
+        config.include('adhocracy_core.changelog')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
         user = testing.DummyResource(__provides__=IMetadata)
@@ -1356,8 +1337,8 @@ class TestMessageUserView:
 class TestAssetsServiceRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request):
@@ -1385,8 +1366,8 @@ class TestAssetsServiceRESTView:
 class TestAssetRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request_(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request_):
@@ -1416,8 +1397,8 @@ class TestAssetRESTView:
 class TestAssetDownloadRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_resource_registry):
-        cornice_request.registry.content = mock_resource_registry
+    def request_(self, cornice_request, mock_content_registry):
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     def make_one(self, context, request_):

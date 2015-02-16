@@ -42,7 +42,7 @@ class TestBatchView:
 
     @fixture
     def request(self, cornice_request, changelog, mock_invoke_subrequest):
-        cornice_request.registry._transaction_changelog = changelog
+        cornice_request.registry.changelog = changelog
         cornice_request.invoke_subrequest = mock_invoke_subrequest
         cornice_request.method = 'POST'
         return cornice_request
