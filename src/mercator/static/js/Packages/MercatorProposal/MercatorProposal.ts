@@ -1004,11 +1004,8 @@ export var register = (angular) => {
                 ]  // correspond to exact mime types EG image/png
             };
         }])
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
-                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
-                return widget.createDirective();
-            }])
+        // NOTE: we do not use a Widget based directive here for performance reasons
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", listItem])
         .directive("adhMercatorProposalDetailView",
             ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
@@ -1023,7 +1020,6 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
-        .directive("adhMercatorProposalListItem", ["adhConfig", "adhHttp", listItem])
         .filter("adhImageUri", imageUriFilter)
         .controller("mercatorProposalFormController", ["$scope", "$element", "$window", ($scope : IControllerScope, $element, $window) => {
             var heardFromCheckboxes = [
