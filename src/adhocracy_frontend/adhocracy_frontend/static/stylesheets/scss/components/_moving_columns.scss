@@ -26,7 +26,7 @@ States:
         <div class="debug-placeholder moving-column-menu">
             <a onclick="$('.moving-column-sidebar').toggleClass('is-visible')">toggle sidebar</a>
         </div>
-        <div class="debug-placeholder moving-column-sidebar">sidebar</div>
+        <div class="debug-placeholder mof-ving-column-sidebar">sidebar</div>
         <div class="debug-placeholder moving-column-body">structure column
             this is scrolling
             this is scrolling
@@ -237,8 +237,8 @@ States:
 
 .moving-column-icon {
     float: left;
-    font-size: $font-size-plus;
-    line-height: 24px / $font-size-plus;
+    font-size: 17px;
+    line-height: (24/17);
     vertical-align: middle;
 }
 
