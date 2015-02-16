@@ -364,4 +364,18 @@ A list of alert messages to notify users in the moving column
     input[type="text"] {
         background: white;
     }
+
+    &.ng-enter, &.ng-leave {
+        @include transition(opacity 0.5s);
+    }
+
+    &.ng-enter,
+    &.ng-leave.ng-leave-active {
+        @include opacity(0);
+    }
+
+    &.ng-leave,
+    &.ng-enter.ng-enter-active {
+        @include opacity(1);
+    }
 }
