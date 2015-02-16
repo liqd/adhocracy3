@@ -21,7 +21,6 @@ select,
 textarea {
     background: $color-structure-normal;
     border: 0;
-    color: $color-text-highlight-introvert;
     margin-bottom: $input-margin-bottom;
 
     &.ng-dirty.ng-invalid {
