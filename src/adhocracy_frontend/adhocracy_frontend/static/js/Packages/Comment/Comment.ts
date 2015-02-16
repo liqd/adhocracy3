@@ -148,7 +148,15 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
     }
 
     public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
-        return this.$q.when();
+        // FIXME: use resource abstractions here
+        return <any>this.adhHttp.putRaw(path, {
+            content_type: "adhocracy_core.resources.comment.IComment",
+            data: {
+                "adhocracy_core.sheets.metadata.IMetadata": {
+                    hidden: true
+                }
+            }
+        });
     }
 
     public _update(
