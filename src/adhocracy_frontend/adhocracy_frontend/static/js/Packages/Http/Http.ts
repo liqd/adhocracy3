@@ -473,9 +473,7 @@ export var register = (angular, config, metaApi) => {
             "angular-data.DSCacheFactory",
         ])
         .config(["$httpProvider", ($httpProvider) => {
-            if (config.debug) {
-                $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
-            }
+            $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
         }])
         .service("adhHttpBusy", ["$q", Busy])
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
