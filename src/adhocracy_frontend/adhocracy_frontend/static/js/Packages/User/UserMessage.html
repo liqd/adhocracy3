@@ -1,6 +1,7 @@
 <div class="user-message">
     <form
         novalidate="novalidate"
+        data-ng-submit="messageSend()"
         name="messageForm">
         <!-- FIXME: replace "Username" -->
         <p>{{ "TR__MESSAGE_TO" | translate }} Username</p>
@@ -30,7 +31,6 @@
             <input
                 type="submit"
                 value="{{ 'TR__MESSAGE_SEND' | translate }}"
-                data-ng-click="messageSend()"
                 class="m-call-to-action form-footer-button-cta" />
             <a href="" class="button form-footer-button" data-ng-click="cancel()" >{{ "TR__CANCEL" | translate }}</a>
         </footer>

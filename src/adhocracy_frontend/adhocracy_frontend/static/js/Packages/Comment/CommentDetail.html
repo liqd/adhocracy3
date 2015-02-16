@@ -29,16 +29,16 @@
             </div>
         </div>
 
-        <div class="comment-children-edit-form" data-ng-switch-when="1">
+        <form class="comment-children-edit-form" data-ng-switch-when="1" data-ng-submit="submit()">
             <div class="form-error" data-ng-repeat="error in errors">
                 <p>{{ error | translate }}</p>
             </div>
             <textarea class="comment-edit-form-text" data-msd-elastic="" data-ng-model="data.content"></textarea>
             <footer class="form-footer">
-                <a href="" class="button m-call-to-action form-footer-button-cta" data-ng-click="submit()">{{ "TR__SAVE" | translate }}</a>
+                <input type="submit" class="m-call-to-action form-footer-button-cta" value="{{ 'TR__SAVE' | translate }}" />
                 <a href="" class="button form-footer-button" data-ng-click="cancel()" data-ng-if="!hideCancel">{{ "TR__CANCEL" | translate }}</a>
             </footer>
-        </div>
+        </form>
         <div class="comment-content" data-ng-switch-default="">
             {{data.content}}
         </div>

@@ -1,5 +1,5 @@
 <div class="register">
-    <form novalidate="novalidate" class="register-form" name="registerForm">
+    <form novalidate="novalidate" class="register-form" name="registerForm" data-ng-submit="register()">
         <div class="form-error" ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
@@ -60,7 +60,6 @@
             name="register"
             value="{{ 'TR__REGISTER' | translate }}"
             class="m-call-to-action"
-            data-ng-click="register()"
             data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
         <div data-ng-if="!success" class="register-info">
             <p>{{ "TR__REGISTRATION_LOGIN_INSTEAD" | translate }}

@@ -1,11 +1,10 @@
-<form>
+<form data-ng-submit="submit()">
     <textarea data-ng-model="remark">
     </textarea>
     <footer class="form-footer">
         <input
             type="submit"
             value="{{ 'TR__SUBMIT' | translate }}"
-            data-ng-click="submit()"
             class="m-call-to-action form-footer-button-cta" />
         <a href="" class="button form-footer-button" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
     </footer>
