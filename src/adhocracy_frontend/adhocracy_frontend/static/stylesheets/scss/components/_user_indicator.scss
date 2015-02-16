@@ -26,6 +26,7 @@ It is usually used in the header bar.
         color: $color-text-highlight-introvert;
         font-variant: small-caps;
         font-size: $font-size-plus;
+        text-transform: lowercase;
 
         &:hover, &:focus {
             text-decoration: underline;

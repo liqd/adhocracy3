@@ -237,8 +237,8 @@ States:
 
 .moving-column-icon {
     float: left;
-    font-size: $font-size-plus;
-    line-height: 24px / $font-size-plus;
+    font-size: 17px;
+    line-height: (24/17);
     vertical-align: middle;
 }
 
