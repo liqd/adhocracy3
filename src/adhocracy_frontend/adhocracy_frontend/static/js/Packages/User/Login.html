@@ -1,5 +1,5 @@
 <div class="login">
-    <form novalidate="novalidate" class="login-form" name="loginForm">
+    <form novalidate="novalidate" class="login-form" name="loginForm" data-ng-submit="logIn()">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
@@ -25,7 +25,6 @@
             type="submit"
             value="{{ 'TR__LOGIN' | translate }}"
             class="m-call-to-action"
-            data-ng-click="logIn()"
             data-ng-disabled="loginForm.$invalid" />
         <div class="login-info">
             <p>{{ "TR__OR_REGISTER" | translate }}

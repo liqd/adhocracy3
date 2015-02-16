@@ -55,7 +55,7 @@ var EmbeddedCommentsPage = function(referer) {
         this.getEditLink(comment).click();
         var textarea = comment.element(by.model("data.content"));
         textarea.sendKeys.apply(textarea, keys);
-        comment.element(by.css("[data-ng-click='submit()']")).click();
+        comment.element(by.css("input[type=\"submit\"]")).click();
         return comment;
     };
 
