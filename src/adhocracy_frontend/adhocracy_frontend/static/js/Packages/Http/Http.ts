@@ -454,8 +454,8 @@ export class Busy {
 export var busyDirective = (adhConfig : AdhConfig.IService, adhBusy : Busy) => {
     return {
         restrict: "E",
-        template: "<div class='busy-bar' data-ng-show='busy.count > 0'>" +
-            (adhConfig.debug ? "<span class='busy-count/'>{{busy.count}}</span>" : "") + "</div>",
+        template: "<div class=\"busy-bar\" data-ng-show=\"busy.count > 0\">" +
+            (adhConfig.debug ? "<span class=\"busy-count\"/>{{busy.count}}</span>" : "") + "</div>",
         link: (scope) => {
             scope.busy = adhBusy;
         }
