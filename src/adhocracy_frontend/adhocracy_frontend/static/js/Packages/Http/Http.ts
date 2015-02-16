@@ -459,8 +459,8 @@ export class Busy {
 export var busyDirective = (adhConfig : AdhConfig.IService, adhBusy : Busy) => {
     return {
         restrict: "E",
-        template: "<div class='busy-bar' data-ng-show='busy.count > 0'>" +
-            (adhConfig.debug ? "<span class='busy-count/'>{{busy.count}}</span>" : "") + "</div>",
+        template: "<div class=\"busy-bar\" data-ng-show=\"busy.count > 0\">" +
+            (adhConfig.debug ? "<span class=\"busy-count\"/>{{busy.count}}</span>" : "") + "</div>",
         link: (scope) => {
             scope.busy = adhBusy;
         }
@@ -478,9 +478,7 @@ export var register = (angular, config, metaApi) => {
             "angular-data.DSCacheFactory",
         ])
         .config(["$httpProvider", ($httpProvider) => {
-            if (config.debug) {
-                $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
-            }
+            $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
         }])
         .service("adhHttpBusy", ["$q", Busy])
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
