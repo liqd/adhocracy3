@@ -1,0 +1,18 @@
+.busy-bar {
+    @include opacity(1);
+    background: url("/static/images/busy.gif") repeat-x left bottom;
+    height: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    &.ng-hide-add.ng-hide-add-active,
+    &.ng-hide-remove.ng-hide-remove-active {
+        transition: 0.5s linear all;
+    }
+
+    &.ng-hide {
+        @include opacity(0);
+    }
+}
