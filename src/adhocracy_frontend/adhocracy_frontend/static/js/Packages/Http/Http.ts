@@ -55,6 +55,11 @@ export interface IUpdated {
 }
 
 
+export var nonResourcePaths : string[] = [
+    "message_user"
+];
+
+
 /**
  * send and receive objects with adhocracy data model awareness
  *
@@ -481,7 +486,7 @@ export var register = (angular, config, metaApi) => {
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
-        .service("adhCache", ["adhWebSocket", "DSCacheFactory", AdhCache.Service])
+        .service("adhCache", ["adhConfig", "adhWebSocket", "DSCacheFactory", AdhCache.Service])
         .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
         .filter("adhFormatError", () => AdhError.formatError);
 };
