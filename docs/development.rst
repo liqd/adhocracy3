@@ -149,6 +149,10 @@ Generate html documentation::
 
     bin/sphinx_build_adhocracy
 
+Open html documentation::
+
+   xdg-open docs/build/html/index.html
+
 Create scaffold for extension packages
 ---------------------------------------
 ::
