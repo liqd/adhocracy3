@@ -238,8 +238,11 @@ class AnnotationStorageSheet(PropertySheet):
     def get_cstruct(self, request: Request, params: dict={}):
         """Return cstruct data.
 
-        Bind `request` and `context` to colander schema.
-        Get sheet appstruct data and serialize.
+        Bind `request` and `context` (self.context) to colander schema
+        (self.schema). Get sheet appstruct data and serialize.
+
+        :param params: optional parameters that can modify the appearance
+        of the returned dictionary, e.g. query parameters in a GET request
         """
         schema = self._get_schema_for_cstruct(request, params)
         appstruct = self.get(params=params)

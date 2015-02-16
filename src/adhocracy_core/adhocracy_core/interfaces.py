@@ -144,8 +144,8 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     def get_cstruct(request, params: dict={}):
         """Return cstruct data.
 
-        Bind `request` and `context` to colander schema.
-        Get sheet appstruct data and serialize.
+        Bind `request` and `context` (self.context) to colander schema
+        (self.schema). Get sheet appstruct data and serialize.
 
         :param params: optional parameters that can modify the appearance
         of the returned dictionary, e.g. query parameters in a GET request
