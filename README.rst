@@ -3,7 +3,7 @@ Adhocracy customizations for advocate-europe
 
 .. image:: https://api.travis-ci.org/liqd/adhocracy3.mercator.png?branch=master
     :target: http://travis-ci.org/liqd/adhocracy3.mercator
-.. image:: https://coveralls.io/repos/liqd/adhocracy3.mercatorz/badge.png?branch=master
+.. image:: https://coveralls.io/repos/liqd/adhocracy3.mercator/badge.png?branch=master
     :target: https://coveralls.io/r/liqd/adhocracy3.mercator
 .. image:: https://readthedocs.org/projects/adhocracy3mercator/badge/?version=latest
     :target: https://coveralls.io/r/liqd/adhocracy3.mercator

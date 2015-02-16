@@ -36,7 +36,7 @@ Glossary
       The unique id for one userique id of one :term:`group`: "group:<name>".
 
    group
-       A set of users. Can be mapped to permision :term:`role`s.
+       A set of users. Can be mapped to permission :term:`role`s.
 
    groupid
        Unique id of one :term:`group`: "group:<name>".
