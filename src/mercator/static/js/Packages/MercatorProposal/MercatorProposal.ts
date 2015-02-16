@@ -1,3 +1,4 @@
+/* tslint:disable:variable-name */
 /// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
 import _ = require("lodash");
