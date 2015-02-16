@@ -199,7 +199,7 @@ class TestClient:
         assert 'changed_descendants' in self._dummy_connection.queue[1]
 
     def test_send_messages_changed_backrefs_and_modified(self, changelog_meta):
-        """"No additional event is sent if a backreferenced resource
+        """No additional event is sent if a backreferenced resource
         has modified anyway.
         """
         client = self._make_one(None)
@@ -237,7 +237,7 @@ class TestClient:
         assert 'removed' in self._dummy_connection.queue[0]
 
     def test_send_modified_messages_for_backrefs(self, changelog_meta):
-        """"A modified event is sent for a backreferenced resource."""
+        """A modified event is sent for a backreferenced resource."""
         client = self._make_one(None)
         client._is_running = True
         metadata = [changelog_meta._replace(changed_backrefs=True)]
@@ -248,7 +248,7 @@ class TestClient:
 
     def test_send_modified_messages_for_backrefs_no_duplicates(
             self, changelog_meta):
-        """"No additional event is sent if a backreferenced resource
+        """No additional event is sent if a backreferenced resource
         is created anyway.
         """
         client = self._make_one(None)

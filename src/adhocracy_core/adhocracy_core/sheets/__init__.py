@@ -151,7 +151,7 @@ class AnnotationStorageSheet(PropertySheet):
         """Return backreference data.
 
         This might be overridden in subclasses.
-        """""
+        """
         if not self._graph:
             return {}
         isheet = node.reftype.getTaggedValue('source_isheet')

@@ -247,8 +247,6 @@ class TestAssetFileDownload:
 
 
 class TestRetrieveAssetFile:
-     # TODO Why do we need this test? If a sheet is not registered something
-     # is really broken and we get and internal error anyway.
 
     def test_retrieve_asset_file_successfully(self, monkeypatch, registry):
         from adhocracy_core import utils

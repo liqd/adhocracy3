@@ -1,4 +1,4 @@
-""""Adhocracy sample backend customizing."""
+"""Adhocracy sample backend customizing."""
 import os
 
 from setuptools import setup, find_packages

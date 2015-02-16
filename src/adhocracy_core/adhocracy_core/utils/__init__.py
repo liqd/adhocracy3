@@ -243,7 +243,7 @@ def exception_to_str(err: Exception):
 
 
 def get_user(request: Request) -> object:
-    """"Return resource object of the authenticated user.
+    """Return resource object of the authenticated user.
 
     This requires that :func:`pyramid.request.Request.authenticated_userid`
     returns a resource path.
