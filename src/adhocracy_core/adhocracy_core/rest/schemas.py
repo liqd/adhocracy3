@@ -282,9 +282,9 @@ class BatchRequestPath(AdhocracySchemaNode):
     missing = colander.required
     absolutpath = AbsolutePath.relative_regex
     preliminarypath = '[a-zA-Z0-9\_\-\.\/]+'
-    validator = colander.All(colander.Regex('^' + colander.URL_REGEX + '|'
+    validator = colander.All(colander.Regex('^(' + colander.URL_REGEX + '|'
                                             + absolutpath + '|@'
-                                            + preliminarypath + '$'),
+                                            + preliminarypath + ')$'),
                              colander.Length(min=1, max=200))
 
 
@@ -325,7 +325,7 @@ class PoolQueryDepth(colander.SchemaNode):
     """
 
     schema_type = colander.String
-    validator = colander.Regex(r'^\d+|all$')
+    validator = colander.Regex(r'^(\d+|all)$')
     missing = '1'
 
 

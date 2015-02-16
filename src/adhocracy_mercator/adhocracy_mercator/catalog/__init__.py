@@ -10,6 +10,7 @@ class MercatorCatalogIndexes(AdhocracyCatalogIndexes):
 
     mercator_location = Keyword()
     mercator_requested_funding = Keyword()
+    mercator_budget = Keyword()
 
 
 def includeme(config):

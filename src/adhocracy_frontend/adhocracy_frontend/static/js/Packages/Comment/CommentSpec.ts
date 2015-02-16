@@ -60,7 +60,7 @@ export var register = () => {
                     adapterMock, adhConfigMock, adhHttpMock, adhPermissionsMock, adhPreliminaryNamesMock, <any>q);
 
                 wrapperMock = {
-                    eventHandler: jasmine.createSpyObj("eventHandler", ["on", "off", "trigger"])
+                    eventManager: jasmine.createSpyObj("eventManager", ["on", "off", "trigger"])
                 };
                 instanceMock = {
                     scope: jasmine.createSpyObj("scope", ["$on"]),

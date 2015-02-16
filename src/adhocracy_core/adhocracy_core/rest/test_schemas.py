@@ -4,6 +4,7 @@ import json
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
+from pytest import mark
 import colander
 
 from adhocracy_core.interfaces import ISheet
@@ -349,6 +350,11 @@ class TestBatchRequestPath:
         with raises(colander.Invalid):
             inst.deserialize('item')
 
+    def test_deserialize_nonvalid_garbage_after_url(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('http://a.org/ah!hä?')
+
     def test_deserialize_valid_url(self):
         inst = self.make_one()
         assert inst.deserialize('http://a.org/a') == 'http://a.org/a'
@@ -615,8 +621,9 @@ class TestGETPoolRequestSchema():
         data = {'depth': 'all'}
         assert inst.deserialize(data) == {'depth': 'all'}
 
-    def test_deserialize_depth_invalid(self, inst):
-        data = {'depth': '-7'}
+    @mark.parametrize('value', ['-7', '1.5', 'fall', 'alle'])
+    def test_deserialize_depth_invalid(self, inst, value):
+        data = {'depth': value}
         with raises(colander.Invalid):
             inst.deserialize(data)
 

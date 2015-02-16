@@ -35,5 +35,6 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'tag' in catalogs['adhocracy']
     # mercator indexes
     assert 'mercator_requested_funding' in catalogs['adhocracy']
+    assert 'mercator_budget' in catalogs['adhocracy']
     assert 'mercator_location' in catalogs['adhocracy']
 

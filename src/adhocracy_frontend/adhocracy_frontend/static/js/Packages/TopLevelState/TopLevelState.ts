@@ -26,7 +26,7 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
-import AdhEventHandler = require("../EventHandler/EventHandler");
+import AdhEventManager = require("../EventManager/EventManager");
 import AdhUser = require("../User/User");
 
 var pkgLocation = "/TopLevelState";
@@ -94,9 +94,9 @@ export class Provider {
         };
         this.spaceDefaults = {};
 
-        this.$get = ["adhEventHandlerClass", "adhUser", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
-            (adhEventHandlerClass, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
-                return new Service(self, adhEventHandlerClass, adhUser, $location, $rootScope, $http, $q, $injector,
+        this.$get = ["adhEventManagerClass", "adhUser", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
+            (adhEventManagerClass, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+                return new Service(self, adhEventManagerClass, adhUser, $location, $rootScope, $http, $q, $injector,
                                    $templateRequest);
             }];
     }
@@ -131,7 +131,7 @@ export class Provider {
 
 
 export class Service {
-    private eventHandler : AdhEventHandler.EventHandler;
+    private eventManager : AdhEventManager.EventManager;
     private area : IArea;
     private currentSpace : string;
     private blockTemplate : boolean;
@@ -143,7 +143,7 @@ export class Service {
 
     constructor(
         private provider : Provider,
-        adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
+        adhEventManagerClass : typeof AdhEventManager.EventManager,
         private adhUser : AdhUser.Service,
         private $location : ng.ILocationService,
         private $rootScope : ng.IScope,
@@ -154,7 +154,7 @@ export class Service {
     ) {
         var self : Service = this;
 
-        this.eventHandler = new adhEventHandlerClass();
+        this.eventManager = new adhEventManagerClass();
         this.currentSpace = "";
         this.data = {"": <any>{}};
 
@@ -346,14 +346,14 @@ export class Service {
             if (key === "space") {
                 this.currentSpace = value;
                 this.data[this.currentSpace] = this.data[this.currentSpace] || this.provider.getSpaceDefaults(this.currentSpace) || {};
-                this.eventHandler.trigger(key, value);
+                this.eventManager.trigger(key, value);
             } else {
                 if (typeof value === "undefined") {
                     delete this.data[this.currentSpace][key];
                 } else {
                     this.data[this.currentSpace][key] = value;
                 }
-                this.eventHandler.trigger(this.currentSpace + ":" + key, value);
+                this.eventManager.trigger(this.currentSpace + ":" + key, value);
             }
             return true;
         } else {
@@ -381,11 +381,11 @@ export class Service {
 
     public on(key : string, fn, space? : string) : void {
         if (key === "space") {
-            this.eventHandler.on(key, fn);
+            this.eventManager.on(key, fn);
         } else if (typeof space !== "undefined") {
-            this.eventHandler.on(space + ":" + key, fn);
+            this.eventManager.on(space + ":" + key, fn);
         } else {
-            this.eventHandler.on(this.currentSpace + ":" + key, fn);
+            this.eventManager.on(this.currentSpace + ":" + key, fn);
         }
 
         // initially trigger callback
@@ -530,7 +530,7 @@ export var moduleName = "adhTopLevelState";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEventHandler.moduleName,
+            AdhEventManager.moduleName,
             AdhUser.moduleName
         ])
         .provider("adhTopLevelState", Provider)

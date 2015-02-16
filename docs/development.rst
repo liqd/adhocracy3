@@ -113,19 +113,9 @@ frontend functional tests::
 
     bin/py.test ./src/adhocracy_frontend/adhocracy_frontend/tests/functional
 
-frontend acceptance tests::
+protractor acceptance tests::
 
-    bin/py.test tests/
-
-   .. note::
-      The embed tests assume aliases for localhost to exist. If it is
-      not already there, please add the following line to /etc/hosts::
-
-          127.0.0.1  adhocracy.embeddee.goo adhocracy.embedder.gaa
-
-      then start the testrunner with enabled embed testing::
-
-          bin/py.test --run_embed_tests tests
+    bin/protractor etc/protractorConf.js
 
 run backend functional tests::
 
@@ -135,7 +125,7 @@ run backend unit tests and show python test code coverage::
 
     bin/py.test_run_unittests_with_coverage
 
-run all tests::
+run all tests (without protractor acceptance tests)::
 
     bin/py.test_run_all
 

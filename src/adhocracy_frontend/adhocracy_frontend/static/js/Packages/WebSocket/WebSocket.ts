@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 
 import AdhConfig = require("../Config/Config");
-import AdhEventHandler = require("../EventHandler/EventHandler");
+import AdhEventManager = require("../EventManager/EventManager");
 
 
 /**
@@ -68,37 +68,37 @@ export class Service {
     private connected : boolean;
     private ws : IRawWebSocket;
     private registrations : {[path : string] : number};
-    private messageEventHandler : AdhEventHandler.EventHandler;
-    private domEventHandler : AdhEventHandler.EventHandler;
+    private messageEventManager : AdhEventManager.EventManager;
+    private domEventManager : AdhEventManager.EventManager;
 
     constructor(
         private adhConfig : AdhConfig.IService,
-        private adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
+        private adhEventManagerClass : typeof AdhEventManager.EventManager,
         rawWebSocketFactory : (uri : string) => IRawWebSocket
     ) {
         this.connected = false;
-        this.messageEventHandler = new adhEventHandlerClass();
+        this.messageEventManager = new adhEventManagerClass();
         this.registrations = {};
 
-        this.domEventHandler = new adhEventHandlerClass();
+        this.domEventManager = new adhEventManagerClass();
 
         this.ws = rawWebSocketFactory(adhConfig.ws_url);
         this.ws.onmessage = (ev) => {
             this.onmessage(ev);
-            this.domEventHandler.trigger("message", ev);
+            this.domEventManager.trigger("message", ev);
         };
         this.ws.onerror = (ev) => {
             this.onerror(ev);
-            this.domEventHandler.trigger("error", ev);
+            this.domEventManager.trigger("error", ev);
         };
         this.ws.onopen = (ev) => {
             this.resendSubscriptions();
             this.connected = true;
-            this.domEventHandler.trigger("open", ev);
+            this.domEventManager.trigger("open", ev);
         };
         this.ws.onclose = (ev) => {
             this.connected = false;
-            this.domEventHandler.trigger("close", ev);
+            this.domEventManager.trigger("close", ev);
         };
     }
 
@@ -113,14 +113,14 @@ export class Service {
         } else {
             this.registrations[path] += 1;
         }
-        return this.messageEventHandler.on(path, callback);
+        return this.messageEventManager.on(path, callback);
     }
 
     public unregister(path : string, id : number) : void {
         if (!this.registrations[path]) {
             throw "resource is not registered";
         }
-        this.messageEventHandler.off(path, id);
+        this.messageEventManager.off(path, id);
         this.registrations[path] -= 1;
         if (this.registrations[path] === 0) {
             this.send("unsubscribe", path);
@@ -128,7 +128,7 @@ export class Service {
     }
 
     public addEventListener(event : string, callback : () => void) : number {
-        return this.domEventHandler.on(event, callback);
+        return this.domEventManager.on(event, callback);
     }
 
     private resendSubscriptions() : void {
@@ -149,7 +149,7 @@ export class Service {
         var msg : IServerMessage = JSON.parse(event.data);
 
         if (msg.hasOwnProperty("event")) {
-            this.messageEventHandler.trigger(msg.resource, <IServerEvent>msg);
+            this.messageEventManager.trigger(msg.resource, <IServerEvent>msg);
         } else if (msg.hasOwnProperty("error")) {
             this.handleErrorResponse(<IResponseError>msg);
         }
@@ -208,8 +208,8 @@ export var moduleName = "adhWebSocket";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEventHandler.moduleName
+            AdhEventManager.moduleName
         ])
         .factory("adhRawWebSocketFactory", ["Modernizr", rawWebSocketFactoryFactory])
-        .service("adhWebSocket", ["adhConfig", "adhEventHandlerClass", "adhRawWebSocketFactory", Service]);
+        .service("adhWebSocket", ["adhConfig", "adhEventManagerClass", "adhRawWebSocketFactory", Service]);
 };

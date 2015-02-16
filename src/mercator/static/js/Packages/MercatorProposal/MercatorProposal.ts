@@ -163,6 +163,8 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     mercatorProposalForm? : any;
     data : IScopeData;
     selectedState : string;
+    subResourceSelectedState : (key : string) => string;
+    commentableUrl : string;
     $flow? : Flow;
 }
 
@@ -254,6 +256,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     $scope.selectedState = "is-not-selected";
                 }
             });
+            adhTopLevelState.bind("commentableUrl", $scope);
         }];
         return directive;
     }
@@ -342,6 +345,17 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         mercatorProposalVersion : R
     ) : ng.IPromise<void> {
         var data = this.initializeScope(instance.scope);
+
+        instance.scope.subResourceSelectedState = (key : string) => {
+            var url = mercatorProposalVersion.data[SIMercatorSubResources.nick][key];
+            if (!instance.scope.commentableUrl) {
+                return "";
+            } else if (instance.scope.commentableUrl === url) {
+                return "is-selected";
+            } else {
+                return "is-not-selected";
+            }
+        };
 
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;

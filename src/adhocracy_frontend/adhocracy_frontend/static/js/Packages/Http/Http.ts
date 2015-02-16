@@ -423,15 +423,61 @@ export class Service<Content extends ResourcesBase.Resource> {
 }
 
 
+export class Busy {
+    public count : number;
+
+    constructor(
+        private $q : ng.IQService
+    ) {
+        this.count = 0;
+    }
+
+    public createInterceptor() {
+        return {
+            request: (config) => {
+                this.count += 1;
+                return config;
+            },
+            response: (response) => {
+                this.count -= 1;
+                return response;
+            },
+            responseError: (rejection) => {
+                this.count -= 1;
+                return this.$q.reject(rejection);
+            }
+        };
+    }
+}
+
+
+export var busyDirective = (adhConfig : AdhConfig.IService, adhBusy : Busy) => {
+    return {
+        restrict: "E",
+        template: adhConfig.debug ? "{{busy.count}}" : "",
+        link: (scope) => {
+            scope.busy = adhBusy;
+        }
+    };
+};
+
+
 export var moduleName = "adhHttp";
 
-export var register = (angular, metaApi) => {
+export var register = (angular, config, metaApi) => {
     angular
         .module(moduleName, [
             AdhPreliminaryNames.moduleName,
             AdhWebSocket.moduleName,
             "angular-data.DSCacheFactory",
         ])
+        .config(["$httpProvider", ($httpProvider) => {
+            if (config.debug) {
+                $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
+            }
+        }])
+        .service("adhHttpBusy", ["$q", Busy])
+        .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
         .service("adhCache", ["adhWebSocket", "DSCacheFactory", AdhCache.Service])

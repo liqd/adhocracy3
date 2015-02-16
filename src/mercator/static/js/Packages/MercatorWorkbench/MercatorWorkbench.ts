@@ -148,20 +148,21 @@ export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLe
             scope.contentType = RIMercatorProposalVersion.content_type;
             scope.shared.facets = [{
                 key: "mercator_location",
-                name: "Location",
+                name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
                 items: [
-                    {key: "specific", name: "Specific"},
-                    {key: "online", name: "Online"},
-                    {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
+                    {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
+                    {key: "online", name: "TR__ONLINE"},
+                    {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
                 ]
             }, {
-                key: "mercator_requested_funding",
-                name: "Requested funding",
+                key: "mercator_budget",
+                name: "TR__MERCATOR_PROPOSAL_TOTAL_BUDGET",
                 items: [
                     {key: "5000", name: "0 - 5000 €"},
                     {key: "10000", name: "5000 - 10000 €"},
                     {key: "20000", name: "10000 - 20000 €"},
-                    {key: "50000", name: "20000 - 50000 €"}
+                    {key: "50000", name: "20000 - 50000 €"},
+                    {key: "above_50000", name: "50000 € +"}
                 ]
             }];
             scope.shared.sort = "-rates";

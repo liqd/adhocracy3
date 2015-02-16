@@ -10,7 +10,7 @@ from random import randint
 from adhocracy_frontend.tests.acceptance.shared import get_random_string
 
 # FIXME: root_uri must be constructed from etc/*.ini, not hard-coded here!
-root_uri = 'http://localhost:6542'
+root_uri = 'http://localhost:9080'
 verbose = False
 
 # for more javascript-ish json representation:

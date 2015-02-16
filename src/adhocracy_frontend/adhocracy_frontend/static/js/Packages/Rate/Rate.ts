@@ -1,7 +1,7 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
-import AdhEventHandler = require("../EventHandler/EventHandler");
+import AdhEventManager = require("../EventManager/EventManager");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -36,7 +36,7 @@ var pkgLocation = "/Rate";
  * when a user casts a rate for the first time.  This does pose a special
  * challange for keeping multiple rate directives on the same page in sync
  * because there is not resource on the server that we could register
- * websockets on.  For this reason, there is the adhRateEventHandler service
+ * websockets on.  For this reason, there is the adhRateEventManager service
  * that is used to sync these directives locally.
  */
 
@@ -82,7 +82,7 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
 
 export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
     $q : ng.IQService,
-    adhRateEventHandler : AdhEventHandler.EventHandler,
+    adhRateEventManager : AdhEventManager.EventManager,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhWebSocket : AdhWebSocket.Service,
@@ -303,7 +303,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
                         return adhHttp.postNewVersionNoFork(version.path, newVersion)
                             .then(() => {
-                                adhRateEventHandler.trigger(scope.refersTo);
+                                adhRateEventManager.trigger(scope.refersTo);
                                 scope.auditTrailVisible = false;
                                 return $q.all([updateMyRate(), updateAggregatedRates()]);
                             })
@@ -323,12 +323,12 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             // sync with other local rate buttons
-            rateEventHandle = adhRateEventHandler.on(scope.refersTo, () => {
+            rateEventHandle = adhRateEventManager.on(scope.refersTo, () => {
                 updateMyRate();
                 updateAggregatedRates();
             });
             element.on("$destroy", () => {
-                adhRateEventHandler.off(scope.refersTo, rateEventHandle);
+                adhRateEventManager.off(scope.refersTo, rateEventHandle);
             });
 
             scope.auditTrailVisible = false;
@@ -352,7 +352,7 @@ export var moduleName = "adhRate";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEventHandler.moduleName,
+            AdhEventManager.moduleName,
             AdhHttp.moduleName,
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
@@ -360,10 +360,10 @@ export var register = (angular) => {
             AdhUser.moduleName,
             AdhWebSocket.moduleName
         ])
-        .service("adhRateEventHandler", ["adhEventHandlerClass", (cls) => new cls()])
+        .service("adhRateEventManager", ["adhEventManagerClass", (cls) => new cls()])
         .directive("adhRate", [
             "$q",
-            "adhRateEventHandler",
+            "adhRateEventManager",
             "adhConfig",
             "adhHttp",
             "adhWebSocket",
@@ -375,7 +375,7 @@ export var register = (angular) => {
             directiveFactory("/Rate.html", new Adapter.RateAdapter())])
         .directive("adhLike", [
             "$q",
-            "adhRateEventHandler",
+            "adhRateEventManager",
             "adhConfig",
             "adhHttp",
             "adhWebSocket",

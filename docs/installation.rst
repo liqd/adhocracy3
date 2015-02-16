@@ -53,7 +53,7 @@ compile python 3.4 and PIL ::
 
 install adhocracy ::
 
-    ./bin/python ./bootstrap.py -v 2.3.1 --setuptools-version=12.0.4
+    ./bin/python ./bootstrap.py -v 2.3.1 --setuptools-version=12.1
     ./bin/buildout
 
 update your shell environment::
@@ -91,3 +91,15 @@ Open the javascript front-end with your web browser::
 Shutdown everything nicely::
 
     ./bin/supervisorctl shutdown
+
+
+Run test suites
+---------------
+
+Run pytest suite::
+
+    bin/py.test_run_all
+
+Run protractor acceptance tests::
+
+    bin/protractor etc/protractorConf.js

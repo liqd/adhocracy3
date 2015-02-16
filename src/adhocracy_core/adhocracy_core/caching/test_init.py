@@ -458,7 +458,7 @@ class TestPurgeVarnishAfterCommitHook:
                                  changelog_meta, context):
         from adhocracy_core.caching import purge_varnish_after_commit_hook
         mock_requests = self._monkeypatch_requests(monkeypatch)
-        registry_for_varnish.changelog[
+        registry_for_varnish._transaction_changelog[
             '/'] = changelog_meta._replace(resource=context, modified=True)
         purge_varnish_after_commit_hook(True, registry_for_varnish)
         assert mock_requests.request.called
@@ -469,7 +469,7 @@ class TestPurgeVarnishAfterCommitHook:
             self, monkeypatch, registry_for_varnish, changelog_meta, context):
         from adhocracy_core.caching import purge_varnish_after_commit_hook
         mock_requests = self._monkeypatch_requests(monkeypatch)
-        registry_for_varnish.changelog[
+        registry_for_varnish._transaction_changelog[
             '/'] = changelog_meta._replace(resource=context)
         purge_varnish_after_commit_hook(True, registry_for_varnish)
         assert not mock_requests.request.called
@@ -479,7 +479,7 @@ class TestPurgeVarnishAfterCommitHook:
         """Nothing should happen if the transaction was unsuccessful."""
         from adhocracy_core.caching import purge_varnish_after_commit_hook
         mock_requests = self._monkeypatch_requests(monkeypatch)
-        registry_for_varnish.changelog[
+        registry_for_varnish._transaction_changelog[
             '/'] = changelog_meta._replace(resource=context, modified=True)
         purge_varnish_after_commit_hook(False, registry_for_varnish)
         assert not mock_requests.request.called
@@ -489,7 +489,7 @@ class TestPurgeVarnishAfterCommitHook:
         """Nothing should happen if no varnish_url is configured."""
         from adhocracy_core.caching import purge_varnish_after_commit_hook
         mock_requests = self._monkeypatch_requests(monkeypatch)
-        registry_with_changelog.changelog[
+        registry_with_changelog._transaction_changelog[
             '/'] = changelog_meta._replace(resource=context, modified=True)
         purge_varnish_after_commit_hook(True, registry_with_changelog)
         assert not mock_requests.request.called
@@ -502,7 +502,7 @@ class TestPurgeVarnishAfterCommitHook:
                                                    status_code=444)
         mock_logger = mock.Mock()
         monkeypatch.setattr(caching, 'logger', mock_logger)
-        registry_for_varnish.changelog[
+        registry_for_varnish._transaction_changelog[
             '/'] = changelog_meta._replace(resource=context, modified=True)
         purge_varnish_after_commit_hook(True, registry_for_varnish)
         assert mock_requests.request.called
@@ -517,7 +517,7 @@ class TestPurgeVarnishAfterCommitHook:
             monkeypatch, side_effect=RequestException('Nope!'))
         mock_logger = mock.Mock()
         monkeypatch.setattr(caching, 'logger', mock_logger)
-        registry_for_varnish.changelog[
+        registry_for_varnish._transaction_changelog[
             '/'] = changelog_meta._replace(resource=context, modified=True)
         purge_varnish_after_commit_hook(True, registry_for_varnish)
         assert mock_requests.request.called

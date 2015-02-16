@@ -39,6 +39,11 @@ category: Widgets
 A section of any content with a link to the respective comments, typically
 displayed as a button in a second column.
 
+States:
+
+-   is-selected
+-   is-not-selected
+
 ```html_example
 <div class="commentable-section">
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</p>
@@ -48,19 +53,22 @@ displayed as a button in a second column.
 */
 
 .commentable-section {
-    margin-bottom: 30px / $font-size-normal * 1em;
-    padding-right: 36px / $font-size-normal * 1em;
+    padding: 1em (48px / $font-size-normal * 1em) (30px / $font-size-normal * 1em) 1em;
     position: relative;
 
     > p {
         margin-bottom: 0;
     }
 
+    &.is-not-selected {
+        background: $color-background-base-introvert;
+    }
+
     .commentable-section-show-comments {
         @include show-comments;
         max-width: 36 / 14 * 1em;
         position: absolute;
-        right: 0;
-        top: 0;
+        right: 1em;
+        top: 1em;
     }
 }
