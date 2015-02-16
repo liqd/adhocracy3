@@ -98,7 +98,7 @@ export class Service {
         var cached = this.cache.get(path);
         if (typeof cached === "undefined") {
             var wshandle;
-            if (!(_.contains(this.nonResourceUrls, path))) {
+            if (!_.contains(this.nonResourceUrls, path)) {
                 wshandle = this.adhWebSocket.register(path, (msg) => {
                     this.invalidate(path);
                 });
