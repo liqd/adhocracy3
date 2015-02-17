@@ -761,21 +761,22 @@ class TestItemRESTView:
         assert wanted == response
 
     def test_post_valid_itemversion_batchmode_last_version_in_transaction_exists(
-            self, request, context):
+            self, request, context, mock_sheet):
         from adhocracy_core.interfaces import IItemVersion
         context['last_new_version'] = testing.DummyResource(__provides__=
                                                             IItemVersion)
         request.root = context
         request.validated = {'content_type': IItemVersion,
-                             'data': {},
+                             'data': {ISheet.__identifier__: {'x':'y'}},
                              'root_versions': [],
                              '_last_new_version_in_transaction':\
                                  context['last_new_version']}
+        request.registry.content.get_sheets_create.return_value = [mock_sheet]
         inst = self.make_one(context, request)
-        inst.put = Mock()
         response = inst.post()
-
-        assert inst.put.call_count == 1
+        mock_sheet.set.assert_called_with({'x':'y'},
+                                          registry=request.registry,
+                                          request=request)
         wanted = {'path': request.application_url + '/last_new_version/',
                   'content_type': IItemVersion.__identifier__,
                   'updated_resources': {'changed_descendants': [],

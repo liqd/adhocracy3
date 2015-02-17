@@ -44,6 +44,266 @@ def login():
         assert response.status_code == 200
     return response.json()
 
+
+create_proposal_batch = \
+    [{"method": "POST", "path": "http://localhost/mercator", "body": {
+        "content_type": "adhocracy_mercator.resources.mercator.IMercatorProposal",
+        "data": {"adhocracy_core.sheets.name.IName": {"name": "proposal2"}},
+        "first_version_path": "@pn2", "root_versions": [],
+        "parent": "http://localhost/mercator"}, "result_path": "@pn1",
+      "result_first_version_path": "@pn2"}, {"method": "POST", "path": "@pn1",
+                                             "body": {
+                                                 "content_type":
+                                                     "adhocracy_mercator.resources.mercator.IExperience",
+                                                 "data": {
+                                                     "adhocracy_core.sheets.name.IName": {
+                                                         "name": "experience"}},
+                                                 "first_version_path": "@pn35",
+                                                 "root_versions": [],
+                                                 "parent": "@pn1"},
+                                             "result_path": "@pn34",
+                                             "result_first_version_path":
+                                                 "@pn35"},
+     {"method": "POST", "path": "@pn34", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IExperienceVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn35"]},
+             "adhocracy_mercator.sheets.mercator.IExperience": {
+                 "experience": "experience"}}, "root_versions": [], "parent": "@pn34"},
+      "result_path": "@pn36", "result_first_version_path": "@pn37"},
+     {"method": "POST", "path": "@pn1",
+      "body": {"content_type": "adhocracy_mercator.resources.mercator.IFinance",
+               "data": {
+                   "adhocracy_core.sheets.name.IName": {"name": "finance"}},
+               "first_version_path": "@pn32", "root_versions": [],
+               "parent": "@pn1"}, "result_path": "@pn31",
+      "result_first_version_path": "@pn32"}, {"method": "POST", "path": "@pn31",
+                                              "body": {
+                                                  "content_type":
+                                                      "adhocracy_mercator.resources.mercator.IFinanceVersion",
+                                                  "data": {
+                                                      "adhocracy_core.sheets.versions.IVersionable": {
+                                                          "follows": ["@pn32"]},
+                                                      "adhocracy_mercator.sheets.mercator.IFinance": {
+                                                          "budget": 1000,
+                                                          "requested_funding": 1000,
+                                                          "granted": true}},
+                                                  "root_versions": [],
+                                                  "parent": "@pn31"},
+                                              "result_path": "@pn33",
+                                              "result_first_version_path":
+                                                  "@pn38"},
+     {"method": "POST", "path": "@pn1", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IPartners",
+         "data": {"adhocracy_core.sheets.name.IName": {"name": "partners"}},
+         "first_version_path": "@pn29", "root_versions": [], "parent": "@pn1"},
+      "result_path": "@pn28", "result_first_version_path": "@pn29"},
+     {"method": "POST", "path": "@pn28", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IPartnersVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn29"]},
+             "adhocracy_mercator.sheets.mercator.IPartners": {"partners": "partners"}},
+         "root_versions": [], "parent": "@pn28"}, "result_path": "@pn30",
+      "result_first_version_path": "@pn39"}, {"method": "POST", "path": "@pn1",
+                                              "body": {
+                                                  "content_type":
+                                                      "adhocracy_mercator.resources.mercator.IValue",
+                                                  "data": {
+                                                      "adhocracy_core.sheets.name.IName": {
+                                                          "name": "value"}},
+                                                  "first_version_path": "@pn26",
+                                                  "root_versions": [],
+                                                  "parent": "@pn1"},
+                                              "result_path": "@pn25",
+                                              "result_first_version_path":
+                                                  "@pn26"},
+     {"method": "POST", "path": "@pn25", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IValueVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn26"]},
+             "adhocracy_mercator.sheets.mercator.IValue": {"value": "relevance"}},
+         "root_versions": [], "parent": "@pn25"}, "result_path": "@pn27",
+      "result_first_version_path": "@pn40"}, {"method": "POST", "path": "@pn1",
+                                              "body": {
+                                                  "content_type":
+                                                      "adhocracy_mercator.resources.mercator.ISteps",
+                                                  "data": {
+                                                      "adhocracy_core.sheets.name.IName": {
+                                                          "name": "steps"}},
+                                                  "first_version_path": "@pn23",
+                                                  "root_versions": [],
+                                                  "parent": "@pn1"},
+                                              "result_path": "@pn22",
+                                              "result_first_version_path":
+                                                  "@pn23"},
+     {"method": "POST", "path": "@pn22", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IStepsVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn23"]},
+             "adhocracy_mercator.sheets.mercator.ISteps": {"steps": "plan"}},
+         "root_versions": [], "parent": "@pn22"}, "result_path": "@pn24",
+      "result_first_version_path": "@pn41"}, {"method": "POST", "path": "@pn1",
+                                              "body": {
+                                                  "content_type":
+                                                      "adhocracy_mercator.resources.mercator.IOutcome",
+                                                  "data": {
+                                                      "adhocracy_core.sheets.name.IName": {
+                                                          "name": "outcome"}},
+                                                  "first_version_path": "@pn20",
+                                                  "root_versions": [],
+                                                  "parent": "@pn1"},
+                                              "result_path": "@pn19",
+                                              "result_first_version_path":
+                                                  "@pn20"},
+     {"method": "POST", "path": "@pn19", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IOutcomeVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn20"]},
+             "adhocracy_mercator.sheets.mercator.IOutcome": {"outcome": "success"}},
+         "root_versions": [], "parent": "@pn19"}, "result_path": "@pn21",
+      "result_first_version_path": "@pn42"}, {"method": "POST", "path": "@pn1",
+                                              "body": {
+                                                  "content_type":
+                                                      "adhocracy_mercator.resources.mercator.IStory",
+                                                  "data": {
+                                                      "adhocracy_core.sheets.name.IName": {
+                                                          "name": "story"}},
+                                                  "first_version_path": "@pn17",
+                                                  "root_versions": [],
+                                                  "parent": "@pn1"},
+                                              "result_path": "@pn16",
+                                              "result_first_version_path":
+                                                  "@pn17"},
+     {"method": "POST", "path": "@pn16", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IStoryVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn17"]},
+             "adhocracy_mercator.sheets.mercator.IStory": {"story": "story"}},
+         "root_versions": [], "parent": "@pn16"}, "result_path": "@pn18",
+      "result_first_version_path": "@pn43"}, {"method": "POST", "path": "@pn1",
+                                              "body": {
+                                                  "content_type": "adhocracy_mercator.resources.mercator.ILocation",
+                                                  "data": {
+                                                      "adhocracy_core.sheets.name.IName": {
+                                                          "name": "location"}},
+                                                  "first_version_path": "@pn14",
+                                                  "root_versions": [],
+                                                  "parent": "@pn1"},
+                                              "result_path": "@pn13",
+                                              "result_first_version_path": "@pn14"},
+     {"method": "POST", "path": "@pn13", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.ILocationVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn14"]},
+             "adhocracy_mercator.sheets.mercator.ILocation": {
+                 "location_is_specific": true, "location_specific_1": "Bonn",
+                 "location_is_linked_to_ruhr": true}}, "root_versions": [],
+         "parent": "@pn13"}, "result_path": "@pn15",
+      "result_first_version_path": "@pn44"}, {"method": "POST", "path": "@pn1",
+                                              "body": {
+                                                  "content_type": "adhocracy_mercator.resources.mercator.IDescription",
+                                                  "data": {
+                                                      "adhocracy_core.sheets.name.IName": {
+                                                          "name": "description"}},
+                                                  "first_version_path": "@pn11",
+                                                  "root_versions": [],
+                                                  "parent": "@pn1"},
+                                              "result_path": "@pn10",
+                                              "result_first_version_path": "@pn11"},
+     {"method": "POST", "path": "@pn10", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IDescriptionVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn11"]},
+             "adhocracy_mercator.sheets.mercator.IDescription": {
+                 "description": "prodescription"}}, "root_versions": [], "parent": "@pn10"},
+      "result_path": "@pn12", "result_first_version_path": "@pn45"},
+     {"method": "POST", "path": "@pn1", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IIntroduction",
+         "data": {"adhocracy_core.sheets.name.IName": {"name": "introduction"}},
+         "first_version_path": "@pn8", "root_versions": [], "parent": "@pn1"},
+      "result_path": "@pn7", "result_first_version_path": "@pn8"},
+     {"method": "POST", "path": "@pn1",
+      "body": {
+          "content_type": "adhocracy_mercator.resources.mercator.IOrganizationInfo",
+          "data": {
+              "adhocracy_core.sheets.name.IName": {
+                  "name": "organization_info"}},
+          "first_version_path": "@pn5",
+          "root_versions": [],
+          "parent": "@pn1"},
+      "result_path": "@pn4",
+      "result_first_version_path": "@pn5"},
+     {"method": "POST", "path": "@pn4", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator.IOrganizationInfoVersion",
+         "data": {
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": ["@pn5"]},
+             "adhocracy_mercator.sheets.mercator.IOrganizationInfo": {
+                 "name": "organization name", "country": "CL",
+                 "status": "registered_nonprofit", "website": "http://example.org"}},
+         "root_versions": [], "parent": "@pn4"}, "result_path": "@pn6",
+      "result_first_version_path": "@pn47"},
+     {"method": "POST", "path": "@pn1",
+      "body": {
+          "content_type": "adhocracy_mercator.resources.mercator.IMercatorProposalVersion",
+          "data": {
+              "adhocracy_core.sheets.versions.IVersionable": {
+                  "follows": ["@pn2"]},
+              "adhocracy_mercator.sheets.mercator.IUserInfo": {
+                  "personal_name": "pita",
+                  "family_name": "pasta",
+                  "country": "AR"},
+              "adhocracy_mercator.sheets.mercator.IHeardFrom": {
+                  "heard_from_colleague": true,
+                  "heard_elsewhere": ""},
+              "adhocracy_mercator.sheets.mercator.IMercatorSubResources": {
+                  "organization_info": "@pn6",
+                  "description": "@pn12",
+                  "location": "@pn15",
+                  "story": "@pn18",
+                  "outcome": "@pn21",
+                  "steps": "@pn24",
+                  "value": "@pn27",
+                  "partners": "@pn30",
+                  "finance": "@pn33",
+                  "experience": "@pn36"}},
+          "root_versions": [],
+          "parent": "@pn1"},
+      "result_path": "@pn3",
+      "result_first_version_path": "@pn48"}]
+
+update_proposal_batch = \
+    [{"method": "POST",
+      "path": "http://localhost/mercator/proposal2/organization_info/", "body": {
+        "content_type": "adhocracy_mercator.resources.mercator"
+                        ".IOrganizationInfoVersion",
+        "data": {"adhocracy_core.sheets.versions.IVersionable": {"follows": [
+            "http://localhost/mercator/proposal2/organization_info"
+            "/VERSION_0000001/"]},
+                 "adhocracy_core.sheets.metadata.IMetadata": {"deleted": false,
+                                                              "preliminaryNames":
+                                                                  {"state": 77}},
+                 "adhocracy_mercator.sheets.mercator.IOrganizationInfo": {
+                     "name": "organization name Updated", "country": "CL",
+                     "status": "registered_nonprofit",
+                     "website": "http://example.org"}}, "root_versions": [],
+        "parent": "http://localhost/mercator/proposal2/organization_info/"},
+      "result_path": "@pn65", "result_first_version_path": "@pn77"},
+     {"method": "POST", "path": "http://localhost/mercator/proposal2/", "body": {
+         "content_type": "adhocracy_mercator.resources.mercator"
+                         ".IMercatorProposalVersion",
+         "data": {
+             "adhocracy_core.sheets.metadata.IMetadata": {"deleted": false,
+                                                          "preliminaryNames":
+                                                              {"state": 78}},
+             "adhocracy_core.sheets.versions.IVersionable": {"follows": [
+                 "http://localhost/mercator/proposal2/VERSION_0000001/"]},
+             "adhocracy_mercator.sheets.mercator.IUserInfo": {
+                 "personal_name": "pita Updated", "family_name": "pasta",
+                 "country": "AR"}}, "root_versions": [],
+         "parent": "http://localhost/mercator/proposal2/"}, "result_path": "@pn64",
+      "result_first_version_path": "@pn78"}]
+
+
 def _create_proposal():
     name = get_random_string()
 
@@ -82,7 +342,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Experience"
+                            "name": "experience"
                         }
                     },
                     "root_versions": [],
@@ -120,7 +380,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Finance"
+                            "name": "finance"
                         }
                     },
                     "root_versions": [],
@@ -161,7 +421,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Partners"
+                            "name": "partners"
                         }
                     },
                     "root_versions": [],
@@ -237,7 +497,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Steps"
+                            "name": "steps"
                         }
                     },
                     "root_versions": [],
@@ -275,7 +535,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Outcome"
+                            "name": "outcome"
                         }
                     },
                     "root_versions": [],
@@ -313,7 +573,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Story"
+                            "name": "story"
                         }
                     },
                     "root_versions": [],
@@ -351,7 +611,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Description"
+                            "name": "description"
                         }
                     },
                     "root_versions": [],
@@ -389,7 +649,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Location"
+                            "name": "location"
                         }
                     },
                     "root_versions": [],
@@ -430,7 +690,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "Introduction"
+                            "name": "introduction"
                         }
                     },
                     "root_versions": [],
@@ -469,7 +729,7 @@ def _create_proposal():
                     "parent": "@pn31",
                     "data": {
                         "adhocracy_core.sheets.name.IName": {
-                            "name": "OrganizationInfo"
+                            "name": "organizationinfo"
                         }
                     },
                     "root_versions": [],

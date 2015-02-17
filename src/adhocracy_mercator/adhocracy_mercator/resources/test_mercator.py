@@ -5,8 +5,9 @@ from webtest import TestResponse
 
 # FIXME: move _create_proposal to somewhere in backend fixtures as the
 # natural dependency ordering is "frontend depends on backend"
-from mercator.tests.fixtures.fixturesMercatorProposals1 \
-        import _create_proposal
+from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
+from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch
+from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
 
 
 def test_mercator_proposal_meta():
@@ -152,9 +153,17 @@ class TestMercatorProposalPermissionsContributor:
         postable_types = app_contributor.get_postable_types('/proposal1')
         assert set(postable_types) == set(possible_types)
 
-    def test_can_create_proposal_per_batch(self, app_contributor):
-        resp = _batch_post_full_sample_proposal(app_contributor)
-        assert resp.status_code == 200
+    def test_can_create_and_update_proposal_per_batch(self, app_contributor):
+        """Create full proposal then do batch request that first
+         creates a new subresource Version (IOrganisationInfo) and then
+         creates a new proposal Version manually (IUserInfo).
+
+        Fix regression issue #697
+        """
+        app_contributor.batch(create_proposal_batch)
+        app_contributor.batch(update_proposal_batch)
+        assert app_contributor.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
+        assert "VERSION_0000002" in  app_contributor.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
 
     def test_cannot_create_other_users_proposal_version(self, app_contributor,
                                                         app_god):
