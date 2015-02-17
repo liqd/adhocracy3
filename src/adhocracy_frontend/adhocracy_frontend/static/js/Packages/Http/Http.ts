@@ -252,12 +252,12 @@ export class Service<Content extends ResourcesBase.Resource> {
         return this.withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource[]> => {
             _.forEach(sortedResources, (resource) => {
                 transaction.post(resource.parent, resource);
-            }).value();
+            });
 
             return transaction.commit().then(postedResources => {
                 _.forEach(postedResources, (resource) => {
                     this.adhCache.invalidate(AdhUtil.parentPath(resource.path));
-                }).value();
+                });
 
                 return postedResources;
             });
