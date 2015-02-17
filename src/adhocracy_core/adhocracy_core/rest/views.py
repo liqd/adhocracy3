@@ -125,10 +125,23 @@ def validate_request_data(context: ILocation, request: Request,
     qs, headers, body, path = extract_request_data(request)
     if request.content_type == 'multipart/form-data':
         body = unflatten_multipart_request(request)
+    validate_user_headers(headers, request)
     validate_body_or_querystring(body, qs, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
     _raise_if_errors(request)
+
+
+def validate_user_headers(headers: dict, request: Request):
+    """
+    Validate the user headers.
+
+    If the request has a 'X-User-Path' and/or 'X-User-Token' header, we
+    ensure that the session takes belongs to the user and is not expired.
+    """
+    if 'X-User-Path' in headers or 'X-User-Token' in headers:
+        if get_user(request) is None:
+            request.errors.add('header', 'X-User-Token', 'Invalid user token')
 
 
 def validate_body_or_querystring(body, qs, schema: MappingSchema,
