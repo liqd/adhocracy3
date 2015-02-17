@@ -4,7 +4,7 @@ python:
   - "3.4"
 install:
   - "python bootstrap.py --setuptools-version=12.0.4"
-  - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout 2>/dev/null"
+  - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout -vvv"
 script:
   - "./bin/py.test_run_unittests_with_coverage"
   - "./bin/py.test_run_all"
