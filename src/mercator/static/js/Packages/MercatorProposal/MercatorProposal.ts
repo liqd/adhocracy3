@@ -989,7 +989,7 @@ export var register = (angular) => {
                             };
                         }
                     );
-            });
+            }).value();
         }])
         .config(["flowFactoryProvider", (flowFactoryProvider) => {
             if (typeof flowFactoryProvider.defaults === "undefined") {
