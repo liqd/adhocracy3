@@ -4,6 +4,7 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
 from logging import getLogger
+import json
 
 from colander import drop
 from colander import Invalid
@@ -237,10 +238,25 @@ def _show_request_body(request: Request) -> str:
 
     In case of multipart/form-data requests (file upload), only the 120
     first characters of the body are shown.
+
+    In case of JSON requests with a "password" field at the top level,
+    the contents of the password field will be hidden.
     """
     result = request.body
     if request.content_type == 'multipart/form-data' and len(result) > 120:
         result = '{}...'.format(result[:120])
+    elif request.content_type == 'application/json':
+        json_data = ''
+        try:
+            json_data = request.json_body
+        except ValueError:
+            pass  # Not even valid JSON, so we cannot hide anything
+        if not isinstance(json_data, dict):
+            pass
+        elif 'password' in json_data:
+            loggable_data = json_data.copy()
+            loggable_data['password'] = '<hidden>'
+            result = json.dumps(loggable_data)
     return result
 
 
