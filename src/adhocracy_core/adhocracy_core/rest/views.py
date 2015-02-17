@@ -237,26 +237,27 @@ def _show_request_body(request: Request) -> str:
     """
     Show the request body.
 
-    In case of JSON requests with a "password" field at the top level,
-    the contents of the password field will be hidden.
-
     In case of multipart/form-data requests (file upload), only the 120
     first characters of the body are shown.
+
+    In case of JSON requests with a "password" field at the top level,
+    the contents of the password field will be hidden.
     """
     result = request.body
     if request.content_type == 'multipart/form-data' and len(result) > 120:
         result = '{}...'.format(result[:120])
     elif request.content_type == 'application/json':
-        # Hide password, if it occurs as a top-level field
+        json_data = ''
         try:
             json_data = request.json_body
         except ValueError:
-            pass  # Not even valid JSON, so we cannot repair it
-        else:
-            if isinstance(json_data, dict) and 'password' in json_data:
-                loggable_data = json_data.copy()
-                loggable_data['password'] = '<hidden>'
-                result = json.dumps(loggable_data)
+            pass  # Not even valid JSON, so we cannot hide anything
+        if not isinstance(json_data, dict):
+            pass
+        elif 'password' in json_data:
+            loggable_data = json_data.copy()
+            loggable_data['password'] = '<hidden>'
+            result = json.dumps(loggable_data)
     return result
 
 
