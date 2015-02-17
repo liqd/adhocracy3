@@ -103,6 +103,7 @@ class TestBatchView:
         # present
         request.authenticated_userid = resource_path(context)
         request.root = context
+        request.script_name = '/virtual'
         inst = self._make_one(context, request)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
@@ -114,6 +115,9 @@ class TestBatchView:
         assert subrequest.__cached_principals__ == [1]
         assert subrequest.headers.get('X-User-Path') == 2
         assert subrequest.headers.get('X-User-Token') == 3
+        assert subrequest.script_name == '/virtual'
+        assert subrequest.path_info == 'cy/blah'
+
 
     def test_post_successful_subrequest_with_updated_resources(
             self, context, request, mock_invoke_subrequest):
