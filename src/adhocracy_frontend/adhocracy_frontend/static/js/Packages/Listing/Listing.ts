@@ -3,6 +3,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
+import _ = require("lodash");
+
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
