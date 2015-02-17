@@ -144,7 +144,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     if ($scope.sort) {
                         params["sort"] = $scope.sort.replace(/^-/, "");
                     }
-                    return adhHttp.get($scope.path, params).then((container) => {
+                    return adhHttp.get($scope.path, params, true).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
