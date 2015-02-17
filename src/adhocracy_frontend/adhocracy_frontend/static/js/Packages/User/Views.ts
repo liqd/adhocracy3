@@ -277,9 +277,9 @@ export var userProfileDirective = (
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
-
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
+                    column.$scope.shared.recipientName = scope.userBasic.name;
                     column.showOverlay("messaging");
                 } else if (!adhUser.loggedIn) {
                     adhTopLevelState.redirectToLogin();
@@ -308,6 +308,7 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column)  => {
+            scope.recipientName = column.$scope.shared.recipientName;
             scope.messageSend = () => {
                 return adhHttp.postRaw(adhConfig.rest_url + "/message_user", {
                     recipient: scope.recipientUrl,
