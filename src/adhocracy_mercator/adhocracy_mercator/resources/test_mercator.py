@@ -136,7 +136,7 @@ class TestMercatorProposalPermissionsAnonymous:
     def test_cannot_create_proposal_per_batch_broken_token(
             self, app_broken_token):
         resp = _batch_post_full_sample_proposal(app_broken_token)
-        assert resp.status_code == 403
+        assert resp.status_code == 400
 
 
 @mark.functional
