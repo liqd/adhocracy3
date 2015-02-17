@@ -147,7 +147,10 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     return adhHttp.get($scope.path, params).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
-                        $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+                        // FIXME: Sorting direction should be implemented in backend, working on a copy is used,
+                        // because otherwise sometimes the already reversed sorted list (from cache) would be 
+                        // reversed again
+                        $scope.elements = angular.copy(_self.containerAdapter.elemRefs($scope.container));
 
                         if ($scope.sort && $scope.sort[0] === "-") {
                             $scope.elements.reverse();
