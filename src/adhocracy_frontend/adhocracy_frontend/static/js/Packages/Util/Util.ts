@@ -129,7 +129,7 @@ export function sortDagTopologically(dag : IDag<any>, sources : string[]) : any[
             if (_.isEmpty(dag[key].incoming)) {
                 sources.push(key);
             }
-        });
+        }).value();
 
         return next;
     };

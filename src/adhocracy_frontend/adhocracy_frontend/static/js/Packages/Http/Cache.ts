@@ -85,7 +85,7 @@ export class Service {
         }
         _.forEach(<string[]>_.uniq(_.flatten(mustInvalidate)), (path) => {
             this.invalidate(path);
-        });
+        }).value();
     }
 
     public invalidateAll() : void {

@@ -81,8 +81,8 @@ export function sortResourcesTopologically(resources : ResourcesBase.Resource[],
 
         _.forEach(references, (reference) => {
             dag[reference].outgoing.push(key);
-        });
-    });
+        }).value();
+    }).value();
 
     return AdhUtil.sortDagTopologically(dag, sources);
 }
