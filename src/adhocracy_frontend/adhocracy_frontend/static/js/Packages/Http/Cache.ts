@@ -32,6 +32,7 @@ export class Service {
     private nonResourceUrls;
 
     constructor(
+        private $q : ng.IQService,
         private adhConfig : AdhConfig.IService,
         private adhWebSocket : AdhWebSocket.Service,
         private DSCacheFactory
@@ -134,6 +135,16 @@ export class Service {
             return promise;
         } else {
             return closure();
+        }
+    }
+
+    /**
+     * Force value into cache.
+     */
+    public putCached(path, subkey, value) {
+        if (this.adhWebSocket.isConnected()) {
+            var cached = this.getOrSetCached(path);
+            cached.promises[subkey] = this.$q.when(value);
         }
     }
 }

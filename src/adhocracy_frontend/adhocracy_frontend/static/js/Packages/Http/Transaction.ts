@@ -117,7 +117,8 @@ export class Transaction {
 
         return this.adhHttp.postRaw("/batch", this.requests.map(conv)).then(
             (response) => {
-                var imported = AdhConvert.importBatchContent(response.data.responses, this.adhMetaApi, this.adhPreliminaryNames);
+                var imported = AdhConvert.importBatchContent(
+                    response.data.responses, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache);
                 _self.adhCache.invalidateUpdated(response.data.updated_resources, _.pluck(imported, "path"));
                 return imported;
             },

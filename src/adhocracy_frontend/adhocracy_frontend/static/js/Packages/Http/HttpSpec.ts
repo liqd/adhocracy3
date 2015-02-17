@@ -527,6 +527,17 @@ export var register = () => {
         });
 
         describe("importContent", () => {
+            var adhCacheMock;
+
+            beforeEach(() => {
+                adhCacheMock = {
+                    invalidate: (path) => undefined,
+                    invalidateAll: () => undefined,
+                    invalidateUpdated: (updated, posted) => undefined,
+                    memoize: (path, subkey, closure) => closure()
+                };
+            });
+
             it("returns response.data if it is an object", () => {
                 var obj : ResourcesBase.Resource = <any>{
                     content_type: "adhocracy_core.resources.pool.IBasicPool",
@@ -538,7 +549,7 @@ export var register = () => {
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
                 var adhPreliminaryNames = new AdhPreliminaryNames.Service();
-                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames, adhCacheMock);
                 expect(imported().path).toBe(obj.path);
             });
             it("throws if response.data is not an object", () => {
@@ -548,7 +559,7 @@ export var register = () => {
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
                 var adhPreliminaryNames = new AdhPreliminaryNames.Service();
-                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames, adhCacheMock);
                 expect(imported).toThrow();
             });
         });
