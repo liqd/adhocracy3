@@ -3,6 +3,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
+import _ = require("lodash");
+
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
@@ -63,7 +65,7 @@ export interface ListingScope<Container> extends ng.IScope {
     poolOptions : AdhHttp.IOptions;
     createPath? : string;
     elements : string[];
-    update : () => ng.IPromise<void>;
+    update : (boolean?) => ng.IPromise<void>;
     wshandle : number;
     clear : () => void;
     onCreate : () => void;
@@ -123,7 +125,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
             ) : void => {
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                $scope.update = () : ng.IPromise<void> => {
+                $scope.update = (warmup? : boolean) : ng.IPromise<void> => {
                     var params = <any>_.extend({}, $scope.params);
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
@@ -144,10 +146,13 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     if ($scope.sort) {
                         params["sort"] = $scope.sort.replace(/^-/, "");
                     }
-                    return adhHttp.get($scope.path, params).then((container) => {
+                    return adhHttp.get($scope.path, params, warmup).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
-                        $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+                        // FIXME: Sorting direction should be implemented in backend, working on a copy is used,
+                        // because otherwise sometimes the already reversed sorted list (from cache) would be
+                        // reversed again
+                        $scope.elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
 
                         if ($scope.sort && $scope.sort[0] === "-") {
                             $scope.elements.reverse();
@@ -177,7 +182,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         // order to not miss any messages in between. But in
                         // order to subscribe we already need the resource. So
                         // that is not possible.
-                        $scope.update().then(() => {
+                        $scope.update(true).then(() => {
                             try {
                                 $scope.wshandle = adhWebSocket.register($scope.poolPath, $scope.update);
                             } catch (e) {

@@ -93,11 +93,16 @@ class TestBatchView:
 
     def test_post_copy_special_request_attributes_headers_to_subrequest(
             self, context, request, mock_invoke_subrequest):
+        from pyramid.traversal import resource_path
         from adhocracy_core.utils import is_batchmode
         request.body = self._make_json_with_subrequest_cstructs()
         request.__cached_principals__ = [1]
         request.headers['X-User-Path'] = 2
         request.headers['X-User-Token'] = 3
+        # Needed to stop the validator from complaining if these headers are
+        # present
+        request.authenticated_userid = resource_path(context)
+        request.root = context
         inst = self._make_one(context, request)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}

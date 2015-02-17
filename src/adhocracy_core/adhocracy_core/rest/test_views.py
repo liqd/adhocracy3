@@ -50,66 +50,66 @@ def mock_password_sheet(registry_with_content, sheet_meta):
 class TestValidateRequest:
 
     @fixture
-    def request(self, cornice_request):
+    def myrequest(self, cornice_request):
         return cornice_request
 
-    def _make_one(self, context, request, **kw):
+    def _make_one(self, context, myrequest, **kw):
         from adhocracy_core.rest.views import validate_request_data
-        validate_request_data(context, request, **kw)
+        validate_request_data(context, myrequest, **kw)
 
-    def test_valid_wrong_method_with_data(self, context, request):
-        request.body = '{"wilddata": "1"}'
-        request.method = 'wrong_method'
-        self._make_one(context, request)
-        assert request.validated == {}
+    def test_valid_wrong_method_with_data(self, context, myrequest):
+        myrequest.body = '{"wilddata": "1"}'
+        myrequest.method = 'wrong_method'
+        self._make_one(context, myrequest)
+        assert myrequest.validated == {}
 
-    def test_valid_no_schema_with_data(self, context, request):
-        request.body = '{"wilddata": "1"}'
-        self._make_one(context, request)
-        assert request.validated == {}
+    def test_valid_no_schema_with_data(self, context, myrequest):
+        myrequest.body = '{"wilddata": "1"}'
+        self._make_one(context, myrequest)
+        assert myrequest.validated == {}
 
-    def test_valid_with_schema_no_data(self, context, request):
-        request.body = ''
-        self._make_one(context, request, schema=CountSchema())
-        assert request.validated == {}
+    def test_valid_with_schema_no_data(self, context, myrequest):
+        myrequest.body = ''
+        self._make_one(context, myrequest, schema=CountSchema())
+        assert myrequest.validated == {}
 
-    def test_valid_with_schema_no_data_empty_dict(self, context, request):
-        request.body = '{}'
-        self._make_one(context, request, schema=CountSchema())
-        assert request.validated == {}
+    def test_valid_with_schema_no_data_empty_dict(self, context, myrequest):
+        myrequest.body = '{}'
+        self._make_one(context, myrequest, schema=CountSchema())
+        assert myrequest.validated == {}
 
-    def test_valid_with_schema_no_data_and_defaults(self, context, request):
+    def test_valid_with_schema_no_data_and_defaults(self, context, myrequest):
         class DefaultDataSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int(),
                                         missing=1)
-        request.body = ''
-        self._make_one(context, request, schema=DefaultDataSchema())
-        assert request.validated == {'count': 1}
+        myrequest.body = ''
+        self._make_one(context, myrequest, schema=DefaultDataSchema())
+        assert myrequest.validated == {'count': 1}
 
-    def test_valid_with_schema_with_data(self, context, request):
-        request.body = '{"count": "1"}'
-        request.method = 'PUT'
-        self._make_one(context, request, schema=CountSchema())
-        assert request.validated == {'count': 1}
+    def test_valid_with_schema_with_data(self, context, myrequest):
+        myrequest.body = '{"count": "1"}'
+        myrequest.method = 'PUT'
+        self._make_one(context, myrequest, schema=CountSchema())
+        assert myrequest.validated == {'count': 1}
 
     def test_valid_with_schema_with_data_in_querystring(self, context,
-                                                        request):
+                                                        myrequest):
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int())
-        request.GET = {'count': 1}
-        self._make_one(context, request, schema=QueryStringSchema())
-        assert request.validated == {'count': 1}
+        myrequest.GET = {'count': 1}
+        self._make_one(context, myrequest, schema=QueryStringSchema())
+        assert myrequest.validated == {'count': 1}
 
     def test_valid_with_schema_with_extra_fields_in_querystring_discarded(
-            self, context, request):
+            self, context, myrequest):
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int())
-        request.GET = {'count': 1, 'extraflag': 'extra value'}
-        self._make_one(context, request, schema=QueryStringSchema())
-        assert request.validated == {'count': 1}
+        myrequest.GET = {'count': 1, 'extraflag': 'extra value'}
+        self._make_one(context, myrequest, schema=QueryStringSchema())
+        assert myrequest.validated == {'count': 1}
 
     def test_valid_with_schema_with_extra_fields_in_querystring_preserved(
-            self, context, request):
+            self, context, myrequest):
 
         class PreservingQueryStringSchema(colander.MappingSchema):
             def __init__(self, *args, **kwargs):
@@ -117,96 +117,119 @@ class TestValidateRequest:
                 self.typ.unknown = 'preserve'
             count = colander.SchemaNode(colander.Int())
 
-        request.GET = {'count': 1, 'extraflag': 'extra value'}
-        self._make_one(context, request, schema=PreservingQueryStringSchema())
-        assert request.validated == {'count': 1, 'extraflag': 'extra value'}
+        myrequest.GET = {'count': 1, 'extraflag': 'extra value'}
+        self._make_one(context, myrequest,
+                       schema=PreservingQueryStringSchema())
+        assert myrequest.validated == {'count': 1, 'extraflag': 'extra value'}
 
-    def test_valid_multipart_formdata(self, context, request):
-        request.content_type = 'multipart/form-data'
-        request.method = 'POST'
-        request.POST['count'] = '1'
-        self._make_one(context, request, schema=CountSchema())
-        assert request.validated == {'count': 1}
+    def test_valid_multipart_formdata(self, context, myrequest):
+        myrequest.content_type = 'multipart/form-data'
+        myrequest.method = 'POST'
+        myrequest.POST['count'] = '1'
+        self._make_one(context, myrequest, schema=CountSchema())
+        assert myrequest.validated == {'count': 1}
 
-    def test_non_valid_with_schema_wrong_data(self, context, request):
+    def test_non_valid_with_schema_wrong_data(self, context, myrequest):
         from cornice.util import _JSONError
-        request.body = '{"count": "wrong_value"}'
-        request.method = 'POST'
+        myrequest.body = '{"count": "wrong_value"}'
+        myrequest.method = 'POST'
         with pytest.raises(_JSONError):
-            self._make_one(context, request, schema=CountSchema())
-        assert request.errors == [{'location': 'body',
+            self._make_one(context, myrequest, schema=CountSchema())
+        assert myrequest.errors == [{'location': 'body',
                                    'name': 'count',
                                    'description': '"wrong_value" is not a number'}]
 
-    def test_non_valid_with_schema_wrong_data_cleanup(self, context, request):
+    def test_non_valid_with_schema_wrong_data_cleanup(self, context,
+                                                      myrequest):
         from cornice.util import _JSONError
-        request.validated = {'secret_data': 'buh'}
-        request.body = '{"count": "wrong_value"}'
-        request.method = 'POST'
+        myrequest.validated = {'secret_data': 'buh'}
+        myrequest.body = '{"count": "wrong_value"}'
+        myrequest.method = 'POST'
         with pytest.raises(_JSONError):
-            self._make_one(context, request, schema=CountSchema())
-        assert request.validated == {}
+            self._make_one(context, myrequest, schema=CountSchema())
+        assert myrequest.validated == {}
 
-    def test_valid_with_extra_validator(self, context, request):
-        def validator1(context, request):
-            request.validated = {"validator": "1"}
-        self._make_one(context, request, extra_validators=[validator1])
-        assert request.validated == {"validator": "1"}
+    def test_valid_with_extra_validator(self, context, myrequest):
+        def validator1(context, myrequest):
+            myrequest.validated = {"validator": "1"}
+        self._make_one(context, myrequest, extra_validators=[validator1])
+        assert myrequest.validated == {"validator": "1"}
 
-    def test_valid_with_extra_validator_and_wrong_schema_data(self, context, request):
+    def test_valid_with_extra_validator_and_wrong_schema_data(self, context,
+                                                              myrequest):
         from cornice.util import _JSONError
-        def validator1(context, request):
-            request._validator_called = True
-        request.body = '{"count": "wrong"}'
-        request.method = 'POST'
+        def validator1(context, myrequest):
+            myrequest._validator_called = True
+        myrequest.body = '{"count": "wrong"}'
+        myrequest.method = 'POST'
         with pytest.raises(_JSONError):
-            self._make_one(context, request, schema=CountSchema(),
+            self._make_one(context, myrequest, schema=CountSchema(),
                            extra_validators=[validator1])
-        assert hasattr(request, '_validator_called') is False
+        assert hasattr(myrequest, '_validator_called') is False
 
-    def test_valid_with_sequence_schema(self, context, request):
+    def test_valid_with_sequence_schema(self, context, myrequest):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
 
-        request.body = '["alpha", "beta", "gamma"]'
-        request.method = 'POST'
-        self._make_one(context, request, schema=TestListSchema())
-        assert request.validated == ['alpha', 'beta', 'gamma']
+        myrequest.body = '["alpha", "beta", "gamma"]'
+        myrequest.method = 'POST'
+        self._make_one(context, myrequest, schema=TestListSchema())
+        assert myrequest.validated == ['alpha', 'beta', 'gamma']
 
-    def test_valid_with_sequence_schema_in_querystring(self, context, request):
+    def test_valid_with_sequence_schema_in_querystring(self, context,
+                                                       myrequest):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
-        self._make_one(context, request, schema=TestListSchema())
+        self._make_one(context, myrequest, schema=TestListSchema())
         # since this doesn't make much sense, the validator is just a no-op
-        assert request.validated == {}
+        assert myrequest.validated == {}
 
-    def test_with_invalid_sequence_schema(self, context, request):
+    def test_with_invalid_sequence_schema(self, context, myrequest):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
             nonsense_node = colander.SchemaNode(colander.String())
 
-        request.body = '["alpha", "beta", "gamma"]'
-        request.method = 'POST'
+        myrequest.body = '["alpha", "beta", "gamma"]'
+        myrequest.method = 'POST'
         with pytest.raises(colander.Invalid):
-            self._make_one(context, request, schema=TestListSchema())
-        assert request.validated == {}
+            self._make_one(context, myrequest, schema=TestListSchema())
+        assert myrequest.validated == {}
 
-    def test_invalid_with_sequence_schema(self, context, request):
+    def test_invalid_with_sequence_schema(self, context, myrequest):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.Integer())
 
         from cornice.util import _JSONError
-        request.body = '[1, 2, "three"]'
-        request.method = 'POST'
+        myrequest.body = '[1, 2, "three"]'
+        myrequest.method = 'POST'
         with pytest.raises(_JSONError):
-            self._make_one(context, request, schema=TestListSchema())
-        assert request.validated == {}
+            self._make_one(context, myrequest, schema=TestListSchema())
+        assert myrequest.validated == {}
 
     def test_invalid_with_not_sequence_and_not_mapping_schema(self, context,
-                                                              request):
+                                                              myrequest):
         schema = colander.SchemaNode(colander.Int())
         with pytest.raises(Exception):
-            self._make_one(context, request, schema=schema)
+            self._make_one(context, myrequest, schema=schema)
+
+    def test_valid_user_headers_and_authenticated_user(
+            self, context, myrequest, monkeypatch):
+        from unittest.mock import Mock
+        from adhocracy_core.rest import views
+        myrequest.headers['X-User-Path'] = 2
+        myrequest.headers['X-User-Token'] = 3
+        monkeypatch.setattr(views, 'get_user', Mock(return_value='user'))
+        self._make_one(context, myrequest)
+        assert myrequest.validated == {}
+
+    def test_invalid_user_headers_but_no_authenticated_user(self, context,
+                                                            myrequest):
+        from cornice.util import _JSONError
+        myrequest.headers['X-User-Path'] = 2
+        myrequest.headers['X-User-Token'] = 3
+        with pytest.raises(_JSONError):
+            self._make_one(context, myrequest)
+        assert myrequest.validated == {}
 
 
 class TestValidatePOSTRootVersions:

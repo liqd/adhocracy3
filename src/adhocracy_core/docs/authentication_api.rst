@@ -294,18 +294,23 @@ With authentication instead we may::
     >>> pprint(resp_data['POST']['request_body'])
     [...'adhocracy_core.resources.pool.IBasicPool',...]
 
-FIXME: If the token is not valid or expired the backend responds with an error status 
+If the token is not valid or expired the backend responds with an error status
 that identifies the "X-User-Token" header as source of the problem::
 
-    >> resp_data = testapp.get('/meta_api/', headers=headers).json
-    >> resp_data['status']
+    >>> broken_header = {'X-User-Path': god_header['X-User-Path'],
+    ...                  'X-User-Token': 'lalala'}
+    >>> resp_data = testapp.get('/meta_api/', headers=broken_header,
+    ...                         status=400).json
+    >>> sorted(resp_data.keys())
+    ['errors', 'status']
+    >>> resp_data['status']
     'error'
-    >> resp_data['errors'][0]['location']
+    >>> resp_data['errors'][0]['location']
     'header'
-    >> resp_data['errors'][0]['name']
+    >>> resp_data['errors'][0]['name']
     'X-User-Token'
-    >> resp_data['errors'][0]['description']
-    'invalid user token'
+    >>> resp_data['errors'][0]['description']
+    'Invalid user token'
 
 Tokens will usually expire after some time. (In the current implementation,
 they expire by default after 30 days, but configurations may change this.)
@@ -371,11 +376,12 @@ the user to be logged in from different devices at the same time. ::
 
     >>> user_token_via_username != user_token_via_email
     True
-    >>> headers = {'X-User-Token': user_token_via_username }
+    >>> headers = {'X-User-Path': user_path,
+    ...            'X-User-Token': user_token_via_username }
     >>> resp_data = testapp.get('/meta_api/', headers=headers).json
     >>> 'resources' in resp_data.keys()
     True
-    >>> headers = {'X-User-Token': user_token_via_email }
+    >>> headers['X-User-Token'] = user_token_via_email
     >>> resp_data = testapp.get('/meta_api/', headers=headers).json
     >>> 'resources' in resp_data.keys()
     True
