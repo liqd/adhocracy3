@@ -157,7 +157,7 @@ export var register = () => {
                         });
 
                         it("updates scope.container from server", () => {
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {}, true);
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {}, undefined);
                             expect(scope.container).toBe(container);
                         });
 
@@ -184,7 +184,7 @@ export var register = () => {
                         it("updates scope.container from server", () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
                                 content_type: "some_content_type"
-                            }, true);
+                            }, undefined);
                             expect(scope.container).toBe(container);
                         });
                     });
