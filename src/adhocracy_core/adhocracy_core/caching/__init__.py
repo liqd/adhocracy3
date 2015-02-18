@@ -93,7 +93,7 @@ class HTTPCacheStrategyBaseAdapter:
     """Time (in seconds) to cache the response in the caching proxy.
        Adds a "Cache-Control: s-maxage=<value>" header to the response.
     """
-    last_modified = True
+    last_modified = False
     """Adds a "Last-Modified" header to the response and turns on  "304 Not
        Modified" responses for "If-Modified-Since" conditional requests.
     """
