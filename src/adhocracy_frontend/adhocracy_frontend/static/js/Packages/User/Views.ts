@@ -6,6 +6,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import AdhUser = require("./User");
 
+import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
 var pkgLocation = "/User";
@@ -277,9 +278,9 @@ export var userProfileDirective = (
         },
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
-                    column.$scope.shared.recipientName = scope.userBasic.name;
                     column.showOverlay("messaging");
                 } else if (!adhUser.loggedIn) {
                     adhTopLevelState.redirectToLogin();
@@ -308,7 +309,10 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column)  => {
-            scope.recipientName = column.$scope.shared.recipientName;
+            adhHttp.get(scope.recipientUrl).then((recipient : RIUser) => {
+                scope.recipientName = recipient.data[SIUserBasic.nick].name;
+            });
+
             scope.messageSend = () => {
                 return adhHttp.postRaw(adhConfig.rest_url + "/message_user", {
                     recipient: scope.recipientUrl,
