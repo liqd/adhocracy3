@@ -849,7 +849,7 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
+export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, adhTopLevelState : AdhTopLevelState.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
@@ -881,12 +881,21 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
                         budget: finance.data[SIMercatorFinance.nick].budget
                     };
                 });
+                adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                    if (!proposalVersionUrl) {
+                        scope.selectedState = "";
+                    } else if (proposalVersionUrl === scope.path) {
+                        scope.selectedState = "is-selected";
+                    } else {
+                        scope.selectedState = "is-not-selected";
+                    }
+                });
             });
             adhHttp.get(AdhUtil.parentPath(scope.path), {
                 content_type: "adhocracy_core.resources.rate.IRateVersion",
                 tag: "LAST",
-                rate: 1,
-                depth: 3,
+                rate: "1",
+                depth: "3",
                 count: "true",
                 elements: "omit"
             }).then((result) => {
@@ -895,7 +904,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
             adhHttp.get(AdhUtil.parentPath(scope.path), {
                 content_type: "adhocracy_core.resources.comment.ICommentVersion",
                 tag: "LAST",
-                depth: 4,
+                depth: "4",
                 count: "true",
                 elements: "omit"
             }).then((result) => {
@@ -1012,7 +1021,7 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", listItem])
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhTopLevelState", listItem])
         .directive("adhMercatorProposalDetailView",
             ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
