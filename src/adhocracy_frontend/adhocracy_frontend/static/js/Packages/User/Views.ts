@@ -35,6 +35,7 @@ export interface IScopeRegister {
         passwordRepeat : string;
     };
     siteName : string;
+    termsUrl : string;
     errors : string[];
     supportEmail : string;
     success : boolean;
@@ -138,6 +139,7 @@ export var registerController = (
     $scope : IScopeRegister
 ) => {
     $scope.siteName = adhConfig.site_name;
+    $scope.termsUrl = adhConfig.terms_url;
 
     $scope.input = {
         username: "",
