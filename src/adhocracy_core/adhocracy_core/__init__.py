@@ -41,7 +41,7 @@ def add_after_commit_hooks(request):
     registry = request.registry
     # Order matters here
     current_transaction.addAfterCommitHook(purge_varnish_after_commit_hook,
-                                           args=(registry,))
+                                           args=(registry, request))
     current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
                                            args=(registry,))
     current_transaction.addAfterCommitHook(clear_changelog_after_commit_hook,
