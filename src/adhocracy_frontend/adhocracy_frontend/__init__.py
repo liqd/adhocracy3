@@ -43,6 +43,7 @@ def config_view(request):
     config['debug'] = asbool(settings.get('adhocracy.frontend.debug', 'false'))
 
     config['cachebust'] = asbool(settings.get('cachebust.enabled', 'false'))
+    config['cachebust_suffix'] = cachebust_query_params(request)
     return config
 
 

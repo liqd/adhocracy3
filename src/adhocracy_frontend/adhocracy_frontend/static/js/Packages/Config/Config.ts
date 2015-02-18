@@ -1,3 +1,5 @@
+/* tslint:disable:variable-name */
+
 /**
  * The configuration is actually created by the server and provided
  * as a json file at `/config.json`.  It is then injected
@@ -19,5 +21,6 @@ export interface IService {
     custom : {[key : string]: string};
     site_name : string;
     cachebust : boolean;
+    cachebust_suffix : string;
     debug : boolean;
 }
