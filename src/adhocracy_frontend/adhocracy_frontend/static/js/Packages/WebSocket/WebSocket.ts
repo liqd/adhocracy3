@@ -127,7 +127,7 @@ export class Service {
         }
     }
 
-    public addEventListener(event : string, callback : () => void) : number {
+    public addEventListener(event : string, callback : (arg?) => void) : number {
         return this.domEventManager.on(event, callback);
     }
 
