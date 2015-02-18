@@ -1443,7 +1443,7 @@ custom filters:
 
 * *rates* the aggregated value of all :class:`adhocracy_core.sheets.rate.IRate`
   resources referencing a resource with :class:`adhocracy_core.sheets.rate.IRateable`.
-  Supports sorting.
+  Only the LAST version of each rate is counted. Supports sorting.
 
 * *name* the identifier value of all resources (last part in the resource url).
   This is the same value like the name in the :class:`adhocracy_core.sheets.name.IName`
