@@ -885,8 +885,8 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
             adhHttp.get(AdhUtil.parentPath(scope.path), {
                 content_type: "adhocracy_core.resources.rate.IRateVersion",
                 tag: "LAST",
-                rate: 1,
-                depth: 3,
+                rate: "1",
+                depth: "3",
                 count: "true",
                 elements: "omit"
             }).then((result) => {
@@ -895,7 +895,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
             adhHttp.get(AdhUtil.parentPath(scope.path), {
                 content_type: "adhocracy_core.resources.comment.ICommentVersion",
                 tag: "LAST",
-                depth: 4,
+                depth: "4",
                 count: "true",
                 elements: "omit"
             }).then((result) => {
