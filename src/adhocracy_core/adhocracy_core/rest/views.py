@@ -599,9 +599,16 @@ class ItemRESTView(PoolRESTView):
         last_new_version = validated.get('_last_new_version_in_transaction',
                                          None)
         if last_new_version is not None:
+            sheets = self.registry.get_sheets_create(last_new_version,
+                                                     self.request)
+            appstructs = self.request.validated.get('data', {})
+            for sheet in sheets:
+                name = sheet.meta.isheet.__identifier__
+                if name in appstructs:  # pragma: no branch
+                    sheet.set(appstructs[name],
+                              registry=self.request.registry,
+                              request=self.request)
             resource = last_new_version
-            self.context = last_new_version
-            self.put()  # FIXME Is it safe to just call put?
         else:
             resource = self.registry.create(resource_type,
                                             self.context,

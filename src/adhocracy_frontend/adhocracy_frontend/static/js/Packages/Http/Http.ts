@@ -1,3 +1,4 @@
+/* tslint:disable:variable-name */
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
@@ -128,12 +129,34 @@ export class Service<Content extends ResourcesBase.Resource> {
         return this.$http.get(path, { params : params });
     }
 
-    public get(path : string, params ?: { [key : string] : string }) : ng.IPromise<Content> {
+    /**
+     * Send HTTP request to path with params and returns a promise of the
+     * imported response.
+     *
+     * The optional parameter `warmupPoolCache` can be used on pool queries
+     * in order to requests the IPool sheet to contain a list of resources
+     * instead of only paths. The returned promise however has the same API
+     * as if `warmupPoolCache` would be skipped.
+     */
+    public get(
+        path : string,
+        params ?: { [key : string] : string },
+        warmupPoolCache ?: boolean
+    ) : ng.IPromise<Content> {
         var query = (typeof params === "undefined") ? "" : "?" + $.param(params);
+
+        if (warmupPoolCache) {
+            if (_.has(params, "elements")) {
+                throw "cannot use warmupPoolCache when elements is set";
+            } else {
+                params["elements"] = "content";
+            }
+        }
 
         return this.adhCache.memoize(path, query,
             () => this.getRaw(path, params).then(
-                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                (response) => AdhConvert.importContent(
+                    <any>response, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache, warmupPoolCache),
                 AdhError.logBackendError));
     }
 
@@ -154,7 +177,7 @@ export class Service<Content extends ResourcesBase.Resource> {
             .then(
                 (response) => {
                     _self.adhCache.invalidateUpdated(response.data.updated_resources);
-                    return AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames);
+                    return AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames, this.adhCache);
                 },
                 AdhError.logBackendError);
     }
@@ -188,7 +211,7 @@ export class Service<Content extends ResourcesBase.Resource> {
             .then(
                 (response) => {
                     this.adhCache.invalidateUpdated(response.data.updated_resources);
-                    return AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames);
+                    return AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames, this.adhCache);
                 },
                 AdhError.logBackendError);
     }
@@ -484,7 +507,7 @@ export var register = (angular, config, metaApi) => {
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
-        .service("adhCache", ["adhConfig", "adhWebSocket", "DSCacheFactory", AdhCache.Service])
+        .service("adhCache", ["$q", "adhConfig", "adhWebSocket", "DSCacheFactory", AdhCache.Service])
         .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
         .filter("adhFormatError", () => AdhError.formatError);
 };

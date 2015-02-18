@@ -1,5 +1,5 @@
 include RELEASE-VERSION version.py
-recursive-include src/mercator/build *.js *.js.map *.css *.css.map *.woff *.eot *.ttf *.svg *.xml *.ico *.json *.jpg *.gif *.png *.html *.md *.mako *.pt
+recursive-include src/mercator/build *.js *.js.map *.min.map *.css *.css.map *.woff *.eot *.ttf *.svg *.xml *.ico *.json *.jpg *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
 global-exclude *Ig.js
 prune src/mercator/build/lib/DefinitelyTyped

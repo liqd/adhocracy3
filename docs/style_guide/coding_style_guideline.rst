@@ -5,7 +5,7 @@ Testing
 -------
 
 * 100% test coverage (must)
-* Test driven development with acceptance/functional, integration und unit test (should)
+* Test driven development with acceptance/functional, integration and unit test (should)
 
   * testing guideline: http://pyramid.readthedocs.org/en/latest/narr/testing.html
   * unit test examples substanced code, http://www.diveintopython.net/unit_testing/
@@ -36,7 +36,7 @@ Suggestions:
 
 * Aim at making small commits containing only one semantic change.
 
-  In order to that, you may want to use helper tools such as
+  In order to do that, you may want to use helper tools such as
   `tig <https://redmine.liqd.net/issues/1184>`_,
   `git-cola <https://git-cola.github.io/>`_ or plain ``git add --interactive``
   or ``git add --patch``, allowing for easy line-by-line staging. Interactive

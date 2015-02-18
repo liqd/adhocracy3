@@ -7,6 +7,9 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import ResourcesBase = require("../../ResourcesBase");
 import Resources_ = require("../../Resources_");
 
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+
+import AdhCache = require("./Cache");
 import AdhMetaApi = require("./MetaApi");
 
 
@@ -31,7 +34,9 @@ var sanityCheck = (obj : ResourcesBase.Resource) : void => {
 export var importContent = <Content extends ResourcesBase.Resource>(
     response : {data : Content},
     metaApi : AdhMetaApi.MetaApiQuery,
-    preliminaryNames : AdhPreliminaryNames.Service
+    preliminaryNames : AdhPreliminaryNames.Service,
+    adhCache : AdhCache.Service,
+    warmupPoolCache ?: boolean
 ) : Content => {
     "use strict";
 
@@ -63,6 +68,22 @@ export var importContent = <Content extends ResourcesBase.Resource>(
     _.forOwn(obj.data, (jsonSheet, sheetName) => {
         if (!Resources_.sheetRegistry.hasOwnProperty(sheetName)) {
             throw ("unknown property sheet: " + sheetName + " " + JSON.stringify(obj, null, 2));
+        }
+
+        if (warmupPoolCache && (sheetName === SIPool.nick)) {
+            // do as if the query param element === content hadn't been set
+            var subresourceList = [];
+
+            _.forEach(jsonSheet.elements, (rawSubresource : any) => {
+                var pseudoResponse = {
+                    data: rawSubresource
+                };
+                var subresource = importContent(pseudoResponse, metaApi, preliminaryNames, adhCache);
+                adhCache.putCached(rawSubresource.path, "", subresource);
+                subresourceList.push(rawSubresource.path);
+            });
+
+            jsonSheet.elements = subresourceList;
         }
 
         var _sclass = Resources_.sheetRegistry[sheetName];
@@ -142,13 +163,14 @@ export var importContent = <Content extends ResourcesBase.Resource>(
 export var importBatchContent = <Content extends ResourcesBase.Resource>(
     responses,
     metaApi : AdhMetaApi.MetaApiQuery,
-    preliminaryNames : AdhPreliminaryNames.Service
+    preliminaryNames : AdhPreliminaryNames.Service,
+    adhCache : AdhCache.Service
 ) : Content[] => {
 
     return responses.map((response) => {
         response.data = response.body;
         delete response.body;
-        return importContent(response, metaApi, preliminaryNames);
+        return importContent(response, metaApi, preliminaryNames, adhCache);
     });
 };
 

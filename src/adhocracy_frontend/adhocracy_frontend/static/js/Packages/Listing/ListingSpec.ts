@@ -157,7 +157,7 @@ export var register = () => {
                         });
 
                         it("updates scope.container from server", () => {
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {});
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {}, undefined);
                             expect(scope.container).toBe(container);
                         });
 
@@ -168,7 +168,7 @@ export var register = () => {
 
                         it("updates scope.elements using adapter from container", () => {
                             expect(adapter.elemRefs).toHaveBeenCalledWith(container);
-                            expect(scope.elements).toBe(elements);
+                            expect(scope.elements).toEqual(elements);
                         });
                     });
 
@@ -184,7 +184,7 @@ export var register = () => {
                         it("updates scope.container from server", () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
                                 content_type: "some_content_type"
-                            });
+                            }, undefined);
                             expect(scope.container).toBe(container);
                         });
                     });

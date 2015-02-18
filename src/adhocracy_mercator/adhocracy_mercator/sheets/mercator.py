@@ -267,8 +267,8 @@ def _intro_image_mime_type_validator(mime_type: str) -> bool:
 intro_image_metadata_meta = asset_metadata_meta._replace(
     isheet=IIntroImageMetadata,
     mime_type_validator=_intro_image_mime_type_validator,
-    image_sizes={'thumbnail': Dimensions(width=800, height=350),
-                 'detail': Dimensions(width=105, height=90)},
+    image_sizes={'thumbnail': Dimensions(width=105, height=90),
+                 'detail': Dimensions(width=800, height=350)},
 )
 
 

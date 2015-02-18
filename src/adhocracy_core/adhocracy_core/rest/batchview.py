@@ -160,6 +160,12 @@ class BatchView(RESTView):
         self.copy_attr_if_exists('__cached_principals__', request)
         self.copy_header_if_exists('X-User-Path', request)
         self.copy_header_if_exists('X-User-Token', request)
+
+        # properly setup subrequest in case script_name env is set,
+        # see https://github.com/Pylons/pyramid/issues/1434
+        request.script_name = self.request.script_name
+        request.path_info = request.path_info[len(self.request.script_name):]
+
         return request
 
     def _invoke_subrequest_and_handle_errors(

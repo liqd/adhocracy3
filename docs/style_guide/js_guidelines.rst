@@ -17,7 +17,7 @@ General considerations
 
 -  We prefer conventions set by 3rd party tools (e.g. `tslint`_) over our
    own preferences.
--  We try to be consistend with other guidelines from the adhocracy3
+-  We try to be consistent with other guidelines from the adhocracy3
    project
 
 General JavaScript
@@ -47,7 +47,7 @@ checked with tslint.
       first line (without a ``.``) is indented at n+0, all functions at
       n+1 (4 spaces deeper).
 
--  Each new identfier has its own ``var``. (rationale: ``git diff`` / conflicts)
+-  Each new identifier has its own ``var``. (rationale: ``git diff`` / conflicts)
 
 -  No whitespace immediately inside parentheses, brackets or braces (this
    includes empty blocks)::
@@ -88,7 +88,7 @@ checked with tslint.
               return;
           }
 
--  The last item in a list or in function parameters may by split across
+-  The last item in a list or in function parameters may be split across
    multiple lines::
 
        app.directive('myDirective', ["$q", "$http", ($q, $http) => {
@@ -120,7 +120,7 @@ TypeScript
       modules, then a3-internal modules.
 
    -  only import from lower level.  (FIXME: "lower level" does not mean file
-      directory hierarchy, but something to be clarified.  this rule
+      directory hierarchy, but something to be clarified. This rule
       is to be re-evaluated at some point.)
 
 -  nested types are allowed up to 2 levels (``Foo<Bar<Baz>>``).  1
@@ -130,7 +130,7 @@ TypeScript
 
 -  Use ``type[]`` rather than ``Array<type>``.
 
--  A colon used for types must always be sorrounded by single spaces.
+-  A colon used for types must always be surrounded by single spaces.
 
 Lambdas
 ~~~~~~~
@@ -229,7 +229,7 @@ Angular
 
    -  directives: 'adh.*' for all directives declared in a3.  (in the
       future, this prefix may be split up in several ones, making
-      refactoring necessary.  Client-specific prefices may be added
+      refactoring necessary.  Client-specific prefixes may be added
       without the need for refactoring.)
 
    -  service registration: '"adhHttp"'.  (services must be implemented
@@ -269,7 +269,7 @@ Template
 
    -  apply classes w/o a specific need/by default?
 
--  CSS and JavaScript are not allwed in templates.  This includes
+-  CSS and JavaScript are not allowed in templates.  This includes
    `ngStyle <https://docs.angularjs.org/api/ng/directive/ngStyle>`_.
 
 -  Since templates (1) ideally are to be maintained by designers rather
