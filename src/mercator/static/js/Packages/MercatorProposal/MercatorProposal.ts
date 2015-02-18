@@ -849,7 +849,7 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
+export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, adhTopLevelState : AdhTopLevelState.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
@@ -880,6 +880,15 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp) => {
                     scope.data.finance = {
                         budget: finance.data[SIMercatorFinance.nick].budget
                     };
+                });
+                adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                    if (!proposalVersionUrl) {
+                        scope.selectedState = "";
+                    } else if (proposalVersionUrl === scope.path) {
+                        scope.selectedState = "is-selected";
+                    } else {
+                        scope.selectedState = "is-not-selected";
+                    }
                 });
             });
             adhHttp.get(AdhUtil.parentPath(scope.path), {
@@ -1012,7 +1021,7 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", listItem])
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhTopLevelState", listItem])
         .directive("adhMercatorProposalDetailView",
             ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
