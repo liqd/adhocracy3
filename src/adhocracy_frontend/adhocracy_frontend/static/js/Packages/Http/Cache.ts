@@ -41,7 +41,7 @@ export class Service {
         this.nonResourceUrls = _.map(AdhHttp.nonResourcePaths, (path) => adhConfig.rest_url + "/" + path);
     }
 
-    private setupCache(DSCacheFactory, adhWebSocket) {
+    private setupCache(DSCacheFactory, adhWebSocket : AdhWebSocket.Service) : void {
         this.cache = DSCacheFactory("httpCache", {
             capacity: 10000,  // items
             maxAge: 5 * 60 * 1000,  // milliseconds
@@ -120,7 +120,7 @@ export class Service {
      * Otherwise, execute the given closure, store the result in the cache and
      * return it.
      */
-    public memoize(path, subkey, closure) {
+    public memoize(path : string, subkey : string, closure : Function) {
         if (this.adhWebSocket.isConnected()) {
             var cached = this.getOrSetCached(path);
 
@@ -141,7 +141,7 @@ export class Service {
     /**
      * Force value into cache.
      */
-    public putCached(path, subkey, value) {
+    public putCached(path : string, subkey : string, value) {
         if (this.adhWebSocket.isConnected()) {
             var cached = this.getOrSetCached(path);
             cached.promises[subkey] = this.$q.when(value);
