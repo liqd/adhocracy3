@@ -14,8 +14,10 @@
             <img src="/static/icons/png/attention.png"/>
             <div>
                 <h1>Non-supported browser!</h1>
-                <p>FIXME: Needs real text. Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein
-                Musterbuch zu erstellen.</p>
+                <p>We're sorry your browser is unsupported. Please either upgrade your Internet Explorer,
+                but we recommend
+                <a href="http://http://chromium.woolyss.com/">Chromium</a> or
+                <a href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>.</p>
             </div>
         </div>
         <![endif]-->
