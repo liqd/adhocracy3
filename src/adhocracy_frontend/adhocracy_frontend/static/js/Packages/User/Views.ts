@@ -6,6 +6,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import AdhUser = require("./User");
 
+import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
 var pkgLocation = "/User";
@@ -308,6 +309,10 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column)  => {
+            adhHttp.get(scope.recipientUrl).then((recipient : RIUser) => {
+                scope.recipientName = recipient.data[SIUserBasic.nick].name;
+            });
+
             scope.messageSend = () => {
                 return adhHttp.postRaw(adhConfig.rest_url + "/message_user", {
                     recipient: scope.recipientUrl,

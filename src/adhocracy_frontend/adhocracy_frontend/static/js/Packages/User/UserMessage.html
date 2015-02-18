@@ -3,8 +3,7 @@
         novalidate="novalidate"
         data-ng-submit="messageSend()"
         name="messageForm">
-        <!-- FIXME: replace "Username" -->
-        <p>{{ "TR__MESSAGE_TO" | translate }} Username</p>
+        <p>{{ "TR__MESSAGE_TO" | translate }} {{recipientName}}</p>
         <input
             class="user-message-subject"
             type="text"
