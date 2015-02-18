@@ -50,10 +50,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     }
 
     isRateable(resource : ResourcesBase.Resource) : boolean {
-        return (
-            resource.data.hasOwnProperty(SIRateable.nick) ||
-            resource.data.hasOwnProperty(SILikeable.nick)
-        );
+        return resource.data.hasOwnProperty(SIRateable.nick);
     }
 
     rateablePostPoolPath(resource : ResourcesBase.Resource) : string {
@@ -109,6 +106,10 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
 
 
 export class LikeAdapter extends RateAdapter {
+    isRateable(resource : ResourcesBase.Resource) : boolean {
+        return resource.data.hasOwnProperty(SILikeable.nick);
+    }
+
     rateablePostPoolPath(resource : ResourcesBase.Resource) : string {
         return resource.data[SILikeable.nick].post_pool;
     }
