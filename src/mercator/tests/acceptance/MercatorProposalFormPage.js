@@ -67,7 +67,7 @@ var MercatorProposalFormPage = function() {
         this.steps.sendKeys("plan");
         this.value.sendKeys("relevance");
         this.partners.sendKeys("partners");
-        this.financeBudget.sendKeys("1000");
+        this.financeBudget.sendKeys("1200");
         this.financeRequestedFunding.sendKeys("1000");
         this.financeGrantedYes.click();
         this.experience.sendKeys("experience");

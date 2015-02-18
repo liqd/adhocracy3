@@ -58,8 +58,52 @@ describe("mercator proposal form", function() {
         page.fillValid();
         page.submitButton.click();
         expect(browser.getCurrentUrl()).not.toContain("@create");
+
+        var detailContainer = element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-detail-container"));
+
+        // proposal pitch
         expect(element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-cover-header"))
-            .getText()).toContain("protitle");
+               .getText()).toContain("protitle");
+        expect(detailContainer.element(by.css("#mercator-detail-view-brief-proposal p"))
+               .getText()).toContain("proteaser");
+        expect(detailContainer.element(by.css(".mercator-proposal-budget-col.requested"))
+               .getText()).toContain("1,000");
+        expect(detailContainer.all(by.css(".mercator-proposal-budget-col")).get(1)
+               .getText()).toContain("1,200");
+        expect(detailContainer.all(by.css(".inline-boxes li")).first()
+               .getText()).toContain("Bonn");
+        expect(detailContainer.all(by.css(".inline-boxes li")).get(1)
+               .getText()).toContain("Ruhr Gebiet, Germany");
+
+        // proposal whos
+        expect(detailContainer.element(by.css("adh-user-meta"))
+               .getText()).toContain("pita pasta");
+        expect(detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).first()
+               .getText()).toContain("organization name");
+        expect(detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).get(1)
+               .getText()).toContain("Chile");
+        expect(detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).last()
+               .getText()).toContain("Non Profit");
+
+        // proposal details
+        expect(detailContainer.all(by.css("#mercator-detail-view-detailed-proposal section p")).first()
+               .getText()).toContain("prodescription");
+        expect(detailContainer.all(by.css("#mercator-detail-view-detailed-proposal section p")).last()
+               .getText()).toContain("story");
+
+        // proposal goals and vision
+        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).first()
+               .getText()).toContain("success");
+        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).get(1)
+               .getText()).toContain("plan");
+        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).get(2)
+               .getText()).toContain("relevance");
+        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).last()
+               .getText()).toContain("partners");
+
+        // proposal additional information
+        expect(detailContainer.element(by.css("#mercator-detail-view-additional p"))
+               .getText()).toContain("experience");
     });
 
     it("allows creator to edit existing proposals (depends on submit)", function() {
