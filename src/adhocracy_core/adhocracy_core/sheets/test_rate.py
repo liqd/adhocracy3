@@ -301,9 +301,19 @@ def test_index_rate(context, mock_rate_sheet, registry_with_content):
     assert index_rate(context['rateable'], None) == 1
 
 
-def test_index_rates(context, mock_rate_sheet, mock_rateable_sheet,
-                     registry_with_content):
+def _inject_mock_graph(monkeypatch, tag: str):
+    from adhocracy_core.sheets import tags
+    mock_graph = Mock()
+    return_value = [testing.DummyResource(__name__=tag)]
+    mock_graph.get_back_reference_sources.return_value = return_value
+    mock_find_graph = Mock(return_value=mock_graph)
+    monkeypatch.setattr(tags, 'find_graph', mock_find_graph)
+
+
+def test_index_rates_with_last_tag(context, monkeypatch, mock_rate_sheet,
+                                   mock_rateable_sheet, registry_with_content):
     from .rate import index_rates
+    _inject_mock_graph(monkeypatch, 'LAST')
     context['rates']['rate'] = testing.DummyResource()
     mock_rate_sheet.get.return_value = {'rate': 1}
     context['rateable'] = testing.DummyResource()
@@ -311,6 +321,20 @@ def test_index_rates(context, mock_rate_sheet, mock_rateable_sheet,
     registry_with_content.content.get_sheet.side_effect = [mock_rateable_sheet,
                                                            mock_rate_sheet]
     assert index_rates(context['rateable'], None) == 1
+
+
+def test_index_rates_with_another_tag(context, monkeypatch, mock_rate_sheet,
+                                      mock_rateable_sheet,
+                                      registry_with_content):
+    from .rate import index_rates
+    _inject_mock_graph(monkeypatch, 'FIRST')
+    context['rates']['rate'] = testing.DummyResource()
+    mock_rate_sheet.get.return_value = {'rate': 1}
+    context['rateable'] = testing.DummyResource()
+    mock_rateable_sheet.get.return_value = {'rates': [context['rates']['rate']]}
+    registry_with_content.content.get_sheet.side_effect = [mock_rateable_sheet,
+                                                           mock_rate_sheet]
+    assert index_rates(context['rateable'], None) == 0
 
 
 @mark.usefixtures('integration')

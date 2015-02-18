@@ -86,10 +86,24 @@ def index_tag(resource, default):
             'Cannot update tag index: No graph found for %s',
             resource_path(resource))
         return default
-    tags = graph.get_back_reference_sources(resource,
-                                            TagElementsReference)
+    tags = graph.get_back_reference_sources(resource, TagElementsReference)
     tagnames = [tag.__name__ for tag in tags]
     return tagnames if tagnames else default
+
+
+def filter_by_tag(resources: list, tag_name: str) -> list:
+    """Filter a list of resources by returning only those with a given tag."""
+    result = []
+    if not resources:
+        return result
+    graph = find_graph(resources[0])
+    for resource in resources:
+        tags = graph.get_back_reference_sources(resource, TagElementsReference)
+        for tag in tags:
+            if tag.__name__ == tag_name:
+                result.append(resource)
+                break
+    return result
 
 
 def includeme(config):

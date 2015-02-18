@@ -11,6 +11,7 @@ from adhocracy_core.interfaces import IRateValidator
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets.tags import filter_by_tag
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
@@ -208,10 +209,15 @@ def index_rate(resource, default):
 
 
 def index_rates(resource, default):
-    """Return aggregated values of referenceing :class:`IRate` resources."""
+    """
+    Return aggregated values of referenceing :class:`IRate` resources.
+
+    Only the LAST version of each rate is counted.
+    """
     rates = get_sheet_field(resource, IRateable, 'rates')
+    last_rates = filter_by_tag(rates, 'LAST')
     rate_sum = 0
-    for rate in rates:
+    for rate in last_rates:
         value = get_sheet_field(rate, IRate, 'rate')
         rate_sum += value
     return rate_sum
