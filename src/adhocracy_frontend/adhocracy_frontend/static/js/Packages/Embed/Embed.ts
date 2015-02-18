@@ -84,10 +84,12 @@ export var hrefDirective = (adhConfig : AdhConfig.IService, $location, $rootScop
                             // set href to canonical url while preserving click behavior
                             element.attr("href", adhConfig.canonical_url + orig);
                             element.on("click.adh_href", (event) => {
-                                _.defer(() => $rootScope.$apply(() => {
-                                    $location.url(orig);
-                                }));
-                                event.preventDefault();
+                                if (event.button === 0) {
+                                    _.defer(() => $rootScope.$apply(() => {
+                                        $location.url(orig);
+                                    }));
+                                    event.preventDefault();
+                                }
                             });
                         }
                     }
