@@ -62,7 +62,7 @@ describe("mercator proposal form", function() {
             .getText()).toContain("protitle");
     });
 
-    xit("allows creator to edit existing proposals (depends on submit) - fails due to #679", function() {
+    it("allows creator to edit existing proposals (depends on submit)", function() {
         shared.loginAnnotator();
 
         var list = new MercatorProposalListing().get();
