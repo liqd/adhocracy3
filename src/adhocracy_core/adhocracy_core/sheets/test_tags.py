@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from pyramid import testing
 from pytest import fixture
 
@@ -67,6 +69,41 @@ class TestTagSheet:
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
+
+
+class TestFilterByTag:
+
+    def _tag_names_to_tags(self, names: list) -> list:
+        return [testing.DummyResource(__name__=name) for name in names]
+
+    def _inject_mock_graph(self, monkeypatch, return_value):
+        from adhocracy_core.sheets import tags
+        mock_graph = Mock()
+        mock_graph.get_back_reference_sources.return_value = return_value
+        mock_find_graph = Mock(return_value=mock_graph)
+        monkeypatch.setattr(tags, 'find_graph', mock_find_graph)
+
+    def test_filter_by_tag_empty_list(self):
+        from adhocracy_core.sheets.tags import filter_by_tag
+        assert filter_by_tag([], 'mytag') == []
+
+    def test_filter_by_tag_has_tag(self, monkeypatch, context):
+        from adhocracy_core.sheets.tags import filter_by_tag
+        self._inject_mock_graph(monkeypatch,
+                                self._tag_names_to_tags(['mytag']))
+        assert filter_by_tag([context], 'mytag') == [context]
+
+    def test_filter_by_tag_has_another_tag(self, monkeypatch, context):
+        from adhocracy_core.sheets.tags import filter_by_tag
+        self._inject_mock_graph(monkeypatch,
+                                self._tag_names_to_tags(['thistag']))
+        assert filter_by_tag([context], 'thattag') == []
+
+    def test_filter_by_tag_has_seveal_tag(self, monkeypatch, context):
+        from adhocracy_core.sheets.tags import filter_by_tag
+        self._inject_mock_graph(monkeypatch, self._tag_names_to_tags(
+            ['thistag', 'thattag']))
+        assert filter_by_tag([context], 'thattag') == [context]
 
 
 def test_includeme_register_tag_sheet(config):
