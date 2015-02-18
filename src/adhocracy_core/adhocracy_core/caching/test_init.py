@@ -110,7 +110,7 @@ class TestHTTPCacheStrategyBaseAdapter:
         assert verifyObject(IHTTPCacheStrategy, inst)
         assert inst.browser_max_age == 0
         assert inst.proxy_max_age == 0
-        assert inst.last_modified
+        assert inst.last_modified is False
         assert inst.etags == ()
         assert inst.vary == ()
 
@@ -140,6 +140,7 @@ class TestHTTPCacheStrategyBaseAdapter:
     def test_set_last_modified_context_with_mod_date(self, inst, request_):
         from datetime import datetime
         inst.context.modification_date = datetime(2015, 1, 1)
+        inst.last_modified = True
         inst.set_last_modified()
         assert request_.response.headers['last-modified'].startswith('Thu, 01')
 
@@ -405,6 +406,8 @@ class TestIntegrationCaching:
     def test_strategy_not_modified_if_modified_since_request(self, app_user,
                                                              context):
         from datetime import datetime
+        from . import HTTPCacheStrategyWeakAdapter
+        HTTPCacheStrategyWeakAdapter.last_modified = True
         context.modification_date = datetime(2000, 1, 23)
         resp = app_user.get('/', status=304, headers={'If-Modified-Since':
                                                       'Fri, 23 Jan 2000 00:00:00 GMT'})
