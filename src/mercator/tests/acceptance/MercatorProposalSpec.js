@@ -64,7 +64,7 @@ describe("mercator proposal form", function() {
         // proposal pitch
         expect(element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-cover-header"))
                .getText()).toContain("protitle");
-        expect(detailContainer.element(by.css("#mercator-detail-view-brief-proposal p"))
+        expect(detailContainer.all(by.css(".chapter section p")).first()
                .getText()).toContain("proteaser");
         expect(detailContainer.element(by.css(".mercator-proposal-budget-col.requested"))
                .getText()).toContain("1,000");
@@ -86,19 +86,21 @@ describe("mercator proposal form", function() {
                .getText()).toContain("Non Profit");
 
         // proposal details
-        expect(detailContainer.all(by.css("#mercator-detail-view-detailed-proposal section p")).first()
+        var proposalDetails = detailContainer.all(by.css(".chapter")).get(2);
+        expect(proposalDetails.all(by.css("section p")).first()
                .getText()).toContain("prodescription");
-        expect(detailContainer.all(by.css("#mercator-detail-view-detailed-proposal section p")).last()
+        expect(proposalDetails.all(by.css("section p")).last()
                .getText()).toContain("story");
 
         // proposal goals and vision
-        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).first()
+        var goalsAndVision = detailContainer.all(by.css(".chapter")).get(3);
+        expect(goalsAndVision.all(by.css("section p")).first()
                .getText()).toContain("success");
-        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).get(1)
+        expect(goalsAndVision.all(by.css("section p")).get(1)
                .getText()).toContain("plan");
-        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).get(2)
+        expect(goalsAndVision.all(by.css("section p")).get(2)
                .getText()).toContain("relevance");
-        expect(detailContainer.all(by.css("#mercator-detail-view-goals-and-vision p")).last()
+        expect(goalsAndVision.all(by.css("section p")).last()
                .getText()).toContain("partners");
 
         // proposal additional information
