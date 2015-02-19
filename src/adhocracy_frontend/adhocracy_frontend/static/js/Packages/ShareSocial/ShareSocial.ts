@@ -36,6 +36,8 @@ export var socialShare = (adhConfig : AdhConfig.IService, $location : ng.ILocati
                 e.attr("title", info.text());
                 info.remove();
             });
+
+            element.find(".settings_info a").attr("target", "_blank");
         }
     };
 };
