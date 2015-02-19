@@ -31,4 +31,8 @@ sub vcl_recv {
     return(hash);
 }
 
-
+sub vcl_backend_response {
+    if (beresp.http.content-type ~ "application/json") {
+        set beresp.do_gzip = true;
+    }
+}
