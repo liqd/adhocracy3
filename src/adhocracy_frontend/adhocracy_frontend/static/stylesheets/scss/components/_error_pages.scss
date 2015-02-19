@@ -1,10 +1,7 @@
-.error-page404 {
-    background: url("/static/images/404.png");
-    height: 515px;
-    margin: 0 auto;
-    width: 663px;
+.error-page-404 {
+    text-align: center;
 
-    .error-page-text {
-        @include hide-text;
+    img {
+        margin: 0 auto;
     }
 }
