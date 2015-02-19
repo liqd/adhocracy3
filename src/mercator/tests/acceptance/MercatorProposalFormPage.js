@@ -104,33 +104,6 @@ var MercatorProposalFormPage = function() {
     this.getEditLink = function(comment) {
         return comment.element(by.css("[data-ng-click='edit()']"));
     };
-
-    this.createReply = function(parent, content) {
-        this.getReplyLink(parent).click();
-        parent.element(by.model("data.content")).sendKeys(content);
-        parent.element(by.css("input[type=\"submit\"]")).click();
-        return parent.element(by.css('.comment-children .comment'));
-    };
-
-    this.editComment = function(comment, keys) {
-        this.getEditLink(comment).click();
-        var textarea = comment.element(by.model("data.content"));
-        textarea.sendKeys.apply(textarea, keys);
-        comment.element(by.css("[data-ng-click='submit()']")).click();
-        return comment;
-    };
-
-    this.getCommentText = function(comment) {
-        return comment.element(by.css(".comment-content")).getText();
-    }
-
-    this.getCommentAuthor = function(comment) {
-        return comment.element(by.css("adh-user-meta a")).getText();
-    }
-
-    this.getRateWidget = function(comment) {
-        return comment.element(by.tagName("adh-rate"));
-    };
 };
 
 module.exports = MercatorProposalFormPage;
