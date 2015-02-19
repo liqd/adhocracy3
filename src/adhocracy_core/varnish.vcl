@@ -28,7 +28,6 @@ sub vcl_recv {
         req.method != "OPTIONS") {
         return(pipe);
     }
-    return(hash);
 }
 
 sub vcl_backend_response {
