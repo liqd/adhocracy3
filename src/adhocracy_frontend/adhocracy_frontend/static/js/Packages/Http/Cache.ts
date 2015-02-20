@@ -96,6 +96,9 @@ export class Service {
     }
 
     private getOrSetCached(path : string) : IHttpCacheItem {
+        // FIXME: normalize URLs everywhere
+        path = path.replace(/\/*$/, "/");
+
         var cached = this.cache.get(path);
         if (typeof cached === "undefined") {
             var wshandle;
