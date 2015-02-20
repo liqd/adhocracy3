@@ -16,7 +16,7 @@
                 <h1>Non-supported browser!</h1>
                 <p>We're sorry your browser is unsupported. Please either upgrade your Internet Explorer,
                 but we recommend
-                <a href="http://http://chromium.woolyss.com/">Chromium</a> or
+                <a href="http://chromium.woolyss.com/">Chromium</a> or
                 <a href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>.</p>
             </div>
         </div>
