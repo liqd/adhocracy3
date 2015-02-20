@@ -38,7 +38,7 @@ require.config({
         moment: "../lib/moment/min/moment-with-locales.min",
         sticky: "../lib/sticky-kit/jquery.sticky-kit.min",
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
-        adhTemplates: "./templates.min",
+        adhTemplates: "./templates",
         polyfiller: "../lib/webshim/js-webshim/minified/polyfiller"
     },
     shim: {
