@@ -253,6 +253,7 @@ class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
     """Weak strategy adapter for :class:`IAssetDownload`."""
 
     browser_max_age = 60 * 5
+    proxy_max_age = 60 * 60 * 24 * 30 * 12
     etags = (etag_modified, etag_userid, etag_blocked)
 
     def __init__(self, context, request):
