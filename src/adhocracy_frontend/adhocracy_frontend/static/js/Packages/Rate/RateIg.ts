@@ -4,6 +4,8 @@
 
 import modernizr = require("modernizr");
 
+import AdhConfig = require("../Config/Config");
+
 import AdhHttp = require("../Http/Http");
 import AdhMetaApi = require("../Http/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -35,6 +37,7 @@ export var register = (angular, config, meta_api) => {
     describe("[]", () => {
         var adhMetaApi : AdhMetaApi.MetaApiQuery;
         var adhPreliminaryNames : AdhPreliminaryNames.Service;
+        var adhConfig : AdhConfig.IService;
         var adhHttp : AdhHttp.Service<any>;
         var adhCache;
         var adhUser : AdhUser.Service;
@@ -70,6 +73,7 @@ export var register = (angular, config, meta_api) => {
                     $window
                 ) => {
                     return (new AdhUser.Service(
+                        adhConfig,
                         adhHttp,
                         adhCache,
                         $q,

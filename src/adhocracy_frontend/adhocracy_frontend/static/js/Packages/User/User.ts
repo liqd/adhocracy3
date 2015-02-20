@@ -1,5 +1,6 @@
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhCache = require("../Http/Cache");
 
@@ -24,6 +25,7 @@ export class Service {
     public userPath : string;
 
     constructor(
+        private adhConfig : AdhConfig.IService,
         private adhHttp : AdhHttp.Service<any>,
         private adhCache : AdhCache.Service,
         private $q : ng.IQService,
@@ -40,7 +42,11 @@ export class Service {
                 var path = _self.$window.localStorage.getItem("user-path");
                 var token = _self.$window.localStorage.getItem("user-token");
                 if (token && path) {
-                    _self.enableToken(token, path, true);
+                    _self.checkSessionValidity(token, path).then((response) => {
+                        _self.enableToken(token, path);
+                    }, (msg) => {
+                        console.log(msg);
+                    });
                 } else {
                     // $apply is necessary here to trigger a UI
                     // update.  the need for _.defer is explained
@@ -61,15 +67,18 @@ export class Service {
     }
 
     // FIXME: type should be ng.IPromise<void> - probably wrong in DefinitelyTyped
-    private checkSessionValidity() : ng.IPromise<any> {
+    private checkSessionValidity(token : string, userPath : string) : ng.IPromise<any> {
         var deferred = this.$q.defer();
 
-        this.adhHttp.options(this.userPath).then((options) => {
-            if (options.PUT) {
-                deferred.resolve();
-            } else {
-                deferred.reject("Session expired or invalid");
+        this.$http.head(this.adhConfig.rest_url, {
+            headers: {
+                "X-User-Token": token,
+                "X-User-Path": userPath
             }
+        }).then((response) => {
+            deferred.resolve();
+        }, (msg) => {
+            deferred.reject("Session expired or invalid");
         });
 
         return deferred.promise;
@@ -91,7 +100,7 @@ export class Service {
             });
     }
 
-    private enableToken(token : string, userPath : string, checkValidity : boolean = false) : ng.IPromise<void> {
+    private enableToken(token : string, userPath : string) : ng.IPromise<void> {
         var _self : Service = this;
 
         _self.token = token;
@@ -99,17 +108,7 @@ export class Service {
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.$http.defaults.headers.common["X-User-Path"] = userPath;
 
-        if (checkValidity) {
-            return this.checkSessionValidity().then(
-                () => {
-                    _self.loadUser(userPath);
-                },
-                (reason) => {
-                    _self.deleteToken();
-                });
-        } else {
-            return _self.loadUser(userPath);
-        }
+        return _self.loadUser(userPath);
     }
 
     private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
@@ -213,5 +212,5 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName,
         ])
-        .service("adhUser", ["adhHttp", "adhCache", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
+        .service("adhUser", ["adhConfig", "adhHttp", "adhCache", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
 };
