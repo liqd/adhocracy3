@@ -77,7 +77,7 @@
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED": "Bereits bewilligt?",
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED_ANNOTATION": "Wenn du weitere finanzielle Mittel in das Projekt einbringst, sind diese bereits bewilligt?",
     "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES": "Weitere finanzielle Mittel",
-    "TR__MERCATOR_PROPOSAL_GRANTED": "Bereits bewilligt?",
+    "TR__MERCATOR_PROPOSAL_GRANTED": "bewilligt",
     "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL": "Wie hast du von „Advocate Europe“ erfahren?",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_1": "Lade ein Bild, Symbol oder eine Grafik hoch und veranschauliche deine  Idee. Bitte lade nur Bilder hoch, zu denen du die Eigentums- oder Nutzungsrechte hast.",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_2": "Erlaubt sind die Formate {{acceptedFileTypes | join}} (je max. {{maximumByteSize/1000000}} MB). Die Breite darf nicht unter {{minimumWidth}} Pixeln liegen.",

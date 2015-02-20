@@ -86,7 +86,7 @@
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED": "Granted?",
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED_ANNOTATION": "If you are planning to include other sources of funding, are these already granted?",
     "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES": "Other source of income",
-    "TR__MERCATOR_PROPOSAL_GRANTED": "Granted?",
+    "TR__MERCATOR_PROPOSAL_GRANTED": "Granted",
     "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL": "How did you hear about “Advocate Europe”?",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_1": "Upload a photo, icon, or illustration that visually supports or explains your idea. Make sure that you have the property rights to share this picture publically.",
     "TR__MERCATOR_PROPOSAL_IMAGE_ANNOTATION_2": "Image must be of type {{acceptedFileTypes | join}}, no bigger than {{maximumByteSize/1000000}}MB, and not less than {{minimumWidth}}px wide.",
