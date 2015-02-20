@@ -1,0 +1,86 @@
+import AdhEventManager = require("../EventManager/EventManager");
+import AdhWebSocket = require("../WebSocket/WebSocket");
+
+
+export interface ILocalEvent extends AdhWebSocket.IServerEvent {}
+
+
+export class Service {
+    "use strict";
+
+    private messageEventManager : AdhEventManager.EventManager;
+
+    constructor(adhEventManagerClass : typeof AdhEventManager.EventManager) {
+        this.messageEventManager = new adhEventManagerClass();
+    }
+
+    public register(path : string, callback : (msg : ILocalEvent) => void) : number {
+        return this.messageEventManager.on(path, callback);
+    }
+
+    public unregister(path : string, id : number) : void {
+        this.messageEventManager.off(path, id);
+    }
+
+    public trigger(path : string, event : ILocalEvent) : void {
+        this.messageEventManager.trigger(path, event);
+    }
+
+    // event factories
+    public modifiedEvent(resource : string) : ILocalEvent {
+        return {
+            event: "modified",
+            resource: resource
+        };
+    }
+
+    public removedEvent(resource : string) : ILocalEvent {
+        return {
+            event: "removed",
+            resource: resource
+        };
+    }
+
+    public newChildEvent(resource : string, child : string) : ILocalEvent {
+        return {
+            event: "new_child",
+            resource: resource,
+            child: child
+        };
+    }
+
+    public removedChildEvent(resource : string, child : string) : ILocalEvent {
+        return {
+            event: "removed_child",
+            resource: resource,
+            child: child
+        };
+    }
+
+    public modifiedChildEvent(resource : string, child : string) : ILocalEvent {
+        return {
+            event: "modified_child",
+            resource: resource,
+            child: child
+        };
+    }
+
+    public newVersionEvent(resource : string, version : string) : ILocalEvent {
+        return {
+            event: "new_version",
+            resource: resource,
+            version: version
+        };
+    }
+}
+
+
+export var moduleName = "adhLocalSocket";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhEventManager.moduleName
+        ])
+        .service("adhLocalSocket", ["adhEventManagerClass", Service]);
+};
