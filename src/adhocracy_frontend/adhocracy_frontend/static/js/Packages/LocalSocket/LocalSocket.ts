@@ -1,4 +1,5 @@
 import AdhEventManager = require("../EventManager/EventManager");
+import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 
 
@@ -24,6 +25,17 @@ export class Service {
 
     public trigger(path : string, event : ILocalEvent) : void {
         this.messageEventManager.trigger(path, event);
+
+        if (path !== "/") {
+            var parentPath = AdhUtil.parentPath(path);
+
+            if (event.event === "modified") {
+                this.trigger(parentPath, this.modifiedChildEvent(parentPath, path));
+            } else if (event.event === "removed") {
+                this.trigger(parentPath, this.removedChildEvent(parentPath, path));
+            }
+            this.trigger(parentPath, this.changedDescendantEvent(parentPath));
+        }
     }
 
     // event factories
