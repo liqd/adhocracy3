@@ -159,6 +159,38 @@ class TestResourcePropertySheet:
 
         assert appstruct['references'] == [source]
 
+    def test_get_valid_back_references_hidden(self, sheet_meta, context,
+                                              mock_graph,
+                                              mock_node_unique_references):
+        inst = self.make_one(sheet_meta, context)
+        node = mock_node_unique_references
+        node.backref = True
+        inst.schema.children.append(node)
+        source = testing.DummyResource()
+        source.hidden = True
+        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
+        inst.context._graph = mock_graph
+
+        appstruct = inst.get()
+
+        assert appstruct['references'] == []
+
+    def test_get_valid_back_references_deleted(self, sheet_meta, context,
+                                              mock_graph,
+                                              mock_node_unique_references):
+        inst = self.make_one(sheet_meta, context)
+        node = mock_node_unique_references
+        node.backref = True
+        inst.schema.children.append(node)
+        source = testing.DummyResource()
+        source.deleted = True
+        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
+        inst.context._graph = mock_graph
+
+        appstruct = inst.get()
+
+        assert appstruct['references'] == []
+
     def test_set_valid_reference(self, sheet_meta, context, mock_graph,
                                  mock_node_single_reference, registry):
         from adhocracy_core.interfaces import ISheet

@@ -146,9 +146,38 @@ Lets create some content::
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
     ...                               headers=admin_header)
     >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child_item'}}}
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy/pool1",
     ...                               data, headers=contributor_header)
+    >>> proposal_item = resp_data.json['path']
+    >>> proposal_item_first_version = resp_data.json['first_version_path']
+
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_section.ISection',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'section_item'},}
+    ...         }
+    >>> resp_data = testapp.post_json(proposal_item,
+    ...                               data, headers=contributor_header)
+    >>> section_item = resp_data.json["path"]
+    >>> section_item_first_version = resp_data.json["first_version_path"]
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'paragraph_item'},}
+    ...         }
+    >>> resp_data = testapp.post_json(proposal_item,
+    ...                               data, headers=contributor_header)
+    >>> paragraph_item = resp_data.json["path"]
+    >>> paragraph_item_first_version = resp_data.json["first_version_path"]
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...         'data': {
+    ...              'adhocracy_core.sheets.document.ISection': {
+    ...                  'elements': [paragraph_item_first_version]},
+    ...               'adhocracy_core.sheets.versions.IVersionable': {
+    ...                  'follows': [section_item_first_version]
+    ...                  }
+    ...          },
+    ...         }
+    >>> resp_data = testapp.post_json(section_item,
+    ...                               data, headers=contributor_header)
+    >>> section_item_second_version = resp_data.json["path"]
 
 As expected, we can retrieve the pool and its child::
 
@@ -232,3 +261,18 @@ private and cannot be directly queried from the frontend::
     ...     params={'private_visibility': 'hidden'}, status=400).json
     >>> resp_data['errors'][0]['description']
     'No such catalog'
+
+Lets hide an item with referenced item versions:
+
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalItem',
+    ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
+    ...                      {'hidden': True}}}
+    >>> resp_data = testapp.put_json(section_item, data, headers=manager_header)
+    >>> resp_data.status
+    '200 OK'
+
+Now the hidden item versions are removed from  backreference listings:
+
+    >>> resp_data = testapp.get(paragraph_item_first_version)
+    >>> resp_data.json['data']['adhocracy_core.sheets.document.IParagraph']['elements_backrefs']
+    []
