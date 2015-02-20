@@ -2,6 +2,7 @@
 
 from itertools import chain
 from logging import getLogger
+from collections import Iterable
 
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
@@ -17,6 +18,8 @@ from zope.interface import implementer
 import colander
 
 from adhocracy_core.utils import find_graph
+from adhocracy_core.utils import is_hidden
+from adhocracy_core.utils import is_deleted
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
@@ -140,14 +143,21 @@ class AnnotationStorageSheet(PropertySheet):
     def _get_back_reference_appstruct(self, params: dict={}) -> dict:
         for key, node in self._back_reference_nodes.items():
             node_backrefs = self._get_backrefs(node)
-            if not node_backrefs:
+            if not isinstance(node_backrefs, Iterable):  # ease testing
                 continue
+            visible_node_backrefs = []
+            for resource in node_backrefs:
+                if is_deleted(resource):
+                    continue
+                if is_hidden(resource):
+                    continue
+                visible_node_backrefs.append(resource)
             if isinstance(node, Reference):
-                yield(key, node_backrefs[0])
+                yield(key, visible_node_backrefs[0])
             else:
-                yield(key, node_backrefs)
+                yield(key, visible_node_backrefs)
 
-    def _get_backrefs(self, node: Reference) -> dict:
+    def _get_backrefs(self, node: Reference) -> Iterable:
         """Return backreference data.
 
         This might be overridden in subclasses.

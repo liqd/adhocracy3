@@ -191,6 +191,7 @@ class TestPrincipalsService:
         user = registry.content.create(IUser.__identifier__,
                                        parent=users_pool,
                                        appstructs=appstructs)
+        user.activate()
         group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
         assert groups_pool['Group1'] is group
         assert group_sheet.get()['users'] == [user]

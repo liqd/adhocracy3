@@ -107,9 +107,12 @@ class ParagraphSchema(colander.MappingSchema):
     """Section sheet data structure.
 
     `content`:  Text
+    `elements_backrefs`: sections referencing this paragraph
     """
 
     content = Text()
+    elements_backrefs = UniqueReferences(reftype=SectionElementsReference,
+                                         backref=True)
 
 
 paragraph_meta = sheet_metadata_defaults._replace(isheet=IParagraph,

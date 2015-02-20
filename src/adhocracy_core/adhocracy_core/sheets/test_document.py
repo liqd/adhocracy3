@@ -51,7 +51,8 @@ class TestParagraphSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'content': ''}
+        assert inst.get() == {'content': '',
+                              'elements_backrefs': []}
 
 
 def test_includeme_register_paragraph_sheet(config):

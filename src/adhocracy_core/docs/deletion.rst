@@ -113,7 +113,7 @@ Notes:
   (or undeleted etc.), a "modified" event is sent to subscribers of that
   resource and a "modified_child" event is sent to subscribers of the parent
   pool. FIXME At same point in the future, we might want to change that and
-  send "removed"/"removed_child" messages instead.
+  send "removed"/"removed_item" messages instead.
 
 
 A Censorship Example
@@ -134,47 +134,79 @@ First, lets import the needed stuff and start the Adhocracy testapp::
 Lets create some content::
 
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-    ...        'data': {'adhocracy_core.sheets.name.IName': {'name':  'GoodProposal'}}}
+    ...        'data': {'adhocracy_core.sheets.name.IName': {'name':  'pool2'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
     ...                               headers=admin_header)
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-    ...        'data': {'adhocracy_core.sheets.name.IName': {'name': 'BadProposal'}}}
+    ...        'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
+    >>> resp_data = testapp.post_json(rest_url + "/adhocracy/pool2", data,
+    ...                               headers=admin_header)
+    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...        'data': {'adhocracy_core.sheets.name.IName': {'name': 'pool1'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
     ...                               headers=admin_header)
     >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kommunismus'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/adhocracy/BadProposal",
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}}
+    >>> resp_data = testapp.post_json(rest_url + "/adhocracy/pool1",
     ...                               data, headers=contributor_header)
+    >>> proposal_item = resp_data.json['path']
+    >>> proposal_item_first_version = resp_data.json['first_version_path']
 
-As expected, we can retrieve the BadProposal and its child::
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_section.ISection',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'section_item'},}
+    ...         }
+    >>> resp_data = testapp.post_json(proposal_item,
+    ...                               data, headers=contributor_header)
+    >>> section_item = resp_data.json["path"]
+    >>> section_item_first_version = resp_data.json["first_version_path"]
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'paragraph_item'},}
+    ...         }
+    >>> resp_data = testapp.post_json(proposal_item,
+    ...                               data, headers=contributor_header)
+    >>> paragraph_item = resp_data.json["path"]
+    >>> paragraph_item_first_version = resp_data.json["first_version_path"]
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...         'data': {
+    ...              'adhocracy_core.sheets.document.ISection': {
+    ...                  'elements': [paragraph_item_first_version]},
+    ...               'adhocracy_core.sheets.versions.IVersionable': {
+    ...                  'follows': [section_item_first_version]
+    ...                  }
+    ...          },
+    ...         }
+    >>> resp_data = testapp.post_json(section_item,
+    ...                               data, headers=contributor_header)
+    >>> section_item_second_version = resp_data.json["path"]
 
-    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal").json
+As expected, we can retrieve the pool and its child::
+
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/pool2").json
     >>> 'data' in resp_data
     True
-    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal/kommunismus").json
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/pool2/child").json
     >>> 'data' in resp_data
     True
 
-Both proposals show up in the pool::
+Both pools show up in the pool sheet::
 
     >>> resp_data = testapp.get(rest_url + "/adhocracy").json
     >>> pprint(sorted(resp_data['data']['adhocracy_core.sheets.pool.IPool']
     ...                        ['elements']))
-    ['.../adhocracy/BadProposal/',
-     '.../adhocracy/GoodProposal/']
+    ['.../adhocracy/pool1/', '.../adhocracy/pool2/']
 
-Lets check whether we have the permission to delete or hide the proposal.
+Lets check whether we have the permission to delete or hide the pool.
 The person who has created a resource (creator role) has the right to delete
 it::
 
-    >>> resp_data = testapp.options(rest_url + "/adhocracy/BadProposal",
+    >>> resp_data = testapp.options(rest_url + "/adhocracy/pool2",
     ...                             headers=admin_header).json
     >>> resp_data['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata']
     {'deleted': ''}
 
 But they cannot hide it -- that special right is reserved to managers::
 
-    >>> resp_data = testapp.options(rest_url + "/adhocracy/BadProposal",
+    >>> resp_data = testapp.options(rest_url + "/adhocracy/pool2",
     ...                             headers=manager_header).json
     >>> sorted(resp_data['PUT']['request_body']['data']
     ...                 ['adhocracy_core.sheets.metadata.IMetadata'])
@@ -188,17 +220,17 @@ that PUTting a new value for this field is allowed. Once more, the
 corresponding value is just a stub (the empty string) and doesn't have any
 meaning.
 
-Lets hide the bad proposal::
+Lets hide pool2::
 
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
     ...                      {'hidden': True}}}
-    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/BadProposal", data,
+    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/pool2", data,
     ...                              headers=manager_header)
 
-Now we get an error message when trying to retrieve the BadProposal::
+Now we get an error message when trying to retrieve the pool2::
 
-    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal",
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/pool2",
     ...                         status=410).json
     >>> resp_data['reason']
     'hidden'
@@ -208,18 +240,18 @@ Now we get an error message when trying to retrieve the BadProposal::
     True
 
 Nested resources inherit the deleted/hidden flag from their ancestors. Hence
-the child of the BadProposal is now hidden too::
+the child of the pool2 is now hidden too::
 
-    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal/kommunismus",
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/pool2/child",
     ...                        status=410).json
     >>> resp_data['reason']
     'hidden'
 
-Only the GoodProposal is still visible in the pool::
+Only the pool1 is still visible in the pool::
 
     >>> resp_data = testapp.get(rest_url + "/adhocracy").json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['.../adhocracy/GoodProposal/']
+    ['.../adhocracy/pool1/']
 
 Sanity check: internally, the backend uses a *private_visibility* index to keep
 track of the visibility/deletion status of resources. But this filter is
@@ -229,3 +261,18 @@ private and cannot be directly queried from the frontend::
     ...     params={'private_visibility': 'hidden'}, status=400).json
     >>> resp_data['errors'][0]['description']
     'No such catalog'
+
+Lets hide an item with referenced item versions:
+
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalItem',
+    ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
+    ...                      {'hidden': True}}}
+    >>> resp_data = testapp.put_json(section_item, data, headers=manager_header)
+    >>> resp_data.status
+    '200 OK'
+
+Now the hidden item versions are removed from  backreference listings:
+
+    >>> resp_data = testapp.get(paragraph_item_first_version)
+    >>> resp_data.json['data']['adhocracy_core.sheets.document.IParagraph']['elements_backrefs']
+    []
