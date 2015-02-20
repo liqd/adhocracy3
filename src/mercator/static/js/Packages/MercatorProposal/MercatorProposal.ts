@@ -63,6 +63,7 @@ import SIMercatorSteps = require("../../Resources_/adhocracy_mercator/sheets/mer
 import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mercator/IStory");
 import SIMercatorSubResources = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMercatorSubResources");
 import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
+import SIMercatorTitle = require("../../Resources_/adhocracy_mercator/sheets/mercator/ITitle");
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
@@ -77,6 +78,10 @@ export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
     supporterCount : number;
+
+    title : {
+        title : string;
+    }
 
     // 1. basic
     user_info : {
@@ -100,7 +105,6 @@ export interface IScopeData {
 
     // 2. introduction
     introduction : {
-        title : string;
         teaser : string;
         picture : string;
         commentCount : number;
@@ -332,6 +336,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var data = scope.data;
 
         data.user_info = data.user_info || <any>{};
+        data.title = data.title || <any>{};
         data.organization_info = data.organization_info || <any>{};
         data.introduction = data.introduction || <any>{};
         data.description = data.description || <any>{};
@@ -365,6 +370,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
         data.user_info.createtime = mercatorProposalVersion.data[SIMetaData.nick].item_creation_date;
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
+        data.title = mercatorProposalVersion.data[SIMercatorTitle.nick].title;
+
 
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
         if (typeof heardFrom !== "undefined") {
@@ -425,8 +432,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     case RIMercatorIntroductionVersion.content_type: (() => {
                         var scope = data.introduction;
                         var res : SIMercatorIntroduction.Sheet = subResource.data[SIMercatorIntroduction.nick];
-
-                        scope.title = res.title;
                         scope.teaser = res.teaser;
                         scope.picture = res.picture;
                         scope.commentCount = subResource.data[SICommentable.nick].comments.length;
@@ -519,6 +524,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     }
 
     private fill(data, resource) : void {
+
         switch (resource.content_type) {
             case RIMercatorOrganizationInfoVersion.content_type:
                 resource.data[SIMercatorOrganizationInfo.nick] = new SIMercatorOrganizationInfo.Sheet({
@@ -533,7 +539,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 break;
             case RIMercatorIntroductionVersion.content_type:
                 resource.data[SIMercatorIntroduction.nick] = new SIMercatorIntroduction.Sheet({
-                    title: data.introduction.title,
                     teaser: data.introduction.teaser,
                     picture: data.introduction.picture
                 });
@@ -597,6 +602,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     family_name: data.user_info.last_name,
                     country: data.user_info.country
                 });
+                resource.data[SIMercatorTitle.nick] = new SIMercatorTitle.Sheet({
+                    title: data.title
+                });
                 if (typeof data.heard_from !== "undefined") {
                     resource.data[SIMercatorHeardFrom.nick] = new SIMercatorHeardFrom.Sheet({
                         heard_from_colleague: data.heard_from.colleague,
@@ -609,6 +617,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 resource.data[SIMercatorSubResources.nick] = new SIMercatorSubResources.Sheet(<any>{});
                 break;
         }
+
     }
 
     private cleanOrganizationInfo(data) : void {
@@ -629,6 +638,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
+
         var data : IScopeData = this.initializeScope(instance.scope);
 
         var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
@@ -641,7 +651,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
             mercatorProposal.parent = instance.scope.poolPath;
             mercatorProposal.data[SIName.nick] = new SIName.Sheet({
-                name: AdhUtil.normalizeName(data.introduction.title + data.introduction.nickInstance)
+                name: AdhUtil.normalizeName(data.title + <any>data.introduction.nickInstance)
             });
 
             var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
@@ -714,6 +724,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
             var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
             mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
+
             this.fill(data, mercatorProposalVersion);
 
             this.cleanOrganizationInfo(data);
@@ -865,10 +876,12 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                     country: proposal.data[SIMetaData.nick].item_creation_date,
                     path: proposal.data[SIMetaData.nick].creator
                 };
+                scope.data.title = {
+                    title: proposal.data[SIMercatorTitle.nick].title
+                };
                 adhHttp.get(proposal.data[SIMercatorSubResources.nick].introduction).then((introduction) => {
                     scope.data.introduction = {
-                        picture: introduction.data[SIMercatorIntroduction.nick].picture,
-                        title: introduction.data[SIMercatorIntroduction.nick].title
+                        picture: introduction.data[SIMercatorIntroduction.nick].picture
                     };
                 });
                 adhHttp.get(proposal.data[SIMercatorSubResources.nick].organization_info).then((organization_info) => {

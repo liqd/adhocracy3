@@ -16,6 +16,12 @@ def integration(config):
 @mark.usefixtures('integration')
 class TestIncludeme:
 
+    def test_includeme_register_title_sheet(self, config):
+        from adhocracy_mercator.sheets.mercator import ITitle
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=ITitle)
+        assert get_sheet(context, ITitle)
+
     def test_includeme_register_userinfo_sheet(self, config):
         from adhocracy_mercator.sheets.mercator import IUserInfo
         from adhocracy_core.utils import get_sheet
@@ -87,6 +93,35 @@ class TestIncludeme:
         from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=IHeardFrom)
         assert get_sheet(context, IHeardFrom)
+
+
+class TestTitleSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_mercator.sheets.mercator import title_meta
+        return title_meta
+
+    @fixture
+    def context(self):
+        from adhocracy_core.interfaces import IItem
+        return testing.DummyResource(__provides__=IItem)
+
+    def test_create_valid(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
+        from adhocracy_mercator.sheets.mercator import ITitle
+        from adhocracy_mercator.sheets.mercator import TitleSchema
+        inst = meta.sheet_class(meta, context)
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+        assert inst.meta.isheet == ITitle
+        assert inst.meta.schema_class == TitleSchema
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        wanted = {'title': ''}
+        assert inst.get() == wanted
 
 
 class TestUserInfoSheet:
@@ -244,7 +279,7 @@ class TestIntroductionSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        wanted = {'picture': '', 'teaser': '', 'title': ''}
+        wanted = {'picture': '', 'teaser': ''}
         assert inst.get() == wanted
 
 

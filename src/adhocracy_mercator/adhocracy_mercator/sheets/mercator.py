@@ -27,6 +27,11 @@ class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for commentable subresources of MercatorProposal."""
 
 
+class ITitle(ISheet, ISheetReferenceAutoUpdateMarker):
+
+    """Marker interface for the proposal title."""
+
+
 class IUserInfo(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for information about the proposal submitter."""
@@ -90,6 +95,17 @@ class IExperience(ISheet, ISheetReferenceAutoUpdateMarker):
 class IHeardFrom(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for heard from fields."""
+
+
+class TitleSchema(colander.MappingSchema):
+
+    """Data structure for the proposal title."""
+
+    title = SingleLine(validator=colander.Length(min=1, max=100))
+
+
+title_meta = sheet_metadata_defaults._replace(isheet=ITitle,
+                                              schema_class=TitleSchema)
 
 
 class UserInfoSchema(colander.MappingSchema):
@@ -285,7 +301,6 @@ class IntroductionSchema(colander.MappingSchema):
 
     """Data structure for the proposal introduction."""
 
-    title = SingleLine(validator=colander.Length(min=1, max=100))
     teaser = Text(validator=colander.Length(min=1, max=300))
     picture = Reference(reftype=IntroImageReference)
 
@@ -466,6 +481,7 @@ heardfrom_meta = sheet_metadata_defaults._replace(
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(mercator_sub_resources_meta, config.registry)
+    add_sheet_to_registry(title_meta, config.registry)
     add_sheet_to_registry(userinfo_meta, config.registry)
     add_sheet_to_registry(organizationinfo_meta, config.registry)
     add_sheet_to_registry(introduction_meta, config.registry)
