@@ -12,6 +12,7 @@ export var register = () => {
     describe("User", () => {
         describe("Service", () => {
             var adhUser;
+            var adhConfigMock;
             var adhHttpMock;
             var adhCacheMock;
             var httpMock;
@@ -20,6 +21,10 @@ export var register = () => {
             var elementMock;
             var angularMock;
             var modernizrMock;
+
+            adhConfigMock = {
+                rest_url: "mock"
+            };
 
             beforeEach(() => {
                 adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post", "postRaw"]);
@@ -36,12 +41,13 @@ export var register = () => {
                     memoize: (path, subkey, closure) => closure()
                 };
 
-                httpMock = <any>jasmine.createSpyObj("httpMock", ["post"]);
+                httpMock = <any>jasmine.createSpyObj("httpMock", ["head", "post"]);
                 httpMock.defaults = {
                     headers: {
                         common: {}
                     }
                 };
+                httpMock.head.and.returnValue(q.when({data: {}}));
                 httpMock.post.and.returnValue(q.when({data: {}}));
 
                 rootScopeMock = jasmine.createSpyObj("rootScope", ["$apply"]);
@@ -60,7 +66,7 @@ export var register = () => {
                 };
 
                 adhUser = new AdhUser.Service(
-                    adhHttpMock, adhCacheMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+                    adhConfigMock, adhHttpMock, adhCacheMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {
@@ -82,7 +88,9 @@ export var register = () => {
                 it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", () => {
                     windowMock.localStorage.getItem.and.returnValue("huhu");
                     fn();
-                    expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu", true);
+                    _.defer(() => {
+                        expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
+                    });
                 });
 
                 it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", (done) => {
