@@ -23,8 +23,8 @@ export interface IRawWebSocket {
 
 
 export interface IServerEvent {
-    event? : string;
-    resource? : string;
+    event : string;
+    resource : string;
     child? : string;
     version? : string;
 }
@@ -37,19 +37,16 @@ interface IRequest {
 
 
 interface IResponseOk {
-    status? : string;
-    action? : string;
-    resource? : string;
+    status : string;
+    action : string;
+    resource : string;
 }
 
 
 interface IResponseError {
-    error? : string;
-    details? : string;
+    error : string;
+    details : string;
 }
-
-
-interface IServerMessage extends IResponseOk, IResponseError, IServerEvent {};
 
 
 /**
@@ -146,10 +143,11 @@ export class Service {
     }
 
     private onmessage(event) : void {
-        var msg : IServerMessage = JSON.parse(event.data);
+        var msg : IResponseOk | IResponseError | IServerEvent = JSON.parse(event.data);
 
         if (msg.hasOwnProperty("event")) {
-            this.messageEventManager.trigger(msg.resource, <IServerEvent>msg);
+            var serverEvent = <IServerEvent>msg;
+            this.messageEventManager.trigger(serverEvent.resource, serverEvent);
         } else if (msg.hasOwnProperty("error")) {
             this.handleErrorResponse(<IResponseError>msg);
         }
