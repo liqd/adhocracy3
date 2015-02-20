@@ -157,7 +157,7 @@ that has been subscribed.
     must be re-rendered.)
 
   * If anything that lies below the pool (children, grandchildren etc.) has
-    been added, removed, or modified:
+    been added, removed, or modified::
 
         { "event": "changed_descendant", "resource": "RESOURCE_PATH" }
 
