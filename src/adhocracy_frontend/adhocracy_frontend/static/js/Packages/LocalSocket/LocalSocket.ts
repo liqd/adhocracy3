@@ -65,6 +65,13 @@ export class Service {
         };
     }
 
+    public changedDescendantEvent(resource : string) : ILocalEvent {
+        return {
+            event: "changed_descendant",
+            resource: resource
+        };
+    }
+
     public newVersionEvent(resource : string, version : string) : ILocalEvent {
         return {
             event: "new_version",
