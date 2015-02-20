@@ -6,6 +6,15 @@ import AdhWebSocket = require("../WebSocket/WebSocket");
 export interface ILocalEvent extends AdhWebSocket.IServerEvent {}
 
 
+/**
+ * The LocalSocket Service is mostly compatible to the WebSocket Service.
+ * The key difference is that not client-server communication takes place.
+ * This means that you will only receive events that originate from the
+ * local client.  In many cases this is desired because we do not want the
+ * UI to change all the time but we do want it to update on user interaction.
+ *
+ * FIXME: Currewntly, very few events are actually triggered.
+ */
 export class Service {
     "use strict";
 
