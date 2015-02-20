@@ -63,6 +63,23 @@ the transifex-client can be used::
 
       pip install --user transifex-client
 
+.. WARNING:: Transifiex requires us to specify a "source language"
+   (currently english). This has the benefit that translators do not
+   need to handle technical strings. But it also has several
+   disadvantages:
+
+   -  The source language can not be translated on transifex.
+
+   -  All translations will be lost when the string in the source
+      language is changed.
+
+   -  Downloaded translation files will contain all keys. Any key
+      that does not have a translation will have the translation from
+      the source language as a value.
+
+   An alternative could be to have a fake source language that simply
+   has the technical strings themselves as translations and an exotic
+   locale.
 
 Missing Features
 ----------------
