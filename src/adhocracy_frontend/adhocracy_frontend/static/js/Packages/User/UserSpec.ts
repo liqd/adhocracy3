@@ -85,11 +85,12 @@ export var register = () => {
                     fn = <any>args[1];
                 });
 
-                it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", () => {
+                it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", (done) => {
                     windowMock.localStorage.getItem.and.returnValue("huhu");
                     fn();
                     _.defer(() => {
                         expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
+                        done();
                     });
                 });
 
