@@ -63,8 +63,8 @@ class TestMercatorFilter(object):
 
 def is_filtered(browser, proposals, location=None, budget=None):
     try:
-        introduction_sheet = 'adhocracy_mercator.sheets.mercator.IIntroduction'
-        title = lambda p: p[20]['body']['data'][introduction_sheet]['title']
+        title_sheet = 'adhocracy_mercator.sheets.mercator.ITitle'
+        title = lambda p: p[23]['body']['data'][title_sheet]['title']
         expected_titles = [title(p) for p in proposals
             if _verify_location(location, p) and
             _verify_budget(budget, p)]

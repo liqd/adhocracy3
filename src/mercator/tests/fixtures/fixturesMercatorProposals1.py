@@ -708,7 +708,6 @@ def _create_proposal():
                     "data": {
                         "adhocracy_mercator.sheets.mercator.IIntroduction": {
                             "teaser": get_random_string(300, whitespace=True),
-                            "title": name
                         },
                         "adhocracy_core.sheets.versions.IVersionable": {
                             "follows": [
@@ -770,6 +769,9 @@ def _create_proposal():
                 "body": {
                     "parent": "@pn31",
                     "data": {
+                        "adhocracy_mercator.sheets.mercator.ITitle": {
+                            "title": name
+                        },
                         "adhocracy_mercator.sheets.mercator.IHeardFrom": {
                             "heard_from_colleague": true,
                             "heard_elsewhere": "i'm not telling"

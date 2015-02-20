@@ -19,7 +19,7 @@ var MercatorProposalFormPage = function() {
     this.organizationInfoName = this.form.element(by.model("data.organization_info.name"));
     this.organizationInfoCountry = this.form.element(by.model("data.organization_info.country"));
     this.organizationInfoWebsite = this.form.element(by.model("data.organization_info.website"));
-    this.introductionTitle = this.form.element(by.model("data.introduction.title"));
+    this.title = this.form.element(by.model("data.title"));
     this.introductionTeaser = this.form.element(by.model("data.introduction.teaser"));
     this.descriptionDescription = this.form.element(by.model("data.description.description"));
     this.locationLocationIsSpecific = this.form.element(by.model("data.location.location_is_specific"));
@@ -55,7 +55,7 @@ var MercatorProposalFormPage = function() {
         this.organizationInfoName.sendKeys("organization name");
         this.organizationInfoCountry.element(by.cssContainingText("option", "Chile")).click();
         this.organizationInfoWebsite.sendKeys("http://example.org");
-        this.introductionTitle.sendKeys("protitle");
+        this.title.sendKeys("protitle");
         this.introductionTeaser.sendKeys("proteaser");
         this.setImage("./proposalImageValid.png");
         this.descriptionDescription.sendKeys("prodescription");
