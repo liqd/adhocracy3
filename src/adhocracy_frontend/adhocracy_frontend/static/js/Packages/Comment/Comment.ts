@@ -180,6 +180,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                 };
                 this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
                 this.adhPermissions.bindScope(scope, AdhUtil.parentPath(scope.data.path), "commentItemOptions");
+                this.adhPermissions.bindScope(scope, scope.data.path, "versionOptions");
             });
     }
 
