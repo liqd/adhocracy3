@@ -184,7 +184,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         // that is not possible.
                         $scope.update(true).then(() => {
                             try {
-                                $scope.wshandle = adhWebSocket.register($scope.poolPath, $scope.update);
+                                $scope.wshandle = adhWebSocket.register($scope.poolPath, () => $scope.update());
                             } catch (e) {
                                 console.log(e);
                                 console.log("Will continue on resource " + $scope.poolPath + " without server bind.");
