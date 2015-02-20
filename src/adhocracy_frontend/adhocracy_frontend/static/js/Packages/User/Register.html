@@ -50,7 +50,7 @@
         </span>
         <div class="register-check">
             <input type="checkbox" name="registerCheck" data-ng-model="input.registerCheck" required="required">
-            {{ "TR__I_ACCEPT_TERMS_AND_CONDITIONS" | translate }}
+            {{ "TR__I_ACCEPT_THE" | translate }} <a href="{{ termsUrl }}" target="_blank">{{ "TR__TERMS_AND_CONDITIONS" | translate }}</a>
         </div>
         <span class="input-error" data-ng-show="registerForm.registerCheck.$error.required && (registerForm.registerCheck.$dirty || registerForm.$submitted)">
             {{ "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS" | translate }}

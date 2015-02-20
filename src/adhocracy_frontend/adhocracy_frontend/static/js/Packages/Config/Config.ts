@@ -23,4 +23,5 @@ export interface IService {
     cachebust : boolean;
     cachebust_suffix : string;
     debug : boolean;
+    terms_url : string;
 }
