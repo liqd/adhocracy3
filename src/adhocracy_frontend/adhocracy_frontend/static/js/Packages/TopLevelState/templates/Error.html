@@ -1,1 +1,4 @@
-<h1>{{code}} - {{message | translate}}</h1>
+<div class="error-page error-page-{{code}}" data-ng-switch="code">
+    <img data-ng-switch-when="404" src="/static/images/404.png" alt="{{code}} - {{message | translate}}" />
+    <h1 data-ng-switch-default>{{code}} - {{message | translate}}</h1>
+</div>

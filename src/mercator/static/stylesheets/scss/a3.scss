@@ -4,6 +4,7 @@
 
 @import "compass/css3";
 @import "compass/css3/inline-block";
+@import "compass/typography/text/replacement";
 @import "compass/utilities/general/clearfix";
 @import "general/future";
 @import "general/a11y";
@@ -46,6 +47,7 @@
 @import "components/facets";
 @import "components/unsupported_browser";
 @import "components/busy";
+@import "components/error_pages";
 
 @import "third_party/social_share";
 
