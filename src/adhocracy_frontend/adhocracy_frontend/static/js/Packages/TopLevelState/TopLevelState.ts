@@ -308,11 +308,22 @@ export class Service {
     private fillRoutingError(error : number) : IRoutingError;
     private fillRoutingError(error : string) : IRoutingError;
     private fillRoutingError(error) {
+        var messages = {
+            "400": "TR__ERROR_HTTP_BAD_REQUEST",
+            "403": "TR__ERROR_HTTP_FORBIDDEN",
+            "404": "TR__ERROR_HTTP_NOT_FOUND",
+            "410": "TR__ERROR_HTTP_GONE"
+        };
+
         if (error.hasOwnProperty("code")) {
+            if (!error.hasOwnProperty("message")) {
+                error.message = messages[error.code.toString()];
+            }
             return error;
         } else if (typeof error === "number") {
             return {
-                code: error
+                code: error,
+                message: messages[error.toString()]
             };
         } else {
             return {
