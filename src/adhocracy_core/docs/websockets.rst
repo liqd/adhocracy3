@@ -157,9 +157,9 @@ that has been subscribed.
     must be re-rendered.)
 
   * If anything that lies below the pool (children, grandchildren etc.) has
-    been added, removed, or modified:
+    been added, removed, or modified::
 
-        { "event": "changed_descendant", "resource": "RESOURCE_PATH" }
+        { "event": "changed_descendants", "resource": "RESOURCE_PATH" }
 
     This event is sent only once per transaction and pool, even if multiple
     of its descendants have been modified. It tells the frontend that any
