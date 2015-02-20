@@ -191,7 +191,8 @@ export class ProposalVersionNew {
                     var pv = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
                     pv.data[SIParagraph.nick] =
                         new SIParagraph.Sheet({
-                            content: ""
+                            content: "",
+                            elements_backrefs: []
                         });
                     $scope.paragraphVersions.push(pv);
                 };
