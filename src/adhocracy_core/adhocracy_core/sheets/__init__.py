@@ -2,6 +2,7 @@
 
 from itertools import chain
 from logging import getLogger
+from collections import Iterable
 
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
@@ -147,7 +148,7 @@ class AnnotationStorageSheet(PropertySheet):
             else:
                 yield(key, node_backrefs)
 
-    def _get_backrefs(self, node: Reference) -> dict:
+    def _get_backrefs(self, node: Reference) -> Iterable:
         """Return backreference data.
 
         This might be overridden in subclasses.
