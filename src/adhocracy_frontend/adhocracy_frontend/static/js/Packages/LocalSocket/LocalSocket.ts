@@ -43,7 +43,7 @@ export class Service {
             } else if (event.event === "removed") {
                 this.trigger(parentPath, this.removedChildEvent(parentPath, path));
             }
-            this.trigger(parentPath, this.changedDescendantEvent(parentPath));
+            this.trigger(parentPath, this.changedDescendantsEvent(parentPath));
         }
     }
 
@@ -86,9 +86,9 @@ export class Service {
         };
     }
 
-    public changedDescendantEvent(resource : string) : ILocalEvent {
+    public changedDescendantsEvent(resource : string) : ILocalEvent {
         return {
-            event: "changed_descendant",
+            event: "changed_descendants",
             resource: resource
         };
     }
