@@ -60,10 +60,15 @@ export class Service {
                 var session = JSON.parse(sessionValue);
                 var path = session["user-path"];
                 var token = session["user-token"];
-                _self.checkSessionValidity(token, path).then((response) => {
+                this.$http.head(this.adhConfig.rest_url, {
+                    headers: {
+                        "X-User-Token": token,
+                        "X-User-Path": path
+                    }
+                }).then((response) => {
                     _self.enableToken(token, path);
                 }, (msg) => {
-                    console.log(msg);
+                    console.log("Expired or invalid session deleted");
                     _self.deleteToken();
                 });
             } catch (e) {
@@ -78,24 +83,6 @@ export class Service {
                 _self.deleteToken();
             }));
         }
-    }
-
-    // FIXME: type should be ng.IPromise<void> - probably wrong in DefinitelyTyped
-    private checkSessionValidity(token : string, userPath : string) : ng.IPromise<any> {
-        var deferred = this.$q.defer();
-
-        this.$http.head(this.adhConfig.rest_url, {
-            headers: {
-                "X-User-Token": token,
-                "X-User-Path": userPath
-            }
-        }).then((response) => {
-            deferred.resolve();
-        }, (msg) => {
-            deferred.reject("Session expired or invalid");
-        });
-
-        return deferred.promise;
     }
 
     private loadUser(userPath) {
