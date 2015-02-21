@@ -145,7 +145,8 @@ def send_registration_mail(context: IUser,
     site_name = registry.settings.get('adhocracy.site_name', 'Adhocracy')
     frontend_url = registry.settings.get('adhocracy.frontend_url',
                                          'http://localhost:6551')
-    subject = '%s account verification' % site_name
+    subject = ('%s: Account Verification / Aktivierung Deines Nutzerkontos'
+               % site_name)
 
     args = {
         'activation_path': activation_path,
