@@ -81,7 +81,6 @@ def root_view(request):
     """Return the embeddee HTML."""
     debug = config_view(request)['debug']
     css_path = 'stylesheets/a3.css' if debug else 'stylesheets/min/a3.css'
-    query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/root.html.mako',
         {'css': [request.cachebusted_url('adhocracy_frontend:build/'
@@ -95,10 +94,8 @@ def root_view(request):
                 request.cachebusted_url('adhocracy_frontend:build/'
                                         'lib/jquery/dist/jquery.min.js'),
                 ],
-         'meta_api': '/static/meta_api.json%s' % (
-             '?' + query_params if query_params else ''),
-         'config': '/config.json%s' % (
-             '?' + query_params if query_params else ''),
+         'meta_api': '/static/meta_api.json',
+         'config': '/config.json',
          },
         request=request)
     response = Response(result)
