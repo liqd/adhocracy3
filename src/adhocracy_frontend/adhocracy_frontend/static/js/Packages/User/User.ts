@@ -47,9 +47,11 @@ export class Service {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
-            var path = _self.$window.localStorage.getItem("user-path");
-            var token = _self.$window.localStorage.getItem("user-token");
-            if (token && path) {
+            var sessionJson = _self.$window.localStorage.getItem("user-session");
+            if (sessionJson) {
+                var session = JSON.parse(sessionJson);
+                var path = session["user-path"];
+                var token = session["user-token"];
                 _self.checkSessionValidity(token, path).then((response) => {
                     _self.enableToken(token, path);
                 }, (msg) => {
@@ -117,8 +119,10 @@ export class Service {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
-            _self.$window.localStorage.setItem("user-token", token);
-            _self.$window.localStorage.setItem("user-path", userPath);
+            _self.$window.localStorage.setItem("user-session", JSON.stringify({
+                "user-path": userPath,
+                "user-token": token
+            }));
         } else {
             console.log("session could not be persisted");
         }
@@ -130,8 +134,7 @@ export class Service {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
-            _self.$window.localStorage.removeItem("user-token");
-            _self.$window.localStorage.removeItem("user-path");
+            _self.$window.localStorage.removeItem("user-session");
         }
         delete _self.$http.defaults.headers.common["X-User-Token"];
         delete _self.$http.defaults.headers.common["X-User-Path"];
