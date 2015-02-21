@@ -56,15 +56,20 @@ export class Service {
         var _self : Service = this;
 
         if (sessionValue) {
-            var session = JSON.parse(sessionValue);
-            var path = session["user-path"];
-            var token = session["user-token"];
-            _self.checkSessionValidity(token, path).then((response) => {
-                _self.enableToken(token, path);
-            }, (msg) => {
-                console.log(msg);
+            try {
+                var session = JSON.parse(sessionValue);
+                var path = session["user-path"];
+                var token = session["user-token"];
+                _self.checkSessionValidity(token, path).then((response) => {
+                    _self.enableToken(token, path);
+                }, (msg) => {
+                    console.log(msg);
+                    _self.deleteToken();
+                });
+            } catch (e) {
+                console.log("Invalid session deleted");
                 _self.deleteToken();
-            });
+            }
         } else {
             // $apply is necessary here to trigger a UI
             // update.  the need for _.defer is explained
