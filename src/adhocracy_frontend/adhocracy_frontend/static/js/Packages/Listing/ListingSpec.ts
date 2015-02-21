@@ -211,7 +211,11 @@ export var register = () => {
                             scope.poolPath = "pool/path";
                             callback("new/path");
                             updatePromise.then.calls.mostRecent().args[0]();
-                            expect(adhWebSocketMock.register).toHaveBeenCalledWith("pool/path", scope.update);
+                            var wsArgs = adhWebSocketMock.register.calls.mostRecent().args;
+                            expect(wsArgs[0]).toEqual("pool/path");
+                            var updateCallCount = scope.update.calls.count();
+                            wsArgs[1]();
+                            expect(scope.update.calls.count()).toEqual(updateCallCount + 1);
                         });
 
                         it("calls scope.update on new path", () => {
