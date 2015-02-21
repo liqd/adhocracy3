@@ -38,7 +38,7 @@ export class Service {
         private DSCacheFactory
     ) {
         this.setupCache(DSCacheFactory, adhWebSocket);
-        this.nonResourceUrls = _.map(AdhHttp.nonResourcePaths, (path) => adhConfig.rest_url + "/" + path);
+        this.nonResourceUrls = _.map(AdhHttp.nonResourcePaths, (path) => adhConfig.rest_url + "/" + path + "/");
     }
 
     private setupCache(DSCacheFactory, adhWebSocket : AdhWebSocket.Service) : void {
@@ -96,6 +96,9 @@ export class Service {
     }
 
     private getOrSetCached(path : string) : IHttpCacheItem {
+        // FIXME: normalize URLs everywhere
+        path = path.replace(/\/*$/, "/");
+
         var cached = this.cache.get(path);
         if (typeof cached === "undefined") {
             var wshandle;
