@@ -38,7 +38,7 @@ export class Service {
         private DSCacheFactory
     ) {
         this.setupCache(DSCacheFactory, adhWebSocket);
-        this.nonResourceUrls = _.map(AdhHttp.nonResourcePaths, (path) => adhConfig.rest_url + "/" + path);
+        this.nonResourceUrls = _.map(AdhHttp.nonResourcePaths, (path) => adhConfig.rest_url + "/" + path + "/");
     }
 
     private setupCache(DSCacheFactory, adhWebSocket : AdhWebSocket.Service) : void {
