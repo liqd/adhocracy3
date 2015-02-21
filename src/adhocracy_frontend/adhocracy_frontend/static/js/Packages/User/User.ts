@@ -37,36 +37,41 @@ export class Service {
     ) {
         var _self : Service = this;
 
-        var win = _self.angular.element(_self.$window);
-        win.on("storage", _self.updateTokenFromStorage.bind(_self));
-
-        _self.updateTokenFromStorage();
+        if (_self.Modernizr.localstorage) {
+            var win = _self.angular.element(_self.$window);
+            win.on("storage", (event) => {
+                var storageEvent = <any>event.originalEvent;
+                if (storageEvent.key === "user-session") {
+                    _self.updateSessionFromStorage(storageEvent.newValue);
+                }
+            });
+            var sessionValue = _self.$window.localStorage.getItem("user-session");
+            _self.updateSessionFromStorage(sessionValue);
+        } else {
+            _self.loggedIn = false;
+        }
     }
 
-    private updateTokenFromStorage() {
+    private updateSessionFromStorage(sessionValue) {
         var _self : Service = this;
 
-        if (_self.Modernizr.localstorage) {
-            var sessionJson = _self.$window.localStorage.getItem("user-session");
-            if (sessionJson) {
-                var session = JSON.parse(sessionJson);
-                var path = session["user-path"];
-                var token = session["user-token"];
-                _self.checkSessionValidity(token, path).then((response) => {
-                    _self.enableToken(token, path);
-                }, (msg) => {
-                    console.log(msg);
-                });
-            } else {
-                // $apply is necessary here to trigger a UI
-                // update.  the need for _.defer is explained
-                // here: http://stackoverflow.com/a/17958847
-                _.defer(() => _self.$rootScope.$apply(() => {
-                    _self.deleteToken();
-                }));
-            }
-        } else if (_self.loggedIn === undefined) {
-            _self.loggedIn = false;
+        if (sessionValue) {
+            var session = JSON.parse(sessionValue);
+            var path = session["user-path"];
+            var token = session["user-token"];
+            _self.checkSessionValidity(token, path).then((response) => {
+                _self.enableToken(token, path);
+            }, (msg) => {
+                console.log(msg);
+                _self.deleteToken();
+            });
+        } else {
+            // $apply is necessary here to trigger a UI
+            // update.  the need for _.defer is explained
+            // here: http://stackoverflow.com/a/17958847
+            _.defer(() => _self.$rootScope.$apply(() => {
+                _self.deleteToken();
+            }));
         }
     }
 
