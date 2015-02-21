@@ -37,51 +37,52 @@ export class Service {
     ) {
         var _self : Service = this;
 
-        var updateTokenFromStorage = () => {
-            if (_self.Modernizr.localstorage) {
-                var path = _self.$window.localStorage.getItem("user-path");
-                var token = _self.$window.localStorage.getItem("user-token");
-                if (token && path) {
-                    _self.checkSessionValidity(token, path).then((response) => {
-                        _self.enableToken(token, path);
-                    }, (msg) => {
-                        console.log(msg);
-                    });
-                } else {
-                    // $apply is necessary here to trigger a UI
-                    // update.  the need for _.defer is explained
-                    // here: http://stackoverflow.com/a/17958847
-                    _.defer(() => _self.$rootScope.$apply(() => {
-                        _self.deleteToken();
-                    }));
+        if (_self.Modernizr.localstorage) {
+            var win = _self.angular.element(_self.$window);
+            win.on("storage", (event) => {
+                var storageEvent = <any>event.originalEvent;
+                if (storageEvent.key === "user-session") {
+                    _self.updateSessionFromStorage(storageEvent.newValue);
                 }
-            } else if (_self.loggedIn === undefined) {
-                _self.loggedIn = false;
-            }
-        };
-
-        var win = _self.angular.element(_self.$window);
-        win.on("storage", updateTokenFromStorage);
-
-        updateTokenFromStorage();
+            });
+            var sessionValue = _self.$window.localStorage.getItem("user-session");
+            _self.updateSessionFromStorage(sessionValue);
+        } else {
+            _self.loggedIn = false;
+        }
     }
 
-    // FIXME: type should be ng.IPromise<void> - probably wrong in DefinitelyTyped
-    private checkSessionValidity(token : string, userPath : string) : ng.IPromise<any> {
-        var deferred = this.$q.defer();
+    private updateSessionFromStorage(sessionValue) {
+        var _self : Service = this;
 
-        this.$http.head(this.adhConfig.rest_url, {
-            headers: {
-                "X-User-Token": token,
-                "X-User-Path": userPath
+        if (sessionValue) {
+            try {
+                var session = JSON.parse(sessionValue);
+                var path = session["user-path"];
+                var token = session["user-token"];
+                this.$http.head(this.adhConfig.rest_url, {
+                    headers: {
+                        "X-User-Token": token,
+                        "X-User-Path": path
+                    }
+                }).then((response) => {
+                    _self.enableToken(token, path);
+                }, (msg) => {
+                    console.log("Expired or invalid session deleted");
+                    _self.deleteToken();
+                });
+            } catch (e) {
+                console.log("Invalid session deleted");
+                _self.deleteToken();
             }
-        }).then((response) => {
-            deferred.resolve();
-        }, (msg) => {
-            deferred.reject("Session expired or invalid");
-        });
-
-        return deferred.promise;
+        } else {
+            // $apply is necessary here to trigger a UI
+            // update.  the need for _.defer is explained
+            // here: http://stackoverflow.com/a/17958847
+            _.defer(() => _self.$rootScope.$apply(() => {
+                _self.deleteToken();
+            }));
+        }
     }
 
     private loadUser(userPath) {
@@ -115,8 +116,10 @@ export class Service {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
-            _self.$window.localStorage.setItem("user-token", token);
-            _self.$window.localStorage.setItem("user-path", userPath);
+            _self.$window.localStorage.setItem("user-session", JSON.stringify({
+                "user-path": userPath,
+                "user-token": token
+            }));
         } else {
             console.log("session could not be persisted");
         }
@@ -128,8 +131,7 @@ export class Service {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
-            _self.$window.localStorage.removeItem("user-token");
-            _self.$window.localStorage.removeItem("user-path");
+            _self.$window.localStorage.removeItem("user-session");
         }
         delete _self.$http.defaults.headers.common["X-User-Token"];
         delete _self.$http.defaults.headers.common["X-User-Path"];

@@ -75,6 +75,7 @@ export var register = () => {
 
             describe("on storage", () => {
                 var fn;
+                var eventMock;
 
                 beforeEach(() => {
                     spyOn(adhUser, "enableToken");
@@ -83,11 +84,20 @@ export var register = () => {
                     var args = elementMock.on.calls.mostRecent().args;
                     expect(args[0]).toBe("storage");
                     fn = <any>args[1];
+                    eventMock = {
+                        originalEvent: {
+                            key: "user-session",
+                            newValue: JSON.stringify({
+                                "user-path": "huhu",
+                                "user-token": "huhu"
+                            })
+                        }
+                    };
                 });
 
                 it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", (done) => {
                     windowMock.localStorage.getItem.and.returnValue("huhu");
-                    fn();
+                    fn(eventMock);
                     _.defer(() => {
                         expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
                         done();
@@ -96,7 +106,7 @@ export var register = () => {
 
                 it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", (done) => {
                     windowMock.localStorage.getItem.and.returnValue(null);
-                    fn();
+                    fn(eventMock);
                     _.defer(() => {
                         expect(rootScopeMock.$apply).toHaveBeenCalled();
                         var callback = rootScopeMock.$apply.calls.mostRecent().args[0];
@@ -153,8 +163,10 @@ export var register = () => {
                     });
 
                     it("stores user token and user path in localstorage", () => {
-                        expect(windowMock.localStorage.setItem).toHaveBeenCalledWith("user-token", "user1_tok");
-                        expect(windowMock.localStorage.setItem).toHaveBeenCalledWith("user-path", "user1_path");
+                        expect(windowMock.localStorage.setItem).toHaveBeenCalledWith("user-session", JSON.stringify({
+                            "user-path": "user1_path",
+                            "user-token": "user1_tok"
+                        }));
                     });
                 });
 
@@ -173,8 +185,10 @@ export var register = () => {
                     });
 
                     it("stores user token and user path in localstorage", () => {
-                        expect(windowMock.localStorage.setItem).toHaveBeenCalledWith("user-token", "user1_tok");
-                        expect(windowMock.localStorage.setItem).toHaveBeenCalledWith("user-path", "user1_path");
+                        expect(windowMock.localStorage.setItem).toHaveBeenCalledWith("user-session", JSON.stringify({
+                            "user-path": "user1_path",
+                            "user-token": "user1_tok"
+                        }));
                     });
                 });
 
@@ -260,8 +274,7 @@ export var register = () => {
                     });
 
                     it("removes user token and user path from localstorage", () => {
-                        expect(windowMock.localStorage.removeItem).toHaveBeenCalledWith("user-token");
-                        expect(windowMock.localStorage.removeItem).toHaveBeenCalledWith("user-path");
+                        expect(windowMock.localStorage.removeItem).toHaveBeenCalledWith("user-session");
                     });
                 });
 
