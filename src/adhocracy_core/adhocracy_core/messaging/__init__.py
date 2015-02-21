@@ -11,6 +11,7 @@ from pyramid_mailer.message import Message
 from pyramid.traversal import resource_path
 
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.utils import get_sheet_field
 
@@ -165,15 +166,30 @@ class Messenger():
         recipient_email = self._get_user_email(recipient)
         logger.debug('Sending message entitled "%s" from %s to %s', title,
                      from_email, recipient_email)
+        sender_name = self._get_user_name(from_user)
+        frontend_url = self.registry.settings.get('adhocracy.frontend_url',
+                                                  'http://localhost:6551')
+        sender_path = resource_path(from_user)
+        sender_url = '%s/r%s/' % (frontend_url, sender_path)
+        site_name = self.registry.settings.get('adhocracy.site_name',
+                                               'Adhocracy')
         self.render_and_send_mail(
             subject=self.message_user_subject.format(title),
             recipients=[recipient_email],
             template_asset_base='adhocracy_core:templates/message_user',
-            args={'text': text},
+            args={
+                'sender_name': sender_name,
+                'sender_url': sender_url,
+                'site_name': site_name,
+                'text': text,
+            },
             sender=from_email)
 
     def _get_user_email(self, user: IResource) -> str:
         return get_sheet_field(user, IUserExtended, 'email', self.registry)
+
+    def _get_user_name(self, user: IResource) -> str:
+        return get_sheet_field(user, IUserBasic, 'name', self.registry)
 
 
 def includeme(config):
