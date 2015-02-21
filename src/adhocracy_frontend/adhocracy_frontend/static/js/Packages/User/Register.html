@@ -1,5 +1,5 @@
 <div class="register">
-    <form novalidate="novalidate" class="register-form" name="registerForm" data-ng-submit="register()">
+    <form novalidate="novalidate" class="register-form" name="registerForm" data-ng-if="!success" data-ng-submit="register()">
         <div class="form-error" ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
