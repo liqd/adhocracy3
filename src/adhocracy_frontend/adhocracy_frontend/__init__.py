@@ -81,6 +81,7 @@ def root_view(request):
     """Return the embeddee HTML."""
     debug = config_view(request)['debug']
     css_path = 'stylesheets/a3.css' if debug else 'stylesheets/min/a3.css'
+    query_params = cachebust_query_params(request)
     result = render(
         'adhocracy_frontend:build/root.html.mako',
         {'css': [request.cachebusted_url('adhocracy_frontend:build/'
@@ -90,9 +91,10 @@ def root_view(request):
                  ],
          'js': [request.cachebusted_url('adhocracy_frontend:build/'
                                         'lib/requirejs/require.js'),
-                '/static/require-config.js',
                 request.cachebusted_url('adhocracy_frontend:build/'
                                         'lib/jquery/dist/jquery.min.js'),
+                '/static/require-config.js%s' % (
+                    '?' + query_params if query_params else ''),
                 ],
          'meta_api': '/static/meta_api.json',
          'config': '/config.json',
@@ -135,7 +137,8 @@ def includeme(config):
     add_frontend_route(config, 'root', '')
     add_frontend_route(config, 'resource', 'r/*path')
     config.add_route('require_config', 'static/require-config.js')
-    config.add_view(require_config_view, route_name='require_config')
+    config.add_view(require_config_view, route_name='require_config',
+                    http_cache=(cache_max_age, {'public': True}))
     # AdhocracySDK shall not be cached the way other static files are cached
     config.add_route('adhocracy_sdk', 'AdhocracySDK.js')
     config.add_view(adhocracy_sdk_view, route_name='adhocracy_sdk')
