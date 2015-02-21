@@ -1,0 +1,1 @@
+../src/adhocracy_core/varnish.vcl

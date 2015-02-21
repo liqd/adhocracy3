@@ -16,6 +16,9 @@ from adhocracy_core.sheets.metadata import IMetadata
 def add_changelog_created(event):
     """Add created message to the transaction_changelog."""
     _add_changelog(event.registry, event.object, key='created', value=True)
+    parent = event.object.__parent__
+    if parent is not None:
+        _add_changelog(event.registry, parent, key='modified', value=True)
 
 
 def add_changelog_modified_and_descendants(event):

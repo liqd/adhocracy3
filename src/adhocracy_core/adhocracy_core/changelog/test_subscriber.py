@@ -20,6 +20,14 @@ def test_add_changelog_created(event, changelog):
     assert changelog['/'].created is True
 
 
+def test_add_changelog_created_with_parent(event, pool, changelog):
+    from .subscriber import add_changelog_created
+    pool.__name__ = 'parent'
+    event.object.__parent__ = pool
+    add_changelog_created(event)
+    assert changelog['parent'].modified is True
+
+
 def test_add_changelog_followed_with_has_no_follows(event, changelog):
     from .subscriber import add_changelog_followed
     event.new_version = None

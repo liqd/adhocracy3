@@ -253,6 +253,7 @@ class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
     """Weak strategy adapter for :class:`IAssetDownload`."""
 
     browser_max_age = 60 * 5
+    proxy_max_age = 60 * 60 * 24 * 30 * 12
     etags = (etag_modified, etag_userid, etag_blocked)
 
     def __init__(self, context, request):
@@ -260,7 +261,8 @@ class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
         super().__init__(parent, request)
 
 
-def purge_varnish_after_commit_hook(success: bool, registry: Registry):
+def purge_varnish_after_commit_hook(success: bool, registry: Registry,
+                                    request: IRequest):
     """Send PURGE requests for all changed resources to Varnish."""
     varnish_url = registry.settings.get('adhocracy.varnish_url')
     if not (success and varnish_url):
@@ -269,10 +271,18 @@ def purge_varnish_after_commit_hook(success: bool, registry: Registry):
     errcount = 0
     for meta in changelog_metadata:
         events = extract_events_from_changelog_metadata(meta)
-        if events:  # resource has changed in some ways
-            path = resource_path(meta.resource)
+        if events == []:
+            continue
+        path = resource_path(meta.resource)
+        url = varnish_url + request.script_name + path
+        for event in events:
+            headers = {'X-Purge-Host': request.host}
+            if event == 'changed_descendants':
+                headers['X-Purge-Regex'] = '/?\?.*$'
+            else:
+                headers['X-Purge-Regex'] = '/?$'
             try:
-                resp = requests.request('PURGE', varnish_url + path)
+                resp = requests.request('PURGE', url, headers=headers)
                 if resp.status_code != 200:
                     logger.warning(
                         'Varnish responded %s to purge request for %s',

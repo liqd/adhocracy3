@@ -362,8 +362,8 @@ The response object has 3 top-level entries:
 
   The subkey 'modified' lists any resources that have been modified::
 
-      >>> resp_data['updated_resources']['modified']
-      ['http://localhost/principals/users/0000000/']
+      >>> sorted(resp_data['updated_resources']['modified'])
+      ['http://localhost/adhocracy/', 'http://localhost/principals/users/0000000/']
 
   Modifications also include that case that a reference from another
   resource has been added or removed, since references are often exposed in
