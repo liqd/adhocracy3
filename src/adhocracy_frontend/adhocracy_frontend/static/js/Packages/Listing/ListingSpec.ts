@@ -102,6 +102,7 @@ export var register = () => {
                 });
 
                 describe("controller", () => {
+                    var filterMock = () => { ; };
                     var adhHttpMock;
                     var adhPreliminaryNamesMock;
                     var adhPermissionsMock;
@@ -122,8 +123,8 @@ export var register = () => {
                             $watch: jasmine.createSpy("$watch")
                         };
 
-                        var controller = directive.controller[4];
-                        controller(scope, adhHttpMock, adhPreliminaryNamesMock, adhPermissionsMock);
+                        var controller = directive.controller[5];
+                        controller(filterMock, scope, adhHttpMock, adhPreliminaryNamesMock, adhPermissionsMock);
                     });
 
                     it("watches scope.path", () => {

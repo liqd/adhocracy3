@@ -124,7 +124,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     unregisterWebsocket(scope);
                 });
             },
-            controller: ["$scope", "adhHttp", "adhPreliminaryNames", "adhPermissions", (
+            controller: ["$filter", "$scope", "adhHttp", "adhPreliminaryNames", "adhPermissions", (
+                $filter: ng.IFilterService,
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.Service<Container>,
                 adhPreliminaryNames : AdhPreliminaryNames.Service,
@@ -156,13 +157,28 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     return adhHttp.get($scope.path, params, warmup).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
+
                         // FIXME: Sorting direction should be implemented in backend, working on a copy is used,
                         // because otherwise sometimes the already reversed sorted list (from cache) would be
                         // reversed again
-                        $scope.elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
+                        var elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
 
                         if ($scope.sort && $scope.sort[0] === "-") {
-                            $scope.elements.reverse();
+                            elements.reverse();
+                        }
+
+                        // trying to maintain compatible with builtin orderBy functionality, but
+                        // allow to not specify predicate or reverse.
+                        if ($scope.frontendOrderPredicate) {
+                            $scope.elements = $filter("orderBy")(
+                                elements,
+                                $scope.frontendOrderPredicate,
+                                $scope.frontendOrderReverse
+                            );
+                        } else if ($scope.frontendOrderReverse) {
+                            $scope.elements = elements.reverse();
+                        } else {
+                            $scope.elements = elements;
                         }
 
                         return adhPermissions.bindScope($scope, $scope.poolPath, "poolOptions");

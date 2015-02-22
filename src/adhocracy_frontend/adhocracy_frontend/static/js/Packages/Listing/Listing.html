@@ -3,7 +3,7 @@
         <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>
     <ol class="listing-elements">
-        <li class="listing-element" data-ng-repeat="element in elements | orderBy:frontendOrderPredicate:frontendOrderReverse">
+        <li class="listing-element" data-ng-repeat="element in elements">
             <adh-inject data-transclusion-id="element-id"></adh-inject>
         </li>
     </ol>
