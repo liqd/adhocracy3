@@ -89,6 +89,8 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
 
         directive.scope.refersTo = "@";
         directive.scope.poolPath = "@";
+        directive.scope.frontendOrderPredicate = "=?";
+        directive.scope.frontendOrderReverse = "=?";
 
         directive.controller = ["adhTopLevelState", "$scope", (
             adhTopLevelState : AdhTopLevelState.Service,
@@ -231,7 +233,9 @@ export var adhCommentListing = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
         scope: {
-            path: "@"
+            path: "@",
+            frontendOrderReverse: "=?",
+            frontendOrderPredicate: "=?"
         },
         controller: ["adhTopLevelState", "$location", (
             adhTopLevelState : AdhTopLevelState.Service,

@@ -1,6 +1,8 @@
 <adh-comment-listing-partial
     data-path="{{path}}"
-    data-empty-text="{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}">
+    data-empty-text="{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}"
+    data-frontend-order-predicate="frontendOrderPredicate"
+    data-frontend-order-reverse="frontendOrderReverse">
     <div data-ng-switch="transclusionId">
         <adh-resource-wrapper
             data-on-submit="onCreate()"
@@ -18,7 +20,9 @@
             data-ng-switch-when="element-id">
             <adh-comment-resource
                 data-path="{{element}}"
-                data-mode="display">
+                data-mode="display"
+                data-frontend-order-predicate="frontendOrderPredicate"
+                data-frontend-order-reverse="frontendOrderReverse">
             </adh-comment-resource>
         </adh-resource-wrapper>
     </div>

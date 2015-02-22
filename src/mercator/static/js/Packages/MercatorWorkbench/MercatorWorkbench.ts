@@ -82,6 +82,8 @@ export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, adhTopLevelState, ["proposalUrl", "commentableUrl"]);
+            scope.frontendOrderPredicate = (id) => id;
+            scope.frontendOrderReverse = true;
         }
     };
 };
