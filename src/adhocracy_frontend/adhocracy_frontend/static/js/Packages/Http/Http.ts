@@ -178,10 +178,10 @@ export class Service<Content extends ResourcesBase.Resource> {
             .put(path, obj);
     }
 
-    public put(path : string, obj : Content) : ng.IPromise<Content> {
+    public put(path : string, obj : Content, keepMetadata : boolean = false) : ng.IPromise<Content> {
         var _self = this;
 
-        return this.putRaw(path, AdhConvert.exportContent(this.adhMetaApi, obj))
+        return this.putRaw(path, AdhConvert.exportContent(this.adhMetaApi, obj, keepMetadata))
             .then(
                 (response) => {
                     _self.adhCache.invalidateUpdated(response.data.updated_resources);
