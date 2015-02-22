@@ -38,6 +38,7 @@ export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhLi
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
+    edited(resource : T) : boolean;
 }
 
 
@@ -163,7 +164,8 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                     modificationDate: this.adapter.modificationDate(resource),
                     commentCount: this.adapter.commentCount(resource),
                     comments: this.adapter.elemRefs(resource),
-                    replyPoolPath: this.adapter.poolPath(resource)
+                    replyPoolPath: this.adapter.poolPath(resource),
+                    edited: this.adapter.edited(resource)
                 };
                 this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
                 this.adhPermissions.bindScope(scope, AdhUtil.parentPath(scope.data.path), "commentItemOptions");

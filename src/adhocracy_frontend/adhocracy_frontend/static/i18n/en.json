@@ -19,6 +19,7 @@
     "TR__DESCRIPTION": "description",
     "TR__DISCLAIMER": "disclaimer",
     "TR__EDIT": "edit",
+    "TR__EDITED": "edited",
     "TR__EMAIL": "email",
     "TR__EMAIL_OR_USERNAME": "email or username",
     "TR__ERROR_FORMAT_EMAIL": "Email format is incorrect.",

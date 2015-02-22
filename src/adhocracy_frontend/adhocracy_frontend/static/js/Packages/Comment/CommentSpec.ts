@@ -25,7 +25,7 @@ export var register = () => {
                 pkg_path: "mock"
             };
 
-            adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "createItem", "content", "refersTo", "creator",
+            adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "createItem", "content", "edited", "refersTo", "creator",
                 "creationDate", "modificationDate", "commentCount", "elemRefs", "poolPath"]);
             adapterMock.create.and.returnValue(RESOURCE);
             adapterMock.createItem.and.returnValue(RESOURCE);
