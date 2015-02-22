@@ -53,6 +53,9 @@ export interface IFacet {
     items : IFacetItem[];
 }
 
+export type IPredicateItem = string | ((string) => string);
+export type IPredicate = IPredicateItem | IPredicateItem[];
+
 export interface ListingScope<Container> extends ng.IScope {
     path : string;
     contentType? : string;
@@ -65,6 +68,8 @@ export interface ListingScope<Container> extends ng.IScope {
     poolOptions : AdhHttp.IOptions;
     createPath? : string;
     elements : string[];
+    frontendOrderPredicate : IPredicate;
+    frontendOrderReverse : boolean;
     update : (boolean?) => ng.IPromise<void>;
     wshandle : number;
     clear : () => void;
@@ -106,6 +111,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 contentType: "@",
                 facets: "=?",
                 sort: "=?",
+                frontendOrderPredicate: "=?",
+                frontendOrderReverse: "=?",
                 params: "=?",
                 update: "=?",
                 noCreateForm: "=?",
