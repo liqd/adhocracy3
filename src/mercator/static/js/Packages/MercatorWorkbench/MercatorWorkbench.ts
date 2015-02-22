@@ -280,17 +280,21 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIPoolWithAssets.content_type, "create_proposal", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
-                    return (resource : RIPoolWithAssets) => {
-                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
-                                throw 401;
-                            } else {
-                                return {};
-                            }
-                        });
-                    };
-                }]);
+                .specific(RIPoolWithAssets.content_type, "create_proposal",
+                    ["adhHttp", "adhUser", (adhHttp : AdhHttp.Service<any>, adhUser) => {
+                        return (resource : RIPoolWithAssets) => {
+                            return adhUser.ready.then(() => {
+                                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                                    if (!options.POST) {
+                                        throw 401;
+                                    } else {
+                                        return {};
+                                    }
+                                });
+                            });
+                        };
+                    }]
+                );
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", mercatorWorkbenchDirective])
         .directive("adhCommentColumn", ["adhTopLevelState", "adhConfig", commentColumnDirective])
