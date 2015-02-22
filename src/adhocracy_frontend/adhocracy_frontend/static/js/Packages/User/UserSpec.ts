@@ -50,7 +50,7 @@ export var register = () => {
                 httpMock.head.and.returnValue(q.when({data: {}}));
                 httpMock.post.and.returnValue(q.when({data: {}}));
 
-                rootScopeMock = jasmine.createSpyObj("rootScope", ["$apply"]);
+                rootScopeMock = jasmine.createSpyObj("rootScope", ["$apply", "$watch"]);
 
                 windowMock = {
                     localStorage: <any>jasmine.createSpyObj("localStorage", ["getItem", "setItem", "removeItem"])

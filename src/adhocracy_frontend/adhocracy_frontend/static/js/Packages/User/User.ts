@@ -20,6 +20,7 @@ export interface IRegisterResponse {}
 
 export class Service {
     public loggedIn : boolean;
+    public ready : ng.IPromise<any>;
     public data : IUserBasic;
     public token : string;
     public userPath : string;
@@ -36,6 +37,15 @@ export class Service {
         private Modernizr
     ) {
         var _self : Service = this;
+
+        var deferred = $q.defer();
+        _self.ready = deferred.promise;
+        var unwatch = this.$rootScope.$watch(() => _self.loggedIn, ((loggedIn) => {
+            if (typeof loggedIn !== "undefined") {
+                deferred.resolve(null);
+                unwatch();
+            }
+        }));
 
         if (_self.Modernizr.localstorage) {
             var win = _self.angular.element(_self.$window);
