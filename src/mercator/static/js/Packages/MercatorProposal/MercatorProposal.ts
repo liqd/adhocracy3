@@ -1096,12 +1096,7 @@ export var register = (angular) => {
             };
 
             $scope.showFinanceGrantedInfo = () : boolean => {
-                if ($scope.data.finance && $scope.data.finance.other_sources) {
-                    if ($scope.data.finance.other_sources !== "") {
-                        return true;
-                    }
-                }
-                return false;
+                return ($scope.data.finance && $scope.data.finance.other_sources && $scope.data.finance.other_sources !== "");
             };
 
             var imageExists = () => {
