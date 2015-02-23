@@ -318,11 +318,77 @@ export var countryName = () => (code) => {
 };
 
 
+/**
+ * A service to wrap parts of a string in templates.
+ *
+ * wrap.replace("Hello [[:World]]!");
+ * -> "Hello World!"
+ *
+ * wrap.replace("Hello [[link:World]]!", {
+ *   link: "<a>{{content}}</a>"
+ * });
+ * -> "Hello <a>World</a>!"
+ */
+export class Wrap {
+    private openMarker : string = "[";
+    private closeMarker : string = "]";
+    private keySeparator : string = ":";
+    private escapeMarker : string = "\\";
+
+    constructor(private $interpolate) {}
+
+    public encode(msg : string) : string {
+        return msg
+            .replace(this.openMarker, this.escapeMarker + this.openMarker)
+            .replace(this.closeMarker, this.escapeMarker + this.closeMarker);
+    }
+
+    public decode(msg : string) : string {
+        return msg
+            .replace(this.escapeMarker + this.openMarker, this.openMarker)
+            .replace(this.escapeMarker + this.closeMarker, this.closeMarker);
+    }
+
+    public wrap(msg : string, templates) : string {
+        var a = msg.split(this.openMarker + this.openMarker);
+        if (a.length < 2) {
+            return msg;
+        }
+        var before = a.shift();
+        var after = a.join(this.openMarker + this.openMarker);
+
+        var b = after.split(this.closeMarker + this.closeMarker);
+        if (b.length < 2) {
+            throw "No matching closing marker found in " + msg;
+        }
+        var inside = b.shift();
+        after = b.join(this.closeMarker + this.closeMarker);
+
+        var c = inside.split(this.keySeparator);
+        if (c.length < 2) {
+            throw "No key seperator found in " + msg;
+        }
+        var key = c.shift();
+        inside = c.join(this.keySeparator);
+
+        var template = templates[key];
+        if (typeof template !== "undefined") {
+            inside = this.$interpolate(template)({
+                content: inside
+            });
+        }
+
+        return before + inside + this.wrap(after, templates);
+    }
+}
+
+
 export var moduleName = "adhLocale";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [])
         .filter("adhCountryName", countryName)
+        .service("adhWrap", ["$interpolate", Wrap])
         .directive("countrySelect", ["adhConfig", countrySelect]);
 };
