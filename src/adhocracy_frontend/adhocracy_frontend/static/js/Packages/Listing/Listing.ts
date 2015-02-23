@@ -151,9 +151,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             });
                         });
                     }
-                    if ($scope.sort) {
-                        params["sort"] = $scope.sort.replace(/^-/, "");
-                    }
                     return adhHttp.get($scope.path, params, warmup).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
@@ -162,10 +159,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         // because otherwise sometimes the already reversed sorted list (from cache) would be
                         // reversed again
                         var elements = _.clone(_self.containerAdapter.elemRefs($scope.container));
-
-                        if ($scope.sort && $scope.sort[0] === "-") {
-                            elements.reverse();
-                        }
 
                         // trying to maintain compatible with builtin orderBy functionality, but
                         // allow to not specify predicate or reverse.
