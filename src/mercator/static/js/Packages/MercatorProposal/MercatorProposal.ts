@@ -234,6 +234,53 @@ export var uploadImageFile = (
         });
 };
 
+/**
+ * promise supporters count.
+ */
+var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : ng.IPromise<number> => {
+    var query : any = {
+        content_type: RIRateVersion.content_type,
+        depth: 2,
+        tag: "LAST",
+        rate: 1,
+        count: "true",
+        elements: "omit"
+    };
+    query[SIRate.nick + ":object"] = objectPath;
+    return adhHttp.get(postPoolPath, query)
+        .then((response) => {
+            var pool : SIPool.Sheet = response.data[SIPool.nick];
+            return parseInt((<any>pool).count, 10);  // see #261
+        });
+};
+
+/**
+ * promise recursive comments count.
+ */
+var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : ng.IPromise<number> => {
+
+    var query : any = {};
+    query.content_type = RICommentVersion.content_type;
+    query.depth = "all";
+    query.tag = "LAST";
+    query.count = "true";
+    query.elements = "omit";
+
+    // NOTE (important for re-factorers): we could filter like this:
+    //
+    // | query[SIComment.nick + ":refers_to"] = commentableVersion.path;
+    //
+    // but that would only catch comments in one sub-tree level.
+    // so we must expect that each proposal has its own post pool,
+    // and just count all LAST versions in that pool, ignoring the
+    // refers_to.)
+
+    return adhHttp.get(postPoolPath, query)
+        .then((response) => {
+            var pool : SIPool.Sheet = response.data[SIPool.nick];
+            return parseInt((<any>pool).count, 10);  // see #261
+        });
+};
 
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
@@ -281,51 +328,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
-    /**
-     * promise supporters count.
-     */
-    private countSupporters(postPoolPath : string, supporteePath : string) : ng.IPromise<number> {
-        var query : any = {};
-        query.content_type = RIRateVersion.content_type;
-        query.depth = 2;
-        query.tag = "LAST";
-        query[SIRate.nick + ":object"] = supporteePath;
-        query.rate = 1;
-        query.count = "true";
-
-        return this.adhHttp.get(postPoolPath, query)
-            .then((response) => {
-                var pool : SIPool.Sheet = response.data[SIPool.nick];
-                return parseInt((<any>pool).count, 10);  // see #261
-            });
-    }
-
-    /**
-     * promise recursive comments count.
-     */
     private countComments(commentableVersion : any) : ng.IPromise<number> {
         var sheet : SICommentable.Sheet = commentableVersion.data[SICommentable.nick];
-
-        var query : any = {};
-        query.content_type = RICommentVersion.content_type;
-        query.depth = "all";
-        query.tag = "LAST";
-        query.count = "true";
-
-        // NOTE (important for re-factorers): we could filter like this:
-        //
-        // | query[SIComment.nick + ":refers_to"] = commentableVersion.path;
-        //
-        // but that would only catch comments in one sub-tree level.
-        // so we must expect that each proposal has its own post pool,
-        // and just count all LAST versions in that pool, ignoring the
-        // refers_to.)
-
-        return this.adhHttp.get(sheet.post_pool, query)
-            .then((response) => {
-                var pool : SIPool.Sheet = response.data[SIPool.nick];
-                return parseInt((<any>pool).count, 10);  // see #261
-            });
+        return countComments(this.adhHttp, sheet.post_pool);
     }
 
     private initializeScope(scope : IScope) : IScopeData {
@@ -391,7 +396,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             .then((count : number) => { data.commentCount = count; data.commentCountTotal += count; });
 
         data.supporterCount = 0;
-        this.countSupporters(mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
+        countSupporters(this.adhHttp, mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
             .then((count : number) => { data.supporterCount = count; });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
@@ -904,24 +909,12 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                     }
                 });
             });
-            adhHttp.get(AdhUtil.parentPath(scope.path), {
-                content_type: "adhocracy_core.resources.rate.IRateVersion",
-                tag: "LAST",
-                rate: "1",
-                depth: "3",
-                count: "true",
-                elements: "omit"
-            }).then((result) => {
-                scope.data.supporterCount = parseInt(result.data[SIPool.nick].count, 10);
+
+            countSupporters(adhHttp, AdhUtil.parentPath(scope.path) + "rates/", scope.path).then((count) => {
+                scope.data.supporterCount = count;
             });
-            adhHttp.get(AdhUtil.parentPath(scope.path), {
-                content_type: "adhocracy_core.resources.comment.ICommentVersion",
-                tag: "LAST",
-                depth: "4",
-                count: "true",
-                elements: "omit"
-            }).then((result) => {
-                scope.data.commentCountTotal = parseInt(result.data[SIPool.nick].count, 10);
+            countComments(adhHttp, AdhUtil.parentPath(scope.path)).then((count) => {
+                scope.data.commentCountTotal = count;
             });
         }
     };
