@@ -19,7 +19,8 @@ var embeddableDirectives = [
     "login",
     "register",
     "user-indicator",
-    "empty"
+    "empty",
+    "social-share"
 ];
 
 var metaParams = [
