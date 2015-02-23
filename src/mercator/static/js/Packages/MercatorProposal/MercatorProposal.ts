@@ -178,6 +178,7 @@ export interface IControllerScope extends IScope {
     showError : (fieldName : string, errorType : string) => boolean;
     showHeardFromError : () => boolean;
     showLocationError : () => boolean;
+    showFinanceGrantedInfo : () => boolean;
     submitIfValid : (callCount? : number) => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
@@ -1092,6 +1093,15 @@ export var register = (angular) => {
 
             $scope.showLocationError = () : boolean => {
                 return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
+            };
+
+            $scope.showFinanceGrantedInfo = () : boolean => {
+                if ($scope.data.finance && $scope.data.finance.other_sources) {
+                    if ($scope.data.finance.other_sources !== "") {
+                        return true;
+                    }
+                }
+                return false;
             };
 
             var imageExists = () => {
