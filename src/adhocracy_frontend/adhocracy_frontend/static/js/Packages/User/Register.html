@@ -65,15 +65,16 @@
             <p>{{ "TR__REGISTRATION_LOGIN_INSTEAD" | translate }}
             <a href="/login">{{ "TR__LINK_HERE" | translate }}</a></p>
         </div>
-        <a class="register-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
-        <div class="register-support">
-            {{ "TR__REGISTRATION_SUPPORT" | translate }} <br />
-            <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>
-        </div>
     </form>
 
     <div data-ng-if="success" class="register-success">
         <p>{{ "TR__REGISTER_SUCCESS" | translate }}</p>
         <p>{{ "TR__CALL_FOR_ACTIVATION" | translate:{siteName: siteName} }}</p>
+    </div>
+
+    <a class="register-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+    <div class="register-support">
+        {{ "TR__REGISTRATION_SUPPORT" | translate }} <br />
+        <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>
     </div>
 </div>
