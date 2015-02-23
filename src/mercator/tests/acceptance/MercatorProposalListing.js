@@ -10,6 +10,8 @@ var MercatorProposalDetailPage = function() {
     this.column = element(by.tagName("adh-mercator-proposal-detail-column"));
     this.coverCommentsButton = element(by.css('.mercator-proposal-cover-show-comments'));
     this.editButton = this.column.element(by.cssContainingText("a", "edit"));
+    this.rateWidget = element(by.css(".mercator-proposal-detail-view .mercator-propsal-detail-meta-item-rate"));
+    this.rateDifference = this.rateWidget.element(by.css(".like-difference"));
 
     this.getEditPage = function() {
         this.editButton.click();

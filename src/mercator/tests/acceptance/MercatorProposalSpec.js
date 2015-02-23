@@ -106,7 +106,85 @@ describe("mercator proposal form", function() {
                .getText()).toContain("experience");
     });
 
-    it("allows creator to edit existing proposals (depends on submit)", function() {
+    it("can be upvoted by the annotator", function() {
+        shared.loginAnnotator();
+
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+
+        expect(page.rateDifference.getText()).toEqual("0");
+        page.rateWidget.click();
+        expect(page.rateDifference.getText()).toEqual("+1");
+    });
+
+    it("can be downvoted by the annotator", function() {
+        shared.loginAnnotator();
+
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+
+        // annotator has upvoted once in the previous test
+        expect(page.rateDifference.getText()).toEqual("+1");
+        page.rateWidget.click();
+        expect(page.rateDifference.getText()).toEqual("0");
+    });
+
+    it("can be upvoted and then downvoted by the annotator", function() {
+        shared.loginAnnotator();
+
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+
+        expect(page.rateDifference.getText()).toEqual("0");
+        page.rateWidget.click();
+        expect(page.rateDifference.getText()).toEqual("+1");
+        page.rateWidget.click();
+    });
+
+    it("can be upvoted by the contributor", function() {
+        shared.loginContributor();
+
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+
+        expect(page.rateDifference.getText()).toEqual("0");
+        page.rateWidget.click();
+        expect(page.rateDifference.getText()).toEqual("+1");
+    });
+
+    it("can be downvoted by the contributor", function() {
+        shared.loginContributor();
+
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+
+        // commentator has upvoted once in the previous test
+        expect(page.rateDifference.getText()).toEqual("+1");
+        page.rateWidget.click();
+        expect(page.rateDifference.getText()).toEqual("0");
+    });
+
+    it("can be upvoted and then downvoted by the contributor", function() {
+        shared.loginContributor();
+
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+
+        expect(page.rateDifference.getText()).toEqual("0");
+        page.rateWidget.click();
+        expect(page.rateDifference.getText()).toEqual("+1");
+        page.rateWidget.click();
+    });
+
+    it("can not be rated by anonymous", function() {
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+
+        page.rateWidget.click();
+        expect(browser.getCurrentUrl()).toContain("login");
+    });
+
+    it("allows creator to edit existing proposals (depends on submit) - fails due to #679", function() {
         shared.loginAnnotator();
 
         var list = new MercatorProposalListing().get();
