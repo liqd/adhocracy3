@@ -240,9 +240,9 @@ export var uploadImageFile = (
 var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : ng.IPromise<number> => {
     var query : any = {
         content_type: RIRateVersion.content_type,
-        depth: 2,
+        depth: "2",
         tag: "LAST",
-        rate: 1,
+        rate: "1",
         count: "true",
         elements: "omit"
     };
@@ -259,12 +259,13 @@ var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, ob
  */
 var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : ng.IPromise<number> => {
 
-    var query : any = {};
-    query.content_type = RICommentVersion.content_type;
-    query.depth = "all";
-    query.tag = "LAST";
-    query.count = "true";
-    query.elements = "omit";
+    var query : any = {
+        content_type: RICommentVersion.content_type,
+        depth: "all",
+        tag: "LAST",
+        count: "true",
+        elements: "omit"
+    };
 
     // NOTE (important for re-factorers): we could filter like this:
     //
