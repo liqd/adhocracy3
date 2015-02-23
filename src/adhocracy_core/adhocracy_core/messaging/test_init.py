@@ -185,6 +185,7 @@ class TestSendMessageToUser():
         recipient = Mock(spec=IUser)
         recipient.email = 'recipient@example.org'
         sender = Mock(spec=IUser)
+        sender.name = 'username'
         sender.email = 'sender@example.org'
         monkeypatch.setattr(messaging, 'get_sheet_field',
                             self._mock_get_sheet_field)
