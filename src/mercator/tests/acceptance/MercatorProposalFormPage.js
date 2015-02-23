@@ -34,6 +34,7 @@ var MercatorProposalFormPage = function() {
     this.partners = this.form.element(by.model("data.partners"));
     this.financeBudget = this.form.element(by.model("data.finance.budget"));
     this.financeRequestedFunding = this.form.element(by.model("data.finance.requested_funding"));
+    this.financeOtherSource = this.form.element(by.model("data.finance.other_sources"))
     this.financeGrantedYes = this.form.all(by.model("data.finance.granted")).first();
     this.experience = this.form.element(by.model("data.experience"));
     this.heardFromColleague = this.form.element(by.model("data.heard_from.colleague"));
@@ -69,6 +70,7 @@ var MercatorProposalFormPage = function() {
         this.partners.sendKeys("partners");
         this.financeBudget.sendKeys("1000");
         this.financeRequestedFunding.sendKeys("1000");
+        this.financeOtherSource.sendKeys("other source");
         this.financeGrantedYes.click();
         this.experience.sendKeys("experience");
         this.heardFromColleague.click();

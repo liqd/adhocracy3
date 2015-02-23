@@ -6,18 +6,15 @@ export var countries : {
     code: string;
 }[] = [
 
-// All countries from here : http://www.countryareacode.net/
+// All countries from here: http://de.wikipedia.org/wiki/Liste_der_Staaten_der_Erde
 /*{name: "Afghanistan", code:"AF"}
 {name: "Albania", code:"AL"}
 {name: "Algeria", code:"DZ"}
 {name: "American Samoa", code:"AS"}
 {name: "Andorra", code:"AD"}
 {name: "Angola", code:"AO"}
-{name: "Anguilla", code:"AI"}
-{name: "Antarctica", code:"AQ"}
 {name: "Argentina", code:"AR"}
 {name: "Armenia", code:"AM"}
-{name: "Aruba", code:"AW"}
 {name: "Australia", code:"AU"}
 {name: "Austria", code:"AT"}
 {name: "Azerbaijan", code:"AZ"}
@@ -29,13 +26,11 @@ export var countries : {
 {name: "Belgium", code:"BE"}
 {name: "Belize", code:"BZ"}
 {name: "Benin", code:"BJ"}
-{name: "Bermuda", code:"BM"}
 {name: "Bhutan", code:"BT"}
 {name: "Bolivia", code:"BO"}
 {name: "Bosnia and Herzegovina", code:"BA"}
 {name: "Botswana", code:"BW"}
 {name: "Brazil", code:"BR"}
-{name: "British Virgin Islands", code:"VG"}
 {name: "Brunei", code:"BN"}
 {name: "Bulgaria", code:"BG"}
 {name: "Burkina Faso", code:"BF"}
@@ -44,7 +39,6 @@ export var countries : {
 {name: "Cameroon", code:"CM"}
 {name: "Canada", code:"CA"}
 {name: "Cape Verde", code:"CV"}
-{name: "Cayman Islands", code:"KY"}
 {name: "Central African Republic", code:"CF"}
 {name: "Chile", code:"CL"}
 {name: "China", code:"CN"}
@@ -54,7 +48,6 @@ export var countries : {
 {name: "Costa Rica", code:"CR"}
 {name: "Croatia", code:"HR"}
 {name: "Cuba", code:"CU"}
-{name: "Curacao", code:"CW"}
 {name: "Cyprus", code:"CY"}
 {name: "Czech Republic", code:"CZ"}
 {name: "Democratic Republic of Congo", code:"CD"}
@@ -75,16 +68,12 @@ export var countries : {
 {name: "Fiji", code:"FJ"}
 {name: "Finland", code:"FI"}
 {name: "France", code:"FR"}
-{name: "French Polynesia", code:"PF"}
 {name: "Gabon", code:"GA"}
 {name: "Gambia", code:"GM"}
 {name: "Georgia", code:"GE"}
 {name: "Germany", code:"DE"}
 {name: "Ghana", code:"GH"}
-{name: "Gibraltar", code:"GI"}
 {name: "Greece", code:"GR"}
-{name: "Greenland", code:"GL"}
-{name: "Guadeloupe", code:"GP"}
 {name: "Guam", code:"GU"}
 {name: "Guatemala", code:"GT"}
 {name: "Guinea", code:"GN"}
@@ -92,7 +81,6 @@ export var countries : {
 {name: "Guyana", code:"GY"}
 {name: "Haiti", code:"HT"}
 {name: "Honduras", code:"HN"}
-{name: "Hong Kong", code:"HK"}
 {name: "Hungary", code:"HU"}
 {name: "Iceland", code:"IS"}
 {name: "India", code:"IN"}
@@ -100,7 +88,6 @@ export var countries : {
 {name: "Iran", code:"IR"}
 {name: "Iraq", code:"IQ"}
 {name: "Ireland", code:"IE"}
-{name: "Isle of Man", code:"IM"}
 {name: "Israel", code:"IL"}
 {name: "Italy", code:"IT"}
 {name: "Ivory Coast", code:"CI"}
@@ -110,7 +97,6 @@ export var countries : {
 {name: "Kazakhstan", code:"KZ"}
 {name: "Kenya", code:"KE"}
 {name: "Kiribati", code:"KI"}
-{name: "Kosovo", code:"XK"}
 {name: "Kuwait", code:"KW"}
 {name: "Kyrgyzstan", code:"KG"}
 {name: "Laos", code:"LA"}
@@ -122,7 +108,6 @@ export var countries : {
 {name: "Liechtenstein", code:"LI"}
 {name: "Lithuania", code:"LT"}
 {name: "Luxembourg", code:"LU"}
-{name: "Macau", code:"MO"}
 {name: "Macedonia", code:"MK"}
 {name: "Madagascar", code:"MG"}
 {name: "Malawi", code:"MW"}
@@ -139,23 +124,19 @@ export var countries : {
 {name: "Monaco", code:"MC"}
 {name: "Mongolia", code:"MN"}
 {name: "Montenegro", code:"ME"}
-{name: "Montserrat", code:"MS"}
 {name: "Morocco", code:"MA"}
 {name: "Mozambique", code:"MZ"}
-{name: "Myanmar [Burma]", code:"MM"}
+{name: "Myanmar", code:"MM"}
 {name: "Namibia", code:"NA"}
 {name: "Nauru", code:"NR"}
 {name: "Nepal", code:"NP"}
 {name: "Netherlands", code:"NL"}
-{name: "New Caledonia", code:"NC"}
 {name: "New Zealand", code:"NZ"}
 {name: "Nicaragua", code:"NI"}
 {name: "Niger", code:"NE"}
 {name: "Nigeria", code:"NG"}
 {name: "Niue", code:"NU"}
-{name: "Norfolk Island", code:"NF"}
 {name: "North Korea", code:"KP"}
-{name: "Northern Mariana Islands", code:"MP"}
 {name: "Norway", code:"NO"}
 {name: "Oman", code:"OM"}
 {name: "Pakistan", code:"PK"}
@@ -165,22 +146,16 @@ export var countries : {
 {name: "Paraguay", code:"PY"}
 {name: "Peru", code:"PE"}
 {name: "Philippines", code:"PH"}
-{name: "Pitcairn Islands", code:"PN"}
 {name: "Poland", code:"PL"}
 {name: "Portugal", code:"PT"}
 {name: "Puerto Rico", code:"PR"}
 {name: "Qatar", code:"QA"}
 {name: "Republic of the Congo", code:"CG"}
-{name: "Reunion", code:"RE"}
 {name: "Romania", code:"RO"}
 {name: "Russia", code:"RU"}
 {name: "Rwanda", code:"RW"}
-{name: "Saint Barthélemy", code:"BL"}
-{name: "Saint Helena", code:"SH"}
 {name: "Saint Kitts and Nevis", code:"KN"}
 {name: "Saint Lucia", code:"LC"}
-{name: "Saint Martin", code:"MF"}
-{name: "Saint Pierre and Miquelon", code:"PM"}
 {name: "Saint Vincent and the Grenadines", code:"VC"}
 {name: "Samoa", code:"WS"}
 {name: "San Marino", code:"SM"}
@@ -211,7 +186,6 @@ export var countries : {
 {name: "Tanzania", code:"TZ"}
 {name: "Thailand", code:"TH"}
 {name: "Togo", code:"TG"}
-{name: "Tokelau", code:"TK"}
 {name: "Trinidad and Tobago", code:"TT"}
 {name: "Tunisia", code:"TN"}
 {name: "Turkey", code:"TR"}
