@@ -6,10 +6,11 @@
                     <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
                 </span>
                 <span class="comment-header-date">
-                    <adh-time data-datetime="data.creationDate"></adh-time>
+                    <adh-time data-datetime="data.creationDate"></adh-time>.
                 </span>
                 <span class="comment-header-edited" data-ng-if="data.edited">
-                    ({{ "TR__EDITED" | translate }})
+                    {{ "TR__EDITED" | translate }}
+                    <adh-time data-datetime="data.modificationDate"></adh-time>
                 </span>
             </div>
             <div class="comment-header-column2">

@@ -190,6 +190,16 @@ parent: comment
         }
     }
 
+    .comment-header-edited {
+        @include inline-block;
+        color: $color-structure-introvert;
+        font-style: italic;
+
+        &:first-letter {
+            text-transform: capitalize;
+        }
+    }
+
 
     .comment-header-creator a {
         color: $color-text-highlight-normal;
