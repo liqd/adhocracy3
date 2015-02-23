@@ -97,6 +97,8 @@ class TestBatchView:
         from adhocracy_core.utils import is_batchmode
         request.body = self._make_json_with_subrequest_cstructs()
         request.__cached_principals__ = [1]
+        date = object()
+        request.__date__ = date
         request.headers['X-User-Path'] = 2
         request.headers['X-User-Token'] = 3
         # Needed to stop the validator from complaining if these headers are
@@ -113,6 +115,7 @@ class TestBatchView:
         subrequest  = mock_invoke_subrequest.call_args[0][0]
         assert is_batchmode(subrequest)
         assert subrequest.__cached_principals__ == [1]
+        assert subrequest.__date__ is date
         assert subrequest.headers.get('X-User-Path') == 2
         assert subrequest.headers.get('X-User-Token') == 3
         assert subrequest.script_name == '/virtual'
