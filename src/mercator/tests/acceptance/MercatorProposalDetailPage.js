@@ -11,7 +11,24 @@ var MercatorProposalDetailPage = function() {
     this.detailContainer = element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-detail-container"));
     this.proposalDetails = this.detailContainer.all(by.css(".chapter")).get(2);
     this.goalsAndVision = this.detailContainer.all(by.css(".chapter")).get(3);
-    
+    this.title = element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-cover-header"));
+    this.teaser = this.detailContainer.all(by.css(".chapter section p")).first();
+    this.requestedFunding = this.detailContainer.element(by.css(".mercator-proposal-budget-col.requested"));
+    this.budget = this.detailContainer.all(by.css(".mercator-proposal-budget-col")).get(1);
+    this.locationSpecific1 = this.detailContainer.all(by.css(".inline-boxes li")).first();
+    this.locationSpecific2 = this.detailContainer.all(by.css(".inline-boxes li")).get(1);
+    this.userInfo = this.detailContainer.element(by.css("adh-user-meta"));
+    this.organizationName = this.detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).first();
+    this.organizationCountry = this.detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).get(1);
+    this.organizationNonProfit = this.detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).last();
+    this.description = this.proposalDetails.all(by.css("section p")).first();
+    this.story = this.proposalDetails.all(by.css("section p")).last();
+    this.outcome = this.goalsAndVision.all(by.css("section p")).first();
+    this.steps = this.goalsAndVision.all(by.css("section p")).get(1);
+    this.addedValue = this.goalsAndVision.all(by.css("section p")).get(2);
+    this.partners = this.goalsAndVision.all(by.css("section p")).last();
+    this.experience = this.detailContainer.element(by.css("#mercator-detail-view-additional p"));
+
     this.getEditPage = function() {
         this.editButton.click();
         return new MercatorProposalFormPage();
@@ -24,90 +41,6 @@ var MercatorProposalDetailPage = function() {
         return new EmbeddedCommentsPage("");
     };
 
-    this.getTitleText = function() {
-        return element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-cover-header"))
-               .getText();
-    };
-
-    this.getTeaserText = function() {
-        return this.detailContainer.all(by.css(".chapter section p")).first()
-               .getText();
-    };
-
-    this.getRequestedFundingText = function() {
-        return this.detailContainer.element(by.css(".mercator-proposal-budget-col.requested"))
-               .getText();
-    };
-
-    this.getBudgetText = function() {
-        return this.detailContainer.all(by.css(".mercator-proposal-budget-col")).get(1)
-               .getText();
-    };
-
-    this.getLocationSpecific1Text = function() {
-        return this.detailContainer.all(by.css(".inline-boxes li")).first()
-               .getText();
-    };
-
-    this.getLocationSpecific2Text = function() {
-        return this.detailContainer.all(by.css(".inline-boxes li")).get(1)
-               .getText();
-    };
-
-    this.getUserInfoText = function() {
-        return this.detailContainer.element(by.css("adh-user-meta"))
-               .getText();
-    };
-
-    this.getOrganizationNameText = function() {
-        return this.detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).first()
-               .getText();
-    };
-
-    this.getOrganizationCountryText = function() {
-        return this.detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).get(1)
-               .getText();
-    };
-
-    this.getOrganizationNonProfitText = function() {
-        return this.detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).last()
-               .getText();
-    };
-
-    this.getDescriptionText = function() {
-        return this.proposalDetails.all(by.css("section p")).first()
-               .getText();
-    };
-
-    this.getStoryText = function() {
-        return this.proposalDetails.all(by.css("section p")).last()
-               .getText();
-    };
-
-    this.getOutcomeText = function() {
-        return this.goalsAndVision.all(by.css("section p")).first()
-               .getText();
-    };
-
-    this.getStepsText = function() {
-        return this.goalsAndVision.all(by.css("section p")).get(1)
-               .getText();
-    };
-
-    this.getAddedValueText = function() {
-        return this.goalsAndVision.all(by.css("section p")).get(2)
-               .getText();
-    };
-
-    this.getPartnersText = function() {
-        return this.goalsAndVision.all(by.css("section p")).last()
-               .getText();
-    };
-
-    this.getExperienceText = function() {
-        return this.detailContainer.element(by.css("#mercator-detail-view-additional p"))
-               .getText();
-    };
 };
 
 module.exports = MercatorProposalDetailPage;

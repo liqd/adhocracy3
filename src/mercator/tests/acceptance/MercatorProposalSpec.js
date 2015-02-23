@@ -62,31 +62,31 @@ describe("mercator proposal form", function() {
         var detailPage = new MercatorProposalDetailPage();
         
         // proposal pitch
-        expect(detailPage.getTitleText()).toContain("protitle");
-        expect(detailPage.getTeaserText()).toBe("proteaser");
-        expect(detailPage.getRequestedFundingText()).toContain("1,000");
-        expect(detailPage.getBudgetText()).toContain("1,200");
-        expect(detailPage.getLocationSpecific1Text()).toContain("Bonn");
-        expect(detailPage.getLocationSpecific2Text()).toContain("Ruhr Gebiet, Germany");
+        expect(detailPage.title.getText()).toContain("protitle");
+        expect(detailPage.teaser.getText()).toBe("proteaser");
+        expect(detailPage.requestedFunding.getText()).toContain("1,000");
+        expect(detailPage.budget.getText()).toContain("1,200");
+        expect(detailPage.locationSpecific1.getText()).toContain("Bonn");
+        expect(detailPage.locationSpecific2.getText()).toContain("Ruhr Gebiet, Germany");
 
         // proposal whos
-        expect(detailPage.getUserInfoText()).toContain("pita pasta");
-        expect(detailPage.getOrganizationNameText()).toContain("organization name");
-        expect(detailPage.getOrganizationCountryText()).toContain("Chile");
-        expect(detailPage.getOrganizationNonProfitText()).toContain("Non Profit");
+        expect(detailPage.userInfo.getText()).toContain("pita pasta");
+        expect(detailPage.organizationName.getText()).toContain("organization name");
+        expect(detailPage.organizationCountry.getText()).toContain("Chile");
+        expect(detailPage.organizationNonProfit.getText()).toContain("Non Profit");
 
         // proposal details
-        expect(detailPage.getDescriptionText()).toBe("prodescription");
-        expect(detailPage.getStoryText()).toBe("story");
+        expect(detailPage.description.getText()).toBe("prodescription");
+        expect(detailPage.story.getText()).toBe("story");
 
         // proposal goals and vision
-        expect(detailPage.getOutcomeText()).toBe("success");
-        expect(detailPage.getStepsText()).toContain("plan");
-        expect(detailPage.getAddedValueText()).toContain("relevance");
-        expect(detailPage.getPartnersText()).toContain("partners");
+        expect(detailPage.outcome.getText()).toBe("success");
+        expect(detailPage.steps.getText()).toContain("plan");
+        expect(detailPage.addedValue.getText()).toContain("relevance");
+        expect(detailPage.partners.getText()).toContain("partners");
 
         // proposal additional information
-        expect(detailPage.getExperienceText()).toContain("experience");
+        expect(detailPage.experience.getText()).toContain("experience");
     });
 
     xit("can be upvoted by the annotator", function() {
