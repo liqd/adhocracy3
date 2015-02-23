@@ -50,10 +50,10 @@ var MercatorProposalFormPage = function() {
     this.fillValid = function() {
         this.userInfoFirstName.sendKeys("pita");
         this.userInfoLastName.sendKeys("pasta");
-        this.userInfoCountry.element(by.cssContainingText("option", "Argentina")).click();
+        this.userInfoCountry.element(by.cssContainingText("option", "Germany")).click();
         this.organizationInfoStatusEnum.click();
         this.organizationInfoName.sendKeys("organization name");
-        this.organizationInfoCountry.element(by.cssContainingText("option", "Chile")).click();
+        this.organizationInfoCountry.element(by.cssContainingText("option", "France")).click();
         this.organizationInfoWebsite.sendKeys("http://example.org");
         this.title.sendKeys("protitle");
         this.introductionTeaser.sendKeys("proteaser");
