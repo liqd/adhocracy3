@@ -3,7 +3,7 @@
 var shared = require("./core/shared.js");
 var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
 var MercatorProposalListing = require("./MercatorProposalListing.js");
-
+var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
 
 describe("mercator proposal form", function() {
     afterEach(function() {
@@ -59,56 +59,37 @@ describe("mercator proposal form", function() {
         page.submitButton.click();
         expect(browser.getCurrentUrl()).not.toContain("@create");
 
-        var detailContainer = element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-detail-container"));
-
+        var detailPage = new MercatorProposalDetailPage();
+        
         // proposal pitch
-        expect(element(by.css("adh-mercator-proposal-detail-view .mercator-proposal-cover-header"))
-               .getText()).toContain("protitle");
-        expect(detailContainer.all(by.css(".chapter section p")).first()
-               .getText()).toContain("proteaser");
-        expect(detailContainer.element(by.css(".mercator-proposal-budget-col.requested"))
-               .getText()).toContain("1,000");
-        expect(detailContainer.all(by.css(".mercator-proposal-budget-col")).get(1)
-               .getText()).toContain("1,200");
-        expect(detailContainer.all(by.css(".inline-boxes li")).first()
-               .getText()).toContain("Bonn");
-        expect(detailContainer.all(by.css(".inline-boxes li")).get(1)
-               .getText()).toContain("Ruhr Gebiet, Germany");
+        expect(detailPage.getTitleText()).toContain("protitle");
+        expect(detailPage.getTeaserText()).toBe("proteaser");
+        expect(detailPage.getRequestedFundingText()).toContain("1,000");
+        expect(detailPage.getBudgetText()).toContain("1,200");
+        expect(detailPage.getLocationSpecific1Text()).toContain("Bonn");
+        expect(detailPage.getLocationSpecific2Text()).toContain("Ruhr Gebiet, Germany");
 
         // proposal whos
-        expect(detailContainer.element(by.css("adh-user-meta"))
-               .getText()).toContain("pita pasta");
-        expect(detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).first()
-               .getText()).toContain("organization name");
-        expect(detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).get(1)
-               .getText()).toContain("Chile");
-        expect(detailContainer.all(by.css(".mercator-proposal-detail-orgs-columns li")).last()
-               .getText()).toContain("Non Profit");
+        expect(detailPage.getUserInfoText()).toContain("pita pasta");
+        expect(detailPage.getOrganizationNameText()).toContain("organization name");
+        expect(detailPage.getOrganizationCountryText()).toContain("Chile");
+        expect(detailPage.getOrganizationNonProfitText()).toContain("Non Profit");
 
         // proposal details
-        var proposalDetails = detailContainer.all(by.css(".chapter")).get(2);
-        expect(proposalDetails.all(by.css("section p")).first()
-               .getText()).toContain("prodescription");
-        expect(proposalDetails.all(by.css("section p")).last()
-               .getText()).toContain("story");
+        expect(detailPage.getDescriptionText()).toBe("prodescription");
+        expect(detailPage.getStoryText()).toBe("story");
 
         // proposal goals and vision
-        var goalsAndVision = detailContainer.all(by.css(".chapter")).get(3);
-        expect(goalsAndVision.all(by.css("section p")).first()
-               .getText()).toContain("success");
-        expect(goalsAndVision.all(by.css("section p")).get(1)
-               .getText()).toContain("plan");
-        expect(goalsAndVision.all(by.css("section p")).get(2)
-               .getText()).toContain("relevance");
-        expect(goalsAndVision.all(by.css("section p")).last()
-               .getText()).toContain("partners");
+        expect(detailPage.getOutcomeText()).toBe("success");
+        expect(detailPage.getStepsText()).toContain("plan");
+        expect(detailPage.getAddedValueText()).toContain("relevance");
+        expect(detailPage.getPartnersText()).toContain("partners");
 
         // proposal additional information
-        expect(detailContainer.element(by.css("#mercator-detail-view-additional p"))
-               .getText()).toContain("experience");
+        expect(detailPage.getExperienceText()).toContain("experience");
     });
 
-    it("can be upvoted by the annotator", function() {
+    xit("can be upvoted by the annotator", function() {
         shared.loginAnnotator();
 
         var list = new MercatorProposalListing().get();
