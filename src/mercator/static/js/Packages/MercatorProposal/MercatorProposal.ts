@@ -842,6 +842,8 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             update: "=?",
             facets: "=?",
             sort: "=?",
+            frontendOrderPredicate: "=?",
+            frontendOrderReverse: "=?",
             params: "=?"
         }
     };

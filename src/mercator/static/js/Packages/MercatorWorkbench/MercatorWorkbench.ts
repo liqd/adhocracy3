@@ -82,6 +82,8 @@ export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, adhTopLevelState, ["proposalUrl", "commentableUrl"]);
+            scope.frontendOrderPredicate = (id) => id;
+            scope.frontendOrderReverse = true;
         }
     };
 };
@@ -165,7 +167,8 @@ export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLe
                     {key: "above_50000", name: "50000 € +"}
                 ]
             }];
-            scope.shared.sort = "-rates";
+            scope.shared.sort = "rates";
+            scope.frontendOrderReverse = true;
         }
     };
 };

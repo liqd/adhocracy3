@@ -6,7 +6,10 @@
                     <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
                 </span>
                 <span class="comment-header-date">
-                    <adh-time data-datetime="data.modificationDate"></adh-time>
+                    <adh-time data-datetime="data.creationDate"></adh-time>
+                </span>
+                <span class="comment-header-edited" data-ng-if="data.edited">
+                    ({{ "TR__EDITED" | translate }})
                 </span>
             </div>
             <div class="comment-header-column2">
@@ -58,10 +61,12 @@
     </div>
     <div class="comment-children">
         <adh-resource-wrapper
-            data-ng-repeat="comment in data.comments">
+            data-ng-repeat="comment in data.comments | orderBy:frontendOrderPredicate:frontendOrderReverse">
             <adh-comment-resource
                 data-path="{{comment}}"
-                data-mode="display">
+                data-mode="display"
+                data-frontend-order-predicate="frontendOrderPredicate"
+                data-frontend-order-reverse="frontendOrderReverse">
             </adh-comment-resource>
         </adh-resource-wrapper>
     </div>

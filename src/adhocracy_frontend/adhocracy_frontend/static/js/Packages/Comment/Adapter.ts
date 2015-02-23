@@ -1,3 +1,7 @@
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+
+import _ = require("lodash");
+
 import AdhComment = require("./Comment");
 import AdhListing = require("../Listing/Listing");
 import AdhUtil = require("../Util/Util");
@@ -87,5 +91,9 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
 
     commentCount(resource : RICommentVersion) : number {
         return AdhUtil.eachItemOnce(resource.data[SICommentable.nick].comments).length;
+    }
+
+    edited(resource : RICommentVersion) : boolean {
+        return !(<any>_).endsWith(resource.path, "/VERSION_0000001/");
     }
 }
