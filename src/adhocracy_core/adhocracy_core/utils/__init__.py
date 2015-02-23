@@ -3,6 +3,7 @@ from collections import namedtuple
 from collections.abc import Sequence
 from datetime import datetime
 from functools import reduce
+from pytz import UTC
 import copy
 import json
 import pprint
@@ -15,6 +16,7 @@ from pyramid.traversal import find_resource
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 from pyramid.threadlocal import get_current_registry
+from pyramid.interfaces import IRequest
 from substanced.util import get_dotted_name
 from substanced.util import acquire
 from zope.interface import directlyProvidedBy
@@ -442,3 +444,19 @@ def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
             return VisibilityChange.revealed
         else:
             return VisibilityChange.invisible
+
+
+def get_request_date(request: IRequest) -> datetime:
+    """Get the creation date for `request` (may be None).
+
+    The returned date is cached for one request.
+    This way every date created in one batch/post request
+    can use this as default value.
+    The frontend relies on this to ease sorting.
+    """
+    date = getattr(request, '__date__', None)
+    if date is None:
+        date = datetime.utcnow().replace(tzinfo=UTC)
+        if request is not None:
+            request.__date__ = date
+    return date

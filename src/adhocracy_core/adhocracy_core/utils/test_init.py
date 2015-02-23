@@ -393,3 +393,28 @@ class TestGetVisibilityChange:
         event.old_appstruct = {'deleted': False, 'hidden': False}
         event.new_appstruct = {'deleted': False, 'hidden': False}
         assert self.call_fut(event) == VisibilityChange.visible
+
+def test_get_request_date_with_none():
+    """If the request is not availabe just return the current datetime."""
+    from datetime import datetime
+    from . import get_request_date
+    now = datetime.now()
+    result = get_request_date(None)
+    assert result.isocalendar() == now.isocalendar()
+
+
+def test_get_request_date_with_request_not_cached_date():
+    """If the request is available the default is cached."""
+    from . import get_request_date
+    request = testing.DummyResource()
+    result = get_request_date(request)
+    assert request.__date__ is result
+
+def test_get_request_date_with_request_cached_date():
+    """If the request has the cached date, return it."""
+    from . import get_request_date
+    from datetime import datetime
+    now = datetime.now()
+    request = testing.DummyResource(__date__=now)
+    result = get_request_date(request)
+    assert result is request.__date__
