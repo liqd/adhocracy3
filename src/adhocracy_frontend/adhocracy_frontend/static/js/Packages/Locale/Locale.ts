@@ -383,6 +383,58 @@ export class Wrap {
 }
 
 
+/**
+ * Translate directive for strings that contain HTML.
+ *
+ * Imagine you want to translate some HTML like this:
+ *
+ *     Click <a href="#">here</a>!
+ *
+ * The issue of course is that a part of the string is wrapped in HTML.
+ * With plain translation, you can not easily translate this. Your only
+ * option is to split this into several translatable strings which might
+ * not work in some languages.
+ *
+ * This directive tries to solve the problem by using adhWrap. So the
+ * above could be written like this:
+ *
+ *     <span adh-html-translate="Click [[link:here]]!" translate-templates="{
+ *         link: '&lt;a href=&quot;#&quot;&gt;{{content}}&lt;/a&gt;'
+ *     }"></span>
+ */
+export var htmlTranslateDirective = ($translate, adhWrap : Wrap) => {
+    return {
+        restrict: "A",
+        scope: {
+            translateValues: "=?",
+            translateTemplates: "=?"
+        },
+        link: (scope, element, attrs) => {
+            // NOTE: we could use another element for this
+            var escapeHTML = (s : string) => element.text(s).html();
+
+            var update = () => {
+                var msg = attrs.adhHtmlTranslate || "";
+                var values = scope.translateValues || {};
+                var templates = scope.translateTemplates || {};
+
+                // FIXME: adhWrap.encode values before interpolating
+                $translate(msg, values).then((translated : string) => {
+                    var html = escapeHTML(translated);
+                    var wrapped = adhWrap.decode(adhWrap.wrap(html, templates));
+                    // FIXME: do some $sce related magic here
+                    element.html(wrapped);
+                });
+            };
+
+            scope.$watch(() => attrs.htmlTranslate, update);
+            scope.$watch("translateValues", update);
+            scope.$watch("translateTemplates", update);
+        }
+    };
+};
+
+
 export var moduleName = "adhLocale";
 
 export var register = (angular) => {
@@ -390,5 +442,6 @@ export var register = (angular) => {
         .module(moduleName, [])
         .filter("adhCountryName", countryName)
         .service("adhWrap", ["$interpolate", Wrap])
+        .directive("adhHtmlTranslate", ["$translate", "adhWrap", htmlTranslateDirective])
         .directive("countrySelect", ["adhConfig", countrySelect]);
 };
