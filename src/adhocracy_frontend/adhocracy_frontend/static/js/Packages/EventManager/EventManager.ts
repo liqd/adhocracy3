@@ -1,3 +1,5 @@
+var totalCallbacks : number = 0;
+
 /**
  * Generic event handler with on, off and trigger.
  *
@@ -17,6 +19,7 @@ export class EventManager {
         this.handlers[event] = this.handlers[event] || {};
         var id = this.getNextID();
         this.handlers[event][id] = handler;
+        totalCallbacks += 1;
 
         return () => {
             this.off(event, id);
@@ -24,6 +27,8 @@ export class EventManager {
     }
 
     public off(event? : string, id? : number) : void {
+        totalCallbacks -= 1;
+
         if (typeof event === "undefined") {
             this.handlers = {};
         } else if (typeof id === "undefined") {
@@ -44,10 +49,22 @@ export class EventManager {
 }
 
 
+var eventManagerDebug = () => {
+    return {
+        template: "<span style=\"font-size: 10vh; position: absolute; top: 5vh; right: 0; z-index: 100;\">{{n}}</span>",
+        link: (scope) => {
+            scope.$watch(() => totalCallbacks, (value) => {
+                scope.n = value;
+            });
+        }
+    };
+};
+
 export var moduleName = "adhEventManager";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [])
+        .directive("eventManagerDebug", eventManagerDebug)
         .value("adhEventManagerClass", EventManager);
 };
