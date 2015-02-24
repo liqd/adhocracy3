@@ -236,3 +236,28 @@ describe("column navigation (depends on created proposal)", function() {
         expect(shared.hasClass(column3, "is-hide"));
     });
 });
+
+describe("space navigation", function() {
+    it("content of comment being written is kept when switching", function() {
+        shared.loginAnnotator();
+
+        var list = new MercatorProposalListing().get();
+        var proposal = list.getDetailPage(0);
+        var introComment = proposal.getCommentPage("introduction");
+        var commentMsg = "a comment about the intro";
+
+        introComment.fillComment(commentMsg);
+
+        var userSpaceButton = element(
+            by.xpath("(.//*[@data-ng-click=\"setSpace('user')\"])[1]"));
+        userSpaceButton.click();
+
+        var contentSpaceButton = element(
+            by.xpath("(.//*[@data-ng-click=\"setSpace('content')\"])[1]"));
+
+        contentSpaceButton.click();
+
+        expect(element(by.css("adh-comment-create form textarea"))
+               .getAttribute("value")).toBe(commentMsg);
+    });
+});
