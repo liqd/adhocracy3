@@ -302,24 +302,25 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
         directive.scope.create = "@";
-        directive.controller = ["adhTopLevelState", "$scope", (adhTopLevelState : AdhTopLevelState.Service, $scope : IScope) => {
-            adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
-                if (!proposalVersionUrl) {
-                    $scope.selectedState = "";
-                } else if (proposalVersionUrl === $scope.path) {
-                    $scope.selectedState = "is-selected";
-                } else {
-                    $scope.selectedState = "is-not-selected";
-                }
-            });
-            adhTopLevelState.bind("commentableUrl", $scope);
-        }];
         return directive;
     }
 
     public link(scope, element, attrs, wrapper) {
         var instance = super.link(scope, element, attrs, wrapper);
+
         instance.scope.$flow = this.flowFactory.create();
+
+        this.adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+            if (!proposalVersionUrl) {
+                scope.selectedState = "";
+            } else if (proposalVersionUrl === scope.path) {
+                scope.selectedState = "is-selected";
+            } else {
+                scope.selectedState = "is-not-selected";
+            }
+        });
+        this.adhTopLevelState.bind("commentableUrl", scope);
+
         return instance;
     }
 
