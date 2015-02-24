@@ -67,10 +67,10 @@ var bindVariablesAndClear = (
     clear();
 
     keys.forEach((key : string) => {
-        adhTopLevelState.on(key, (value) => {
+        scope.$on("$destroy", adhTopLevelState.on(key, (value) => {
             scope[key] = value;
             clear();
-        });
+        }));
     });
 };
 

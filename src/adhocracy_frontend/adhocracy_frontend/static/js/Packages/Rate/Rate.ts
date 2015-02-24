@@ -192,10 +192,9 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         scope: {
             refersTo: "@"
         },
-        link: (scope : IRateScope, element) : void => {
+        link: (scope : IRateScope) : void => {
             var myRateResource : RIRateVersion;
             var webSocketOff : Function;
-            var rateEventOff : Function;
             var postPoolPath : string;
             var rates : {[key : string]: number};
             var lock : boolean;
@@ -246,11 +245,11 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
                 if (typeof webSocketOff === "undefined") {
                     var itemPath = AdhUtil.parentPath(resource.path);
-                    webSocketOff = adhWebSocket.register(itemPath, (message) => {
+                    // FIXME DefinitelyTyped
+                    (<any>scope).$on("$destroy", adhWebSocket.register(itemPath, (message) => {
                         updateMyRate();
                         updateAggregatedRates();
-                    });
-                    element.on("$destroy", webSocketOff);
+                    }));
                 }
             };
 
@@ -321,13 +320,11 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             // sync with other local rate buttons
-            rateEventOff = adhRateEventManager.on(scope.refersTo, () => {
+            // FIXME DefinitelyTyped
+            (<any>scope).$on("$destroy", adhRateEventManager.on(scope.refersTo, () => {
                 updateMyRate();
                 updateAggregatedRates();
-            });
-            element.on("$destroy", () => {
-                rateEventOff();
-            });
+            }));
 
             scope.auditTrailVisible = false;
             adhHttp.get(scope.refersTo)

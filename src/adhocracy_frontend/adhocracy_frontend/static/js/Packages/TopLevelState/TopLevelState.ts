@@ -470,8 +470,8 @@ export var spaceDirective = (adhTopLevelState : Service) => {
             key: "@"
         },
         link: (scope) => {
-            adhTopLevelState.bind("space", scope, "currentSpace");
-            adhTopLevelState.bind("view", scope, "view", scope.key);
+            scope.$on("$destroy", adhTopLevelState.bind("space", scope, "currentSpace"));
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope, "view", scope.key));
         },
         template: "<adh-wait data-condition=\"currentSpace === key\" data-ng-show=\"currentSpace === key\">" +
             "    <adh-inject></adh-inject>" +
@@ -488,7 +488,7 @@ export var spaceSwitch = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "SpaceSwitch.html",
         link: (scope) => {
-            adhTopLevelState.bind("space", scope, "currentSpace");
+            scope.$on("$destroy", adhTopLevelState.bind("space", scope, "currentSpace"));
             scope.setSpace = (space : string) => {
                 if (scope.currentSpace === space) {
                     adhTopLevelState.redirectToSpaceHome(space);
@@ -529,8 +529,8 @@ export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Error.html",
         scope: {},
         controller: ["adhTopLevelState", "$scope", (adhTopLevelState : Service, $scope) => {
-            adhTopLevelState.bind("code", $scope);
-            adhTopLevelState.bind("message", $scope);
+            $scope.$on("$destroy", adhTopLevelState.bind("code", $scope));
+            $scope.$on("$destroy", adhTopLevelState.bind("message", $scope));
         }]
     };
 };

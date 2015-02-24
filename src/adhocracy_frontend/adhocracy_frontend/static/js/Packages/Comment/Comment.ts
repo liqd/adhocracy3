@@ -96,7 +96,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
             adhTopLevelState : AdhTopLevelState.Service,
             $scope : ICommentResourceScope
         ) => {
-            adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
+            $scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
                 if (!commentVersionUrl) {
                     $scope.selectedState = "";
                 } else if (AdhUtil.parentPath(commentVersionUrl) === $scope.path) {
@@ -104,7 +104,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                 } else {
                     $scope.selectedState = "is-not-selected";
                 }
-            });
+            }));
         }];
 
         return directive;

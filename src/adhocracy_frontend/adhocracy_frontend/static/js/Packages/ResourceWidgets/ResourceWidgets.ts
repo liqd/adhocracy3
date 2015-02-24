@@ -284,7 +284,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             self.clear(instance));
 
         scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
-        scope.$on("$delete", () => {
+        scope.$on("$destroy", () => {
             setModeOff();
             submitOff();
             cancelOff();

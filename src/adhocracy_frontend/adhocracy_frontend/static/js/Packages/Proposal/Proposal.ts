@@ -59,8 +59,6 @@ export class ProposalDetail {
                 adhWebSocket : AdhWebSocket.Service,
                 $scope : DetailScope<RIProposal>
             ) => {
-                var wsOff : Function;
-
                 var fetchAndUpdateContent = (itemPath : string) : void => {
                     adhHttp.getNewestVersionPathNoFork(itemPath)
                         .then((versionPath : string) => adhHttp.get(versionPath))
@@ -69,20 +67,9 @@ export class ProposalDetail {
                         });
                 };
 
-                var wsHandler = (event : AdhWebSocket.IServerEvent) : void => {
+                $scope.$on("$destroy", adhWebSocket.register($scope.path, () => {
                     fetchAndUpdateContent($scope.path);
-                };
-
-                try {
-                    if (typeof wsOff !== "undefined") {
-                        wsOff();
-                    }
-                    wsOff = adhWebSocket.register($scope.path, wsHandler);
-
-                } catch (e) {
-                    console.log(e);
-                    console.log("Will continue on resource " + $scope.path + " without server bind.");
-                }
+                }));
 
                 fetchAndUpdateContent($scope.path);
             }]

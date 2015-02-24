@@ -249,7 +249,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                     });
             }
-            adhTopLevelState.on("userUrl", (userUrl) => {
+            $scope.$on("$destroy", adhTopLevelState.on("userUrl", (userUrl) => {
                 if (!userUrl) {
                     $scope.selectedState = "";
                 } else if (userUrl === $scope.path) {
@@ -257,7 +257,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
                 } else {
                     $scope.selectedState = "is-not-selected";
                 }
-            });
+            }));
         }]
     };
 };

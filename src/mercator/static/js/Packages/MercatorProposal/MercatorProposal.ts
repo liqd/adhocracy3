@@ -310,7 +310,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         instance.scope.$flow = this.flowFactory.create();
 
-        this.adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+        scope.$on("$destroy", this.adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
             if (!proposalVersionUrl) {
                 scope.selectedState = "";
             } else if (proposalVersionUrl === scope.path) {
@@ -318,8 +318,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             } else {
                 scope.selectedState = "is-not-selected";
             }
-        });
-        this.adhTopLevelState.bind("commentableUrl", scope);
+        }));
+        scope.$on("$destroy", this.adhTopLevelState.bind("commentableUrl", scope));
 
         return instance;
     }
@@ -877,7 +877,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
         scope: {
             path: "@"
         },
-        link: (scope) => {
+        link: (scope, element) => {
             scope.data  = {};
             adhHttp.get(scope.path).then((proposal) => {
                 scope.data.user_info = {
@@ -904,7 +904,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                         budget: finance.data[SIMercatorFinance.nick].budget
                     };
                 });
-                adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
                         scope.selectedState = "";
                     } else if (proposalVersionUrl === scope.path) {
@@ -912,7 +912,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                     } else {
                         scope.selectedState = "is-not-selected";
                     }
-                });
+                }));
             });
 
             countSupporters(adhHttp, AdhUtil.parentPath(scope.path) + "rates/", scope.path).then((count) => {

@@ -161,9 +161,9 @@ export var register = () => {
                         expect(resourceWidget.update).toHaveBeenCalled();
                     });
 
-                    describe("on $delete", () => {
+                    describe("on $destroy", () => {
                         beforeEach(() => {
-                            var fn = getArgsByFirst(scopeMock.$on, "$delete")[0][1];
+                            var fn = getArgsByFirst(scopeMock.$on, "$destroy")[0][1];
                             instance.deferred.resolve = jasmine.createSpy("resolve");
                             fn("event");
                         });
