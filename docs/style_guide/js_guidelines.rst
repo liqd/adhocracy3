@@ -258,6 +258,62 @@ Angular
 
 -  angular scopes should be typed with interfaces.
 
+link vs. controller
+~~~~~~~~~~~~~~~~~~~
+
+When writing directives, ``link`` and ``controller`` do mostly the
+same::
+
+   var linkDirective = (service) => {
+       return {
+           link: (scope, element) => {
+               scope.foo = "bar";
+               service.something();
+           }
+       };
+   };
+
+   var ctrlDirective = () => {
+       return {
+           controller: ["$scope", "$element", "service", ($scope, $element, service) => {
+               $scope.foo = "bar";
+               service.something();
+           }]
+       };
+   };
+
+Note that dependency injection happens in different places in the two
+examples.
+
+In general, ``link`` is to be preferred.  There is one case where
+``controller`` must be used.  See `Creating Directives that
+Communicate`_ in the angular docs for an in depth discussion.  In that
+case, the controller should not be defined inline but as a separate
+``class``::
+
+   class FooController {
+       constructor(private depedency) {}
+
+       public something() {
+           ...
+       }
+   }
+
+   var ctrlDirective = () => {
+       return {
+           controller: ["dependency", FooController]
+       };
+   };
+
+   var subDirective = (service) => {
+       return {
+           require: "^ctrlDirective",
+           link: (scope, element, attrs, ctrl) => {
+               ctrl.something();
+           }
+       };
+   };
+
 Template
 ~~~~~~~~
 
@@ -306,3 +362,4 @@ Documentation
 .. _tslint: https://github.com/palantir/tslint
 .. _jsdoc: http://usejsdoc.org/
 .. _isolated scope: https://docs.angularjs.org/guide/directive#isolating-the-scope-of-a-directive
+.. _Creating Directives that Communicate: https://docs.angularjs.org/guide/directive#creating-directives-that-communicate
