@@ -390,21 +390,21 @@ export class Service {
         }
     }
 
-    public on(key : string, fn, space? : string) : void {
-        if (key === "space") {
-            this.eventManager.on(key, fn);
-        } else if (typeof space !== "undefined") {
-            this.eventManager.on(space + ":" + key, fn);
-        } else {
-            this.eventManager.on(this.currentSpace + ":" + key, fn);
-        }
-
+    public on(key : string, fn, space? : string) : Function {
         // initially trigger callback
         fn(this.get(key, space));
+
+        if (key === "space") {
+            return this.eventManager.on(key, fn);
+        } else if (typeof space !== "undefined") {
+            return this.eventManager.on(space + ":" + key, fn);
+        } else {
+            return this.eventManager.on(this.currentSpace + ":" + key, fn);
+        }
     }
 
-    public bind(key : string, context : {[k : string]: any}, keyInContext? : string, space? : string) {
-        this.on(key, (value : string) => {
+    public bind(key : string, context : {[k : string]: any}, keyInContext? : string, space? : string) : Function {
+        return this.on(key, (value : string) => {
             context[keyInContext || key] = value;
         }, space);
     }
