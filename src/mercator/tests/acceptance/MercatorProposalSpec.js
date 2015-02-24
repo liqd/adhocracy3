@@ -89,7 +89,7 @@ describe("mercator proposal form", function() {
         expect(detailPage.experience.getText()).toContain("experience");
     });
 
-    xit("can be upvoted by the annotator", function() {
+    it("can be upvoted by the annotator", function() {
         shared.loginAnnotator();
 
         var list = new MercatorProposalListing().get();
