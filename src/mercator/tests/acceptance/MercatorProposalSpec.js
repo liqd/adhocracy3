@@ -167,7 +167,7 @@ describe("mercator proposal form", function() {
         expect(browser.getCurrentUrl()).toContain("login");
     });
 
-    it("allows creator to edit existing proposals (depends on submit) - fails due to #679", function() {
+    it("allows creator to edit existing proposals (depends on submit)", function() {
         shared.loginAnnotator();
 
         var list = new MercatorProposalListing().get();
