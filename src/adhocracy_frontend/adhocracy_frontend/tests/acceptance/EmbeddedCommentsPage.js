@@ -9,7 +9,7 @@ var EmbeddedCommentsPage = function(referer) {
     this.url = "/embed/create-or-show-comment-listing"
         + "?key=" + referer + "&pool-path=" + this.poolPath;
 
-    this.listing = element(by.css(".listing"));
+    this.listing = element(by.tagName("adh-comment-listing"));
     this.listingCreateForm = this.listing.element(by.css(".listing-create-form"));
     this.commentInput = this.listingCreateForm.element(by.model("data.content"));
     this.submitButton = this.listingCreateForm.element(by.css("input[type=\"submit\"]"));
