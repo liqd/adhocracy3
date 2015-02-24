@@ -245,11 +245,12 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
                 if (typeof webSocketOff === "undefined") {
                     var itemPath = AdhUtil.parentPath(resource.path);
-                    // FIXME DefinitelyTyped
-                    (<any>scope).$on("$destroy", adhWebSocket.register(itemPath, (message) => {
+                    webSocketOff = adhWebSocket.register(itemPath, (message) => {
                         updateMyRate();
                         updateAggregatedRates();
-                    }));
+                    });
+                    // FIXME DefinitelyTyped
+                    (<any>scope).$on("$destroy", webSocketOff);
                 }
             };
 
