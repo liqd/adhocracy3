@@ -223,13 +223,13 @@ describe("column navigation (depends on created proposal)", function() {
         expect(shared.hasClass(column2, "is-show"));
         expect(shared.hasClass(column3, "is-show"));
 
-        column3.all(by.css('.moving-column-menu-nav a')).last().click();
+        column3.all(by.css(".moving-column-menu-nav a")).last().click();
 
         expect(shared.hasClass(column1, "is-show"));
         expect(shared.hasClass(column2, "is-show"));
         expect(shared.hasClass(column3, "is-hide"));
 
-        column2.all(by.css('.moving-column-menu-nav a')).last().click();
+        column2.all(by.css(".moving-column-menu-nav a")).last().click();
 
         expect(shared.hasClass(column1, "is-show"));
         expect(shared.hasClass(column2, "is-hide"));

@@ -12,7 +12,7 @@ describe("sharing", function() {
         page.clickDummyTweetButton();
 
         var tweeterIframe = page.getTweeterIframe();
-        expect(tweeterIframe.getAttribute('src')).toContain("twitter.com/widgets/tweet_button.html");
+        expect(tweeterIframe.getAttribute("src")).toContain("twitter.com/widgets/tweet_button.html");
     });
 
     it("can be shared on Facebook", function() {
@@ -21,7 +21,7 @@ describe("sharing", function() {
         page.clickDummyFacebookLikeButton();
 
         var facebookIframe = page.getFacebookIframe();
-        expect(facebookIframe.getAttribute('src')).toContain("www.facebook.com/plugins/like.php");
+        expect(facebookIframe.getAttribute("src")).toContain("www.facebook.com/plugins/like.php");
     });
 
 });

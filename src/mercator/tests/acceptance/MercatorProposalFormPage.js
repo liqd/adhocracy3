@@ -102,7 +102,7 @@ var MercatorProposalFormPage = function() {
     }
 
     this.getEditLink = function(comment) {
-        return comment.element(by.css("[data-ng-click='edit()']"));
+        return comment.element(by.css("[data-ng-click=\"edit()\"]"));
     };
 };
 
