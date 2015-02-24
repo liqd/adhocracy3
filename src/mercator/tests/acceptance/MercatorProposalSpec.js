@@ -72,7 +72,7 @@ describe("mercator proposal form", function() {
         // proposal whos
         expect(detailPage.userInfo.getText()).toContain("pita pasta");
         expect(detailPage.organizationName.getText()).toContain("organization name");
-        expect(detailPage.organizationCountry.getText()).toContain("Chile");
+        expect(detailPage.organizationCountry.getText()).toContain("France");
         expect(detailPage.organizationNonProfit.getText()).toContain("Non Profit");
 
         // proposal details
