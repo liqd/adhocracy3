@@ -141,7 +141,7 @@ describe("mercator proposal form", function() {
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
 
-        // commentator has upvoted once in the previous test
+        // contributor has upvoted once in the previous test
         expect(page.rateDifference.getText()).toEqual("+1");
         page.rateWidget.click();
         expect(page.rateDifference.getText()).toEqual("0");
