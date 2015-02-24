@@ -59,7 +59,7 @@ export class ProposalDetail {
                 adhWebSocket : AdhWebSocket.Service,
                 $scope : DetailScope<RIProposal>
             ) => {
-                var wsHandle : number;
+                var wsOff : Function;
 
                 var fetchAndUpdateContent = (itemPath : string) : void => {
                     adhHttp.getNewestVersionPathNoFork(itemPath)
@@ -74,10 +74,10 @@ export class ProposalDetail {
                 };
 
                 try {
-                    if (typeof wsHandle !== "undefined") {
-                        adhWebSocket.unregister($scope.path, wsHandle);
+                    if (typeof wsOff !== "undefined") {
+                        wsOff();
                     }
-                    wsHandle = adhWebSocket.register($scope.path, wsHandler);
+                    wsOff = adhWebSocket.register($scope.path, wsHandler);
 
                 } catch (e) {
                     console.log(e);
