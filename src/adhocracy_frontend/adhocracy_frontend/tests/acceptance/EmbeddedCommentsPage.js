@@ -40,7 +40,7 @@ var EmbeddedCommentsPage = function(referer) {
     };
 
     this.getEditLink = function(comment) {
-        return comment.element(by.xpath('(.//*[@data-ng-click="edit()"])[1]'));
+        return comment.element(by.xpath("(.//*[@data-ng-click=\"edit()\"])[1]"));
     };
 
     this.createReply = function(parent, content) {
