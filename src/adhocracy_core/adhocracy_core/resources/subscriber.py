@@ -26,7 +26,7 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import get_last_version
-from adhocracy_core.utils import get_request_date
+from adhocracy_core.utils import get_modification_date
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
@@ -40,9 +40,9 @@ def update_modification_date_modified_by(event):
     sheet = get_sheet(event.object, IMetadata, registry=event.registry)
     request = event.request
     appstruct = {}
+    appstruct['modification_date'] = get_modification_date(event.registry)
     if request is not None:
         appstruct['modified_by'] = get_user(request)
-        appstruct['modification_date'] = get_request_date(request)
     sheet.set(appstruct,
               send_event=False,
               registry=event.registry,

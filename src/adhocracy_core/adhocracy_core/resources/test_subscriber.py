@@ -396,24 +396,12 @@ class TestUpdateModificationDate:
         from .subscriber import update_modification_date_modified_by
         return update_modification_date_modified_by(event)
 
-    def test_without_request(self, context, registry, mock_sheet):
-        from adhocracy_core.sheets.metadata import IMetadata
-        register_sheet(context, mock_sheet, registry, isheet=IMetadata)
-        event = testing.DummyResource(object=context,
-                                      registry=registry,
-                                      request=None)
-        self._call_fut(event)
-        assert mock_sheet.set.call_args[0][0] == {}
-        assert mock_sheet.set.call_args[1] ==\
-            {'send_event': False,  'omit_readonly': False, 'request': None,
-             'registry': registry}
-
     def test_with_request(self, context, registry, mock_sheet, monkeypatch):
         from datetime import datetime
         from . import subscriber
         from adhocracy_core.sheets.metadata import IMetadata
         now = datetime.now()
-        monkeypatch.setattr(subscriber, 'get_request_date', lambda x: now)
+        monkeypatch.setattr(subscriber, 'get_modification_date', lambda x: now)
         user = object()
         monkeypatch.setattr(subscriber, 'get_user', lambda x: user)
         register_sheet(context, mock_sheet, registry, isheet=IMetadata)
@@ -424,6 +412,10 @@ class TestUpdateModificationDate:
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'modification_date': now,
                                                   'modified_by': user}
+        assert mock_sheet.set.call_args[1] ==\
+            {'send_event': False,  'omit_readonly': False, 'request': request,
+             'registry': registry}
+
 
 
 @fixture()
