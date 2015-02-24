@@ -4,7 +4,7 @@ var EmbeddedCommentsPage = require("./core/EmbeddedCommentsPage.js");
 var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
 
 var MercatorProposalDetailPage = function() {
-    this.column = element(by.tagName("adh-mercator-proposal-detail-column"));
+    this.column = element.all(by.tagName("adh-mercator-proposal-detail-column")).first();
     this.coverCommentsButton = element(by.css(".mercator-proposal-cover-show-comments"));
     this.editButton = this.column.element(by.cssContainingText("a", "edit"));
     this.rateWidget = element(by.css(".mercator-proposal-detail-view .mercator-propsal-detail-meta-item-rate"));
