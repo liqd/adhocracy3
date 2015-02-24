@@ -22,7 +22,17 @@ var EmbeddedCommentsPage = function(referer) {
     this.createComment = function(content) {
         this.commentInput.sendKeys(content);
         this.submitButton.click();
+        // FIXME: Return created comment
         return this.listing.element(by.xpath("(//adh-comment-resource)[1]"));
+
+        // return all.reduce(function(acc, elem) {
+        //            return protractor.promise.all(
+        //                acc.getAttribute("data-path"),
+        //                elem.getAttribute("data-path")
+        //            ).then(function(paths) {
+        //                       return (path[0] > path[1] ? acc : elem);
+        //                   })
+        //        });
     };
 
     this.getReplyLink = function(comment) {
