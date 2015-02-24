@@ -248,7 +248,6 @@ describe("column navigation (depends on created proposal)", function() {
         // if using a tiling window manager, be sure your browser
         // window is floating otherwise the following call won't work
         browser.driver.manage().window().setSize(640, 480);
-
         expect(shared.hasClass(leftColumn, "is-collapse"));
 
         browser.driver.manage().window().setSize(1024, 1280);
