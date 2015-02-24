@@ -60,7 +60,7 @@ describe("mercator proposal form", function() {
         expect(browser.getCurrentUrl()).not.toContain("@create");
 
         var detailPage = new MercatorProposalDetailPage();
-        
+
         // proposal pitch
         expect(detailPage.title.getText()).toContain("protitle");
         expect(detailPage.teaser.getText()).toBe("proteaser");
