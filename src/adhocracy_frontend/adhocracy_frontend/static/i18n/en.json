@@ -3,7 +3,7 @@
     "TR__ACTIVATION_ERROR_1": "We will send you a new authentification link within the next 24h. Please check your mail and SPAM meanwhile.",
     "TR__ACTIVATION_ERROR_2": "Please excuse the inconvience and make sure you activate your account within the next 6 days.",
     "TR__ACTIVATION_ERROR_3": "Thanks!",
-    "TR__ACTIVATION_ERROR_SUPPORT": "To request a new link, please contact our support team, explicitly stating the email address you registered with, via ",
+    "TR__ACTIVATION_ERROR_SUPPORT": "To request a new link, please contact our support team, explicitly stating the email address you registered with, via",
     "TR__AUTHOR": "author",
     "TR__BACK_TO_TOP": "back to top",
     "TR__CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can procede using {{siteName}}.",
