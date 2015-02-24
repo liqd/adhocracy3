@@ -235,4 +235,23 @@ describe("column navigation (depends on created proposal)", function() {
         expect(shared.hasClass(column2, "is-hide"));
         expect(shared.hasClass(column3, "is-hide"));
     });
+
+    it("allows a single column design when the screen size is small", function() {
+        var list = new MercatorProposalListing().get();
+        var proposal = list.getDetailPage(0);
+
+        var leftColumn = element.all(by.css("adh-moving-column div.moving-column"))
+                         .first();
+
+        expect(shared.hasClass(leftColumn, "is-show"));
+
+        // if using a tiling window manager, be sure your browser
+        // window is floating otherwise the following call won't work
+        browser.driver.manage().window().setSize(640, 480);
+
+        expect(shared.hasClass(leftColumn, "is-collapse"));
+
+        browser.driver.manage().window().setSize(1024, 1280);
+        expect(shared.hasClass(leftColumn, "is-show"));
+    });
 });
