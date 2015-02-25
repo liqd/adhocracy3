@@ -89,6 +89,18 @@ describe("mercator proposal form", function() {
         expect(detailPage.experience.getText()).toContain("experience");
     });
 
+    it("can be commented by the contributor", function() {
+        shared.loginContributor();
+
+        var list = new MercatorProposalListing().get();
+        var page = list.getDetailPage(0);
+        var commentContent = "some comment on the proposal";
+        var introCommentPage = page.getCommentPage("introduction");
+        var comment = introCommentPage.createComment(commentContent);
+
+        expect(introCommentPage.getCommentText(comment)).toBe(commentContent);
+    });
+
     it("can be upvoted by the annotator", function() {
         shared.loginAnnotator();
 
