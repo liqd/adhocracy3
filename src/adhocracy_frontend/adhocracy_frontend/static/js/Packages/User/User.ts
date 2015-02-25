@@ -3,6 +3,7 @@ import _ = require("lodash");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhCache = require("../Http/Cache");
+import AdhLocale = require("../Locale/Locale");
 
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
@@ -223,6 +224,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhLocale.moduleName,
         ])
         .service("adhUser", ["adhConfig", "adhHttp", "adhCache", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
 };

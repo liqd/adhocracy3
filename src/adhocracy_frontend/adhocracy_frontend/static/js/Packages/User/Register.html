@@ -62,8 +62,9 @@
             class="m-call-to-action"
             data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
         <div data-ng-if="!success" class="register-info">
-            <p>{{ "TR__REGISTRATION_LOGIN_INSTEAD" | translate }}
-            <a href="/login">{{ "TR__LINK_HERE" | translate }}</a></p>
+            <p data-adh-html-translate="TR__REGISTRATION_LOGIN_INSTEAD" data-translate-templates="{
+                link: '&lt;a href=&quot;/login&quot;&gt;{{ content }}&lt;/a&gt;'
+            }"></p>
         </div>
     </form>
 
