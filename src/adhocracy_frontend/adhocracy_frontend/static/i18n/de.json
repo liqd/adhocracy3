@@ -86,7 +86,7 @@
     "TR__MERCATOR_PROPOSAL_DETAIL": "Deine Idee im Detail",
     "TR__MERCATOR_PROPOSAL_EXTRA": "Extras",
     "TR__MERCATOR_PROPOSAL_FINANCE": "Finanzen",
-    "TR__MERCATOR_PROPOSAL_FINANCE_ANNOTATION": "Nur das „Gesamtbudget“ und die „beantragte Förderung“ werden mit Deinem Antrag öffentlich gemacht. Alle weiteren Angaben bleiben privat und sind nur für das „Advocate Europe“-Team und die Jury sichtbar. \n\nWenn es Deine Projektidee in die nächste Runde schafft, bitten wir Dich um einen detaillierteren Finanzplan. Nutze die Finanzplan-Vorlage gern bereits jetzt für die Berechnung des Budgets. ",
+    "TR__MERCATOR_PROPOSAL_FINANCE_ANNOTATION": "Nur das „Gesamtbudget“ und die „beantragte Förderung“ werden mit Deinem Antrag öffentlich gemacht. Alle weiteren Angaben bleiben privat und sind nur für das „Advocate Europe“-Team und die Jury sichtbar. \n\nWenn es Deine Projektidee in die nächste Runde schafft, bitten wir Dich um einen detaillierteren Finanzplan. Nutze die [[link:Finanzplan-Vorlage]] gern bereits jetzt für die Berechnung des Budgets. ",
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED": "Bereits bewilligt?",
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED_ANNOTATION": "Wenn Du weitere finanzielle Mittel in das Projekt einbringst, sind diese bereits bewilligt?",
     "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES": "Weitere finanzielle Mittel",

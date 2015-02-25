@@ -172,6 +172,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     commentableUrl : string;
     $flow? : Flow;
     create : boolean;
+    financialPlanTemplate : string;
 }
 
 export interface IControllerScope extends IScope {
@@ -309,6 +310,17 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var instance = super.link(scope, element, attrs, wrapper);
 
         instance.scope.$flow = this.flowFactory.create();
+
+        scope.$watch(() => this.adhConfig.locale, (locale) => {
+            var financialPlanUrl : string;
+
+            if (locale === "de") {
+                financialPlanUrl = this.adhConfig.custom["financial_plan_url_de"];
+            } else {
+                financialPlanUrl = this.adhConfig.custom["financial_plan_url_en"];
+            }
+            scope.financialPlanTemplate = "<a href=\"" + financialPlanUrl + "\" target=\"_blank\">{{content}}</a>";
+        });
 
         scope.$on("$destroy", this.adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
             if (!proposalVersionUrl) {
