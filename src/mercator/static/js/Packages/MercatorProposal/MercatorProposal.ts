@@ -319,7 +319,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             } else {
                 financialPlanUrl = this.adhConfig.custom["financial_plan_url_en"];
             }
-            scope.financialPlanTemplate = "<a href=\"" + financialPlanUrl + "\" target=\"_top\">{{content}}</a>";
+            scope.financialPlanTemplate = "<a href=\"" + financialPlanUrl + "\" target=\"_blank\">{{content}}</a>";
         });
 
         scope.$on("$destroy", this.adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
