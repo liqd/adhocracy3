@@ -6,12 +6,12 @@ var EmbeddedSharePage = require("./EmbeddedSharePage.js");
 
 describe("sharing", function() {
 
-    it("can be shared on Tweeter", function() {
+    it("can be shared on Twitter", function() {
         var page = new EmbeddedSharePage().get();
 
         page.clickDummyTweetButton();
 
-        var tweeterIframe = page.getTweeterIframe();
+        var tweeterIframe = page.getTwitterIframe();
         expect(tweeterIframe.getAttribute("src")).toContain("twitter.com/widgets/tweet_button.html");
     });
 
