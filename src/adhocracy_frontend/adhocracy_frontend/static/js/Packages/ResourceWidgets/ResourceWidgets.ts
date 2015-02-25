@@ -264,13 +264,13 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             deferred: self.$q.defer()
         };
 
-        var setModeID = wrapper.eventManager.on("setMode", (mode : Mode) =>
+        var setModeOff = wrapper.eventManager.on("setMode", (mode : Mode) =>
             self.setMode(instance, mode));
 
-        var submitID = wrapper.eventManager.on("submit", () =>
+        var submitOff = wrapper.eventManager.on("submit", () =>
             self.provide(instance).then((resources) => instance.deferred.resolve(resources)));
 
-        var cancelID = wrapper.eventManager.on("cancel", () => {
+        var cancelOff = wrapper.eventManager.on("cancel", () => {
             if (scope.mode === Mode.edit) {
                 return self.update(instance).then(() => {
                     self.setMode(instance, Mode.display);
@@ -280,15 +280,15 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             }
         });
 
-        var clearID = wrapper.eventManager.on("clear", () =>
+        var clearOff = wrapper.eventManager.on("clear", () =>
             self.clear(instance));
 
         scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
-        scope.$on("$delete", () => {
-            wrapper.eventManager.off("setMode", setModeID);
-            wrapper.eventManager.off("submit", submitID);
-            wrapper.eventManager.off("cancel", cancelID);
-            wrapper.eventManager.off("clear", clearID);
+        scope.$on("$destroy", () => {
+            setModeOff();
+            submitOff();
+            cancelOff();
+            clearOff();
             instance.deferred.resolve([]);
         });
 
