@@ -158,7 +158,6 @@ class BatchView(RESTView):
         set_batchmode(request)
         self.copy_attr_if_exists('root', request)
         self.copy_attr_if_exists('__cached_principals__', request)
-        self.copy_attr_if_exists('__date__', request)
         self.copy_header_if_exists('X-User-Path', request)
         self.copy_header_if_exists('X-User-Token', request)
 
