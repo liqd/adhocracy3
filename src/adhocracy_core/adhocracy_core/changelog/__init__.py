@@ -27,7 +27,8 @@ def clear_modification_date_after_commit_hook(success: bool,
 
     The date is set by :func:`adhocracy_utils.get_modification_date`.
     """
-    if getattr(registry, '__modification_date__', None):  # pragma: no branch
+    if getattr(registry, '__modification_date__',
+               None) is not None:  # pragma: no branch
         del registry.__modification_date__
 
 
