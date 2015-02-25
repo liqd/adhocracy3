@@ -47,6 +47,5 @@ describe("ratings", function() {
         var changedComment = page.editComment(comment, ["c4 - edited"]);
         var rate2 = page.getRateWidget(changedComment);
         expect(rate2.element(by.css(".rate-difference")).getText()).toEqual("+1");
-
     });
 });
