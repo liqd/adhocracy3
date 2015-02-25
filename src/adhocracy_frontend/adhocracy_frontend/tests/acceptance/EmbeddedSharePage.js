@@ -14,6 +14,7 @@ var EmbeddedSharePage = function() {
 
     this.clickDummyTweetButton = function() {
         this.dummyTweetButton.click();
+        browser.waitForAngular();
     };
 
     this.getTwitterIframe = function() {
