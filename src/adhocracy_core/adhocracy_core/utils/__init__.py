@@ -3,6 +3,7 @@ from collections import namedtuple
 from collections.abc import Sequence
 from datetime import datetime
 from functools import reduce
+from pytz import UTC
 import copy
 import json
 import pprint
@@ -442,3 +443,17 @@ def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
             return VisibilityChange.revealed
         else:
             return VisibilityChange.invisible
+
+
+def get_modification_date(registry: Registry) -> datetime:
+    """Get the shared modification date for the current transaction.
+
+    This way every date created in one batch/post request
+    can use this as default value.
+    The frontend relies on this to ease sorting.
+    """
+    date = getattr(registry, '__modification_date__', None)
+    if date is None:
+        date = datetime.utcnow().replace(tzinfo=UTC)
+        registry.__modification_date__ = date
+    return date

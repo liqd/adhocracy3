@@ -34,6 +34,7 @@ var MercatorProposalFormPage = function() {
     this.partners = this.form.element(by.model("data.partners"));
     this.financeBudget = this.form.element(by.model("data.finance.budget"));
     this.financeRequestedFunding = this.form.element(by.model("data.finance.requested_funding"));
+    this.financeOtherSource = this.form.element(by.model("data.finance.other_sources"))
     this.financeGrantedYes = this.form.all(by.model("data.finance.granted")).first();
     this.experience = this.form.element(by.model("data.experience"));
     this.heardFromColleague = this.form.element(by.model("data.heard_from.colleague"));
@@ -67,8 +68,9 @@ var MercatorProposalFormPage = function() {
         this.steps.sendKeys("plan");
         this.value.sendKeys("relevance");
         this.partners.sendKeys("partners");
-        this.financeBudget.sendKeys("1000");
+        this.financeBudget.sendKeys("1200");
         this.financeRequestedFunding.sendKeys("1000");
+        this.financeOtherSource.sendKeys("other source");
         this.financeGrantedYes.click();
         this.experience.sendKeys("experience");
         this.heardFromColleague.click();
@@ -102,34 +104,7 @@ var MercatorProposalFormPage = function() {
     }
 
     this.getEditLink = function(comment) {
-        return comment.element(by.css("[data-ng-click='edit()']"));
-    };
-
-    this.createReply = function(parent, content) {
-        this.getReplyLink(parent).click();
-        parent.element(by.model("data.content")).sendKeys(content);
-        parent.element(by.css("input[type=\"submit\"]")).click();
-        return parent.element(by.css('.comment-children .comment'));
-    };
-
-    this.editComment = function(comment, keys) {
-        this.getEditLink(comment).click();
-        var textarea = comment.element(by.model("data.content"));
-        textarea.sendKeys.apply(textarea, keys);
-        comment.element(by.css("[data-ng-click='submit()']")).click();
-        return comment;
-    };
-
-    this.getCommentText = function(comment) {
-        return comment.element(by.css(".comment-content")).getText();
-    }
-
-    this.getCommentAuthor = function(comment) {
-        return comment.element(by.css("adh-user-meta a")).getText();
-    }
-
-    this.getRateWidget = function(comment) {
-        return comment.element(by.tagName("adh-rate"));
+        return comment.element(by.css("[data-ng-click=\"edit()\"]"));
     };
 };
 
