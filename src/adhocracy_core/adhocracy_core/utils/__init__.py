@@ -1,5 +1,6 @@
 """Helper functions shared between modules."""
 from collections import namedtuple
+from collections.abc import Iterable
 from collections.abc import Sequence
 from datetime import datetime
 from functools import reduce
@@ -17,8 +18,9 @@ from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 from pyramid.threadlocal import get_current_registry
 from pyramid.interfaces import IRequest
-from substanced.util import get_dotted_name
 from substanced.util import acquire
+from substanced.util import find_catalog
+from substanced.util import get_dotted_name
 from zope.interface import directlyProvidedBy
 from zope.interface import Interface
 from zope.interface import providedBy
@@ -394,6 +396,16 @@ def get_reason_if_blocked(resource: IResource) -> str:
     if is_hidden(resource):
         reason = 'both' if reason else 'hidden'
     return reason
+
+
+def list_resource_with_descendants(resource: IResource) -> Iterable:
+    """List all descendants of a resource, including the resource itself."""
+    system_catalog = find_catalog(resource, 'system')
+    if system_catalog is None:
+        return []  # easier testing
+    path_index = system_catalog['path']
+    query = path_index.eq(resource_path(resource), include_origin=True)
+    return query.execute()
 
 
 def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
