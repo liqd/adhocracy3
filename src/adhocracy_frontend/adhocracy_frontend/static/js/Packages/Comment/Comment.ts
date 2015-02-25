@@ -96,7 +96,8 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
             adhTopLevelState : AdhTopLevelState.Service,
             $scope : ICommentResourceScope
         ) => {
-            $scope.$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
+            // FIXME DefinitelyTyped
+            (<any>$scope).$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
                 if (!commentVersionUrl) {
                     $scope.selectedState = "";
                 } else if (AdhUtil.parentPath(commentVersionUrl) === $scope.path) {
