@@ -179,6 +179,7 @@ export interface IControllerScope extends IScope {
     showError : (fieldName : string, errorType : string) => boolean;
     showHeardFromError : () => boolean;
     showLocationError : () => boolean;
+    showFinanceGrantedInfo : () => boolean;
     submitIfValid : (callCount? : number) => void;
     mercatorProposalExtraForm? : any;
     mercatorProposalDetailForm? : any;
@@ -302,24 +303,14 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
         directive.scope.create = "@";
-        directive.controller = ["adhTopLevelState", "$scope", (adhTopLevelState : AdhTopLevelState.Service, $scope : IScope) => {
-            adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
-                if (!proposalVersionUrl) {
-                    $scope.selectedState = "";
-                } else if (proposalVersionUrl === $scope.path) {
-                    $scope.selectedState = "is-selected";
-                } else {
-                    $scope.selectedState = "is-not-selected";
-                }
-            });
-            adhTopLevelState.bind("commentableUrl", $scope);
-        }];
         return directive;
     }
 
     public link(scope, element, attrs, wrapper) {
         var instance = super.link(scope, element, attrs, wrapper);
+
         instance.scope.$flow = this.flowFactory.create();
+
         scope.$watch(() => this.adhConfig.locale, (locale) => {
             var financialPlanUrl : string;
 
@@ -330,6 +321,18 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             }
             scope.financialPlanTemplate = "<a href=\"" + financialPlanUrl + "\" target=\"_top\">{{content}}</a>";
         });
+
+        scope.$on("$destroy", this.adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+            if (!proposalVersionUrl) {
+                scope.selectedState = "";
+            } else if (proposalVersionUrl === scope.path) {
+                scope.selectedState = "is-selected";
+            } else {
+                scope.selectedState = "is-not-selected";
+            }
+        }));
+        scope.$on("$destroy", this.adhTopLevelState.bind("commentableUrl", scope));
+
         return instance;
     }
 
@@ -886,7 +889,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
         scope: {
             path: "@"
         },
-        link: (scope) => {
+        link: (scope, element) => {
             scope.data  = {};
             adhHttp.get(scope.path).then((proposal) => {
                 scope.data.user_info = {
@@ -913,7 +916,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                         budget: finance.data[SIMercatorFinance.nick].budget
                     };
                 });
-                adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
                         scope.selectedState = "";
                     } else if (proposalVersionUrl === scope.path) {
@@ -921,7 +924,7 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                     } else {
                         scope.selectedState = "is-not-selected";
                     }
-                });
+                }));
             });
 
             countSupporters(adhHttp, AdhUtil.parentPath(scope.path) + "rates/", scope.path).then((count) => {
@@ -1103,6 +1106,10 @@ export var register = (angular) => {
 
             $scope.showLocationError = () : boolean => {
                 return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
+            };
+
+            $scope.showFinanceGrantedInfo = () : boolean => {
+                return ($scope.data.finance && $scope.data.finance.other_sources && $scope.data.finance.other_sources !== "");
             };
 
             var imageExists = () => {
