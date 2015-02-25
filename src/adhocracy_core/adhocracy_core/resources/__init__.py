@@ -5,7 +5,6 @@ from pyramid.config import Configurator
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 from pyramid.registry import Registry
-from pyramid.interfaces import IRequest
 from substanced.content import add_content_type
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
@@ -22,7 +21,7 @@ from adhocracy_core.events import ResourceCreatedAndAdded
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_request_date
+from adhocracy_core.utils import get_modification_date
 
 
 def add_resource_type_to_registry(metadata: ResourceMetadata,
@@ -174,7 +173,7 @@ class ResourceFactory:
             set_local_roles(resource, {userid: {'role:creator'}})
 
         if IMetadata.providedBy(resource):
-            metadata = self._get_metadata(resource, creator, registry, request)
+            metadata = self._get_metadata(resource, creator, registry)
             sheet = get_sheet(resource, IMetadata, registry=registry)
             sheet.set(metadata,
                       send_event=False,
@@ -193,8 +192,8 @@ class ResourceFactory:
         return resource
 
     def _get_metadata(self, resource: IResource, creator: IResource,
-                      registry: Registry, request: IRequest) -> dict:
-        now = get_request_date(request)
+                      registry: Registry) -> dict:
+        now = get_modification_date(registry)
         creator = creator if creator is not None else None
         metadata = {'creator': creator,
                     'creation_date': now,
