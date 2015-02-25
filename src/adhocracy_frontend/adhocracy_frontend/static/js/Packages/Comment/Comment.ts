@@ -79,6 +79,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        private adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -97,22 +98,6 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         directive.scope.frontendOrderReverse = "=?";
         directive.scope.updateListing = "=";
 
-        directive.controller = ["adhTopLevelState", "$scope", (
-            adhTopLevelState : AdhTopLevelState.Service,
-            $scope : ICommentResourceScope
-        ) => {
-            // FIXME DefinitelyTyped
-            (<any>$scope).$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
-                if (!commentVersionUrl) {
-                    $scope.selectedState = "";
-                } else if (AdhUtil.parentPath(commentVersionUrl) === $scope.path) {
-                    $scope.selectedState = "is-selected";
-                } else {
-                    $scope.selectedState = "is-not-selected";
-                }
-            }));
-        }];
-
         return directive;
     }
 
@@ -129,6 +114,17 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                 column.toggleOverlay("abuse");
             };
         }
+
+        // FIXME DefinitelyTyped
+        (<any>scope).$on("$destroy", this.adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
+            if (!commentVersionUrl) {
+                scope.selectedState = "";
+            } else if (AdhUtil.parentPath(commentVersionUrl) === scope.path) {
+                scope.selectedState = "is-selected";
+            } else {
+                scope.selectedState = "is-not-selected";
+            }
+        }));
 
         scope.show = {
             createForm: false
@@ -236,9 +232,10 @@ export class CommentCreate<R extends ResourcesBase.Resource> extends CommentReso
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
-        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
     }
 
@@ -357,16 +354,18 @@ export var register = (angular) => {
                 new AdhListing.Listing(new Adapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)])
         .directive("adhCommentListing", ["adhConfig", adhCommentListing])
         .directive("adhCreateOrShowCommentListing", ["adhConfig", adhCreateOrShowCommentListing])
-        .directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhRecursionHelper", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhRecursionHelper, $q) => {
+        .directive("adhCommentResource", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $q) => {
                 var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentResource(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+                var widget = new CommentResource(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }])
-        .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhRecursionHelper", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhRecursionHelper, $q) => {
+        .directive("adhCommentCreate", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $q) => {
                 var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentCreate(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+                var widget = new CommentCreate(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }]);
 };
