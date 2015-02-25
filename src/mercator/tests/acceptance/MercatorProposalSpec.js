@@ -248,12 +248,10 @@ describe("space navigation", function() {
 
         introComment.fillComment(commentMsg);
 
-        var userSpaceButton = element(
-            by.xpath("(.//*[@data-ng-click=\"setSpace('user')\"])[1]"));
+        var userSpaceButton = element(by.css(".space-switch-user"));
         userSpaceButton.click();
 
-        var contentSpaceButton = element(
-            by.xpath("(.//*[@data-ng-click=\"setSpace('content')\"])[1]"));
+        var contentSpaceButton = element(by.css(".space-switch-content"));
 
         contentSpaceButton.click();
 
