@@ -86,7 +86,7 @@
     "TR__MERCATOR_PROPOSAL_DETAIL": "Your idea in detail",
     "TR__MERCATOR_PROPOSAL_EXTRA": "Extras",
     "TR__MERCATOR_PROPOSAL_FINANCE": "Financing",
-    "TR__MERCATOR_PROPOSAL_FINANCE_ANNOTATION": "Only the “total budget” and “funding requested” will be public and shown on the proposal summary. Other data will be private and can only be seen by the “Advocate Europe” team and the jury. Once we have reviewed all submitted entries, we might come back to you and ask for a more detailed financial plan. You can see the template here (link to file that we will provide) and already use it while preparing your proposal.",
+    "TR__MERCATOR_PROPOSAL_FINANCE_ANNOTATION": "Only the “total budget” and “funding requested” will be public and shown on the proposal summary. Other data will be private and can only be seen by the “Advocate Europe” team and the jury. Once we have reviewed all submitted entries, we might come back to you and ask for a more detailed financial plan. You can see [[link:the template here]] and already use it while preparing your proposal.",
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED": "Granted?",
     "TR__MERCATOR_PROPOSAL_FINANCE_GRANTED_ANNOTATION": "If you are planning to include other sources of funding, are these already granted?",
     "TR__MERCATOR_PROPOSAL_FINANCE_OTHERS_SOURCES": "Other source of income",
