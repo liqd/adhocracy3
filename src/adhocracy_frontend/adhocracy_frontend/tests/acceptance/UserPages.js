@@ -113,7 +113,7 @@ var UsersListing = function() {
     };
 
     this.getUserPage = function(user) {
-        var path = "//a[span/text() = '" + user + "']";
+        var path = "(//a[span/text() = '" + user + "'])[1]";
         var userItem = element(by.xpath(path));
 
         userItem.click();
