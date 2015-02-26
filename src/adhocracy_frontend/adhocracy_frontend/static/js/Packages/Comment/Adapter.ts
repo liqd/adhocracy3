@@ -1,7 +1,3 @@
-/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
-
-import _ = require("lodash");
-
 import AdhComment = require("./Comment");
 import AdhListing = require("../Listing/Listing");
 import AdhUtil = require("../Util/Util");
@@ -94,6 +90,7 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     }
 
     edited(resource : RICommentVersion) : boolean {
-        return !(<any>_).endsWith(resource.path, "/VERSION_0000001/");
+        var meta = resource.data[SIMetadata.nick];
+        return (meta.modification_date > meta.item_creation_date);
     }
 }
