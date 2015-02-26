@@ -151,6 +151,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             });
                         });
                     }
+                    if ($scope.sort) {
+                        params["sort"] = $scope.sort;
+                    }
                     return adhHttp.get($scope.path, params, warmup).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
