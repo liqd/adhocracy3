@@ -56,6 +56,10 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     cancelCreateComment() : void;
     afterCreateComment() : ng.IPromise<void>;
     report? : () => void;
+    // update resource
+    update() : void;
+    // update outer listing
+    updateListing() : void;
     data : {
         content : string;
         creator : string;
@@ -91,6 +95,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         directive.scope.poolPath = "@";
         directive.scope.frontendOrderPredicate = "=?";
         directive.scope.frontendOrderReverse = "=?";
+        directive.scope.updateListing = "=";
 
         directive.controller = ["adhTopLevelState", "$scope", (
             adhTopLevelState : AdhTopLevelState.Service,
@@ -144,6 +149,10 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
             });
         };
 
+        scope.update = () => {
+            return this.update(instance);
+        };
+
         return instance;
     }
 
@@ -156,7 +165,9 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                     hidden: true
                 }
             }
-        }, true);
+        }, true).then((response) => {
+            instance.scope.updateListing();
+        });
     }
 
     public _update(
