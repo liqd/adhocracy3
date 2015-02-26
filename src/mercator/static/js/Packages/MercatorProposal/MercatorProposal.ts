@@ -913,7 +913,8 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                 });
                 adhHttp.get(proposal.data[SIMercatorSubResources.nick].finance).then((finance) => {
                     scope.data.finance = {
-                        budget: finance.data[SIMercatorFinance.nick].budget
+                        budget: finance.data[SIMercatorFinance.nick].budget,
+                        requested_funding: finance.data[SIMercatorFinance.nick].requested_funding
                     };
                 });
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
