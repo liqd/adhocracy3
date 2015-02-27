@@ -56,6 +56,10 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     cancelCreateComment() : void;
     afterCreateComment() : ng.IPromise<void>;
     report? : () => void;
+    // update resource
+    update() : void;
+    // update outer listing
+    updateListing() : void;
     data : {
         content : string;
         creator : string;
@@ -91,6 +95,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         directive.scope.poolPath = "@";
         directive.scope.frontendOrderPredicate = "=?";
         directive.scope.frontendOrderReverse = "=?";
+        directive.scope.updateListing = "=";
 
         directive.controller = ["adhTopLevelState", "$scope", (
             adhTopLevelState : AdhTopLevelState.Service,
@@ -144,11 +149,25 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
             });
         };
 
+        scope.update = () => {
+            return this.update(instance);
+        };
+
         return instance;
     }
 
     public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
-        return this.$q.when();
+        // FIXME: use resource abstractions here
+        return <any>this.adhHttp.put(path, {
+            content_type: "adhocracy_core.resources.comment.IComment",
+            data: {
+                "adhocracy_core.sheets.metadata.IMetadata": {
+                    hidden: true
+                }
+            }
+        }, true).then((response) => {
+            instance.scope.updateListing();
+        });
     }
 
     public _update(
@@ -172,6 +191,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                 };
                 this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
                 this.adhPermissions.bindScope(scope, AdhUtil.parentPath(scope.data.path), "commentItemOptions");
+                this.adhPermissions.bindScope(scope, scope.data.path, "versionOptions");
             });
     }
 

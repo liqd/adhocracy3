@@ -16,6 +16,7 @@
     "TR__CONTENT": "content",
     "TR__COUNTRY": "country",
     "TR__CREATE": "create",
+    "TR__DELETE": "delete",
     "TR__DESCRIPTION": "description",
     "TR__DISCLAIMER": "disclaimer",
     "TR__EDIT": "edit",
