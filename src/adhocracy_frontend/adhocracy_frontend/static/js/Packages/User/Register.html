@@ -44,8 +44,8 @@
             placeholder="{{ 'TR__PASSWORD_REPEAT' | translate }}"
             data-ng-model="input.passwordRepeat"
             required="required"
-            data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat)}"/>
-        <span class="input-error" data-ng-show="(!registerForm.password.$error.minlength) && (input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty">
+            data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty}"/>
+        <span class="input-error" data-ng-show="(input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty">
             {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
         </span>
         <div class="register-check">
