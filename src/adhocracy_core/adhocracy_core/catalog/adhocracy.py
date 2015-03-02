@@ -1,9 +1,12 @@
 """Adhocracy catalog and index views."""
+from pyramid.traversal import resource_path
 from substanced import catalog
 from substanced.catalog import IndexFactory
 from adhocracy_core.catalog.index import ReferenceIndex
-
-# TODO move index views here
+from adhocracy_core.utils import is_deleted
+from adhocracy_core.utils import is_hidden
+from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.utils import get_sheet_field
 
 
 class Reference(IndexFactory):
@@ -26,6 +29,43 @@ class AdhocracyCatalogIndexes:
     reference = Reference()
 
 
+def index_creator(resource, default) -> str:
+    """Return creator userid value for the creator index."""
+    creator = get_sheet_field(resource, IMetadata, 'creator')
+    if creator == '':  # FIXME the default value should be None
+        return creator
+    userid = resource_path(creator)
+    return userid
+
+
+def index_visibility(resource, default) -> [str]:
+    """Return value for the private_visibility index.
+
+    The return value will be one of [visible], [deleted], [hidden], or
+    [deleted, hidden].
+    """
+    # FIXME: be more dry, this almost the same like what
+    # utils.get_reason_if_blocked is doing
+    result = []
+    if is_deleted(resource):
+        result.append('deleted')
+    if is_hidden(resource):
+        result.append('hidden')
+    if not result:
+        result.append('visible')
+    return result
+
+
 def includeme(config):
     """Register adhocracy catalog factory."""
     config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
+    config.add_indexview(index_visibility,
+                         catalog_name='adhocracy',
+                         index_name='private_visibility',
+                         context=IMetadata,
+                         )
+    config.add_indexview(index_creator,
+                         catalog_name='adhocracy',
+                         index_name='creator',
+                         context=IMetadata,
+                         )
