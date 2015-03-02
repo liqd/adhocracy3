@@ -19,8 +19,12 @@ var EmbeddedCommentsPage = function(referer) {
         return this;
     };
 
-    this.createComment = function(content) {
+    this.fillComment = function(content) {
         this.commentInput.sendKeys(content);
+    };
+
+    this.createComment = function(content) {
+        this.fillComment(content);
         this.submitButton.click();
         // FIXME: Return created comment
         return this.listing.element(by.xpath("(//adh-comment-resource)[1]"));
