@@ -20,6 +20,8 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
     public poolPath(container : ResourcesBase.Resource) {
         return container.data[SICommentable.nick].post_pool;
     }
+
+    public canWarmup = false;
 }
 
 export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
