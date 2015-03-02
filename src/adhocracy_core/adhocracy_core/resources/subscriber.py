@@ -223,4 +223,4 @@ def includeme(config):
                           interface=IUser)
     config.add_subscriber(update_modification_date_modified_by,
                           IResourceSheetModified,
-                          isheet=IMetadata)
+                          interface=IMetadata)
