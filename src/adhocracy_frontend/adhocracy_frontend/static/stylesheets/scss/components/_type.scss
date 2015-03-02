@@ -171,7 +171,7 @@ category: Type
 ```
 */
 
-@mixin inline-box {
+.inline-box {
     @include inline-block;
     color: $color-text-highlight-introvert;
     border: 1px solid $color-text-highlight-introvert;
@@ -179,17 +179,12 @@ category: Type
     padding: 0 1em;
 }
 
-.inline-box {
-    @include inline-box;
-}
-
 .inline-boxes {
-    clear: left;
     margin: 0;
     padding: 0;
 
     li {
-        @include inline-box;
+        @extend .inline-box;
     }
 }
 
