@@ -90,7 +90,9 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     }
 
     edited(resource : RICommentVersion) : boolean {
+        // NOTE: this is lexicographic comparison. Might break if the datetime
+        // encoding changes.
         var meta = resource.data[SIMetadata.nick];
-        return (meta.modification_date > meta.item_creation_date);
+        return meta.modification_date > meta.item_creation_date;
     }
 }
