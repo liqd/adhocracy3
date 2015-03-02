@@ -79,6 +79,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        private adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -97,22 +98,6 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         directive.scope.frontendOrderReverse = "=?";
         directive.scope.updateListing = "=";
 
-        directive.controller = ["adhTopLevelState", "$scope", (
-            adhTopLevelState : AdhTopLevelState.Service,
-            $scope : ICommentResourceScope
-        ) => {
-            // FIXME DefinitelyTyped
-            (<any>$scope).$on("$destroy", adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
-                if (!commentVersionUrl) {
-                    $scope.selectedState = "";
-                } else if (AdhUtil.parentPath(commentVersionUrl) === $scope.path) {
-                    $scope.selectedState = "is-selected";
-                } else {
-                    $scope.selectedState = "is-not-selected";
-                }
-            }));
-        }];
-
         return directive;
     }
 
@@ -129,6 +114,17 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                 column.toggleOverlay("abuse");
             };
         }
+
+        // FIXME DefinitelyTyped
+        (<any>scope).$on("$destroy", this.adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
+            if (!commentVersionUrl) {
+                scope.selectedState = "";
+            } else if (AdhUtil.parentPath(commentVersionUrl) === scope.path) {
+                scope.selectedState = "is-selected";
+            } else {
+                scope.selectedState = "is-not-selected";
+            }
+        }));
 
         scope.show = {
             createForm: false
@@ -236,9 +232,10 @@ export class CommentCreate<R extends ResourcesBase.Resource> extends CommentReso
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
-        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
     }
 
@@ -249,7 +246,11 @@ export class CommentCreate<R extends ResourcesBase.Resource> extends CommentReso
     }
 }
 
-export var adhCommentListing = (adhConfig : AdhConfig.IService) => {
+export var adhCommentListing = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
+    $location : ng.ILocationService
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
@@ -258,12 +259,9 @@ export var adhCommentListing = (adhConfig : AdhConfig.IService) => {
             frontendOrderReverse: "=?",
             frontendOrderPredicate: "=?"
         },
-        controller: ["adhTopLevelState", "$location", (
-            adhTopLevelState : AdhTopLevelState.Service,
-            $location : ng.ILocationService
-        ) : void => {
+        link: () => {
             adhTopLevelState.setCameFrom($location.url());
-        }]
+        }
     };
 };
 
@@ -275,7 +273,13 @@ export var adhCommentListing = (adhConfig : AdhConfig.IService) => {
  *
  * If it exists, the corresponding comment listing is created.
  */
-export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.IService) => {
+export var adhCreateOrShowCommentListing = (
+    adhConfig : AdhConfig.IService,
+    adhDone,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhUser : AdhUser.Service
+) => {
     return {
         restrict: "E",
         template: "<adh-comment-listing data-ng-if=\"display\" data-path=\"{{commentablePath}}\"></adh-comment-listing>",
@@ -283,35 +287,28 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.IService) => {
             poolPath: "@",
             key: "@"
         },
-        controller: ["adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", "$scope", (
-            adhDone,
-            adhHttp : AdhHttp.Service<any>,
-            adhPreliminaryNames : AdhPreliminaryNames.Service,
-            adhUser : AdhUser.Service,
-            $scope
-        ) : void => {
-
-            $scope.display = false;
-            var commentablePath = $scope.poolPath + $scope.key + "/";
+        link: (scope) => {
+            scope.display = false;
+            var commentablePath = scope.poolPath + scope.key + "/";
 
             var setScope = (path) => {
-                $scope.display = true;
-                $scope.commentablePath = path;
+                scope.display = true;
+                scope.commentablePath = path;
             };
 
             // create commentable if it doesn't exist yet
-            // REFACT: Add Filter "name": $scope.key - this requires name index to be enabled in the backend
-            adhHttp.get($scope.poolPath, {
+            // REFACT: Add Filter "name": scope.key - this requires name index to be enabled in the backend
+            adhHttp.get(scope.poolPath, {
                 "content_type": RIExternalResource.content_type
             }).then(
                 (result) => {
                     if (_.contains(result.data[SIPool.nick].elements, commentablePath)) {
                         setScope(commentablePath);
                     } else {
-                        var unwatch = $scope.$watch(() => adhUser.loggedIn, (loggedIn) => {
+                        var unwatch = scope.$watch(() => adhUser.loggedIn, (loggedIn) => {
                             if (loggedIn) {
-                                var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
-                                return adhHttp.post($scope.poolPath, externalResource).then((obj) => {
+                                var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: scope.key});
+                                return adhHttp.post(scope.poolPath, externalResource).then((obj) => {
                                     if (obj.path !== commentablePath) {
                                         console.log("Created object has wrong path (internal error)");
                                     }
@@ -329,7 +326,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.IService) => {
                     console.log("Could not query given postPool");
                 }
             ).then(adhDone);
-        }]
+        }
     };
 };
 
@@ -355,18 +352,21 @@ export var register = (angular) => {
         .directive("adhCommentListingPartial",
             ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
                 new AdhListing.Listing(new Adapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)])
-        .directive("adhCommentListing", ["adhConfig", adhCommentListing])
-        .directive("adhCreateOrShowCommentListing", ["adhConfig", adhCreateOrShowCommentListing])
-        .directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhRecursionHelper", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhRecursionHelper, $q) => {
+        .directive("adhCommentListing", ["adhConfig", "adhTopLevelState", "$location", adhCommentListing])
+        .directive("adhCreateOrShowCommentListing", [
+            "adhConfig", "adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", adhCreateOrShowCommentListing])
+        .directive("adhCommentResource", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $q) => {
                 var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentResource(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+                var widget = new CommentResource(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }])
-        .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhRecursionHelper", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhRecursionHelper, $q) => {
+        .directive("adhCommentCreate", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $q) => {
                 var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentCreate(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+                var widget = new CommentCreate(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }]);
 };
