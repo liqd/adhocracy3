@@ -192,7 +192,7 @@ def autoupdate_non_versionable_has_new_version(event):
 
 
 def autoupdate_tag_has_new_version(event):
-    """Auto update tag (LAST and FIRST) if a reference has new version."""
+    """Auto update last but not first tag if a reference has new version."""
     name = event.object.__name__
     if name and 'FIRST' in name:
         return

@@ -69,12 +69,13 @@ def event(changelog, context):
     return event
 
 
-class TestAutoupdateVersionableHasNewVersion:
+@fixture
+def registry(registry_with_content, changelog):
+    registry_with_content.changelog = changelog
+    return registry_with_content
 
-    @fixture
-    def registry(self, registry_with_content, changelog):
-        registry_with_content.changelog = changelog
-        return registry_with_content
+
+class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
     def mock_sheet(self, mock_sheet):
@@ -283,10 +284,6 @@ class TestAutoupdateVersionableHasNewVersion:
 class TestAutoupdateNoneVersionableHasNewVersion:
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
-    @fixture
     def mock_sheet(self, mock_sheet):
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IDummySheetAutoUpdate)
         mock_sheet.get.return_value = {'elements': []}
@@ -342,10 +339,6 @@ class TestAutoupdateNoneVersionableHasNewVersion:
 class TestAutoupdateTagHasNewVersion:
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
-    @fixture
     def mock_sheet(self, mock_sheet):
         from adhocracy_core.sheets.tags import ITag
         mock_sheet.meta = mock_sheet.meta._replace(isheet=ITag)
@@ -391,10 +384,6 @@ class TestAutoupdateTagHasNewVersion:
 class TestAddDefaultGroupToUserSubscriber:
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
-    @fixture
     def principals(self, pool, service):
         pool['principals'] = service
         pool['principals']['groups'] = service.clone()
@@ -436,10 +425,6 @@ class TestAddDefaultGroupToUserSubscriber:
 
 
 class TestUpdateModificationDate:
-
-    @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
 
     def _call_fut(self, event):
         from .subscriber import update_modification_date_modified_by
