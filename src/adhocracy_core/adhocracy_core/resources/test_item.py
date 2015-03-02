@@ -116,6 +116,7 @@ class TestItem:
         last_targets = context.__graph__.get_references_for_isheet(last_tag, ITagS)['elements']
         assert last_targets == [version1]
 
+    @mark.xfail(reason="Forkables resources are not yet supported")
     def test_update_last_tag_two_versions_with_forkable(self, context, registry):
         """Test branching off two versions from the same version,
         using forkable versionables.

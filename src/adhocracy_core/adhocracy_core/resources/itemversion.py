@@ -1,16 +1,10 @@
 """Basic versionable type typically for process content."""
-from pyramid.traversal import find_interface
-
 from adhocracy_core.events import ItemVersionNewVersionAdded
 from adhocracy_core.events import SheetReferenceNewVersion
 from adhocracy_core.interfaces import IItemVersion
-from adhocracy_core.interfaces import IItem
-from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.resource import resource_metadata_defaults
-from adhocracy_core.sheets import tags
-from adhocracy_core.sheets.versions import IForkableVersionable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import find_graph
@@ -52,9 +46,6 @@ def notify_new_itemversion_created(context, registry, options):
                                                         creator,
                                                         is_batchmode)
 
-        # Update LAST tag in parent item
-        _update_last_tag(context, registry, old_versions)
-
 
 def _notify_itemversion_has_new_version(old_version, new_version, registry,
                                         creator):
@@ -85,56 +76,6 @@ def _notify_referencing_resources_about_new_version(old_version,
                                          is_batchmode=is_batchmode,
                                          )
         registry.notify(event)
-
-
-def _update_last_tag(context: IResource, registry, old_versions: list):
-    """Update the LAST tag in the parent item of a new version.
-
-    Args:
-        context (IResource): the newly created resource
-        registry: the registry
-        old_versions (list of IItemVersion): list of versions followed by the
-                                              new one.
-
-    """
-    # FIXME we would not need this code at all if we use the
-    # SheetReferenceAutoUpdateMarker for the LAST Tag
-    parent_item = find_interface(context, IItem)
-    if parent_item is None:
-        return
-
-    tag_sheet = get_sheet(parent_item, tags.ITags, registry=registry)
-    taglist = tag_sheet.get()['elements']
-
-    for tag in taglist:  # pragma: no branch
-        if tag.__name__ == 'LAST':
-            sheet = get_sheet(tag, tags.ITag, registry=registry)
-            data = sheet.get()
-            old_last_tagged_versions = data['elements']
-            if IForkableVersionable.providedBy(context):
-                # FIXME the last Tag should only reference the last version.
-                # For forkable resources we should add a HEAD tag, referenceing
-                # the "heads"
-                updated_references = _determine_elements_for_forkable_last_tag(
-                    context, old_last_tagged_versions, old_versions)
-            else:
-                updated_references = [context]
-            data['elements'] = updated_references
-            sheet.set(data)
-            break
-
-
-def _determine_elements_for_forkable_last_tag(context: IResource,
-                                              old_last_tagged_versions: list,
-                                              predecessors: list) -> list:
-    updated_references = []
-    # Remove predecessors, keep the rest
-    for reference in old_last_tagged_versions:
-        if reference not in predecessors:
-            updated_references.append(reference)
-    # Append new version to end of list
-    updated_references.append(context)
-    return updated_references
 
 
 itemversion_metadata = resource_metadata_defaults._replace(
