@@ -21,7 +21,7 @@ Banner showing up if the browser is not supported.
 .unsupported-browser {
     @include clearfix;
     background: $color-structure-normal;
-    padding: 1em;
+    padding: 1em 1em 0.5em;
 
     h1 {
         font-size: $font-size-plus;
@@ -29,8 +29,8 @@ Banner showing up if the browser is not supported.
         margin: 0 0 (5px / $font-size-plus * 1em);
     }
 
-    div {
-        margin-left: 56px;
+    .language-block {
+        margin: 0 0 1em 56px;
     }
 
     p {
