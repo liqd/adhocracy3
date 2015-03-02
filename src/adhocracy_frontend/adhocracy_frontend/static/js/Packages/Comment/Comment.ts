@@ -149,6 +149,10 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
             return this.update(instance);
         };
 
+        this.adhPermissions.bindScope(scope, () => scope.data && scope.data.replyPoolPath, "poolOptions");
+        this.adhPermissions.bindScope(scope, () => scope.data && AdhUtil.parentPath(scope.data.path), "commentItemOptions");
+        this.adhPermissions.bindScope(scope, () => scope.data && scope.data.path, "versionOptions");
+
         return instance;
     }
 
@@ -185,9 +189,6 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                     replyPoolPath: this.adapter.poolPath(resource),
                     edited: this.adapter.edited(resource)
                 };
-                this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
-                this.adhPermissions.bindScope(scope, AdhUtil.parentPath(scope.data.path), "commentItemOptions");
-                this.adhPermissions.bindScope(scope, scope.data.path, "versionOptions");
             });
     }
 
