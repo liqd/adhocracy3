@@ -63,8 +63,10 @@ export class Service {
         }
     }
 
-    private updateSessionFromStorage(sessionValue) {
+    private updateSessionFromStorage(sessionValue) : ng.IPromise<boolean> {
         var _self : Service = this;
+
+        var deferred = _self.$q.defer();
 
         if (sessionValue) {
             try {
@@ -78,9 +80,11 @@ export class Service {
                     }
                 }).then((response) => {
                     _self.enableToken(token, path);
+                    deferred.resolve(true);
                 }, (msg) => {
                     console.log("Expired or invalid session deleted");
                     _self.deleteToken();
+                    deferred.resolve(false);
                 });
             } catch (e) {
                 console.log("Invalid session deleted");
@@ -92,8 +96,11 @@ export class Service {
             // here: http://stackoverflow.com/a/17958847
             _.defer(() => _self.$rootScope.$apply(() => {
                 _self.deleteToken();
+                deferred.resolve(false);
             }));
         }
+
+        return deferred.promise;
     }
 
     private loadUser(userPath) {
