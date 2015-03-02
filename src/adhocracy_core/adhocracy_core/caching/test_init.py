@@ -286,7 +286,7 @@ class TestHTTPCacheStrategyWeakAdapter:
         assert verifyObject(IHTTPCacheStrategy, inst)
         assert inst.browser_max_age == 0
         assert inst.proxy_max_age == 31104000
-        assert inst.vary == ('X-User-Path', 'X-User-Token')
+        assert inst.vary == ('Accept-Encoding', 'X-User-Path', 'X-User-Token')
         assert inst.etags == (etag_backrefs, etag_descendants, etag_modified,
                               etag_userid, etag_blocked)
 
@@ -392,7 +392,7 @@ class TestIntegrationCaching:
         resp = app_user.get('/', status=200)
         assert resp.headers['Cache-control'] ==\
                'max-age=0, proxy-revalidate, s-maxage=31104000'
-        assert resp.headers['Vary'] == 'X-User-Path, X-User-Token'
+        assert resp.headers['Vary'] == 'Accept-Encoding, X-User-Path, X-User-Token'
         assert resp.headers['etag'] == '"None|None|None|None|None"'
 
     def test_strategy_modified_if_modified_since_request(self, app_user,
