@@ -162,8 +162,6 @@ export var registerDirective = (
                         scope.success = true;
                     }, (errors) => bindServerErrors(scope, errors));
             };
-
-            scope.registerForm.password_repeat.$error.passwords_match = (scope.input.password !== scope.input.passwordRepeat);
         }
     };
 };
