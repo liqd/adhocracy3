@@ -11,6 +11,13 @@ var hasClass = function (element, cls) {
     });
 };
 
+var diffArray = function(a, b) {
+    if (a.length > b.length) {
+        return a.filter(function(i) {return b.indexOf(i) < 0;});
+    } else {
+        return b.filter(function(i) {return a.indexOf(i) < 0;});
+    }
+};
 
 module.exports = {
     restUrl: restUrl,
@@ -21,5 +28,6 @@ module.exports = {
     loginAnnotator: UserPages.loginAnnotator,
     annotatorName: UserPages.annotatorName,
     loginContributor: UserPages.loginContributor,
-    hasClass: hasClass
+    hasClass: hasClass,
+    diffArray: diffArray
 }
