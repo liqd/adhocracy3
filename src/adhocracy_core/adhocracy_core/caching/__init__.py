@@ -242,7 +242,7 @@ class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
 
     browser_max_age = 0
     proxy_max_age = 60 * 60 * 24 * 30 * 12
-    vary = ('X-User-Path', 'X-User-Token')
+    vary = ('Accept-Encoding', 'X-User-Path', 'X-User-Token')
     etags = (etag_backrefs, etag_descendants, etag_modified, etag_userid,
              etag_blocked)
 
