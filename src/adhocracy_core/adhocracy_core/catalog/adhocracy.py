@@ -6,6 +6,9 @@ from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.rate import IRate
+from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.tags import filter_by_tag
 from adhocracy_core.utils import get_sheet_field
 
 
@@ -56,6 +59,27 @@ def index_visibility(resource, default) -> [str]:
     return result
 
 
+def index_rate(resource, default):
+    """Return the value of field name `rate` for :class:`IRate` resources."""
+    rate = get_sheet_field(resource, IRate, 'rate')
+    return rate
+
+
+def index_rates(resource, default):
+    """
+    Return aggregated values of referenceing :class:`IRate` resources.
+
+    Only the LAST version of each rate is counted.
+    """
+    rates = get_sheet_field(resource, IRateable, 'rates')
+    last_rates = filter_by_tag(rates, 'LAST')
+    rate_sum = 0
+    for rate in last_rates:
+        value = get_sheet_field(rate, IRate, 'rate')
+        rate_sum += value
+    return rate_sum
+
+
 def includeme(config):
     """Register adhocracy catalog factory."""
     config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
@@ -69,3 +93,11 @@ def includeme(config):
                          index_name='creator',
                          context=IMetadata,
                          )
+    config.add_indexview(index_rate,
+                         catalog_name='adhocracy',
+                         index_name='rate',
+                         context=IRate)
+    config.add_indexview(index_rates,
+                         catalog_name='adhocracy',
+                         index_name='rates',
+                         context=IRateable)

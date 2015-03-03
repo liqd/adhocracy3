@@ -1,3 +1,4 @@
+from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
@@ -10,6 +11,7 @@ def integration(config):
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets.metadata')
+    config.include('adhocracy_core.sheets.rate')
 
 
 def test_create_adhocracy_catalog_indexes():
@@ -105,6 +107,87 @@ def test_includeme_register_index_visibilityreator(registry):
                                     name='adhocracy|private_visibility')
 
 
+class TestIndexRate:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def item(self, pool, service):
+        pool['rates'] = service
+        return pool
+
+    @fixture
+    def mock_rate_sheet(self, mock_sheet):
+        from copy import deepcopy
+        from adhocracy_core.sheets.rate import IRate
+        mock_sheet = deepcopy(mock_sheet)
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IRate)
+        return mock_sheet
+
+    @fixture
+    def mock_rateable_sheet(self, mock_sheet):
+        from copy import deepcopy
+        from adhocracy_core.sheets.rate import IRateable
+        mock_sheet = deepcopy(mock_sheet)
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IRateable)
+        return mock_sheet
+
+    def test_index_rate(self, context, mock_rate_sheet, registry):
+        from .adhocracy import index_rate
+        context['rateable'] = testing.DummyResource()
+        registry.content.get_sheet.return_value = mock_rate_sheet
+        mock_rate_sheet.get.return_value = {'rate': 1}
+        assert index_rate(context['rateable'], None) == 1
+
+    def _inject_mock_graph(self, monkeypatch, tag: str):
+        from adhocracy_core.sheets import tags
+        mock_graph = Mock()
+        return_value = [testing.DummyResource(__name__=tag)]
+        mock_graph.get_back_reference_sources.return_value = return_value
+        mock_find_graph = Mock(return_value=mock_graph)
+        monkeypatch.setattr(tags, 'find_graph', mock_find_graph)
+
+    def test_index_rates_with_last_tag(self, item, monkeypatch,
+                                       mock_rate_sheet, mock_rateable_sheet,
+                                       registry):
+        from .adhocracy import index_rates
+        self._inject_mock_graph(monkeypatch, 'LAST')
+        item['rates']['rate'] = testing.DummyResource()
+        mock_rate_sheet.get.return_value = {'rate': 1}
+        item['rateable'] = testing.DummyResource()
+        mock_rateable_sheet.get.return_value = {'rates': [item['rates']['rate']]}
+        registry.content.get_sheet.side_effect = [mock_rateable_sheet,
+                                                  mock_rate_sheet]
+        assert index_rates(item['rateable'], None) == 1
+
+    def test_index_rates_with_another_tag(self, item, monkeypatch,
+                                          mock_rate_sheet, mock_rateable_sheet,
+                                          registry):
+        from .adhocracy import index_rates
+        self._inject_mock_graph(monkeypatch, 'FIRST')
+        item['rates']['rate'] = testing.DummyResource()
+        mock_rate_sheet.get.return_value = {'rate': 1}
+        item['rateable'] = testing.DummyResource()
+        mock_rateable_sheet.get.return_value = {'rates': [item['rates']['rate']]}
+        registry.content.get_sheet.side_effect = [mock_rateable_sheet,
+                                                  mock_rate_sheet]
+        assert index_rates(item['rateable'], None) == 0
 
 
+@mark.usefixtures('integration')
+def test_includeme_register_index_rate(registry):
+    from adhocracy_core.sheets.rate import IRate
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IRate,), IIndexView,
+                                    name='adhocracy|rate')
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_rates(registry):
+    from adhocracy_core.sheets.rate import IRateable
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IRateable,), IIndexView,
+                                    name='adhocracy|rates')
 
