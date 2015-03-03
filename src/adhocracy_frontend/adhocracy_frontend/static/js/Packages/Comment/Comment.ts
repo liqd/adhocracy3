@@ -174,6 +174,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
                     });
             }
         }
+        return this.$q.when();
     }
 
     public _update(
