@@ -90,6 +90,7 @@ Modules API and separation of responsibility
     adhocracy_core.rest.views
     adhocracy_core.rest.batchview
     adhocracy_core.rest.schemas
+    adhocracy_core.rest.subscriber
     adhocracy_core.rest.exceptions
     adhocracy_core.caching
     adhocracy_core.authentication
@@ -146,9 +147,6 @@ Modules API and separation of responsibility
 TODO: mark pluggable dependency modules
 
 TODO: move scripts to adhocracy_core.scripts
-
-TODO: move index functions to adhocracy_core.catalogs.adhocracy
-
 
 Modules import rules
 ~~~~~~~~~~~~~~~~~~~~
