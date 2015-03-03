@@ -510,9 +510,8 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     resource (None or IResource):
         The resource that is modified/created.
     last_version_in_transaction (None or IResource):
-        The last Version created in this transaction
+        The last Version created in this transaction (assuming linear history)
         (only for :class:`adhocracy_core.interfaces.IItem`)
-        FIXME: we assume linear history here
     changed_descendants (bool): child or grandchild is modified or has
                                 changed_backrefs
     changed_backrefs (bool): References targeting this resource are changed

@@ -14,7 +14,6 @@ from pyramid import testing
 from pyramid.traversal import resource_path_tuple
 from pyramid.util import DottedNameResolver
 from pytest import fixture
-from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
 from ZODB import FileStorage
 from webtest import TestApp
@@ -122,20 +121,6 @@ class DummyPoolWithObjectMap(DummyPool):
 
     def next_name(self, obj, prefix=''):
         return prefix + '_0000000' + str(hash(obj))
-
-
-def create_pool_with_graph() -> testing.DummyResource:
-    """Return pool like dummy object with objectmap and graph."""
-    # FIXME use pool_graph or pool_graph_catalog fixture instead
-    from adhocracy_core.interfaces import IPool
-    from substanced.interfaces import IFolder
-    from adhocracy_core.graph import Graph
-    context = DummyPoolWithObjectMap(__oid__=0,
-                                     __provides__=(IPool, IFolder))
-    objectmap = ObjectMap(context)
-    context.__objectmap__ = objectmap
-    context.__graph__ = Graph(context)
-    return context
 
 
 def register_sheet(context, mock_sheet, registry, isheet=None) -> Mock:
@@ -308,8 +293,8 @@ def mock_sheet() -> Mock:
     """Mock :class:`adhocracy_core.sheets.GenericResourceSheet`."""
     from adhocracy_core.interfaces import sheet_metadata
     from adhocracy_core.interfaces import ISheet
-    # FIXME: Use spec=GenericResourceSheet for Mock; however this fails if the
-    # mock object is deepcopied.
+    # Better would be spec=GenericResourceSheet for the mock object;
+    # however this fails if the object is deepcopied.
     sheet = Mock()
     sheet.meta = sheet_metadata._replace(isheet=ISheet,
                                          schema_class=colander.MappingSchema)

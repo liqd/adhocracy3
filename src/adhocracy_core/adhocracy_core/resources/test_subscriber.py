@@ -360,16 +360,6 @@ class TestAutoupdateTagHasNewVersion:
         self._call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
 
-    def test_single_element(self, version, registry, mock_sheet):
-        """Update version (sheet field is list) """
-        event = create_new_reference_event(version, registry, old_version=2,
-                                           new_version=3,
-                                           isheet_field='elements')
-        register_sheet(version, mock_sheet, registry)
-        mock_sheet.get.return_value = {'elements': [1, 2]}
-        self._call_fut(event)
-        assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
-
     def test_tag_name_is_first(self, version, registry, mock_sheet):
         """Don`t update the "first" tag."""
         version.__name__ = 'FIRST'
