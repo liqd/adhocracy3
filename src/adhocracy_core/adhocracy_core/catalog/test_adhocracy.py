@@ -191,3 +191,26 @@ def test_includeme_register_index_rates(registry):
     assert registry.adapters.lookup((IRateable,), IIndexView,
                                     name='adhocracy|rates')
 
+
+def test_index_tag_with_tags(context, mock_graph):
+    from .adhocracy import index_tag
+    context.__graph__ = mock_graph
+    tag = testing.DummyResource(__name__='tag')
+    mock_graph.get_back_reference_sources.return_value = [tag]
+    assert index_tag(context, 'default') == ['tag']
+
+
+def test_index_tag_without_tags(context, mock_graph):
+    from .adhocracy import index_tag
+    context.__graph__ = mock_graph
+    mock_graph.get_back_reference_sources.return_value = []
+    assert index_tag(context, 'default') == 'default'
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_rates(registry):
+    from adhocracy_core.sheets.versions import IVersionable
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IVersionable,), IIndexView,
+                                    name='adhocracy|tag')
+

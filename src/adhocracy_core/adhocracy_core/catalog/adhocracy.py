@@ -9,7 +9,10 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.tags import filter_by_tag
+from adhocracy_core.sheets.tags import TagElementsReference
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import find_graph
 
 
 class Reference(IndexFactory):
@@ -59,13 +62,13 @@ def index_visibility(resource, default) -> [str]:
     return result
 
 
-def index_rate(resource, default):
+def index_rate(resource, default) -> int:
     """Return the value of field name `rate` for :class:`IRate` resources."""
     rate = get_sheet_field(resource, IRate, 'rate')
     return rate
 
 
-def index_rates(resource, default):
+def index_rates(resource, default) -> int:
     """
     Return aggregated values of referenceing :class:`IRate` resources.
 
@@ -78,6 +81,14 @@ def index_rates(resource, default):
         value = get_sheet_field(rate, IRate, 'rate')
         rate_sum += value
     return rate_sum
+
+
+def index_tag(resource, default) -> [str]:
+    """Return value for the tag index."""
+    graph = find_graph(resource)
+    tags = graph.get_back_reference_sources(resource, TagElementsReference)
+    tagnames = [tag.__name__ for tag in tags]
+    return tagnames if tagnames else default
 
 
 def includeme(config):
@@ -101,3 +112,8 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='rates',
                          context=IRateable)
+    config.add_indexview(index_tag,
+                         catalog_name='adhocracy',
+                         index_name='tag',
+                         context=IVersionable,
+                         )
