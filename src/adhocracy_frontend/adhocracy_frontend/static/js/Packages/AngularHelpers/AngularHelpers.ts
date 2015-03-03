@@ -88,11 +88,12 @@ export var recompileOnChange = ($compile : ng.ICompileService) => {
 
             var contents = element.contents().remove();
             var compiledContents;
-            var innerScope : ng.IScope;
 
             return {
                 pre: (link && link.pre) ? link.pre : null,
                 post: (scope : ng.IScope, element, attrs) => {
+                    var innerScope : ng.IScope;
+
                     if (!compiledContents) {
                         compiledContents = $compile(contents);
                     }

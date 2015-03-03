@@ -30,6 +30,7 @@ from adhocracy_core.utils import get_modification_date
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.tags import ITag
 
 
 logger = getLogger(__name__)
@@ -187,7 +188,17 @@ def autoupdate_non_versionable_has_new_version(event):
     if not sheet.meta.editable:
         return
     appstruct = _get_updated_appstruct(event, sheet)
-    sheet.set(appstruct)
+    sheet.set(appstruct, registry=event.registry)
+
+
+def autoupdate_tag_has_new_version(event):
+    """Auto update last but not first tag if a reference has new version."""
+    name = event.object.__name__
+    if name and 'FIRST' in name:
+        return
+    sheet = get_sheet(event.object, event.isheet, event.registry)
+    appstruct = _get_updated_appstruct(event, sheet)
+    sheet.set(appstruct, registry=event.registry)
 
 
 def includeme(config):
@@ -204,9 +215,12 @@ def includeme(config):
                           ISheetReferenceNewVersion,
                           interface=ISimple,
                           isheet=ISheetReferenceAutoUpdateMarker)
+    config.add_subscriber(autoupdate_tag_has_new_version,
+                          ISheetReferenceNewVersion,
+                          isheet=ITag)
     config.add_subscriber(user_created_and_added_subscriber,
                           IResourceCreatedAndAdded,
                           interface=IUser)
     config.add_subscriber(update_modification_date_modified_by,
                           IResourceSheetModified,
-                          isheet=IMetadata)
+                          interface=IMetadata)

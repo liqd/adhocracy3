@@ -28,6 +28,8 @@ export interface IListingContainerAdapter {
 
     // The pool a new element should be posted to.
     poolPath(any) : string;
+
+    canWarmup : boolean;
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
@@ -38,6 +40,8 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
     public poolPath(container : ResourcesBase.Resource) {
         return container.path;
     }
+
+    public canWarmup = true;
 }
 
 export interface IFacetItem {
@@ -201,7 +205,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         // order to not miss any messages in between. But in
                         // order to subscribe we already need the resource. So
                         // that is not possible.
-                        $scope.update(true).then(() => {
+                        $scope.update(_self.containerAdapter.canWarmup).then(() => {
                             try {
                                 $scope.wsOff = adhWebSocket.register($scope.poolPath, () => $scope.update());
                             } catch (e) {

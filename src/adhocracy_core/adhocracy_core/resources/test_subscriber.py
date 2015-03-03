@@ -69,12 +69,13 @@ def event(changelog, context):
     return event
 
 
-class TestAutoupdateVersionableHasNewVersion:
+@fixture
+def registry(registry_with_content, changelog):
+    registry_with_content.changelog = changelog
+    return registry_with_content
 
-    @fixture
-    def registry(self, registry_with_content, changelog):
-        registry_with_content.changelog = changelog
-        return registry_with_content
+
+class TestAutoupdateVersionableHasNewVersion:
 
     @fixture
     def mock_sheet(self, mock_sheet):
@@ -283,10 +284,6 @@ class TestAutoupdateVersionableHasNewVersion:
 class TestAutoupdateNoneVersionableHasNewVersion:
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
-    @fixture
     def mock_sheet(self, mock_sheet):
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IDummySheetAutoUpdate)
         mock_sheet.get.return_value = {'elements': []}
@@ -339,11 +336,52 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
 
 
-class TestAddDefaultGroupToUserSubscriber:
+class TestAutoupdateTagHasNewVersion:
 
     @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
+    def mock_sheet(self, mock_sheet):
+        from adhocracy_core.sheets.tags import ITag
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=ITag)
+        mock_sheet.get.return_value = {'elements': []}
+        return mock_sheet
+
+    def _call_fut(self, event):
+        from adhocracy_core.resources.subscriber import \
+            autoupdate_tag_has_new_version
+        return autoupdate_tag_has_new_version(event)
+
+    def test_multiple_elements(self, version, registry, mock_sheet):
+        """Update version (sheet field is list) """
+        event = create_new_reference_event(version, registry, old_version=2,
+                                           new_version=3,
+                                           isheet_field='elements')
+        register_sheet(version, mock_sheet, registry)
+        mock_sheet.get.return_value = {'elements': [1, 2]}
+        self._call_fut(event)
+        assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
+
+    def test_single_element(self, version, registry, mock_sheet):
+        """Update version (sheet field is list) """
+        event = create_new_reference_event(version, registry, old_version=2,
+                                           new_version=3,
+                                           isheet_field='elements')
+        register_sheet(version, mock_sheet, registry)
+        mock_sheet.get.return_value = {'elements': [1, 2]}
+        self._call_fut(event)
+        assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
+
+    def test_tag_name_is_first(self, version, registry, mock_sheet):
+        """Don`t update the "first" tag."""
+        version.__name__ = 'FIRST'
+        event = create_new_reference_event(version, registry, old_version=2,
+                                           new_version=3,
+                                           isheet_field='elements')
+        register_sheet(version, mock_sheet, registry)
+        self._call_fut(event)
+        assert mock_sheet.set.called is False
+
+
+class TestAddDefaultGroupToUserSubscriber:
 
     @fixture
     def principals(self, pool, service):
@@ -388,10 +426,6 @@ class TestAddDefaultGroupToUserSubscriber:
 
 class TestUpdateModificationDate:
 
-    @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
-
     def _call_fut(self, event):
         from .subscriber import update_modification_date_modified_by
         return update_modification_date_modified_by(event)
@@ -430,6 +464,7 @@ def test_register_subscriber(registry):
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
     assert subscriber.autoupdate_non_versionable_has_new_version.__name__ in handlers
     assert subscriber.autoupdate_versionable_has_new_version.__name__ in handlers
+    assert subscriber.autoupdate_tag_has_new_version.__name__ in handlers
     assert subscriber.user_created_and_added_subscriber.__name__ in handlers
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
 

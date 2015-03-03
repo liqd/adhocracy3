@@ -950,6 +950,148 @@ export var imageUriFilter = () => {
 };
 
 
+export var mercatorProposalFormController = ($scope : IControllerScope, $element, $window) => {
+    var heardFromCheckboxes = [
+        "heard-from-colleague",
+        "heard-from-website",
+        "heard-from-newsletter",
+        "heard-from-facebook",
+        "heard-from-other"
+    ];
+
+    var locationCheckboxes = [
+        "location-location-is-specific",
+        "location-location-is-online",
+        "location-location-is-linked-to-ruhr"
+    ];
+
+    var getFieldByName = (fieldName : string) => {
+        var fieldNameArr : string[] = fieldName.split(".");
+        return fieldNameArr[1]
+            ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]]
+            : $scope.mercatorProposalForm[fieldNameArr[0]];
+    };
+
+    var updateCheckBoxGroupValidity = (form, names : string[]) : boolean => {
+        var valid =  _.some(names, (name) => form[name].$modelValue);
+        _.forOwn(names, (name) => {
+            form[name].$setValidity("groupRequired", valid);
+        });
+        return valid;
+    };
+
+    var showCheckboxGroupError = (form, names : string[]) : boolean => {
+        var dirty = $scope.mercatorProposalForm.$submitted || _.some(names, (name) => form[name].$dirty);
+        return !updateCheckBoxGroupValidity(form, names) && dirty;
+    };
+
+    $scope.showError = (fieldName : string, errorType : string) : boolean => {
+        var field = getFieldByName(fieldName);
+        return field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted);
+    };
+
+    $scope.showHeardFromError = () : boolean => {
+        return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
+    };
+
+    $scope.showLocationError = () : boolean => {
+        return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
+    };
+
+    $scope.showFinanceGrantedInfo = () : boolean => {
+        return ($scope.data.finance && $scope.data.finance.other_sources && $scope.data.finance.other_sources !== "");
+    };
+
+    var imageExists = () => {
+        if ($scope.$flow && $scope.$flow.support) {
+            return ($scope.data.introduction && $scope.data.introduction.picture) || $scope.$flow.files.length > 0;
+        } else {
+            return false;
+        }
+    };
+
+    // $scope.$flow is set in parent link() function, so it is not available yet
+    _.defer(() => {
+        if ($scope.$flow && $scope.$flow.support) {
+            var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+
+            // validate image upload
+            $scope.$flow.on("fileAdded", (file, event) => {
+                // We can only check some constraints after the image has
+                // been loaded asynchronously.  So we always return false in
+                // order to keep flow.js from adding the image and then add
+                // it manually after successful validation.
+
+                // FIXME: possible compatibility issue
+                var _URL = $window.URL || $window.webkitURL;
+
+                var img = new Image();
+                img.src = _URL.createObjectURL(file.file);
+                img.onload = () => {
+                    imgUploadController.$setDirty();
+                    imgUploadController.$setValidity("required", true);
+                    imgUploadController.$setValidity("tooBig", file.size <= $scope.$flow.opts.maximumByteSize);
+                    imgUploadController.$setValidity(
+                        "wrongType", $scope.$flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
+                    imgUploadController.$setValidity("tooNarrow", img.width >= $scope.$flow.opts.minimumWidth);
+
+                    if (imgUploadController.$valid) {
+                        $scope.$flow.files[0] = file;
+                    } else {
+                        $scope.$flow.cancel();
+                        imgUploadController.$setValidity("required", imageExists());
+                    }
+
+                    $scope.$apply();
+                };
+
+                $scope.$apply();
+                return false;
+            });
+        }
+    });
+
+    $scope.submitIfValid = (callCount = 0) => {
+        var container = $element.parents("[data-du-scroll-container]");
+
+        if (callCount > 10) {
+            throw "maximum number of post attempts reached!";
+        }
+
+        if ($scope.$flow && $scope.$flow.support) {
+            var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
+            imgUploadController.$setValidity("required", imageExists());
+        }
+
+        if ($scope.mercatorProposalForm.$valid) {
+            // append a random number to the nick to allow duplicate titles
+            $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
+                Math.floor((Math.random() * 10000) + 1);
+
+            $scope.submit()
+                .catch((error) => {
+                    if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
+                        $scope.data.introduction.nickInstance++;
+                        $scope.submitIfValid(callCount + 1);
+                    } else {
+                        container.scrollTopAnimated(0);
+                    }
+                });
+        } else {
+            var getErrorControllers = (ctrl) => _.flatten(_.values(ctrl.$error));
+
+            var errorForms = getErrorControllers($scope.mercatorProposalForm);
+            var errorControllers = _.flatten(_.map(errorForms, getErrorControllers));
+            var names = _.unique(_.map(errorControllers, "$name"));
+            var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
+
+            var element = $element.find(selector).first();
+            container.scrollToElementAnimated(element, 20);
+        }
+    };
+};
+
+
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -1061,144 +1203,5 @@ export var register = (angular) => {
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
         .filter("adhImageUri", imageUriFilter)
-        .controller("mercatorProposalFormController", ["$scope", "$element", "$window", ($scope : IControllerScope, $element, $window) => {
-            var heardFromCheckboxes = [
-                "heard-from-colleague",
-                "heard-from-website",
-                "heard-from-newsletter",
-                "heard-from-facebook",
-                "heard-from-other"
-            ];
-
-            var locationCheckboxes = [
-                "location-location-is-specific",
-                "location-location-is-online",
-                "location-location-is-linked-to-ruhr"
-            ];
-
-            var getFieldByName = (fieldName : string) => {
-                var fieldNameArr : string[] = fieldName.split(".");
-                return fieldNameArr[1]
-                    ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]]
-                    : $scope.mercatorProposalForm[fieldNameArr[0]];
-            };
-
-            var updateCheckBoxGroupValidity = (form, names : string[]) : boolean => {
-                var valid =  _.some(names, (name) => form[name].$modelValue);
-                _.forOwn(names, (name) => {
-                    form[name].$setValidity("groupRequired", valid);
-                });
-                return valid;
-            };
-
-            var showCheckboxGroupError = (form, names : string[]) : boolean => {
-                var dirty = $scope.mercatorProposalForm.$submitted || _.some(names, (name) => form[name].$dirty);
-                return !updateCheckBoxGroupValidity(form, names) && dirty;
-            };
-
-            $scope.showError = (fieldName : string, errorType : string) : boolean => {
-                var field = getFieldByName(fieldName);
-                return field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted);
-            };
-
-            $scope.showHeardFromError = () : boolean => {
-                return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
-            };
-
-            $scope.showLocationError = () : boolean => {
-                return showCheckboxGroupError($scope.mercatorProposalDetailForm, locationCheckboxes);
-            };
-
-            $scope.showFinanceGrantedInfo = () : boolean => {
-                return ($scope.data.finance && $scope.data.finance.other_sources && $scope.data.finance.other_sources !== "");
-            };
-
-            var imageExists = () => {
-                if ($scope.$flow && $scope.$flow.support) {
-                    return ($scope.data.introduction && $scope.data.introduction.picture) || $scope.$flow.files.length > 0;
-                } else {
-                    return false;
-                }
-            };
-
-            // $scope.$flow is set in parent link() function, so it is not available yet
-            _.defer(() => {
-                if ($scope.$flow && $scope.$flow.support) {
-                    var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
-
-                    // validate image upload
-                    $scope.$flow.on("fileAdded", (file, event) => {
-                        // We can only check some constraints after the image has
-                        // been loaded asynchronously.  So we always return false in
-                        // order to keep flow.js from adding the image and then add
-                        // it manually after successful validation.
-
-                        // FIXME: possible compatibility issue
-                        var _URL = $window.URL || $window.webkitURL;
-
-                        var img = new Image();
-                        img.src = _URL.createObjectURL(file.file);
-                        img.onload = () => {
-                            imgUploadController.$setDirty();
-                            imgUploadController.$setValidity("required", true);
-                            imgUploadController.$setValidity("tooBig", file.size <= $scope.$flow.opts.maximumByteSize);
-                            imgUploadController.$setValidity(
-                                "wrongType", $scope.$flow.opts.acceptedFileTypes.indexOf(file.getType()) !== -1);
-                            imgUploadController.$setValidity("tooNarrow", img.width >= $scope.$flow.opts.minimumWidth);
-
-                            if (imgUploadController.$valid) {
-                                $scope.$flow.files[0] = file;
-                            } else {
-                                $scope.$flow.cancel();
-                                imgUploadController.$setValidity("required", imageExists());
-                            }
-
-                            $scope.$apply();
-                        };
-
-                        $scope.$apply();
-                        return false;
-                    });
-                }
-            });
-
-            $scope.submitIfValid = (callCount = 0) => {
-                var container = $element.parents("[data-du-scroll-container]");
-
-                if (callCount > 10) {
-                    throw "maximum number of post attempts reached!";
-                }
-
-                if ($scope.$flow && $scope.$flow.support) {
-                    var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
-                    imgUploadController.$setValidity("required", imageExists());
-                }
-
-                if ($scope.mercatorProposalForm.$valid) {
-                    // append a random number to the nick to allow duplicate titles
-                    $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
-                        Math.floor((Math.random() * 10000) + 1);
-
-                    $scope.submit()
-                        .catch((error) => {
-                            if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
-                                $scope.data.introduction.nickInstance++;
-                                $scope.submitIfValid(callCount + 1);
-                            } else {
-                                container.scrollTopAnimated(0);
-                            }
-                        });
-                } else {
-                    var getErrorControllers = (ctrl) => _.flatten(_.values(ctrl.$error));
-
-                    var errorForms = getErrorControllers($scope.mercatorProposalForm);
-                    var errorControllers = _.flatten(_.map(errorForms, getErrorControllers));
-                    var names = _.unique(_.map(errorControllers, "$name"));
-                    var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
-
-                    var element = $element.find(selector).first();
-                    container.scrollToElementAnimated(element, 20);
-                }
-            };
-        }]);
+        .controller("mercatorProposalFormController", ["$scope", "$element", "$window", mercatorProposalFormController]);
 };
