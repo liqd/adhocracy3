@@ -25,6 +25,9 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
 }
 
 export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
+    contentType : string = RICommentVersion.content_type;
+    itemContentType : string = RIComment.content_type;
+
     // FIXME: settings here is expected to be the union of the
     // constructor arguments of the resource and all sheets.  i would
     // like to suggest a couple of tasks:
