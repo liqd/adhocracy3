@@ -67,7 +67,9 @@ export var logBackendBatchError = (
             code : number;
             body : IBackendError;
         }[];
+        /* tslint:disable:variable-name */
         updated_resources : any;
+        /* tslint:enable:variable-name */
     }>
 ) : void => {
     "use strict";
