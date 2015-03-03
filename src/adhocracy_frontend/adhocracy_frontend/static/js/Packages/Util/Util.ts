@@ -179,7 +179,7 @@ export function endsWith(str, suffix) {
  *
  * The only real difference is that it skips rejected promises instead of rejecting the whole result.
  */
-export var qFilter = (promises : ng.IPromise<any>[], $q : ng.IQService) : ng.IPromise<any[]> => {
+export var qFilter = (promises : angular.IPromise<any>[], $q : angular.IQService) : angular.IPromise<any[]> => {
     // unique marker
     var empty = new Object();
 
@@ -191,7 +191,7 @@ export var qFilter = (promises : ng.IPromise<any>[], $q : ng.IQService) : ng.IPr
     if (count === 0) {
         deferred.resolve(results);
     } else {
-        _.forEach(promises, (promise : ng.IPromise<any>, i : number) => {
+        _.forEach(promises, (promise : angular.IPromise<any>, i : number) => {
             results.push(empty);
 
             promise

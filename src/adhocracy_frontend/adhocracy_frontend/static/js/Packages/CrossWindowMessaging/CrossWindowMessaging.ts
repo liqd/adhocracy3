@@ -69,7 +69,7 @@ export class Service implements IService {
      */
     constructor(
         private _postMessage : IPostMessageService,
-        private $location : ng.ILocationService,
+        private $location : angular.ILocationService,
         private $window : Window,
         private $rootScope,
         private trustedDomains : string[],
@@ -204,7 +204,7 @@ export class Dummy implements IService {
 
 export var factory = (
     adhConfig : AdhConfig.IService,
-    $location : ng.ILocationService,
+    $location : angular.ILocationService,
     $window : Window,
     $rootScope,
     adhUser ?: AdhUser.Service

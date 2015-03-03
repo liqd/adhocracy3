@@ -193,7 +193,7 @@ export var register = () => {
 
         describe("qFilter", () => {
             it("works mostly like $q.all", (done) => {
-                AdhUtil.qFilter([q.when("a"), q.when("b"), q.when("c")], q)
+                AdhUtil.qFilter([q.when("a"), q.when("b"), q.when("c")], <any>q)
                     .then((result) => {
                         expect(result).toEqual(["a", "b", "c"]);
                         done();
@@ -201,7 +201,7 @@ export var register = () => {
             });
 
             it("filters out any rejected promises", (done) => {
-                AdhUtil.qFilter([q.when("a"), q.reject("b"), q.when("c")], q)
+                AdhUtil.qFilter([q.when("a"), q.reject("b"), q.when("c")], <any>q)
                     .then((result) => {
                         expect(result).toEqual(["a", "c"]);
                         done();
@@ -209,7 +209,7 @@ export var register = () => {
             });
 
             it("promises empty list if empty list was passed", (done) => {
-                AdhUtil.qFilter([], q)
+                AdhUtil.qFilter([], <any>q)
                     .then((result) => {
                         expect(result).toEqual([]);
                         done();

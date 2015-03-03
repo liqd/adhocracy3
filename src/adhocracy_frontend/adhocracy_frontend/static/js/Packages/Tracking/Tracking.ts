@@ -12,7 +12,7 @@ export class Service {
     private _paq : any[];
 
     constructor(
-        private $q : ng.IQService,
+        private $q : angular.IQService,
         private $window : PiwikWindow,
         private adhConfig : AdhConfig.IService
     ) {

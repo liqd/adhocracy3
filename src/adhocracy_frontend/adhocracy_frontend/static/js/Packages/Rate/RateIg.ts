@@ -97,7 +97,7 @@ export var register = (angular, config, meta_api) => {
                 // without having to come up with new names every
                 // time, so we just randomise.)
 
-            var cb = (transaction : any) : ng.IPromise<void> => {
+            var cb = (transaction : any) : angular.IPromise<void> => {
                 // post items
                 var proposal : AdhHttp.ITransactionResult =
                     transaction.post(poolPath, new RIProposal({preliminaryNames: adhPreliminaryNames, name: proposalName}));
@@ -125,7 +125,7 @@ export var register = (angular, config, meta_api) => {
 
                 var proposalVersionProper = transaction.get(proposalVersion.path);
 
-                return transaction.commit().then((responses) : ng.IPromise<void> => {
+                return transaction.commit().then((responses) : angular.IPromise<void> => {
                     _proposalVersion = responses[proposalVersionProper.index];
 
                     return adhHttp.withTransaction((transaction) => {
@@ -143,7 +143,7 @@ export var register = (angular, config, meta_api) => {
                         var commentVersion : AdhHttp.ITransactionResult = transaction.post(comment.path, commentVersionResource);
                         var commentVersionProper = transaction.get(commentVersion.path);
 
-                        return transaction.commit().then((responses) : ng.IPromise<void> => {
+                        return transaction.commit().then((responses) : angular.IPromise<void> => {
                             _commentVersion = <any>(responses[commentVersionProper.index]);
 
                             return adhHttp.withTransaction((transaction) => {

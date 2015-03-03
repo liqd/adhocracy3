@@ -73,7 +73,7 @@ export var register = (angular, config, meta_api) => {
 
         it("Deep-rewrites preliminary resource paths.", (done) => {
             var poolPath = "/adhocracy";
-            var cb = (transaction : any) : ng.IPromise<void> => {
+            var cb = (transaction : any) : angular.IPromise<void> => {
                 var proposal : AdhHttp.ITransactionResult =
                     transaction.post(poolPath, new RIProposal({preliminaryNames: adhPreliminaryNames, name: proposalName}));
                 var section : AdhHttp.ITransactionResult =
@@ -97,7 +97,7 @@ export var register = (angular, config, meta_api) => {
                 transaction.post(proposal.path, proposalVersionResource);
 
                 return transaction.commit()
-                    .then((responses) : ng.IPromise<ResourcesBase.Resource> => {
+                    .then((responses) : angular.IPromise<ResourcesBase.Resource> => {
                         var lastTagPath : string = responses[proposal.index].path + "LAST";
                         return adhHttp.get(lastTagPath);
                     })

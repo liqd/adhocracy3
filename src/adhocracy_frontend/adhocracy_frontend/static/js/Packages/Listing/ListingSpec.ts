@@ -27,7 +27,7 @@ var createAdhHttpMock = () => {
     // same issue further down.)
 };
 
-var registerDirectiveSpec = (directive: ng.IDirective): void => {
+var registerDirectiveSpec = (directive: angular.IDirective): void => {
     it("has an isolated scope", () => {
         expect(directive.scope).toBeDefined();
     });
@@ -93,7 +93,7 @@ export var register = () => {
                 adapter.poolPath.and.returnValue(poolPath);
 
                 var listing = new AdhListing.Listing(adapter);
-                var directive: ng.IDirective = listing.createDirective(config, adhWebSocketMock);
+                var directive: angular.IDirective = listing.createDirective(config, adhWebSocketMock);
 
                 registerDirectiveSpec(directive);
 

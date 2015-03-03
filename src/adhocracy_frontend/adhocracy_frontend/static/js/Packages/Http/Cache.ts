@@ -11,7 +11,7 @@ import AdhHttp = require("./Http");
 
 export interface IHttpCacheItem {
     wsOff : Function;
-    promises : {[query : string] : ng.IPromise<any>};
+    promises : {[query : string] : angular.IPromise<any>};
 }
 
 
@@ -32,7 +32,7 @@ export class Service {
     private nonResourceUrls;
 
     constructor(
-        private $q : ng.IQService,
+        private $q : angular.IQService,
         private adhConfig : AdhConfig.IService,
         private adhWebSocket : AdhWebSocket.Service,
         private DSCacheFactory

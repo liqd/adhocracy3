@@ -41,7 +41,7 @@ export interface IAreaInput {
      *
      * This is the reverse of 'this.reverse'.
      */
-    route? : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    route? : (path : string, search : {[key : string] : string}) => angular.IPromise<{[key : string] : string}>;
     /**
      * Convert (a3 top-level) state to (ng) location: Take a
      * 'TopLevelState' and return a path and a search query
@@ -61,7 +61,7 @@ export interface IAreaInput {
 
 export interface IArea {
     prefix : string;
-    route : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    route : (path : string, search : {[key : string] : string}) => angular.IPromise<{[key : string] : string}>;
     reverse : (data : {[key : string] : string}) => {
         path : string;
         search : {[key : string] : string};
@@ -150,12 +150,12 @@ export class Service {
         adhEventManagerClass : typeof AdhEventManager.EventManager,
         private adhTracking : AdhTracking.Service,
         private adhUser : AdhUser.Service,
-        private $location : ng.ILocationService,
-        private $rootScope : ng.IScope,
-        private $http : ng.IHttpService,
-        private $q : ng.IQService,
-        private $injector : ng.auto.IInjectorService,
-        private $templateRequest : ng.ITemplateRequestService
+        private $location : angular.ILocationService,
+        private $rootScope : angular.IScope,
+        private $http : angular.IHttpService,
+        private $q : angular.IQService,
+        private $injector : angular.auto.IInjectorService,
+        private $templateRequest : angular.ITemplateRequestService
     ) {
         var self : Service = this;
 
@@ -231,7 +231,7 @@ export class Service {
         }
     }
 
-    private fromLocation() : ng.IPromise<void> {
+    private fromLocation() : angular.IPromise<void> {
         var area = this.getArea();
         var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
@@ -516,7 +516,7 @@ export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var viewFactory = (adhTopLevelState : Service, $compile : ng.ICompileService) => {
+export var viewFactory = (adhTopLevelState : Service, $compile : angular.ICompileService) => {
     return {
         restrict: "E",
         link: (scope, element) => {
