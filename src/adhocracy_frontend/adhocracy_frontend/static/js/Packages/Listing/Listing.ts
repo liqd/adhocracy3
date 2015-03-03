@@ -135,6 +135,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 adhPreliminaryNames : AdhPreliminaryNames.Service,
                 adhPermissions : AdhPermissions.Service
             ) : void => {
+                adhPermissions.bindScope($scope, () => $scope.poolPath, "poolOptions");
+
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
                 $scope.update = (warmup? : boolean) : ng.IPromise<void> => {
@@ -180,8 +182,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         } else {
                             $scope.elements = elements;
                         }
-
-                        return adhPermissions.bindScope($scope, $scope.poolPath, "poolOptions");
                     });
                 };
 
