@@ -165,12 +165,14 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
 
     public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
         // FIXME: use resource abstractions here
-        // FIXME: translate
-        if (this.$window.confirm("Do you really want to delete this?")) {
-            return this.adhHttp.hide(path, this.adapter.itemContentType)
-                .then(() => {
-                    instance.scope.updateListing();
-                });
+        if (AdhUtil.parentPath(instance.scope.data.path) === path) {
+            // FIXME: translate
+            if (this.$window.confirm("Do you really want to delete this?")) {
+                return this.adhHttp.hide(path, this.adapter.itemContentType)
+                    .then(() => {
+                        instance.scope.updateListing();
+                    });
+            }
         }
     }
 
