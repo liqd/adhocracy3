@@ -113,6 +113,9 @@ var UsersListing = function() {
     };
 
     this.getUserPage = function(user) {
+        // ensures the list of users is visible
+        this.get();
+
         var path = "(//a[span/text() = '" + user + "'])[1]";
         var userItem = element(by.xpath(path));
 
