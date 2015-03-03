@@ -5,9 +5,9 @@ from pytest import mark
 
 def _make_mercator_resource(context, location_appstruct={}, finance_appstruct={}):
     from adhocracy_core.interfaces import IResource
-    from . import IMercatorSubResources
-    from . import ILocation
-    from . import IFinance
+    from adhocracy_mercator.sheets.mercator import IMercatorSubResources
+    from adhocracy_mercator.sheets.mercator import ILocation
+    from adhocracy_mercator.sheets.mercator import IFinance
     from adhocracy_core.utils import get_sheet
     resource = testing.DummyResource(__provides__=[IResource,
                                                    IMercatorSubResources])
@@ -32,7 +32,7 @@ def _make_mercator_resource(context, location_appstruct={}, finance_appstruct={}
 
 def test_create_mercator_catalog_indexes():
     from substanced.catalog import Keyword
-    from . import MercatorCatalogIndexes
+    from .adhocracy import MercatorCatalogIndexes
     inst = MercatorCatalogIndexes()
     assert isinstance(inst.mercator_requested_funding, Keyword)
     assert isinstance(inst.mercator_location, Keyword)
@@ -44,6 +44,7 @@ def integration(config):
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_mercator.catalog')
     config.include('adhocracy_mercator.sheets.mercator')
 
@@ -73,13 +74,13 @@ class TestMercatorLocationIndex:
         return pool_graph
 
     def test_index_location_default(self, context):
-        from . import index_location
+        from .adhocracy import index_location
         resource = _make_mercator_resource(context)
         result = index_location(resource, 'default')
         assert result == 'default'
 
     def test_index_location_is_linked_to_ruhr(self, context):
-        from . import index_location
+        from .adhocracy import index_location
         resource = _make_mercator_resource(
             context,
             location_appstruct={'location_is_linked_to_ruhr': True})
@@ -87,7 +88,7 @@ class TestMercatorLocationIndex:
         assert result == ['linked_to_ruhr']
 
     def test_index_location_is_online_and_linked_to_ruhr(self, context):
-        from . import index_location
+        from .adhocracy import index_location
         resource = _make_mercator_resource(
             context,
             location_appstruct={'location_is_online': True,
@@ -110,13 +111,13 @@ class TestMercatorRequestedFundingIndex:
         return pool_graph
 
     def test_index_requested_funding_default(self, context):
-        from . import index_requested_funding
+        from .adhocracy import index_requested_funding
         resource = _make_mercator_resource(context)
         result = index_requested_funding(resource, 'default')
         assert result == 'default'
 
     def test_index_requested_funding_lte_5000(self, context):
-        from . import index_requested_funding
+        from .adhocracy import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 5000})
@@ -124,7 +125,7 @@ class TestMercatorRequestedFundingIndex:
         assert result == ['5000']
 
     def test_index_requested_funding_lte_10000(self, context):
-        from . import index_requested_funding
+        from .adhocracy import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 10000})
@@ -132,7 +133,7 @@ class TestMercatorRequestedFundingIndex:
         assert result == ['10000']
 
     def test_index_requested_funding_lte_20000(self, context):
-        from . import index_requested_funding
+        from .adhocracy import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 20000})
@@ -140,7 +141,7 @@ class TestMercatorRequestedFundingIndex:
         assert result == ['20000']
 
     def test_index_requested_funding_lte_50000(self, context):
-        from . import index_requested_funding
+        from .adhocracy import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 50000})
@@ -148,7 +149,7 @@ class TestMercatorRequestedFundingIndex:
         assert result == ['50000']
 
     def test_index_requested_funding_gt_50000(self, context):
-        from . import index_requested_funding
+        from .adhocracy import index_requested_funding
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'requested_funding': 50001})
@@ -171,13 +172,13 @@ class TestMercatorBudgetIndex:
         return pool_graph
 
     def test_index_budget_default(self, context):
-        from . import index_budget
+        from .adhocracy import index_budget
         resource = _make_mercator_resource(context)
         result = index_budget(resource, 'default')
         assert result == 'default'
 
     def test_index_budget_lte_5000(self, context):
-        from . import index_budget
+        from .adhocracy import index_budget
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'budget': 5000})
@@ -185,7 +186,7 @@ class TestMercatorBudgetIndex:
         assert result == ['5000']
 
     def test_index_budget_lte_10000(self, context):
-        from . import index_budget
+        from .adhocracy import index_budget
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'budget': 10000})
@@ -193,7 +194,7 @@ class TestMercatorBudgetIndex:
         assert result == ['10000']
 
     def test_index_budget_lte_20000(self, context):
-        from . import index_budget
+        from .adhocracy import index_budget
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'budget': 20000})
@@ -201,7 +202,7 @@ class TestMercatorBudgetIndex:
         assert result == ['20000']
 
     def test_index_budget_lte_50000(self, context):
-        from . import index_budget
+        from .adhocracy import index_budget
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'budget': 50000})
@@ -209,7 +210,7 @@ class TestMercatorBudgetIndex:
         assert result == ['50000']
 
     def test_index_budget_gt_50000(self, context):
-        from . import index_budget
+        from .adhocracy import index_budget
         resource = _make_mercator_resource(
             context,
             finance_appstruct={'budget': 50001})
