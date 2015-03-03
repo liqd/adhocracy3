@@ -3,7 +3,6 @@ import colander
 
 from adhocracy_core.interfaces import Dimensions
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
@@ -19,7 +18,6 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
-from adhocracy_core.utils import get_sheet_field
 
 
 class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -336,23 +334,6 @@ location_meta = sheet_metadata_defaults._replace(isheet=ILocation,
                                                  schema_class=LocationSchema)
 
 
-LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
-
-
-def index_location(resource, default) -> list:
-    """Return search index keywords based on the "location_is_..." fields."""
-    location = get_sheet_field(resource, IMercatorSubResources, 'location')
-    # FIXME: Why is location '' in the first pass of that function
-    # during MercatorProposal create?
-    if location is None or location == '':
-        return default
-    locations = []
-    for keyword in LOCATION_INDEX_KEYWORDS:
-        if get_sheet_field(location, ILocation, 'location_is_' + keyword):
-            locations.append(keyword)
-    return locations if locations else default
-
-
 class StorySchema(colander.MappingSchema):
     story = Text(validator=colander.Length(min=1, max=800))
 
@@ -409,45 +390,6 @@ finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
                                                 schema_class=FinanceSchema)
 
 
-BUDGET_INDEX_LIMIT_KEYWORDS = [5000, 10000, 20000, 50000]
-
-
-def index_requested_funding(resource: IResource, default) -> str:
-    """Return search index keyword based on the "requested_funding" field."""
-    # FIXME: Why is finance '' in the first pass of that function
-    # during MercatorProposal create?
-    # This sounds like a bug, the default value for References is None,
-    # Note: you should not cast resources to Boolean because a resource without
-    # sub resources is equal False [joka]
-    finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
-    if finance is None or finance == '':
-            return default
-    funding = get_sheet_field(finance, IFinance, 'requested_funding')
-    for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
-        if funding <= limit:
-            return [str(limit)]
-    return default
-
-
-def index_budget(resource: IResource, default) -> str:
-    """
-    Return search index keyword based on the "budget" field.
-
-    The returned values are the same values as per the "requested_funding"
-    field, or "above_50000" if the total budget value is more than 50,000 euro.
-    """
-    # FIXME: Why is finance '' in the first pass of that function
-    # during MercatorProposal create?
-    finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
-    if finance is None or finance == '':
-            return default
-    funding = get_sheet_field(finance, IFinance, 'budget')
-    for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
-        if funding <= limit:
-            return [str(limit)]
-    return ['above_50000']
-
-
 class ExperienceSchema(colander.MappingSchema):
 
     """Data structure for additional fields."""
@@ -496,15 +438,3 @@ def includeme(config):
     add_sheet_to_registry(experience_meta, config.registry)
     add_sheet_to_registry(heardfrom_meta, config.registry)
     add_sheet_to_registry(intro_image_metadata_meta, config.registry)
-    config.add_indexview(index_location,
-                         catalog_name='adhocracy',
-                         index_name='mercator_location',
-                         context=IMercatorSubResources)
-    config.add_indexview(index_requested_funding,
-                         catalog_name='adhocracy',
-                         index_name='mercator_requested_funding',
-                         context=IMercatorSubResources)
-    config.add_indexview(index_budget,
-                         catalog_name='adhocracy',
-                         index_name='mercator_budget',
-                         context=IMercatorSubResources)
