@@ -82,6 +82,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
+        private $window : Window,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -164,10 +165,13 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
 
     public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
         // FIXME: use resource abstractions here
-        return this.adhHttp.hide(path, this.adapter.itemContentType)
-            .then(() => {
-                instance.scope.updateListing();
-            });
+        // FIXME: translate
+        if (this.$window.confirm("Do you really want to delete this?")) {
+            return this.adhHttp.hide(path, this.adapter.itemContentType)
+                .then(() => {
+                    instance.scope.updateListing();
+                });
+        }
     }
 
     public _update(
@@ -237,9 +241,10 @@ export class CommentCreate<R extends ResourcesBase.Resource> extends CommentReso
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
+        $window : Window,
         $q : ng.IQService
     ) {
-        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
+        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
     }
 
@@ -360,17 +365,19 @@ export var register = (angular) => {
         .directive("adhCreateOrShowCommentListing", [
             "adhConfig", "adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", adhCreateOrShowCommentListing])
         .directive("adhCommentResource", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $q) => {
+            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$window", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $window, $q) => {
                 var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentResource(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
+                var widget = new CommentResource(
+                    adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }])
         .directive("adhCommentCreate", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $q) => {
+            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$window", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $window, $q) => {
                 var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentCreate(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $q);
+                var widget = new CommentCreate(
+                    adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }]);
 };

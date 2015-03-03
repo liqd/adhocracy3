@@ -53,13 +53,23 @@ export var register = () => {
             var adhPermissionsMock;
             var adhPreliminaryNamesMock;
             var adhTopLevelStateMock;
+            var $windowMock;
 
             beforeEach(() => {
                 adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
                 adhPermissionsMock = jasmine.createSpyObj("adhPermissions", ["bindScope"]);
                 adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelState", ["on"]);
+                $windowMock = jasmine.createSpyObj("$window", ["confirm"]);
                 widget = new AdhComment.CommentResource(
-                    adapterMock, adhConfigMock, adhHttpMock, adhPermissionsMock, adhPreliminaryNamesMock, adhTopLevelStateMock, <any>q);
+                    adapterMock,
+                    adhConfigMock,
+                    adhHttpMock,
+                    adhPermissionsMock,
+                    adhPreliminaryNamesMock,
+                    adhTopLevelStateMock,
+                    $windowMock,
+                    <any>q
+                );
 
                 wrapperMock = {
                     eventManager: jasmine.createSpyObj("eventManager", ["on", "off", "trigger"])
@@ -261,8 +271,17 @@ export var register = () => {
                 var adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
                 var adhPermissionsMock = jasmine.createSpyObj("adhPermissions", ["bindScope"]);
                 var adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelState", ["on"]);
+                var $windowMock = jasmine.createSpyObj("$window", ["confirm"]);
                 widget = new AdhComment.CommentCreate(
-                    adapterMock, adhConfigMock, adhHttpMock, adhPermissionsMock, adhPreliminaryNamesMock, adhTopLevelStateMock, <any>q);
+                    adapterMock,
+                    adhConfigMock,
+                    adhHttpMock,
+                    adhPermissionsMock,
+                    adhPreliminaryNamesMock,
+                    adhTopLevelStateMock,
+                    $windowMock,
+                    <any>q
+                );
             });
 
             it("sets 'templateUrl' on construction", () => {
