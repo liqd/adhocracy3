@@ -148,9 +148,6 @@ TODO: mark pluggable dependency modules
 
 TODO: move scripts to adhocracy_core.scripts
 
-TODO: move index functions to adhocracy_core.catalogs.adhocracy
-
-
 Modules import rules
 ~~~~~~~~~~~~~~~~~~~~
 
