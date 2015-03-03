@@ -6,6 +6,7 @@ exports.config = {
         mercator: "../src/mercator/tests/acceptance/*Spec.js"
     },
     baseUrl: "http://localhost:9090",
+    getPageTimeout: 30000,
     directConnect: true,
     capabilities: {
         "browserName": "chrome"
