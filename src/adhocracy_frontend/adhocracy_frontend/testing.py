@@ -181,7 +181,6 @@ def browser_root(browser_class, backend, frontend, frontend_url):
     """
     add_helper_methods_to_splinter_browser_wrapper(browser_class)
     browser_class.root_url = frontend_url
-    browser_class.app_url = frontend_url  # FIXME do we still need this?
     browser_class.visit(frontend_url)
     browser_class.execute_script('window.localStorage.clear();')
     browser_class.wait_for_condition(angular_app_loaded, 5)

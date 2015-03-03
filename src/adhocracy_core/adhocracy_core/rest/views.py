@@ -75,7 +75,6 @@ def respond_if_blocked(context, request):
 
     Otherwise or it request method is 'options' or 'put' return None
     """
-    # FIXME handle OPTIONS request
     from adhocracy_core.utils import get_reason_if_blocked
     if request.method not in ['HEAD', 'GET', 'POST']:
         return
@@ -86,7 +85,7 @@ def respond_if_blocked(context, request):
 
 def validate_post_root_versions(context, request: Request):
     """Check and transform the 'root_version' paths to resources."""
-    # FIXME: make this a colander validator and move to schema.py
+    # TODO: make this a colander validator and move to schema.py
     # use the catalog to find IItemversions
     root_versions = request.validated.get('root_versions', [])
     valid_root_versions = []
@@ -397,7 +396,7 @@ class ResourceRESTView(RESTView):
 
         is_users = IUsersService.providedBy(context) \
             and request.has_permission('add_user', self.context)
-        # FIXME move the iuser specific part the UsersRestView
+        # TODO move the is_user specific part the UsersRestView
         if request.has_permission('add_resource', self.context) or is_users:
             addables = registry.get_resources_meta_addable(context, request)
             if addables:
@@ -416,9 +415,6 @@ class ResourceRESTView(RESTView):
                 del cstruct['POST']
         else:
             del cstruct['POST']
-
-        # FIXME? maybe simplify options response data structure,
-        # do we really need request/response_body, content_type,..?
         return cstruct
 
     def _inject_removal_permissions(self, put_sheets_dict: dict):

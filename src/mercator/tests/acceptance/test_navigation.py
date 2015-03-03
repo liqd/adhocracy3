@@ -2,7 +2,8 @@ from adhocracy_frontend.tests.acceptance.shared import wait
 
 
 class TestNavigation(object):
-    def test_simple(self, browser_with_proposal):  # FIXME: bad name
+
+    def test_simple(self, browser_with_proposal):
         browser = browser_with_proposal
 
         column1 = browser.find_by_css('.moving-column')[0]

@@ -1015,7 +1015,7 @@ class TestMetaApiView:
         assert field_metadata['valuetype'] == 'adhocracy_core.schema.Role'
         assert field_metadata['containertype'] == 'list'
 
-    # FIXME test for single reference
+    # TODO test for single reference
 
 
 class TestValidateLoginEmail:

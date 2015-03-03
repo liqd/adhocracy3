@@ -198,7 +198,7 @@ class AnnotationStorageSheet(PropertySheet):
         if registry is None:
             registry = get_current_registry(self.context)
         self._store_references(appstruct, registry)
-        # FIXME: only store struct if values have changed
+        # TODO: only store struct if values have changed
         self._notify_resource_sheet_modified(send_event,
                                              registry,
                                              appstruct_old,

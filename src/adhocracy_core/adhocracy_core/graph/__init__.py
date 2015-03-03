@@ -37,7 +37,7 @@ class Graph(Persistent):
 
     """
 
-    # FIXME: add interface for graph implementations
+    # TODO: add interface for graph to make it a nice droppable dependency
     def __init__(self, context):
         self.context = context
 
@@ -214,7 +214,7 @@ class Graph(Persistent):
                                     orientation='sources') -> dict:
         references_isheet = {}
         for source, isheet, field, target in references:
-            # FIXME we return a list of resources here, but for big data a
+            # TODO we return a list of resources here, but for big data a
             # generator would be much better
             resources = references_isheet.get(field, [])
             if orientation == 'sources':

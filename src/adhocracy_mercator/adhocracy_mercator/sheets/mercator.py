@@ -241,8 +241,6 @@ class OrganizationInfoSchema(colander.MappingSchema):
     status = StatusEnum()
     status_other = Text(validator=colander.Length(max=500))
     """Custom description for status == other."""
-    # FIXME status_other must be non-empty if status=other, otherwise it must
-    # be empty or null
     website = URL()
     planned_date = DateTime(missing=colander.drop, default=None)
     help_request = Text(validator=colander.Length(max=500))
@@ -256,7 +254,7 @@ class OrganizationInfoSchema(colander.MappingSchema):
                 raise colander.Invalid(status_other,
                                        msg='Required iff status == other')
         else:
-            # FIXME: Allow multiple errors at the same time
+            # TODO: Allow multiple errors at the same time
             name = node['name']
             if not value.get('name', None):
                 raise colander.Invalid(name,
@@ -342,7 +340,7 @@ LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
 def index_location(resource, default) -> list:
     """Return search index keywords based on the "location_is_..." fields."""
     location = get_sheet_field(resource, IMercatorSubResources, 'location')
-    # FIXME: Why is location '' in the first pass of that function
+    # TODO: Why is location '' in the first pass of that function
     # during MercatorProposal create?
     if location is None or location == '':
         return default
@@ -414,11 +412,9 @@ BUDGET_INDEX_LIMIT_KEYWORDS = [5000, 10000, 20000, 50000]
 
 def index_requested_funding(resource: IResource, default) -> str:
     """Return search index keyword based on the "requested_funding" field."""
-    # FIXME: Why is finance '' in the first pass of that function
+    # TODO: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
     # This sounds like a bug, the default value for References is None,
-    # Note: you should not cast resources to Boolean because a resource without
-    # sub resources is equal False [joka]
     finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
     if finance is None or finance == '':
             return default
@@ -436,7 +432,7 @@ def index_budget(resource: IResource, default) -> str:
     The returned values are the same values as per the "requested_funding"
     field, or "above_50000" if the total budget value is more than 50,000 euro.
     """
-    # FIXME: Why is finance '' in the first pass of that function
+    # TODOE: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
     finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
     if finance is None or finance == '':

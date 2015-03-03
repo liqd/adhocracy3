@@ -85,7 +85,7 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
 
     def _search(self, isheet, isheet_field, target=None):
         graph = find_graph(self.__parent__)
-        # FIXME? unneeded objectid -> object -> objectid transformation
+        # TODO? unneeded objectid -> object -> objectid transformation
         backreferences = graph.get_back_references(target, base_isheet=isheet)
         result = self.family.IF.TreeSet()
         for source, isheet, field, target in backreferences:

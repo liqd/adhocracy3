@@ -3,7 +3,7 @@ from pytest import mark
 from webtest import TestResponse
 
 
-# FIXME: move _create_proposal to somewhere in backend fixtures as the
+# TODO: move _create_proposal to somewhere in backend fixtures as the
 # natural dependency ordering is "frontend depends on backend"
 from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch

@@ -313,7 +313,6 @@ def unflatten_multipart_request(request: Request) -> dict:
 def get_last_version(resource: IItemVersion,
                      registry: Registry) -> IItemVersion:
     """Get last version of  resource' according to the last tag."""
-    # FIXME better just add tag backreferences fields to resources
     from adhocracy_core.sheets.tags import ITag  # prevent circle imports
     item = find_interface(resource, IItem)
     if item is None:

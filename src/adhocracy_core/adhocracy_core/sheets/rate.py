@@ -203,7 +203,6 @@ likeable_meta = rateable_meta._replace(
 
 def index_rate(resource, default):
     """Return the value of field name `rate` for :class:`IRate` resources."""
-    # FIXME?: can we pass the registry to get_sheet_field her?
     rate = get_sheet_field(resource, IRate, 'rate')
     return rate
 
