@@ -190,6 +190,18 @@ export class Service<Content extends ResourcesBase.Resource> {
                 AdhError.logBackendError);
     }
 
+    public hide(path : string, contentType : string) : ng.IPromise<any> {
+        var obj = {
+            content_type: contentType,
+            data: {}
+        };
+        obj.data[SIMetadata.nick] = {
+            hidden: true
+        };
+
+        return this.put(path, <any>obj, true);
+    }
+
     public postRaw(path : string, obj : Content) : ng.IHttpPromise<any> {
         var _self = this;
 
