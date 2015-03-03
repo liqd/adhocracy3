@@ -28,6 +28,8 @@ var pkgLocation = "/Comment";
 
 
 export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhListing.IListingContainerAdapter {
+    contentType : string;
+    itemContentType : string;
     create(settings : any) : T;
     createItem(settings : any) : any;
     content(resource : T) : string;
@@ -162,7 +164,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
 
     public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
         // FIXME: use resource abstractions here
-        return this.adhHttp.hide(path, "adhocracy_core.resources.comment.IComment")
+        return this.adhHttp.hide(path, this.adapter.itemContentType)
             .then(() => {
                 instance.scope.updateListing();
             });
