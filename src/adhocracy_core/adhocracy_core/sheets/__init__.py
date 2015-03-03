@@ -9,11 +9,7 @@ from pyramid.decorator import reify
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.threadlocal import get_current_registry
-from pyramid.traversal import resource_path
 from substanced.property import PropertySheet
-from transaction.interfaces import TransientError
-from ZODB.POSException import POSError
-from ZODB.POSException import ConnectionStateError
 from zope.interface import implementer
 import colander
 
@@ -51,23 +47,10 @@ class AnnotationStorageSheet(PropertySheet):
 
     def get(self, params: dict={}) -> dict:
         """Return appstruct."""
-        try:
-            appstruct = self._default_appstruct
-            appstruct.update(self._get_data_appstruct(params))
-            appstruct.update(self._get_reference_appstruct(params))
-            appstruct.update(self._get_back_reference_appstruct(params))
-        except (ValueError, AttributeError, KeyError, ConnectionStateError,
-                POSError) as err:  # pragma: no cover
-            # If an error is raises here it is most likely because the Database
-            # connection is closed (ConnectionStateError) somehow.
-            # FIXME!! This should never happen, TEMPORALLY WORKAROUND
-            msg = '\nError getting the sheet data for context {path}: ·{err}.'\
-                  '\nRaising TransientError instead to reattemp the request.'
-            logger.error(msg.format(path=resource_path(self.context),
-                                    err=str(err)))
-            raise TransientError(str(err))
-            # Raise TransientError to make the pyramid_tm tween reattemp the
-            # request. Hopefully it will work then.
+        appstruct = self._default_appstruct
+        appstruct.update(self._get_data_appstruct(params))
+        appstruct.update(self._get_reference_appstruct(params))
+        appstruct.update(self._get_back_reference_appstruct(params))
         return appstruct
 
     @property
