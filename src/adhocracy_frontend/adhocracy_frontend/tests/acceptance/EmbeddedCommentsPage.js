@@ -14,8 +14,13 @@ var EmbeddedCommentsPage = function(referer) {
     this.commentInput = this.listingCreateForm.element(by.model("data.content"));
     this.submitButton = this.listingCreateForm.element(by.css("input[type=\"submit\"]"));
 
+
+    this.getUrl = function() {
+        return browser.get(this.url);
+    };
+
     this.get = function() {
-        browser.get(this.url);
+        this.getUrl();
         return this;
     };
 
