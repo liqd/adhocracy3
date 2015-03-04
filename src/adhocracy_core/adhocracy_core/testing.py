@@ -174,6 +174,7 @@ def pool_graph_catalog(config, pool_graph):
     from substanced.interfaces import MODE_IMMEDIATE
     from adhocracy_core.resources.root import _add_catalog_service
     config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets.metadata')
     context = pool_graph
     _add_catalog_service(context, config.registry)
     context['catalogs']['system']['name'].action_mode = MODE_IMMEDIATE

@@ -11,14 +11,12 @@ from adhocracy_core.interfaces import IRateValidator
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets.tags import filter_by_tag
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_user
 
 
@@ -201,27 +199,6 @@ likeable_meta = rateable_meta._replace(
 )
 
 
-def index_rate(resource, default):
-    """Return the value of field name `rate` for :class:`IRate` resources."""
-    rate = get_sheet_field(resource, IRate, 'rate')
-    return rate
-
-
-def index_rates(resource, default):
-    """
-    Return aggregated values of referenceing :class:`IRate` resources.
-
-    Only the LAST version of each rate is counted.
-    """
-    rates = get_sheet_field(resource, IRateable, 'rates')
-    last_rates = filter_by_tag(rates, 'LAST')
-    rate_sum = 0
-    for rate in last_rates:
-        value = get_sheet_field(rate, IRate, 'rate')
-        rate_sum += value
-    return rate_sum
-
-
 def includeme(config):
     """Register sheets, adapters and index views."""
     add_sheet_to_registry(rate_meta, config.registry)
@@ -234,11 +211,3 @@ def includeme(config):
     config.registry.registerAdapter(LikeableRateValidator,
                                     (ILikeable,),
                                     IRateValidator)
-    config.add_indexview(index_rate,
-                         catalog_name='adhocracy',
-                         index_name='rate',
-                         context=IRate)
-    config.add_indexview(index_rates,
-                         catalog_name='adhocracy',
-                         index_name='rates',
-                         context=IRateable)

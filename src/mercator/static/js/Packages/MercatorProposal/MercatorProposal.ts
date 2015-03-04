@@ -293,6 +293,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         private adhTopLevelState : AdhTopLevelState.Service,
         private flowFactory,
         private moment : MomentStatic,
+        private $window : Window,
+        private $location : ng.ILocationService,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -340,6 +342,14 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
         path : string
     ) : ng.IPromise<void> {
+        var itemPath = AdhUtil.parentPath(path);
+        // FIXME: translate
+        if (this.$window.confirm("Do you really want to delete this?")) {
+            return this.adhHttp.hide(itemPath, RIMercatorProposal.content_type)
+                .then(() => {
+                    this.$location.url("/r/mercator");
+                });
+        }
         return this.$q.when();
     }
 
@@ -793,9 +803,11 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         private $timeout : ng.ITimeoutService,
         flowFactory,
         moment : MomentStatic,
+        $window : Window,
+        $location : ng.ILocationService,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 
@@ -838,9 +850,11 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhTopLevelState : AdhTopLevelState.Service,
         flowFactory,
         moment : MomentStatic,
+        $window,
+        $location,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 }
@@ -1189,15 +1203,26 @@ export var register = (angular) => {
         // NOTE: we do not use a Widget based directive here for performance reasons
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhTopLevelState", listItem])
         .directive("adhMercatorProposalDetailView",
-            ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q) => {
-                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $q);
+            ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$window", "$location", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q) => {
+                var widget = new DetailWidget(
+                    adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalCreate",
-            ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$timeout", "flowFactory", "moment", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $q) => {
-                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $q);
+        .directive("adhMercatorProposalCreate", [
+            "adhConfig",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "$timeout",
+            "flowFactory",
+            "moment",
+            "$window",
+            "$location",
+            "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $window, $location, $q) => {
+                var widget = new CreateWidget(
+                    adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $window, $location, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])

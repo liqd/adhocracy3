@@ -411,3 +411,101 @@ def test_get_modification_date_cached():
     registry = testing.DummyResource(__date__=now)
     result = get_modification_date(registry)
     assert result is registry.__modification_date__
+
+
+def test_is_deleted_attribute_is_true(context):
+    from . import is_deleted
+    context.deleted = True
+    assert is_deleted(context) is True
+
+
+def test_is_deleted_attribute_is_false(context):
+    from . import is_deleted
+    context.deleted = False
+    assert is_deleted(context) is False
+
+
+def test_is_deleted_attribute_not_set(context):
+    from . import is_deleted
+    assert is_deleted(context) is False
+
+
+def test_is_deleted_parent_attribute_is_true(context):
+    from . import is_deleted
+    child = testing.DummyResource()
+    context['child'] = child
+    context.deleted = True
+    assert is_deleted(child) is True
+
+
+def test_is_deleted_parent_attribute_is_false(context):
+    from . import is_deleted
+    child = testing.DummyResource()
+    context['child'] = child
+    context.deleted = False
+    assert is_deleted(child) is False
+
+
+def test_is_deleted_parent_attribute_not_set(context):
+    from . import is_deleted
+    child = testing.DummyResource()
+    context['child'] = child
+    assert is_deleted(child) is False
+
+
+def test_is_deleted_parent_attrib_true_child_attrib_false(context):
+    from . import is_deleted
+    child = testing.DummyResource()
+    context['child'] = child
+    context.deleted = True
+    child.deleted = False
+    assert is_deleted(child) is True
+
+
+def test_is_hidden_attribute_is_true(context):
+    from . import is_hidden
+    context.hidden = True
+    assert is_hidden(context) is True
+
+
+def test_is_hidden_attribute_is_false(context):
+    from . import is_hidden
+    context.hidden = False
+    assert is_hidden(context) is False
+
+
+def test_is_hidden_attribute_not_set(context):
+    from . import is_hidden
+    assert is_hidden(context) is False
+
+
+def test_is_hidden_parent_attribute_is_true(context):
+    from . import is_hidden
+    child = testing.DummyResource()
+    context['child'] = child
+    context.hidden = True
+    assert is_hidden(child) is True
+
+
+def test_is_hidden_parent_attribute_is_false(context):
+    from . import is_hidden
+    child = testing.DummyResource()
+    context['child'] = child
+    context.hidden = False
+    assert is_hidden(child) is False
+
+
+def test_is_hidden_parent_attribute_not_set(context):
+    from . import is_hidden
+    child = testing.DummyResource()
+    context['child'] = child
+    assert is_hidden(child) is False
+
+
+def test_is_hidden_parent_attrib_true_child_attrib_false(context):
+    from . import is_hidden
+    child = testing.DummyResource()
+    context['child'] = child
+    context.hidden = True
+    child.hidden = False
+    assert is_hidden(child) is True

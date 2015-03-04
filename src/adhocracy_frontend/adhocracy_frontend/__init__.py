@@ -10,7 +10,7 @@ from pyramid.response import Response
 from pyramid.settings import asbool
 from pyramid.settings import aslist
 
-from adhocracy_core.rest.views import add_cors_headers_subscriber
+from adhocracy_core.rest.subscriber import add_cors_headers
 
 
 def config_view(request):
@@ -144,7 +144,7 @@ def includeme(config):
     config.add_view(adhocracy_sdk_view, route_name='adhocracy_sdk')
     config.add_static_view('static', 'adhocracy_frontend:build/',
                            cache_max_age=cache_max_age)
-    config.add_subscriber(add_cors_headers_subscriber, NewResponse)
+    config.add_subscriber(add_cors_headers, NewResponse)
 
 
 def add_frontend_route(config, name, pattern):

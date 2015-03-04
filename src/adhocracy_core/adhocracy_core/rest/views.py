@@ -14,7 +14,6 @@ from colander import SequenceSchema
 from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
-from pyramid.events import NewResponse
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
 from pyramid.request import Request
@@ -979,16 +978,6 @@ class LoginEmailView(RESTView):
         return _login_user(self.request)
 
 
-def add_cors_headers_subscriber(event):
-    """Add CORS headers to response."""
-    event.response.headers.update({
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers':
-        'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
-        'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
-    })
-
-
 def validate_activation_path(context, request: Request):
     """Validate the user name of a login request.
 
@@ -1108,4 +1097,3 @@ class MessageUserView(RESTView):
 def includeme(config):
     """Register Views."""
     config.scan('.views')
-    config.add_subscriber(add_cors_headers_subscriber, NewResponse)

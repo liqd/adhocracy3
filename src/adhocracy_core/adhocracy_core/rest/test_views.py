@@ -1199,20 +1199,6 @@ class TestLoginEmailView:
         assert inst.options() == {}
 
 
-def test_add_cors_headers_subscriber(context):
-    from adhocracy_core.rest.views import add_cors_headers_subscriber
-    headers = {}
-    response = testing.DummyResource(headers=headers)
-    event = testing.DummyResource(response=response)
-
-    add_cors_headers_subscriber(event)
-
-    assert headers == \
-        {'Access-Control-Allow-Origin': '*',
-         'Access-Control-Allow-Headers':
-         'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
-         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'}
-
 
 class TestValidateActivationPathUnitTest:
 
@@ -1509,9 +1495,4 @@ class TestIntegrationIncludeme:
     def test_includeme(self):
         """Check that includeme runs without errors."""
         assert True
-
-    def test_register_subscriber(self, registry):
-        from adhocracy_core.rest.views import add_cors_headers_subscriber
-        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-        assert add_cors_headers_subscriber.__name__ in handlers
 
