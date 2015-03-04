@@ -432,7 +432,7 @@ def index_budget(resource: IResource, default) -> str:
     The returned values are the same values as per the "requested_funding"
     field, or "above_50000" if the total budget value is more than 50,000 euro.
     """
-    # TODOE: Why is finance '' in the first pass of that function
+    # TODO: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
     finance = get_sheet_field(resource, IMercatorSubResources, 'finance')
     if finance is None or finance == '':

@@ -103,7 +103,7 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
 def _get_raw_x_user_headers(request: Request) -> tuple:
     """Return not validated tuple with the X-User-Path/Token values."""
     user_url = request.headers.get('X-User-Path', '')
-    # TODO find a proper solution, useid should just be an identifier.
+    # TODO find a proper solution, userid should just be an identifier.
     # user_url/path as userid does not work
     # well with the pyramid authentication system. We don't have the
     # a context or root object to resolve the resource path when processing
