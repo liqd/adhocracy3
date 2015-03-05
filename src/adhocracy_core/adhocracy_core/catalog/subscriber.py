@@ -50,10 +50,10 @@ def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tag,
                           ISheetBackReferenceModified,
-                          interface=IVersionable)
+                          object_iface=IVersionable)
     config.add_subscriber(reindex_visibility,
                           IResourceSheetModified,
-                          isheet=IMetadata)
+                          event_isheet=IMetadata)
     config.add_subscriber(reindex_rate,
                           ISheetBackReferenceModified,
-                          isheet=IRateable)
+                          event_isheet=IRateable)

@@ -128,4 +128,4 @@ def includeme(config):
                           IItemVersionNewVersionAdded)
     config.add_subscriber(add_changelog_visibility,
                           IResourceSheetModified,
-                          isheet=IMetadata)
+                          event_isheet=IMetadata)
