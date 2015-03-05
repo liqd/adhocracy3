@@ -39,8 +39,8 @@ def integration(config):
 class TestItemVersion:
 
     @fixture
-    def context(self, pool_graph):
-        return pool_graph
+    def context(self, pool_graph_catalog):
+        return pool_graph_catalog
 
     def _make_one(self, config, parent, follows=[], appstructs={}, creator=None,
                   is_batchmode=False):
