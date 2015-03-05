@@ -418,7 +418,7 @@ class ISheetReferenceNewVersion(IObjectEvent):
                              'mode.')
 
 
-class ISheetReferenceModified(IObjectEvent):  # pragma: no cover
+class ISheetBackReferenceModified(IObjectEvent):  # pragma: no cover
 
     """An event type sent when a sheet back reference was added/removed.
 
@@ -431,12 +431,12 @@ class ISheetReferenceModified(IObjectEvent):  # pragma: no cover
     registry = Attribute('The pyramid registry')
 
 
-class ISheetBackReferenceAdded(ISheetReferenceModified):  # pragma: no cover
+class ISheetBackReferenceAdded(ISheetBackReferenceModified):
 
     """An event type sent when a sheet back reference was added."""
 
 
-class ISheetBackReferenceRemoved(ISheetReferenceModified):  # pragma: no cover
+class ISheetBackReferenceRemoved(ISheetBackReferenceModified):
 
     """An event type sent when a sheet back reference was removed."""
 

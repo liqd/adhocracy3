@@ -7,7 +7,7 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
-from adhocracy_core.interfaces import ISheetReferenceModified
+from adhocracy_core.interfaces import ISheetBackReferenceModified
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.utils import get_visibility_change
@@ -123,7 +123,7 @@ def includeme(config):
     config.add_subscriber(add_changelog_modified_and_descendants,
                           IResourceSheetModified)
     config.add_subscriber(add_changelog_backrefs,
-                          ISheetReferenceModified)
+                          ISheetBackReferenceModified)
     config.add_subscriber(add_changelog_followed,
                           IItemVersionNewVersionAdded)
     config.add_subscriber(add_changelog_visibility,
