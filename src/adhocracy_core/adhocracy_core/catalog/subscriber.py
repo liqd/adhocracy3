@@ -10,8 +10,8 @@ from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.interfaces import ISheetBackReferenceModified
-from adhocracy_core.sheets.tags import ITag
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.utils import list_resource_with_descendants
 
@@ -49,8 +49,8 @@ def _reindex_resource_and_descendants(resource: IResource):
 def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tag,
-                          isheet=ITag)
                           ISheetBackReferenceModified,
+                          interface=IVersionable)
     config.add_subscriber(reindex_visibility,
                           IResourceSheetModified,
                           isheet=IMetadata)
