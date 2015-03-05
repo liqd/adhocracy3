@@ -42,6 +42,13 @@ var MercatorProposalDetailPage = function() {
         return new EmbeddedCommentsPage("");
     };
 
+    this.sendAbuseComplaint = function(content) {
+        var reportButton = element(by.xpath("//a[text() = \"report\"]"));
+        reportButton.click();
+        element(by.css(".report-abuse textarea")).sendKeys(content);
+        element(by.css(".report-abuse input.m-call-to-action")).click();
+    };
+
 };
 
 module.exports = MercatorProposalDetailPage;

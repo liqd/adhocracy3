@@ -1,5 +1,8 @@
 "use strict";
 
+var fs = require("fs");
+var MailParser = require("mailparser").MailParser;
+var EC = protractor.ExpectedConditions;
 var shared = require("./core/shared.js");
 var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
 var MercatorProposalListing = require("./MercatorProposalListing.js");
@@ -287,5 +290,59 @@ describe("space navigation", function() {
 
         expect(element(by.css("adh-comment-create form textarea"))
                .getAttribute("value")).toBe(commentMsg);
+    });
+});
+
+describe("abuse complaint", function() {
+    it("can be sent and is received as email", function() {
+        shared.loginAnnotator();
+
+        var mailsBeforeComplaint =
+            fs.readdirSync(browser.params.mail.queue_path + "/new");
+
+        var list = new MercatorProposalListing().get();
+        var proposal = list.getDetailPage(0);
+
+        var complaintContent =
+            ["The entire content of this proposal is",
+             "copyrighted to John H. Doe and should never be",
+             "reproduced/copied to another website without",
+             "written authorization from the owner"].join("\n");;
+
+        proposal.sendAbuseComplaint(complaintContent);
+
+        // expect the message widget to disappear
+        var textArea = element(by.css(".report-abuse textarea"));
+        browser.wait(EC.not(EC.presenceOf(textArea)), 5000);
+        expect(textArea.isPresent()).toBeFalsy();
+
+        // ensures tests and disk access are executed after the
+        // message has been sent
+        var flow = browser.controlFlow();
+        flow.execute(function() {
+            var mailsAfterComplaint =
+                fs.readdirSync(browser.params.mail.queue_path + "/new");
+
+            expect(mailsAfterComplaint.length).toEqual(mailsBeforeComplaint.length + 1);
+
+            var newMails = shared.diffArray(mailsAfterComplaint, mailsBeforeComplaint);
+            expect(newMails.length).toEqual(1);
+
+            var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
+            var mailparser = new MailParser();
+
+            mailparser.on("end", function(mail) {
+                expect(mail.text).toContain(complaintContent);
+                browser.getLocationAbsUrl().then(function(currentUrl) {
+                    expect(mail.text).toContain(currentUrl);
+                });
+                expect(mail.subject).toEqual("Adhocracy Abuse Complaint");
+                expect(mail.from[0].address).toContain("support@");
+                expect(mail.to[0].address).toContain("abuse_handler@");
+            });
+
+            mailparser.write(fs.readFileSync(mailpath));
+            mailparser.end();
+        });
     });
 });
