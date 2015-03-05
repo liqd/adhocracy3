@@ -1,5 +1,6 @@
 import _ = require("lodash");
 
+/* Country list from Wikipedia: http://de.wikipedia.org/wiki/Liste_der_Staaten_der_Erde */
 export var allCountries = [
 
 "AF",
@@ -204,7 +205,7 @@ export var allCountries = [
 ];
 
 
-
+/* European country list as defined by Stiftung Mercator */
 export var europeanCountries = [
 "AL",
 "AD",
