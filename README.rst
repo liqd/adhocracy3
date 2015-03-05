@@ -54,7 +54,7 @@ Server (backend):
 
 Client (frontend):
 
-- `JavaScript` (programming language)
+- `JavaScript <https://developer.mozilla.org/en-US/docs/Web/JavaScript>`_ (programming language)
 
 - `TypeScript <http://www.typescriptlang.org/>`_ (programming language)
 
