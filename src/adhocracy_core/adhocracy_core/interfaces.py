@@ -418,7 +418,7 @@ class ISheetReferenceNewVersion(IObjectEvent):
                              'mode.')
 
 
-class ISheetReferenceModified(IObjectEvent):  # pragma: no cover
+class ISheetBackReferenceModified(IObjectEvent):  # pragma: no cover
 
     """An event type sent when a sheet back reference was added/removed.
 
@@ -431,12 +431,12 @@ class ISheetReferenceModified(IObjectEvent):  # pragma: no cover
     registry = Attribute('The pyramid registry')
 
 
-class ISheetBackReferenceAdded(ISheetReferenceModified):  # pragma: no cover
+class ISheetBackReferenceAdded(ISheetBackReferenceModified):
 
     """An event type sent when a sheet back reference was added."""
 
 
-class ISheetBackReferenceRemoved(ISheetReferenceModified):  # pragma: no cover
+class ISheetBackReferenceRemoved(ISheetBackReferenceModified):
 
     """An event type sent when a sheet back reference was removed."""
 
@@ -510,9 +510,8 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     resource (None or IResource):
         The resource that is modified/created.
     last_version_in_transaction (None or IResource):
-        The last Version created in this transaction
+        The last Version created in this transaction (assuming linear history)
         (only for :class:`adhocracy_core.interfaces.IItem`)
-        FIXME: we assume linear history here
     changed_descendants (bool): child or grandchild is modified or has
                                 changed_backrefs
     changed_backrefs (bool): References targeting this resource are changed

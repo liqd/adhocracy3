@@ -47,7 +47,7 @@ def test_user_meta():
     import adhocracy_core.sheets
     meta = user_metadata
     assert meta.iresource is IUser
-    assert meta.content_class == User  # FIXME remove ths special class
+    assert meta.content_class == User  # TODO do we really need this class?
     assert meta.permission_add == 'add_user'
     assert meta.is_implicit_addable is False
     assert meta.basic_sheets == [adhocracy_core.sheets.principal.IUserBasic,

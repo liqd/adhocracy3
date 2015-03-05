@@ -203,5 +203,5 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_register_subsriber_predicats(self):
-        assert self.config.get_predlist('isheet')
-        assert self.config.get_predlist('interface')
+        assert self.config.get_predlist('event_isheet')
+        assert self.config.get_predlist('object_iface')

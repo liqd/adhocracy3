@@ -75,9 +75,8 @@ class BatchView(RESTView):
     def options(self) -> dict:
         """Return options for batch view.
 
-        FIXME: Return something useful. This currently only exist in order to
-        satisfy the preflight request, which browsers do in CORS situations
-        before doing the actual POST.
+        This currently only exist in order to satisfy the preflight request,
+        which browsers do in CORS situations before doing the actual POST.
 
         """
         return {}
@@ -177,7 +176,7 @@ class BatchView(RESTView):
         except HTTPException as err:
             code = err.status_code
             body = self._try_to_decode_json(err.body)
-        # FIXME catch PredicateMismatch, if you do a put instead of post
+        # TODO catch PredicateMismatch, if you do a put instead of post
         # you dont't get any help what is going wrong.
         except Exception as err:
             code = 500

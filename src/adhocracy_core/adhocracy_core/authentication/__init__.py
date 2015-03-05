@@ -103,7 +103,8 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
 def _get_raw_x_user_headers(request: Request) -> tuple:
     """Return not validated tuple with the X-User-Path/Token values."""
     user_url = request.headers.get('X-User-Path', '')
-    # FIXME find a proper solution, user_url/path as userid does not work
+    # TODO find a proper solution, userid should just be an identifier.
+    # user_url/path as userid does not work
     # well with the pyramid authentication system. We don't have the
     # a context or root object to resolve the resource path when processing
     # the unauthenticated_userid and effective_principals methods.
@@ -126,9 +127,7 @@ def _get_x_user_headers(request: Request) -> tuple:
         user = schema.deserialize(user_url)
         user_path = resource_path(user)
     except Invalid:
-        # FIXME if we want to use multiple authentication policies we should
-        # ignore exceptions at all.
-        # Else we should raise a proper colander error.
+        # TODO: raise a proper colander error.
         pass
     token = request.headers.get('X-User-Token', None)
     return (user_path, token)

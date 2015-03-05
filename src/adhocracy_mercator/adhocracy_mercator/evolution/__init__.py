@@ -28,7 +28,6 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         introduction = get_sheet_field(proposal, IMercatorSubResources,
                                        'introduction')
         if introduction == '' or introduction is None:
-            # FIXME: the default value for references should be None
             continue
         alsoProvides(proposal, ITitle)
         if 'title' not in introduction._sheets[IIntroduction.__identifier__]:

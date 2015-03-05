@@ -239,8 +239,6 @@ class OrganizationInfoSchema(colander.MappingSchema):
     status = StatusEnum()
     status_other = Text(validator=colander.Length(max=500))
     """Custom description for status == other."""
-    # FIXME status_other must be non-empty if status=other, otherwise it must
-    # be empty or null
     website = URL()
     planned_date = DateTime(missing=colander.drop, default=None)
     help_request = Text(validator=colander.Length(max=500))
@@ -254,7 +252,7 @@ class OrganizationInfoSchema(colander.MappingSchema):
                 raise colander.Invalid(status_other,
                                        msg='Required iff status == other')
         else:
-            # FIXME: Allow multiple errors at the same time
+            # TODO: Allow multiple errors at the same time
             name = node['name']
             if not value.get('name', None):
                 raise colander.Invalid(name,

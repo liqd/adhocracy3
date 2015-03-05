@@ -204,8 +204,8 @@ class TestIntegrationPoolSheet:
         poolsheet = self._get_pool_sheet(pool)
         assert poolsheet.get() == {'elements': []}
 
-    #FIXME: add check if the schema has a children named 'elements' with tagged
-    #Value 'target_isheet'. This isheet is used to filter return data.
+    # TODO: add test if the schema has a children named 'elements' with tagged
+    # Value 'target_isheet'. This isheet is used to filter return data.
 
     def test_get_not_empty_with_target_isheet(self, registry,
                                               pool_graph_catalog):

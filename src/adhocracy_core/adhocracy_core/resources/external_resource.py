@@ -21,7 +21,7 @@ class IExternalResource(IBasicPool):
 external_resource_meta = pool_metadata._replace(
     content_name='ExternalResource',
     iresource=IExternalResource,
-    element_types=[IComment],  # FIXME remove IComment, this is the wrong place
+    element_types=[IComment],
     is_implicit_addable=True,
     permission_add='add_externalresource',
     extended_sheets=[adhocracy_core.sheets.comment.ICommentable],

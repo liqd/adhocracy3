@@ -78,8 +78,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             # God role
             (Allow, 'role:god', ALL_PERMISSIONS),
             ]
-# FIXME: nice documentation for default permissions and how to set permissions
-# FIXME every sheet/resource should have the posibility to add the needed ACEs
+# TODO? every sheet/resource should have the posibility to add the needed ACEs
 
 
 class IRootPool(IPool, IRoot):
@@ -98,7 +97,7 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
     _add_platform(context, registry)
-    # FIXME: Move mercator platform creation to mercator package
+    # TODO: Move mercator platform creation to mercator package
     _add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
 
 
@@ -143,12 +142,12 @@ def _add_default_group(context, registry):
     if not registry.settings.get('adhocracy.add_default_group',
                                  True):  # pragma: no cover
         return
-    # FIXME: the 'app' fixture in adhocracy_core.testing does not work with
+    # the 'app' fixture in adhocracy_core.testing does not work with
     # setting a default group. So we allow to disable here.
     group_name = 'authenticated'
     group_roles = ['reader', 'annotator', 'contributor']
-    # FIXME these rules only makes sense for mercator
-    # FIXME groups should be created with an evolve script
+    # TODO these rules only makes sense for mercator
+    #      groups should be created with an evolve script
     groups = find_service(context, 'principals', 'groups')
     appstructs = {adhocracy_core.sheets.principal.IGroup.__identifier__:
                   {'roles': group_roles},

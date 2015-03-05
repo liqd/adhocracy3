@@ -13,7 +13,6 @@ from adhocracy_core.testing import annotator_login
 from selenium.common.exceptions import NoSuchElementException
 
 
-# FIXME: root_uri must be constructed from etc/*.ini, not hard-coded here!
 root_uri = 'http://localhost:9080'
 verbose = False
 

@@ -32,7 +32,6 @@ def root_factory(request):
 
 def add_after_commit_hooks(request):
     """Add after commit hooks."""
-    # FIXME this is a quick hack
     from adhocracy_core.caching import purge_varnish_after_commit_hook
     from adhocracy_core.websockets.client import \
         send_messages_after_commit_hook
