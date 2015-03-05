@@ -4,6 +4,7 @@ var fs = require("fs");
 var MailParser = require("mailparser").MailParser;
 var EC = protractor.ExpectedConditions;
 var shared = require("./core/shared.js");
+var _ = require("lodash");
 var MercatorProposalFormPage = require("./MercatorProposalFormPage.js");
 var MercatorProposalListing = require("./MercatorProposalListing.js");
 var MercatorProposalDetailPage = require("./MercatorProposalDetailPage.js");
@@ -325,7 +326,7 @@ describe("abuse complaint", function() {
 
             expect(mailsAfterComplaint.length).toEqual(mailsBeforeComplaint.length + 1);
 
-            var newMails = shared.diffArray(mailsAfterComplaint, mailsBeforeComplaint);
+            var newMails = _.difference(mailsAfterComplaint, mailsBeforeComplaint);
             expect(newMails.length).toEqual(1);
 
             var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];

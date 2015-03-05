@@ -6,6 +6,7 @@ var fs = require("fs");
 var exec = require("sync-exec");
 var EC = protractor.ExpectedConditions;
 var MailParser = require("mailparser").MailParser;
+var _ = require("lodash");
 
 describe("user page", function() {
     it("displays the correct name for each user", function() {
@@ -52,7 +53,7 @@ describe("user page", function() {
 
             expect(mailsAfterMessaging.length).toEqual(mailsBeforeMessaging.length + 1);
 
-            var newMails = shared.diffArray(mailsAfterMessaging, mailsBeforeMessaging);
+            var newMails = _.difference(mailsAfterMessaging, mailsBeforeMessaging);
             expect(newMails.length).toEqual(1);
 
             var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
