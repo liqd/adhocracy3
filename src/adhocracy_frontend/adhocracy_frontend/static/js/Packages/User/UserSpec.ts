@@ -15,6 +15,7 @@ export var register = () => {
             var adhConfigMock;
             var adhHttpMock;
             var adhCacheMock;
+            var adhTrackingMock;
             var httpMock;
             var rootScopeMock;
             var windowMock;
@@ -41,6 +42,8 @@ export var register = () => {
                     memoize: (path, subkey, closure) => closure()
                 };
 
+                adhTrackingMock = jasmine.createSpyObj("adhTrackingMock", ["trackPageView", "setLoginState", "setUserId"]);
+
                 httpMock = <any>jasmine.createSpyObj("httpMock", ["head", "post"]);
                 httpMock.defaults = {
                     headers: {
@@ -66,7 +69,8 @@ export var register = () => {
                 };
 
                 adhUser = new AdhUser.Service(
-                    adhConfigMock, adhHttpMock, adhCacheMock, <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+                    adhConfigMock, adhHttpMock, adhCacheMock, adhTrackingMock,
+                    <any>q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {
