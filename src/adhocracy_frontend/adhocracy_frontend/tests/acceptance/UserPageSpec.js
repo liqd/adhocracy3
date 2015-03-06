@@ -28,7 +28,7 @@ describe("user page", function() {
         var mailsBeforeMessaging =
             fs.readdirSync(browser.params.mail.queue_path + "/new");
 
-        var usersListing = new UserPages.UsersListing().get();
+        var usersListing = new UserPages.UsersListing();
         var annotatorPage = usersListing.getUserPage("annotator");
         var currentDate = Date.now().toString();
         var subject = "title" + currentDate;
