@@ -12,6 +12,7 @@ exports.config = {
 
     capabilities: {
         "browserName": "chrome",
+        "version": "40",
         "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER,
         "build": process.env.TRAVIS_BUILD_NUMBER,
         "name": name
