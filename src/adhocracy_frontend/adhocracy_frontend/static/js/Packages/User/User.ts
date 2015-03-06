@@ -128,7 +128,8 @@ export class Service {
         _self.userPath = userPath;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.$http.defaults.headers.common["X-User-Path"] = userPath;
-        _self.adhTracking.setUser(userPath);
+        _self.adhTracking.setLoginState(true);
+        _self.adhTracking.setUserId(userPath);
 
         return _self.loadUser(userPath);
     }
@@ -160,7 +161,8 @@ export class Service {
         _self.userPath = undefined;
         _self.data = undefined;
         _self.loggedIn = false;
-        _self.adhTracking.setUser(null);
+        _self.adhTracking.setLoginState(false);
+        _self.adhTracking.setUserId(null);
 
         _self.adhCache.invalidateAll();
     }

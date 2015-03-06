@@ -50,11 +50,24 @@ export class Service {
         }
     }
 
-    public setUser(userPath : string) {
-        if (this.trackUserId) {
+    public setLoginState(loggedIn : boolean) {
+        if (this.trackingEnabled) {
+            // NOTE: tracking login state on a page base
+            this.setCustomVariable(1, "user type", loggedIn ? "registered" : "anonymous", "page");
+        }
+    }
+
+    public setUserId(userPath : string) {
+        if (this.trackingEnabled && this.trackUserId) {
             this.$window._paq.push(["setUserId", userPath]);
         }
     }
+
+    /* TODO: nicer API without explicit index argument */
+    private setCustomVariable(index : number, name : string, value : string, scope : string) {
+        this.$window._paq.push(["setCustomVariable", index, name, value, scope]);
+    }
+
 }
 
 export var moduleName = "adhTracking";

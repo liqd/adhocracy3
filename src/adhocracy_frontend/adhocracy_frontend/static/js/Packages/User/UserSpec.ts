@@ -42,7 +42,7 @@ export var register = () => {
                     memoize: (path, subkey, closure) => closure()
                 };
 
-                adhTrackingMock = jasmine.createSpyObj("adhTrackingMock", ["trackPageView", "setUser"]);
+                adhTrackingMock = jasmine.createSpyObj("adhTrackingMock", ["trackPageView", "setLoginState", "setUserId"]);
 
                 httpMock = <any>jasmine.createSpyObj("httpMock", ["head", "post"]);
                 httpMock.defaults = {
