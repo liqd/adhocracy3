@@ -30,7 +30,7 @@ var metaParams = [
     "noheader"
 ];
 
-export var location2template = ($location : ng.ILocationService) => {
+export var location2template = ($location : angular.ILocationService) => {
     var widget : string = $location.path().split("/")[2];
     var search = $location.search();
 
@@ -51,7 +51,7 @@ export var location2template = ($location : ng.ILocationService) => {
 };
 
 
-export var normalizeInternalUrl = (url : string, $location : ng.ILocationService) => {
+export var normalizeInternalUrl = (url : string, $location : angular.ILocationService) => {
     var host = $location.protocol() + "://" + $location.host();
     var port = $location.port();
     if (port && (port !== 80) && (port !== 443)) {
@@ -64,7 +64,7 @@ export var normalizeInternalUrl = (url : string, $location : ng.ILocationService
 };
 
 
-export var isInternalUrl = (url : string, $location : ng.ILocationService) => {
+export var isInternalUrl = (url : string, $location : angular.ILocationService) => {
     return normalizeInternalUrl(url, $location)[0] === "/";
 };
 
@@ -117,7 +117,7 @@ export var register = (angular) => {
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
-                .when("embed", ["$location", ($location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
+                .when("embed", ["$location", ($location : angular.ILocationService) : AdhTopLevelState.IAreaInput => {
                     var params = $location.search();
                     var template = location2template($location);
 

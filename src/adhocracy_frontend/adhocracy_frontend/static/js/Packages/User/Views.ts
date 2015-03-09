@@ -23,7 +23,7 @@ export interface IScopeLogin {
 
     resetCredentials : () => void;
     cancel : () => void;
-    logIn : () => ng.IPromise<void>;
+    logIn : () => angular.IPromise<void>;
 }
 
 
@@ -40,7 +40,7 @@ export interface IScopeRegister {
     supportEmail : string;
     success : boolean;
 
-    register : () => ng.IPromise<void>;
+    register : () => angular.IPromise<void>;
     cancel : () => void;
 }
 
@@ -64,7 +64,7 @@ export var activateController = (
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhDone,
-    $location : ng.ILocationService
+    $location : angular.ILocationService
 ) : void => {
     var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
@@ -155,7 +155,7 @@ export var registerDirective = (
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
 
-            scope.register = () : ng.IPromise<void> => {
+            scope.register = () : angular.IPromise<void> => {
                 return adhUser.register(scope.input.username, scope.input.email, scope.input.password, scope.input.passwordRepeat)
                     .then((response) => {
                         scope.errors = [];

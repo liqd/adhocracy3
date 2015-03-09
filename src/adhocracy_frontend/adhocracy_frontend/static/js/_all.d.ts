@@ -29,7 +29,7 @@ declare module "modernizr" {
 /**
  * Fake module description for Kris Kowal's q
  *
- * This is actually the description of ng.IQService.
+ * This is actually the description of angular.IQService.
  *
  * We use q as a drop-in replacement in testing as it is compatible with both
  * node.js and browsers and does not require angular.
@@ -38,19 +38,19 @@ declare module "modernizr" {
  * DefinitelyTyped are not.  So we use this one instead.
  *
  * I did not find a simple way of saying "this module has just the same API as
- * ng.IQService" because one is a module and the other is an interface. So I
+ * angular.IQService" because one is a module and the other is an interface. So I
  * copied the whole description over.
  *
  * [0]: https://docs.angularjs.org/api/ng/service/$q#differences-between-kris-kowal-s-q-and-q
  */
 declare module "q" {
-    export function all(promises: ng.IPromise<any>[]): ng.IPromise<any[]>;
-    export function all(promises: { [id: string]: ng.IPromise<any>; }): ng.IPromise<{ [id: string]: any }>;
-    export function defer<T>(): ng.IDeferred<T>;
-    export function reject(reason?: any): ng.IPromise<void>;
-    export function when<T>(value: ng.IPromise<T>): ng.IPromise<T>;
-    export function when<T>(value: T): ng.IPromise<T>;
-    export function when(): ng.IPromise<void>;
+    export function all(promises: angular.IPromise<any>[]): angular.IPromise<any[]>;
+    export function all(promises: { [id: string]: angular.IPromise<any>; }): angular.IPromise<{ [id: string]: any }>;
+    export function defer<T>(): angular.IDeferred<T>;
+    export function reject(reason?: any): angular.IPromise<void>;
+    export function when<T>(value: angular.IPromise<T>): angular.IPromise<T>;
+    export function when<T>(value: T): angular.IPromise<T>;
+    export function when(): angular.IPromise<void>;
 }
 
 /**

@@ -26,7 +26,7 @@ var pkgLocation = "/Proposal";
 /**
  * contents of the resource with view mode.
  */
-export interface DetailScope<Data> extends ng.IScope {
+export interface DetailScope<Data> extends angular.IScope {
     viewmode : string;
     content : ResourcesBase.Resource;
     path : string;
@@ -149,7 +149,7 @@ export interface IScopeProposalVersion {
 
 export class ProposalVersionNew {
 
-    public createDirective(adhHttp : ng.IHttpService, adhConfig : AdhConfig.IService, adhProposal : Service) {
+    public createDirective(adhHttp : angular.IHttpService, adhConfig : AdhConfig.IService, adhProposal : Service) {
 
         return {
             restrict: "E",
@@ -282,7 +282,7 @@ export class Service {
     constructor(
         private adhHttp : AdhHttp.Service<any>,
         private adhPreliminaryNames : AdhPreliminaryNames.Service,
-        private $q : ng.IQService
+        private $q : angular.IQService
     ) {}
 
 
@@ -315,7 +315,7 @@ export class Service {
         // deal.)
 
         return _self.adhHttp
-            .withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource> => {
+            .withTransaction((transaction) : angular.IPromise<ResourcesBase.Resource> => {
                 // items
                 var postProposal : AdhHttp.ITransactionResult =
                     transaction.post(poolPath, new RIProposal({preliminaryNames: _self.adhPreliminaryNames, name: name}));

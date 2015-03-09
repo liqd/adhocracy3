@@ -43,13 +43,13 @@ export enum Mode {display, edit};
  * parent scope.
  */
 export class ResourceWrapperController {
-    private resourcePromises : ng.IPromise<ResourcesBase.Resource[]>[];
+    private resourcePromises : angular.IPromise<ResourcesBase.Resource[]>[];
 
     constructor(
-        private $scope : ng.IScope,
-        private $attrs : ng.IAttributes,
-        private $q : ng.IQService,
-        private $parse : ng.IParseService,
+        private $scope : angular.IScope,
+        private $attrs : angular.IAttributes,
+        private $q : angular.IQService,
+        private $parse : angular.IParseService,
         adhEventManagerClass,
         private adhHttp : AdhHttp.Service<any>
     ) {
@@ -97,7 +97,7 @@ export class ResourceWrapperController {
      * registers a promise that will eventually be resolved with a list of
      * resources on submit.
      */
-    public registerResourceDirective(promise : ng.IPromise<ResourcesBase.Resource[]>) {
+    public registerResourceDirective(promise : angular.IPromise<ResourcesBase.Resource[]>) {
         this.resourcePromises.push(promise);
     }
 
@@ -158,7 +158,7 @@ export var resourceWrapper = () => {
 };
 
 
-export interface IResourceWidgetScope extends ng.IScope {
+export interface IResourceWidgetScope extends angular.IScope {
     mode : Mode;
     path : string;
     errors? : AdhHttp.IBackendErrorItem[];
@@ -171,7 +171,7 @@ export interface IResourceWidgetScope extends ng.IScope {
     /**
      * Trigger submit on resourceWrapper.
      */
-    submit() : ng.IPromise<void>;
+    submit() : angular.IPromise<void>;
 
     /**
      * Trigger cancel on resourceWrapper.
@@ -192,7 +192,7 @@ export interface IResourceWidgetScope extends ng.IScope {
 export interface IResourceWidgetInstance<R extends ResourcesBase.Resource, S extends IResourceWidgetScope> {
     scope : S;
     wrapper : ResourceWrapperController;
-    deferred : ng.IDeferred<R[]>
+    deferred : angular.IDeferred<R[]>
 }
 
 /**
@@ -221,10 +221,10 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     constructor(
         public adhHttp : AdhHttp.Service<any>,
         public adhPreliminaryNames : AdhPreliminaryNames.Service,
-        public $q : ng.IQService
+        public $q : angular.IQService
     ) {}
 
-    public createDirective() : ng.IDirective {
+    public createDirective() : angular.IDirective {
         var self : ResourceWidget<R, S> = this;
 
         return {
@@ -243,8 +243,8 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
 
     public link(
         scope : S,
-        element : ng.IAugmentedJQuery,
-        attrs : ng.IAttributes,
+        element : angular.IAugmentedJQuery,
+        attrs : angular.IAttributes,
         controllers
     ) : IResourceWidgetInstance<R, S> {
         var self : ResourceWidget<R, S> = this;
@@ -332,7 +332,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         instance.scope.mode = mode;
     }
 
-    public update(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<void> {
+    public update(instance : IResourceWidgetInstance<R, S>) : angular.IPromise<void> {
         var self : ResourceWidget<R, S> = this;
 
         if (self.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
@@ -348,7 +348,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
      *
      * Calls _create/_edit if scope.path is preliminary/not preliminary.
      */
-    public provide(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
+    public provide(instance : IResourceWidgetInstance<R, S>) : angular.IPromise<R[]> {
         if (this.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
             return this._create(instance);
         } else {
@@ -369,28 +369,28 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     /**
      * Handle delete events from children.
      */
-    public _handleDelete(instance : IResourceWidgetInstance<R, S>, path : string) : ng.IPromise<void> {
+    public _handleDelete(instance : IResourceWidgetInstance<R, S>, path : string) : angular.IPromise<void> {
         throw "abstract method: not implemented";
     }
 
     /**
      * Update scope from resource.
      */
-    public _update(instance : IResourceWidgetInstance<R, S>, resource : R) : ng.IPromise<void> {
+    public _update(instance : IResourceWidgetInstance<R, S>, resource : R) : angular.IPromise<void> {
         throw "abstract method: not implemented";
     }
 
     /**
      * Initially create resource(s) from scope.
      */
-    public _create(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
+    public _create(instance : IResourceWidgetInstance<R, S>) : angular.IPromise<R[]> {
         throw "abstract method: not implemented";
     }
 
     /**
      * Create modified resource(s) from scope.
      */
-    public _edit(instance : IResourceWidgetInstance<R, S>, old : R) : ng.IPromise<R[]> {
+    public _edit(instance : IResourceWidgetInstance<R, S>, old : R) : angular.IPromise<R[]> {
         throw "abstract method: not implemented";
     }
 

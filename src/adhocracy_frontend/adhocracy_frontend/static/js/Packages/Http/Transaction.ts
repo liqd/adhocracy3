@@ -103,7 +103,7 @@ export class Transaction {
         };
     }
 
-    public commit() : ng.IPromise<ResourcesBase.Resource[]> {
+    public commit() : angular.IPromise<ResourcesBase.Resource[]> {
         var _self = this;
 
         this.checkNotCommitted();

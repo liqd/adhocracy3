@@ -56,7 +56,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     };
     createComment() : void;
     cancelCreateComment() : void;
-    afterCreateComment() : ng.IPromise<void>;
+    afterCreateComment() : angular.IPromise<void>;
     report? : () => void;
     // update resource
     update() : void;
@@ -83,7 +83,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
         private $window : Window,
-        $q : ng.IQService
+        $q : angular.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentDetail.html";
@@ -250,7 +250,7 @@ export class CommentCreate<R extends ResourcesBase.Resource> extends CommentReso
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
         $window : Window,
-        $q : ng.IQService
+        $q : angular.IQService
     ) {
         super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
@@ -266,7 +266,7 @@ export class CommentCreate<R extends ResourcesBase.Resource> extends CommentReso
 export var adhCommentListing = (
     adhConfig : AdhConfig.IService,
     adhTopLevelState : AdhTopLevelState.Service,
-    $location : ng.ILocationService
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",

@@ -13,7 +13,7 @@ export interface IBackendErrorItem {
     description : string;
 }
 
-var renderBackendError = (response : ng.IHttpPromiseCallbackArg<any>) : void => {
+var renderBackendError = (response : angular.IHttpPromiseCallbackArg<any>) : void => {
     // get rid of unrenderable junk (good for console log extraction with web driver).
     var sanitize = (x : any) : any => {
         try {
@@ -31,7 +31,7 @@ var renderBackendError = (response : ng.IHttpPromiseCallbackArg<any>) : void => 
     console.log("response (.data):", sanitize(response.data));
 };
 
-export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
+export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
     renderBackendError(response);
@@ -62,12 +62,14 @@ export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendErro
  * NOTE: See documentation of `importBatchContent`.
  */
 export var logBackendBatchError = (
-    response : ng.IHttpPromiseCallbackArg<{
+    response : angular.IHttpPromiseCallbackArg<{
         responses : {
             code : number;
             body : IBackendError;
         }[];
+        /* tslint:disable:variable-name */
         updated_resources : any;
+        /* tslint:enable:variable-name */
     }>
 ) : void => {
     "use strict";

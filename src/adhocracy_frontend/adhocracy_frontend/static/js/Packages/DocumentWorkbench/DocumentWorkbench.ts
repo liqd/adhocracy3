@@ -16,7 +16,7 @@ import RIUsersService = require("../../Resources_/adhocracy_core/resources/princ
 
 var pkgLocation = "/DocumentWorkbench";
 
-interface IDocumentWorkbenchScope extends ng.IScope {
+interface IDocumentWorkbenchScope extends angular.IScope {
     path : string;
     user : AdhUser.Service;
     websocketTestPaths : string;

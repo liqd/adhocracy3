@@ -1,3 +1,5 @@
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
@@ -22,7 +24,7 @@ export interface IRegisterResponse {}
 
 export class Service {
     public loggedIn : boolean;
-    public ready : ng.IPromise<any>;
+    public ready : angular.IPromise<any>;
     public data : IUserBasic;
     public token : string;
     public userPath : string;
@@ -32,11 +34,11 @@ export class Service {
         private adhHttp : AdhHttp.Service<any>,
         private adhCache : AdhCache.Service,
         private adhTracking : AdhTracking.Service,
-        private $q : ng.IQService,
-        private $http : ng.IHttpService,
-        private $rootScope : ng.IScope,
+        private $q : angular.IQService,
+        private $http : angular.IHttpService,
+        private $rootScope : angular.IScope,
         private $window : Window,
-        private angular : ng.IAngularStatic,
+        private angular,
         private Modernizr
     ) {
         var _self : Service = this;
@@ -65,7 +67,7 @@ export class Service {
         }
     }
 
-    private updateSessionFromStorage(sessionValue) : ng.IPromise<boolean> {
+    private updateSessionFromStorage(sessionValue) : angular.IPromise<boolean> {
         var _self : Service = this;
 
         var deferred = _self.$q.defer();
@@ -121,7 +123,7 @@ export class Service {
             });
     }
 
-    private enableToken(token : string, userPath : string) : ng.IPromise<void> {
+    private enableToken(token : string, userPath : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         _self.token = token;
@@ -134,7 +136,7 @@ export class Service {
         return _self.loadUser(userPath);
     }
 
-    private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
+    private storeAndEnableToken(token : string, userPath : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
@@ -167,7 +169,7 @@ export class Service {
         _self.adhCache.invalidateAll();
     }
 
-    public logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
+    public logIn(nameOrEmail : string, password : string) : angular.IPromise<void> {
         var _self : Service = this;
         var promise;
 
@@ -198,7 +200,7 @@ export class Service {
         _self.deleteToken();
     }
 
-    public register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
+    public register(username : string, email : string, password : string, passwordRepeat : string) : angular.IPromise<IRegisterResponse> {
         var _self : Service = this;
 
         var resource = {
@@ -218,7 +220,7 @@ export class Service {
         return _self.adhHttp.post("/principals/users/", resource);
     }
 
-    public activate(path : string) : ng.IPromise<void> {
+    public activate(path : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         var success = (response) => {

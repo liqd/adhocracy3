@@ -204,7 +204,7 @@ export var uploadImageFile = (
     adhHttp : AdhHttp.Service<any>,
     poolPath : string,
     flow : Flow
-) : ng.IPromise<string> => {
+) : angular.IPromise<string> => {
     if (flow.files.length !== 1) {
         throw "could not upload file: $flow.files.length !== 1";
     }
@@ -239,7 +239,7 @@ export var uploadImageFile = (
 /**
  * promise supporters count.
  */
-var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : ng.IPromise<number> => {
+var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : angular.IPromise<number> => {
     var query : any = {
         content_type: RIRateVersion.content_type,
         depth: "2",
@@ -259,7 +259,7 @@ var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, ob
 /**
  * promise recursive comments count.
  */
-var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : ng.IPromise<number> => {
+var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : angular.IPromise<number> => {
 
     var query : any = {
         content_type: RICommentVersion.content_type,
@@ -292,16 +292,16 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
         private flowFactory,
-        private moment : MomentStatic,
+        private moment : moment.MomentStatic,
         private $window : Window,
-        private $location : ng.ILocationService,
-        $q : ng.IQService
+        private $location : angular.ILocationService,
+        $q : angular.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ListItem.html";
     }
 
-    public createDirective() : ng.IDirective {
+    public createDirective() : angular.IDirective {
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
         directive.scope.create = "@";
@@ -341,7 +341,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public _handleDelete(
         instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
         path : string
-    ) : ng.IPromise<void> {
+    ) : angular.IPromise<void> {
         var itemPath = AdhUtil.parentPath(path);
         // FIXME: translate
         if (this.$window.confirm("Do you really want to delete this?")) {
@@ -353,7 +353,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
-    private countComments(commentableVersion : any) : ng.IPromise<number> {
+    private countComments(commentableVersion : any) : angular.IPromise<number> {
         var sheet : SICommentable.Sheet = commentableVersion.data[SICommentable.nick];
         return countComments(this.adhHttp, sheet.post_pool);
     }
@@ -381,7 +381,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public _update(
         instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
         mercatorProposalVersion : R
-    ) : ng.IPromise<void> {
+    ) : angular.IPromise<void> {
         var data = this.initializeScope(instance.scope);
 
         instance.scope.subResourceSelectedState = (key : string) => {
@@ -425,7 +425,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             .then((count : number) => { data.supporterCount = count; });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
-        var subResourcePromises : ng.IPromise<ResourcesBase.Resource[]> = this.$q.all([
+        var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
             this.adhHttp.get(subResourcePaths.organization_info),
             this.adhHttp.get(subResourcePaths.introduction),
             this.adhHttp.get(subResourcePaths.description),
@@ -667,11 +667,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     }
 
     // NOTE: see _update.
-    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
+    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : angular.IPromise<R[]> {
 
         var data : IScopeData = this.initializeScope(instance.scope);
 
-        var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
+        var postProposal = (imagePath? : string) : angular.IPromise<R[]> => {
             if (typeof imagePath !== "undefined") {
                 data.introduction.picture = imagePath;
             } else if (typeof data.introduction.picture === "undefined") {
@@ -741,11 +741,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         }
     }
 
-    public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
+    public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : angular.IPromise<R[]> {
         var self : Widget<R> = this;
         var data = this.initializeScope(instance.scope);
 
-        var postProposal = (imagePath? : string) : ng.IPromise<R[]> => {
+        var postProposal = (imagePath? : string) : angular.IPromise<R[]> => {
             if (typeof imagePath !== "undefined") {
                 data.introduction.picture = imagePath;
             } else if (typeof data.introduction.picture === "undefined") {
@@ -800,12 +800,12 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
-        private $timeout : ng.ITimeoutService,
+        private $timeout : angular.ITimeoutService,
         flowFactory,
-        moment : MomentStatic,
+        moment : moment.MomentStatic,
         $window : Window,
-        $location : ng.ILocationService,
-        $q : ng.IQService
+        $location : angular.ILocationService,
+        $q : angular.IQService
     ) {
         super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
@@ -849,10 +849,10 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
         flowFactory,
-        moment : MomentStatic,
+        moment : moment.MomentStatic,
         $window,
         $location,
-        $q : ng.IQService
+        $q : angular.IQService
     ) {
         super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";

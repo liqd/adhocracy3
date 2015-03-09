@@ -5,7 +5,7 @@ import AdhConfig = require("../Config/Config");
 export var PATH = "/static/lib/jquery.socialshareprivacy/socialshareprivacy/";
 
 
-export var socialShare = (adhConfig : AdhConfig.IService, $location : ng.ILocationService, $document : ng.IDocumentService) => {
+export var socialShare = (adhConfig : AdhConfig.IService, $location : angular.ILocationService, $document : angular.IDocumentService) => {
     return {
         restrict: "E",
         link: (scope, element, attrs) => {
