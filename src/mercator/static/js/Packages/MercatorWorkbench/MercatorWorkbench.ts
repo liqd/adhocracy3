@@ -118,6 +118,10 @@ export var mercatorProposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, adhTopLevelState, ["platformUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+
+            scope.delete = () => {
+                column.$broadcast("triggerDelete", scope.proposalUrl);
+            };
         }
     };
 };

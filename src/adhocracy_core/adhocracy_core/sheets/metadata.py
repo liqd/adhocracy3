@@ -2,7 +2,6 @@
 from logging import getLogger
 
 from pyramid.registry import Registry
-from pyramid.traversal import resource_path
 import colander
 
 from adhocracy_core.interfaces import IResource
@@ -16,9 +15,6 @@ from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import is_deleted
-from adhocracy_core.utils import is_hidden
 
 
 logger = getLogger(__name__)
@@ -104,15 +100,6 @@ metadata_metadata = sheet_metadata_defaults._replace(
 )
 
 
-def index_creator(resource, default):
-    """Return creator userid value for the creator index."""
-    creator = get_sheet_field(resource, IMetadata, 'creator')
-    if creator == '':  # FIXME the default value should be None
-        return creator
-    userid = resource_path(creator)
-    return userid
-
-
 def view_blocked_by_metadata(resource: IResource, registry: Registry,
                              block_reason: str) -> dict:
     """
@@ -131,33 +118,6 @@ def view_blocked_by_metadata(resource: IResource, registry: Registry,
     return result
 
 
-def index_visibility(resource, default):
-    """Return value for the private_visibility index.
-
-    The return value will be one of [visible], [deleted], [hidden], or
-    [deleted, hidden].
-    """
-    result = []
-    if is_deleted(resource):
-        result.append('deleted')
-    if is_hidden(resource):
-        result.append('hidden')
-    if not result:
-        # resources that are neither deleted nor hidden are visible
-        result.append('visible')
-    return result
-
-
 def includeme(config):
     """Register sheets, add subscriber to update creation/modification date."""
     add_sheet_to_registry(metadata_metadata, config.registry)
-    config.add_indexview(index_visibility,
-                         catalog_name='adhocracy',
-                         index_name='private_visibility',
-                         context=IMetadata,
-                         )
-    config.add_indexview(index_creator,
-                         catalog_name='adhocracy',
-                         index_name='creator',
-                         context=IMetadata,
-                         )

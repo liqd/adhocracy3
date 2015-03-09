@@ -8,3 +8,4 @@ def includeme(config):  # pragma: no cover
     config.include('.batchview')
     config.commit()  # override cornice exception views
     config.include('.exceptions')
+    config.include('.subscriber')

@@ -88,19 +88,6 @@ class TestMetadataSheet:
         assert inst.meta.sheet_class is AttributeStorageSheet
 
 
-def test_index_creator_creator_exists(context, mock_metadata_sheet):
-    from .metadata import index_creator
-    context['user1'] = testing.DummyResource()
-    mock_metadata_sheet.get.return_value = {'creator': context['user1']}
-    assert index_creator(context, 'default') == '/user1'
-
-
-def test_index_creator_creator_does_not_exists(context, mock_metadata_sheet):
-    from .metadata import index_creator
-    context['user1'] = testing.DummyResource()
-    mock_metadata_sheet.get.return_value = {'creator': ''}
-    assert index_creator(context, 'default') == ''
-
 
 @fixture
 def integration(config):
@@ -119,14 +106,6 @@ def test_includeme_register_metadata_sheet(config):
     assert get_sheet(context, IMetadata)
 
 
-@mark.usefixtures('integration')
-def test_includeme_register_index_creator(registry):
-    from .metadata import IMetadata
-    from substanced.interfaces import IIndexView
-    assert registry.adapters.lookup((IMetadata,), IIndexView,
-                                    name='adhocracy|creator')
-
-
 class TestVisibility:
 
     @fixture
@@ -134,90 +113,6 @@ class TestVisibility:
         from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import IMetadata
         return testing.DummyResource(__provides__=[IResource, IMetadata])
-
-    def test_is_deleted_attribute_is_true(self, context):
-        from adhocracy_core.sheets.metadata import is_deleted
-        context.deleted = True
-        assert is_deleted(context) is True
-
-    def test_is_deleted_attribute_is_false(self, context):
-        from adhocracy_core.sheets.metadata import is_deleted
-        context.deleted = False
-        assert is_deleted(context) is False
-
-    def test_is_deleted_attribute_not_set(self, context):
-        from adhocracy_core.sheets.metadata import is_deleted
-        assert is_deleted(context) is False
-
-    def test_is_deleted_parent_attribute_is_true(self, context):
-        from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource()
-        context['child'] = child
-        context.deleted = True
-        assert is_deleted(child) is True
-
-    def test_is_deleted_parent_attribute_is_false(self, context):
-        from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource()
-        context['child'] = child
-        context.deleted = False
-        assert is_deleted(child) is False
-
-    def test_is_deleted_parent_attribute_not_set(self, context):
-        from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource()
-        context['child'] = child
-        assert is_deleted(child) is False
-
-    def test_is_deleted_parent_attrib_true_child_attrib_false(self, context):
-        from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource()
-        context['child'] = child
-        context.deleted = True
-        child.deleted = False
-        assert is_deleted(child) is True
-
-    def test_is_hidden_attribute_is_true(self, context):
-        from adhocracy_core.sheets.metadata import is_hidden
-        context.hidden = True
-        assert is_hidden(context) is True
-
-    def test_is_hidden_attribute_is_false(self, context):
-        from adhocracy_core.sheets.metadata import is_hidden
-        context.hidden = False
-        assert is_hidden(context) is False
-
-    def test_is_hidden_attribute_not_set(self, context):
-        from adhocracy_core.sheets.metadata import is_hidden
-        assert is_hidden(context) is False
-
-    def test_is_hidden_parent_attribute_is_true(self, context):
-        from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource()
-        context['child'] = child
-        context.hidden = True
-        assert is_hidden(child) is True
-
-    def test_is_hidden_parent_attribute_is_false(self, context):
-        from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource()
-        context['child'] = child
-        context.hidden = False
-        assert is_hidden(child) is False
-
-    def test_is_hidden_parent_attribute_not_set(self, context):
-        from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource()
-        context['child'] = child
-        assert is_hidden(child) is False
-
-    def test_is_hidden_parent_attrib_true_child_attrib_false(self, context):
-        from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource()
-        context['child'] = child
-        context.hidden = True
-        child.hidden = False
-        assert is_hidden(child) is True
 
     def test_view_blocked_by_metadata_no_imetadata(self, registry):
         from adhocracy_core.interfaces import IResource
@@ -248,24 +143,3 @@ class TestVisibility:
                                           'hidden')
         assert result['modified_by'] == user
         assert result['modification_date'] == now
-
-    def test_index_visibility_visible(self, context):
-        from adhocracy_core.sheets.metadata import index_visibility
-        assert index_visibility(context, 'default') == ['visible']
-
-    def test_index_visibility_deleted(self, context):
-        from adhocracy_core.sheets.metadata import index_visibility
-        context.deleted = True
-        assert index_visibility(context, 'default') == ['deleted']
-
-    def test_index_visibility_hidden(self, context):
-        from adhocracy_core.sheets.metadata import index_visibility
-        context.hidden = True
-        assert index_visibility(context, 'default') == ['hidden']
-
-    def test_index_visibility_both(self, context):
-        from adhocracy_core.sheets.metadata import index_visibility
-        context.deleted = True
-        context.hidden = True
-        assert sorted(index_visibility(context, 'default')) == ['deleted',
-                                                                'hidden']

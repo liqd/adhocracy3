@@ -236,6 +236,10 @@ export class MovingColumnController {
         }
         this.$scope._showSidebar = condition;
     }
+
+    public $broadcast(...args : any[]) {
+        return this.$scope.$broadcast.apply(this.$scope, args);
+    }
 }
 
 

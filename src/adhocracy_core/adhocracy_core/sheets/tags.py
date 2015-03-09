@@ -1,7 +1,6 @@
 """Sheets for tagging."""
 from logging import getLogger
 
-from pyramid.traversal import resource_path
 import colander
 
 from adhocracy_core.interfaces import ISheet
@@ -78,19 +77,6 @@ tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,
                                                  )
 
 
-def index_tag(resource, default):
-    """Return value for the tag index."""
-    graph = find_graph(resource)
-    if graph is None:  # pragma: no cover
-        logger.warning(
-            'Cannot update tag index: No graph found for %s',
-            resource_path(resource))
-        return default
-    tags = graph.get_back_reference_sources(resource, TagElementsReference)
-    tagnames = [tag.__name__ for tag in tags]
-    return tagnames if tagnames else default
-
-
 def filter_by_tag(resources: list, tag_name: str) -> list:
     """Filter a list of resources by returning only those with a given tag."""
     result = []
@@ -110,8 +96,3 @@ def includeme(config):
     """Register sheets and add indexviews."""
     add_sheet_to_registry(tag_metadata, config.registry)
     add_sheet_to_registry(tags_metadata, config.registry)
-    config.add_indexview(index_tag,
-                         catalog_name='adhocracy',
-                         index_name='tag',
-                         context=IVersionable,
-                         )
