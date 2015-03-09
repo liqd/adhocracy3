@@ -141,6 +141,8 @@ def includeme(config):
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')
     add_frontend_route(config, 'password_reset', 'password_reset')
+    add_frontend_route(config, 'password_reset_request',
+                       'password_reset_request')
     add_frontend_route(config, 'activate', 'activate/{key}')
     add_frontend_route(config, 'activation_error', 'activation_error')
     add_frontend_route(config, 'root', '')

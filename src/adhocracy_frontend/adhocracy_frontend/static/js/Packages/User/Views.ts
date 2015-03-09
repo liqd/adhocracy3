@@ -378,6 +378,11 @@ export var register = (angular) => {
                         templateUrl: "/static/js/templates/PasswordReset.html"
                     };
                 })
+                .when("password_reset_request", () : AdhTopLevelState.IAreaInput => {
+                    return {
+                        templateUrl: "/static/js/templates/PasswordResetRequest.html"
+                    };
+                })
                 .when("register", () : AdhTopLevelState.IAreaInput => {
                     return {
                         templateUrl: "/static/js/templates/Register.html"
@@ -405,6 +410,7 @@ export var register = (angular) => {
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", loginDirective])
         .directive("adhPasswordReset", ["adhConfig", "adhUser", "adhTopLevelState", passwordResetDirective])
+        .directive("adhPasswordResetRequest", ["adhConfig", "adhUser", "adhTopLevelState", passwordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])
