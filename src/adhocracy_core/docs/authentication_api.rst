@@ -386,46 +386,8 @@ the user to be logged in from different devices at the same time. ::
     >>> 'resources' in resp_data.keys()
     True
 
-Alternative A: User Password reset without API extension (more backend friendly)
---------------------------------------------------------------------------------
-
-A password reset link is send by creating a password reset object under the
-``/principals/passwordresets`` pool. The user is identified with the given
-email adress::
-
-    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IPaswordReset',
-    ...         'data': {
-    ...              'adhocracy_core.sheets.principal.IPasswordReset': {
-    ...                  'email': 'anna@example.org'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/principals/passwordresets", prop).json
-
-the url for the created password reset object is protected by obscurity::
-
-    >>> password_reset_path = resp_data["path"]
-    >>> password_reset_path
-    '.../principals/passwordresets/1318...
-
-    >>> resp = testapp.get(rest_url + "/principals/passwordresets")
-    >>> resp.status_code
-    404
-
-On Success the backend sends an email with the link to reset the password to
-the user. The link contains the path to the created passwordreset object and
-needs to be handled by the frontend::
-
-    http://frontend_url/passwordreset/?path=/principals/passwordresets/1318...
-
-If the user clicks on this link, the frontend has to send a put request with the
-new password::
-
-  >>> prop = {'data': {'adhocracy_core.sheets.principal.IPasswordAuthentication': {
-    ...                     'password': 'new_password'}}}
-    >>> resp = testapp.put_json(password_reset_path, prop)
-    >>> resp.status_code
-    200
-
-Alternative B: User Password reset with API extension (more thentos friendly) 
----------------------------------------------------------------------------------
+User Password reset
+--------------------
 
 The frontend sends an email to the create password reset end point
 
@@ -437,7 +399,7 @@ The frontend sends an email to the create password reset end point
 On Success the backend sends an email with the link to reset the password to
 the user. The link contains the path to identify the password reset request::
 
-    http://frontend_url/passwordreset/?path=1318...
+    http://frontend_url/resetpassword/?path=/1318...
 
 If the user clicks on this link, the frontend has to send a post request with the
 new password to the reset password end point::
@@ -445,7 +407,7 @@ new password to the reset password end point::
     >>> newest_reset_path = getfixture('newest_reset_path')
     >>> prop = {'path': newest_reset_path,
                 'password': new_password}
-    >>> resp = testapp.post_json('/reset_password', prop)
+    >>> resp = testapp.post_json('/resetpassword', prop)
     >>> resp.status_code
     200
 
