@@ -210,6 +210,8 @@ export var createPasswordResetDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CreatePasswordReset.html",
         scope: {},
         link: (scope) => {
+            scope.success = false;
+
             scope.input = {
                 email: ""
             };
@@ -224,7 +226,7 @@ export var createPasswordResetDirective = (
                 return adhHttp.postRaw(adhConfig.rest_url + "/create_password_reset", {
                     email: scope.input.email
                 }).then(() => {
-                    alert("FIXME");
+                    scope.success = true;
                 }, AdhHttp.logBackendError)
                 .catch((errors) => bindServerErrors(scope, errors));
             };
