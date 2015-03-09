@@ -168,6 +168,7 @@ export var registerDirective = (
 
 export var passwordResetDirective = (
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -187,7 +188,13 @@ export var passwordResetDirective = (
             scope.errors = [];
 
             scope.passwordReset = () => {
-                // FIXME
+                return adhHttp.postRaw(adhConfig.rest_url + "/resetpassword", {
+                    path: "FIXME",
+                    password: scope.input.password
+                }).then(() => {
+                    adhTopLevelState.redirectToCameFrom("/login");
+                }, AdhHttp.logBackendError)
+                .catch((errors) => bindServerErrors(scope, errors));
             };
         }
     };
@@ -195,6 +202,7 @@ export var passwordResetDirective = (
 
 export var passwordResetRequestDirective = (
     adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -213,7 +221,12 @@ export var passwordResetRequestDirective = (
             scope.errors = [];
 
             scope.submit = () => {
-                // FIXME
+                return adhHttp.postRaw(adhConfig.rest_url + "/create_password_reset", {
+                    email: scope.input.email
+                }).then(() => {
+                    alert("FIXME");
+                }, AdhHttp.logBackendError)
+                .catch((errors) => bindServerErrors(scope, errors));
             };
         }
     };
@@ -432,8 +445,8 @@ export var register = (angular) => {
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", loginDirective])
-        .directive("adhPasswordReset", ["adhConfig", "adhTopLevelState", passwordResetDirective])
-        .directive("adhPasswordResetRequest", ["adhConfig", "adhTopLevelState", passwordResetRequestDirective])
+        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", passwordResetDirective])
+        .directive("adhPasswordResetRequest", ["adhConfig", "adhHttp", "adhTopLevelState", passwordResetRequestDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])
