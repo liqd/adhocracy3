@@ -192,6 +192,7 @@ export var passwordResetDirective = (
                     path: adhTopLevelState.get("path"),
                     password: scope.input.password
                 }).then(() => {
+                    // FIXME: automatically log in
                     adhTopLevelState.redirectToCameFrom("/login");
                 }, AdhHttp.logBackendError)
                 .catch((errors) => bindServerErrors(scope, errors));
