@@ -1501,7 +1501,7 @@ not a reference field, the backend responds with an error::
     >>> resp_data['errors'][0]['name']
     'adhocracy_core.sheets.name.IName:name'
 
-You'll also get an error if try to filter by a catalog that doesn't exist::
+You'll also get an error if you try to filter by a catalog that doesn't exist::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
