@@ -124,7 +124,7 @@ Register Dialog.
 .register-form,
 .login-form,
 .password-reset-form,
-.password-reset-request-form {
+.create-password-reset-form {
     margin-bottom: 1em;
     text-align: center;
 
@@ -147,7 +147,7 @@ Register Dialog.
 }
 
 .password-reset-form,
-.password-reset-request-form {
+.create-password-reset-form {
     label, p {
         display: block;
         text-align: left;
@@ -190,7 +190,7 @@ Register Dialog.
 .register-cancel,
 .login-cancel,
 .password-reset-cancel,
-.password-reset-request-cancel {
+.create-password-reset-cancel {
     color: $color-text-highlight-introvert;
     display: block;
     font-size: $font-size-plus;
