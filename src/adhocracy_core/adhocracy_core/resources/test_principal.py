@@ -98,32 +98,30 @@ def integration(config):
 class TestPrincipalsService:
 
     @fixture
-    def context(self, pool):
-        return pool
+    def context(self, pool_graph):
+        return pool_graph
 
-    def test_create_principals(self, context, config, registry):
+    @fixture
+    def principals(self, context, registry):
+        from adhocracy_core.resources.principal import IPrincipalsService
+        inst = registry.content.create(IPrincipalsService.__identifier__,
+                                       parent=context)
+        return inst
+
+    def test_create_principals(self, principals):
         from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUsersService
         from adhocracy_core.resources.principal import IGroupsService
         from adhocracy_core.resources.principal import IPasswordResetsService
+        assert IPrincipalsService.providedBy(principals)
+        assert 'users' in principals
+        assert 'groups' in principals
+        assert 'resets' in principals
+        assert IUsersService.providedBy(principals['users'])
+        assert IGroupsService.providedBy(principals['groups'])
+        assert IPasswordResetsService.providedBy(principals['resets'])
 
-        inst = registry.content.create(
-            IPrincipalsService.__identifier__, parent=context)
-
-        assert IPrincipalsService.providedBy(inst)
-        assert 'users' in inst
-        assert 'groups' in inst
-        assert 'resets' in inst
-        assert IUsersService.providedBy(inst['users'])
-        assert IGroupsService.providedBy(inst['groups'])
-        assert IPasswordResetsService.providedBy(inst['resets'])
-
-    def test_register_services(self, context, registry):
-        from adhocracy_core.resources.principal import IPrincipalsService
-
-        registry.content.create(IPrincipalsService.__identifier__,
-                                            parent=context)
-
+    def test_register_services(self, principals, context):
         from substanced.util import find_service
         assert find_service(context, 'principals', 'users')
         assert find_service(context, 'principals', 'groups')
@@ -138,62 +136,48 @@ class TestPrincipalsService:
         assert IUser.providedBy(inst)
         assert isinstance(inst, User)
 
-    def test_create_and_add_user(self, registry):
-        from adhocracy_core.resources.principal import IPrincipalsService
+    def test_create_and_add_user(self, principals, registry):
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.sheets.principal import IPasswordAuthentication
         from adhocracy_core.sheets.principal import IUserBasic
-
-        principals_pool = registry.content.create(
-            IPrincipalsService.__identifier__)
-        users_pool = principals_pool['users']
         appstructs = {
             IUserBasic.__identifier__ : {
                 'name': 'Anna Müller',
-                'email': 'anna@example.org'
             },
             IPasswordAuthentication.__identifier__ : {
                 'password': 'fodThyd2'
             },
         }
         user = registry.content.create(IUser.__identifier__,
-                                                   parent=users_pool,
-                                                   appstructs=appstructs)
-        assert users_pool['0000000'] is user
+                                       parent=principals['users'],
+                                       appstructs=appstructs)
+        assert principals['users']['0000000'] is user
 
     def test_create_group(self, registry):
         from adhocracy_core.resources.principal import IGroup
         inst = registry.content.create(IGroup.__identifier__)
         assert IGroup.providedBy(inst)
 
-    def test_create_and_add_group(self, pool_graph, registry):
+    def test_create_and_add_group(self, principals, registry):
         from adhocracy_core.utils import get_sheet
-        from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.resources.principal import IGroup
         from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.sheets.name import IName
         import adhocracy_core.sheets.principal
-        context = pool_graph
-
-        principals_pool = registry.content.create(
-            IPrincipalsService.__identifier__,
-            parent=context)
-        groups_pool = principals_pool['groups']
         appstructs = {IName.__identifier__: {'name': 'Group1'},
                       adhocracy_core.sheets.principal.IGroup.__identifier__:
                            {'roles': ['reader']}}
         group = registry.content.create(IGroup.__identifier__,
-                                        parent=groups_pool,
+                                        parent=principals['groups'],
                                         appstructs=appstructs)
-        users_pool = principals_pool['users']
         appstructs = {IPermissions.__identifier__: {'groups': [group]}}
         user = registry.content.create(IUser.__identifier__,
-                                       parent=users_pool,
+                                       parent=principals['users'],
                                        appstructs=appstructs)
         user.activate()
         group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
-        assert groups_pool['Group1'] is group
+        assert principals['groups']['Group1'] is group
         assert group_sheet.get()['users'] == [user]
         assert group_sheet.get()['roles'] == ['reader']
 
