@@ -3,18 +3,6 @@
 import _ = require("lodash");
 
 
-/**
- * isArrayMember could be inlined, but is not for two reasons: (1)
- * even though js developers are used to it, the inlined idiom is just
- * weird; (2) the test suite documents what can and cannot be done
- * with it.
- */
-export function isArrayMember(member : any, array : any[]) : boolean {
-    "use strict";
-    return array.indexOf(member) > -1;
-}
-
-
 export function deepPluck(base, keys : string[]) : any {
     "use strict";
     return _.reduce(keys, (obj, key) => {

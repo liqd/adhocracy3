@@ -8,43 +8,6 @@ import AdhUtil = require("./Util");
 
 export var register = () => {
     describe("Util", () => {
-        describe("isArrayMember", () => {
-            var isArrayMember = AdhUtil.isArrayMember;
-
-            it("finds nothing in empty array.", () => {
-                expect(isArrayMember(0, [])).toBe(false);
-            });
-            it("finds array members if they are present at pos [0].", () => {
-                expect(isArrayMember("wef", ["wef", null, 3])).toBe(true);
-            });
-            it("finds array members if they are present at pos [end].", () => {
-                expect(isArrayMember("wef", [null, "wef"])).toBe(true);
-            });
-            it("finds array members if they are present in between.", () => {
-                expect(isArrayMember("wef", [true, "wef", null, 3])).toBe(true);
-            });
-            it("does not find array members if they are not present.", () => {
-                expect(isArrayMember("wef", ["woff", null, 3])).toBe(false);
-            });
-            it("works on other base types.", () => {
-                expect(isArrayMember(true, [true])).toBe(true);
-                expect(isArrayMember(false, [true])).toBe(false);
-                expect(isArrayMember(1, [1])).toBe(true);
-                expect(isArrayMember(0, [1])).toBe(false);
-            });
-            it("works on null.", () => {
-                expect(isArrayMember(null, [null])).toBe(true);
-                expect(isArrayMember(null, [3])).toBe(false);
-            });
-            it("null is not member of ['null'].", () => {
-                expect(isArrayMember(null, ["null"])).toBe(false);
-            });
-            it("returns false for array properties that are not array items (such as length)", () => {
-                expect(AdhUtil.isArrayMember("length", ["hay", "stack"])).toBe(false);
-                expect(AdhUtil.isArrayMember(0, ["hay", "stack"])).toBe(false);
-            });
-        });
-
         describe("parentPath", () => {
             it("returns '/foo' for '/foo/bar'", () => {
                 expect(AdhUtil.parentPath("/foo/bar")).toBe("/foo");

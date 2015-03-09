@@ -35,7 +35,8 @@ export var location2template = ($location : angular.ILocationService) => {
     var search = $location.search();
 
     var attrs = [];
-    if (!AdhUtil.isArrayMember(widget, embeddableDirectives)) {
+    // FIXME DefinitelyTyped
+    if (!(<any>_).includes(embeddableDirectives, widget)) {
         throw "unknown widget: " + widget;
     }
 
