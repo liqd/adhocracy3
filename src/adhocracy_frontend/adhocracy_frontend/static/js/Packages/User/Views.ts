@@ -168,7 +168,6 @@ export var registerDirective = (
 
 export var passwordResetDirective = (
     adhConfig : AdhConfig.IService,
-    adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -407,8 +406,8 @@ export var register = (angular) => {
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", loginDirective])
-        .directive("adhPasswordReset", ["adhConfig", "adhUser", "adhTopLevelState", passwordResetDirective])
-        .directive("adhPasswordResetRequest", ["adhConfig", "adhUser", "adhTopLevelState", passwordResetDirective])
+        .directive("adhPasswordReset", ["adhConfig", "adhTopLevelState", passwordResetDirective])
+        .directive("adhPasswordResetRequest", ["adhConfig", "adhTopLevelState", passwordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])
