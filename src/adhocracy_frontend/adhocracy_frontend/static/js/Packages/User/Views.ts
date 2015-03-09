@@ -189,7 +189,7 @@ export var passwordResetDirective = (
 
             scope.passwordReset = () => {
                 return adhHttp.postRaw(adhConfig.rest_url + "/password_reset", {
-                    path: "FIXME",
+                    path: adhTopLevelState.get("resetPath"),
                     password: scope.input.password
                 }).then(() => {
                     adhTopLevelState.redirectToCameFrom("/login");
@@ -411,7 +411,21 @@ export var register = (angular) => {
                 })
                 .when("password_reset", () : AdhTopLevelState.IAreaInput => {
                     return {
-                        templateUrl: "/static/js/templates/PasswordReset.html"
+                        templateUrl: "/static/js/templates/PasswordReset.html",
+                        route: (path, search) => {
+                            return {
+                                _path: path,
+                                resetPath: search["path"]
+                            };
+                        },
+                        reverse: (data) => {
+                            return {
+                                path: data["_path"],
+                                search: {
+                                    path: data["resetPath"]
+                                }
+                            };
+                        }
                     };
                 })
                 .when("create_password_reset", () : AdhTopLevelState.IAreaInput => {
