@@ -181,8 +181,6 @@ export var passwordResetDirective = (
                 passwordRepeat: ""
             };
 
-            scope.username = "FIXME";
-
             scope.cancel = () => {
                  adhTopLevelState.redirectToCameFrom("/");
             };
