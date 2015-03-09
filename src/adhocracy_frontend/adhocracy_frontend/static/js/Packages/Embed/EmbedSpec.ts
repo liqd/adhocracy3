@@ -21,6 +21,41 @@ export var register = () => {
                 .and.returnValue(() => undefined);
         });
 
+        describe("Provider", () => {
+            var provider;
+
+            beforeEach(() => {
+                provider = new AdhEmbed.Provider();
+            });
+
+            describe("registerEmbeddableDirectives", () => {
+                it("appends the passed list to embeddableDirectives", () => {
+                    provider.registerEmbeddableDirectives(["foo", "bar"]);
+                    expect(provider.embeddableDirectives).toContain("foo");
+                    expect(provider.embeddableDirectives).toContain("bar");
+                });
+
+                it("does not create duplicates", () => {
+                    var initialLenth = provider.embeddableDirectives.length;
+
+                    provider.registerEmbeddableDirectives(["foo", "bar"]);
+                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 2);
+
+                    provider.registerEmbeddableDirectives(["foo", "bar"]);
+                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 2);
+
+                    provider.registerEmbeddableDirectives(["baz", "baz"]);
+                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 3);
+                });
+            });
+
+            describe("$get", () => {
+                it("returns a service instance", () => {
+                    expect(provider.$get().constructor).toBe(AdhEmbed.Service);
+                });
+            });
+        });
+
         describe("Service", () => {
             var providerMock;
             var service;
