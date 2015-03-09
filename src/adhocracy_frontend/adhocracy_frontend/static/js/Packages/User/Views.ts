@@ -174,7 +174,25 @@ export var passwordResetDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/PasswordReset.html",
-        scope: {}
+        scope: {},
+        link: (scope) => {
+            scope.input = {
+                password: "",
+                passwordRepeat: ""
+            };
+
+            scope.username = "FIXME";
+
+            scope.cancel = () => {
+                 adhTopLevelState.redirectToCameFrom("/");
+            };
+
+            scope.errors = [];
+
+            scope.passwordReset = () => {
+                // FIXME
+            };
+        }
     };
 };
 
