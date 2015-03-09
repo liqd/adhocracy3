@@ -16,7 +16,7 @@
     "TR__CONTENT": "content",
     "TR__COUNTRY": "country",
     "TR__CREATE": "create",
-    "TR__CREATE_PASSWORD_RESET_SUCCESS": "An email has been send to your account. Please follow the instructions there to reset your password FIXME.",
+    "TR__CREATE_PASSWORD_RESET_SUCCESS": "Thank you for your password reset request. We will send you a link to reset your password within the next 24h. Please check your mail and SPAM meanwhile.",
     "TR__CREATE_PASSWORD_RESET_TITLE": "Reset Password",
     "TR__DELETE": "delete",
     "TR__DESCRIPTION": "description",
