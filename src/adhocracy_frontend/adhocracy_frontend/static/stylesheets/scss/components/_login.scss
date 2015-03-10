@@ -28,36 +28,6 @@ A simple box containing text.
 
 /*doc
 ---
-title: box with button
-name: box-with-button
-category: Widgets
----
-
-A generic box with a single button.
-
-```html_example
-<div class="box-with-button">
-    <p>Description</p>
-    <a class="button">register</a>
-</div>
-```
-*/
-.box-with-button {
-    background-color: $color-structure-introvert;
-    padding: 1em 1em 0;
-    margin-bottom: 2em;
-
-    .button,
-    button,
-    input[type="submit"],
-    input[type="reset"] {
-        width: 100%;
-        margin-bottom: -1em;
-    }
-}
-
-/*doc
----
 title: Login
 name: login
 category: Widgets
@@ -115,11 +85,6 @@ Register Dialog.
 </div>
 ```
 */
-
-.title {
-    font-size: 100%;
-    text-transform: uppercase;
-}
 
 .register-form,
 .login-form,
