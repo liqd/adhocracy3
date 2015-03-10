@@ -3,32 +3,40 @@
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
-        <input
-            type="text"
-            name="nameOrEmail"
-            placeholder="{{ 'TR__EMAIL_OR_USERNAME' | translate }}"
-            required="required"
-            data-ng-model="credentials.nameOrEmail" />
-        <span class="input-error" data-ng-show="loginForm.nameOrEmail.$error.required && loginForm.nameOrEmail.$dirty">
-            {{ "TR__ERROR_REQUIRED_EMAIL_OR_USERNAME" | translate }}
-        </span>
-        <input
-            type="password"
-            name="password"
-            placeholder="{{ 'TR__PASSWORD' | translate }}"
-            required="required"
-            data-ng-model="credentials.password" />
-        <span class="input-error" data-ng-show="loginForm.password.$error.required && loginForm.password.$dirty">
-            {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
-        </span>
+
+        <label>
+            <input
+                type="text"
+                name="nameOrEmail"
+                placeholder="{{ 'TR__EMAIL_OR_USERNAME' | translate }}"
+                required="required"
+                data-ng-model="credentials.nameOrEmail" />
+            <span class="input-error" data-ng-show="loginForm.nameOrEmail.$error.required && loginForm.nameOrEmail.$dirty">
+                {{ "TR__ERROR_REQUIRED_EMAIL_OR_USERNAME" | translate }}
+            </span>
+        </label>
+        <label>
+            <input
+                type="password"
+                name="password"
+                placeholder="{{ 'TR__PASSWORD' | translate }}"
+                required="required"
+                data-ng-model="credentials.password" />
+            <span class="input-error" data-ng-show="loginForm.password.$error.required && loginForm.password.$dirty">
+                {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
+            </span>
+        </label>
+
         <div class="login-forgotten-password">
             {{ "TR__FORGOTTEN_PASSWORD" | translate }} <a href="/create_password_reset">{{ "TR__RESET" | translate }}</a>.
         </div>
+
         <input
             type="submit"
             value="{{ 'TR__LOGIN' | translate }}"
             class="m-call-to-action"
             data-ng-disabled="loginForm.$invalid" />
+
         <div class="login-info" data-adh-html-translate="TR__OR_REGISTER_HERE" data-translate-templates="{
             link: '&lt;a href=&quot;/register&quot;&gt;{{ content }}&lt;/a&gt;'
         }"></div>

@@ -3,51 +3,60 @@
         <div class="form-error" ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
-        <input
-            type="text"
-            name="username"
-            placeholder="{{ 'TR__USERNAME' | translate }}"
-            data-ng-model="input.username"
-            required="required" />
-        <span class="input-error" data-ng-show="registerForm.username.$error.required && registerForm.username.$dirty">
-            {{ "TR__ERROR_REQUIRED_USERNAME" | translate }}
-        </span>
-        <input
-            type="email"
-            name="email"
-            placeholder="{{ 'TR__EMAIL' | translate }}"
-            data-ng-model="input.email"
-            required="required" />
-        <span class="input-error" data-ng-show="registerForm.email.$error.required && registerForm.email.$dirty">
-            {{ "TR__ERROR_REQUIRED_EMAIL" | translate }}
-        </span>
-        <span class="input-error" data-ng-show="registerForm.email.$error.email && registerForm.email.$dirty">
-            {{ "TR__ERROR_FORMAT_EMAIL" | translate }}
-        </span>
-        <input
-            type="password"
-            name="password"
-            placeholder="{{ 'TR__PASSWORD' | translate }}"
-            data-ng-model="input.password"
-            required="required"
-            data-ng-minlength="6"
-            data-ng-maxlength="100" />
-        <span class="input-error" data-ng-show="registerForm.password.$error.required && registerForm.password.$dirty">
-            {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
-        </span>
-        <span class="input-error" data-ng-show="registerForm.password.$error.minlength && registerForm.password.$dirty">
-            {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
-        </span>
-        <input
-            type="password"
-            name="password_repeat"
-            placeholder="{{ 'TR__PASSWORD_REPEAT' | translate }}"
-            data-ng-model="input.passwordRepeat"
-            required="required"
-            data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty}"/>
-        <span class="input-error" data-ng-show="(input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty">
-            {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
-        </span>
+
+        <label>
+            <input
+                type="text"
+                name="username"
+                placeholder="{{ 'TR__USERNAME' | translate }}"
+                data-ng-model="input.username"
+                required="required" />
+            <span class="input-error" data-ng-show="registerForm.username.$error.required && registerForm.username.$dirty">
+                {{ "TR__ERROR_REQUIRED_USERNAME" | translate }}
+            </span>
+        </label>
+        <label>
+            <input
+                type="email"
+                name="email"
+                placeholder="{{ 'TR__EMAIL' | translate }}"
+                data-ng-model="input.email"
+                required="required" />
+            <span class="input-error" data-ng-show="registerForm.email.$error.required && registerForm.email.$dirty">
+                {{ "TR__ERROR_REQUIRED_EMAIL" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="registerForm.email.$error.email && registerForm.email.$dirty">
+                {{ "TR__ERROR_FORMAT_EMAIL" | translate }}
+            </span>
+        </label>
+        <label>
+            <input
+                type="password"
+                name="password"
+                placeholder="{{ 'TR__PASSWORD' | translate }}"
+                data-ng-model="input.password"
+                required="required"
+                data-ng-minlength="6"
+                data-ng-maxlength="100" />
+            <span class="input-error" data-ng-show="registerForm.password.$error.required && registerForm.password.$dirty">
+                {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="registerForm.password.$error.minlength && registerForm.password.$dirty">
+                {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
+            </span>
+        </label>
+        <label>
+            <input
+                type="password"
+                name="password_repeat"
+                placeholder="{{ 'TR__PASSWORD_REPEAT' | translate }}"
+                data-ng-model="input.passwordRepeat"
+                required="required"
+                data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty}"/>
+            <span class="input-error" data-ng-show="(input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty">
+                {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
+            </span>
+        </label>
         <label class="login-check">
             <div class="login-check-input">
                 <input type="checkbox" name="registerCheck" data-ng-model="input.registerCheck" required="required" />
@@ -57,6 +66,7 @@
                 {{ "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS" | translate }}
             </span>
         </label>
+
         <input
             type="submit"
             name="register"
