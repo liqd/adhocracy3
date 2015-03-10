@@ -33,7 +33,7 @@ name: login
 category: Widgets
 ---
 
-Login Dialog.
+Dialog for login related flow (login, register, password reset).
 
 ```html_example
 <div class="login">
@@ -86,12 +86,14 @@ Register Dialog.
 ```
 */
 
-.register-form,
-.login-form,
-.password-reset-form,
-.create-password-reset-form {
+.login-form {
     margin-bottom: 1em;
     text-align: center;
+
+    label, p {
+        display: block;
+        text-align: left;
+    }
 
     input[type="text"],
     input[type="email"],
@@ -102,36 +104,17 @@ Register Dialog.
 
     input[type="submit"] {
         @include text-align(center);
-    }
-}
-
-.login-form {
-    input[type="submit"] {
         margin-top: 24px / $font-size-normal * 1em;
     }
 }
 
-.password-reset-form,
-.create-password-reset-form {
-    label, p {
-        display: block;
-        text-align: left;
-    }
-
-    input[type="submit"] {
-        margin-top: 24px / $font-size-normal * 1em;
-    }
-}
-
-.register-support,
 .login-support,
-.register-cancel,
-.create-password-reset-cancel {
+.login-cancel {
     font-size: $font-size-small;
     text-align: center;
 }
 
-.register-check {
+.login-check {
     margin-bottom: 24px / $font-size-normal * 1em;
 
     + .input-error {
@@ -139,7 +122,6 @@ Register Dialog.
     }
 }
 
-.register-info,
 .login-info {
     font-size: $font-size-small;
     margin: (24px / $font-size-small * 1em) 0 (28px / $font-size-small * 1em);
@@ -153,10 +135,7 @@ Register Dialog.
     }
 }
 
-.register-cancel,
-.login-cancel,
-.password-reset-cancel,
-.create-password-reset-cancel {
+.login-cancel {
     color: $color-text-highlight-introvert;
     display: block;
     font-size: $font-size-plus;
