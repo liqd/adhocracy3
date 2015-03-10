@@ -115,10 +115,17 @@ Register Dialog.
 }
 
 .login-check {
-    margin-bottom: 24px / $font-size-normal * 1em;
+    position: relative;
 
-    + .input-error {
-        margin-top: -1.4em;
+    .login-check-input {
+        margin-bottom: 24px / $font-size-normal * 1em;
+    }
+
+    .input-error {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        bottom: -18px;
     }
 }
 
