@@ -1,4 +1,7 @@
 """Resource types mapped to sheets (OpenClosePrinciple), object hierarchy."""
+import random
+import string
+
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
@@ -22,6 +25,13 @@ from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_modification_date
+
+
+def generate_random_name():
+    """Return random name (alpha/num)."""
+    length = random.choice(range(40, 60))
+    chars = string.ascii_letters + string.digits
+    return ''.join(random.choice(chars) for _ in range(length))
 
 
 def add_resource_type_to_registry(metadata: ResourceMetadata,
@@ -66,6 +76,8 @@ class ResourceFactory:
         if self.meta.use_autonaming:
             prefix = self.meta.autonaming_prefix
             name = parent.next_name(resource, prefix=prefix)
+        elif self.meta.use_autonaming_random:
+            name = generate_random_name()
         if name in parent:
             raise KeyError('Duplicate name: {}'.format(name))
         if IServicePool.providedBy(resource):
