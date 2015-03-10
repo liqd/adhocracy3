@@ -109,13 +109,13 @@ Applications
 ++++++++++++
 
 At the top level of the directory structure there are TypeScript modules
-that define angular modules. These represent different application. Each
+that define angular modules. These represent different applications. Each
 application wires together everything that is required: Packages,
 resources and adapters.
 
 Application modules are also in charge of loading all required files. As
 explained before, it is not sufficient to require the corresponding
-TypeScript modules. You additionally need to use this modules, e.g. as
+TypeScript modules. You additionally need to use these modules, e.g. as
 parameters to a dummy function like this::
 
     var forceLoad = (...args) => args;
