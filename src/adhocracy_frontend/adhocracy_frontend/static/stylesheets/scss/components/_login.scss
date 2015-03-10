@@ -110,6 +110,14 @@ Register Dialog.
     }
 }
 
+.login-title {
+    font-size: 100%;
+    font-weight: normal;
+    line-height: inherit;
+    margin: 0 0 2em;
+    text-align: left;
+}
+
 // FIXME overspecifc selector
 .login-form .login-check {
     text-align: center;
