@@ -37,51 +37,35 @@ Dialog for login related flow (login, register, password reset).
 
 ```html_example
 <div class="login">
-    <h1 class="title">Log in!</h1>
+    <h1 class="login-title">Log in!</h1>
+
     <form class="login-form">
-        <input type="text" name="name" placeholder="email or username" />
-        <input type="password" name="password" placeholder="password" />
+        <label>
+            <span class="label-text">email or username</span>
+            <input type="text" name="name" />
+        </label>
+        <label>
+            <span class="label-text">password</span>
+            <input type="password" name="password" />
+        </label>
+
+        <label class="login-check">
+            <div class="login-check-input">
+                <input type="checkbox" /> I really want to login
+            </div>
+            <span class="input-error">
+                Required
+            </span>
+        </label>
+
         <input type="submit" class="m-call-to-action" value="login" />
+
         <div class="login-info">
             <p class="ng-binding">Or register <a href="">here</a></p>
         </div>
-        <div class="login-support ng-binding">
-            Having trouble with login? <br>
-            <a href="">support@unconfigured.domain</a>
-        </div>
-        <a class="login-cancel" href="">Cancel</a>
     </form>
-</div>
-```
-*/
 
-/*doc
----
-title: Register
-name: register
-category: Widgets
----
-
-Register Dialog.
-
-```html_example
-<div class="register">
-    <h1 class="title">Register!</h1>
-    <form class="register-form">
-        <input type="text" name="username" placeholder="username" />
-        <input type="email" name="email" placeholder="email" />
-        <input type="password" name="password" placeholder="password" />
-        <input type="password" name="password_repeat" placeholder="password repeat" />
-        <input type="submit" class="m-call-to-action" name="register" value="register" />
-        <div class="register-info">
-            <p class="ng-binding">Or Login <a href="">here</a></p>
-        </div>
-        <div class="register-support ng-binding">
-            Having trouble with Register? <br>
-            <a href="">support@unconfigured.domain</a>
-        </div>
-        <a class="register-cancel" href="">Cancel</a>
-    </form>
+    <a class="login-cancel" href="">Cancel</a>
 </div>
 ```
 */
