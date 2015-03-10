@@ -406,8 +406,10 @@ new password to the reset password end point::
 
     >>> newest_reset_path = getfixture('newest_reset_path')
     >>> prop = {'path': newest_reset_path,
-                'password': new_password}
-    >>> resp = testapp.post_json('/password_reset', prop)
-    >>> resp.status_code
-    200
+    ...         'password': 'new_password'}
+    >>> resp_data = testapp.post_json('/password_reset', prop).json
+    >>> pprint(resp_data)
+    {'status': 'success',
+     'user_path': 'http://localhost/principals/users/0000008/',
+     'user_token':...
 
