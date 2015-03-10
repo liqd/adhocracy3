@@ -29,11 +29,9 @@
             value="{{ 'TR__LOGIN' | translate }}"
             class="m-call-to-action"
             data-ng-disabled="loginForm.$invalid" />
-        <div class="login-info">
-            <p data-adh-html-translate="TR__OR_REGISTER_HERE" data-translate-templates="{
-                link: '&lt;a href=&quot;/register&quot;&gt;{{ content }}&lt;/a&gt;'
-            }"></p>
-        </div>
+        <div class="login-info" data-adh-html-translate="TR__OR_REGISTER_HERE" data-translate-templates="{
+            link: '&lt;a href=&quot;/register&quot;&gt;{{ content }}&lt;/a&gt;'
+        }"></div>
         <div class="login-support">
             {{ "TR__LOGIN_SUPPORT" | translate}} <br />
             <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20login">{{ supportEmail }}</a>
