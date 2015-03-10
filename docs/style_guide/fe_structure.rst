@@ -11,7 +11,7 @@ are very different.
 TypeScript Modules
 ++++++++++++++++++
 
-In TypeScipt, each file is a module (TypeScript does in fact offer two
+In TypeScript, each file is a module (TypeScript does in fact offer two
 module systems. We use `external modules
 <http://www.typescriptlang.org/Handbook#modules-going-external>`_).
 A module ``example.ts`` can be imported like this::
@@ -77,7 +77,7 @@ directives.
 .. FIXME: Packages should also include all CSS and other static content
    they depend on.
 
-A package must not directly use TypeScipt modules from other Packages.
+A package must not directly use TypeScript modules from other Packages.
 When you want to actually use the code from other packages, you must
 import the corresponding angular module referenced by the TypeScript
 module's ``moduleName`` variable. This way it is also made sure that
