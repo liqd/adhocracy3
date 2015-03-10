@@ -31,8 +31,7 @@ export class Provider {
             "login",
             "register",
             "user-indicator",
-            "empty",
-            "social-share"
+            "empty"
         ];
 
         this.$get = () => new Service(this);
