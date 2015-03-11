@@ -1102,7 +1102,6 @@ class MessageUserView(RESTView):
     renderer='simplejson',
     context=IRootPool,
     name='create_password_reset',
-    content_type='application/json'
 )
 class CreatePasswordResetView(RESTView):
 
@@ -1116,6 +1115,7 @@ class CreatePasswordResetView(RESTView):
         return {'POST': {}}
 
     @view_config(request_method='POST',
+                 content_type='application/json'
                  )
     def post(self) -> dict:
         """Create as password reset resource."""
@@ -1131,7 +1131,6 @@ class CreatePasswordResetView(RESTView):
     renderer='simplejson',
     context=IRootPool,
     name='password_reset',
-    content_type='application/json'
 )
 class PasswordResetView(RESTView):
 
@@ -1145,6 +1144,7 @@ class PasswordResetView(RESTView):
         return {'POST': {}}
 
     @view_config(request_method='POST',
+                 content_type='application/json',
                  )
     def post(self) -> dict:
         """Reset password."""
