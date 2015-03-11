@@ -914,6 +914,10 @@ class TestValidatePasswordResetPath:
         from .schemas import validate_password_reset_path
         return validate_password_reset_path(node, kw)
 
+    def test_path_is_none(self, node, request, context):
+        validator = self.call_fut(node, {'context': context, 'request': request})
+        assert validator(node, None) is None
+
     def test_path_is_reset_password(self, node,  request, context, registry,
                                     mock_sheet):
         from adhocracy_core.resources.principal import IPasswordReset
