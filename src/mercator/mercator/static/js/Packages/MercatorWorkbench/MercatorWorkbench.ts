@@ -228,12 +228,14 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RICommentVersion.content_type, "", {
+                .default(RICommentVersion.content_type, "", "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RICommentVersion.content_type, "", ["adhHttp", "$q", (adhHttp : AdhHttp.Service<any>, $q : angular.IQService) =>
-                                                              (resource : RICommentVersion) => {
+                .specific(RICommentVersion.content_type, "", "", ["adhHttp", "$q", (
+                    adhHttp : AdhHttp.Service<any>,
+                    $q : angular.IQService
+                ) => (resource : RICommentVersion) => {
                     var specifics = {};
                     specifics["commentUrl"] = resource.path;
 
@@ -261,33 +263,33 @@ export var register = (angular) => {
                     })
                     .then(() => specifics);
                 }])
-                .default(RIUser.content_type, "", {
+                .default(RIUser.content_type, "", "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIUser.content_type, "", () => (resource : RIUser) => {
+                .specific(RIUser.content_type, "", "", () => (resource : RIUser) => {
                     return {
                         userUrl: resource.path
                     };
                 })
-                .default(RIUsersService.content_type, "", {
+                .default(RIUsersService.content_type, "", "", {
                     space: "user",
                     movingColumns: "is-show-hide-hide",
                     userUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIPoolWithAssets.content_type, "", {
+                .default(RIPoolWithAssets.content_type, "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
                     proposalUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIPoolWithAssets.content_type, "create_proposal", {
+                .default(RIPoolWithAssets.content_type, "create_proposal", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIPoolWithAssets.content_type, "create_proposal",
-                    ["adhHttp", "adhUser", (adhHttp : AdhHttp.Service<any>, adhUser) => {
+                .specific(RIPoolWithAssets.content_type, "create_proposal", "", ["adhHttp", "adhUser",
+                    (adhHttp : AdhHttp.Service<any>, adhUser) => {
                         return (resource : RIPoolWithAssets) => {
                             return adhUser.ready.then(() => {
                                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
