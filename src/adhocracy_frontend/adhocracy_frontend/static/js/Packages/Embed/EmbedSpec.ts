@@ -21,34 +21,81 @@ export var register = () => {
                 .and.returnValue(() => undefined);
         });
 
-        describe("location2template", () => {
-            it("compiles a template from the parameters given in $location", () => {
-                var expected = "<adh-document-workbench data-path=\"/this/is/a/path\" " +
-                    "data-test=\"&quot;&#39;&amp;\"></adh-document-workbench>";
-                expect(AdhEmbed.location2template($locationMock)).toBe(expected);
+        describe("Provider", () => {
+            var provider;
+
+            beforeEach(() => {
+                provider = new AdhEmbed.Provider();
             });
-            it("does not include meta params as attributes", () => {
-                var expected = "<adh-document-workbench data-path=\"/this/is/a/path\"></adh-document-workbench>";
-                $locationMock.search.and.returnValue({
-                    path: "/this/is/a/path",
-                    noheader: "",
-                    nocenter: "",
-                    locale: "de"
+
+            describe("registerEmbeddableDirectives", () => {
+                it("appends the passed list to embeddableDirectives", () => {
+                    provider.registerEmbeddableDirectives(["foo", "bar"]);
+                    expect(provider.embeddableDirectives).toContain("foo");
+                    expect(provider.embeddableDirectives).toContain("bar");
                 });
-                expect(AdhEmbed.location2template($locationMock)).toBe(expected);
+
+                it("does not create duplicates", () => {
+                    var initialLenth = provider.embeddableDirectives.length;
+
+                    provider.registerEmbeddableDirectives(["foo", "bar"]);
+                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 2);
+
+                    provider.registerEmbeddableDirectives(["foo", "bar"]);
+                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 2);
+
+                    provider.registerEmbeddableDirectives(["baz", "baz"]);
+                    expect(provider.embeddableDirectives.length).toBe(initialLenth + 3);
+                });
             });
-            it("returns '' if widget is 'empty'", () => {
-                var expected = "";
-                $locationMock.path.and.returnValue("/embed/empty");
-                expect(AdhEmbed.location2template($locationMock)).toBe(expected);
+
+            describe("$get", () => {
+                it("returns a service instance", () => {
+                    expect(provider.$get().constructor).toBe(AdhEmbed.Service);
+                });
             });
-            it("throws if $location does not specify a widget", () => {
-                $locationMock.path.and.returnValue("/embed/");
-                expect(() => AdhEmbed.location2template($locationMock)).toThrow();
+        });
+
+        describe("Service", () => {
+            var providerMock;
+            var service;
+
+            beforeEach(() => {
+                providerMock = {
+                    embeddableDirectives: ["document-workbench", "empty"]
+                };
+                service = new AdhEmbed.Service(providerMock);
             });
-            it("throws if the requested widget is not available for embedding", () => {
-                $locationMock.path.and.returnValue("/embed/do-not-embed");
-                expect(() => AdhEmbed.location2template($locationMock)).toThrow();
+
+            describe("location2template", () => {
+                it("compiles a template from the parameters given in $location", () => {
+                    var expected = "<adh-document-workbench data-path=\"/this/is/a/path\" " +
+                        "data-test=\"&quot;&#39;&amp;\"></adh-document-workbench>";
+                    expect(service.location2template($locationMock)).toBe(expected);
+                });
+                it("does not include meta params as attributes", () => {
+                    var expected = "<adh-document-workbench data-path=\"/this/is/a/path\"></adh-document-workbench>";
+                    $locationMock.search.and.returnValue({
+                        path: "/this/is/a/path",
+                        noheader: "",
+                        nocenter: "",
+                        locale: "de"
+                    });
+                    expect(service.location2template($locationMock)).toBe(expected);
+                });
+                it("returns '' if widget is 'empty'", () => {
+                    var expected = "";
+                    $locationMock.path.and.returnValue("/embed/empty");
+                    expect(service.location2template($locationMock)).toBe(expected);
+                });
+                it("throws if $location does not specify a widget", () => {
+                    $locationMock.path.and.returnValue("/embed/");
+                    expect(() => service.location2template($locationMock)).toThrow();
+                });
+                it("throws if the requested widget is not available for embedding", () => {
+                    $locationMock.path.and.returnValue("/embed/do-not-embed");
+                    expect(() => service.location2template($locationMock)).toThrow();
+                });
             });
         });
 
