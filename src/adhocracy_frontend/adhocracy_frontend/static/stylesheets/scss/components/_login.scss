@@ -82,6 +82,10 @@ Dialog for login related flow (login, register, password reset).
         text-align: left;
     }
 
+    .login-check {
+        text-align: center;
+    }
+
     input[type="text"],
     input[type="email"],
     input[type="password"],
@@ -100,11 +104,6 @@ Dialog for login related flow (login, register, password reset).
     line-height: inherit;
     margin: 0 0 2em;
     text-align: left;
-}
-
-// FIXME overspecifc selector
-.login-form .login-check {
-    text-align: center;
 }
 
 .login-check {
