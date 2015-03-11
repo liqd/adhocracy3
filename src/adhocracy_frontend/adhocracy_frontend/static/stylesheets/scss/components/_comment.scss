@@ -168,16 +168,6 @@ parent: comment
     margin-bottom: 10px / $font-size-small * 1em;
     padding-top: 3px / $font-size-small * 1em;
 
-    .comment-header-icon {
-        @include border-radius(50%);
-        float: left;
-        font-size: 150%;
-        line-height: 1.333;
-        width: 1.333em;
-        text-align: center;
-        background: white;
-    }
-
     .comment-header-creator,
     .comment-header-date,
     .comment-header-links {
