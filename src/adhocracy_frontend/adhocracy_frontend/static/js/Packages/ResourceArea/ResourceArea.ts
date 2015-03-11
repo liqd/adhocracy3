@@ -24,15 +24,17 @@ export class Provider implements angular.IServiceProvider {
             ($q, $injector, adhHttp, adhConfig) => new Service(self, $q, $injector, adhHttp, adhConfig)];
     }
 
-    public default(resourceType : string, view : string, defaults : Dict) : Provider {
-        this.defaults[resourceType + "@" + view] = defaults;
+    public default(resourceType : string, view : string, processType : string, defaults : Dict) : Provider {
+        var key : string = resourceType + "@" + view + "@" + processType;
+        this.defaults[key] = defaults;
         return this;
     }
 
-    public specific(resourceType : string, view : string, factory : Function) : Provider;
-    public specific(resourceType : string, view : string, factory : any[]) : Provider;
-    public specific(resourceType, view, factory) {
-        this.specifics[resourceType + "@" + view] = factory;
+    public specific(resourceType : string, view : string, processType : string, factory : Function) : Provider;
+    public specific(resourceType : string, view : string, processType : string, factory : any[]) : Provider;
+    public specific(resourceType, view, processType, factory) {
+        var key : string = resourceType + "@" + view + "@" + processType;
+        this.specifics[key] = factory;
         return this;
     }
 }
@@ -50,6 +52,10 @@ export class Provider implements angular.IServiceProvider {
  * would be mapped to a resource at `<rest_url>/adhocracy/proposal/VERSION_0000001`
  * and view `"edit"`. If no view is provided, it defaults to `""`.
  *
+ * Additionally, resources typically belong to a specific *process*. resourceArea
+ * automatically finds that process and extracts it `processType`. If a resource is
+ * not part of a process, `processType` defaults to `""`.
+ *
  * The state `data` object as used by resourceArea consists of three different parts:
  *
  * -   meta
@@ -63,19 +69,19 @@ export class Provider implements angular.IServiceProvider {
  * overwritten in `search`. Any parameters from search that do not exists in defaults
  * are removed. Defaults can be configured like this:
  *
- *     resourceAreaProvider.default("<contentType>", "<view>", {
+ *     resourceAreaProvider.default("<contentType>", "<view>", "<processType>", {
  *         key: "value",
  *         foo: "bar"
  *     });
  *
- * Specifics are also configured per contentType/view combination. But they are
- * not provided as a plain object. Instead, they are provided in form of a injectable
+ * Specifics are also configured per contentType/view/processType combination. But they
+ * are not provided as a plain object. Instead, they are provided in form of a injectable
  * factory that returns a function that takes the actual resource as a parameter and
  * returns the specifics (that may optionally be wrapped in a promise). This sounds
  * complex, but it allows for a great deal of flexibility. Specifics can be configured
  * like this:
  *
- *     resourceAreaProvider.specific("<contentType>", "<view>", ["adhHttp", (adhHttp) => {
+ *     resourceAreaProvider.specific("<contentType>", "<view>", "<processType>", ["adhHttp", (adhHttp) => {
  *         return (resource) => {
  *             adhHttp.get(resource.data[<someSheet>.nick].reference).then((referencedResource) => {
  *                 return {
@@ -99,12 +105,13 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private adhConfig : AdhConfig.IService
     ) {}
 
-    private getDefaults(resourceType : string, view : string) : Dict {
-        return <Dict>_.extend({}, this.provider.defaults[resourceType + "@" + view]);
+    private getDefaults(resourceType : string, view : string, processType : string) : Dict {
+        var key : string = resourceType + "@" + view + "@" + processType;
+        return <Dict>_.extend({}, this.provider.defaults[key]);
     }
 
-    private getSpecifics(resource, view : string) : angular.IPromise<Dict> {
-        var key = resource.content_type + "@" + view;
+    private getSpecifics(resource, view : string, processType : string) : angular.IPromise<Dict> {
+        var key : string = resource.content_type + "@" + view + "@" + processType;
         var specifics;
 
         if (this.provider.specifics.hasOwnProperty(key)) {
@@ -155,8 +162,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
             var resource = values[0];
             var processType : string = values[1];
 
-            return self.getSpecifics(resource, view).then((specifics : Dict) => {
-                var defaults : Dict = self.getDefaults(resource.content_type, view);
+            return self.getSpecifics(resource, view, processType).then((specifics : Dict) => {
+                var defaults : Dict = self.getDefaults(resource.content_type, view, processType);
 
                 var meta : Dict = {
                     processType: processType,
@@ -174,7 +181,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
     }
 
     public reverse(data : Dict) : { path : string; search : Dict; } {
-        var defaults = this.getDefaults(data["contentType"], data["view"]);
+        var defaults = this.getDefaults(data["contentType"], data["view"], data["processType"]);
         var path = path = data["resourceUrl"].replace(this.adhConfig.rest_url, "");
 
         if (path.substr(-1) !== "/") {
