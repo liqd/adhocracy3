@@ -855,7 +855,6 @@ class TestDeferredValidateResetPasswordEmail:
         validator(node, 'test@email.de')
         assert request.validated['user'] is user
 
-    @mark.xfail(reason='work in progress')
     def test_email_has_user_without_password_authentication(
             self, node, request, context, mock_user_locator):
         validator = self._call_fut(node, {'context': context,
@@ -865,7 +864,6 @@ class TestDeferredValidateResetPasswordEmail:
         with raises(colander.Invalid):
             validator(node, 'test@email.de')
 
-    @mark.xfail(reason='work in progress')
     def test_email_has_user_not_activated(self, node, request, context,
                                           mock_user_locator):
         from adhocracy_core.sheets.principal import IPasswordAuthentication
@@ -879,7 +877,6 @@ class TestDeferredValidateResetPasswordEmail:
 
 
 class TestPOSTResetPasswordRequestSchema:
-
 
     def make_one(self):
         from .schemas import POSTPasswordResetRequestSchema
@@ -921,10 +918,12 @@ class TestValidatePasswordResetPath:
     def test_path_is_reset_password(self, node,  request, context, registry,
                                     mock_sheet):
         from datetime import datetime
+        from pytz import UTC
         from adhocracy_core.resources.principal import IPasswordReset
         user = testing.DummyResource()
+        creation_date = datetime.utcnow().replace(tzinfo=UTC)
         mock_sheet.get.return_value = {'creator': user,
-                                       'creation_date': datetime.now()}
+                                       'creation_date': creation_date}
         registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(node, {'request': request, 'context': context})
 
@@ -936,9 +935,11 @@ class TestValidatePasswordResetPath:
     def test_path_is_not_reset_password(self, node,  request, context, registry,
                                         mock_sheet):
         from datetime import datetime
+        from pytz import UTC
         user = testing.DummyResource()
+        creation_date = datetime.utcnow().replace(tzinfo=UTC)
         mock_sheet.get.return_value = {'creator': user,
-                                       'creation_date': datetime.now()}
+                                       'creation_date': creation_date}
         registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(node, {'request': request, 'context': context})
 
@@ -949,9 +950,11 @@ class TestValidatePasswordResetPath:
     def test_path_is_reset_password_but_8_days_old(
             self, node,  request, context, registry, mock_sheet):
         import datetime
+        from pytz import UTC
         from adhocracy_core.resources.principal import IPasswordReset
         user = testing.DummyResource()
-        creation_date = datetime.datetime.now() - datetime.timedelta(days=7)
+        creation_date = datetime.datetime.utcnow().replace(tzinfo=UTC) -\
+                        datetime.timedelta(days=7)
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': creation_date}
         registry.content.get_sheet.return_value = mock_sheet

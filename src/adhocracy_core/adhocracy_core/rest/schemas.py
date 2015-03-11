@@ -35,6 +35,7 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.interfaces import IUserLocator
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 
 
 resolver = DottedNameResolver()
@@ -515,6 +516,12 @@ def deferred_validate_password_reset_email(node: SchemaNode, kw: dict):
         user = locator.get_user_by_email(value)
         if user is None:
             msg = 'No user exists with this email: {0}'.format(value)
+            raise colander.Invalid(node, msg)
+        if not IPasswordAuthentication.providedBy(user):
+            msg = 'This user has no password to reset: {0}'.format(value)
+            raise colander.Invalid(node, msg)
+        if not user.active:
+            msg = 'This user is not activated yet: {0}'.format(value)
             raise colander.Invalid(node, msg)
         else:
             request.validated['user'] = user
