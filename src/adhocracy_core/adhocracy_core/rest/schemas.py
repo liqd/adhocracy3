@@ -1,4 +1,5 @@
 """Data structures / validation specific to rest api requests."""
+from datetime import datetime
 from hypatia.interfaces import IIndexSort
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
@@ -28,7 +29,7 @@ from adhocracy_core.schema import URL
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
-from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import get_sheet
 from adhocracy_core.interfaces import IUserLocator
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.sheets.principal import IUserExtended
@@ -530,17 +531,32 @@ class POSTCreatePasswordResetRequestSchema(colander.Schema):
 
 @colander.deferred
 def validate_password_reset_path(node, kw):
-    """Add the user needing password reset to request.validated."""
+    """Validate password reset and add the user needing password reset."""
     request = kw['request']
 
     def validate_path(node, value):
         if value is None:
             return
-        if not IPasswordReset.providedBy(value):
-            raise colander.Invalid(node, 'This is not a valid password reset.')
-        user = get_sheet_field(value, IMetadata, 'creator')
-        request.validated['user'] = user
+        _raise_if_no_password_reset(node, value)
+        metadata = get_sheet(value, IMetadata).get()
+        _raise_if_outdated(node, value, metadata['creation_date'])
+        request.validated['user'] = metadata['creator']
     return validate_path
+
+
+def _raise_if_no_password_reset(node: colander.SchemaNode,
+                                value: IPasswordReset):
+    if not IPasswordReset.providedBy(value):
+        raise colander.Invalid(node, 'This is not a valid password reset.')
+
+
+def _raise_if_outdated(node: colander.SchemaNode,
+                       value: IPasswordReset, creation_date: datetime):
+        now = datetime.now()
+        if (now - creation_date).days >= 7:
+            value.__parent__ = None  # commit_suicide
+            msg = 'This password reset is older than 7 days.'
+            raise colander.Invalid(node, msg)
 
 
 class POSTPasswordResetRequestSchema(colander.Schema):

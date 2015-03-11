@@ -920,9 +920,11 @@ class TestValidatePasswordResetPath:
 
     def test_path_is_reset_password(self, node,  request, context, registry,
                                     mock_sheet):
+        from datetime import datetime
         from adhocracy_core.resources.principal import IPasswordReset
         user = testing.DummyResource()
-        mock_sheet.get.return_value = {'creator': user}
+        mock_sheet.get.return_value = {'creator': user,
+                                       'creation_date': datetime.now()}
         registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(node, {'request': request, 'context': context})
 
@@ -933,8 +935,10 @@ class TestValidatePasswordResetPath:
 
     def test_path_is_not_reset_password(self, node,  request, context, registry,
                                         mock_sheet):
+        from datetime import datetime
         user = testing.DummyResource()
-        mock_sheet.get.return_value = {'creator': user}
+        mock_sheet.get.return_value = {'creator': user,
+                                       'creation_date': datetime.now()}
         registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(node, {'request': request, 'context': context})
 
@@ -942,4 +946,17 @@ class TestValidatePasswordResetPath:
         with raises(colander.Invalid):
             validator(node, context['reset'])
 
-    # FIXME raise if reset resource is outdated
+    def test_path_is_reset_password_but_8_days_old(
+            self, node,  request, context, registry, mock_sheet):
+        import datetime
+        from adhocracy_core.resources.principal import IPasswordReset
+        user = testing.DummyResource()
+        creation_date = datetime.datetime.now() - datetime.timedelta(days=7)
+        mock_sheet.get.return_value = {'creator': user,
+                                       'creation_date': creation_date}
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(node, {'request': request, 'context': context})
+
+        context['reset'] = testing.DummyResource(__provides__=IPasswordReset)
+        with raises(colander.Invalid):
+            validator(node, context['reset'])
