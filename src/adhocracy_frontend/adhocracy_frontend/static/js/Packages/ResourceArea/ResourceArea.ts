@@ -2,6 +2,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
@@ -88,7 +89,7 @@ export class Provider implements angular.IServiceProvider {
  * possible. In those cases, search overwrites specifics overwrites meta overwrites defaults.
  */
 export class Service implements AdhTopLevelState.IAreaInput {
-    public template : string = "<adh-page-wrapper><adh-mercator-workbench></adh-mercator-workbench></adh-page-wrapper>";
+    public template : string = "<adh-page-wrapper><adh-process-view></adh-process-view></adh-page-wrapper>";
 
     constructor(
         private provider : Provider,
@@ -223,6 +224,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhProcess.moduleName,
             AdhTopLevelState.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
