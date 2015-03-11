@@ -265,9 +265,11 @@ autodoc_default_flags = ['members', 'undoc-members']
 
 #custom skip methods
 def skip(app, what, name, obj, skip, options):
-    if name in ["__doc__"]:
-        return True
-    return True
+    exclusions = ('__weakref__',  # special-members
+                  '__doc__', '__module__', '__dict__',  # undoc-members
+                  )
+    exclude = name in exclusions
+    return skip or exclude
 
 def setup(app):
     app.connect("autodoc-skip-member", skip)
