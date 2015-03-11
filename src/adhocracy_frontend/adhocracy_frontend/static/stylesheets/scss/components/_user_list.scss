@@ -8,16 +8,22 @@ category: Widgets
 A user list item within a listing widget
 
 ```html_example
-<div class="user-list-me">
-    <strong>ME</strong>
-    <button type="button" href="#FIXME">PROFILE</button>
-</div>
 <div class="listing">
     <ol class="listing-elements">
         <li class="listing-element">
             <div class="user-list-item">
-                <strong>Dr. Who</strong>
-                <button type="button" class="user-profile-button">Profile</button>
+                <a class="user-list-item-link " href="#" class="m-me">
+                    <span class="user-list-item-name">Me</span>
+                    <span class="user-list-item-button">Profil anzeigen</span>
+                </a>
+            </div>
+        </li>
+        <li class="listing-element>
+            <div class="user-list-item">
+                <a class="user-list-item-link" href="#">
+                    <span class="user-list-item-name">Another User</span>
+                    <span class="user-list-item-button">Profil anzeigen</span>
+                </a>
             </div>
         </li>
     </ol>
@@ -45,7 +51,7 @@ A user list item within a listing widget
     }
 
     &.m-me, &:hover, &:focus, &.is-selected {
-        background: white;
+        background: $color-background-base;
 
         .user-list-item-button {
             color: $color-text-highlight-normal;
