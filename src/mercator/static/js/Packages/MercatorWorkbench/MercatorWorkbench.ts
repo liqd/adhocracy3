@@ -302,6 +302,11 @@ export var register = (angular) => {
                     }]
                 );
         }])
+        .config(["adhProcessProvider", (adhProcessProvider) => {
+            adhProcessProvider.templateFactories[""] = ["$q", ($q : angular.IQService) => {
+                return $q.when("<adh-mercator-workbench></adh-mercator-workbench>");
+            }];
+        }])
         .directive("adhMercatorWorkbench", ["adhConfig", mercatorWorkbenchDirective])
         .directive("adhCommentColumn", ["adhTopLevelState", "adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalCreateColumnDirective])
