@@ -16,7 +16,7 @@ import RIUsersService = require("../../Resources_/adhocracy_core/resources/princ
 
 var pkgLocation = "/DocumentWorkbench";
 
-interface IDocumentWorkbenchScope extends angular.IScope {
+export interface IDocumentWorkbenchScope extends angular.IScope {
     path : string;
     user : AdhUser.Service;
     websocketTestPaths : string;
@@ -24,8 +24,8 @@ interface IDocumentWorkbenchScope extends angular.IScope {
 }
 
 export var documentWorkbench = (
-    adhConfig : AdhConfig.IService
-    adhUser : AdhUser.Service,
+    adhConfig : AdhConfig.IService,
+    adhUser : AdhUser.Service
 ) => {
     return {
         restrict: "E",
@@ -35,7 +35,7 @@ export var documentWorkbench = (
             scope.contentType = RIProposal.content_type;
             scope.user = adhUser;
             scope.websocketTestPaths = JSON.stringify([scope.path]);
-        }]
+        }
     };
 };
 
