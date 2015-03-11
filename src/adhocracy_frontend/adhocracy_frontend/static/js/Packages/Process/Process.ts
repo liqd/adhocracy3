@@ -4,14 +4,14 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
 export class Provider implements angular.IServiceProvider {
-    public templateUrls : {[processType : string]: string};
+    public templateFactories : {[processType : string]: Function};
     public $get;
 
     constructor () {
-        this.templateUrls = {};
+        this.templateFactories = {};
 
-        this.$get = ["$templateRequest", ($templateRequest) => {
-            return new Service(this, $templateRequest);
+        this.$get = ["$injector", ($injector) => {
+            return new Service(this, $injector);
         }];
     }
 }
@@ -19,12 +19,12 @@ export class Provider implements angular.IServiceProvider {
 export class Service {
     constructor(
         private provider : Provider,
-        private $templateRequest : angular.ITemplateRequestService
+        private $injector : angular.auto.IInjectorService
     ) {}
 
     public getTemplate(processType : string) : angular.IPromise<string> {
-        var templateUrl = this.provider.templateUrls[processType];
-        return this.$templateRequest(templateUrl);
+        var fn = this.provider.templateFactories[processType];
+        return this.$injector.invoke(fn);
     }
 }
 
