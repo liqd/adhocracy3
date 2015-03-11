@@ -116,19 +116,20 @@ def integration(config):
     config.include('adhocracy_core.resources.subscriber')
 
 
+@fixture
+def principals(context, registry):
+    from adhocracy_core.resources.principal import IPrincipalsService
+    inst = registry.content.create(IPrincipalsService.__identifier__,
+                                   parent=context)
+    return inst
+
+
 @mark.usefixtures('integration')
 class TestPrincipalsService:
 
     @fixture
     def context(self, pool_graph):
         return pool_graph
-
-    @fixture
-    def principals(self, context, registry):
-        from adhocracy_core.resources.principal import IPrincipalsService
-        inst = registry.content.create(IPrincipalsService.__identifier__,
-                                       parent=context)
-        return inst
 
     def test_create_principals(self, principals):
         from adhocracy_core.resources.principal import IPrincipalsService
@@ -148,6 +149,14 @@ class TestPrincipalsService:
         assert find_service(context, 'principals', 'users')
         assert find_service(context, 'principals', 'groups')
         assert find_service(context, 'principals', 'resets')
+
+
+@mark.usefixtures('integration')
+class TestUser:
+
+    @fixture
+    def context(self, pool_graph):
+        return pool_graph
 
     def test_create_user(self, registry):
         from adhocracy_core.resources.principal import IUser
@@ -174,6 +183,14 @@ class TestPrincipalsService:
                                        parent=principals['users'],
                                        appstructs=appstructs)
         assert principals['users']['0000000'] is user
+
+
+@mark.usefixtures('integration')
+class TestGroup:
+
+    @fixture
+    def context(self, pool_graph):
+        return pool_graph
 
     def test_create_group(self, registry):
         from adhocracy_core.resources.principal import IGroup
@@ -203,6 +220,14 @@ class TestPrincipalsService:
         assert group_sheet.get()['users'] == [user]
         assert group_sheet.get()['roles'] == ['reader']
 
+
+@mark.usefixtures('integration')
+class TestPasswordReset:
+
+    @fixture
+    def context(self, pool_graph):
+        return pool_graph
+
     def test_password_reset_reset_password(self, principals, registry):
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.resources.principal import IPasswordReset
@@ -217,7 +242,6 @@ class TestPrincipalsService:
         new_password = user.password
         assert old_password != new_password
         # FIXME websocket clients should not be notified about created reset
-        # FIXME delete reset resource after 7 days
 
     def test_password_reset_suicide_after_reset(self, principals, registry):
         from adhocracy_core.resources.principal import IUser

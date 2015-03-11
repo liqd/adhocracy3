@@ -57,7 +57,7 @@ def update_modification_date_modified_by(event):
 def user_created_and_added_subscriber(event):
     """Add default group to user."""
     group = _get_default_group(event.object)
-    if group is None:  # ease testing,
+    if group is None:  # ease testing
         return
     _add_user_to_group(event.object, group, event.registry)
 
