@@ -50,7 +50,6 @@ is selected, no state is applied.
     border-left: 1px solid $color-brand-one-normal;
 
     .comment {
-        @include triangle-tl;
         padding-right: 0;
     }
 }
