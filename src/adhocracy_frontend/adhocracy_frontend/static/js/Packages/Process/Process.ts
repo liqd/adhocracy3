@@ -23,6 +23,10 @@ export class Service {
     ) {}
 
     public getTemplate(processType : string) : angular.IPromise<string> {
+        if (!this.provider.templateFactories.hasOwnProperty(processType)) {
+            throw "No template for process type \"" + processType + "\" has been configured.";
+        }
+
         var fn = this.provider.templateFactories[processType];
         return this.$injector.invoke(fn);
     }
@@ -37,10 +41,12 @@ export var processViewDirective = (
         restrict: "E",
         link: (scope, element) => {
             adhTopLevelState.on("processType", (processType) => {
-                adhProcess.getTemplate(processType).then((template) => {
-                    element.html(template);
-                    $compile(element.contents())(scope);
-                });
+                if (typeof processType !== "undefined") {
+                    adhProcess.getTemplate(processType).then((template) => {
+                        element.html(template);
+                        $compile(element.contents())(scope);
+                    });
+                }
             });
         }
     };
