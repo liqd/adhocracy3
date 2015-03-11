@@ -2,6 +2,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
@@ -88,7 +89,7 @@ export class Provider implements angular.IServiceProvider {
  * possible. In those cases, search overwrites specifics overwrites meta overwrites defaults.
  */
 export class Service implements AdhTopLevelState.IAreaInput {
-    public template : string = "<adh-page-wrapper><adh-mercator-workbench></adh-mercator-workbench></adh-page-wrapper>";
+    public template : string = "<adh-page-wrapper><adh-process-view></adh-process-view></adh-page-wrapper>";
 
     constructor(
         private provider : Provider,
@@ -119,6 +120,17 @@ export class Service implements AdhTopLevelState.IAreaInput {
             .then((data : Dict) => _.clone(data));
     }
 
+    /**
+     * Promise the process type of next ancestor process.
+     *
+     * Promise "" if none could be found.
+     *
+     * FIXME: don't really know how to do this yet
+     */
+    private getProcessType(resourceUrl : string) : angular.IPromise<string> {
+        return this.$q.when("");
+    }
+
     public route(path : string, search : Dict) : angular.IPromise<Dict> {
         var self : Service = this;
         var segs : string[] = path.replace(/\/+$/, "").split("/");
@@ -136,11 +148,18 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         var resourceUrl : string = this.adhConfig.rest_url + segs.join("/");
 
-        return this.adhHttp.get(resourceUrl).then((resource) => {
+        return self.$q.all([
+            self.adhHttp.get(resourceUrl),
+            self.getProcessType(resourceUrl)
+        ]).then((values : any[]) => {
+            var resource = values[0];
+            var processType : string = values[1];
+
             return self.getSpecifics(resource, view).then((specifics : Dict) => {
                 var defaults : Dict = self.getDefaults(resource.content_type, view);
 
                 var meta : Dict = {
+                    processType: processType,
                     platformUrl: self.adhConfig.rest_url + "/" + segs[1],
                     contentType: resource.content_type,
                     resourceUrl: resourceUrl,
@@ -205,6 +224,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhProcess.moduleName,
             AdhTopLevelState.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
