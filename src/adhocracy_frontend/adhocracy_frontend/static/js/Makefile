@@ -1,7 +1,7 @@
 SHELL=/bin/bash --login
 MAKE_ROOT=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-A3_ROOT=$(shell cat ${MAKE_ROOT}/../../../../source_env | grep A3_ROOT | egrep -o '[^=]+$$')
-LD_LIBRARY_PATH=$(shell cat ${MAKE_ROOT}/../../../../source_env | grep LD_LIBRARY_PATH | egrep -o '[^=]+$$')
+A3_ROOT=$(shell cat ${MAKE_ROOT}/../../../../../source_env | grep A3_ROOT | egrep -o '[^=]+$$')
+LD_LIBRARY_PATH=$(shell cat ${MAKE_ROOT}/../../../../../source_env | grep LD_LIBRARY_PATH | egrep -o '[^=]+$$')
 TSC=$(A3_ROOT)/bin/tsc
 TSLINT=$(A3_ROOT)/bin/tslint
 NODE=$(A3_ROOT)/bin/node
