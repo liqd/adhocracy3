@@ -241,7 +241,6 @@ class TestPasswordReset:
         reset.reset_password('new_password')
         new_password = user.password
         assert old_password != new_password
-        # FIXME websocket clients should not be notified about created reset
 
     def test_password_reset_suicide_after_reset(self, principals, registry):
         from adhocracy_core.resources.principal import IUser
