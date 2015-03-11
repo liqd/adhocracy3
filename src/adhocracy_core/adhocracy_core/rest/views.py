@@ -1113,7 +1113,7 @@ class CreatePasswordResetView(RESTView):
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return {}
+        return {'POST': {}}
 
     @view_config(request_method='POST',
                  )
@@ -1142,7 +1142,7 @@ class PasswordResetView(RESTView):
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
         """Return options for view."""
-        return {}
+        return {'POST': {}}
 
     @view_config(request_method='POST',
                  )

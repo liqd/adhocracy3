@@ -1528,7 +1528,7 @@ class TestCreatePasswordResetView:
 
     def test_options(self, request_, context):
         inst = self._make_one(context, request_)
-        assert inst.options() == {}
+        assert inst.options() == {'POST': {}}
 
 
 class TestPasswordResetView:
@@ -1575,7 +1575,7 @@ class TestPasswordResetView:
 
     def test_options(self, request_, context):
         inst = self._make_one(context, request_)
-        assert inst.options() == {}
+        assert inst.options() == {'POST': {}}
 
 
 @fixture()
