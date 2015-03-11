@@ -3,7 +3,7 @@
 import AdhProcess = require("./Process");
 
 export var register = () => {
-    describe("Tracking", () => {
+    describe("Process", () => {
         xit("is defined", () => {
             expect(AdhProcess).toBeDefined();
         });
