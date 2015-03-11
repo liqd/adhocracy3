@@ -1,30 +1,13 @@
-<adh-space data-key="content">
-    <div data-adh-moving-columns="" class="moving-columns">
-        <adh-moving-column>
-            <adh-mercator-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mercator-proposal-create-column>
-            <adh-mercator-proposal-listing-column data-ng-if="view !== 'create_proposal'"></adh-mercator-proposal-listing-column>
-        </adh-moving-column>
-        <adh-moving-column>
-            <adh-mercator-proposal-edit-column data-ng-if="view === 'edit'"></adh-mercator-proposal-edit-column>
-            <adh-mercator-proposal-detail-column data-ng-if="view !== 'edit'"></adh-mercator-proposal-detail-column>
-        </adh-moving-column>
-        <adh-moving-column>
-            <adh-comment-column></adh-comment-column>
-        </adh-moving-column>
-    </div>
-</adh-space>
-
-<adh-space data-key="user">
-    <div data-adh-moving-columns="" class="moving-columns">
-        <adh-moving-column>
-            <adh-user-listing-column></adh-user-listing-column>
-        </adh-moving-column>
-        <adh-moving-column>
-            <adh-user-detail-column></adh-user-detail-column>
-        </adh-moving-column>
-    </div>
-</adh-space>
-
-<adh-space data-key="error">
-    <adh-routing-error></adh-routing-error>
-</adh-space>
+<div data-adh-moving-columns="" class="moving-columns">
+    <adh-moving-column>
+        <adh-mercator-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mercator-proposal-create-column>
+        <adh-mercator-proposal-listing-column data-ng-if="view !== 'create_proposal'"></adh-mercator-proposal-listing-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-mercator-proposal-edit-column data-ng-if="view === 'edit'"></adh-mercator-proposal-edit-column>
+        <adh-mercator-proposal-detail-column data-ng-if="view !== 'edit'"></adh-mercator-proposal-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-comment-column></adh-comment-column>
+    </adh-moving-column>
+</div>
