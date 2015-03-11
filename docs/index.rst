@@ -13,9 +13,10 @@ Contents
 
    installation
    development
-   translation
+   architecture/index
+   coding_guides/index
    api/index
-   style_guide/index
+   translation
    attic/index
    CHANGES
    glossary

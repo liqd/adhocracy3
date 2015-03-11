@@ -46,7 +46,7 @@ Usage of external dependencies
      and a generic class to create the persistent object hierarchy.
      `sheet types` (:class:`adhocracy_core.interfaces.ISheet`) mapped
      to data structures (:class:`colander.Schema`) and generic class that
-     encapsulates persistent data access.
+     encapsulate persistent data access.
      (For performance reasons / implementation issues some code uses
      direct attribute access to retrieve data.)
    * :mod:`substanced.evolution` (migration, see :mod:`adhocracy_core.evolution`)
@@ -56,6 +56,14 @@ Usage of external dependencies
    * :mod:`substanced.objectmap` (reference resources, extented by :mod:`adhocracy_core.graph`)
    * :mod:`substanced.scripts` (command line utilities)
    * :mod:`substanced.folder` (Persistent implemention for :class:`adhocracy_core.interfaces.IPool` resources)
+
+TODO: Here it would be great to have a small overview of what sheets
+do and how they work. Maybe give a concrete example of how they are
+used in combination with Colander for the JSON serialization and how
+they are used by the object factory. Also explain the link between
+resources and sheets and how they reference each other could be
+explain (with a diagram?). Also the term "content type" is used
+instead of "resource".
 
 * Data structures / validation `colander <http://colander.readthedocs.org/en/latest/>`_
 
@@ -141,30 +149,10 @@ Modules API and separation of responsibility
 .. autosummary::
 
     adhocracy_core.scaffolds
-    adhocracy_core.scripts
-
 
 TODO: mark pluggable dependency modules
 
 TODO: move scripts to adhocracy_core.scripts
-
-Modules import rules
-~~~~~~~~~~~~~~~~~~~~
-
-* must not import from upper level
-
-* should not import from same level
-
-  (pluggable: must not have imports from other modules or to other pluggable modules)
-
-  (pluggable: must have interface for public methods)
-
-* may import from bottom level
-
-* may import interfaces
-
-* you can use `bin/check_forbidden_imports` to list suspicious imports  # TODO update script
-
 
 History Notes
 ~~~~~~~~~~~~~

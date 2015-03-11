@@ -1,5 +1,5 @@
-Refactor guideline
-==================
+Refactor Guidelines
+===================
 
 For refactoring we follow mostly the rules from the chapter "Smells and hints"
 from the book "Clean Code" by Robert C. Martin, 2008.
