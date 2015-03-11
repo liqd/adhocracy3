@@ -179,7 +179,7 @@ where possible, such as allowing for inline-comments::
         ...
     }
 
-On the other, we want do not want to insist that it is possible for
+On the other, we do not want to insist that it is possible for
 all elements.
 
 The solution is to resort to dynamic checks::

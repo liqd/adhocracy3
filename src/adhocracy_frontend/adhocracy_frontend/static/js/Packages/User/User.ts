@@ -38,7 +38,7 @@ export class Service {
         private $http : angular.IHttpService,
         private $rootScope : angular.IScope,
         private $window : Window,
-        private angular,
+        private ng : typeof angular,
         private Modernizr
     ) {
         var _self : Service = this;
@@ -53,7 +53,7 @@ export class Service {
         }));
 
         if (_self.Modernizr.localstorage) {
-            var win = _self.angular.element(_self.$window);
+            var win = _self.ng.element(_self.$window);
             win.on("storage", (event) => {
                 var storageEvent = <any>event.originalEvent;
                 if (storageEvent.key === "user-session") {

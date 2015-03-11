@@ -195,9 +195,9 @@ Doing this we had the following in mind:
       * workflows, permissions based on resource location
 
 We did a prototype with a graph database and dropped it mainly because the
-python support and transaction features were to much cutting edge.
+python support and transaction features were too much cutting edge.
 So we came to the ZODB database. It is stable and can do python object
-references in a very simple way because its an object database.
+references in a very simple way because it is an object database.
 That lead to the substanced framework that already provides solutions for
 multiple other things we wanted to implement.
 
