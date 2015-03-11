@@ -1,80 +1,92 @@
-<div class="register">
-    <form novalidate="novalidate" class="register-form" name="registerForm" data-ng-if="!success" data-ng-submit="register()">
+<div class="login">
+    <form novalidate="novalidate" class="login-form" name="registerForm" data-ng-if="!success" data-ng-submit="register()">
         <div class="form-error" ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
-        <input
-            type="text"
-            name="username"
-            placeholder="{{ 'TR__USERNAME' | translate }}"
-            data-ng-model="input.username"
-            required="required" />
-        <span class="input-error" data-ng-show="registerForm.username.$error.required && registerForm.username.$dirty">
-            {{ "TR__ERROR_REQUIRED_USERNAME" | translate }}
-        </span>
-        <input
-            type="email"
-            name="email"
-            placeholder="{{ 'TR__EMAIL' | translate }}"
-            data-ng-model="input.email"
-            required="required" />
-        <span class="input-error" data-ng-show="registerForm.email.$error.required && registerForm.email.$dirty">
-            {{ "TR__ERROR_REQUIRED_EMAIL" | translate }}
-        </span>
-        <span class="input-error" data-ng-show="registerForm.email.$error.email && registerForm.email.$dirty">
-            {{ "TR__ERROR_FORMAT_EMAIL" | translate }}
-        </span>
-        <input
-            type="password"
-            name="password"
-            placeholder="{{ 'TR__PASSWORD' | translate }}"
-            data-ng-model="input.password"
-            required="required"
-            data-ng-minlength="6"
-            data-ng-maxlength="100" />
-        <span class="input-error" data-ng-show="registerForm.password.$error.required && registerForm.password.$dirty">
-            {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
-        </span>
-        <span class="input-error" data-ng-show="registerForm.password.$error.minlength && registerForm.password.$dirty">
-            {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
-        </span>
-        <input
-            type="password"
-            name="password_repeat"
-            placeholder="{{ 'TR__PASSWORD_REPEAT' | translate }}"
-            data-ng-model="input.passwordRepeat"
-            required="required"
-            data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty}"/>
-        <span class="input-error" data-ng-show="(input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty">
-            {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
-        </span>
-        <div class="register-check">
-            <input type="checkbox" name="registerCheck" data-ng-model="input.registerCheck" required="required">
-            {{ "TR__I_ACCEPT_THE" | translate }} <a href="{{ termsUrl }}" target="_blank">{{ "TR__TERMS_AND_CONDITIONS" | translate }}</a>
-        </div>
-        <span class="input-error" data-ng-show="registerForm.registerCheck.$error.required && (registerForm.registerCheck.$dirty || registerForm.$submitted)">
-            {{ "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS" | translate }}
-        </span>
+
+        <label>
+            <span class="label-text">{{ "TR__USERNAME" | translate }}</span>
+            <input
+                type="text"
+                name="username"
+                data-ng-model="input.username"
+                required="required" />
+            <span class="input-error" data-ng-show="registerForm.username.$error.required && registerForm.username.$dirty">
+                {{ "TR__ERROR_REQUIRED_USERNAME" | translate }}
+            </span>
+        </label>
+        <label>
+            <span class="label-text">{{ "TR__EMAIL" | translate }}</span>
+            <input
+                type="email"
+                name="email"
+                data-ng-model="input.email"
+                required="required" />
+            <span class="input-error" data-ng-show="registerForm.email.$error.required && registerForm.email.$dirty">
+                {{ "TR__ERROR_REQUIRED_EMAIL" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="registerForm.email.$error.email && registerForm.email.$dirty">
+                {{ "TR__ERROR_FORMAT_EMAIL" | translate }}
+            </span>
+        </label>
+        <label>
+            <span class="label-text">{{ "TR__PASSWORD" | translate }}</span>
+            <input
+                type="password"
+                name="password"
+                data-ng-model="input.password"
+                required="required"
+                data-ng-minlength="6"
+                data-ng-maxlength="100" />
+            <span class="input-error" data-ng-show="registerForm.password.$error.required && registerForm.password.$dirty">
+                {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="registerForm.password.$error.minlength && registerForm.password.$dirty">
+                {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
+            </span>
+        </label>
+        <label>
+            <span class="label-text">{{ "TR__PASSWORD_REPEAT" | translate }}</span>
+            <input
+                type="password"
+                name="password_repeat"
+                data-ng-model="input.passwordRepeat"
+                required="required"
+                data-ng-class="{'ng-invalid': (input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty}"/>
+            <span class="input-error" data-ng-show="(input.password !== input.passwordRepeat) && registerForm.password_repeat.$dirty">
+                {{ "TR__ERROR_MATCH_PASSWORD" | translate }}
+            </span>
+        </label>
+        <label class="login-check">
+            <div class="login-check-input">
+                <input type="checkbox" name="registerCheck" data-ng-model="input.registerCheck" required="required" />
+                {{ "TR__I_ACCEPT_THE" | translate }} <a href="{{ termsUrl }}" target="_blank">{{ "TR__TERMS_AND_CONDITIONS" | translate }}</a>
+            </div>
+            <span class="input-error" data-ng-show="registerForm.registerCheck.$error.required && (registerForm.registerCheck.$dirty || registerForm.$submitted)">
+                {{ "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS" | translate }}
+            </span>
+        </label>
+
         <input
             type="submit"
             name="register"
             value="{{ 'TR__REGISTER' | translate }}"
             class="m-call-to-action"
             data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
-        <div data-ng-if="!success" class="register-info">
+        <div class="login-info">
             <p data-adh-html-translate="TR__REGISTRATION_LOGIN_INSTEAD" data-translate-templates="{
                 link: '&lt;a href=&quot;/login&quot;&gt;{{ content }}&lt;/a&gt;'
             }"></p>
         </div>
     </form>
 
-    <div data-ng-if="success" class="register-success">
+    <div data-ng-if="success" class="login-success">
         <p>{{ "TR__REGISTER_SUCCESS" | translate }}</p>
         <p>{{ "TR__CALL_FOR_ACTIVATION" | translate:{siteName: siteName} }}</p>
     </div>
 
-    <a class="register-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
-    <div class="register-support">
+    <a class="login-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+    <div class="login-info">
         {{ "TR__REGISTRATION_SUPPORT" | translate }} <br />
         <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>
     </div>

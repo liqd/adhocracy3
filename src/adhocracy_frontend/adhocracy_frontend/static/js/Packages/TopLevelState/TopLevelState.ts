@@ -41,7 +41,7 @@ export interface IAreaInput {
      *
      * This is the reverse of 'this.reverse'.
      */
-    route? : (path : string, search : {[key : string] : string}) => angular.IPromise<{[key : string] : string}>;
+    route? : (path : string, search : {[key : string] : string}) => angular.IPromise<{[key : string] : string}> | {[key : string] : string};
     /**
      * Convert (a3 top-level) state to (ng) location: Take a
      * 'TopLevelState' and return a path and a search query
@@ -201,7 +201,9 @@ export class Service {
             var areaInput : IAreaInput = this.$injector.invoke(fn);
             var area : IArea = {
                 prefix: prefix,
-                route: typeof areaInput.route !== "undefined" ? areaInput.route.bind(areaInput) : defaultRoute,
+                route: typeof areaInput.route === "undefined" ? defaultRoute : (path, search) => {
+                    return this.$q.when(areaInput.route(path, search));
+                },
                 reverse: typeof areaInput.reverse !== "undefined" ? areaInput.reverse.bind(areaInput) : defaultReverse,
                 template: "",
                 skip: !!areaInput.skip
