@@ -14,6 +14,7 @@ from colander import SequenceSchema
 from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
+from substanced.util import find_service
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
 from pyramid.request import Request
@@ -35,6 +36,7 @@ from adhocracy_core.resources.asset import IAssetsService
 from adhocracy_core.resources.asset import validate_and_complete_asset
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
+from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
 from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
@@ -42,6 +44,8 @@ from adhocracy_core.rest.schemas import POSTItemRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy_core.rest.schemas import POSTMessageUserViewRequestSchema
+from adhocracy_core.rest.schemas import POSTCreatePasswordResetRequestSchema
+from adhocracy_core.rest.schemas import POSTPasswordResetRequestSchema
 from adhocracy_core.rest.schemas import POSTReportAbuseViewRequestSchema
 from adhocracy_core.rest.schemas import POSTResourceRequestSchema
 from adhocracy_core.rest.schemas import PUTResourceRequestSchema
@@ -1096,6 +1100,62 @@ class MessageUserView(RESTView):
                                        text=data['text'],
                                        from_user=get_user(self.request))
         return ''
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRootPool,
+    name='create_password_reset',
+    content_type='application/json'
+)
+class CreatePasswordResetView(RESTView):
+
+    """Create a password reset resource."""
+
+    validation_POST = (POSTCreatePasswordResetRequestSchema, [])
+
+    @view_config(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return {}
+
+    @view_config(request_method='POST',
+                 )
+    def post(self) -> dict:
+        """Create as password reset resource."""
+        resets = find_service(self.context, 'principals', 'resets')
+        user = self.request.validated['user']
+        self.request.registry.content.create(IPasswordReset.__identifier__,
+                                             resets,
+                                             creator=user)
+        return {'status': 'success'}
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRootPool,
+    name='password_reset',
+    content_type='application/json'
+)
+class PasswordResetView(RESTView):
+
+    """Reset a user password."""
+
+    validation_POST = (POSTPasswordResetRequestSchema, [])
+
+    @view_config(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return {}
+
+    @view_config(request_method='POST',
+                 )
+    def post(self) -> dict:
+        """Reset password."""
+        reset = self.request.validated['path']
+        password = self.request.validated['password']
+        reset.reset_password(password)
+        return _login_user(self.request)
 
 
 def includeme(config):

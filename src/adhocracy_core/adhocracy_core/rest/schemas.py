@@ -25,8 +25,12 @@ from adhocracy_core.schema import ResourcePathAndContentSchema
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.interfaces import IUserLocator
+from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.sheets.principal import IUserExtended
 
 
@@ -488,3 +492,62 @@ options_resource_response_data_dict =\
                               'data': {}},
              'response_body': {'content_type': '',
                                'path': ''}}}
+
+
+@colander.deferred
+def deferred_validate_password_reset_email(node: colander.SchemaNode,
+                                           kw: dict):
+    """Validate the email address of a password reset request.
+
+    If valid, the user object is added as 'user' to
+    `request.validated`.
+
+    :raise colander.Invalid: if no user with this email exists.
+    """
+    # TODO gardening: import SchemaNode directly like everywhere else
+    context = kw['context']
+    request = kw['request']
+
+    def validate_email(node, value):
+        locator = request.registry.getMultiAdapter((context, request),
+                                                   IUserLocator)
+        user = locator.get_user_by_email(value)
+        if user is None:
+            msg = 'No user exists with this email: {0}'.format(value)
+            raise colander.Invalid(node, msg)
+        else:
+            request.validated['user'] = user
+    return validate_email
+
+
+class POSTCreatePasswordResetRequestSchema(colander.Schema):
+
+    """Schema to create a user password reset."""
+
+    email = Email(missing=colander.required,
+                  validator=deferred_validate_password_reset_email)
+
+
+@colander.deferred
+def validate_password_reset_path(node, kw):
+    """Add the user needing password reset to request.validated."""
+    request = kw['request']
+
+    def validate_path(node, value):
+        if value is None:
+            return
+        if not IPasswordReset.providedBy(value):
+            raise colander.Invalid(node, 'This is not a valid password reset.')
+        user = get_sheet_field(value, IMetadata, 'creator')
+        request.validated['user'] = user
+    return validate_path
+
+
+class POSTPasswordResetRequestSchema(colander.Schema):
+
+    """Schema to get a user password reset resource."""
+
+    path = Resource(missing=colander.required,
+                    validator=validate_password_reset_path,
+                    )
+    password = Password(missing=colander.required)
