@@ -451,6 +451,39 @@ class TestUpdateModificationDate:
              'registry': registry}
 
 
+class TestSendPasswordResetMail:
+
+    @fixture
+    def registry(self, registry, mock_messenger):
+        registry.messenger = mock_messenger
+        registry.settings['adhocracy.site_name'] = 'sitename'
+        registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        return registry
+
+    @fixture
+    def event(self, context, registry):
+        event.object = context
+        event.registry = registry
+        return event
+
+    def _call_fut(self, event):
+        from .subscriber import send_password_reset_mail
+        return send_password_reset_mail(event)
+
+    def test_call(self, event, mock_sheet, registry):
+        user = testing.DummyResource(name='user name',
+                                     email='test@test.de')
+        mock_sheet.get.return_value = {'creator': user}
+        registry.content.get_sheet.return_value = mock_sheet
+        event.object.__name__ = '/reset'
+        self._call_fut(event)
+        send_mail = registry.messenger.render_and_send_mail
+        assert send_mail.call_args[1]['recipients'] == ['test@test.de']
+        assert 'Reset' in send_mail.call_args[1]['subject']
+        assert send_mail.call_args[1]['args']['name'] == 'user name'
+        assert send_mail.call_args[1]['args']['reset_url'] ==\
+               'http://front.end/resetpassword/?path=%252Freset'
+
 
 @fixture()
 def integration(config):
@@ -467,5 +500,6 @@ def test_register_subscriber(registry):
     assert subscriber.autoupdate_tag_has_new_version.__name__ in handlers
     assert subscriber.user_created_and_added_subscriber.__name__ in handlers
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
+    assert subscriber.send_password_reset_mail.__name__ in handlers
 
 

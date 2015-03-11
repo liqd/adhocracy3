@@ -15,14 +15,18 @@ from zope.interface import implementer
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRolesUserLocator
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.resources.resource import resource_metadata
+from adhocracy_core.resources.resource import Base
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
@@ -83,6 +87,8 @@ class IUser(IPool):
         'Activation path for not-yet-activated accounts (str)')
     roles = Attribute('List of :term:`role`s')
     group_ids = Attribute('List of :term:`group_id`s')
+    # TODO: add `password` attribute, this may be set by the
+    # password authentication sheet
 
 
 @implementer(IUser)
@@ -140,6 +146,7 @@ def send_registration_mail(context: IUser,
     email = context.email
     activation_path = _generate_activation_path()
     context.activation_path = activation_path
+    # TODO: debug log needed? if so move to adhocracy_core.messaging
     logger.debug('Sending registration mail to %s for new user named %s, '
                  'activation path=%s', email, name, context.activation_path)
     site_name = registry.settings.get('adhocracy.site_name', 'Adhocracy')
@@ -168,6 +175,7 @@ def send_registration_mail(context: IUser,
 
 def _generate_activation_path() -> str:
     random_bytes = urandom(18)
+    # TODO: not DRY, .resources.generate_name does almost the same
     # We use '+_' as altchars since both are reliably recognized in URLs,
     # even if they occur at the end. Conversely, '-' at the end of URLs is
     # not recognized as part of the URL by some programs such as Thunderbird,
@@ -245,6 +253,35 @@ groups_metadata = service_metadata._replace(
 )
 
 
+class IPasswordReset(IResource):
+
+    """ Resource to do one user password reset. """
+
+
+@implementer(IPasswordReset)
+class PasswordReset(Base):
+
+    """ Password reset implementation."""
+
+    def reset_password(self, password):
+        """ Set `password` for creator user and commit suicide."""
+        user = get_sheet_field(self, IMetadata, 'creator')
+        password_sheet = get_sheet(
+            user, adhocracy_core.sheets.principal.IPasswordAuthentication)
+        password_sheet.set({'password': password}, send_event=False)
+        del self.__parent__[self.__name__]
+
+
+passwordreset_metadata = resource_metadata._replace(
+    iresource=IPasswordReset,
+    content_class=PasswordReset,
+    permission_add='add_password_reset',
+    permission_view='manage_password_reset',
+    basic_sheets=[adhocracy_core.sheets.metadata.IMetadata],
+    use_autonaming_random=True,
+)
+
+
 class IPasswordResetsService(IServicePool):
 
     """Service Pool for Password Resets."""
@@ -253,8 +290,9 @@ class IPasswordResetsService(IServicePool):
 passwordresets_metadata = service_metadata._replace(
     iresource=IPasswordResetsService,
     content_name='resets',
-    element_types=[],
+    element_types=[IPasswordReset],
     permission_add='add_service',
+    permission_view='manage_password_reset',
 )
 
 
@@ -368,6 +406,7 @@ def includeme(config):
     add_resource_type_to_registry(group_metadata, config)
     add_resource_type_to_registry(groups_metadata, config)
     add_resource_type_to_registry(passwordresets_metadata, config)
+    add_resource_type_to_registry(passwordreset_metadata, config)
     config.registry.registerAdapter(UserLocatorAdapter,
                                     (Interface, Interface),
                                     IRolesUserLocator)

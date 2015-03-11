@@ -78,6 +78,28 @@ def test_group_meta():
     assert meta.element_types == []
 
 
+def test_passwordresets_meta():
+    from .principal import passwordresets_metadata
+    from .principal import IPasswordResetsService
+    meta = passwordresets_metadata
+    assert meta.iresource is IPasswordResetsService
+    assert meta.permission_add == 'add_service'
+    assert meta.permission_view == "manage_password_reset"
+    assert meta.content_name == 'resets'
+
+
+def test_passwordreset_meta():
+    import adhocracy_core.sheets
+    from .principal import passwordreset_metadata
+    from .principal import IPasswordReset
+    meta = passwordreset_metadata
+    assert meta.iresource is IPasswordReset
+    assert meta.permission_add == 'add_password_reset'
+    assert meta.permission_view == 'manage_password_reset'
+    assert meta.use_autonaming_random
+    assert meta.basic_sheets == [adhocracy_core.sheets.metadata.IMetadata]
+
+
 @fixture
 def integration(config):
     config.include('pyramid_mailer.testing')
@@ -180,6 +202,52 @@ class TestPrincipalsService:
         assert principals['groups']['Group1'] is group
         assert group_sheet.get()['users'] == [user]
         assert group_sheet.get()['roles'] == ['reader']
+
+    def test_password_reset_reset_password(self, principals, registry):
+        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core.resources.principal import IPasswordReset
+        user = registry.content.create(IUser.__identifier__,
+                                       parent=principals['users'],
+                                       appstructs={})
+        reset = registry.content.create(IPasswordReset.__identifier__,
+                                        parent=principals['resets'],
+                                        creator=user)
+        old_password = user.password
+        reset.reset_password('new_password')
+        new_password = user.password
+        assert old_password != new_password
+        # FIXME websocket clients should not be notified about created reset
+        # FIXME delete reset resource after 7 days
+
+    def test_password_reset_suicide_after_reset(self, principals, registry):
+        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core.resources.principal import IPasswordReset
+        user = registry.content.create(IUser.__identifier__,
+                                       parent=principals['users'],
+                                       appstructs={})
+        reset = registry.content.create(IPasswordReset.__identifier__,
+                                        parent=principals['resets'],
+                                        creator=user)
+        reset.reset_password('new_password')
+        assert reset.__parent__ is None
+
+
+class TestPasswordResetClass:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def _make_one(self):
+        from adhocracy_core.resources.principal import PasswordReset
+        return PasswordReset()
+
+    def test_create(self):
+        from zope.interface.verify import verifyObject
+        from .principal import IPasswordReset
+        inst = self._make_one()
+        assert IPasswordReset.providedBy(inst)
+        assert verifyObject(IPasswordReset, inst)
 
 
 class TestUserClass:
