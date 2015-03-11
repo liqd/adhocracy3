@@ -23,6 +23,10 @@ export class Service {
     ) {}
 
     public getTemplate(processType : string) : angular.IPromise<string> {
+        if (!this.provider.templateFactories.hasOwnProperty(processType)) {
+            throw "No template for process type \"" + processType + "\" has been configured.";
+        }
+
         var fn = this.provider.templateFactories[processType];
         return this.$injector.invoke(fn);
     }
