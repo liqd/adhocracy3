@@ -52,7 +52,7 @@ src/pyramid_cachebust/
 /package.json
 /node_modules
 /Gruntfile.js
-src/mercator/build
+src/mercator/mercator/build
 /tmp
 /wheelhouse
 /share
