@@ -10,7 +10,6 @@ import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -60,7 +59,7 @@ export interface IFacet {
 export type IPredicateItem = string | ((string) => string);
 export type IPredicate = IPredicateItem | IPredicateItem[];
 
-export interface ListingScope<Container> extends ng.IScope {
+export interface ListingScope<Container> extends angular.IScope {
     path : string;
     contentType? : string;
     facets? : IFacet[];
@@ -74,15 +73,15 @@ export interface ListingScope<Container> extends ng.IScope {
     elements : string[];
     frontendOrderPredicate : IPredicate;
     frontendOrderReverse : boolean;
-    update : (boolean?) => ng.IPromise<void>;
+    update : (boolean?) => angular.IPromise<void>;
     wsOff : Function;
     clear : () => void;
     onCreate : () => void;
 }
 
-export interface IFacetsScope extends ng.IScope {
+export interface IFacetsScope extends angular.IScope {
     facets : IFacet[];
-    update : () => ng.IPromise<void>;
+    update : () => angular.IPromise<void>;
     enableItem : (IFacet, IFacetItem) => void;
     disableItem : (IFacet, IFacetItem) => void;
     toggleItem : (IFacet, IFacetItem, event) => void;
@@ -129,7 +128,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 });
             },
             controller: ["$filter", "$scope", "adhHttp", "adhPreliminaryNames", "adhPermissions", (
-                $filter: ng.IFilterService,
+                $filter: angular.IFilterService,
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.Service<Container>,
                 adhPreliminaryNames : AdhPreliminaryNames.Service,
@@ -139,11 +138,11 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                $scope.update = (warmup? : boolean) : ng.IPromise<void> => {
+                $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
                     var params = <any>_.extend({}, $scope.params);
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
-                        if (AdhUtil.endsWith($scope.contentType, "Version")) {
+                        if (_.endsWith($scope.contentType, "Version")) {
                             params.depth = 2;
                             params.tag = "LAST";
                         }

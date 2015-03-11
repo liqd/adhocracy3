@@ -141,7 +141,7 @@ def send_registration_mail(context: IUser,
                                     'false')):
         context.activate()
         return
-    # FIXME subject should be configurable
+    # TODO subject should be configurable
     name = context.name
     email = context.email
     activation_path = _generate_activation_path()
@@ -307,7 +307,7 @@ class UserLocatorAdapter(object):
 
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
-        # FIXME use catalog for all get_user_by_ methods
+        # TODO use catalog for all get_user_by_ methods
         users = find_service(self.context, 'principals', 'users')
         for user in users.values():
             if user.name == login:
@@ -316,7 +316,7 @@ class UserLocatorAdapter(object):
     def get_user_by_userid(self, userid: str) -> IUser:
         """Find user by :term:`userid` or return None."""
         # This method is called multiple times, so we cache the result
-        # FIXME use decorator for caching with request scope instead
+        # TODO? use decorator for caching with request scope instead
         user = getattr(self.request, '__user__' + userid, None)
         if user is None:
             try:

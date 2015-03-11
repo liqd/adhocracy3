@@ -6,26 +6,22 @@ Read :mod:`substanced.catalog.subscribers` for default reindex subscribers.
 from substanced.util import find_catalog
 
 from adhocracy_core.utils import get_visibility_change
-from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheetModified
-from adhocracy_core.interfaces import ISheetReferenceModified
-from adhocracy_core.sheets.tags import ITag
+from adhocracy_core.interfaces import ISheetBackReferenceModified
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.utils import list_resource_with_descendants
 
 
-def reindex_tagged(event):
-    """Reindex tagged Itemversions subscriber."""
-    # FIXME use ISheetBackReferenceModified subscriber instead
+def reindex_tag(event):
+    """Reindex tag index if a tag backreference is modified."""
+    # TODO: als long as we cannot reindex a single index this function
+    # does the same like reindex_rate: reindex all indexes
     adhocracy_catalog = find_catalog(event.object, 'adhocracy')
-    old_elements_set = set(event.old_appstruct['elements'])
-    new_elements_set = set(event.new_appstruct['elements'])
-    newly_tagged_or_untagged_resources = old_elements_set ^ new_elements_set
-    for tagged in newly_tagged_or_untagged_resources:
-            adhocracy_catalog.reindex_resource(tagged)
+    adhocracy_catalog.reindex_resource(event.object)
 
 
 def reindex_rate(event):
@@ -52,15 +48,12 @@ def _reindex_resource_and_descendants(resource: IResource):
 
 def includeme(config):
     """Register index subscribers."""
-    config.add_subscriber(reindex_tagged,
-                          IResourceCreatedAndAdded,
-                          isheet=ITag)
-    config.add_subscriber(reindex_tagged,
-                          IResourceSheetModified,
-                          isheet=ITag)
+    config.add_subscriber(reindex_tag,
+                          ISheetBackReferenceModified,
+                          object_iface=IVersionable)
     config.add_subscriber(reindex_visibility,
                           IResourceSheetModified,
-                          isheet=IMetadata)
+                          event_isheet=IMetadata)
     config.add_subscriber(reindex_rate,
-                          ISheetReferenceModified,
-                          isheet=IRateable)
+                          ISheetBackReferenceModified,
+                          event_isheet=IRateable)

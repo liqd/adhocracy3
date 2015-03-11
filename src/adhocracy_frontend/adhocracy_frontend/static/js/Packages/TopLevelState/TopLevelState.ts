@@ -27,6 +27,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhEventManager = require("../EventManager/EventManager");
+import AdhTracking = require("../Tracking/Tracking");
 import AdhUser = require("../User/User");
 
 var pkgLocation = "/TopLevelState";
@@ -40,7 +41,7 @@ export interface IAreaInput {
      *
      * This is the reverse of 'this.reverse'.
      */
-    route? : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    route? : (path : string, search : {[key : string] : string}) => angular.IPromise<{[key : string] : string}> | {[key : string] : string};
     /**
      * Convert (a3 top-level) state to (ng) location: Take a
      * 'TopLevelState' and return a path and a search query
@@ -60,7 +61,7 @@ export interface IAreaInput {
 
 export interface IArea {
     prefix : string;
-    route : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    route : (path : string, search : {[key : string] : string}) => angular.IPromise<{[key : string] : string}>;
     reverse : (data : {[key : string] : string}) => {
         path : string;
         search : {[key : string] : string};
@@ -94,11 +95,14 @@ export class Provider {
         };
         this.spaceDefaults = {};
 
-        this.$get = ["adhEventManagerClass", "adhUser", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
-            (adhEventManagerClass, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
-                return new Service(self, adhEventManagerClass, adhUser, $location, $rootScope, $http, $q, $injector,
-                                   $templateRequest);
-            }];
+        this.$get = [
+            "adhEventManagerClass", "adhTracking", "adhUser",
+            "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
+            (adhEventManagerClass, adhTracking, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+                return new Service(
+                    self, adhEventManagerClass, adhTracking, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest);
+            }
+        ];
     }
 
     public when(prefix : string, factory : (...args : any[]) => IAreaInput);
@@ -144,13 +148,14 @@ export class Service {
     constructor(
         private provider : Provider,
         adhEventManagerClass : typeof AdhEventManager.EventManager,
+        private adhTracking : AdhTracking.Service,
         private adhUser : AdhUser.Service,
-        private $location : ng.ILocationService,
-        private $rootScope : ng.IScope,
-        private $http : ng.IHttpService,
-        private $q : ng.IQService,
-        private $injector : ng.auto.IInjectorService,
-        private $templateRequest : ng.ITemplateRequestService
+        private $location : angular.ILocationService,
+        private $rootScope : angular.IScope,
+        private $http : angular.IHttpService,
+        private $q : angular.IQService,
+        private $injector : angular.auto.IInjectorService,
+        private $templateRequest : angular.ITemplateRequestService
     ) {
         var self : Service = this;
 
@@ -196,7 +201,9 @@ export class Service {
             var areaInput : IAreaInput = this.$injector.invoke(fn);
             var area : IArea = {
                 prefix: prefix,
-                route: typeof areaInput.route !== "undefined" ? areaInput.route.bind(areaInput) : defaultRoute,
+                route: typeof areaInput.route === "undefined" ? defaultRoute : (path, search) => {
+                    return this.$q.when(areaInput.route(path, search));
+                },
                 reverse: typeof areaInput.reverse !== "undefined" ? areaInput.reverse.bind(areaInput) : defaultReverse,
                 template: "",
                 skip: !!areaInput.skip
@@ -226,7 +233,7 @@ export class Service {
         }
     }
 
-    private fromLocation() : ng.IPromise<void> {
+    private fromLocation() : angular.IPromise<void> {
         var area = this.getArea();
         var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
@@ -350,6 +357,7 @@ export class Service {
                 this.$location.search(key2, ret.search[key2]);
             }
         }
+        this.adhTracking.trackPageView(this.$location.absUrl());
     }
 
     private _set(key : string, value) : boolean {
@@ -510,7 +518,7 @@ export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var viewFactory = (adhTopLevelState : Service, $compile : ng.ICompileService) => {
+export var viewFactory = (adhTopLevelState : Service, $compile : angular.ICompileService) => {
     return {
         restrict: "E",
         link: (scope, element) => {
@@ -542,6 +550,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEventManager.moduleName,
+            AdhTracking.moduleName,
             AdhUser.moduleName
         ])
         .provider("adhTopLevelState", Provider)

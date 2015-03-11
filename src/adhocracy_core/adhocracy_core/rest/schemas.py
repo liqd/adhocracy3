@@ -336,7 +336,7 @@ class PoolQueryDepth(colander.SchemaNode):
 @colander.deferred
 def deferred_validate_aggregateby(node: colander.MappingSchema, kw):
     """Validate if `value` is an catalog index with `unique_values`."""
-    # FIXME In the future we may have indexes where aggregateby doesn't make
+    # TODO In the future we may have indexes where aggregateby doesn't make
     # sense, e.g. username or email. We should have a blacklist to prohibit
     # calling aggregateby on such indexes.
     context = kw['context']
@@ -377,7 +377,7 @@ class GETPoolRequestSchema(colander.MappingSchema):
         # Raise if unknown to tell client the query parameters are wrong.
         self.typ.unknown = 'raise'
 
-    # FIXME For now we don't have a way to specify GET parameters that can
+    # TODO For now we don't have a way to specify GET parameters that can
     # be repeated, e.g. 'sheet=Blah&sheet=Blub'. The querystring is converted
     # by Cornice into a MultiDict (http://docs.pylonsproject.org/projects
     # /pyramid/en/master/api/interfaces.html#pyramid.interfaces.IMultiDict),

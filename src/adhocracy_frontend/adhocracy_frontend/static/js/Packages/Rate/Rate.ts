@@ -41,16 +41,16 @@ var pkgLocation = "/Rate";
  */
 
 
-export interface IRateScope extends ng.IScope {
+export interface IRateScope extends angular.IScope {
     refersTo : string;
     myRate : number;
     rates(rate : number) : number;
     optionsPostPool : AdhHttp.IOptions;
     ready : boolean;
 
-    cast(value : number) : ng.IPromise<void>;
-    uncast() : ng.IPromise<void>;
-    toggle(value : number) : ng.IPromise<void>;
+    cast(value : number) : angular.IPromise<void>;
+    uncast() : angular.IPromise<void>;
+    toggle(value : number) : angular.IPromise<void>;
 
     // not currently used in the UI
     auditTrail : { subject: string; rate: number }[];
@@ -81,7 +81,7 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
 
 
 export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
-    $q : ng.IQService,
+    $q : angular.IQService,
     adhRateEventManager : AdhEventManager.EventManager,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -100,7 +100,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
      * NOTE: This will return the first match. The backend must make sure that
      * there is never more than one rate item per subject-object pair.
      */
-    var fetchRate = (poolPath : string, object : string, subject : string) : ng.IPromise<RIRateVersion> => {
+    var fetchRate = (poolPath : string, object : string, subject : string) : angular.IPromise<RIRateVersion> => {
         var query : any = {
             content_type: RIRateVersion.content_type,
             depth: 2,
@@ -121,7 +121,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     /**
      * Promise aggregates rates of all users.
      */
-    var fetchAggregatedRates = (poolPath : string, object : string) : ng.IPromise<{[key : string]: number}> => {
+    var fetchAggregatedRates = (poolPath : string, object : string) : angular.IPromise<{[key : string]: number}> => {
         var query : any = {
             content_type: RIRateVersion.content_type,
             depth: 2,
@@ -139,7 +139,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     /**
      * Collect detailed information about poolPath specific to ratings for object.
      */
-    var fetchAuditTrail = (poolPath : string, object : string) : ng.IPromise<any> => {
+    var fetchAuditTrail = (poolPath : string, object : string) : angular.IPromise<any> => {
         var query : any = {
             content_type: RIRateVersion.content_type,
             depth: 2,
@@ -154,7 +154,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 var users : RIUser[] = [];
                 var auditTrail : { subject: string; rate: number }[] = [];
 
-                adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
+                adhHttp.withTransaction((transaction) : angular.IPromise<void> => {
                     var gets : AdhHttp.ITransactionResult[] = ratePaths.map((path) => transaction.get(path));
 
                     return transaction.commit()
@@ -164,7 +164,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                             });
                         });
                 }).then(() => {
-                    return adhHttp.withTransaction((transaction) : ng.IPromise<void> => {
+                    return adhHttp.withTransaction((transaction) : angular.IPromise<void> => {
                         var gets : AdhHttp.ITransactionResult[] = rates.map((rate) => transaction.get(adapter.subject(rate)));
 
                         return transaction.commit()
@@ -200,7 +200,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var lock : boolean;
             var storeMyRateResource : (resource : RIRateVersion) => void;
 
-            var updateMyRate = () : ng.IPromise<void> => {
+            var updateMyRate = () : angular.IPromise<void> => {
                 if (adhUser.loggedIn) {
                     return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
                         storeMyRateResource(resource);
@@ -211,19 +211,19 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
-            var updateAggregatedRates = () : ng.IPromise<void> => {
+            var updateAggregatedRates = () : angular.IPromise<void> => {
                 return fetchAggregatedRates(postPoolPath, scope.refersTo).then((r) => {
                     rates = r;
                 });
             };
 
-            var updateAuditTrail = () : ng.IPromise<void> => {
+            var updateAuditTrail = () : angular.IPromise<void> => {
                 return fetchAuditTrail(postPoolPath, scope.refersTo).then((auditTrail)  => {
                     scope.auditTrail = auditTrail;
                 });
             };
 
-            var assureUserRateExists = () : ng.IPromise<RIRateVersion> => {
+            var assureUserRateExists = () : angular.IPromise<RIRateVersion> => {
                 if (typeof myRateResource !== "undefined") {
                     return $q.when(myRateResource);
                 } else {
@@ -271,11 +271,11 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
             // NOTE: In the future we might want to delete the rate instead.
             // For now, uncasting is simply implemented by casting a "neutral" rate.
-            scope.uncast = () : ng.IPromise<void> => {
+            scope.uncast = () : angular.IPromise<void> => {
                 return scope.cast(0);
             };
 
-            scope.cast = (rate : number) : ng.IPromise<void> => {
+            scope.cast = (rate : number) : angular.IPromise<void> => {
                 if (lock) {
                     return $q.reject("locked");
                 }
@@ -312,7 +312,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
             };
 
-            scope.toggle = (rate : number) : ng.IPromise<void> => {
+            scope.toggle = (rate : number) : angular.IPromise<void> => {
                 if (rate === scope.myRate) {
                     return scope.uncast();
                 } else {

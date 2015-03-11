@@ -4,7 +4,7 @@ var shared = require("./shared.js");
 
 var EmbeddedSharePage = function() {
     this.url = "/embed/social-share";
-    this.dummyTweetButton = element(by.css(".tweet.dummy_btn"));
+    this.dummyTweetButton = element(by.css(".tweet_this_dummy"));
     this.dummyFacebookLikeButton = element(by.css(".fb_like.dummy_btn"));
 
     this.get = function() {
@@ -13,12 +13,11 @@ var EmbeddedSharePage = function() {
     }
 
     this.clickDummyTweetButton = function() {
-        this.dummyTweetButton.click();
-        browser.waitForAngular();
+        return this.dummyTweetButton.click();
     };
 
     this.getTwitterIframe = function() {
-        return this.dummyTweetButton.element(by.css("iframe"));
+        return element(by.css(".tweet.dummy_btn")).element(by.css("iframe"));
     };
 
     this.clickDummyFacebookLikeButton = function() {

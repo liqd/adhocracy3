@@ -73,7 +73,7 @@ def _assert_follows_eq_last_version(node: colander.SchemaNode, value: list,
 @colander.deferred
 def deferred_validate_follows(node: colander.SchemaNode, kw: dict) -> callable:
     """Validate lineare history for the `follows` field."""
-    # FIXME add validation for ForkableVersionables
+    # TODO add validation for ForkableVersionables
     return colander.All(validate_linear_history_no_merge,
                         validate_linear_history_no_fork,
                         )

@@ -228,25 +228,25 @@ def includeme(config):
     """Register subscribers."""
     config.add_subscriber(autoupdate_versionable_has_new_version,
                           ISheetReferenceNewVersion,
-                          interface=IItemVersion,
-                          isheet=ISheetReferenceAutoUpdateMarker)
+                          object_iface=IItemVersion,
+                          event_isheet=ISheetReferenceAutoUpdateMarker)
     config.add_subscriber(autoupdate_non_versionable_has_new_version,
                           ISheetReferenceNewVersion,
-                          interface=IPool,
-                          isheet=ISheetReferenceAutoUpdateMarker)
+                          object_iface=IPool,
+                          event_isheet=ISheetReferenceAutoUpdateMarker)
     config.add_subscriber(autoupdate_non_versionable_has_new_version,
                           ISheetReferenceNewVersion,
-                          interface=ISimple,
-                          isheet=ISheetReferenceAutoUpdateMarker)
+                          object_iface=ISimple,
+                          event_isheet=ISheetReferenceAutoUpdateMarker)
     config.add_subscriber(autoupdate_tag_has_new_version,
                           ISheetReferenceNewVersion,
-                          isheet=ITag)
+                          event_isheet=ITag)
     config.add_subscriber(user_created_and_added_subscriber,
                           IResourceCreatedAndAdded,
-                          interface=IUser)
+                          object_iface=IUser)
     config.add_subscriber(update_modification_date_modified_by,
                           IResourceSheetModified,
-                          interface=IMetadata)
+                          object_iface=IMetadata)
     config.add_subscriber(send_password_reset_mail,
                           IResourceCreatedAndAdded,
-                          interface=IPasswordReset)
+                          object_iface=IPasswordReset)

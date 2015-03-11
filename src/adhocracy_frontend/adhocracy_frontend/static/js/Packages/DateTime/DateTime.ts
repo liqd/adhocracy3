@@ -6,7 +6,7 @@ import AdhConfig = require("../Config/Config");
 /**
  * A wrapper around HTML5's <time> integrating moment.js.
  */
-export var createDirective = (config : AdhConfig.IService, moment : MomentStatic, $interval : ng.IIntervalService) => {
+export var createDirective = (config : AdhConfig.IService, moment : moment.MomentStatic, $interval : angular.IIntervalService) => {
     return {
         restrict: "E",
         template: "<time datetime=\"{{datetimeString}}\">{{text}}</time>",

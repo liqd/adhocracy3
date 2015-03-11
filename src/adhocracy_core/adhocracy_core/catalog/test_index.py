@@ -150,7 +150,7 @@ class TestReference:
     def test_apply_with_invalid_query(self):
         inst = self._make_one()
         query = {'WRONG': ''}
-        #FIXME? better error message
+        # TODO better error message explaining what could be wrong
         with raises(KeyError):
             inst.apply(query)
 

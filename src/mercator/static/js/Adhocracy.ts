@@ -47,6 +47,7 @@ import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets"
 import AdhShareSocial = require("./Packages/ShareSocial/ShareSocial");
 import AdhSticky = require("./Packages/Sticky/Sticky");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
+import AdhTracking = require("./Packages/Tracking/Tracking");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
@@ -90,7 +91,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhMercatorWorkbench.moduleName,
         AdhResourceArea.moduleName,
         AdhProposal.moduleName,
-        AdhSticky.moduleName
+        AdhSticky.moduleName,
+        AdhTracking.moduleName
     ];
 
     if (config.cachebust) {
@@ -132,9 +134,15 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         $locationProvider.html5Mode(true);
     }]);
     app.config(["$translateProvider", ($translateProvider) => {
-        $translateProvider.useStaticFilesLoader({
-            prefix: "/static/i18n/",
-            suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+         $translateProvider.useStaticFilesLoader({
+            files: [{
+                prefix: "/static/i18n/",
+                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+            }, {
+                prefix: "/static/i18n/countries_",
+                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+            }
+            ]
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
@@ -178,6 +186,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhShareSocial.register(angular);
     AdhSticky.register(angular);
     AdhTopLevelState.register(angular);
+    AdhTracking.register(angular);
     AdhUser.register(angular);
     AdhUserViews.register(angular);
     AdhWebSocket.register(angular);

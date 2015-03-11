@@ -145,7 +145,7 @@ class FilteringPoolSheet(PoolSheet):
         sort_index = system_catalog.get(sort_filter, None) \
             or adhocracy_catalog.get(sort_filter, None)
         if sort_index is not None:
-            # FIXME: We should assert the IIndexSort interfaces here, but
+            # TODO: We should assert the IIndexSort interfaces here, but
             # hypation.field.FieldIndex is missing this interfaces.
             assert 'sort' in sort_index.__dir__()
             elements = elements.sort(sort_index)

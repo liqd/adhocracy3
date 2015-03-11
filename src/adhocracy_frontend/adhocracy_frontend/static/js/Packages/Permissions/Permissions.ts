@@ -13,8 +13,8 @@ export class Service {
      * all-falses in order to avoid exceptions when scope.key is
      * accessed in javascript code (rather than ng templates).
      */
-    public bindScope(scope : ng.IScope, path : Function, key?) : void;
-    public bindScope(scope : ng.IScope, path : string, key?) : void;
+    public bindScope(scope : angular.IScope, path : Function, key?) : void;
+    public bindScope(scope : angular.IScope, path : string, key?) : void;
     public bindScope(scope, path, key = "options") {
         var self : Service = this;
 

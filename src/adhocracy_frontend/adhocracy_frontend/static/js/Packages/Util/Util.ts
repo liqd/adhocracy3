@@ -3,18 +3,6 @@
 import _ = require("lodash");
 
 
-/**
- * isArrayMember could be inlined, but is not for two reasons: (1)
- * even though js developers are used to it, the inlined idiom is just
- * weird; (2) the test suite documents what can and cannot be done
- * with it.
- */
-export function isArrayMember(member : any, array : any[]) : boolean {
-    "use strict";
-    return array.indexOf(member) > -1;
-}
-
-
 export function deepPluck(base, keys : string[]) : any {
     "use strict";
     return _.reduce(keys, (obj, key) => {
@@ -163,23 +151,11 @@ export function sortDagTopologically(dag : IDag<any>, sources : string[]) : any[
 
 
 /**
- * String ending comparison from http://stackoverflow.com/a/2548133/201743
- *
- * Could also be done with underscore.string.
- */
-export function endsWith(str, suffix) {
-    "use strict";
-
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
-}
-
-
-/**
  * Very much like $q.all().
  *
  * The only real difference is that it skips rejected promises instead of rejecting the whole result.
  */
-export var qFilter = (promises : ng.IPromise<any>[], $q : ng.IQService) : ng.IPromise<any[]> => {
+export var qFilter = (promises : angular.IPromise<any>[], $q : angular.IQService) : angular.IPromise<any[]> => {
     // unique marker
     var empty = new Object();
 
@@ -191,7 +167,7 @@ export var qFilter = (promises : ng.IPromise<any>[], $q : ng.IQService) : ng.IPr
     if (count === 0) {
         deferred.resolve(results);
     } else {
-        _.forEach(promises, (promise : ng.IPromise<any>, i : number) => {
+        _.forEach(promises, (promise : angular.IPromise<any>, i : number) => {
             results.push(empty);
 
             promise

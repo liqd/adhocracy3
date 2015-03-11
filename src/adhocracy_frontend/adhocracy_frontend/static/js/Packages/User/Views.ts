@@ -23,7 +23,7 @@ export interface IScopeLogin {
 
     resetCredentials : () => void;
     cancel : () => void;
-    logIn : () => ng.IPromise<void>;
+    logIn : () => angular.IPromise<void>;
 }
 
 
@@ -40,7 +40,7 @@ export interface IScopeRegister {
     supportEmail : string;
     success : boolean;
 
-    register : () => ng.IPromise<void>;
+    register : () => angular.IPromise<void>;
     cancel : () => void;
 }
 
@@ -64,7 +64,7 @@ export var activateController = (
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhDone,
-    $location : ng.ILocationService
+    $location : angular.ILocationService
 ) : void => {
     var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
@@ -155,12 +155,81 @@ export var registerDirective = (
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
 
-            scope.register = () : ng.IPromise<void> => {
+            scope.register = () : angular.IPromise<void> => {
                 return adhUser.register(scope.input.username, scope.input.email, scope.input.password, scope.input.passwordRepeat)
                     .then((response) => {
                         scope.errors = [];
                         scope.success = true;
                     }, (errors) => bindServerErrors(scope, errors));
+            };
+        }
+    };
+};
+
+export var passwordResetDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/PasswordReset.html",
+        scope: {},
+        link: (scope) => {
+            scope.input = {
+                password: "",
+                passwordRepeat: ""
+            };
+
+            scope.cancel = () => {
+                 adhTopLevelState.redirectToCameFrom("/");
+            };
+
+            scope.errors = [];
+
+            scope.passwordReset = () => {
+                return adhHttp.postRaw(adhConfig.rest_url + "/password_reset", {
+                    path: adhTopLevelState.get("path"),
+                    password: scope.input.password
+                }).then(() => {
+                    // FIXME: automatically log in
+                    adhTopLevelState.redirectToCameFrom("/login");
+                }, AdhHttp.logBackendError)
+                .catch((errors) => bindServerErrors(scope, errors));
+            };
+        }
+    };
+};
+
+export var createPasswordResetDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/CreatePasswordReset.html",
+        scope: {},
+        link: (scope) => {
+            scope.success = false;
+
+            scope.input = {
+                email: ""
+            };
+
+            scope.cancel = () => {
+                 adhTopLevelState.redirectToCameFrom("/");
+            };
+
+            scope.errors = [];
+
+            scope.submit = () => {
+                return adhHttp.postRaw(adhConfig.rest_url + "/create_password_reset", {
+                    email: scope.input.email
+                }).then(() => {
+                    scope.success = true;
+                }, AdhHttp.logBackendError)
+                .catch((errors) => bindServerErrors(scope, errors));
             };
         }
     };
@@ -343,6 +412,24 @@ export var register = (angular) => {
                         templateUrl: "/static/js/templates/Login.html"
                     };
                 })
+                .when("password_reset", () : AdhTopLevelState.IAreaInput => {
+                    return {
+                        templateUrl: "/static/js/templates/PasswordReset.html",
+                        reverse: (data) => {
+                            return {
+                                path: data["_path"],
+                                search: {
+                                    path: data["path"]
+                                }
+                            };
+                        }
+                    };
+                })
+                .when("create_password_reset", () : AdhTopLevelState.IAreaInput => {
+                    return {
+                        templateUrl: "/static/js/templates/CreatePasswordReset.html"
+                    };
+                })
                 .when("register", () : AdhTopLevelState.IAreaInput => {
                     return {
                         templateUrl: "/static/js/templates/Register.html"
@@ -369,6 +456,8 @@ export var register = (angular) => {
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", loginDirective])
+        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", passwordResetDirective])
+        .directive("adhCreatePasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])

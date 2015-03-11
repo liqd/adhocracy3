@@ -28,13 +28,9 @@ def event(context):
 
 
 def test_reindex_tagged_with_removed_and_added_elements(event, catalog):
-    from .subscriber import reindex_tagged
-    added = testing.DummyResource()
-    removed = testing.DummyResource()
-    event.old_appstruct = {'elements': [removed]}
-    event.new_appstruct = {'elements': [added]}
-    reindex_tagged(event)
-    assert catalog['adhocracy'].reindex_resource.call_count == 2
+    from .subscriber import reindex_tag
+    reindex_tag(event)
+    assert catalog['adhocracy'].reindex_resource.call_count == 1
 
 
 def test_reindex_rate_index(event, catalog):
@@ -141,7 +137,7 @@ def integration(config):
 def test_register_subscriber(registry):
     from adhocracy_core.catalog import subscriber
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-    assert subscriber.reindex_tagged.__name__ in handlers
+    assert subscriber.reindex_tag.__name__ in handlers
     assert subscriber.reindex_visibility.__name__ in handlers
     assert subscriber.reindex_rate.__name__ in handlers
 

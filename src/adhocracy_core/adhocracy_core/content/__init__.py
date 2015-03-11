@@ -236,10 +236,7 @@ class ResourceContentRegistry(ContentRegistry):
 
 
 def includeme(config):  # pragma: no cover
-    """Run pyramid config."""
     """Add content registry, register substanced content_type decorators."""
     config.registry.content = ResourceContentRegistry(config.registry)
     config.add_directive('add_content_type', add_content_type)
     config.add_directive('add_service_type', add_service_type)
-    # FIXME we cannot add the substanced view_predicate `content_type` here,
-    # this conflicts with _:class:`cornice.ContentTypePredicate`

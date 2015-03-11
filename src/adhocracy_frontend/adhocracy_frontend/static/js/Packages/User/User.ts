@@ -1,9 +1,12 @@
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhCache = require("../Http/Cache");
 import AdhLocale = require("../Locale/Locale");
+import AdhTracking = require("../Tracking/Tracking");
 
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
@@ -21,7 +24,7 @@ export interface IRegisterResponse {}
 
 export class Service {
     public loggedIn : boolean;
-    public ready : ng.IPromise<any>;
+    public ready : angular.IPromise<any>;
     public data : IUserBasic;
     public token : string;
     public userPath : string;
@@ -30,11 +33,12 @@ export class Service {
         private adhConfig : AdhConfig.IService,
         private adhHttp : AdhHttp.Service<any>,
         private adhCache : AdhCache.Service,
-        private $q : ng.IQService,
-        private $http : ng.IHttpService,
-        private $rootScope : ng.IScope,
+        private adhTracking : AdhTracking.Service,
+        private $q : angular.IQService,
+        private $http : angular.IHttpService,
+        private $rootScope : angular.IScope,
         private $window : Window,
-        private angular : ng.IAngularStatic,
+        private ng : typeof angular,
         private Modernizr
     ) {
         var _self : Service = this;
@@ -49,7 +53,7 @@ export class Service {
         }));
 
         if (_self.Modernizr.localstorage) {
-            var win = _self.angular.element(_self.$window);
+            var win = _self.ng.element(_self.$window);
             win.on("storage", (event) => {
                 var storageEvent = <any>event.originalEvent;
                 if (storageEvent.key === "user-session") {
@@ -63,7 +67,7 @@ export class Service {
         }
     }
 
-    private updateSessionFromStorage(sessionValue) : ng.IPromise<boolean> {
+    private updateSessionFromStorage(sessionValue) : angular.IPromise<boolean> {
         var _self : Service = this;
 
         var deferred = _self.$q.defer();
@@ -119,18 +123,20 @@ export class Service {
             });
     }
 
-    private enableToken(token : string, userPath : string) : ng.IPromise<void> {
+    private enableToken(token : string, userPath : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         _self.token = token;
         _self.userPath = userPath;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.$http.defaults.headers.common["X-User-Path"] = userPath;
+        _self.adhTracking.setLoginState(true);
+        _self.adhTracking.setUserId(userPath);
 
         return _self.loadUser(userPath);
     }
 
-    private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
+    private storeAndEnableToken(token : string, userPath : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
@@ -157,11 +163,13 @@ export class Service {
         _self.userPath = undefined;
         _self.data = undefined;
         _self.loggedIn = false;
+        _self.adhTracking.setLoginState(false);
+        _self.adhTracking.setUserId(null);
 
         _self.adhCache.invalidateAll();
     }
 
-    public logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
+    public logIn(nameOrEmail : string, password : string) : angular.IPromise<void> {
         var _self : Service = this;
         var promise;
 
@@ -192,7 +200,7 @@ export class Service {
         _self.deleteToken();
     }
 
-    public register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
+    public register(username : string, email : string, password : string, passwordRepeat : string) : angular.IPromise<IRegisterResponse> {
         var _self : Service = this;
 
         var resource = {
@@ -212,7 +220,7 @@ export class Service {
         return _self.adhHttp.post("/principals/users/", resource);
     }
 
-    public activate(path : string) : ng.IPromise<void> {
+    public activate(path : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         var success = (response) => {
@@ -233,5 +241,7 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhLocale.moduleName,
         ])
-        .service("adhUser", ["adhConfig", "adhHttp", "adhCache", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
+        .service("adhUser", [
+            "adhConfig", "adhHttp", "adhCache", "adhTracking",
+            "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service]);
 };

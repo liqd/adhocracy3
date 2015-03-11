@@ -15,6 +15,7 @@ export var register = () => {
             var rootScopeMock;
             var injectorMock;
             var providerMock;
+            var adhTrackingMock;
             var trigger;
             var off;
             var on;
@@ -25,12 +26,14 @@ export var register = () => {
                 on = jasmine.createSpy("on");
                 off = jasmine.createSpy("off");
                 trigger = jasmine.createSpy("trigger");
-                locationMock = jasmine.createSpyObj("locationMock", ["url", "search", "path", "replace"]);
+                locationMock = jasmine.createSpyObj("locationMock", ["absUrl", "url", "search", "path", "replace"]);
                 rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
 
                 providerMock = jasmine.createSpyObj("providerMock", ["getArea", "getSpaceDefaults"]);
                 providerMock.getArea.and.callThrough();
                 providerMock.getSpaceDefaults.and.callThrough();
+
+                adhTrackingMock = jasmine.createSpyObj("adhTrackingMock", ["trackPageView", "setUserId"]);
 
                 injectorMock = jasmine.createSpyObj("injectorMock", ["invoke"]);
                 injectorMock.invoke.and.returnValue(areaInput);
@@ -42,7 +45,8 @@ export var register = () => {
                 };
 
                 adhTopLevelState = <any>new AdhTopLevelState.Service(
-                    providerMock, eventManagerMockClass, null, locationMock, rootScopeMock, null, <any>q, injectorMock, null);
+                    providerMock, eventManagerMockClass, adhTrackingMock, null,
+                    locationMock, rootScopeMock, null, <any>q, injectorMock, null);
 
                 spyOn(adhTopLevelState, "toLocation");
 

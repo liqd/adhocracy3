@@ -45,6 +45,14 @@ def config_view(request):
     config['cachebust'] = asbool(settings.get('cachebust.enabled', 'false'))
     config['cachebust_suffix'] = cachebust_query_params(request)
     config['terms_url'] = settings.get('adhocracy.frontend.terms_url')
+    config['piwik_enabled'] = asbool(settings.get(
+        'adhocracy.frontend.piwik_enabled', 'false'))
+    config['piwik_host'] = settings.get('adhocracy.frontend.piwik_host')
+    config['piwik_site_id'] = settings.get('adhocracy.frontend.piwik_site_id')
+    config['piwik_use_cookies'] = asbool(settings.get(
+        'adhocracy.frontend.piwik_use_cookies', 'false'))
+    config['piwik_track_user_id'] = asbool(settings.get(
+        'adhocracy.frontend.piwik_track_user_id', 'false'))
     return config
 
 
@@ -132,6 +140,9 @@ def includeme(config):
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')
+    add_frontend_route(config, 'password_reset', 'password_reset')
+    add_frontend_route(config, 'create_password_reset',
+                       'create_password_reset')
     add_frontend_route(config, 'activate', 'activate/{key}')
     add_frontend_route(config, 'activation_error', 'activation_error')
     add_frontend_route(config, 'root', '')

@@ -10,10 +10,10 @@ export interface Dict {
 }
 
 
-export class Provider implements ng.IServiceProvider {
+export class Provider implements angular.IServiceProvider {
     public $get;
     public defaults : {[key : string]: Dict};
-    public specifics : {[key : string]: (resource) => any};  // values return either Dict or ng.IPromise<Dict>
+    public specifics : {[key : string]: (resource) => any};  // values return either Dict or angular.IPromise<Dict>
 
     constructor() {
         var self = this;
@@ -92,8 +92,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
     constructor(
         private provider : Provider,
-        private $q : ng.IQService,
-        private $injector : ng.auto.IInjectorService,
+        private $q : angular.IQService,
+        private $injector : angular.auto.IInjectorService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService
     ) {}
@@ -102,7 +102,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return <Dict>_.extend({}, this.provider.defaults[resourceType + "@" + view]);
     }
 
-    private getSpecifics(resource, view : string) : ng.IPromise<Dict> {
+    private getSpecifics(resource, view : string) : angular.IPromise<Dict> {
         var key = resource.content_type + "@" + view;
         var specifics;
 
@@ -119,7 +119,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
             .then((data : Dict) => _.clone(data));
     }
 
-    public route(path : string, search : Dict) : ng.IPromise<Dict> {
+    public route(path : string, search : Dict) : angular.IPromise<Dict> {
         var self : Service = this;
         var segs : string[] = path.replace(/\/+$/, "").split("/");
 

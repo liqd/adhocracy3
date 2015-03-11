@@ -11,7 +11,6 @@ var hasClass = function (element, cls) {
     });
 };
 
-
 module.exports = {
     restUrl: restUrl,
     register: UserPages.register,

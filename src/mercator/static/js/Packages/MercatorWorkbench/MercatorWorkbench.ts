@@ -92,7 +92,7 @@ export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service
 export var mercatorProposalCreateColumnDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
-    $location : ng.ILocationService
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
@@ -130,7 +130,7 @@ export var mercatorProposalDetailColumnDirective = (
 export var mercatorProposalEditColumnDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
-    $location : ng.ILocationService
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
@@ -232,12 +232,12 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RICommentVersion.content_type, "", ["adhHttp", "$q", (adhHttp : AdhHttp.Service<any>, $q : ng.IQService) =>
+                .specific(RICommentVersion.content_type, "", ["adhHttp", "$q", (adhHttp : AdhHttp.Service<any>, $q : angular.IQService) =>
                                                               (resource : RICommentVersion) => {
                     var specifics = {};
                     specifics["commentUrl"] = resource.path;
 
-                    var getCommentableUrl = (resource) : ng.IPromise<any> => {
+                    var getCommentableUrl = (resource) : angular.IPromise<any> => {
                         if (resource.content_type !== RICommentVersion.content_type) {
                             return $q.when(resource);
                         } else {

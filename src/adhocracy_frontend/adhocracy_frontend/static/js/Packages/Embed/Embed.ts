@@ -6,23 +6,6 @@ import AdhConfig = require("../Config/Config");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
-/**
- * List of directive names that can be embedded.  names must be in
- * lower-case with dashes, but without 'adh-' prefix.  (example:
- * 'document-workbench' for directive DocumentWorkbench.)
- */
-var embeddableDirectives = [
-    "document-workbench",
-    "paragraph-version-detail",
-    "comment-listing",
-    "create-or-show-comment-listing",
-    "login",
-    "register",
-    "user-indicator",
-    "empty",
-    "social-share"
-];
-
 var metaParams = [
     "autoresize",
     "locale",
@@ -30,28 +13,68 @@ var metaParams = [
     "noheader"
 ];
 
-export var location2template = ($location : ng.ILocationService) => {
-    var widget : string = $location.path().split("/")[2];
-    var search = $location.search();
+export class Provider {
+    public embeddableDirectives : string[];
+    public $get;
 
-    var attrs = [];
-    if (!AdhUtil.isArrayMember(widget, embeddableDirectives)) {
-        throw "unknown widget: " + widget;
+    /**
+     * List of directive names that can be embedded.  names must be in
+     * lower-case with dashes, but without 'adh-' prefix.  (example:
+     * 'document-workbench' for directive DocumentWorkbench.)
+     */
+    constructor() {
+        this.embeddableDirectives = [
+            "document-workbench",
+            "paragraph-version-detail",
+            "comment-listing",
+            "create-or-show-comment-listing",
+            "login",
+            "register",
+            "user-indicator",
+            "empty"
+        ];
+
+        this.$get = () => new Service(this);
     }
 
-    if (widget === "empty") {
-        return "";
-    }
-    for (var key in search) {
-        if (search.hasOwnProperty(key) && metaParams.indexOf(key) === -1) {
-            attrs.push(AdhUtil.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(search[key])));
+    public registerEmbeddableDirectives(directives : string[]) : void {
+        for (var i = 0; i < directives.length; i++) {
+            var directive = directives[i];
+            // FIXME DefinitelyTyped
+            if (!(<any>_).includes(this.embeddableDirectives, directive)) {
+                this.embeddableDirectives.push(directive);
+            }
         }
     }
-    return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(widget), attrs.join(" "));
-};
+}
+
+export class Service {
+    constructor(private provider : Provider) {}
+
+    public location2template($location : angular.ILocationService) {
+        var widget : string = $location.path().split("/")[2];
+        var search = $location.search();
+
+        var attrs = [];
+        // FIXME DefinitelyTyped
+        if (!(<any>_).includes(this.provider.embeddableDirectives, widget)) {
+            throw "unknown widget: " + widget;
+        }
+
+        if (widget === "empty") {
+            return "";
+        }
+        for (var key in search) {
+            if (search.hasOwnProperty(key) && metaParams.indexOf(key) === -1) {
+                attrs.push(AdhUtil.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(search[key])));
+            }
+        }
+        return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(widget), attrs.join(" "));
+    }
+}
 
 
-export var normalizeInternalUrl = (url : string, $location : ng.ILocationService) => {
+export var normalizeInternalUrl = (url : string, $location : angular.ILocationService) => {
     var host = $location.protocol() + "://" + $location.host();
     var port = $location.port();
     if (port && (port !== 80) && (port !== 443)) {
@@ -64,7 +87,7 @@ export var normalizeInternalUrl = (url : string, $location : ng.ILocationService
 };
 
 
-export var isInternalUrl = (url : string, $location : ng.ILocationService) => {
+export var isInternalUrl = (url : string, $location : angular.ILocationService) => {
     return normalizeInternalUrl(url, $location)[0] === "/";
 };
 
@@ -117,9 +140,12 @@ export var register = (angular) => {
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
-                .when("embed", ["$location", ($location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
+                .when("embed", ["$location", "adhEmbed", (
+                    $location : angular.ILocationService,
+                    adhEmbed : Service
+                ) : AdhTopLevelState.IAreaInput => {
                     var params = $location.search();
-                    var template = location2template($location);
+                    var template = adhEmbed.location2template($location);
 
                     if (!params.hasOwnProperty("nocenter")) {
                         template = "<div class=\"l-center\">" + template + "</div>";
@@ -147,6 +173,7 @@ export var register = (angular) => {
             }
             adhConfig.locale = params.locale;
         }])
+        .provider("adhEmbed", Provider)
         .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective])
         .filter("adhCanonicalUrl", ["adhConfig", canonicalUrl]);
 };

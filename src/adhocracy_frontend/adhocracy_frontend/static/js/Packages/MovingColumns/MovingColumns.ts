@@ -155,7 +155,7 @@ export var movingColumns = (
  * -   sidebar
  * -   overlays
  */
-export interface IMovingColumnScope extends ng.IScope {
+export interface IMovingColumnScope extends angular.IScope {
     // the controller with interfaces for alerts, overlays, ...
     ctrl : MovingColumnController;
 
@@ -176,7 +176,7 @@ export interface IMovingColumnScope extends ng.IScope {
 export class MovingColumnController {
     private lastId : number;
 
-    constructor(protected $timeout : ng.ITimeoutService, public $scope : IMovingColumnScope) {
+    constructor(protected $timeout : angular.ITimeoutService, public $scope : IMovingColumnScope) {
         $scope.ctrl = this;
         $scope._alerts = {};
         $scope.shared = {};
@@ -237,8 +237,8 @@ export class MovingColumnController {
         this.$scope._showSidebar = condition;
     }
 
-    public $broadcast(...args : any[]) {
-        return this.$scope.$broadcast.apply(this.$scope, args);
+    public $broadcast(name : string, ...args : any[]) {
+        return this.$scope.$broadcast.apply(this.$scope, arguments);
     }
 }
 
