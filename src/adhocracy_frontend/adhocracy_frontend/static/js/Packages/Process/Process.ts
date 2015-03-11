@@ -37,10 +37,12 @@ export var processViewDirective = (
         restrict: "E",
         link: (scope, element) => {
             adhTopLevelState.on("processType", (processType) => {
-                adhProcess.getTemplate(processType).then((template) => {
-                    element.html(template);
-                    $compile(element.contents())(scope);
-                });
+                if (typeof processType !== "undefined") {
+                    adhProcess.getTemplate(processType).then((template) => {
+                        element.html(template);
+                        $compile(element.contents())(scope);
+                    });
+                }
             });
         }
     };
