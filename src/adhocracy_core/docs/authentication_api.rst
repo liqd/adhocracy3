@@ -399,7 +399,7 @@ The frontend sends an email to the create password reset end point
 On Success the backend sends an email with the link to reset the password to
 the user. The link contains the path to identify the password reset request::
 
-    http://frontend_url/resetpassword/?path=/1318...
+    http://frontend_url/password_reset/?path=/1318...
 
 If the user clicks on this link, the frontend has to send a post request with the
 new password to the reset password end point::

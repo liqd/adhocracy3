@@ -472,7 +472,7 @@ class TestSendPasswordResetMail:
         assert 'Reset' in send_mail.call_args[1]['subject']
         assert send_mail.call_args[1]['args']['name'] == 'user name'
         assert send_mail.call_args[1]['args']['reset_url'] ==\
-               'http://front.end/resetpassword/?path=%252Freset'
+               'http://front.end/password_reset/?path=%252Freset'
 
 
 @fixture()

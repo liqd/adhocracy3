@@ -202,8 +202,8 @@ def send_password_reset_mail(event):
     frontend_url = event.registry.settings.get('adhocracy.frontend_url', '')
     path = resource_path(event.object)
     path_quoted = quote(path, safe='')
-    args = {'reset_url': '{0}/resetpassword/?path={1}'.format(frontend_url,
-                                                              path_quoted),
+    args = {'reset_url': '{0}/password_reset/?path={1}'.format(frontend_url,
+                                                               path_quoted),
             'name': user.name,
             'site_name': site_name,
             }
