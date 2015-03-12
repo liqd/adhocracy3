@@ -110,8 +110,8 @@ describe("user password reset", function() {
 
             // After changing the password the user is redirected to the login page
             var login_page = new UserPages.LoginPage();
-            expect(UserPages.isLoggedIn());
             login_page.login(UserPages.annotatorEmail, 'new password');
+            expect(UserPages.isLoggedIn()).toBe(true);
         });
     });
 });
