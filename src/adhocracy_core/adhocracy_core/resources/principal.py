@@ -264,7 +264,7 @@ class PasswordReset(Base):
     """ Password reset implementation."""
 
     def reset_password(self, password):
-        """ Set `password` for creator user and commit suicide."""
+        """ Set `password` for creator user and delete itself."""
         user = get_sheet_field(self, IMetadata, 'creator')
         password_sheet = get_sheet(
             user, adhocracy_core.sheets.principal.IPasswordAuthentication)
