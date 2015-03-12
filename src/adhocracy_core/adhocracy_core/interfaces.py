@@ -297,6 +297,7 @@ class IPool(IResource):  # pragma: no cover
 
         This is a shortcut for :func:`substanced.service.find_service`.
         """
+    # TODO remove find_service, substanced.util.find_service does the same
 
 
 class IServicePool(IPool, IService):

@@ -117,8 +117,9 @@ def integration(config):
 
 
 @fixture
-def principals(context, registry):
+def principals(pool_graph, registry):
     from adhocracy_core.resources.principal import IPrincipalsService
+    context = pool_graph
     inst = registry.content.create(IPrincipalsService.__identifier__,
                                    parent=context)
     return inst
@@ -126,10 +127,6 @@ def principals(context, registry):
 
 @mark.usefixtures('integration')
 class TestPrincipalsService:
-
-    @fixture
-    def context(self, pool_graph):
-        return pool_graph
 
     def test_create_principals(self, principals):
         from adhocracy_core.resources.principal import IPrincipalsService
@@ -144,8 +141,9 @@ class TestPrincipalsService:
         assert IGroupsService.providedBy(principals['groups'])
         assert IPasswordResetsService.providedBy(principals['resets'])
 
-    def test_register_services(self, principals, context):
+    def test_register_services(self, principals):
         from substanced.util import find_service
+        context = principals.__parent__
         assert find_service(context, 'principals', 'users')
         assert find_service(context, 'principals', 'groups')
         assert find_service(context, 'principals', 'resets')
@@ -153,10 +151,6 @@ class TestPrincipalsService:
 
 @mark.usefixtures('integration')
 class TestUser:
-
-    @fixture
-    def context(self, pool_graph):
-        return pool_graph
 
     def test_create_user(self, registry):
         from adhocracy_core.resources.principal import IUser
@@ -187,10 +181,6 @@ class TestUser:
 
 @mark.usefixtures('integration')
 class TestGroup:
-
-    @fixture
-    def context(self, pool_graph):
-        return pool_graph
 
     def test_create_group(self, registry):
         from adhocracy_core.resources.principal import IGroup
@@ -223,10 +213,6 @@ class TestGroup:
 
 @mark.usefixtures('integration')
 class TestPasswordReset:
-
-    @fixture
-    def context(self, pool_graph):
-        return pool_graph
 
     def test_password_reset_reset_password(self, principals, registry):
         from adhocracy_core.resources.principal import IUser
