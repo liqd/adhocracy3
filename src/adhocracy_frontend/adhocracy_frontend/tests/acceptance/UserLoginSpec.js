@@ -63,7 +63,7 @@ describe("user login", function() {
 });
 
 describe("user password reset", function() {
-    it("get email if email-adress exists", function() {
+    it("email is sent to user", function() {
         var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
 
         var page = new UserPages.ResetPasswordCreatePage().get();
@@ -77,13 +77,13 @@ describe("user password reset", function() {
         });
     });
 
-    it("get error if email-adress does not exists", function() {
+    it("error displayed if the email is not associated to an user", function() {
         var page = new UserPages.ResetPasswordCreatePage().get();
         page.fill("abc@xy.de");
         expect(element(by.css(".form-error")).getText()).toContain("No user");
     });
 
-    it("get link from email to reset password", function(){
+    it("recover access with the link contained in the email", function(){
         var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
 
         var page = new UserPages.ResetPasswordCreatePage().get();
