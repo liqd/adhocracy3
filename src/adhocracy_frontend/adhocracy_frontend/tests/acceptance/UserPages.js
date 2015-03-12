@@ -25,6 +25,7 @@ var LoginPage = function() {
         this.passwordInput.sendKeys(password);
         this.submitButton.click();
         browser.waitForAngular();
+
     };
 };
 
@@ -59,7 +60,6 @@ var ResetPasswordPage = function() {
         this.password.sendKeys(password);
         this.passwordRepeat.sendKeys(password);
         this.submitButton.click();
-        browser.waitForAngular();
     }
 }
 
