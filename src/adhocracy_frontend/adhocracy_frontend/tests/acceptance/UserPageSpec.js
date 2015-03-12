@@ -5,7 +5,6 @@ var UserPages = require("./UserPages.js");
 var fs = require("fs");
 var exec = require("sync-exec");
 var EC = protractor.ExpectedConditions;
-var MailParser = require("mailparser").MailParser;
 var _ = require("lodash");
 
 describe("user page", function() {
@@ -57,18 +56,14 @@ describe("user page", function() {
             expect(newMails.length).toEqual(1);
 
             var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
-            var mailparser = new MailParser();
 
-            mailparser.on("end", function(mail) {
+            shared.parseEmail(mailpath, function(mail) {
                 // console.log('mail', mail);
                 expect(mail.text).toContain(content);
                 expect(mail.subject).toContain(subject);
                 expect(mail.from[0].address).toContain("contributor");
                 expect(mail.to[0].address).toContain("annotator");
             });
-
-            mailparser.write(fs.readFileSync(mailpath));
-            mailparser.end();
         });
     });
 });

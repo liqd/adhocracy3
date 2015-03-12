@@ -2,9 +2,8 @@
 
 var UserPages = require("./UserPages.js");
 var fs = require("fs");
-var MailParser = require("mailparser").MailParser;
 var _ = require("lodash");
-
+var shared = require("./shared");
 
 describe("user registration", function() {
     xit("can register - broken due to issue #583 (duplicate tpc_begin)", function() {
@@ -84,27 +83,23 @@ describe("user password reset", function() {
 
     it("recover access with the link contained in the email", function(){
         var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
-
         var page = new UserPages.ResetPasswordCreatePage().get();
+        var reset_url = "";
+
         page.fill(UserPages.annotatorEmail);
+
         var flow = browser.controlFlow();
-        var reset_url = ""
         flow.execute(function() {
             var mailsAfterMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
             var newMails = _.difference(mailsAfterMessaging, mailsBeforeMessaging);
             var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
 
-            var mailparser = new MailParser();
-
-            mailparser.on("end", function(mail) {
+            shared.parseEmail(mailpath, function(mail) {
+                // console.log('email=', mail);
                 expect(mail.subject).toContain("Reset Password");
                 expect(mail.to[0].address).toContain("annotator");
                 reset_url = mail.text.split("\n\n")[4];
-
             });
-
-            mailparser.write(fs.readFileSync(mailpath));
-            mailparser.end();
         });
 
         browser.driver.wait(function() {
@@ -113,7 +108,7 @@ describe("user password reset", function() {
             var reset_page = new UserPages.ResetPasswordPage().get(reset_url);
             reset_page.fill('password');
 
-            //After changing the password the user is redirected to the login page
+            // After changing the password the user is redirected to the login page
             var login_page = new UserPages.LoginPage();
             login_page.login(UserPages.annotatorEmail,'password');
             expect(UserPages.isLoggedIn());
