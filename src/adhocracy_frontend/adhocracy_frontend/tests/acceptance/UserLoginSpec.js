@@ -1,6 +1,10 @@
 "use strict";
 
 var UserPages = require("./UserPages.js");
+var UserPages = require("./UserPages.js");
+var fs = require("fs");
+var MailParser = require("mailparser").MailParser;
+var _ = require("lodash");
 
 
 describe("user registration", function() {
@@ -55,5 +59,65 @@ describe("user login", function() {
         page.passwordInput.sendKeys("abc");
         page.submitButton.click();
         expect(element(by.css(".form-error")).getText()).toContain("Short");
+    });
+});
+
+describe("user password reset", function() {
+    it("get email if email-adress exists", function() {
+        var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
+
+        var page = new UserPages.ResetPasswordCreatePage().get();
+        page.fill(UserPages.annotatorEmail);
+        expect(element(by.css(".login-success")).getText()).toContain("SPAM");
+
+        var flow = browser.controlFlow();
+        flow.execute(function() {
+            var mailsAfterMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
+            expect(mailsAfterMessaging.length).toEqual(mailsBeforeMessaging.length + 1);
+        });
+    });
+
+    it("get error if email-adress does not exists", function() {
+        var page = new UserPages.ResetPasswordCreatePage().get();
+        page.fill("abc@xy.de");
+        expect(element(by.css(".form-error")).getText()).toContain("No user");
+    });
+
+    it("get link from email to reset password", function(){
+        var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
+
+        var page = new UserPages.ResetPasswordCreatePage().get();
+        page.fill(UserPages.annotatorEmail);
+        var flow = browser.controlFlow();
+        var reset_url = ""
+        flow.execute(function() {
+            var mailsAfterMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
+            var newMails = _.difference(mailsAfterMessaging, mailsBeforeMessaging);
+            var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
+
+            var mailparser = new MailParser();
+
+            mailparser.on("end", function(mail) {
+                expect(mail.subject).toContain("Reset Password");
+                expect(mail.to[0].address).toContain("annotator");
+                reset_url = mail.text.split("\n\n")[4];
+
+            });
+
+            mailparser.write(fs.readFileSync(mailpath));
+            mailparser.end();
+        });
+
+        browser.driver.wait(function() {
+            return reset_url != "";
+        }).then(function() {
+            var reset_page = new UserPages.ResetPasswordPage().get(reset_url);
+            reset_page.fill('password');
+
+            //After changing the password the user is redirected to the login page
+            var login_page = new UserPages.LoginPage();
+            login_page.login(UserPages.annotatorEmail,'password');
+            expect(UserPages.isLoggedIn());
+        });
     });
 });

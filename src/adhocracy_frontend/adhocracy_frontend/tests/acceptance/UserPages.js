@@ -28,6 +28,40 @@ var LoginPage = function() {
     };
 };
 
+var ResetPasswordCreatePage = function() {
+    this.emailInput = element(by.model("input.email"));
+    this.submitButton = element(by.css(".login [type=\"submit\"]"));
+
+    this.get = function() {
+        browser.get("/create_password_reset");
+        return this;
+    };
+
+    this.fill = function(email) {
+        this.emailInput.sendKeys(email)
+        this.submitButton.click();
+        browser.waitForAngular();
+    };
+};
+
+
+var ResetPasswordPage = function() {
+    this.password = element(by.model("input.password"));
+    this.passwordRepeat = element(by.model("input.passwordRepeat"));
+    this.submitButton = element(by.css(".login [type=\"submit\"]"));
+
+    this.get = function(link) {
+        browser.get(link);
+        return this;
+    };
+
+    this.fill = function(password){
+        this.password.sendKeys(password);
+        this.passwordRepeat.sendKeys(password);
+        this.submitButton.click();
+        browser.waitForAngular();
+    }
+}
 
 var RegisterPage = function() {
     this.nameInput = element(by.model("input.username"));
@@ -129,6 +163,8 @@ module.exports = {
     register: register,
     LoginPage: LoginPage,
     RegisterPage: RegisterPage,
+    ResetPasswordCreatePage: ResetPasswordCreatePage,
+    ResetPasswordPage: ResetPasswordPage,
     UsersListing: UsersListing,
     login: login,
     logout: logout,
