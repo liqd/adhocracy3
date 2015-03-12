@@ -1,7 +1,6 @@
 "use strict";
 
 var UserPages = require("./UserPages.js");
-var UserPages = require("./UserPages.js");
 var fs = require("fs");
 var MailParser = require("mailparser").MailParser;
 var _ = require("lodash");
