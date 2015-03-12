@@ -136,7 +136,7 @@ export class Service {
         return _self.loadUser(userPath);
     }
 
-    private storeAndEnableToken(token : string, userPath : string) : angular.IPromise<void> {
+    public storeAndEnableToken(token : string, userPath : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
