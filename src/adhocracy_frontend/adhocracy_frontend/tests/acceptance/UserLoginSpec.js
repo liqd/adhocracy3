@@ -84,7 +84,7 @@ describe("user password reset", function() {
     it("recover access with the link contained in the email", function(){
         var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
         var page = new UserPages.ResetPasswordCreatePage().get();
-        var reset_url = "";
+        var resetUrl = "";
 
         page.fill(UserPages.annotatorEmail);
 
@@ -98,15 +98,15 @@ describe("user password reset", function() {
                 // console.log('email=', mail);
                 expect(mail.subject).toContain("Reset Password");
                 expect(mail.to[0].address).toContain("annotator");
-                reset_url = mail.text.split("\n\n")[4];
+                resetUrl = mail.text.split("\n\n")[4];
             });
         });
 
         browser.driver.wait(function() {
-            return reset_url != "";
+            return resetUrl != "";
         }).then(function() {
-            var reset_page = new UserPages.ResetPasswordPage().get(reset_url);
-            reset_page.fill('new password');
+            var resetPage = new UserPages.ResetPasswordPage().get(resetUrl);
+            resetPage.fill('new password');
 
             // After changing the password the user is redirected to the login page
             var login_page = new UserPages.LoginPage();
