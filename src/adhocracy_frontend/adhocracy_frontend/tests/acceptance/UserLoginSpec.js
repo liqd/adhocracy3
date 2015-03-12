@@ -108,9 +108,12 @@ describe("user password reset", function() {
             var resetPage = new UserPages.ResetPasswordPage().get(resetUrl);
             resetPage.fill('new password');
 
-            // After changing the password the user is redirected to the login page
-            var login_page = new UserPages.LoginPage();
-            login_page.login(UserPages.annotatorEmail, 'new password');
+            // After changing the password the user is logged in
+            expect(UserPages.isLoggedIn()).toBe(true);
+
+            // and can now login with the new user name
+            UserPages.logout();
+            UserPages.login(UserPages.annotatorEmail, 'new password');
             expect(UserPages.isLoggedIn()).toBe(true);
         });
     });
