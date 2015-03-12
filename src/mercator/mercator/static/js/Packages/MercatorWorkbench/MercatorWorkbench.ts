@@ -9,16 +9,12 @@ import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
-import AdhUserViews = require("../User/Views");
 import AdhUtil = require("../Util/Util");
 
 import RIPoolWithAssets = require("../../Resources_/adhocracy_core/resources/asset/IPoolWithAssets");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -47,41 +43,13 @@ var bindRedirectsToScope = (scope, adhConfig, $location) => {
 };
 
 
-/**
- * Bind variables from topLevelState and clear the column whenever one of them changes.
- */
-var bindVariablesAndClear = (
-    scope,
-    column : AdhMovingColumns.MovingColumnController,
-    adhTopLevelState : AdhTopLevelState.Service,
-    keys : string[]
-) : void => {
-    // NOTE: column directives are typically injected mutliple times
-    // with different transcludionIds. But we to trigger clear() only once.
-    var clear = () => {
-        if (scope.transclusionId === "body") {
-            column.clear();
-        }
-    };
-
-    clear();
-
-    keys.forEach((key : string) => {
-        scope.$on("$destroy", adhTopLevelState.on(key, (value) => {
-            scope[key] = value;
-            clear();
-        }));
-    });
-};
-
-
-export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
+export var commentColumnDirective = (bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, adhTopLevelState, ["proposalUrl", "commentableUrl"]);
+            bindVariablesAndClear(scope, column, ["proposalUrl", "commentableUrl"]);
             scope.frontendOrderPredicate = (id) => id;
             scope.frontendOrderReverse = true;
         }
@@ -90,7 +58,7 @@ export var commentColumnDirective = (adhTopLevelState : AdhTopLevelState.Service
 
 
 export var mercatorProposalCreateColumnDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService,
     $location : angular.ILocationService
 ) => {
@@ -99,7 +67,7 @@ export var mercatorProposalCreateColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, adhTopLevelState, ["platformUrl"]);
+            bindVariablesAndClear(scope, column, ["platformUrl"]);
             bindRedirectsToScope(scope, adhConfig, $location);
         }
     };
@@ -107,7 +75,7 @@ export var mercatorProposalCreateColumnDirective = (
 
 
 export var mercatorProposalDetailColumnDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhPermissions : AdhPermissions.Service,
     adhConfig : AdhConfig.IService
 ) => {
@@ -116,7 +84,7 @@ export var mercatorProposalDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, adhTopLevelState, ["platformUrl", "proposalUrl"]);
+            bindVariablesAndClear(scope, column, ["platformUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
 
             scope.delete = () => {
@@ -128,7 +96,7 @@ export var mercatorProposalDetailColumnDirective = (
 
 
 export var mercatorProposalEditColumnDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService,
     $location : angular.ILocationService
 ) => {
@@ -137,20 +105,23 @@ export var mercatorProposalEditColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, adhTopLevelState, ["platformUrl", "proposalUrl"]);
+            bindVariablesAndClear(scope, column, ["platformUrl", "proposalUrl"]);
             bindRedirectsToScope(scope, adhConfig, $location);
         }
     };
 };
 
 
-export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLevelState.Service, adhConfig : AdhConfig.IService) => {
+export var mercatorProposalListingColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorProposalListingColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, adhTopLevelState, ["platformUrl", "proposalUrl"]);
+            bindVariablesAndClear(scope, column, ["platformUrl", "proposalUrl"]);
             scope.contentType = RIMercatorProposalVersion.content_type;
             scope.shared.facets = [{
                 key: "mercator_location",
@@ -177,38 +148,6 @@ export var mercatorProposalListingColumnDirective = (adhTopLevelState : AdhTopLe
 };
 
 
-export var userDetailColumnDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhPermissions : AdhPermissions.Service,
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, adhTopLevelState, ["userUrl"]);
-            adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
-        }
-    };
-};
-
-
-export var userListingColumnDirective = (
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, adhTopLevelState, ["userUrl"]);
-        }
-    };
-};
-
-
 export var moduleName = "adhMercatorWorkbench";
 
 export var register = (angular) => {
@@ -222,9 +161,7 @@ export var register = (angular) => {
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhUser.moduleName,
-            AdhUserViews.moduleName
+            AdhUser.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
@@ -261,21 +198,6 @@ export var register = (angular) => {
                     })
                     .then(() => specifics);
                 }])
-                .default(RIUser.content_type, "", {
-                    space: "user",
-                    movingColumns: "is-show-show-hide"
-                })
-                .specific(RIUser.content_type, "", () => (resource : RIUser) => {
-                    return {
-                        userUrl: resource.path
-                    };
-                })
-                .default(RIUsersService.content_type, "", {
-                    space: "user",
-                    movingColumns: "is-show-hide-hide",
-                    userUrl: "",  // not used by default, but should be overridable
-                    focus: "0"
-                })
                 .default(RIPoolWithAssets.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
@@ -308,12 +230,12 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", mercatorWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhTopLevelState", "adhConfig", commentColumnDirective])
-        .directive("adhMercatorProposalCreateColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalCreateColumnDirective])
-        .directive("adhMercatorProposalDetailColumn", ["adhTopLevelState", "adhPermissions", "adhConfig",
+        .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
+        .directive("adhMercatorProposalCreateColumn", ["adhBindVariablesAndClear", "adhConfig", "$location",
+            mercatorProposalCreateColumnDirective])
+        .directive("adhMercatorProposalDetailColumn", ["adhBindVariablesAndClear", "adhPermissions", "adhConfig",
             mercatorProposalDetailColumnDirective])
-        .directive("adhMercatorProposalEditColumn", ["adhTopLevelState", "adhConfig", "$location", mercatorProposalEditColumnDirective])
-        .directive("adhMercatorProposalListingColumn", ["adhTopLevelState", "adhConfig", mercatorProposalListingColumnDirective])
-        .directive("adhUserDetailColumn", ["adhTopLevelState", "adhPermissions", "adhConfig", userDetailColumnDirective])
-        .directive("adhUserListingColumn", ["adhTopLevelState", "adhConfig", userListingColumnDirective]);
+        .directive("adhMercatorProposalEditColumn", ["adhBindVariablesAndClear", "adhConfig", "$location",
+            mercatorProposalEditColumnDirective])
+        .directive("adhMercatorProposalListingColumn", ["adhBindVariablesAndClear", "adhConfig", mercatorProposalListingColumnDirective]);
 };
