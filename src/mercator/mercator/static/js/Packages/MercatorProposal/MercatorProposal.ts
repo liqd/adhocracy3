@@ -908,8 +908,8 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
             adhHttp.get(scope.path).then((proposal) => {
                 scope.data.user_info = {
                     first_name: proposal.data[SIMercatorUserInfo.nick].personal_name,
-                    last_name: proposal.data[SIMercatorUserInfo.nick].personal_name,
                     country: proposal.data[SIMetaData.nick].item_creation_date,
+                    last_name: proposal.data[SIMercatorUserInfo.nick].family_name,
                     path: proposal.data[SIMetaData.nick].creator
                 };
                 scope.data.title = {
