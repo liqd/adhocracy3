@@ -169,6 +169,7 @@ export var registerDirective = (
 export var passwordResetDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -191,9 +192,9 @@ export var passwordResetDirective = (
                 return adhHttp.postRaw(adhConfig.rest_url + "/password_reset", {
                     path: adhTopLevelState.get("path"),
                     password: scope.input.password
-                }).then(() => {
-                    // FIXME: automatically log in
-                    adhTopLevelState.redirectToCameFrom("/login");
+                }).then((response) => {
+                    adhUser.storeAndEnableToken(response.data.user_token, response.data.user_path);
+                    adhTopLevelState.redirectToCameFrom("/");
                 }, AdhHttp.logBackendError)
                 .catch((errors) => bindServerErrors(scope, errors));
             };
@@ -456,7 +457,7 @@ export var register = (angular) => {
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", loginDirective])
-        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", passwordResetDirective])
+        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", passwordResetDirective])
         .directive("adhCreatePasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
