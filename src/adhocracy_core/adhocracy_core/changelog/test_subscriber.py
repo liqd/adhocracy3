@@ -20,6 +20,14 @@ def test_add_changelog_created(event, changelog):
     assert changelog['/'].created is True
 
 
+def test_add_changelog_created_password_reset(event, changelog):
+    from adhocracy_core.resources.principal import IPasswordReset
+    from .subscriber import add_changelog_created
+    event.object = testing.DummyResource(__provides__=IPasswordReset)
+    add_changelog_created(event)
+    assert changelog['/'].created is False
+
+
 def test_add_changelog_created_with_parent(event, pool, changelog):
     from .subscriber import add_changelog_created
     pool.__name__ = 'parent'

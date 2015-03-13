@@ -385,3 +385,31 @@ the user to be logged in from different devices at the same time. ::
     >>> resp_data = testapp.get('/meta_api/', headers=headers).json
     >>> 'resources' in resp_data.keys()
     True
+
+User Password reset
+--------------------
+
+The frontend sends an email to the create password reset end point
+
+    >>> prop = {'email': 'anna@example.org'}
+    >>> resp = testapp.post_json(rest_url + "/create_password_reset", prop)
+    >>> resp.status_code
+    200
+
+On Success the backend sends an email with the link to reset the password to
+the user. The link contains the path to identify the password reset request::
+
+    http://frontend_url/password_reset/?path=/1318...
+
+If the user clicks on this link, the frontend has to send a post request with the
+new password to the reset password end point::
+
+    >>> newest_reset_path = getfixture('newest_reset_path')
+    >>> prop = {'path': newest_reset_path,
+    ...         'password': 'new_password'}
+    >>> resp_data = testapp.post_json('/password_reset', prop).json
+    >>> pprint(resp_data)
+    {'status': 'success',
+     'user_path': 'http://localhost/principals/users/0000008/',
+     'user_token':...
+

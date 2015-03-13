@@ -166,6 +166,7 @@ RESOURCE_METADATA = OrderedDict({
     'item_type': None,
     'use_autonaming': False,
     'autonaming_prefix': '',
+    'use_autonaming_random': False,
 })
 
 
@@ -204,6 +205,9 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
         to the parent.
     autonaming_prefix:
         uses this prefix for autonaming.
+    use_autonaming_random:
+        Use random the name if the new content object is added to the parent.
+        You can enable only one, autonaming or random autonaming.
 
     IPool fields:
     -------------
@@ -293,6 +297,7 @@ class IPool(IResource):  # pragma: no cover
 
         This is a shortcut for :func:`substanced.service.find_service`.
         """
+    # TODO remove find_service, substanced.util.find_service does the same
 
 
 class IServicePool(IPool, IService):

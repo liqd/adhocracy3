@@ -801,3 +801,165 @@ class TestPostMessageUserViewRequestSchema:
                   'text': 'text'}
         with raises(colander.Invalid):
             inst.deserialize(cstrut)
+
+
+class TestPOSTCreateResetPasswordRequestSchema:
+
+    def make_one(self):
+        from adhocracy_core.rest.schemas import\
+            POSTCreatePasswordResetRequestSchema
+        return POSTCreatePasswordResetRequestSchema()
+
+    def test_deserialize_without_email(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize({})
+
+    def test_deserialize_with_email(self):
+        inst = self.make_one()
+        data = {'email': 'test@email.de'}
+        assert inst.deserialize(data) == {'email': 'test@email.de'}
+
+    def test_email_has_deferred_validator(self):
+        from adhocracy_core.rest.schemas import \
+            deferred_validate_password_reset_email
+        inst = self.make_one()
+        assert inst['email'].validator is deferred_validate_password_reset_email
+
+
+class TestDeferredValidateResetPasswordEmail:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry = registry
+        return cornice_request
+
+    def _call_fut(self, node, kw):
+        from . schemas import deferred_validate_password_reset_email
+        return deferred_validate_password_reset_email(node, kw)
+
+    def test_email_has_no_user(self, node, request, context, mock_user_locator):
+        validator = self._call_fut(node, {'context': context, 'request': request})
+        with raises(colander.Invalid) as exception_info:
+            validator(node, 'test@email.de')
+        assert 'No user' in exception_info.value.msg
+
+    def test_email_has_user_with_password_authentication(
+            self, node, request, context, mock_user_locator):
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
+        validator = self._call_fut(node, {'context': context,
+                                          'request': request})
+        user = testing.DummyResource(active=True,
+                                     __provides__=IPasswordAuthentication)
+        mock_user_locator.get_user_by_email.return_value = user
+        validator(node, 'test@email.de')
+        assert request.validated['user'] is user
+
+    def test_email_has_user_without_password_authentication(
+            self, node, request, context, mock_user_locator):
+        validator = self._call_fut(node, {'context': context,
+                                          'request': request})
+        user = testing.DummyResource(active=True)
+        mock_user_locator.get_user_by_email.return_value = user
+        with raises(colander.Invalid):
+            validator(node, 'test@email.de')
+
+    def test_email_has_user_not_activated(self, node, request, context,
+                                          mock_user_locator):
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
+        validator = self._call_fut(node, {'context': context,
+                                          'request': request})
+        user = testing.DummyResource(active=False,
+                                     __provides__=IPasswordAuthentication)
+        mock_user_locator.get_user_by_email.return_value = user
+        with raises(colander.Invalid):
+            validator(node, 'test@email.de')
+
+
+class TestPOSTResetPasswordRequestSchema:
+
+    def make_one(self):
+        from .schemas import POSTPasswordResetRequestSchema
+        return POSTPasswordResetRequestSchema()
+
+    def test_create(self):
+        from adhocracy_core.schema import Password
+        from adhocracy_core.schema import Resource
+        from .schemas import validate_password_reset_path
+        inst = self.make_one()
+        assert isinstance(inst['password'], Password)
+        assert inst['password'].required
+        assert isinstance(inst['path'], Resource)
+        assert inst['path'].required
+        assert inst['path'].validator is validate_password_reset_path
+
+
+class TestValidatePasswordResetPath:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def request(self, cornice_request, context, registry):
+        request = cornice_request
+        request.registry = registry
+        request.root = context
+        return request
+
+    def call_fut(self, node, kw):
+        from .schemas import validate_password_reset_path
+        return validate_password_reset_path(node, kw)
+
+    def test_path_is_none(self, node, request, context):
+        validator = self.call_fut(node, {'context': context, 'request': request})
+        assert validator(node, None) is None
+
+    def test_path_is_reset_password(self, node,  request, context, registry,
+                                    mock_sheet):
+        from datetime import datetime
+        from pytz import UTC
+        from adhocracy_core.resources.principal import IPasswordReset
+        user = testing.DummyResource()
+        creation_date = datetime.utcnow().replace(tzinfo=UTC)
+        mock_sheet.get.return_value = {'creator': user,
+                                       'creation_date': creation_date}
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(node, {'request': request, 'context': context})
+
+        context['reset'] = testing.DummyResource(__provides__=IPasswordReset)
+        validator(node, context['reset'])
+
+        assert request.validated['user'] is user
+
+    def test_path_is_not_reset_password(self, node,  request, context, registry,
+                                        mock_sheet):
+        from datetime import datetime
+        from pytz import UTC
+        user = testing.DummyResource()
+        creation_date = datetime.utcnow().replace(tzinfo=UTC)
+        mock_sheet.get.return_value = {'creator': user,
+                                       'creation_date': creation_date}
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(node, {'request': request, 'context': context})
+
+        context['reset'] = testing.DummyResource()
+        with raises(colander.Invalid):
+            validator(node, context['reset'])
+
+    def test_path_is_reset_password_but_8_days_old(
+            self, node,  request, context, registry, mock_sheet):
+        import datetime
+        from pytz import UTC
+        from adhocracy_core.resources.principal import IPasswordReset
+        user = testing.DummyResource()
+        creation_date = datetime.datetime.utcnow().replace(tzinfo=UTC) -\
+                        datetime.timedelta(days=7)
+        mock_sheet.get.return_value = {'creator': user,
+                                       'creation_date': creation_date}
+        registry.content.get_sheet.return_value = mock_sheet
+        validator = self.call_fut(node, {'request': request, 'context': context})
+
+        context['reset'] = testing.DummyResource(__provides__=IPasswordReset)
+        with raises(colander.Invalid):
+            validator(node, context['reset'])

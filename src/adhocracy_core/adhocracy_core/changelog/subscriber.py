@@ -14,10 +14,13 @@ from adhocracy_core.utils import get_visibility_change
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import list_resource_with_descendants
+from adhocracy_core.resources.principal import IPasswordReset
 
 
 def add_changelog_created(event):
     """Add created message to the transaction_changelog."""
+    if IPasswordReset.providedBy(event.object):
+        return  # don't tell others about created password resets
     _add_changelog(event.registry, event.object, key='created', value=True)
     parent = event.object.__parent__
     if parent is not None:

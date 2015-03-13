@@ -1,9 +1,12 @@
 """Data structures / validation specific to rest api requests."""
+from datetime import datetime
 from hypatia.interfaces import IIndexSort
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
+from pytz import UTC
 from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
+from colander import SchemaNode
 import colander
 
 from adhocracy_core.interfaces import IResource
@@ -25,9 +28,14 @@ from adhocracy_core.schema import ResourcePathAndContentSchema
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.utils import get_sheet
+from adhocracy_core.interfaces import IUserLocator
+from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 
 
 resolver = DottedNameResolver()
@@ -69,7 +77,7 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
     first_version_path = Resource()
 
 
-def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
+def add_put_data_subschemas(node: colander.Schema, kw: dict):
     """Add the resource sheet colander schemas that are 'editable'."""
     context = kw.get('context', None)
     request = kw.get('request', None)
@@ -103,12 +111,12 @@ class PUTResourceRequestSchema(colander.Schema):
     The subschemas for the Resource Sheets
     """
 
-    data = colander.SchemaNode(colander.Mapping(unknown='raise'),
-                               after_bind=add_put_data_subschemas,
-                               default={})
+    data = SchemaNode(colander.Mapping(unknown='raise'),
+                      after_bind=add_put_data_subschemas,
+                      default={})
 
 
-def add_post_data_subschemas(node: colander.MappingSchema, kw: dict):
+def add_post_data_subschemas(node: SchemaNode, kw: dict):
     """Add the resource sheet colander schemas that are 'creatable'."""
     context = kw['context']
     request = kw['request']
@@ -155,9 +163,9 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
     content_type = ContentType(validator=deferred_validate_post_content_type,
                                missing=colander.required)
 
-    data = colander.SchemaNode(colander.Mapping(unknown='raise'),
-                               after_bind=add_post_data_subschemas,
-                               default={})
+    data = SchemaNode(colander.Mapping(unknown='raise'),
+                      after_bind=add_post_data_subschemas,
+                      default={})
 
 
 class AbsolutePaths(colander.SequenceSchema):
@@ -185,8 +193,8 @@ class GETLocationMapping(colander.Schema):
 
     """Overview of GET request/response data structure."""
 
-    request_querystring = colander.SchemaNode(colander.Mapping(), default={})
-    request_body = colander.SchemaNode(colander.Mapping(), default={})
+    request_querystring = SchemaNode(colander.Mapping(), default={})
+    request_body = SchemaNode(colander.Mapping(), default={})
     response_body = GETResourceResponseSchema()
 
 
@@ -202,8 +210,7 @@ class POSTLocationMapping(colander.Schema):
 
     """Overview of POST request/response data structure."""
 
-    request_body = colander.SchemaNode(POSTResourceRequestSchemaList(),
-                                       default=[])
+    request_body = SchemaNode(POSTResourceRequestSchemaList(), default=[])
     response_body = ResourceResponseSchema()
 
 
@@ -211,8 +218,7 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
 
     """Schema for login requests via username and password."""
 
-    name = colander.SchemaNode(colander.String(),
-                               missing=colander.required)
+    name = SchemaNode(colander.String(), missing=colander.required)
     password = Password(missing=colander.required)
 
 
@@ -220,9 +226,9 @@ class POSTActivateAccountViewRequestSchema(colander.Schema):
 
     """Schema for account activation."""
 
-    path = colander.SchemaNode(colander.String(),
-                               missing=colander.required,
-                               validator=colander.Regex('^/activate/'))
+    path = SchemaNode(colander.String(),
+                      missing=colander.required,
+                      validator=colander.Regex('^/activate/'))
 
 
 class POSTLoginEmailRequestSchema(colander.Schema):
@@ -258,7 +264,7 @@ class POSTMessageUserViewRequestSchema(colander.Schema):
     text = Text(missing=colander.required)
 
 
-class BatchHTTPMethod(colander.SchemaNode):
+class BatchHTTPMethod(SchemaNode):
 
     """An HTTP method in a batch request."""
 
@@ -294,8 +300,8 @@ class POSTBatchRequestItem(colander.Schema):
 
     method = BatchHTTPMethod()
     path = BatchRequestPath()
-    body = colander.SchemaNode(colander.Mapping(unknown='preserve'),
-                               missing={})
+    body = SchemaNode(colander.Mapping(unknown='preserve'),
+                      missing={})
     result_path = BatchRequestPath(missing='')
     result_first_version_path = BatchRequestPath(missing='')
 
@@ -307,7 +313,7 @@ class POSTBatchRequestSchema(colander.SequenceSchema):
     items = POSTBatchRequestItem()
 
 
-class PoolElementsForm(colander.SchemaNode):
+class PoolElementsForm(SchemaNode):
 
     """The form of the elements attribute returned by the pool sheet."""
 
@@ -316,7 +322,7 @@ class PoolElementsForm(colander.SchemaNode):
     missing = 'paths'
 
 
-class PoolQueryDepth(colander.SchemaNode):
+class PoolQueryDepth(SchemaNode):
 
     """The nesting depth of descendants in a pool response.
 
@@ -330,7 +336,7 @@ class PoolQueryDepth(colander.SchemaNode):
 
 
 @colander.deferred
-def deferred_validate_aggregateby(node: colander.MappingSchema, kw):
+def deferred_validate_aggregateby(node: SchemaNode, kw):
     """Validate if `value` is an catalog index with `unique_values`."""
     # TODO In the future we may have indexes where aggregateby doesn't make
     # sense, e.g. username or email. We should have a blacklist to prohibit
@@ -343,7 +349,7 @@ def deferred_validate_aggregateby(node: colander.MappingSchema, kw):
 
 
 @colander.deferred
-def deferred_validate_sort(node: colander.MappingSchema, kw: dict):
+def deferred_validate_sort(node: SchemaNode, kw: dict):
     """Validate if value is an index name that support sorting."""
     context = kw['context']
     indexes = _get_indexes(context)
@@ -364,7 +370,7 @@ def _get_indexes(context) -> list:
     return indexes
 
 
-class GETPoolRequestSchema(colander.MappingSchema):
+class GETPoolRequestSchema(colander.Schema):
 
     """GET parameters accepted for pool queries."""
 
@@ -387,14 +393,16 @@ class GETPoolRequestSchema(colander.MappingSchema):
     # sheet, aggregateby, tag.
 
     content_type = ContentType(missing=colander.drop)
-    sheet = colander.SchemaNode(Interface(), missing=colander.drop)
+    sheet = SchemaNode(Interface(), missing=colander.drop)
     depth = PoolQueryDepth(missing=colander.drop)
     elements = PoolElementsForm(missing=colander.drop)
-    count = colander.SchemaNode(colander.Boolean(), missing=colander.drop)
-    sort = colander.SchemaNode(colander.String(), missing=colander.drop,
-                               validator=deferred_validate_sort)
-    aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop,
-                                      validator=deferred_validate_aggregateby)
+    count = SchemaNode(colander.Boolean(), missing=colander.drop)
+    sort = SchemaNode(colander.String(),
+                      missing=colander.drop,
+                      validator=deferred_validate_sort)
+    aggregateby = SchemaNode(colander.String(),
+                             missing=colander.drop,
+                             validator=deferred_validate_aggregateby)
 
 
 def add_get_pool_request_extra_fields(cstruct: dict,
@@ -488,3 +496,80 @@ options_resource_response_data_dict =\
                               'data': {}},
              'response_body': {'content_type': '',
                                'path': ''}}}
+
+
+@colander.deferred
+def deferred_validate_password_reset_email(node: SchemaNode, kw: dict):
+    """Validate the email address of a password reset request.
+
+    If valid, the user object is added as 'user' to
+    `request.validated`.
+
+    :raise colander.Invalid: if no user with this email exists.
+    """
+    context = kw['context']
+    request = kw['request']
+
+    def validate_email(node, value):
+        locator = request.registry.getMultiAdapter((context, request),
+                                                   IUserLocator)
+        user = locator.get_user_by_email(value)
+        if user is None:
+            msg = 'No user exists with this email: {0}'.format(value)
+            raise colander.Invalid(node, msg)
+        if not IPasswordAuthentication.providedBy(user):
+            msg = 'This user has no password to reset: {0}'.format(value)
+            raise colander.Invalid(node, msg)
+        if not user.active:
+            msg = 'This user is not activated yet: {0}'.format(value)
+            raise colander.Invalid(node, msg)
+        else:
+            request.validated['user'] = user
+    return validate_email
+
+
+class POSTCreatePasswordResetRequestSchema(colander.Schema):
+
+    """Schema to create a user password reset."""
+
+    email = Email(missing=colander.required,
+                  validator=deferred_validate_password_reset_email)
+
+
+@colander.deferred
+def validate_password_reset_path(node, kw):
+    """Validate password reset and add the user needing password reset."""
+    request = kw['request']
+
+    def validate_path(node, value):
+        if value is None:
+            return
+        _raise_if_no_password_reset(node, value)
+        metadata = get_sheet(value, IMetadata).get()
+        _raise_if_outdated(node, value, metadata['creation_date'])
+        request.validated['user'] = metadata['creator']
+    return validate_path
+
+
+def _raise_if_no_password_reset(node: SchemaNode, value: IPasswordReset):
+    if not IPasswordReset.providedBy(value):
+        raise colander.Invalid(node, 'This is not a valid password reset.')
+
+
+def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
+                       creation_date: datetime):
+        now = datetime.utcnow().replace(tzinfo=UTC)
+        if (now - creation_date).days >= 7:
+            value.__parent__ = None  # commit_suicide
+            msg = 'This password reset is older than 7 days.'
+            raise colander.Invalid(node, msg)
+
+
+class POSTPasswordResetRequestSchema(colander.Schema):
+
+    """Schema to get a user password reset resource."""
+
+    path = Resource(missing=colander.required,
+                    validator=validate_password_reset_path,
+                    )
+    password = Password(missing=colander.required)

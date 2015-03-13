@@ -140,7 +140,7 @@ def includeme(config):
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')
-    add_frontend_route(config, 'password_reset', 'password_reset')
+    add_frontend_route(config, 'password_reset', 'password_reset/')
     add_frontend_route(config, 'create_password_reset',
                        'create_password_reset')
     add_frontend_route(config, 'activate', 'activate/{key}')

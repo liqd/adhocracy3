@@ -1483,6 +1483,101 @@ class TestShowRequestBody:
         result = _show_request_body(cornice_request)
         assert result == cornice_request.body
 
+
+class TestCreatePasswordResetView:
+
+    @fixture
+    def resets(self, context, service):
+        context['resets'] = service
+
+    @fixture
+    def request_(self, cornice_request, registry_with_content):
+        cornice_request.registry = registry_with_content
+        cornice_request.validated['user'] = testing.DummyResource()
+        return cornice_request
+
+    @fixture
+    def mock_remember(self, monkeypatch):
+        from pyramid.security import remember
+        from . import views
+        mock_remember = Mock(spec=remember)
+        monkeypatch.setattr(views, 'remember', mock_remember)
+        return mock_remember
+
+    def _make_one(self, context, request):
+        from adhocracy_core.rest.views import CreatePasswordResetView
+        return CreatePasswordResetView(context, request)
+
+    def test_create(self, context, request_):
+        from .schemas import POSTCreatePasswordResetRequestSchema
+        inst = self._make_one(context, request_)
+        assert inst.validation_POST == (POSTCreatePasswordResetRequestSchema,
+                                        [])
+
+    def test_post(self, request_, context, registry, resets):
+        from adhocracy_core.resources.principal import IPasswordReset
+        inst = self._make_one(context, request_)
+        reset = testing.DummyResource(__name__='reset')
+        registry.content.create.return_value = reset
+        result = inst.post()
+        registry.content.create.assert_called_with(
+            IPasswordReset.__identifier__,
+            resets,
+            creator=request_.validated['user'])
+        assert result == {'status': 'success'}
+
+    def test_options(self, request_, context):
+        inst = self._make_one(context, request_)
+        assert inst.options() == {'POST': {}}
+
+
+class TestPasswordResetView:
+
+    @fixture
+    def request_(self, cornice_request, registry_with_content):
+        cornice_request.registry = registry_with_content
+        return cornice_request
+
+    @fixture
+    def mock_remember(self, monkeypatch):
+        from pyramid.security import remember
+        from . import views
+        mock_remember = Mock(spec=remember)
+        monkeypatch.setattr(views, 'remember', mock_remember)
+        return mock_remember
+
+    def _make_one(self, context, request):
+        from adhocracy_core.rest.views import PasswordResetView
+        return PasswordResetView(context, request)
+
+    def test_create(self, context, request_):
+        from .schemas import POSTPasswordResetRequestSchema
+        inst = self._make_one(context, request_)
+        assert inst.validation_POST == (POSTPasswordResetRequestSchema,
+                                        [])
+
+    def test_post(self, request_, context, mock_remember):
+        from adhocracy_core.resources.principal import PasswordReset
+        mock_reset = Mock(spec=PasswordReset)
+        request_.validated['user'] = testing.DummyResource()
+        request_.validated['path'] = mock_reset
+        request_.validated['password'] = 'password'
+        mock_remember.return_value = {'X-User-Path': '/',
+                                      'X-User-Token': 'token'}
+        inst = self._make_one(context, request_)
+        result = inst.post()
+        mock_reset.reset_password.assert_called()
+        mock_remember.assert_called_with(request_, '/')
+        mock_reset.reset_password.assert_called_with('password')
+        assert result == {'status': 'success',
+                          'user_path': '/',
+                          'user_token': 'token'}
+
+    def test_options(self, request_, context):
+        inst = self._make_one(context, request_)
+        assert inst.options() == {'POST': {}}
+
+
 @fixture()
 def integration(config):
     config.include('cornice')
