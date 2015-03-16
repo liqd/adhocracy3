@@ -7,7 +7,7 @@ Default permissions
 Basic functional tests for roles and default permission settings.
 
 Prerequisites
-.............
+~~~~~~~~~~~~~
 
 Some imports to work with rest api calls::
 
@@ -66,7 +66,7 @@ Create annotations by annotator
 
 
 Reader
-------
+~~~~~~
 
 Can read resources and normal sheets::
 
@@ -113,7 +113,7 @@ Cannot edit process structure::
 
 
 Annotator
----------
+~~~~~~~~~
 
 Can read resources and normal sheets::
 
@@ -163,7 +163,7 @@ Cannot edit process structure::
     True
 
 Contributor
------------
+~~~~~~~~~~~
 
 Can read resources and normal sheets::
 
@@ -210,10 +210,10 @@ Cannot edit process structure::
     True
 
 Reviewer
----------
+~~~~~~~~
 
 Manager
---------
+~~~~~~~
 
 FIXME Can delete and hide resources::
 
@@ -223,7 +223,7 @@ FIXME Can delete and hide resources::
     ['deleted', 'hidden']
 
 Admin
-------
+~~~~~
 
 Can read resources and normal sheets::
 
