@@ -1,9 +1,10 @@
 """Autoupdate resources."""
-
+from urllib.request import quote
 from collections import Sequence
 from logging import getLogger
 
 from pyramid.registry import Registry
+from pyramid.traversal import resource_path
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import IResource
@@ -17,6 +18,7 @@ from adhocracy_core.interfaces import ISheetReferenceNewVersion
 from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import find_graph
@@ -55,15 +57,13 @@ def update_modification_date_modified_by(event):
 def user_created_and_added_subscriber(event):
     """Add default group to user."""
     group = _get_default_group(event.object)
-    if group is None:  # ease testing,
+    if group is None:  # ease testing
         return
     _add_user_to_group(event.object, group, event.registry)
 
 
 def _get_default_group(context) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
-    if groups is None:  # ease testing
-        return
     default_group = groups.get('authenticated', None)
     return default_group
 
@@ -191,6 +191,27 @@ def autoupdate_non_versionable_has_new_version(event):
     sheet.set(appstruct, registry=event.registry)
 
 
+def send_password_reset_mail(event):
+    """Send mail with reset password link if a reset resource is created."""
+    site_name = event.registry.settings.get('adhocracy.site_name', '')
+    subject = '{0}: Reset Password / Password neu setzen'.format(site_name)
+    template = 'adhocracy_core:templates/reset_password_mail'
+    user = get_sheet_field(event.object, IMetadata, 'creator')
+    frontend_url = event.registry.settings.get('adhocracy.frontend_url', '')
+    path = resource_path(event.object)
+    path_quoted = quote(path, safe='')
+    args = {'reset_url': '{0}/password_reset/?path={1}'.format(frontend_url,
+                                                               path_quoted),
+            'name': user.name,
+            'site_name': site_name,
+            }
+    event.registry.messenger.render_and_send_mail(subject=subject,
+                                                  recipients=[user.email],
+                                                  template_asset_base=template,
+                                                  args=args,
+                                                  )
+
+
 def autoupdate_tag_has_new_version(event):
     """Auto update last but not first tag if a reference has new version."""
     name = event.object.__name__
@@ -224,3 +245,6 @@ def includeme(config):
     config.add_subscriber(update_modification_date_modified_by,
                           IResourceSheetModified,
                           object_iface=IMetadata)
+    config.add_subscriber(send_password_reset_mail,
+                          IResourceCreatedAndAdded,
+                          object_iface=IPasswordReset)

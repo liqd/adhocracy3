@@ -5,6 +5,8 @@ import AdhHttp = require("../Http/Http");
 import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
+var pkgLocation = "/ResourceArea";
+
 
 export interface Dict {
     [key : string]: string;
@@ -95,7 +97,7 @@ export class Provider implements angular.IServiceProvider {
  * possible. In those cases, search overwrites specifics overwrites meta overwrites defaults.
  */
 export class Service implements AdhTopLevelState.IAreaInput {
-    public template : string = "<adh-page-wrapper><adh-process-view></adh-process-view></adh-page-wrapper>";
+    public templateUrl : string;
 
     constructor(
         private provider : Provider,
@@ -103,7 +105,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $injector : angular.auto.IInjectorService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService
-    ) {}
+    ) {
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
+    }
 
     private getDefaults(resourceType : string, view : string, processType : string) : Dict {
         var key : string = resourceType + "@" + view + "@" + processType;

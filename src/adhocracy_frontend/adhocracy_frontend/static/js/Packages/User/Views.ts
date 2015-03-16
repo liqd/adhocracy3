@@ -2,11 +2,13 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
+import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import AdhUser = require("./User");
 
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
+import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
 var pkgLocation = "/User";
@@ -169,6 +171,7 @@ export var registerDirective = (
 export var passwordResetDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -191,9 +194,9 @@ export var passwordResetDirective = (
                 return adhHttp.postRaw(adhConfig.rest_url + "/password_reset", {
                     path: adhTopLevelState.get("path"),
                     password: scope.input.password
-                }).then(() => {
-                    // FIXME: automatically log in
-                    adhTopLevelState.redirectToCameFrom("/login");
+                }).then((response) => {
+                    adhUser.storeAndEnableToken(response.data.user_token, response.data.user_path);
+                    adhTopLevelState.redirectToCameFrom("/");
                 }, AdhHttp.logBackendError)
                 .catch((errors) => bindServerErrors(scope, errors));
             };
@@ -396,13 +399,47 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
 };
 
 
+export var userDetailColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhPermissions : AdhPermissions.Service,
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            bindVariablesAndClear(scope, column, ["userUrl"]);
+            adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
+        }
+    };
+};
+
+
+export var userListingColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            bindVariablesAndClear(scope, column, ["userUrl"]);
+        }
+    };
+};
+
+
 export var moduleName = "adhUserViews";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTopLevelState.moduleName,
+            AdhResourceArea.moduleName,
             AdhUser.moduleName
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
@@ -452,14 +489,34 @@ export var register = (angular) => {
                     };
                 }]);
         }])
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+            adhResourceAreaProvider
+                .default(RIUser.content_type, "", "", {
+                    space: "user",
+                    movingColumns: "is-show-show-hide"
+                })
+                .specific(RIUser.content_type, "", "", () => (resource : RIUser) => {
+                    return {
+                        userUrl: resource.path
+                    };
+                })
+                .default(RIUsersService.content_type, "", "", {
+                    space: "user",
+                    movingColumns: "is-show-hide-hide",
+                    userUrl: "",  // not used by default, but should be overridable
+                    focus: "0"
+                });
+        }])
         .directive("adhListUsers", ["adhUser", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", loginDirective])
-        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", passwordResetDirective])
+        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", passwordResetDirective])
         .directive("adhCreatePasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])
-        .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective]);
+        .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
+        .directive("adhUserDetailColumn", ["adhBindVariablesAndClear", "adhPermissions", "adhConfig", userDetailColumnDirective])
+        .directive("adhUserListingColumn", ["adhBindVariablesAndClear", "adhConfig", userListingColumnDirective]);
 };

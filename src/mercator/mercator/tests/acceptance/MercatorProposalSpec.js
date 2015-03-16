@@ -1,7 +1,6 @@
 "use strict";
 
 var fs = require("fs");
-var MailParser = require("mailparser").MailParser;
 var EC = protractor.ExpectedConditions;
 var shared = require("./core/shared.js");
 var _ = require("lodash");
@@ -330,9 +329,8 @@ describe("abuse complaint", function() {
             expect(newMails.length).toEqual(1);
 
             var mailpath = browser.params.mail.queue_path + "/new/" + newMails[0];
-            var mailparser = new MailParser();
 
-            mailparser.on("end", function(mail) {
+            shared.parseEmail(mailpath, function(mail) {
                 expect(mail.text).toContain(complaintContent);
                 browser.getLocationAbsUrl().then(function(currentUrl) {
                     expect(mail.text).toContain(currentUrl);
@@ -341,9 +339,6 @@ describe("abuse complaint", function() {
                 expect(mail.from[0].address).toContain("support@");
                 expect(mail.to[0].address).toContain("abuse_handler@");
             });
-
-            mailparser.write(fs.readFileSync(mailpath));
-            mailparser.end();
         });
     });
 });

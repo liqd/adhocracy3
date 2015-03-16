@@ -254,6 +254,39 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
+/**
+ * Bind variables from topLevelState and clear the column whenever one of them changes.
+ */
+export interface IBindVariablesAndClear {
+    (scope, column : MovingColumnController, keys : string[]) : void;
+}
+
+export var bindVariablesAndClearFactory = (
+    adhTopLevelState : AdhTopLevelState.Service
+) : IBindVariablesAndClear => (
+    scope,
+    column : MovingColumnController,
+    keys : string[]
+) : void => {
+    // NOTE: column directives are typically injected mutliple times
+    // with different transcludionIds. But we to trigger clear() only once.
+    var clear = () => {
+        if (scope.transclusionId === "body") {
+            column.clear();
+        }
+    };
+
+    clear();
+
+    keys.forEach((key : string) => {
+        scope.$on("$destroy", adhTopLevelState.on(key, (value) => {
+            scope[key] = value;
+            clear();
+        }));
+    });
+};
+
+
 export var moduleName = "adhMovingColumns";
 
 export var register = (angular) => {
@@ -263,5 +296,6 @@ export var register = (angular) => {
             AdhShareSocial.moduleName
         ])
         .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
-        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
+        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns])
+        .service("adhBindVariablesAndClear", ["adhTopLevelState", bindVariablesAndClearFactory]);
 };

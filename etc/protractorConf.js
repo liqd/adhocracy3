@@ -4,8 +4,8 @@ var ini = require("ini");
 
 exports.config = {
     suites: {
-        core: "../src/adhocracy_frontend/adhocracy_frontend/tests/acceptance/*Spec.js",
-        mercator: "../src/mercator/mercator/tests/acceptance/*Spec.js"
+        mercator: "../src/mercator/mercator/tests/acceptance/*Spec.js",
+        core: "../src/adhocracy_frontend/adhocracy_frontend/tests/acceptance/*Spec.js"
     },
     baseUrl: "http://localhost:9090",
     getPageTimeout: 30000,
