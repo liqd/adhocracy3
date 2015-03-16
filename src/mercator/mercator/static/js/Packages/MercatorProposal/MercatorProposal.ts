@@ -1125,20 +1125,20 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIMercatorProposalVersion.content_type, "", {
+                .default(RIMercatorProposalVersion.content_type, "", "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIMercatorProposalVersion.content_type, "", () => (resource : RIMercatorProposalVersion) => {
+                .specific(RIMercatorProposalVersion.content_type, "", "", () => (resource : RIMercatorProposalVersion) => {
                     return {
                         proposalUrl: resource.path
                     };
                 })
-                .default(RIMercatorProposalVersion.content_type, "edit", {
+                .default(RIMercatorProposalVersion.content_type, "edit", "", {
                     space: "content",
                     movingColumns: "is-collapse-show-hide"
                 })
-                .specific(RIMercatorProposalVersion.content_type, "edit", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                .specific(RIMercatorProposalVersion.content_type, "edit", "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
                     return (resource : RIMercatorProposalVersion) => {
                         var poolPath = AdhUtil.parentPath(resource.path);
 
@@ -1153,11 +1153,11 @@ export var register = (angular) => {
                         });
                     };
                 }])
-                .default(RIMercatorProposalVersion.content_type, "comments", {
+                .default(RIMercatorProposalVersion.content_type, "comments", "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIMercatorProposalVersion.content_type, "comments", () => (resource : RIMercatorProposalVersion) => {
+                .specific(RIMercatorProposalVersion.content_type, "comments", "", () => (resource : RIMercatorProposalVersion) => {
                     return {
                         proposalUrl: resource.path,
                         commentableUrl: resource.path
@@ -1166,11 +1166,11 @@ export var register = (angular) => {
 
             _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
                 adhResourceAreaProvider
-                    .default(RIMercatorProposalVersion.content_type, "comments:" + section, {
+                    .default(RIMercatorProposalVersion.content_type, "comments:" + section, "", {
                         space: "content",
                         movingColumns: "is-collapse-show-show"
                     })
-                    .specific(RIMercatorProposalVersion.content_type, "comments:" + section, () =>
+                    .specific(RIMercatorProposalVersion.content_type, "comments:" + section, "", () =>
                         (resource : RIMercatorProposalVersion) => {
                             return {
                                 proposalUrl: resource.path,
