@@ -436,6 +436,7 @@ export var moduleName = "adhUserViews";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhAngularHelpers.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTopLevelState.moduleName,
