@@ -53,25 +53,25 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIBasicPool.content_type, "", {
+                .default(RIBasicPool.content_type, "", "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
                     content2Url: ""
                 })
-                .default(RIProposalVersion.content_type, "", {
+                .default(RIProposalVersion.content_type, "", "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "", () => (resource : RIProposalVersion) => {
+                .specific(RIProposalVersion.content_type, "", "", () => (resource : RIProposalVersion) => {
                     return {
                         content2Url: resource.path
                     };
                 })
-                .default(RIUser.content_type, "", {
+                .default(RIUser.content_type, "", "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"
                 })
-                .default(RIUsersService.content_type, "", {
+                .default(RIUsersService.content_type, "", "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"
                 });
