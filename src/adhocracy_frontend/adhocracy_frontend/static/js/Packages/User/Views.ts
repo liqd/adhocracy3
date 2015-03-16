@@ -17,6 +17,7 @@ var pkgLocation = "/User";
 
 export interface IScopeLogin {
     user : AdhUser.Service;
+    loginForm : angular.IFormController;
     credentials : {
         nameOrEmail : string;
         password : string;
@@ -31,6 +32,7 @@ export interface IScopeLogin {
 
 
 export interface IScopeRegister {
+    registerForm : angular.IFormController;
     input : {
         username : string;
         email : string;
