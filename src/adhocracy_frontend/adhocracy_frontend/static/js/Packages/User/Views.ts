@@ -1,3 +1,4 @@
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
@@ -436,6 +437,7 @@ export var moduleName = "adhUserViews";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhAngularHelpers.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTopLevelState.moduleName,

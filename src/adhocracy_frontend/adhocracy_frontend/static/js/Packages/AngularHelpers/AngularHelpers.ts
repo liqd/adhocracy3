@@ -148,6 +148,28 @@ export var waitForCondition = () => {
 };
 
 
+/**
+ * Make sure the view value is loaded correctly on input fields
+ *
+ * Can be used to work around issues with browser autofill.
+ *
+ * Inspired by https://stackoverflow.com/questions/14965968
+ */
+export var inputSync = ($timeout : angular.ITimeoutService) => {
+    return {
+        restrict : "A",
+        require: "ngModel",
+        link : (scope, element, attrs, ngModel) => {
+            $timeout(() => {
+                if (ngModel.$viewValue !== element.val()) {
+                    ngModel.$setViewValue(element.val());
+                }
+            }, 500);
+        }
+    };
+};
+
+
 export var moduleName = "adhAngularHelpers";
 
 export var register = (angular) => {
@@ -159,5 +181,6 @@ export var register = (angular) => {
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .directive("adhWait", waitForCondition);
+        .directive("adhWait", waitForCondition)
+        .directive("adhInputSync", ["$timeout" , inputSync]);
 };
