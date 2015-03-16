@@ -182,7 +182,7 @@ node.js
 ```````
 ::
 
-    bin/npm --prefix node_modules outdated
+    bin/npm --prefix node_modules --depth 0 outdated
 
 bower
 `````
