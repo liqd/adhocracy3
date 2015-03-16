@@ -21,7 +21,11 @@ require.config({
 % endif
         text: "../lib/requirejs-text/text",
         jquery: "../lib/jquery/dist/jquery",
+% if minify:
         angular: "../lib/angular/angular.min",
+% else:
+        angular: "../lib/angular/angular",
+% endif
         angularAnimate: "../lib/angular-animate/angular-animate.min",
         angularAria: "../lib/angular-aria/angular-aria.min",
         angularCache: "../lib/angular-cache/dist/angular-cache.min",
