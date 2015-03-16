@@ -9,15 +9,15 @@ README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = ['adhocracy_frontend',
-            'adhocracy_core',
+            'adhocracy_{{project}}',
             ]
 
 test_requires = ['adhocracy_frontend[test]',
-                 'adhocracy_core[test]',
+                 'adhocracy_{{project}}[test]',
                  ]
 
 debug_requires = ['adhocracy_frontend[debug]',
-                  'adhocracy_core[debug]',
+                  'adhocracy_{{project}}[debug]',
                   ]
 
 setup(name='{{project}}',
