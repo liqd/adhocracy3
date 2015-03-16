@@ -1,3 +1,4 @@
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
