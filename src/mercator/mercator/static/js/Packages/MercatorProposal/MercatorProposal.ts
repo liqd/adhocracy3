@@ -964,7 +964,7 @@ export var imageUriFilter = () => {
 };
 
 
-export var mercatorProposalFormController = ($scope : IControllerScope, $element, $window) => {
+export var mercatorProposalFormController = ($scope : IControllerScope, $element, $window, adhShowError) => {
     var heardFromCheckboxes = [
         "heard-from-colleague",
         "heard-from-website",
@@ -979,13 +979,6 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
         "location-location-is-linked-to-ruhr"
     ];
 
-    var getFieldByName = (fieldName : string) => {
-        var fieldNameArr : string[] = fieldName.split(".");
-        return fieldNameArr[1]
-            ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]]
-            : $scope.mercatorProposalForm[fieldNameArr[0]];
-    };
-
     var updateCheckBoxGroupValidity = (form, names : string[]) : boolean => {
         var valid =  _.some(names, (name) => form[name].$modelValue);
         _.forOwn(names, (name) => {
@@ -999,10 +992,7 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
         return !updateCheckBoxGroupValidity(form, names) && dirty;
     };
 
-    $scope.showError = (fieldName : string, errorType : string) : boolean => {
-        var field = getFieldByName(fieldName);
-        return field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted);
-    };
+    $scope.showError = adhShowError;
 
     $scope.showHeardFromError = () : boolean => {
         return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
@@ -1228,5 +1218,5 @@ export var register = (angular) => {
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
         .filter("adhImageUri", imageUriFilter)
-        .controller("mercatorProposalFormController", ["$scope", "$element", "$window", mercatorProposalFormController]);
+        .controller("mercatorProposalFormController", ["$scope", "$element", "$window", "adhShowError", mercatorProposalFormController]);
 };
