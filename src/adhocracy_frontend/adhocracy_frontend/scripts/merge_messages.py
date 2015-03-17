@@ -4,21 +4,49 @@
 Does remove existing entries for keys that are not in stdin.
 """
 
-import fileinput
 import json
+import subprocess
+import sys
 import os
 
+LOCALES = ['en', 'de']
 
-FILES = [
-    'src/adhocracy_frontend/adhocracy_frontend/static/i18n/core_de.json',
-    'src/adhocracy_frontend/adhocracy_frontend/static/i18n/core_en.json',
-]
+
+def get_git_root():
+    """Get root of git repo."""
+    cmd = 'git rev-parse --show-toplevel'
+    output = subprocess.check_output(cmd, shell=True)
+    return output.rstrip().decode('utf8')
+
+
+def get_i18n_dir(package_name):
+    """Get i18n dir of a package."""
+    git_root = get_git_root()
+    i18n_dir = os.path.join(
+        git_root, 'src', package_name, package_name, 'static', 'i18n')
+
+    if not os.path.exists(i18n_dir):
+        os.makedirs(i18n_dir)
+
+    return i18n_dir
+
+
+def get_path(package_name, file_prefix, locale):
+    """Get list of translation files."""
+    i18n_dir = get_i18n_dir(package_name)
+    filename = '%s_%s.json' % (file_prefix, locale)
+    return os.path.join(i18n_dir, filename)
 
 
 if __name__ == '__main__':
-    keys = [l.rstrip() for l in fileinput.input()]
+    package_name = sys.argv[1]
+    file_prefix = sys.argv[2]
+    keys = [l.rstrip() for l in sys.stdin]
 
-    for filename in FILES:
+    for filename in get_files(package_name, file_prefix):
+    for locale in LOCALES:
+        filename = get_path(package_name, file_prefix, locale)
+
         if os.path.exists(filename):
             with open(filename) as fh:
                 data = json.load(fh)
