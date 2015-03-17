@@ -170,6 +170,11 @@ export var inputSync = ($timeout : angular.ITimeoutService) => {
 };
 
 
+export var showError = (form : angular.IFormController, field : angular.INgModelController, errorName : string) : boolean => {
+    return field.$error[errorName] && (form.$submitted || field.$dirty);
+};
+
+
 export var moduleName = "adhAngularHelpers";
 
 export var register = (angular) => {
@@ -179,6 +184,7 @@ export var register = (angular) => {
         ])
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
+        .factory("adhShowError", () => showError)
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .directive("adhWait", waitForCondition)
