@@ -121,8 +121,11 @@
                             <ul class="mercator-proposal-detail-orgs-columns">
                                 <li>
                                     <a
-                                        data-ng-href="{{ data.organization_info.website }}" target="_new">
+                                        data-ng-if="data.organization_info.website"
+                                        href="{{ data.organization_info.website }}"
+                                        target="_new">
                                         {{ data.organization_info.name }}</a>
+                                    <span ng-if="!data.organization_info.website">{{ data.organization_info.name }}</span>
                                     <a
                                         data-ng-if="data.organization_info.email"
                                         href="mailto:{{ data.organization_info.email }}">
@@ -134,7 +137,13 @@
                         </div>
                         <div data-ng-switch-when="planned_nonprofit">
                             <ul class="mercator-proposal-detail-orgs-columns">
-                                <li>{{ data.organization_info.name }}
+                                <li>
+                                    <a
+                                        data-ng-if="data.organization_info.website"
+                                        href="{{ data.organization_info.website }}"
+                                        target="_new">
+                                        {{ data.organization_info.name }}</a>
+                                    <span ng-if="!data.organization_info.website">{{ data.organization_info.name }}</span>
                                     <a
                                         data-ng-if="data.organization_info.email"
                                         href="mailto:{{ data.organization_info.email }}">
@@ -148,7 +157,13 @@
                         </div>
                         <div data-ng-switch-when="support_needed">
                             <ul class="mercator-proposal-detail-orgs-columns">
-                                <li>{{ data.organization_info.name }}
+                                <li>
+                                    <a
+                                        data-ng-if="data.organization_info.website"
+                                        href="{{ data.organization_info.website }}"
+                                        target="_new">
+                                        {{ data.organization_info.name }}</a>
+                                    <span ng-if="!data.organization_info.website">{{ data.organization_info.name }}</span>
                                     <a
                                         data-ng-if="data.organization_info.email"
                                         href="mailto:{{ data.organization_info.email }}">
