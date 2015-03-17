@@ -679,6 +679,10 @@
                             class="input-error"
                             data-ng-if="showError('mercatorProposalFinanceForm.finance-budget', 'required')">
                             {{ "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_TOTAL_BUDGET" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-budget', 'number')">
+                            {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}</span>
                     </label>
                 </div><!--/.annotated-section-body -->
 
@@ -711,6 +715,10 @@
                             class="input-error"
                             data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'min')">
                             {{ "TR__ERROR_MIN_NUMBER_0" | translate }}</span>
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'number')">
+                            {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}</span>
                     </label>
                 </div><!--/.annotated-section-body -->
 
