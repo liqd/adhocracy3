@@ -38,12 +38,28 @@ def get_path(package_name, file_prefix, locale):
     return os.path.join(i18n_dir, filename)
 
 
+def filter_core_keys(keys):
+    """Exclude any keys that are already in core."""
+    core_path = get_path('adhocracy_frontend', 'core', 'en')
+
+    with open(core_path) as fh:
+        data = json.load(fh)
+
+    for key in data:
+        if key in keys:
+            keys.remove(key)
+
+    return keys
+
+
 if __name__ == '__main__':
     package_name = sys.argv[1]
     file_prefix = sys.argv[2]
     keys = [l.rstrip() for l in sys.stdin]
 
-    for filename in get_files(package_name, file_prefix):
+    if file_prefix != 'core':
+        keys = filter_core_keys(keys)
+
     for locale in LOCALES:
         filename = get_path(package_name, file_prefix, locale)
 
