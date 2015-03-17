@@ -32,7 +32,7 @@
     "TR__ERROR_HTTP_NOT_FOUND": "Nicht gefunden",
     "TR__ERROR_INTERNAL_VIEWMODE_UNKNOWN": "Interner Fehler: unbekannter Ansichtsmodus",
     "TR__ERROR_INVALID_DATE": "Bitte ein gültiges Datum (jjjj-mm-tt) eingeben.",
-    "TR__ERROR_INVALID_URL": "Bitte eine gültige URL eingeben",
+    "TR__ERROR_INVALID_URL": "Bitte eine gültige URL eingeben (fängt mit https:// oder http:// an)",
     "TR__ERROR_MATCH_PASSWORD": "Passwörter stimmen nicht überein",
     "TR__ERROR_MAX_EURO_50000": "Nicht mehr als 50.000€ erlaubt",
     "TR__ERROR_MIN_NUMBER_0": "Bitte eine Zahl größer als 0 eingeben.",
