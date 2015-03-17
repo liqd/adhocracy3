@@ -8,7 +8,7 @@ def includeme(config):
     config.include('adhocracy_frontend')
     # override static javascript and css files
     config.override_asset(to_override='adhocracy_frontend:build/',
-                          override_with='{{project}}:build/')
+                          override_with='meinberlin:build/')
 
 
 def main(global_config, **settings):

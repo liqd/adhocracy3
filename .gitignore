@@ -60,6 +60,7 @@ src/pyramid_cachebust/
 /Gruntfile.js
 src/adhocracy_frontend/adhocracy_frontend/build/
 src/mercator/mercator/build/
+src/meinberlin/meinberlin/build/
 /tmp
 /wheelhouse
 /share

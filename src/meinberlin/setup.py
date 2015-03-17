@@ -9,18 +9,18 @@ README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = ['adhocracy_frontend',
-            'adhocracy_{{project}}',
+            'adhocracy_meinberlin',
             ]
 
 test_requires = ['adhocracy_frontend[test]',
-                 'adhocracy_{{project}}[test]',
+                 'adhocracy_meinberlin[test]',
                  ]
 
 debug_requires = ['adhocracy_frontend[debug]',
-                  'adhocracy_{{project}}[debug]',
+                  'adhocracy_meinberlin[debug]',
                   ]
 
-setup(name='{{project}}',
+setup(name='meinberlin',
       version=version.get_git_version(),
       description='Adhocracy meta package for backend/frontend customization.',
       long_description=README + '\n\n' + CHANGES,
@@ -42,6 +42,6 @@ setup(name='{{project}}',
                       'debug': debug_requires},
       entry_points="""\
       [paste.app_factory]
-      main = {{project}}:main
+      main = meinberlin:main
       """,
       )
