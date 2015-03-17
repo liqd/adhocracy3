@@ -119,7 +119,10 @@
                     <div data-ng-switch="data.organization_info.status_enum">
                         <div data-ng-switch-when="registered_nonprofit">
                             <ul class="mercator-proposal-detail-orgs-columns">
-                                <li>{{ data.organization_info.name }}
+                                <li>
+                                    <a
+                                        data-ng-href="{{ data.organization_info.website }}" target="_new">
+                                        {{ data.organization_info.name }}</a>
                                     <a
                                         data-ng-if="data.organization_info.email"
                                         href="mailto:{{ data.organization_info.email }}">
