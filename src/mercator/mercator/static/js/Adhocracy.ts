@@ -143,8 +143,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
             }, {
                 prefix: "/static/i18n/countries_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
-            }
-            ]
+            }]
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
