@@ -138,13 +138,15 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     app.config(["$translateProvider", ($translateProvider) => {
          $translateProvider.useStaticFilesLoader({
             files: [{
-                prefix: "/static/i18n/",
+                prefix: "/static/i18n/core_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }, {
                 prefix: "/static/i18n/countries_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
-            }
-            ]
+            }, {
+                prefix: "/static/i18n/mercator_",
+                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
+            }]
         });
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
