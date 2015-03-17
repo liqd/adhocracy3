@@ -88,7 +88,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhProposal.moduleName,
         AdhSticky.moduleName,
         AdhTracking.moduleName,
-        AdhUserViews
+        AdhUserViews.moduleName
     ];
 
     if (config.cachebust) {
