@@ -36,6 +36,7 @@
     "TR__ERROR_MATCH_PASSWORD": "Passwords do not match.",
     "TR__ERROR_MAX_EURO_50000": "Not more than 50,000€ are allowed",
     "TR__ERROR_MIN_NUMBER_0": "Please insert a number higher than 0",
+    "TR__ERROR_MUST_BE_A_NUMBER": "Value must be a number",
     "TR__ERROR_REQUIRED_CHECKBOXES": "Please select one",
     "TR__ERROR_REQUIRED_COUNTRY": "Please select a country",
     "TR__ERROR_REQUIRED_DESCRIPTION": "Please enter a description",
