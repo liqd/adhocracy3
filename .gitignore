@@ -28,6 +28,12 @@ __pycache__
 /local/
 etc/scss-lint.yml
 etc/tslint.json
+/etc/development.ini
+/etc/frontend_development.ini
+/etc/test.ini
+/etc/test_with_ws.ini
+/etc/frontend_test.ini
+/etc/noserver.ini
 /src/rubygemsrecipe/build/
 /src/sphinx-autodoc-annotation/
 /source_env

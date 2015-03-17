@@ -1,5 +1,10 @@
+#
+# WARNING: Please make you changes in *.ini.in file and then run buildout
+#          to install it.
+#
+
 [app:main]
-use = egg:adhocracy_mercator
+use = egg:${adhocracy:backend_package_name}
 
 pyramid.reload_templates = true
 pyramid.debug_authorization = false
