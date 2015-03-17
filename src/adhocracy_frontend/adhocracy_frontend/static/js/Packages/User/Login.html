@@ -12,7 +12,7 @@
                 name="nameOrEmail"
                 required="required"
                 data-ng-model="credentials.nameOrEmail" />
-            <span class="input-error" data-ng-show="loginForm.nameOrEmail.$error.required && loginForm.nameOrEmail.$dirty">
+            <span class="input-error" data-ng-show="showError(loginForm, loginForm.nameOrEmail, 'required')">
                 {{ "TR__ERROR_REQUIRED_EMAIL_OR_USERNAME" | translate }}
             </span>
         </label>
@@ -24,7 +24,7 @@
                 name="password"
                 required="required"
                 data-ng-model="credentials.password" />
-            <span class="input-error" data-ng-show="loginForm.password.$error.required && loginForm.password.$dirty">
+            <span class="input-error" data-ng-show="showError(loginForm, loginForm.password, 'required')">
                 {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
             </span>
         </label>

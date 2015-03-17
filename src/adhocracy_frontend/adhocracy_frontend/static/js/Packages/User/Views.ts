@@ -28,6 +28,7 @@ export interface IScopeLogin {
     resetCredentials : () => void;
     cancel : () => void;
     logIn : () => angular.IPromise<void>;
+    showError;
 }
 
 
@@ -47,6 +48,7 @@ export interface IScopeRegister {
 
     register : () => angular.IPromise<void>;
     cancel : () => void;
+    showError;
 }
 
 
@@ -93,7 +95,8 @@ export var activateController = (
 export var loginDirective = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError
 ) => {
     return {
         restrict: "E",
@@ -102,6 +105,7 @@ export var loginDirective = (
         link: (scope : IScopeLogin) => {
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
+            scope.showError = adhShowError;
 
             scope.credentials = {
                 nameOrEmail: "",
@@ -136,7 +140,8 @@ export var loginDirective = (
 export var registerDirective = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError
 ) => {
     return {
         restrict: "E",
@@ -145,6 +150,7 @@ export var registerDirective = (
         link: (scope : IScopeRegister) => {
             scope.siteName = adhConfig.site_name;
             scope.termsUrl = adhConfig.terms_url;
+            scope.showError = adhShowError;
 
             scope.input = {
                 username: "",
@@ -175,13 +181,16 @@ export var passwordResetDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/PasswordReset.html",
         scope: {},
         link: (scope) => {
+            scope.showError = adhShowError;
+
             scope.input = {
                 password: "",
                 passwordRepeat: ""
@@ -210,7 +219,8 @@ export var passwordResetDirective = (
 export var createPasswordResetDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError
 ) => {
     return {
         restrict: "E",
@@ -218,6 +228,7 @@ export var createPasswordResetDirective = (
         scope: {},
         link: (scope) => {
             scope.success = false;
+            scope.showError = adhShowError;
 
             scope.input = {
                 email: ""
@@ -514,10 +525,10 @@ export var register = (angular) => {
         .directive("adhListUsers", ["adhUser", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
-        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", loginDirective])
+        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
         .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", passwordResetDirective])
         .directive("adhCreatePasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", createPasswordResetDirective])
-        .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", registerDirective])
+        .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
