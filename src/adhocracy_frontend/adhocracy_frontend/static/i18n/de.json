@@ -36,6 +36,7 @@
     "TR__ERROR_MATCH_PASSWORD": "Passwörter stimmen nicht überein",
     "TR__ERROR_MAX_EURO_50000": "Nicht mehr als 50.000€ erlaubt",
     "TR__ERROR_MIN_NUMBER_0": "Bitte eine Zahl größer als 0 eingeben.",
+    "TR__ERROR_MUST_BE_A_NUMBER": "Wert muss eine Nummer sein",
     "TR__ERROR_REQUIRED_CHECKBOXES": "Bitte etwas auswählen",
     "TR__ERROR_REQUIRED_COUNTRY": "Bitte ein Land auswählen",
     "TR__ERROR_REQUIRED_DESCRIPTION": "Bitte eine Beschreibung eingeben",
