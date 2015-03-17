@@ -9,8 +9,8 @@ import json
 
 
 FILES = [
-    'src/adhocracy_frontend/adhocracy_frontend/static/i18n/de.json',
-    'src/adhocracy_frontend/adhocracy_frontend/static/i18n/en.json',
+    'src/adhocracy_frontend/adhocracy_frontend/static/i18n/core_de.json',
+    'src/adhocracy_frontend/adhocracy_frontend/static/i18n/core_en.json',
 ]
 
 
