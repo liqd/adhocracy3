@@ -61,6 +61,14 @@ is selected, no state is applied.
     &:last-child {
         margin-bottom: 0;
     }
+
+    &.is-not-selected {
+        background: $color-background-base-introvert;
+    }
+
+    &.is-selected {
+        background: $color-background-base;
+    }
 }
 
 .comment-content {
