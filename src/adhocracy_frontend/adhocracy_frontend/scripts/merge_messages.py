@@ -6,6 +6,7 @@ Does remove existing entries for keys that are not in stdin.
 
 import fileinput
 import json
+import os
 
 
 FILES = [
@@ -18,8 +19,11 @@ if __name__ == '__main__':
     keys = [l.rstrip() for l in fileinput.input()]
 
     for filename in FILES:
-        with open(filename) as fh:
-            data = json.load(fh)
+        if os.path.exists(filename):
+            with open(filename) as fh:
+                data = json.load(fh)
+        else:
+            data = {}
 
         # add new keys
         for key in keys:
