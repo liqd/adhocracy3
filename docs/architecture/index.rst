@@ -4,6 +4,6 @@ Architecture
 .. toctree::
    :maxdepth: 2
 
-   frontend_structure
-   frontend_routing
-   backend_structure
+   frontend_structure.rst
+   frontend_routing.rst
+   backend_structure.rst
