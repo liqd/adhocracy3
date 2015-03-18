@@ -359,6 +359,8 @@ A list of alert messages to notify users in the moving column
     border-top: 1px solid $color-structure-border;
     padding: 1em;
     z-index: 3;
+    max-height: 80%;
+    overflow-y: auto;
 
     textarea,
     input[type="text"] {
