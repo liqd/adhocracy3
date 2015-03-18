@@ -11,7 +11,7 @@
                 name="username"
                 data-ng-model="input.username"
                 required="required" />
-            <span class="input-error" data-ng-show="registerForm.username.$error.required && registerForm.username.$dirty">
+            <span class="input-error" data-ng-show="showError(registerForm, registerForm.username, 'required')">
                 {{ "TR__ERROR_REQUIRED_USERNAME" | translate }}
             </span>
         </label>
@@ -22,10 +22,10 @@
                 name="email"
                 data-ng-model="input.email"
                 required="required" />
-            <span class="input-error" data-ng-show="registerForm.email.$error.required && registerForm.email.$dirty">
+            <span class="input-error" data-ng-show="showError(registerForm, registerForm.email, 'required')">
                 {{ "TR__ERROR_REQUIRED_EMAIL" | translate }}
             </span>
-            <span class="input-error" data-ng-show="registerForm.email.$error.email && registerForm.email.$dirty">
+            <span class="input-error" data-ng-show="showError(registerForm, registerForm.email, 'email')">
                 {{ "TR__ERROR_FORMAT_EMAIL" | translate }}
             </span>
         </label>
@@ -38,10 +38,10 @@
                 required="required"
                 data-ng-minlength="6"
                 data-ng-maxlength="100" />
-            <span class="input-error" data-ng-show="registerForm.password.$error.required && registerForm.password.$dirty">
+            <span class="input-error" data-ng-show="showError(registerForm, registerForm.password, 'required')">
                 {{ "TR__ERROR_REQUIRED_PASSWORD" | translate }}
             </span>
-            <span class="input-error" data-ng-show="registerForm.password.$error.minlength && registerForm.password.$dirty">
+            <span class="input-error" data-ng-show="showError(registerForm, registerForm.password, 'minlength')">
                 {{ "TR__ERROR_TOO_SHORT_PASSWORD" | translate }}
             </span>
         </label>
@@ -62,7 +62,7 @@
                 <input type="checkbox" name="registerCheck" data-ng-model="input.registerCheck" required="required" />
                 {{ "TR__I_ACCEPT_THE" | translate }} <a href="{{ termsUrl }}" target="_blank">{{ "TR__TERMS_AND_CONDITIONS" | translate }}</a>
             </div>
-            <span class="input-error" data-ng-show="registerForm.registerCheck.$error.required && (registerForm.registerCheck.$dirty || registerForm.$submitted)">
+            <span class="input-error" data-ng-show="showError(registerForm, registerForm.registerCheck, 'required')">
                 {{ "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS" | translate }}
             </span>
         </label>

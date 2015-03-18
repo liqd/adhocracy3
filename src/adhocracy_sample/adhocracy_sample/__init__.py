@@ -13,7 +13,7 @@ def includeme(config):
     config.include('adhocracy_core.resources.sample_section')
     config.include('adhocracy_core.resources.sample_proposal')
     # include custom sheets
-    config.include('adhocracy_core.sheets.sample_sheets')
+    config.include('adhocracy_sample.sheets.sample_sheets')
 
 
 def main(global_config, **settings):

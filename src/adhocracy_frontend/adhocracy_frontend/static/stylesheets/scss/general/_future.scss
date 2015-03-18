@@ -58,6 +58,7 @@ This mixin allows to set attributes to placeholders in several browser.
 }
 
 .sticky {
+    // scss-lint:disable VendorPrefixes
     position: -webkit-sticky;
     position: sticky;
     top: 0;

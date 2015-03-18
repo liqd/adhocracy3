@@ -8,10 +8,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-requires = ['adhocracy_core',
+requires = ['adhocracy_sample',
             ]
 
-test_requires = ['adhocracy_core[test]',
+test_requires = ['adhocracy_sample[test]',
                  ]
 
 debug_requires = ['adhocracy_core[debug]',

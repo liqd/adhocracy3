@@ -720,6 +720,9 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     var stringToBoolean : string = "(field : string) => typeof field === \"string\" ? field === \"true\" : <any>field";
 
     switch (field.valuetype) {
+    case "String":
+        resultType = "string";
+        break;
     case "adhocracy_core.schema.Boolean":
         resultType = "boolean";
         parser = stringToBoolean;

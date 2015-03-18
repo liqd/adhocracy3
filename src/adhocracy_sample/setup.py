@@ -32,6 +32,6 @@ setup(name='adhocracy_sample',
       extras_require={'test': test_requires},
       entry_points="""\
       [paste.app_factory]
-      main = adhocracy_core:main
+      main = adhocracy_sample:main
       """,
       )
