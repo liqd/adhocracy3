@@ -34,12 +34,12 @@ a form for creating new elements. This form is then always visible.
     &.ng-enter {
         @include transition(all 0.3s);
         @include opacity(0.5);
-        background: greenyellow;
+        background: $color-function-animation-enter;
 
         // destination animations
         &.ng-enter-active {
             @include opacity(1);
-            background: white;
+            background: $color-background-base;
         }
     }
 }
