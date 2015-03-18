@@ -40,11 +40,17 @@ export var processViewDirective = (
     return {
         restrict: "E",
         link: (scope, element) => {
+            var childScope : angular.IScope;
+
             adhTopLevelState.on("processType", (processType) => {
                 if (typeof processType !== "undefined") {
                     adhProcess.getTemplate(processType).then((template) => {
+                        if (childScope) {
+                            childScope.$destroy();
+                        }
+                        childScope = scope.$new();
                         element.html(template);
-                        $compile(element.contents())(scope);
+                        $compile(element.contents())(childScope);
                     });
                 }
             });

@@ -522,9 +522,15 @@ export var viewFactory = (adhTopLevelState : Service, $compile : angular.ICompil
     return {
         restrict: "E",
         link: (scope, element) => {
+            var childScope : angular.IScope;
+
             scope.$watch(() => adhTopLevelState.getTemplate(), (template) => {
+                if (childScope) {
+                    childScope.$destroy();
+                }
+                childScope = scope.$new();
                 element.html(template);
-                $compile(element.contents())(scope);
+                $compile(element.contents())(childScope);
             });
         }
     };
