@@ -32,7 +32,7 @@ $arrow-width: 1em;
     text-transform: uppercase;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
-    color: white;
+    color: $color-text-inverted;
     text-align: center;
     text-decoration: none;
     min-width: 100px / $font-size-small * 1em;
@@ -43,15 +43,15 @@ $arrow-width: 1em;
         left: -$arrow-width;
         width: 0;
         height: 0;
-        border-top: $line-height/2 * 1em solid transparent;
-        border-bottom: $line-height/2 * 1em solid transparent;
+        border-top: $line-height/2 * 1em solid $color-structure-transparent;
+        border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
         border-right: $arrow-width solid $color-brand-one-normal;
         border-left: 0;
     }
 
     &:hover,
     &:focus {
-        color: white;
+        color: $color-text-inverted;
         background-color: $color-brand-one-extrovert;
 
         &:before {

@@ -306,7 +306,7 @@ States:
 
 .moving-column-mask {
     @include opacity(0.5);
-    background-color: black;
+    background-color: $color-background-mask;
     z-index: 2;
 }
 
@@ -362,7 +362,7 @@ A list of alert messages to notify users in the moving column
 
     textarea,
     input[type="text"] {
-        background: white;
+        background: $color-background-base;
     }
 
     &.ng-enter, &.ng-leave {
