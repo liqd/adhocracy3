@@ -64,7 +64,7 @@ the transifex-client can be used::
    $ tx pull -a
 
 .. NOTE:: The configuration for transifex-client is stored in
-   ``src/adhocracy_frontend/.tx/config``.
+   ``src/{package_name}/.tx/config``.
 
 .. NOTE:: transifex-client is currently not compatible with python3.4
    and can therefore not be installed in the usual way.  If you need
