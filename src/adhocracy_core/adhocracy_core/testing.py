@@ -741,12 +741,20 @@ class AppUser:
         """default header for requests, mostly for authentication."""
         self._resolver = DottedNameResolver()
 
-    def post(self,
-             path: str, iresource: IInterface, cstruct: dict) -> TestResponse:
-        """Build and post request to the backend rest server."""
+    def post_resource(self, path: str,
+                      iresource: IInterface,
+                      cstruct: dict) -> TestResponse:
+        """Build and post request to create a new resource."""
         url = self.rest_url + self.base_path + path
         props = self._build_post_body(iresource, cstruct)
         resp = self.app.post_json(url, props, headers=self.header,
+                                  expect_errors=True)
+        return resp
+
+    def post(self, path: str, cstruct: dict={}) -> TestResponse:
+        """Post request to create a new resource."""
+        url = self.rest_url + self.base_path + path
+        resp = self.app.post_json(url, cstruct, headers=self.header,
                                   expect_errors=True)
         return resp
 

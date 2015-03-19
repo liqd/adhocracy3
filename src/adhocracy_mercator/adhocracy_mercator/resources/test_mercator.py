@@ -113,7 +113,7 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
     from adhocracy_core.sheets.name import IName
     iresource = IMercatorProposal
     sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post(path, iresource, sheets_cstruct)
+    resp = app_user.post_resource(path, iresource, sheets_cstruct)
     return resp
 
 
