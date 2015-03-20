@@ -3,7 +3,6 @@
 /// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
 import angular = require("angular");
@@ -20,7 +19,6 @@ import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
-import leaflet = require("leaflet");
 import webshim = require("polyfiller");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
@@ -36,7 +34,6 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
-import AdhMapping = require("./Packages/Mapping/Mapping");
 
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
 import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
@@ -92,7 +89,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
-        AdhMapping.moduleName,
         AdhMercatorProposal.moduleName,
         AdhMercatorWorkbench.moduleName,
         AdhResourceArea.moduleName,
@@ -165,7 +161,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     app.value("angular", angular);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
-    app.value("leaflet", leaflet);
 
     app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
 
@@ -183,7 +178,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
-    AdhMapping.register(angular);
     AdhMercatorProposal.register(angular);
     AdhMercatorWorkbench.register(angular);
     AdhMovingColumns.register(angular);
