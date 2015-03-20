@@ -32,7 +32,8 @@ export class Provider {
             "register",
             "user-indicator",
             "empty",
-            "map-input"
+            "map-input",
+            "map-detail"
         ];
 
         this.$get = () => new Service(this);
