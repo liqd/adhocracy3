@@ -49,6 +49,8 @@ import AdhTracking = require("./Packages/Tracking/Tracking");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
+import AdhMapping = require("./Packages/Mapping/Mapping");
+
 import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
@@ -81,6 +83,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "angular-data.DSCacheFactory",
         AdhComment.moduleName,
         AdhDone.moduleName,
+        AdhMapping.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhResourceArea.moduleName,
@@ -155,6 +158,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
+    AdhMapping.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
