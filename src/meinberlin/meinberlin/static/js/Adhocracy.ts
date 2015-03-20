@@ -3,6 +3,7 @@
 /// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
 import angular = require("angular");
@@ -17,6 +18,7 @@ import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
+import leaflet = require("leaflet");
 import webshim = require("polyfiller");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
@@ -135,6 +137,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     app.value("angular", angular);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
+    app.value("leaflet", leaflet);
 
     app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
 
