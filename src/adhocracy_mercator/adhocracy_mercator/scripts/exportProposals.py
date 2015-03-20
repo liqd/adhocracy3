@@ -2,7 +2,6 @@
 import csv
 import time
 import os
-import errno
 
 from pyramid.paster import bootstrap
 from pyramid.threadlocal import get_current_registry
@@ -38,11 +37,8 @@ query = path.eq('/mercator') \
 
 proposals = query.execute()
 
-try:
+if not os.path.exists('./var/export/'):
     os.makedirs('./var/export/')
-except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
 
 timestr = time.strftime('%Y%m%d-%H%M%S')
 resultFile = open('./var/export/MercatorProposalExport'
