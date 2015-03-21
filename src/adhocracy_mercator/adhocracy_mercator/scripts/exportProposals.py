@@ -41,8 +41,9 @@ if not os.path.exists('./var/export/'):
     os.makedirs('./var/export/')
 
 timestr = time.strftime('%Y%m%d-%H%M%S')
-resultFile = open('./var/export/MercatorProposalExport-'
-                  + timestr + '.csv', 'w', newline='')
+
+filename = './var/export/MercatorProposalExport-%s.csv' % timestr
+resultFile = open(filename, 'w', newline='')
 wr = csv.writer(resultFile, delimiter=';', quotechar='"',
                 quoting=csv.QUOTE_MINIMAL)
 wr.writerow(['Title', 'Username', 'First name', 'Last name', 'Country',
@@ -96,3 +97,5 @@ for proposal in proposals:
 
 
 env['closer']()
+
+print('Exported mercator proposals to %s' % filename)
