@@ -41,12 +41,12 @@ if not os.path.exists('./var/export/'):
     os.makedirs('./var/export/')
 
 timestr = time.strftime('%Y%m%d-%H%M%S')
-resultFile = open('./var/export/MercatorProposalExport'
+resultFile = open('./var/export/MercatorProposalExport-'
                   + timestr + '.csv', 'w', newline='')
 wr = csv.writer(resultFile, delimiter=';', quotechar='"',
                 quoting=csv.QUOTE_MINIMAL)
-wr.writerow(['Title', 'Creator', 'Country', 'Organisation',
-             'Rates', 'requested funding', 'budget'])
+wr.writerow(['Title', 'Username', 'First name', 'Last name', 'Country',
+             'Organisation', '# Rates', 'requested funding', 'budget'])
 
 for proposal in proposals:
 
@@ -56,10 +56,18 @@ for proposal in proposals:
     title = get_sheet_field(proposal, ITitle, 'title')
     result.append(title)
 
-    # Creator
+    # Username
     creator = get_sheet_field(proposal, IMetadata, 'creator')
     email = creator.email
     result.append(email)
+
+    # First name
+    first_name = get_sheet_field(proposal, IUserInfo, 'personal_name')
+    result.append(first_name)
+
+    # Last name
+    last_name = get_sheet_field(proposal, IUserInfo, 'family_name')
+    result.append(last_name)
 
     # Country
     country = get_sheet_field(proposal, IUserInfo, 'country')
@@ -80,8 +88,8 @@ for proposal in proposals:
     # requested funding
     finance = get_sheet_field(proposal, IMercatorSubResources, 'finance')
     budget = get_sheet_field(finance, IFinance, 'budget')
-    result.append(str(budget) + ' Euro')
+    result.append(str(budget))
     requested_funding = get_sheet_field(finance, IFinance, 'requested_funding')
-    result.append(str(requested_funding) + ' Euro')
+    result.append(str(requested_funding))
 
     wr.writerow(result)
