@@ -93,3 +93,6 @@ for proposal in proposals:
     result.append(str(requested_funding))
 
     wr.writerow(result)
+
+
+env['closer']()
