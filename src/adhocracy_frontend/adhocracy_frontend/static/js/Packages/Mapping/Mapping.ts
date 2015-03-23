@@ -1,4 +1,8 @@
-export var mapinput = ($timeout, leaflet) => {
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
+
+
+export var mapinput = ($timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
         scope: {
             lat: "=",
@@ -49,7 +53,7 @@ export var mapinput = ($timeout, leaflet) => {
     };
 };
 
-export var mapdetail = (leaflet) => {
+export var mapdetail = (leaflet : typeof L) => {
     return {
         scope: {
             lat: "@",
