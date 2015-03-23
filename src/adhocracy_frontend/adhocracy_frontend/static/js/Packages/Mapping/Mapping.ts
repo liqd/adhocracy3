@@ -1,8 +1,8 @@
 export var mapinput = ($timeout, L) => {
     return {
         scope: {
-            lat : "=",
-            lng : "="
+            lat: "=",
+            lng: "="
         },
         restrict: "E",
         template: "<div class=\"map\" style=\"cursor:crosshair;\"></div>",
@@ -19,12 +19,12 @@ export var mapinput = ($timeout, L) => {
 
             var marker = L.marker([scope.lat, scope.lng], {draggable: true});
             map.on("click", (event) => {
-                map.clicked = map.clicked + 1;
+                map.clicked += 1;
                 setTimeout(() => {
                     if (map.clicked === 1) {
                         marker.setLatLng(event.latlng);
                         marker.addTo(map);
-                        $timeout( () => {
+                        $timeout(() => {
                             scope.lat = event.latlng.lat;
                             scope.lng = event.latlng.lng;
                         });
@@ -38,7 +38,7 @@ export var mapinput = ($timeout, L) => {
             });
             marker.on("dragend", (event) => {
                 var result = event.target.getLatLng();
-                $timeout(function() {
+                $timeout(() => {
                     scope.lat = result.lat;
                     scope.lng = result.lng;
                 });
@@ -50,8 +50,8 @@ export var mapinput = ($timeout, L) => {
 export var mapdetail = (L) => {
     return {
         scope: {
-            lat : "=",
-            lng : "="
+            lat: "=",
+            lng: "="
         },
         restrict: "E",
         template: "<div class=\"map\"></div>",
