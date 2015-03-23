@@ -26,7 +26,9 @@ def root_factory(request):
         transaction.savepoint()  # give app_root a _p_jar
         registry.notify(RootAdded(app_root))
         transaction.commit()
+
     add_after_commit_hooks(request)
+    add_request_callbacks(request)
     return zodb_root['app_root']
 
 
@@ -35,9 +37,6 @@ def add_after_commit_hooks(request):
     from adhocracy_core.caching import purge_varnish_after_commit_hook
     from adhocracy_core.websockets.client import \
         send_messages_after_commit_hook
-    from adhocracy_core.changelog import clear_changelog_after_commit_hook
-    from adhocracy_core.changelog import \
-        clear_modification_date_after_commit_hook
     current_transaction = transaction.get()
     registry = request.registry
     # Order matters here
@@ -45,10 +44,16 @@ def add_after_commit_hooks(request):
                                            args=(registry, request))
     current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
                                            args=(registry,))
-    current_transaction.addAfterCommitHook(clear_changelog_after_commit_hook,
-                                           args=(registry,))
-    current_transaction.addAfterCommitHook(
-        clear_modification_date_after_commit_hook, args=(registry,))
+
+
+def add_request_callbacks(request):
+    """Add request callbacks."""
+    from adhocracy_core.auditing import audit_changes_callback
+    from adhocracy_core.changelog import clear_changelog_callback
+    from adhocracy_core.changelog import clear_modification_date_callback
+    request.add_response_callback(audit_changes_callback)
+    request.add_finished_callback(clear_changelog_callback)
+    request.add_finished_callback(clear_modification_date_callback)
 
 
 def includeme(config):
