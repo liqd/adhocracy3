@@ -5,13 +5,12 @@ export var mapinput = ($timeout, L) => {
             lng : "="
         },
         restrict: "E",
-        replace: true,
-        template: (elem, attr) => {
-            return "<div style=\"height:" + attr.height + "px; cursor:crosshair;\"  id=\"" + attr.id + "\"></div>";
-        },
+        template: "<div class=\"map\" style=\"cursor:crosshair;\"></div>",
         link: (scope, element, attrs) => {
+            var mapElement = element.find(".map");
+            mapElement.height(attrs.height);
 
-            var map = L.map(attrs.id, {
+            var map = L.map(mapElement[0], {
                 center: [attrs.lat, attrs.lng],
                 zoom: 14
             });
@@ -55,12 +54,12 @@ export var mapdetail = (L) => {
             lng : "="
         },
         restrict: "E",
-        replace: true,
-        template: (elem, attr) => {
-            return "<div style=\"height:" + attr.height + "px;\"  id=\"" + attr.id + "\"></div>";
-        },
+        template: "<div class=\"map\"></div>",
         link: (scope, element, attrs) => {
-            var map = L.map(attrs.id, {
+            var mapElement = element.find(".map");
+            mapElement.height(attrs.height);
+
+            var map = L.map(mapElement[0], {
                 center: [attrs.lat, attrs.lng],
                 zoom: 14
             });
