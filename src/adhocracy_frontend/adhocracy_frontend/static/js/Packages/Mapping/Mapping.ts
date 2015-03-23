@@ -2,7 +2,9 @@ export var mapinput = ($timeout, L) => {
     return {
         scope: {
             lat: "=",
-            lng: "="
+            lng: "=",
+            height: "@",
+            zoom: "@?"
         },
         restrict: "E",
         template: "<div class=\"map\" style=\"cursor:crosshair;\"></div>",
@@ -12,7 +14,7 @@ export var mapinput = ($timeout, L) => {
 
             var map = L.map(mapElement[0], {
                 center: [attrs.lat, attrs.lng],
-                zoom: 14
+                zoom: attrs.zoom || 14
             });
             map.clicked = 0;
             L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
@@ -50,8 +52,10 @@ export var mapinput = ($timeout, L) => {
 export var mapdetail = (L) => {
     return {
         scope: {
-            lat: "=",
-            lng: "="
+            lat: "@",
+            lng: "@",
+            height: "@",
+            zoom: "@?"
         },
         restrict: "E",
         template: "<div class=\"map\"></div>",
@@ -61,7 +65,7 @@ export var mapdetail = (L) => {
 
             var map = L.map(mapElement[0], {
                 center: [attrs.lat, attrs.lng],
-                zoom: 14
+                zoom: attrs.zoom || 14
             });
             L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
             L.marker([scope.lat, scope.lng]).addTo(map);
