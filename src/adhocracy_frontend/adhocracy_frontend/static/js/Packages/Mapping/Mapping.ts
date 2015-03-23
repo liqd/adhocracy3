@@ -1,4 +1,4 @@
-export var mapinput = ($timeout, L) => {
+export var mapinput = ($timeout, leaflet) => {
     return {
         scope: {
             lat: "=",
@@ -12,14 +12,14 @@ export var mapinput = ($timeout, L) => {
             var mapElement = element.find(".map");
             mapElement.height(attrs.height);
 
-            var map = L.map(mapElement[0], {
+            var map = leaflet.map(mapElement[0], {
                 center: [attrs.lat, attrs.lng],
                 zoom: attrs.zoom || 14
             });
             map.clicked = 0;
-            L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            var marker = L.marker([scope.lat, scope.lng], {draggable: true});
+            var marker = leaflet.marker([scope.lat, scope.lng], {draggable: true});
             map.on("click", (event) => {
                 map.clicked += 1;
                 setTimeout(() => {
@@ -49,7 +49,7 @@ export var mapinput = ($timeout, L) => {
     };
 };
 
-export var mapdetail = (L) => {
+export var mapdetail = (leaflet) => {
     return {
         scope: {
             lat: "@",
@@ -63,12 +63,12 @@ export var mapdetail = (L) => {
             var mapElement = element.find(".map");
             mapElement.height(attrs.height);
 
-            var map = L.map(mapElement[0], {
+            var map = leaflet.map(mapElement[0], {
                 center: [attrs.lat, attrs.lng],
                 zoom: attrs.zoom || 14
             });
-            L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            L.marker([scope.lat, scope.lng]).addTo(map);
+            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            leaflet.marker([scope.lat, scope.lng]).addTo(map);
         }
     };
 };
