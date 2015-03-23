@@ -60,7 +60,10 @@ export var mapdetail = (L) => {
             return "<div style=\"height:" + attr.height + "px;\"  id=\"" + attr.id + "\"></div>";
         },
         link: (scope, element, attrs) => {
-            var map = L.map(attrs.id, {center: [attrs.lat, attrs.lng], zoom: 14});
+            var map = L.map(attrs.id, {
+                center: [attrs.lat, attrs.lng],
+                zoom: 14
+            });
             L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
             L.marker([scope.lat, scope.lng]).addTo(map);
         }
