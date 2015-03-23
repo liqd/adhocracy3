@@ -413,7 +413,7 @@ new password to the reset password end point::
      'user_path': 'http://localhost/principals/users/0000008/',
      'user_token':...
 
-If the user that requested the password reset is not activated yet::
+If the user is not activated yet::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
