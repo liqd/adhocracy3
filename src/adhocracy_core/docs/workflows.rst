@@ -23,29 +23,30 @@ Lets create some content::
 Workflows
 ---------
 
-Workflows are fine state machines Assigned to a Resource.
+Workflows are finite state machines assigned to a resource.
 States can set the local permissions.
 States can have metadata (title, date,...).
-State transitions can have a callable to excecute arbitrary tasks.
-TODO nice Introduction.
+State transitions can have a callable to execute arbitrary tasks.
+
+.. TODO:: nice Introduction.
 
 The MetaAPI gives us the states and transitions metadata for each workflow::
 
     >>> resp_data = app_god.get('/../meta_api').json
     >>> worklow = resp_data['worklows']['sampleworkflow']
 
-State metadata contains a human readable title ::
+State metadata contains a human readable title::
 
     >>> state = workflow['states']['announced']
     >>> state['title']
     'Announced'
 
-a description ::
+a description::
 
     >>> state['description']
     'In this phase you may wait.'
 
-a local ACL (see doc:`authorization`) that is set when entering this state, ::
+a local ACL (see doc:`authorization`) that is set when entering this state::
 
     >>> state['acl']
     [('Disallow, 'role:reader', 'view')]
@@ -55,14 +56,14 @@ a hint for the frontend if displaying this state in listing should be restricted
     >>> state['display_only_to_roles']
     ['Manager']
 
-The order these states shoudl be listet is also set, in addition this
-defines the initial workflow state (the first in the list). ::
+The order these states should be listet is also set, in addition this
+defines the initial workflow state (the first in the list)::
 
     >>> workflow['states_order']
     ['draft', 'announced', 'published']
 
-Transition metadata determes the possible state flow and can provide a callable to
-excecute arbitrary tasks ::
+Transition metadata determines the possible state flow and can provide a callable to
+execute arbitrary tasks::
 
      >>> transition = workflow['transitions']['to_announced']
      >>> pprint(transition)
@@ -95,14 +96,14 @@ in addition we can add custom metadata for specific workflow states::
 Workflow transition to states
 -----------------------------
 
-The Metadata sheets shows the current workflow state::
+The metadata sheets shows the current workflow state::
 
     >>> resp_data = app_god.get('/proposals/proposal_item').json
     >>> metadata_data = resp_data['data']['adhocracy_core.sheets.metadata.IMetadataSheet']
     >>> workflow_data['workflow_state']
     'announced'
 
-We can also modify the state if the workflow has a suitable transition ::
+We can also modify the state if the workflow has a suitable transition::
 
     >>> resp_data = app_god.options('/proposals/proposal_item')
     >>> available_next_states = resp_data['PUT']['adhocracy_core.sheets.metadata.IMetadataSheet'][workflow_state]
@@ -111,9 +112,8 @@ We can also modify the state if the workflow has a suitable transition ::
 NOTE: The available next states depend on the workflow transitions and user permissions.
 NOTE: To make this work every state may have only one transition to another state.
 
-TODO: How to hide resource and subresources if needed for state?
+TODO: How to hide resources and subresources if needed for state?
       We can set/remove the local view permission for the resource.
-      Then you cannot do get requests anymore. But we never implementent this
+      Then you cannot do GET requests anymore. But we never implemented this
       properly, you can still view the resource in listings and the client
-      excpect that its possible to do get requests.
-
+      expects that its possible to do GET requests.
