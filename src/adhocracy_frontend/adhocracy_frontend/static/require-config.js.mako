@@ -45,7 +45,6 @@ require.config({
         socialSharePrivacy: "../lib/jquery.socialshareprivacy/jquery.socialshareprivacy.min",
         adhTemplates: "./templates",
         polyfiller: "../lib/webshim/js-webshim/minified/polyfiller"
-
     },
     shim: {
         jquery: {

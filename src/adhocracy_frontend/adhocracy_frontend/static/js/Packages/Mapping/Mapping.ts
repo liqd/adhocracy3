@@ -1,6 +1,6 @@
 export var mapinput = ($timeout, L) => {
     return {
-         scope: {
+        scope: {
             lat : "=",
             lng : "="
         },
@@ -8,18 +8,21 @@ export var mapinput = ($timeout, L) => {
         replace: true,
         template: (elem, attr) => {
             return "<div style=\"height:" + attr.height + "px; cursor:crosshair;\"  id=\"" + attr.id + "\"></div>";
-            },
+        },
         link: (scope, element, attrs) => {
 
-            var map = L.map(attrs.id, {center: [attrs.lat, attrs.lng], zoom: 14});
+            var map = L.map(attrs.id, {
+                center: [attrs.lat, attrs.lng],
+                zoom: 14
+            });
             map.clicked = 0;
             L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             var marker = L.marker([scope.lat, scope.lng], {draggable: true});
             map.on("click", (event) => {
                 map.clicked = map.clicked + 1;
-                setTimeout( () => {
-                    if ( map.clicked === 1 ) {
+                setTimeout(() => {
+                    if (map.clicked === 1) {
                         marker.setLatLng(event.latlng);
                         marker.addTo(map);
                         $timeout( () => {
@@ -47,7 +50,7 @@ export var mapinput = ($timeout, L) => {
 
 export var mapdetail = (L) => {
     return {
-         scope: {
+        scope: {
             lat : "=",
             lng : "="
         },
@@ -55,16 +58,14 @@ export var mapdetail = (L) => {
         replace: true,
         template: (elem, attr) => {
             return "<div style=\"height:" + attr.height + "px;\"  id=\"" + attr.id + "\"></div>";
-            },
+        },
         link: (scope, element, attrs) => {
-
             var map = L.map(attrs.id, {center: [attrs.lat, attrs.lng], zoom: 14});
             L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
             L.marker([scope.lat, scope.lng]).addTo(map);
         }
     };
 };
-
 
 
 export var moduleName = "adhMapping";
@@ -75,6 +76,3 @@ export var register = (angular) => {
         .directive("adhMapInput", ["$timeout", "leaflet", mapinput])
         .directive("adhMapDetail", ["leaflet", mapdetail]);
 };
-
-
-
