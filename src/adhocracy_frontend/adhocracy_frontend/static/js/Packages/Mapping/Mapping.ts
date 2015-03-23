@@ -17,32 +17,32 @@ export var mapinput = ($timeout : angular.ITimeoutService, leaflet : typeof L) =
             mapElement.height(attrs.height);
 
             var map = leaflet.map(mapElement[0], {
-                center: [attrs.lat, attrs.lng],
+                center: leaflet.latLng(attrs.lat, attrs.lng),
                 zoom: attrs.zoom || 14
             });
-            map.clicked = 0;
+            var clicked = 0;
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            var marker = leaflet.marker([scope.lat, scope.lng], {draggable: true});
-            map.on("click", (event) => {
-                map.clicked += 1;
+            var marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng), {draggable: true});
+            map.on("click", (event : L.LeafletMouseEvent) => {
+                clicked += 1;
                 setTimeout(() => {
-                    if (map.clicked === 1) {
+                    if (clicked === 1) {
                         marker.setLatLng(event.latlng);
                         marker.addTo(map);
                         $timeout(() => {
                             scope.lat = event.latlng.lat;
                             scope.lng = event.latlng.lng;
                         });
-                        map.clicked = 0;
+                        clicked = 0;
                     }
                 }, 200);
             });
-            map.on("dblclick", (event) => {
-                map.clicked = 0;
+            map.on("dblclick", (event : L.LeafletMouseEvent) => {
+                clicked = 0;
                 map.zoomIn();
             });
-            marker.on("dragend", (event) => {
+            marker.on("dragend", (event : L.LeafletDragEndEvent) => {
                 var result = event.target.getLatLng();
                 $timeout(() => {
                     scope.lat = result.lat;
@@ -68,11 +68,11 @@ export var mapdetail = (leaflet : typeof L) => {
             mapElement.height(attrs.height);
 
             var map = leaflet.map(mapElement[0], {
-                center: [attrs.lat, attrs.lng],
+                center: leaflet.latLng(attrs.lat, attrs.lng),
                 zoom: attrs.zoom || 14
             });
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            leaflet.marker([scope.lat, scope.lng]).addTo(map);
+            leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
         }
     };
 };
