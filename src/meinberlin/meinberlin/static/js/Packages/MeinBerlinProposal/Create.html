@@ -51,6 +51,9 @@
         <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.required && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET" | translate }}
         </span>
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.number && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}
+        </span>
     </label>
 
     <label>
