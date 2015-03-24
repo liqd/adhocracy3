@@ -1,6 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 
+import AdhEmbed = require("../Embed/Embed");
+
 
 export var mapinput = ($timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
@@ -82,7 +84,10 @@ export var moduleName = "adhMapping";
 
 export var register = (angular) => {
     angular
-        .module(moduleName, [])
+        .module(moduleName, [AdhEmbed.moduleName])
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail"]);
+        }])
         .directive("adhMapInput", ["$timeout", "leaflet", mapinput])
         .directive("adhMapDetail", ["leaflet", mapdetail]);
 };
