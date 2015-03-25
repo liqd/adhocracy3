@@ -109,8 +109,8 @@ In your directive you can now for example use this like this::
     export var myDirective = () => {
         return {
             scope: {
-                variable1: "=",
-                variable2: "=",
+                variable1: "@",
+                variable2: "@"
             },
             // more code
         };
