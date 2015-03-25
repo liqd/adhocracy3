@@ -15,7 +15,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             zoom: "@?"
         },
         restrict: "E",
-        template: "<div class=\"map\" style=\"cursor:crosshair;\"></div>",
+        template: "<div class=\"map\"></div>",
         link: (scope, element, attrs) => {
             var mapElement = element.find(".map");
             mapElement.height(attrs.height);
@@ -36,13 +36,16 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             }
 
             var marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng), {draggable: true});
-            adhClickContext(map).on("sglclick", (event : L.LeafletMouseEvent) => {
+            adhClickContext(attrs.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 marker.setLatLng(event.latlng);
                 marker.addTo(map);
                 $timeout(() => {
                     scope.lat = event.latlng.lat;
                     scope.lng = event.latlng.lng;
                 });
+            });
+            attrs.polygon.on("dblclick", (event : L.LeafletMouseEvent) => {
+                map.zoomIn();
             });
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
