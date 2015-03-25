@@ -34,6 +34,7 @@ One or more markers can appear anywhere in the document::
          data-ref="..." data-viewmode="display">
     </div>
 
+
 Widget markers
 --------------
 
@@ -57,10 +58,14 @@ Example (current HTML5 syntax)::
 
     <div id="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
 
+
 Embed Widget for testing
 ------------------------
 
-In order to develop and test functionalities of frontend widgets in an isolated way there is the possibility to display a widget as if it was embeded. For that, the module to which the widget (e.g. the angular directive) belongs has to inject the Embed-Package.
+In order to develop and test functionalities of frontend widgets in an
+isolated way there is the possibility to display a widget as if it was
+embeded. For that, the module to which the widget (e.g. the angular
+directive) belongs has to inject the Embed-Package.
 
 Example::
 
@@ -70,28 +75,32 @@ Example::
         // your directive's code
     };
 
+
     export var moduleName = "adhMyModule";
 
     export var register = (angular) => {
-    angular
-        .module(moduleName, [AdhEmbed.moduleName])
-        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["my-directive"]);
-        }])
-        .directive("adhMyDirective", [myDirective])
+        angular
+            .module(moduleName, [
+                AdhEmbed.moduleName
+            ])
+            .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+                adhEmbedProvider.registerEmbeddableDirectives(["my-directive"]);
+            }])
+            .directive("adhMyDirective", [myDirective]);
     };
 
 Now you can see your widget under::
 
     /embed/my-directive
 
-Maybe you would also like to add data to your directive using attributes. As there is no surrounding scope to your directive, this needs to be mocked. You can do that by appending some get parameters to your url.
-
-For example like this::
+Maybe you would also like to add data to your directive using
+attributes. As there is no surrounding scope to your directive, this
+needs to be mocked. You can do that by appending some GET parameters to
+your URL::
 
     /embed/my-directive?variable1=1&variable2=2
 
-The html-element, that is added to the embed page will look like this::
+The HTML element that is added to the embed page will look like this::
 
     <adh-my-directive data-variable1="1" data-variable2="2" ></adh-my-directive
 
@@ -103,7 +112,6 @@ In your directive you can now for example use this like this::
                 variable1: "=",
                 variable2: "=",
             },
-        // more code
+            // more code
+        };
     };
-
-
