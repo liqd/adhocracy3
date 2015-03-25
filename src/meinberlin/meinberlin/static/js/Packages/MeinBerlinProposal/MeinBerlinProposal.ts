@@ -1,6 +1,5 @@
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 export var createDirective = (adhConfig : AdhConfig.IService) => {
     return {
@@ -21,20 +20,10 @@ export var meinBerlinProposalFormController = ($scope, $element, $window) => {
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhTopLevelState.moduleName
+            AdhEmbed.moduleName
         ])
-        // FIXME: This will probably require proper routing
         .config(["adhEmbedProvider", (adhEmbedProvider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-create");
-        }])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
-            adhTopLevelStateProvider
-                .when("mein_berlin_create", () : AdhTopLevelState.IAreaInput => {
-                    return {
-                        template: "<adh-mein-berlin-create></adh-mein-berlin-create>"
-                    };
-                });
         }])
         .directive("adhMeinBerlinCreate", [createDirective])
         .controller("meinBerlinProposalFormController", [meinBerlinProposalFormController]);
