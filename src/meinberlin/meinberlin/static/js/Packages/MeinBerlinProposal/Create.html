@@ -30,18 +30,6 @@
     </label>
 
     <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
-        <input
-            type="text"
-            data-ng-model="data.location"
-            name="location"
-            required="required" />
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.location.$error.required && (meinBerlinProposalForm.location.$dirty || meinBerlinProposalForm.$submitted)">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION" | translate }}
-        </span>
-    </label>
-
-    <label>
         <span class="label-text">{{ "TR__MEINBERLIN_BUDGET" | translate }}</span>
         <input
             type="number"
@@ -53,18 +41,6 @@
         </span>
         <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.number && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
             {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}
-        </span>
-    </label>
-
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_ADDRESS" | translate }}</span>
-        <input
-            type="text"
-            data-ng-model="data.address"
-            name="address"
-            required="required" />
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.address.$error.required && (meinBerlinProposalForm.address.$dirty || meinBerlinProposalForm.$submitted)">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS" | translate }}
         </span>
     </label>
 
@@ -91,6 +67,26 @@
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART" | translate }}
         </span>
     </label>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_ADDRESS" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.address"
+            name="address"
+            required="required" />
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.address.$error.required && (meinBerlinProposalForm.address.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS" | translate }}
+        </span>
+    </label>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
+        <div>Click on the map to set marker. Afterwards drag and drop marker to change the position</div>
+        <adh-map-input data-ng-if="data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-height="200"></adh-map-input>
+
+    </label>
+
 
     <footer class="form-footer mein-berlin-proposal-form-footer">
         <input

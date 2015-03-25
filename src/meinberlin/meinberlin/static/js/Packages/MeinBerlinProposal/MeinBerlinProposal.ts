@@ -9,7 +9,11 @@ export var createDirective = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element, attrs) => {
-            var data = {};
+            scope.data = {};
+
+            // FIXME: These values have to come from somewhere
+            scope.data.lat = 52.5011278698;
+            scope.data.lng = 13.3592486393;
         }
     };
 };
