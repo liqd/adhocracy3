@@ -29,6 +29,6 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-create");
         }])
-        .directive("adhMeinBerlinCreate", [createDirective])
+        .directive("adhMeinBerlinCreate", ["adhConfig", createDirective])
         .controller("meinBerlinProposalFormController", [meinBerlinProposalFormController]);
 };
