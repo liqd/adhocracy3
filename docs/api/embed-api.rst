@@ -10,7 +10,7 @@ SDK snippet
 -----------
 
 - Bootstraps everything, initializes widgets
-- Select Adhocracy version to be used
+- Selects Adhocracy version to be used
 - Opens `adhocracy` namespace
 - Resizes widgets on the fly
 
@@ -40,23 +40,18 @@ Widget markers
 
 A widget is defined by
 
-- One angular directive (presentation)
+- One embeddable angular directive (presentation)
 - Optionally a locale
-- Multiple directive parameters, e.g.
-
-  - One or multiple resources (content)
-  - Initial widget state? (e.g. initial list sorting)
-  - Other widget parameters? (e.g. specify subwidgets)
-
+- Multiple directive parameters
 
 Constraints:
 
-- Different HTML5 (`data`- parameters) and HTML4 syntax (different)
+- Syntax should exist for both HTML5 (`data`- parameters) and HTML4
 
 
 Example (current HTML5 syntax)::
 
-    <div id="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
+    <div class="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
 
 
 Embed Widget for testing
