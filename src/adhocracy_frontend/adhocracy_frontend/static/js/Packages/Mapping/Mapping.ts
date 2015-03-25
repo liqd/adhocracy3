@@ -22,6 +22,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
 
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon));
             scope.polygon.addTo(map);
 
             // limit map to polygon

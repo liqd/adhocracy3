@@ -71,7 +71,8 @@
     <label>
         <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
         <div>Click on the map to set marker. Afterwards drag and drop marker to change the position</div>
-        <adh-map-input data-ng-if="data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-height="200"></adh-map-input>
+
+        <adh-map-input data-ng-if="data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="200"></adh-map-input>
 
     </label>
 
