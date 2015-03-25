@@ -26,7 +26,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbed.moduleName
         ])
-        .config(["adhEmbedProvider", (adhEmbedProvider) => {
+        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-create");
         }])
         .directive("adhMeinBerlinCreate", [createDirective])
