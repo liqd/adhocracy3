@@ -16,16 +16,16 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
         },
         restrict: "E",
         template: "<div class=\"map\"></div>",
-        link: (scope, element, attrs) => {
+        link: (scope, element) => {
             var mapElement = element.find(".map");
-            mapElement.height(attrs.height);
+            mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            attrs.polygon.addTo(map);
+            scope.polygon.addTo(map);
 
             // limit map to polygon
-            map.fitBounds(attrs.polygon.getBounds());
+            map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(map, {
                 minZoom: map.getZoom(),
                 maxBounds: map.getBounds()
@@ -36,7 +36,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             }
 
             var marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng), {draggable: true});
-            adhClickContext(attrs.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
+            adhClickContext(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 marker.setLatLng(event.latlng);
                 marker.addTo(map);
                 $timeout(() => {
@@ -44,7 +44,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                     scope.lng = event.latlng.lng;
                 });
             });
-            attrs.polygon.on("dblclick", (event : L.LeafletMouseEvent) => {
+            scope.polygon.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
             });
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
@@ -71,13 +71,13 @@ export var mapdetail = (leaflet : typeof L) => {
         },
         restrict: "E",
         template: "<div class=\"map\"></div>",
-        link: (scope, element, attrs) => {
+        link: (scope, element) => {
             var mapElement = element.find(".map");
-            mapElement.height(attrs.height);
+            mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0], {
-                center: leaflet.latLng(attrs.lat, attrs.lng),
-                zoom: attrs.zoom || 14
+                center: leaflet.latLng(scope.lat, scope.lng),
+                zoom: scope.zoom || 14
             });
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
             leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
