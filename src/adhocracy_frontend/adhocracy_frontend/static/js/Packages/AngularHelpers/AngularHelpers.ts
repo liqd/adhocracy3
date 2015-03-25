@@ -175,6 +175,48 @@ export var showError = (form : angular.IFormController, field : angular.INgModel
 };
 
 
+/**
+ * Wrapper around clickable element that adds a sglclick event.
+ *
+ * sglclick is triggered with on a click event that is not followed
+ * by another click or dblclick event within given timeout.
+ */
+export var clickContextFactory = ($timeout : angular.ITimeoutService) => {
+    return (clickable, timeout : number  = 200) => {
+        var clicked = 0;
+        var callbacks : Function[] = [];
+
+        var triggerSingleClick = (event) => {
+            callbacks.forEach((callback) => callback(event));
+        };
+
+        clickable.on("click", (event) => {
+            clicked += 1;
+            $timeout(() => {
+                if (clicked === 1) {
+                    triggerSingleClick(event);
+                }
+                clicked = 0;
+            }, timeout);
+        });
+
+        clickable.on("dblclick", (event) => {
+            clicked = 0;
+        });
+
+        return {
+            on: (eventName : string, callback : Function) : void => {
+                if (eventName === "sglclick") {
+                    callbacks.push(callback);
+                } else {
+                    clickable.on(eventName, callback);
+                }
+            }
+        };
+    };
+};
+
+
 export var moduleName = "adhAngularHelpers";
 
 export var register = (angular) => {
@@ -185,6 +227,7 @@ export var register = (angular) => {
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .factory("adhShowError", () => showError)
+        .factory("adhClickContext", ["$timeout", clickContextFactory])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .directive("adhWait", waitForCondition)
