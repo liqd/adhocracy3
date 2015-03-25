@@ -54,15 +54,11 @@ Example (current HTML5 syntax)::
     <div class="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
 
 
-Embed Widget for testing
-------------------------
+Allowing a directive to be embedded
+-----------------------------------
 
-In order to develop and test functionalities of frontend widgets in an
-isolated way there is the possibility to display a widget as if it was
-embeded. For that, the module to which the widget (e.g. the angular
-directive) belongs has to inject the Embed-Package.
-
-Example::
+Not every directive is allowed to be embedded.  You need to register it
+with the embed provider::
 
     import AdhEmbed = require("../Embed/Embed");
 
@@ -84,7 +80,15 @@ Example::
             .directive("adhMyDirective", [myDirective]);
     };
 
-Now you can see your widget under::
+
+Embed Widget for testing
+------------------------
+
+As a side effect, the embed API can be used to develop and test
+functionalities of frontend widgets in an isolated way.
+
+Say you have registered a directive as described in the previous
+section.  Now you can see your widget under::
 
     /embed/my-directive
 
