@@ -1,4 +1,5 @@
 import AdhConfig = require("../Config/Config");
+import AdhEmbed = require("../Embed/Embed");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 export var createDirective = (adhConfig : AdhConfig.IService) => {
@@ -20,6 +21,7 @@ export var meinBerlinProposalFormController = ($scope, $element, $window) => {
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhEmbed.moduleName,
             AdhTopLevelState.moduleName
         ])
         // FIXME: This will probably require proper routing
