@@ -54,6 +54,22 @@ Example (current HTML5 syntax)::
     <div class="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
 
 
+What happens internally
+-----------------------
+
+Say we use the following marker::
+
+    <div class="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
+
+This will be converted to the following URL for the iframe::
+
+    //example.com/embed/proposal-workbench?content=/proposal
+
+The template inside of that iframe will look roughly like this::
+
+    <adh-proposal-workbench data-content="/proposal"></adh-proposal-workbench>
+
+
 Allowing a directive to be embedded
 -----------------------------------
 
