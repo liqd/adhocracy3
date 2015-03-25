@@ -1,11 +1,13 @@
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 
+var pkgLocation = "/MeinBerlinProposal";
+
 
 export var createDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        templateUrl: "/static/js/Packages/MeinBerlinProposal/Create.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element, attrs) => {
             var data = {};
         }
