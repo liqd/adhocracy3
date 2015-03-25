@@ -1,6 +1,7 @@
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 
+
 export var createDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
@@ -11,11 +12,12 @@ export var createDirective = (adhConfig : AdhConfig.IService) => {
     };
 };
 
-export var moduleName = "adhMeinBerlinProposal";
-
 export var meinBerlinProposalFormController = ($scope, $element, $window) => {
     console.log($scope);
 };
+
+
+export var moduleName = "adhMeinBerlinProposal";
 
 export var register = (angular) => {
     angular
