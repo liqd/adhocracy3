@@ -45,18 +45,6 @@
     </label>
 
     <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_ADDRESSEE" | translate }}</span>
-        <input
-            type="text"
-            data-ng-model="data.addressee"
-            name="addressee"
-            required="required" />
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.addressee.$error.required && (meinBerlinProposalForm.addressee.$dirty || meinBerlinProposalForm.$submitted)">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESSEE" | translate }}
-        </span>
-    </label>
-
-    <label>
         <input
             type="checkbox"
             data-ng-model="data.i_want"
