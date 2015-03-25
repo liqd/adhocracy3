@@ -11,28 +11,41 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             lat: "=",
             lng: "=",
             height: "@",
+            polygon: "=",
             zoom: "@?"
         },
         restrict: "E",
-        template: "<div class=\"map\" style=\"cursor:crosshair;\"></div>",
+        template: "<div class=\"map\"></div>",
         link: (scope, element, attrs) => {
             var mapElement = element.find(".map");
             mapElement.height(attrs.height);
 
-            var map = leaflet.map(mapElement[0], {
-                center: leaflet.latLng(attrs.lat, attrs.lng),
-                zoom: attrs.zoom || 14
-            });
+            var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            attrs.polygon.addTo(map);
+
+            // limit map to polygon
+            map.fitBounds(attrs.polygon.getBounds());
+            leaflet.Util.setOptions(map, {
+                minZoom: map.getZoom(),
+                maxBounds: map.getBounds()
+            });
+
+            if (typeof scope.zoom !== "undefined") {
+                map.setZoom(scope.zoom);
+            }
 
             var marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng), {draggable: true});
-            adhClickContext(map).on("sglclick", (event : L.LeafletMouseEvent) => {
+            adhClickContext(attrs.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 marker.setLatLng(event.latlng);
                 marker.addTo(map);
                 $timeout(() => {
                     scope.lat = event.latlng.lat;
                     scope.lng = event.latlng.lng;
                 });
+            });
+            attrs.polygon.on("dblclick", (event : L.LeafletMouseEvent) => {
+                map.zoomIn();
             });
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
