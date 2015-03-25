@@ -117,7 +117,7 @@ your URL::
 
 The HTML element that is added to the embed page will look like this::
 
-    <adh-my-directive data-variable1="1" data-variable2="2" ></adh-my-directive
+    <adh-my-directive data-variable1="1" data-variable2="2" ></adh-my-directive>
 
 In your directive you can now for example use this like this::
 
