@@ -7,7 +7,6 @@ import os
 import sys
 import textwrap
 import time
-import itertools
 from pyramid.paster import bootstrap
 from substanced.util import find_catalog
 
@@ -62,7 +61,7 @@ def _get_user_rate(user_name, proposal):
         creation_date = get_sheet_field(rate, IMetadata, 'creation_date')
         return (get_sheet_field(rate, IRate, 'rate'),
                 creation_date.strftime('%Y-%m-%d_%H:%M:%S'))
-    return (0, '<never>')
+    return (0, '')
 
 
 def export_users():
@@ -92,9 +91,6 @@ def export_users():
     # FIXME: set 100 instead of 0 on prod
     proposals = _get_most_rated_proposals(root, 100)
     proposals_titles = _get_proposals_titles(proposals)
-    proposals_column_names = zip(proposals_titles,
-                                 itertools.repeat('Rate'),
-                                 itertools.repeat('Date'))
 
     if not os.path.exists('./var/export/'):
         os.makedirs('./var/export/')
@@ -106,7 +102,7 @@ def export_users():
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
     columns = ['Username', 'Email', 'Creation date'] +\
-        list(itertools.chain(*proposals_column_names))
+        proposals_titles
     wr.writerow(columns)
 
     for user in users:
@@ -119,10 +115,6 @@ def export_users():
 
         for proposal in proposals:
             (user_rate, date) = _get_user_rate(user_name, proposal)
-            proposal_title = get_sheet_field(proposal, ITitle, 'title')
-
-            row.append(proposal_title)
-            row.append(user_rate)
             row.append(date)
 
         wr.writerow(row)
