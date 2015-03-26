@@ -4,7 +4,6 @@
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhEmbed = require("../Embed/Embed");
 
-
 export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
         scope: {
@@ -15,8 +14,26 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             zoom: "@?"
         },
         restrict: "E",
-        template: "<div class=\"map\"></div>",
+        template: "<div style=\"padding: 5px; background-color: #FFCCFF; \">" +
+                   "{{ text | translate }}" +
+                   "</div>" +
+                    "<div class=\"map\"></div>" +
+                    "<span ng-show=\"map.error\" class=\"input-error\">Error</span>" +
+                    "<div ng-if=\" mapclicked\" style=\"padding: 5px; background-color: #FFCCFF; \">" +
+                        "<div>" +
+                            "<a href=\"#\" class=\"button form-footer-button\"" +
+                                "data-ng-click=\"saveCoordinates();\" style=\"" +
+                                "margin-right: 5px;\" >Speichern</a>" +
+                            "<a href=\"#\" class=\"button form-footer-button\"" +
+                            "data-ng-click=\"resetCoordinates();\" >Zurücksetzen</a>" +
+                        "</div>" +
+                    "</div>" ,
+
         link: (scope, element) => {
+            scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
+            scope.copy_lng = angular.copy(scope.lng);
+            scope.copy_lat = angular.copy(scope.lat);
+
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
 
@@ -38,28 +55,50 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 map.setZoom(scope.zoom);
             }
 
-            var marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng), {draggable: true});
+            scope.marker = leaflet.marker(leaflet.latLng(scope.copy_lat, scope.copy_lng), {draggable: true});
             adhClickContext(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
-                marker.setLatLng(event.latlng);
-                marker.addTo(map);
+                scope.marker.setLatLng(event.latlng);
+                scope.marker.addTo(map);
                 $timeout(() => {
-                    scope.lat = event.latlng.lat;
-                    scope.lng = event.latlng.lng;
+                    scope.copy_lat = event.latlng.lat;
+                    scope.copy_lng = event.latlng.lng;
+                    scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                    scope.mapclicked = true;
                 });
             });
+
             scope.polygon.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
             });
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
             });
-            marker.on("dragend", (event : L.LeafletDragEndEvent) => {
+            scope.marker.on("dragend", (event : L.LeafletDragEndEvent) => {
                 var result = event.target.getLatLng();
+                scope.mapclicked = true;
                 $timeout(() => {
-                    scope.lat = result.lat;
-                    scope.lng = result.lng;
+                    scope.copy_lat = result.lat;
+                    scope.copy_lng = result.lng;
                 });
             });
+
+            scope.saveCoordinates = () => {
+                scope.lng = scope.copy_lng;
+                scope.lat = scope.copy_lat;
+                scope.mapclicked = false;
+                scope.text = "TR__MEINBERLIN_MAP_MARKER_SAVED";
+                $timeout(() => {
+                    scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                }, 1000);
+            };
+
+            scope.resetCoordinates = () => {
+                scope.copy_lng = scope.lng;
+                scope.copy_lat = scope.lat;
+                map.removeLayer(scope.marker);
+                scope.mapclicked = false;
+                scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
+            };
         }
     };
 };
