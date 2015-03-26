@@ -217,12 +217,6 @@ States:
     padding: 0 0 0 $padding-small;
 
     a {
-        @include inline-block;
-        color: $color-text-highlight-introvert;
-        font-size: $font-size-small;
-        font-weight: $font-weight-introvert;
-        float: left;
-        margin-left: 2.5em;
         text-decoration: none;
 
         &:hover, &:focus {
@@ -232,6 +226,40 @@ States:
         &:active, &.is-active {
             color: $color-text-highlight-normal;
          }
+    }
+
+    a,
+    .moving-column-menu-sort-label {
+        @include inline-block;
+        color: $color-text-highlight-introvert;
+        font-size: $font-size-small;
+        font-weight: $font-weight-introvert;
+        float: left;
+        margin-left: 2.5em;
+    }
+
+    .moving-column-menu-sort-label {
+        font-style: italic;
+        margin-right: 1em;
+    }
+
+    .moving-column-menu-sort-option {
+        margin: 0;
+
+        &:not(:last-child) {
+            margin-right: 1em;
+            position: relative;
+
+            &:after {
+                @include inline-block;
+                content: "|";
+                position: absolute;
+                right: -1em;
+                width: 1em;
+                text-align: center;
+                color: $color-text-highlight-introvert;
+            }
+        }
     }
 }
 
@@ -306,7 +334,7 @@ States:
 
 .moving-column-mask {
     @include opacity(0.5);
-    background-color: black;
+    background-color: $color-background-mask;
     z-index: 2;
 }
 
@@ -359,10 +387,12 @@ A list of alert messages to notify users in the moving column
     border-top: 1px solid $color-structure-border;
     padding: 1em;
     z-index: 3;
+    max-height: 80%;
+    overflow-y: auto;
 
     textarea,
     input[type="text"] {
-        background: white;
+        background: $color-background-base;
     }
 
     &.ng-enter, &.ng-leave {

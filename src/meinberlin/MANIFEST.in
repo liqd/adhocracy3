@@ -1,9 +1,9 @@
 include RELEASE-VERSION version.py
-recursive-include src/meinberlin/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
+recursive-include meinberlin/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
 global-exclude *Ig.js
-prune src/meinberlin/build/styleguide
-prune src/meinberlin/build/lib/DefinitelyTyped
-prune src/meinberlin/build/lib/q
-prune src/meinberlin/build/lib/jasmine
-prune src/meinberlin/build/lib/blanket
+prune meinberlin/build/styleguide
+prune meinberlin/build/lib/DefinitelyTyped
+prune meinberlin/build/lib/q
+prune meinberlin/build/lib/jasmine
+prune meinberlin/build/lib/blanket

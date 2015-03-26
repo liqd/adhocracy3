@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[adhocracy3mercator.mercator]
+file_filter = mercator/static/i18n/mercator_<lang>.json
+source_file = mercator/static/i18n/mercator_en.json
+source_lang = en
+type = KEYVALUEJSON

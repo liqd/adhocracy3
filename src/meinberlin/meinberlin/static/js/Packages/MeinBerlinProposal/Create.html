@@ -1,0 +1,106 @@
+<form
+    novalidate="novalidate"
+    class="mein-berlin-proposal-form"
+    name="meinBerlinProposalForm">
+
+    <h2 class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL" | translate }}</h2>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_TITLE" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.title"
+            name="title"
+            required="required" />
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.title.$error.required && (meinBerlinProposalForm.title.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_TITLE" | translate }}
+        </span>
+    </label>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_DETAIL" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.detail"
+            name="detail"
+            required="required" />
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.detail.$error.required && (meinBerlinProposalForm.detail.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DETAIL" | translate }}
+        </span>
+    </label>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.location"
+            name="location"
+            required="required" />
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.location.$error.required && (meinBerlinProposalForm.location.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION" | translate }}
+        </span>
+    </label>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_BUDGET" | translate }}</span>
+        <input
+            type="number"
+            data-ng-model="data.budget"
+            name="budget"
+            required="required" />
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.required && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET" | translate }}
+        </span>
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.number && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}
+        </span>
+    </label>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_ADDRESS" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.address"
+            name="address"
+            required="required" />
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.address.$error.required && (meinBerlinProposalForm.address.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS" | translate }}
+        </span>
+    </label>
+
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_ADDRESSEE" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.addressee"
+            name="addressee"
+            required="required" />
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.addressee.$error.required && (meinBerlinProposalForm.addressee.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESSEE" | translate }}
+        </span>
+    </label>
+
+    <label>
+        <input
+            type="checkbox"
+            data-ng-model="data.i_want"
+            name="iWant"
+            required="required" />
+            {{ "TR__MEINBERLIN_I_WANT_TO_BE_PART" | translate }}
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.iWant.$error.required && (meinBerlinProposalForm.iWant.$dirty || meinBerlinProposalForm.$submitted)">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART" | translate }}
+        </span>
+    </label>
+
+    <footer class="form-footer mein-berlin-proposal-form-footer">
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__PUBLISH' | translate }}"
+            class="m-call-to-action form-footer-button-cta" />
+
+        <a href="" data-ng-click="cancel()" class="button form-footer-button">
+        {{ "TR__CANCEL" | translate }}</a>
+    </footer>
+
+</form>

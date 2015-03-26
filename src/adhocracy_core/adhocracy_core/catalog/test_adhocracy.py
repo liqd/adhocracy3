@@ -37,10 +37,11 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'rate' in catalogs['adhocracy']
     assert 'rates' in catalogs['adhocracy']
     assert 'creator' in catalogs['adhocracy']
+    assert 'item_creation_date' in catalogs['adhocracy']
     assert 'private_visibility' in catalogs['adhocracy']
 
 
-class TestIndexCreator:
+class TestIndexMetadata:
 
     @fixture
     def registry(self, registry_with_content):
@@ -64,6 +65,14 @@ class TestIndexCreator:
         context['user1'] = testing.DummyResource()
         mock_sheet.get.return_value = {'creator': ''}
         assert index_creator(context, 'default') == ''
+
+    def test_item_creation_date(self, context, mock_sheet):
+        import datetime
+        from .adhocracy import index_item_creation_date
+        context['user1'] = testing.DummyResource()
+        some_date = datetime.datetime(2009, 7, 12)
+        mock_sheet.get.return_value = {'item_creation_date': some_date}
+        assert index_item_creation_date(context, 'default') == some_date
 
 
 @mark.usefixtures('integration')
