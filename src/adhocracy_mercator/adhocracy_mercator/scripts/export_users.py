@@ -98,26 +98,28 @@ def export_users():
     timestr = time.strftime('%Y%m%d-%H%M%S')
 
     filename = './var/export/adhocracy-users-%s.csv' % timestr
-    result_file = open(filename, 'w', newline='')
-    wr = csv.writer(result_file, delimiter=';', quotechar='"',
-                    quoting=csv.QUOTE_MINIMAL)
-    columns = ['Username', 'Email', 'Creation date'] +\
-        proposals_titles
-    wr.writerow(columns)
 
-    for user in users:
-        user_name = get_sheet_field(user, IUserBasic, 'name')
-        user_email = get_sheet_field(user, IUserExtended, 'email')
-        creation_date = get_sheet_field(user, IMetadata, 'creation_date')
-        formated_creation_date = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
+    with open(filename, 'w', newline='') as result_file:
+        wr = csv.writer(result_file, delimiter=';', quotechar='"',
+                        quoting=csv.QUOTE_MINIMAL)
+        columns = ['Username', 'Email', 'Creation date'] +\
+            proposals_titles
+        wr.writerow(columns)
 
-        row = [user_name, user_email, formated_creation_date]
+        for user in users:
+            user_name = get_sheet_field(user, IUserBasic, 'name')
+            user_email = get_sheet_field(user, IUserExtended, 'email')
+            creation_date = get_sheet_field(user, IMetadata, 'creation_date')
+            formated_creation_date = creation_date.strftime(
+                '%Y-%m-%d_%H:%M:%S')
 
-        for proposal in proposals:
-            (user_rate, date) = _get_user_rate(user_name, proposal)
-            row.append(date)
+            row = [user_name, user_email, formated_creation_date]
 
-        wr.writerow(row)
+            for proposal in proposals:
+                (user_rate, date) = _get_user_rate(user_name, proposal)
+                row.append(date)
+
+            wr.writerow(row)
 
     env['closer']()
     print('Users exported to %s' % filename)
