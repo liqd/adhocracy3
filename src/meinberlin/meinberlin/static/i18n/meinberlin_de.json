@@ -1,3 +1,15 @@
 {
-
+    "TR__MEINBERLIN_ADDRESS": "Bitte geben Sie einen Ort für Ihr Projekt an, z.B. Grundschule XY",
+    "TR__MEINBERLIN_BUDGET": "Geldbetrag",
+    "TR__MEINBERLIN_DETAIL": "Detailbeschreibung und Begründung",
+    "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS": "Bitte geben Sie einen Ort an",
+    "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET": "Bitte geben Sie einen Geldbetrag ein",
+    "TR__MEINBERLIN_ERROR_REQUIRED_DETAIL": "Bitte geben Sie eine Detailbeschreibung an",
+    "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART": "This must be checked",
+    "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION": "Please enter a Geolocation",
+    "TR__MEINBERLIN_ERROR_REQUIRED_TITLE": "Bitte geben Sie einen Titel an",
+    "TR__MEINBERLIN_I_WANT_TO_BE_PART": "Mitwirkung",
+    "TR__MEINBERLIN_LOCATION": "Geo location point",
+    "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL": "Kiezkasse: Vorschlag einreichen",
+    "TR__MEINBERLIN_TITLE": "Titel ihre Projektvorschlages"
 }
