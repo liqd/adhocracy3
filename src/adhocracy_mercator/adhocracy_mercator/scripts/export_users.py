@@ -129,6 +129,3 @@ def export_users():
 
     env['closer']()
     print('Users exported to %s' % filename)
-
-
-export_users()
