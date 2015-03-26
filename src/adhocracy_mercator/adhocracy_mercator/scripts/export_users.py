@@ -54,11 +54,15 @@ def _get_rate_subject_name(rate):
 def _get_user_rate(user_name, proposal):
     rates = get_sheet_field(proposal, IRateable, 'rates')
     last_rates = filter_by_tag(rates, 'LAST')
-    rated = [get_sheet_field(rate, IRate, 'rate') for rate in last_rates
+    rated = [rate for rate in last_rates
              if _get_rate_subject_name(rate) == user_name]
+
     if len(rated) == 1:
-        return rated[0]
-    return 0
+        rate = rated[0]
+        creation_date = get_sheet_field(rate, IMetadata, 'creation_date')
+        return (get_sheet_field(rate, IRate, 'rate'),
+                creation_date.strftime('%Y-%m-%d_%H:%M:%S'))
+    return (0, '<never>')
 
 
 def export_users():
@@ -86,9 +90,11 @@ def export_users():
     users = query.execute()
 
     # FIXME: set 100 instead of 0 on prod
-    proposals = _get_most_rated_proposals(root, 0)
+    proposals = _get_most_rated_proposals(root, 100)
     proposals_titles = _get_proposals_titles(proposals)
-    proposals_column_names = zip(proposals_titles, itertools.repeat('Rate'))
+    proposals_column_names = zip(proposals_titles,
+                                 itertools.repeat('Rate'),
+                                 itertools.repeat('Date'))
 
     if not os.path.exists('./var/export/'):
         os.makedirs('./var/export/')
@@ -112,11 +118,12 @@ def export_users():
         row = [user_name, user_email, formated_creation_date]
 
         for proposal in proposals:
-            user_rate = _get_user_rate(user_name, proposal)
+            (user_rate, date) = _get_user_rate(user_name, proposal)
             proposal_title = get_sheet_field(proposal, ITitle, 'title')
 
             row.append(proposal_title)
             row.append(user_rate)
+            row.append(date)
 
         wr.writerow(row)
 
