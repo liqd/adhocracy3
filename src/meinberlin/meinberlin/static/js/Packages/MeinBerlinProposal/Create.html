@@ -66,30 +66,35 @@
     <!-- LOCATION RELATED INFORMATION -->
 
     <!-- Related Place -->
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_ADDRESS" | translate }}</span>
-        <input
-            type="text"
-            data-ng-model="data.address"
-            name="address"
-            required="required" />
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.address.$error.required && (meinBerlinProposalForm.address.$dirty || meinBerlinProposalForm.$submitted)">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS" | translate }}
-        </span>
-    </label>
+    <div style="margin-top: 30px;">
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_ADDRESS" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.address"
+                name="address"
+                required="required" />
+            <span class="input-error" data-ng-show="meinBerlinProposalForm.address.$error.required && (meinBerlinProposalForm.address.$dirty || meinBerlinProposalForm.$submitted)">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS" | translate }}
+            </span>
+        </label>
 
-    <!-- Map -->
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
-        <div>Click on the map to set marker. Afterwards drag and drop marker to change the position</div>
-        <adh-map-input data-ng-if="data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="200"></adh-map-input>
+        <!-- Map -->
+        <!--<a href="#" ng-hide="data.addPin" ng-click="showMap()">Diesen Ort auf der Karte makieren</a>-->
+        <!--<div ng-if="data.addPin">-->
+            <label>
+                <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
+                <!--<div>Click on the map to set marker. Afterwards drag and drop marker to change the position</div>-->
+                <adh-map-input data-ng-if="data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="400"></adh-map-input>
 
-    </label>
+            </label>
+        <!--</div>-->
+    </div>
 
 
     <!-- DATA SUBMIT -->
 
-    <footer class="form-footer mein-berlin-proposal-form-footer">
+    <footer style="margin-top: 10px;" class="form-footer mein-berlin-proposal-form-footer">
         <input
             type="submit"
             name="submit"
@@ -99,5 +104,8 @@
         <a href="" data-ng-click="cancel()" class="button form-footer-button">
         {{ "TR__CANCEL" | translate }}</a>
     </footer>
+
+    <div>{{ data.lat }}</div>
+    <div>{{ data.lng }}</div>
 
 </form>
