@@ -19,7 +19,6 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import get_sheet
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import ITitle
 from adhocracy_core.sheets.tags import filter_by_tag
