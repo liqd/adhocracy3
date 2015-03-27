@@ -58,7 +58,7 @@ def _get_user_rate(user_name, proposal):
 
     if len(rated) == 1:
         rate = rated[0]
-        creation_date = get_sheet_field(rate, IMetadata, 'creation_date')
+        creation_date = get_sheet_field(rate, IMetadata, 'item_creation_date')
         return (get_sheet_field(rate, IRate, 'rate'),
                 creation_date.strftime('%Y-%m-%d_%H:%M:%S'))
     return (0, '')
@@ -109,7 +109,8 @@ def export_users():
         for user in users:
             user_name = get_sheet_field(user, IUserBasic, 'name')
             user_email = get_sheet_field(user, IUserExtended, 'email')
-            creation_date = get_sheet_field(user, IMetadata, 'creation_date')
+            creation_date = get_sheet_field(user, IMetadata,
+                                            'item_creation_date')
             formated_creation_date = creation_date.strftime(
                 '%Y-%m-%d_%H:%M:%S')
 
