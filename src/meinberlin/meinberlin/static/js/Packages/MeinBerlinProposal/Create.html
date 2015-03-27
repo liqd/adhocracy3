@@ -80,15 +80,10 @@
         </label>
 
         <!-- Map -->
-        <!--<a href="#" ng-hide="data.addPin" ng-click="showMap()">Diesen Ort auf der Karte makieren</a>-->
-        <!--<div ng-if="data.addPin">-->
-            <label>
-                <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
-                <!--<div>Click on the map to set marker. Afterwards drag and drop marker to change the position</div>-->
-                <adh-map-input data-ng-if="data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="400"></adh-map-input>
-
-            </label>
-        <!--</div>-->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
+            <adh-map-input data-ng-if="data.polygon" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="400"></adh-map-input>
+        </label>
     </div>
 
 

@@ -25,11 +25,12 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                                 "data-ng-click=\"saveCoordinates();\" style=\"" +
                                 "margin-right: 5px;\" >Speichern</a>" +
                             "<a href=\"#\" class=\"button form-footer-button\"" +
-                            "data-ng-click=\"resetCoordinates();\" >Zurücksetzen</a>" +
+                            "data-ng-click=\"resetCoordinates();\" >Löschen</a>" +
                         "</div>" +
                     "</div>" ,
 
         link: (scope, element) => {
+
             scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
             scope.copy_lng = angular.copy(scope.lng);
             scope.copy_lat = angular.copy(scope.lat);
@@ -55,10 +56,19 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 map.setZoom(scope.zoom);
             }
 
-            scope.marker = leaflet.marker(leaflet.latLng(scope.copy_lat, scope.copy_lng), {draggable: true});
+            scope.marker = leaflet.marker();
+
+
+            if (scope.copy_lat && scope.copy_lng) {
+                scope.marker.setLatLng(leaflet.latLng(scope.copy_lat, scope.copy_lng)).addTo(map);
+                scope.marker.dragging.enable();
+                scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+            }
+
             adhClickContext(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 scope.marker.setLatLng(event.latlng);
                 scope.marker.addTo(map);
+                scope.marker.dragging.enable();
                 $timeout(() => {
                     scope.copy_lat = event.latlng.lat;
                     scope.copy_lng = event.latlng.lng;
@@ -93,8 +103,10 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             };
 
             scope.resetCoordinates = () => {
-                scope.copy_lng = scope.lng;
-                scope.copy_lat = scope.lat;
+                scope.copy_lng = "";
+                scope.copy_lat = "";
+                scope.lng = "";
+                scope.lat = "";
                 map.removeLayer(scope.marker);
                 scope.mapclicked = false;
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
