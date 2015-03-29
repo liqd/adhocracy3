@@ -94,6 +94,8 @@ class TestFilteringPoolSheet:
                                                       'references': {},
                                                       'sort_filter': '',
                                                       'reverse': False,
+                                                      'limit': None,
+                                                      'offset': 0,
                                                       'aggregate_filter': '',
                                                       }
         assert appstruct == {'elements': ['Dummy'], 'count': 1}
@@ -110,6 +112,8 @@ class TestFilteringPoolSheet:
             'references': {},
             'sort_filter': '',
             'reverse': False,
+            'limit': None,
+            'offset': 0,
             'aggregate_filter': '',
             }
         assert appstruct == {'elements': ['Dummy']}
@@ -125,6 +129,8 @@ class TestFilteringPoolSheet:
                 'references': {},
                 'sort_filter': '',
                 'reverse': False,
+                'limit': None,
+                'offset': 0,
                 'aggregate_filter': '',
                 }
         assert appstruct == {'elements': ['Dummy']}
@@ -145,6 +151,8 @@ class TestFilteringPoolSheet:
                 'references': {},
                 'sort_filter': '',
                 'reverse': False,
+                'limit': None,
+                'offset': 0,
                 'aggregate_filter': 'interfaces',
                 }
         assert appstruct == {'elements': ['Dummy'], 'aggregateby': {}}

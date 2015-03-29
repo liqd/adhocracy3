@@ -401,6 +401,9 @@ class GETPoolRequestSchema(colander.Schema):
                       missing=colander.drop,
                       validator=deferred_validate_sort)
     reverse = SchemaNode(colander.Boolean(), missing=colander.drop)
+    # FIXME: validate limit, offset to be multiple of 10, 20, 50, 100, 200, 500
+    limit = SchemaNode(colander.Int(), missing=colander.drop)
+    offset = SchemaNode(colander.Int(), missing=colander.drop)
     aggregateby = SchemaNode(colander.String(),
                              missing=colander.drop,
                              validator=deferred_validate_aggregateby)
