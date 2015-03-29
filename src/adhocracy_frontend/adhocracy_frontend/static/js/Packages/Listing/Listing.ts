@@ -64,6 +64,7 @@ export interface ListingScope<Container> extends angular.IScope {
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
+    reverse? : boolean;
     params? : any;
     emptyText? : string;
     container : Container;
@@ -114,6 +115,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 contentType: "@",
                 facets: "=?",
                 sort: "=?",
+                reverse: "=?",
                 frontendOrderPredicate: "=?",
                 frontendOrderReverse: "=?",
                 params: "=?",
@@ -158,6 +160,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     }
                     if ($scope.sort) {
                         params["sort"] = $scope.sort;
+                        if ($scope.reverse) {
+                            params["reverse"] = $scope.reverse;
+                        }
                     }
                     return adhHttp.get($scope.path, params, warmup).then((container) => {
                         $scope.container = container;

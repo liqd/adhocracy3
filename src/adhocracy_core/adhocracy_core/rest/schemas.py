@@ -400,6 +400,7 @@ class GETPoolRequestSchema(colander.Schema):
     sort = SchemaNode(colander.String(),
                       missing=colander.drop,
                       validator=deferred_validate_sort)
+    reverse = SchemaNode(colander.Boolean(), missing=colander.drop)
     aggregateby = SchemaNode(colander.String(),
                              missing=colander.drop,
                              validator=deferred_validate_aggregateby)
