@@ -61,7 +61,7 @@ def export_proposals():
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
     wr.writerow(['Title', 'Username', 'First name', 'Last name', 'Country',
-                'Organisation', '# Rates', 'requested funding', 'budget'])
+                'Organisation', '# Rates', 'budget', 'requested funding'])
 
     for proposal in proposals:
 
