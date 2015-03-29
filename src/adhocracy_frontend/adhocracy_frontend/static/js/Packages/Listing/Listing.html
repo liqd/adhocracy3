@@ -7,6 +7,9 @@
             <adh-inject data-transclusion-id="element-id"></adh-inject>
         </li>
     </ol>
+    <div data-ng-if="currentLimit<totalCount">
+        <a href="" data-ng-click="loadMore()">more</a>
+    </div>
     <div class="listing-empty-text" data-ng-if="elements.length === 0">
         {{ emptyText }}
     </div>

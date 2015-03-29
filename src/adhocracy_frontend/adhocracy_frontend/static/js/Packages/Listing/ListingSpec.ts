@@ -88,8 +88,9 @@ export var register = () => {
 
                 var adhWebSocketMock = <any>jasmine.createSpyObj("WebSocketMock", ["register"]);
 
-                var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs", "poolPath"]);
+                var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs", "totalCount", "poolPath"]);
                 adapter.elemRefs.and.returnValue(elements);
+                adapter.totalCount.and.returnValue(elements.length);
                 adapter.poolPath.and.returnValue(poolPath);
 
                 var listing = new AdhListing.Listing(adapter);
@@ -158,7 +159,7 @@ export var register = () => {
                         });
 
                         it("updates scope.container from server", () => {
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {}, undefined);
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {count: "true"}, undefined);
                             expect(scope.container).toBe(container);
                         });
 
@@ -184,7 +185,8 @@ export var register = () => {
 
                         it("updates scope.container from server", () => {
                             expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
-                                content_type: "some_content_type"
+                                content_type: "some_content_type",
+                                count: "true"
                             }, undefined);
                             expect(scope.container).toBe(container);
                         });
