@@ -146,6 +146,7 @@ export var mercatorProposalListingColumnDirective = (
             scope.shared.setSort = (sort : string) => {
                 scope.shared.sort = sort;
             };
+            scope.initialLimit = 50;
         }
     };
 };

@@ -873,6 +873,7 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             reverse: "=?",
             frontendOrderPredicate: "=?",
             frontendOrderReverse: "=?",
+            initialLimit: "=?",
             params: "=?"
         }
     };
