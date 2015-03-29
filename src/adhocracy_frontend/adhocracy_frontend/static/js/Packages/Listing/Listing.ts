@@ -140,7 +140,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
+                var getElements = (warmup? : boolean) : angular.IPromise<Container> => {
                     var params = <any>_.extend({}, $scope.params);
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
@@ -164,7 +164,11 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             params["reverse"] = $scope.reverse;
                         }
                     }
-                    return adhHttp.get($scope.path, params, warmup).then((container) => {
+                    return adhHttp.get($scope.path, params, warmup);
+                };
+
+                $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
+                    return getElements(warmup).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
 
