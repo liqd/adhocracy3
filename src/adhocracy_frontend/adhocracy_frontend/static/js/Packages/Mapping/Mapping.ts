@@ -3,6 +3,7 @@
 
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhEmbed = require("../Embed/Embed");
+import AdhMappingUtils = require("./MappingUtils");
 
 export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
@@ -84,36 +85,19 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 map.zoomIn();
             });
 
-            scope.pointInPolygon = (point, vs) => {
-
-                var x = point[1], y = point[0];
-
-                var inside = false;
-                for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-                    var xi = vs[i][0], yi = vs[i][1];
-                    var xj = vs[j][0], yj = vs[j][1];
-                    var intersect = ((yi > y) != (yj > y))
-                        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-                    if (intersect) inside = !inside;
-                }
-
-                return inside;
-
-            };
 
             scope.marker.on("dragend", (event : L.LeafletDragEndEvent) => {
 
                 var result = event.target.getLatLng();
-                var pointInPolygon = (scope.pointInPolygon([result.lat, result.lng], scope.polygon_origin));
+                var pointInPolygon = (AdhMappingUtils.pointInPolygon([result.lat, result.lng], scope.polygon_origin));
 
-                if(pointInPolygon){
+                if (pointInPolygon) {
                     scope.mapclicked = true;
                     $timeout(() => {
                         scope.copy_lat = result.lat;
                         scope.copy_lng = result.lng;
                     });
-                }
-                else{
+                } else {
                     scope.marker.setLatLng(leaflet.latLng(scope.copy_lat, scope.copy_lng));
                     $timeout(() => {
                         scope.text = "TR__MEINBERLIN_MAP_MARKER_ERROR";
