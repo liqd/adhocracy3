@@ -15,5 +15,6 @@
     "TR__MEINBERLIN_TITLE": "Title",
     "TR__MEINBERLIN_MAP_EXPLAIN_CLICK" : "Click on map to set a location",
     "TR__MEINBERLIN_MAP_EXPLAIN_DRAG" : "Drag the pin to set a correct location",
-    "TR__MEINBERLIN_MAP_MARKER_SAVED" : "The location was saved"
+    "TR__MEINBERLIN_MAP_MARKER_SAVED" : "The location was saved",
+    "TR__MEINBERLIN_MAP_MARKER_ERROR" : "Please set marker inside of the marked area"
 }

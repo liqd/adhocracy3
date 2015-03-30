@@ -18,7 +18,6 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                    "{{ text | translate }}" +
                    "</div>" +
                     "<div class=\"map\"></div>" +
-                    "<span ng-show=\"map.error\" class=\"input-error\">Error</span>" +
                     "<div ng-if=\" mapclicked\" style=\"padding: 5px; background-color: #FFCCFF; \">" +
                         "<div>" +
                             "<a href=\"#\" class=\"button form-footer-button\"" +
@@ -42,6 +41,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             // FIXME: Definetely Typed
+            scope.polygon_origin = angular.copy(scope.polygon);
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
             scope.polygon.addTo(map);
 
@@ -56,7 +56,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 map.setZoom(scope.zoom);
             }
 
-            scope.marker = leaflet.marker();
+            scope.marker = (<any>leaflet).marker();
 
 
             if (scope.copy_lat && scope.copy_lng) {
@@ -83,13 +83,47 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
             });
+
+            scope.pointInPolygon = (point, vs) => {
+
+                var x = point[1], y = point[0];
+
+                var inside = false;
+                for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+                    var xi = vs[i][0], yi = vs[i][1];
+                    var xj = vs[j][0], yj = vs[j][1];
+                    var intersect = ((yi > y) != (yj > y))
+                        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+
+                return inside;
+
+            };
+
             scope.marker.on("dragend", (event : L.LeafletDragEndEvent) => {
+
                 var result = event.target.getLatLng();
-                scope.mapclicked = true;
-                $timeout(() => {
-                    scope.copy_lat = result.lat;
-                    scope.copy_lng = result.lng;
-                });
+                var pointInPolygon = (scope.pointInPolygon([result.lat, result.lng], scope.polygon_origin));
+
+                if(pointInPolygon){
+                    scope.mapclicked = true;
+                    $timeout(() => {
+                        scope.copy_lat = result.lat;
+                        scope.copy_lng = result.lng;
+                    });
+                }
+                else{
+                    scope.marker.setLatLng(leaflet.latLng(scope.copy_lat, scope.copy_lng));
+                    $timeout(() => {
+                        scope.text = "TR__MEINBERLIN_MAP_MARKER_ERROR";
+                        $timeout(() => {
+                            scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                        }, 2000);
+                    });
+                }
+
+
             });
 
             scope.saveCoordinates = () => {
@@ -99,7 +133,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 scope.text = "TR__MEINBERLIN_MAP_MARKER_SAVED";
                 $timeout(() => {
                     scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
-                }, 1000);
+                }, 2000);
             };
 
             scope.resetCoordinates = () => {
