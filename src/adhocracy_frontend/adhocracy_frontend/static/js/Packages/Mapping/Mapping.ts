@@ -183,34 +183,79 @@ export var maplist = (leaflet : typeof L, $timeout : angular.ITimeoutService) =>
         scope: {
             height: "@",
             polygon: "=",
-            proposals: "=",
-            zoom: "@?"
+            proposals: "="
         },
         restrict: "E",
-        template: "<div class=\"map\"></div>",
+        template: "<div class=\"map\"></div>" +
+                  "<table class=\"table\">" +
+                        "<tr ng-repeat=\"proposal in proposals\" data-ng-hide=\"proposal.hide\" data-ng-class=\"{'highlighted': activeItem == proposal}\">" +
+                            "<td>" +
+                                "<a ng-click=\"toggleItem(proposal);\" href=\"#\">{{ proposal.title }}</a>" +
+                            "</td>" +
+                        "</tr>" +
+                  "</table>",
         link: (scope, element, attrs) => {
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
-            var map = leaflet.map(mapElement[0]);
+            scope.map = leaflet.map(mapElement[0]);
 
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
 
-            map.fitBounds(scope.polygon.getBounds());
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            scope.polygon.addTo(map);
+            scope.map.fitBounds(scope.polygon.getBounds());
+            leaflet.Util.setOptions(scope.map, {
+                 minZoom: scope.map.getZoom(),
+                 maxBounds: scope.map.getBounds()
+            });
 
-            $timeout(() => {
-                angular.forEach(scope.proposals, function (v,k) {
+            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
+            scope.polygon.addTo(scope.map);
+
+            angular.forEach(scope.proposals, function (v,k) {
                 var marker = L.marker(leaflet.latLng(v.lat, v.lng));
-                marker.addTo(map);
-
+                marker.addTo(scope.map);
+                v.marker = marker;
+                v.id = k;
+                (<any>marker).index = k;
+                marker.on('click', function (e) {
+                    $timeout(function() {
+                        if(typeof scope.activeItem !== "undefined") {
+                            $(scope.activeItem.marker._icon).removeClass("highlighted");
+                        }
+                        scope.activeItem = scope.proposals[e.target.index];
+                        $((<any>marker)._icon).addClass("highlighted");
+                        /*var string = $scope.places.activeItem.properties.bezirke[0] +e.target.itemkey;
+                        var element = angular.element('#' + string);
+                        var scrollContainer = angular.element('#scroll-container');
+                        scrollContainer.scrollToElement(element, 10, 300);*/
+                    })
                 });
             });
+
+            scope.map.on('zoomend', function(){
+                var bounds = scope.map.getBounds();
+                $timeout(() => {
+                    _.forEach(scope.proposals, function(proposal) {
+                        if (bounds.contains((<any>proposal).marker.getLatLng())){
+                            (<any>proposal).hide = false;
+                        } else {
+                            (<any>proposal).hide = true;
+                        }
+                    })
+                });
+            });
+
+            scope.toggleItem = (proposal) => {
+                if(typeof scope.activeItem !== "undefined"){
+                    $(scope.activeItem.marker._icon).removeClass("highlighted");
+                }
+                scope.activeItem = proposal;
+                $(proposal.marker._icon).addClass("highlighted");
+                scope.map.fitBounds(proposal.marker._latlng);
+            }
         }
     };
 };
-
 
 export var moduleName = "adhMapping";
 
