@@ -178,6 +178,39 @@ export var mapDetail = (leaflet : typeof L) => {
     };
 };
 
+export var maplist = (leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+    return {
+        scope: {
+            height: "@",
+            polygon: "=",
+            proposals: "=",
+            zoom: "@?"
+        },
+        restrict: "E",
+        template: "<div class=\"map\"></div>",
+        link: (scope, element, attrs) => {
+
+            var mapElement = element.find(".map");
+            mapElement.height(scope.height);
+            var map = leaflet.map(mapElement[0]);
+
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
+
+            map.fitBounds(scope.polygon.getBounds());
+            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            scope.polygon.addTo(map);
+
+            $timeout(() => {
+                angular.forEach(scope.proposals, function (v,k) {
+                var marker = L.marker(leaflet.latLng(v.lat, v.lng));
+                marker.addTo(map);
+
+                });
+            });
+        }
+    };
+};
+
 
 export var moduleName = "adhMapping";
 
@@ -188,8 +221,9 @@ export var register = (angular) => {
             AdhEmbed.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail"]);
+            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-list"]);
         }])
         .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
-        .directive("adhMapDetail", ["leaflet", mapDetail]);
+        .directive("adhMapDetail", ["leaflet", mapdetail])
+        .directive("adhMapList", ["leaflet", "$timeout" , maplist]);
 };
