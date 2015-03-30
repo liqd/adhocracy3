@@ -99,10 +99,12 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                     });
                 } else {
                     scope.marker.setLatLng(leaflet.latLng(scope.copy_lat, scope.copy_lng));
+                    scope.marker.dragging.disable();
                     $timeout(() => {
                         scope.text = "TR__MEINBERLIN_MAP_MARKER_ERROR";
                         $timeout(() => {
                             scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                            scope.marker.dragging.enable();
                         }, 2000);
                     });
                 }
