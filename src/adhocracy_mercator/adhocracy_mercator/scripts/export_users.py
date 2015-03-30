@@ -1,4 +1,9 @@
-"""Export scripts for adhocracy_mercator."""
+"""Export scripts for adhocracy_mercator.
+
+This is registered as console script in setup.py and can be used as::
+
+    bin/export_mercator_users
+"""
 
 import csv
 import inspect
