@@ -8,7 +8,7 @@
         </li>
     </ol>
     <div data-ng-if="currentLimit<totalCount">
-        <a href="" data-ng-click="loadMore()">more</a>
+        <a href="" data-ng-click="loadMore()">{{ "TR__LOAD_MORE" | translate }}</a>
     </div>
     <div class="listing-empty-text" data-ng-if="elements.length === 0">
         {{ emptyText }}
