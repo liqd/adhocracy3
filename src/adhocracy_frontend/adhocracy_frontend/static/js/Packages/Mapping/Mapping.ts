@@ -16,7 +16,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             zoom: "@?"
         },
         restrict: "E",
-        template: "<div style=\"padding: 5px; background-color: #FFCCFF; \">" +
+        template: "<div class=\"ng-class: {myErrorClass: error}\" style=\"padding: 5px; background-color: #FFCCFF; \">" +
                    "{{ text | translate }}" +
                    "</div>" +
                     "<div class=\"map\"></div>" +
@@ -102,9 +102,11 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                     scope.marker.dragging.disable();
                     $timeout(() => {
                         scope.text = "TR__MEINBERLIN_MAP_MARKER_ERROR";
+                        scope.error = true;
                         $timeout(() => {
                             scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
                             scope.marker.dragging.enable();
+                            scope.error = false;
                         }, 2000);
                     });
                 }
