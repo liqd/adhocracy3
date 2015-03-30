@@ -4,6 +4,7 @@
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhEmbed = require("../Embed/Embed");
 import AdhMappingUtils = require("./MappingUtils");
+import _ = require("lodash");
 
 export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
@@ -32,8 +33,8 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
         link: (scope, element) => {
 
             scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
-            scope.copy_lng = angular.copy(scope.lng);
-            scope.copy_lat = angular.copy(scope.lat);
+            scope.copy_lng = _.clone(scope.lng);
+            scope.copy_lat = _.clone(scope.lat);
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
@@ -42,7 +43,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             // FIXME: Definetely Typed
-            scope.polygon_origin = angular.copy(scope.polygon);
+            scope.polygon_origin = _.clone(scope.polygon);
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
             scope.polygon.addTo(map);
 
@@ -85,7 +86,6 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 map.zoomIn();
             });
 
-
             scope.marker.on("dragend", (event : L.LeafletDragEndEvent) => {
 
                 var result = event.target.getLatLng();
@@ -106,8 +106,6 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                         }, 2000);
                     });
                 }
-
-
             });
 
             scope.saveCoordinates = () => {
