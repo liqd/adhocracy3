@@ -32,7 +32,6 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
 
         link: (scope, element) => {
 
-            scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
             scope.copy_lng = _.clone(scope.lng);
             scope.copy_lat = _.clone(scope.lat);
 
@@ -60,13 +59,19 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
 
             scope.marker = (<any>leaflet).marker();
 
-
+            // check if the geoloation is already set (means we are editin) or not (means we are creating)
+            // if yes, show show marker and dragging explanation
+            // if no dont show marker and mapclicking explanation
             if (scope.copy_lat && scope.copy_lng) {
                 scope.marker.setLatLng(leaflet.latLng(scope.copy_lat, scope.copy_lng)).addTo(map);
                 scope.marker.dragging.enable();
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+            } else {
+                scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
             }
 
+            // when the polygon is clicked, set the marker there
+            // sglclick checks if doubleclick needs to be fired (and zoom in)
             adhClickContext(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 scope.marker.setLatLng(event.latlng);
                 scope.marker.addTo(map);
@@ -86,8 +91,8 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 map.zoomIn();
             });
 
+            // only allow to change location by dragging if the new point is inside the polygon
             scope.marker.on("dragend", (event : L.LeafletDragEndEvent) => {
-
                 var result = event.target.getLatLng();
                 var pointInPolygon = (AdhMappingUtils.pointInPolygon([result.lat, result.lng], scope.polygon_origin));
 
