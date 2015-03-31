@@ -63,12 +63,13 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
                 map.setZoom(scope.zoom);
             }
 
+            // FIXME: Definetely Typed
             var marker = (<any>leaflet).marker();
 
             // check if the geoloation is already set (means we are editing) or not (means we are creating)
             // if yes, show show marker and dragging explanation
             // if no dont show marker and mapclicking explanation
-            if (copyLat && copyLng) {
+            if (typeof copyLat === "undefined" && typeof copyLng === "undefined") {
                 marker.setLatLng(leaflet.latLng(copyLat, copyLng)).addTo(map);
                 marker.dragging.enable();
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
@@ -100,7 +101,7 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             // only allow to change location by dragging if the new point is inside the polygon
             marker.on("dragend", (event : L.LeafletDragEndEvent) => {
                 var result = event.target.getLatLng();
-                var pointInPolygon = (AdhMappingUtils.pointInPolygon([result.lat, result.lng], scope.polygon_origin));
+                var pointInPolygon = AdhMappingUtils.pointInPolygon([result.lat, result.lng], scope.polygon_origin);
 
                 if (pointInPolygon) {
                     scope.mapClicked = true;

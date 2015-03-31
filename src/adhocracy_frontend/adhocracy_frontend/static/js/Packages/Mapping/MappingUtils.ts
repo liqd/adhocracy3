@@ -1,7 +1,5 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-
 // code comes from https://github.com/substack/point-in-polygon/blob/master/index.js
-export function pointInPolygon(point : number[], polygon: number[][]) : Boolean {
+export var pointInPolygon = (point : number[], polygon : number[][]) : Boolean => {
     "use strict";
 
     var n = polygon.length;
@@ -29,4 +27,4 @@ export function pointInPolygon(point : number[], polygon: number[][]) : Boolean 
     }
 
     return inside;
-}
+};
