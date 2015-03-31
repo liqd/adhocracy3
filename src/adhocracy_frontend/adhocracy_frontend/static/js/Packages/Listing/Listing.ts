@@ -25,6 +25,9 @@ export interface IListingContainerAdapter {
     // A list of elements that should be displayed
     elemRefs(any) : string[];
 
+    // Total number of elements
+    totalCount(any) : number;
+
     // The pool a new element should be posted to.
     poolPath(any) : string;
 
@@ -34,6 +37,10 @@ export interface IListingContainerAdapter {
 export class ListingPoolAdapter implements IListingContainerAdapter {
     public elemRefs(container : ResourcesBase.Resource) {
         return container.data[SIPool.nick].elements;
+    }
+
+    public totalCount(container : ResourcesBase.Resource) {
+        return container.data[SIPool.nick].count;
     }
 
     public poolPath(container : ResourcesBase.Resource) {
@@ -64,6 +71,10 @@ export interface ListingScope<Container> extends angular.IScope {
     contentType? : string;
     facets? : IFacet[];
     sort? : string;
+    reverse? : boolean;
+    initialLimit? : number;
+    currentLimit? : number;
+    totalCount? : number;
     params? : any;
     emptyText? : string;
     container : Container;
@@ -74,6 +85,7 @@ export interface ListingScope<Container> extends angular.IScope {
     frontendOrderPredicate : IPredicate;
     frontendOrderReverse : boolean;
     update : (boolean?) => angular.IPromise<void>;
+    loadMore : () => void;
     wsOff : Function;
     clear : () => void;
     onCreate : () => void;
@@ -114,6 +126,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 contentType: "@",
                 facets: "=?",
                 sort: "=?",
+                reverse: "=?",
+                initialLimit: "=?",
                 frontendOrderPredicate: "=?",
                 frontendOrderReverse: "=?",
                 params: "=?",
@@ -138,7 +152,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
-                $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
+                var getElements = (
+                    warmup? : boolean, count? : boolean, limit? : number, offset? : number
+                ) : angular.IPromise<Container> => {
                     var params = <any>_.extend({}, $scope.params);
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
@@ -158,10 +174,32 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     }
                     if ($scope.sort) {
                         params["sort"] = $scope.sort;
+                        if ($scope.reverse) {
+                            params["reverse"] = $scope.reverse;
+                        }
                     }
-                    return adhHttp.get($scope.path, params, warmup).then((container) => {
+                    if (limit) {
+                        params["limit"] = limit;
+                        if (offset) {
+                            params["offset"] = offset;
+                        }
+                    }
+                    if (count) {
+                        params["count"] = "true";
+                    }
+                    return adhHttp.get($scope.path, params, warmup);
+                };
+
+                $scope.update = (warmup? : boolean) : angular.IPromise<void> => {
+                    if ($scope.initialLimit) {
+                        if (!$scope.currentLimit) {
+                            $scope.currentLimit = $scope.initialLimit;
+                        }
+                    }
+                    return getElements(warmup, true, $scope.currentLimit).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
+                        $scope.totalCount = _self.containerAdapter.totalCount($scope.container);
 
                         // FIXME: Sorting direction should be implemented in backend, working on a copy is used,
                         // because otherwise sometimes the already reversed sorted list (from cache) would be
@@ -184,6 +222,16 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     });
                 };
 
+                $scope.loadMore = () : void => {
+                    if ($scope.currentLimit < $scope.totalCount) {
+                        getElements(true, false, $scope.initialLimit, $scope.currentLimit).then((container) => {
+                            var elements = _.clone(_self.containerAdapter.elemRefs(container));
+                            $scope.elements = $scope.elements.concat(elements);
+                            $scope.currentLimit += $scope.initialLimit;
+                        });
+                    }
+                };
+
                 $scope.clear = () : void => {
                     $scope.container = undefined;
                     $scope.poolPath = undefined;
@@ -194,6 +242,10 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     $scope.update();
                     $scope.createPath = adhPreliminaryNames.nextPreliminary();
                 };
+
+                $scope.$watch("sort", (sort : string) => {
+                    $scope.update();
+                });
 
                 $scope.$watch("path", (newPath : string) => {
                     unregisterWebsocket($scope);

@@ -870,8 +870,10 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             update: "=?",
             facets: "=?",
             sort: "=?",
+            reverse: "=?",
             frontendOrderPredicate: "=?",
             frontendOrderReverse: "=?",
+            initialLimit: "=?",
             params: "=?"
         }
     };

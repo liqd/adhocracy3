@@ -61,3 +61,16 @@ a form for creating new elements. This form is then always visible.
 .listing-elements + .listing-create-form {
     margin-top: 0;
 }
+
+.load-more {
+    display: block;
+    line-height: 2;
+    background: $color-structure-extrovert;
+    color: $color-text-inverted;
+    text-align: center;
+    text-decoration: none;
+
+    &:hover, &:focus {
+        color: $color-text-inverted;
+    }
+}

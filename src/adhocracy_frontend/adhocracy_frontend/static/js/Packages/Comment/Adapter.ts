@@ -17,6 +17,10 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
         return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
     }
 
+    public totalCount(container : ResourcesBase.Resource) {
+        return this.elemRefs(container).length;
+    }
+
     public poolPath(container : ResourcesBase.Resource) {
         return container.data[SICommentable.nick].post_pool;
     }

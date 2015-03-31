@@ -152,21 +152,28 @@ export var mapDetail = (leaflet : typeof L) => {
         scope: {
             lat: "@",
             lng: "@",
+            polygon: "@",
             height: "@",
             zoom: "@?"
         },
         restrict: "E",
         template: "<div class=\"map\"></div>",
         link: (scope, element) => {
+
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
 
-            var map = leaflet.map(mapElement[0], {
-                center: leaflet.latLng(scope.lat, scope.lng),
-                zoom: scope.zoom || 14
+            scope.map = leaflet.map(mapElement[0]);
+            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
+            scope.polygon.addTo(scope.map);
+
+            scope.map.fitBounds(scope.polygon.getBounds());
+            leaflet.Util.setOptions(scope.map, {
+                minZoom: scope.map.getZoom(),
+                maxBounds: scope.map.getBounds()
             });
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
+            leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map);
         }
     };
 };

@@ -6,6 +6,7 @@
 translateMe = [
     "TR__BACK_TO_TOP",
     "TR__COMMENTS_TOTAL",
+    "TR__CREATION_DATE",
     "TR__ERROR_INVALID_DATE",
     "TR__ERROR_INVALID_URL",
     "TR__ERROR_MIN_NUMBER_0",
@@ -42,7 +43,9 @@ translateMe = [
     "TR__OTHER",
     "TR__PLEASE_SPECIFY",
     "TR__PUBLISH",
+    "TR__RATES",
     "TR__SHARE",
+    "TR__SORT_BY",
     "TR__SUPPORTERS",
     "TR__WEBSITE",
     "TR__YES"

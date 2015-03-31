@@ -1,7 +1,7 @@
 [run]
 branch = True
 omit =
-    *export.py
+    *export*.py
     *version.py
     *test*py
     *bootstrap.py*

@@ -303,6 +303,7 @@ export var userListDirective = (adhUser : AdhUser.Service, adhConfig : AdhConfig
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html",
         link: (scope) => {
             scope.user = adhUser;
+            scope.initialLimit = 50;
             scope.frontendOrderPredicate = (id) => id;
             scope.frontendOrderReverse = true;
         }
