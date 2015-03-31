@@ -5,24 +5,23 @@
 -e ./src/adhocracy_frontend
 -e ./src/adhocracy_mercator
 -e ./src/adhocracy_sample
+-e ./src/mercator
 -e git+https://github.com/hsoft/sphinx-autodoc-annotation.git@5a5bb637dbde91ac3dde70546b6da4949851bf1c#egg=sphinx-autodoc-annotation
 # other dependencies
-Sphinx==1.3b2
-repoze.sphinx.autointerface==0.7.1
-autobahn==0.9.5
+autobahn==0.9.6
 beautifulsoup4==4.3.2
 BTrees==4.1.1
-Chameleon==2.20
+Chameleon==2.22
 colander==1.0
 contexttimer==0.3.1
 cornice==0.17
-coverage==4.0a3
+coverage==3.7.1
 cryptacular==1.4.1
 deform==2.0a2
-gunicorn==19.1.1
+gunicorn==19.2.1
 hypatia==0.3
 ipdb==0.8
-ipython==2.3.1
+ipython==2.4.1
 iso8601==0.1.10
 Mako==1.0.1
 MarkupSafe==0.23
@@ -33,7 +32,7 @@ peppercorn==0.5
 persistent==4.0.8
 Pillow==2.7.0
 profilehooks==1.7.1
-pudb==2014.1
+pudb==2015.2
 py==1.4.26
 pycallgraph==1.0.1
 Pygments==2.0.2
@@ -48,8 +47,9 @@ pyramid-tm==0.11
 pyramid-zodbconn==0.7
 pytest==2.6.4
 pytest-pyramid==0.1.1
-pytest-splinter==1.2.9
+pytest-splinter==1.2.10
 pytest-timeout==0.4
+python-coveralls==2.5.0
 python-magic==0.4.6
 pytz==2014.10
 PyYAML==3.11
@@ -57,6 +57,7 @@ repoze.lru==0.6
 repoze.sendmail==4.2
 requests==2.5.1
 selenium==2.44.0
+sh==1.11
 simplejson==3.6.5
 six==1.9.0
 splinter==0.7.0
@@ -68,8 +69,7 @@ venusian==1.0
 waitress==0.8.9
 WebOb==1.4
 websocket-client==0.23.0
-WebTest==2.0.17
-wheel==0.24.0
+WebTest==2.0.18
 zc.lockfile==1.1.0
 ZConfig==3.0.4
 zdaemon==4.0.1
