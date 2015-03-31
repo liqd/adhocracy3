@@ -11,6 +11,20 @@ import AdhMappingUtils = require("./MappingUtils");
 var pkgLocation = "/Mapping";
 
 
+export interface IMapInputScope extends angular.IScope {
+    lat : number;
+    lng : number;
+    height : number;
+    polygon : any;
+    zoom? : number;
+    text : string;
+    error : boolean;
+    mapClicked : boolean;
+    saveCoordinates() : void;
+    resetCoordinates() : void;
+    polygon_origin : any;
+}
+
 export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
         scope: {
@@ -22,10 +36,10 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
         },
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Input.html",
-        link: (scope, element) => {
+        link: (scope : IMapInputScope, element) => {
 
-            scope.copyLng = _.clone(scope.lng);
-            scope.copyLat = _.clone(scope.lat);
+            var copyLng : number = _.clone(scope.lng);
+            var copyLat : number = _.clone(scope.lat);
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
@@ -49,14 +63,14 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
                 map.setZoom(scope.zoom);
             }
 
-            scope.marker = (<any>leaflet).marker();
+            var marker = (<any>leaflet).marker();
 
             // check if the geoloation is already set (means we are editing) or not (means we are creating)
             // if yes, show show marker and dragging explanation
             // if no dont show marker and mapclicking explanation
-            if (scope.copyLat && scope.copyLng) {
-                scope.marker.setLatLng(leaflet.latLng(scope.copyLat, scope.copyLng)).addTo(map);
-                scope.marker.dragging.enable();
+            if (copyLat && copyLng) {
+                marker.setLatLng(leaflet.latLng(copyLat, copyLng)).addTo(map);
+                marker.dragging.enable();
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
             } else {
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
@@ -65,12 +79,12 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             // when the polygon is clicked, set the marker there
             // sglclick checks if doubleclick needs to be fired (and zoom in)
             adhClickContext(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
-                scope.marker.setLatLng(event.latlng);
-                scope.marker.addTo(map);
-                scope.marker.dragging.enable();
+                marker.setLatLng(event.latlng);
+                marker.addTo(map);
+                marker.dragging.enable();
                 $timeout(() => {
-                    scope.copyLat = event.latlng.lat;
-                    scope.copyLng = event.latlng.lng;
+                    copyLat = event.latlng.lat;
+                    copyLng = event.latlng.lng;
                     scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
                     scope.mapClicked = true;
                 });
@@ -84,25 +98,25 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             });
 
             // only allow to change location by dragging if the new point is inside the polygon
-            scope.marker.on("dragend", (event : L.LeafletDragEndEvent) => {
+            marker.on("dragend", (event : L.LeafletDragEndEvent) => {
                 var result = event.target.getLatLng();
                 var pointInPolygon = (AdhMappingUtils.pointInPolygon([result.lat, result.lng], scope.polygon_origin));
 
                 if (pointInPolygon) {
                     scope.mapClicked = true;
                     $timeout(() => {
-                        scope.copyLat = result.lat;
-                        scope.copyLng = result.lng;
+                        copyLat = result.lat;
+                        copyLng = result.lng;
                     });
                 } else {
-                    scope.marker.setLatLng(leaflet.latLng(scope.copyLat, scope.copyLng));
-                    scope.marker.dragging.disable();
+                    marker.setLatLng(leaflet.latLng(copyLat, copyLng));
+                    marker.dragging.disable();
                     $timeout(() => {
                         scope.text = "TR__MEINBERLIN_MAP_MARKER_ERROR";
                         scope.error = true;
                         $timeout(() => {
                             scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
-                            scope.marker.dragging.enable();
+                            marker.dragging.enable();
                             scope.error = false;
                         }, 2000);
                     });
@@ -110,8 +124,8 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             });
 
             scope.saveCoordinates = () => {
-                scope.lng = scope.copyLng;
-                scope.lat = scope.copyLat;
+                scope.lng = copyLng;
+                scope.lat = copyLat;
                 scope.mapClicked = false;
                 scope.text = "TR__MEINBERLIN_MAP_MARKER_SAVED";
                 $timeout(() => {
@@ -120,11 +134,11 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             };
 
             scope.resetCoordinates = () => {
-                scope.copyLng = "";
-                scope.copyLat = "";
-                scope.lng = "";
-                scope.lat = "";
-                map.removeLayer(scope.marker);
+                copyLng = undefined;
+                copyLat = undefined;
+                scope.lng = undefined;
+                scope.lat = undefined;
+                map.removeLayer(marker);
                 scope.mapClicked = false;
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
             };
