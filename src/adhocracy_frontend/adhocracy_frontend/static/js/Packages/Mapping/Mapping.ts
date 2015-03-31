@@ -70,11 +70,8 @@ export var mapInput = (
             // FIXME: Definetely Typed
             var marker = (<any>leaflet).marker();
 
-            // check if the geoloation is already set (means we are editing) or not (means we are creating)
-            // if yes, show show marker and dragging explanation
-            // if no dont show marker and mapclicking explanation
-            if (typeof tmpLat === "undefined" && typeof tmpLng === "undefined") {
-                marker.setLatLng(leaflet.latLng(tmpLat, tmpLng)).addTo(map);
+            if (typeof scope.lat === "undefined" && typeof scope.lng === "undefined") {
+                marker.setLatLng(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
                 marker.dragging.enable();
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
             } else {
