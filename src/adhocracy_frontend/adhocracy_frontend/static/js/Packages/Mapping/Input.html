@@ -1,0 +1,13 @@
+<div class="ng-class: {myErrorClass: error}" style="padding: 5px; background-color: #FFCCFF; ">
+   {{ text | translate }}
+</div>
+<div class="map"></div>
+<div ng-if="mapclicked" style="padding: 5px; background-color: #FFCCFF; ">
+   <div>
+       <a href="#" class="button form-footer-button"
+           data-ng-click="saveCoordinates();" style="
+           margin-right: 5px;" >Speichern</a>
+       <a href="#" class="button form-footer-button"
+       data-ng-click="resetCoordinates();" >Löschen</a>
+   </div>
+</div>

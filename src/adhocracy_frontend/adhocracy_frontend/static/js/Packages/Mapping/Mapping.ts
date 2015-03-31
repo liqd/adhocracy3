@@ -4,11 +4,14 @@
 import _ = require("lodash");
 
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhMappingUtils = require("./MappingUtils");
 
+var pkgLocation = "/Mapping";
 
-export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
+
+export var mapinput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
         scope: {
             lat: "=",
@@ -18,20 +21,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
             zoom: "@?"
         },
         restrict: "E",
-        template: "<div class=\"ng-class: {myErrorClass: error}\" style=\"padding: 5px; background-color: #FFCCFF; \">" +
-                   "{{ text | translate }}" +
-                   "</div>" +
-                    "<div class=\"map\"></div>" +
-                    "<div ng-if=\" mapclicked\" style=\"padding: 5px; background-color: #FFCCFF; \">" +
-                        "<div>" +
-                            "<a href=\"#\" class=\"button form-footer-button\"" +
-                                "data-ng-click=\"saveCoordinates();\" style=\"" +
-                                "margin-right: 5px;\" >Speichern</a>" +
-                            "<a href=\"#\" class=\"button form-footer-button\"" +
-                            "data-ng-click=\"resetCoordinates();\" >Löschen</a>" +
-                        "</div>" +
-                    "</div>" ,
-
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Input.html",
         link: (scope, element) => {
 
             scope.copy_lng = _.clone(scope.lng);
@@ -178,6 +168,6 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail"]);
         }])
-        .directive("adhMapInput", ["adhClickContext", "$timeout", "leaflet", mapinput])
+        .directive("adhMapInput", ["adhConfig", "adhClickContext", "$timeout", "leaflet", mapinput])
         .directive("adhMapDetail", ["leaflet", mapdetail]);
 };
