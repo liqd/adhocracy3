@@ -217,9 +217,9 @@ export var maplist = (leaflet : typeof L, $timeout : angular.ITimeoutService) =>
                 v.marker = marker;
                 v.id = k;
                 (<any>marker).index = k;
-                marker.on('click', function (e) {
+                marker.on("click", function (e) {
                     $timeout(function() {
-                        if(typeof scope.activeItem !== "undefined") {
+                        if (typeof scope.activeItem !== "undefined") {
                             $(scope.activeItem.marker._icon).removeClass("highlighted");
                         }
                         scope.activeItem = scope.proposals[e.target.index];
@@ -228,31 +228,43 @@ export var maplist = (leaflet : typeof L, $timeout : angular.ITimeoutService) =>
                         var element = angular.element('#' + string);
                         var scrollContainer = angular.element('#scroll-container');
                         scrollContainer.scrollToElement(element, 10, 300);*/
-                    })
+                    });
                 });
             });
 
-            scope.map.on('zoomend', function(){
+            scope.map.on("zoomend", function(){
                 var bounds = scope.map.getBounds();
                 $timeout(() => {
                     _.forEach(scope.proposals, function(proposal) {
-                        if (bounds.contains((<any>proposal).marker.getLatLng())){
+                        if (bounds.contains((<any>proposal).marker.getLatLng())) {
                             (<any>proposal).hide = false;
                         } else {
                             (<any>proposal).hide = true;
                         }
-                    })
+                    });
+                });
+            });
+
+            scope.map.on("dragend", function(){
+                var bounds = scope.map.getBounds();
+                $timeout(() => {
+                    _.forEach(scope.proposals, function(proposal) {
+                        if (bounds.contains((<any>proposal).marker.getLatLng())) {
+                            (<any>proposal).hide = false;
+                        } else {
+                            (<any>proposal).hide = true;
+                        }
+                    });
                 });
             });
 
             scope.toggleItem = (proposal) => {
-                if(typeof scope.activeItem !== "undefined"){
+                if (typeof scope.activeItem !== "undefined") {
                     $(scope.activeItem.marker._icon).removeClass("highlighted");
                 }
                 scope.activeItem = proposal;
                 $(proposal.marker._icon).addClass("highlighted");
-                scope.map.fitBounds(proposal.marker._latlng);
-            }
+            };
         }
     };
 };
