@@ -1,13 +1,18 @@
-<div class="ng-class: {myErrorClass: error}" style="padding: 5px; background-color: #FFCCFF; ">
-   {{ text | translate }}
-</div>
-<div class="map"></div>
-<div ng-if="mapclicked" style="padding: 5px; background-color: #FFCCFF; ">
-   <div>
-       <a href="#" class="button form-footer-button"
-           data-ng-click="saveCoordinates();" style="
-           margin-right: 5px;" >Speichern</a>
-       <a href="#" class="button form-footer-button"
-       data-ng-click="resetCoordinates();" >Löschen</a>
-   </div>
+<!-- FIXME: remove inline CSS -->
+<div class="map-wrapper">
+    <div data-ng-class="{'m-error': error}" style="padding: 5px; background-color: #FFCCFF;">
+       {{ text | translate }}
+    </div>
+    <div class="map"></div>
+    <div data-ng-if="mapclicked" style="padding: 5px; background-color: #FFCCFF;">
+        <a
+            href=""
+            class="button form-footer-button"
+            data-ng-click="saveCoordinates();"
+            style="margin-right: 5px;" >{{ "TR__SAVE" | translate }}</a>
+        <a
+            href=""
+            class="button form-footer-button"
+            data-ng-click="resetCoordinates()">{{ "TR__DELETE" | translate }}</a>
+    </div>
 </div>
