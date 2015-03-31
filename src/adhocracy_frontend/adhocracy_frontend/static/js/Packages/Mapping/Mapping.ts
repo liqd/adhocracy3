@@ -73,9 +73,9 @@ export var mapInput = (
             if (typeof scope.lat === "undefined" && typeof scope.lng === "undefined") {
                 marker.setLatLng(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
                 marker.dragging.enable();
-                scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                scope.text = "TR__MAP_EXPLAIN_DRAG";
             } else {
-                scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
+                scope.text = "TR__MAP_EXPLAIN_CLICK";
             }
 
             // when the polygon is clicked, set the marker there
@@ -86,7 +86,7 @@ export var mapInput = (
                 $timeout(() => {
                     tmpLat = event.latlng.lat;
                     tmpLng = event.latlng.lng;
-                    scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                    scope.text = "TR__MAP_EXPLAIN_DRAG";
                     scope.mapClicked = true;
                 });
             });
@@ -113,10 +113,10 @@ export var mapInput = (
                     marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
                     marker.dragging.disable();
                     $timeout(() => {
-                        scope.text = "TR__MEINBERLIN_MAP_MARKER_ERROR";
+                        scope.text = "TR__MAP_MARKER_ERROR";
                         scope.error = true;
                         $timeout(() => {
-                            scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                            scope.text = "TR__MAP_EXPLAIN_DRAG";
                             marker.dragging.enable();
                             scope.error = false;
                         }, 2000);
@@ -128,9 +128,9 @@ export var mapInput = (
                 scope.lng = tmpLng;
                 scope.lat = tmpLat;
                 scope.mapClicked = false;
-                scope.text = "TR__MEINBERLIN_MAP_MARKER_SAVED";
+                scope.text = "TR__MAP_MARKER_SAVED";
                 $timeout(() => {
-                    scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
+                    scope.text = "TR__MAP_EXPLAIN_DRAG";
                 }, 2000);
             };
 
@@ -141,7 +141,7 @@ export var mapInput = (
                 scope.lat = undefined;
                 map.removeLayer(marker);
                 scope.mapClicked = false;
-                scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_CLICK";
+                scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
         }
     };
