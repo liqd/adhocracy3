@@ -2,10 +2,10 @@
 	<div class="cols-2">
 		<div class="map"></div>
 	</div>
-	<div class="cols-2">
+	<div class="cols-2" style="height: {{height}}px; overflow-y: scroll;" id="scroll-container">
 		<table class="table">
 			<tr ng-repeat="proposal in proposals" data-ng-hide="proposal.hide" data-ng-class="{'highlighted': activeItem == proposal}">
-				<td>
+				<td id="proposal{{proposal.id}}">
 					<a ng-click="toggleItem(proposal);" href="#">{{ proposal.title }}</a>
 				</td>
 			</tr>

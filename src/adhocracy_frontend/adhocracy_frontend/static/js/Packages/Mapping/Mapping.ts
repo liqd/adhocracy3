@@ -204,28 +204,28 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
             scope.polygon.addTo(scope.map);
 
-            angular.forEach(scope.proposals, function (v,k) {
+            angular.forEach(scope.proposals, (v, k) => {
                 var marker = L.marker(leaflet.latLng(v.lat, v.lng));
                 marker.addTo(scope.map);
                 v.marker = marker;
                 v.id = k;
                 (<any>marker).index = k;
-                marker.on("click", function (e) {
+                marker.on("click", (e) => {
                     $timeout(function() {
                         if (typeof scope.activeItem !== "undefined") {
                             $(scope.activeItem.marker._icon).removeClass("highlighted");
                         }
                         scope.activeItem = scope.proposals[e.target.index];
                         $((<any>marker)._icon).addClass("highlighted");
-                        /*var string = $scope.places.activeItem.properties.bezirke[0] +e.target.itemkey;
-                        var element = angular.element('#' + string);
-                        var scrollContainer = angular.element('#scroll-container');
-                        scrollContainer.scrollToElement(element, 10, 300);*/
+                        var string = "proposal" + e.target.index;
+                        var element = angular.element("#" + string);
+                        var scrollContainer = angular.element("#scroll-container");
+                        (<any>scrollContainer).scrollToElement(element, 10, 300);
                     });
                 });
             });
 
-            scope.map.on("zoomend", function(){
+            scope.map.on("zoomend", () => {
                 var bounds = scope.map.getBounds();
                 $timeout(() => {
                     _.forEach(scope.proposals, function(proposal) {
@@ -268,7 +268,8 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
-            AdhEmbed.moduleName
+            AdhEmbed.moduleName,
+            "duScroll"
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-list"]);
