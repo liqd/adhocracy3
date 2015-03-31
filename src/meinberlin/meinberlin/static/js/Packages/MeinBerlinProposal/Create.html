@@ -1,3 +1,4 @@
+<!-- FIXME: remove inline CSS -->
 <form
     novalidate="novalidate"
     class="mein-berlin-proposal-form"
@@ -25,6 +26,7 @@
         <span class="label-text">{{ "TR__MEINBERLIN_DETAIL" | translate }}</span>
 
         <textarea
+            data-msd-elastic=""
             data-ng-model="data.detail"
             name="detail"
             required="required"></textarea>
@@ -88,7 +90,6 @@
 
 
     <!-- DATA SUBMIT -->
-
     <footer style="margin-top: 10px;" class="form-footer mein-berlin-proposal-form-footer">
         <input
             type="submit"
