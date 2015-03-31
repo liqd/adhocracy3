@@ -87,7 +87,7 @@ export var mapdetail = (leaflet : typeof L) => {
                 minZoom: scope.map.getZoom(),
                 maxBounds: scope.map.getBounds()
             });
-            leaflet.marker(leaflet.latLng(scope.lat, scope.lng), {draggable: true}).addTo(scope.map);
+            leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map);
         }
     };
 };
