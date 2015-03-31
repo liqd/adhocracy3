@@ -2,6 +2,7 @@
 from copy import deepcopy
 from collections.abc import Iterable
 from collections import namedtuple
+from itertools import islice
 
 from pyramid.traversal import resource_path
 from pyramid.util import DottedNameResolver
@@ -22,7 +23,8 @@ dotted_name_resolver = DottedNameResolver()
 
 
 filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
-                                 'count', 'sort', 'aggregateby']
+                                 'count', 'sort', 'reverse', 'limit', 'offset',
+                                 'aggregateby']
 
 
 FilterElementsResult = namedtuple('FilterElementsResult',
@@ -61,6 +63,9 @@ class FilteringPoolSheet(PoolSheet):
         serialization_form = params.get('elements', 'path')
         resolve_resources = serialization_form != 'omit'
         sort = params.get('sort', '')
+        reverse = params.get('reverse', False)
+        limit = params.get('limit', None)
+        offset = params.get('offset', 0)
         aggregate_filter = params.get('aggregateby', '')
         result = self._filter_elements(depth=depth,
                                        ifaces=ifaces,
@@ -68,6 +73,9 @@ class FilteringPoolSheet(PoolSheet):
                                        resolve_resources=resolve_resources,
                                        references=references,
                                        sort_filter=sort,
+                                       reverse=reverse,
+                                       limit=limit,
+                                       offset=offset,
                                        aggregate_filter=aggregate_filter,
                                        )
         appstruct = {}
@@ -111,6 +119,9 @@ class FilteringPoolSheet(PoolSheet):
                          resolve_resources=True,
                          references: dict=None,
                          sort_filter: str='',
+                         reverse: bool=False,
+                         limit: int=None,
+                         offset: int=0,
                          aggregate_filter: str=None) -> FilterElementsResult:
         system_catalog = find_catalog(self.context, 'system')
         # filter path
@@ -148,9 +159,12 @@ class FilteringPoolSheet(PoolSheet):
             # TODO: We should assert the IIndexSort interfaces here, but
             # hypation.field.FieldIndex is missing this interfaces.
             assert 'sort' in sort_index.__dir__()
-            elements = elements.sort(sort_index)
+            elements = elements.sort(sort_index, reverse)
         # Count
         count = len(elements)
+        # Limit with offset
+        if limit is not None:
+            elements = islice(elements.all(), offset, offset + limit)
         # Aggregate
         aggregateby = {}
         if aggregate_filter:

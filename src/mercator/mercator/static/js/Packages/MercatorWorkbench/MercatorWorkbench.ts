@@ -142,10 +142,11 @@ export var mercatorProposalListingColumnDirective = (
                 ]
             }];
             scope.shared.sort = "rates";
+            scope.shared.reverse = true;
             scope.shared.setSort = (sort : string) => {
                 scope.shared.sort = sort;
             };
-            scope.frontendOrderReverse = true;
+            scope.initialLimit = 50;
         }
     };
 };
