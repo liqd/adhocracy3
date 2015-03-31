@@ -1,0 +1,41 @@
+//brand colors
+$color-brand-one-normal: #31458a;
+$color-brand-one-introvert: #122556;
+$color-brand-one-extrovert: #8faff5;
+$color-brand-two-normal: #ff195a;
+$color-brand-two-introvert: #c81e50;
+$color-brand-two-extrovert: #f27179;
+
+// text colors
+$color-text-normal: #4c4c4c;
+$color-text-introvert: #666;
+$color-text-extrovert: #1c1c1b;
+$color-text-highlight-normal: #ec145a;
+$color-text-highlight-introvert: $color-brand-two-introvert;
+$color-text-highlight-extrovert: #333;
+$color-text-inverted: white;
+
+// function colors
+$color-function-valid: #73bf44;
+$color-function-invalid: #f00;
+
+// background colors
+$color-background-base: white;
+$color-background-base-introvert: #f2f2f2;
+
+// structure colors
+$color-structure-normal: #e6e6e6;
+$color-structure-introvert: #ccc;
+$color-structure-extrovert: #808080;
+
+//font sizes
+$font-size-smaller: 10px;
+$font-size-small: 12px;
+$font-size-normal: 14px;
+$font-size-plus: 18px;
+$font-size-large: 24px;
+$font-size-huge: 48px;
+
+//images
+$thumbnail-width: 105px;
+$thumbnail-height: 90px;
