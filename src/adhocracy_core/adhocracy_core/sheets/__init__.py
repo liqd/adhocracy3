@@ -317,3 +317,4 @@ def includeme(config):  # pragma: no cover
     config.include('.rate')
     config.include('.asset')
     config.include('.sample_image')
+    config.include('.geo')
