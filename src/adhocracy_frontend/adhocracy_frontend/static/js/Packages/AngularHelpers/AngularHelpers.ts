@@ -181,7 +181,7 @@ export var showError = (form : angular.IFormController, field : angular.INgModel
  * sglclick is triggered with on a click event that is not followed
  * by another click or dblclick event within given timeout.
  */
-export var clickContextFactory = ($timeout : angular.ITimeoutService) => {
+export var singleClickWrapperFactory = ($timeout : angular.ITimeoutService) => {
     return (clickable, timeout : number  = 200) => {
         var clicked = 0;
         var callbacks : Function[] = [];
@@ -227,7 +227,7 @@ export var register = (angular) => {
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .factory("adhShowError", () => showError)
-        .factory("adhClickContext", ["$timeout", clickContextFactory])
+        .factory("adhSingleClickWrapper", ["$timeout", singleClickWrapperFactory])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .directive("adhWait", waitForCondition)

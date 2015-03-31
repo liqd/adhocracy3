@@ -1,6 +1,5 @@
 {
     "TR__MEINBERLIN_ADDRESS": "Address",
-    "TR__MEINBERLIN_ADDRESSEE": "Addressee",
     "TR__MEINBERLIN_BUDGET": "Budget",
     "TR__MEINBERLIN_DETAIL": "Detail",
     "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS": "Please enter the address",
@@ -13,5 +12,9 @@
     "TR__MEINBERLIN_I_WANT_TO_BE_PART": "I want to be a part",
     "TR__MEINBERLIN_LOCATION": "Geo location point",
     "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL": "MeinBerlin Simple Proposal",
-    "TR__MEINBERLIN_TITLE": "Title"
+    "TR__MEINBERLIN_TITLE": "Title",
+    "TR__MEINBERLIN_MAP_EXPLAIN_CLICK" : "Click on map to set a location",
+    "TR__MEINBERLIN_MAP_EXPLAIN_DRAG" : "Drag the pin to set a correct location",
+    "TR__MEINBERLIN_MAP_MARKER_SAVED" : "The location was saved",
+    "TR__MEINBERLIN_MAP_MARKER_ERROR" : "Please set marker inside of the marked area"
 }
