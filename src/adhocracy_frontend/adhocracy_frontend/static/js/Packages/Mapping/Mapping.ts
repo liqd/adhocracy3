@@ -38,8 +38,8 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Input.html",
         link: (scope : IMapInputScope, element) => {
 
-            var copyLng : number = _.clone(scope.lng);
-            var copyLat : number = _.clone(scope.lat);
+            var tmpLng : number = _.clone(scope.lng);
+            var tmpLat : number = _.clone(scope.lat);
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
@@ -68,8 +68,8 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             // check if the geoloation is already set (means we are editing) or not (means we are creating)
             // if yes, show show marker and dragging explanation
             // if no dont show marker and mapclicking explanation
-            if (typeof copyLat === "undefined" && typeof copyLng === "undefined") {
-                marker.setLatLng(leaflet.latLng(copyLat, copyLng)).addTo(map);
+            if (typeof tmpLat === "undefined" && typeof tmpLng === "undefined") {
+                marker.setLatLng(leaflet.latLng(tmpLat, tmpLng)).addTo(map);
                 marker.dragging.enable();
                 scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
             } else {
@@ -83,8 +83,8 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
                 marker.addTo(map);
                 marker.dragging.enable();
                 $timeout(() => {
-                    copyLat = event.latlng.lat;
-                    copyLng = event.latlng.lng;
+                    tmpLat = event.latlng.lat;
+                    tmpLng = event.latlng.lng;
                     scope.text = "TR__MEINBERLIN_MAP_EXPLAIN_DRAG";
                     scope.mapClicked = true;
                 });
@@ -105,11 +105,11 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
                 if (pointInPolygon) {
                     scope.mapClicked = true;
                     $timeout(() => {
-                        copyLat = result.lat;
-                        copyLng = result.lng;
+                        tmpLat = result.lat;
+                        tmpLng = result.lng;
                     });
                 } else {
-                    marker.setLatLng(leaflet.latLng(copyLat, copyLng));
+                    marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
                     marker.dragging.disable();
                     $timeout(() => {
                         scope.text = "TR__MEINBERLIN_MAP_MARKER_ERROR";
@@ -124,8 +124,8 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             });
 
             scope.saveCoordinates = () => {
-                scope.lng = copyLng;
-                scope.lat = copyLat;
+                scope.lng = tmpLng;
+                scope.lat = tmpLat;
                 scope.mapClicked = false;
                 scope.text = "TR__MEINBERLIN_MAP_MARKER_SAVED";
                 $timeout(() => {
@@ -134,8 +134,8 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             };
 
             scope.resetCoordinates = () => {
-                copyLng = undefined;
-                copyLat = undefined;
+                tmpLng = undefined;
+                tmpLat = undefined;
                 scope.lng = undefined;
                 scope.lat = undefined;
                 map.removeLayer(marker);
