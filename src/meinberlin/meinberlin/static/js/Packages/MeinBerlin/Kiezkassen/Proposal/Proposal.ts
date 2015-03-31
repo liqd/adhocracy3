@@ -1,9 +1,9 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
+import AdhConfig = require("../../../Config/Config");
+import AdhEmbed = require("../../../Embed/Embed");
 
-var pkgLocation = "/MeinBerlinProposal";
+var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 
 
 var bindPath = (scope, pathKey : string = "path") : void => {
@@ -68,7 +68,7 @@ export var meinBerlinProposalFormController = ($scope, $element, $window) => {
 };
 
 
-export var moduleName = "adhMeinBerlinProposal";
+export var moduleName = "adhMeinBerlinKiezkassenProposal";
 
 export var register = (angular) => {
     angular
@@ -76,12 +76,12 @@ export var register = (angular) => {
             AdhEmbed.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-detail");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-list-item");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-create");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list-item");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-create");
         }])
-        .directive("adhMeinBerlinDetail", ["adhConfig", detailDirective])
-        .directive("adhMeinBerlinListItem", ["adhConfig", listItemDirective])
-        .directive("adhMeinBerlinCreate", ["adhConfig", createDirective])
-        .controller("meinBerlinProposalFormController", [meinBerlinProposalFormController]);
+        .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", detailDirective])
+        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalCreate", ["adhConfig", createDirective])
+        .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
 };
