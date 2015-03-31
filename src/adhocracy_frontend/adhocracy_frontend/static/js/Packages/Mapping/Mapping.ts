@@ -1,10 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 
+import _ = require("lodash");
+
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhEmbed = require("../Embed/Embed");
 import AdhMappingUtils = require("./MappingUtils");
-import _ = require("lodash");
+
 
 export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
     return {
@@ -59,7 +61,7 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
 
             scope.marker = (<any>leaflet).marker();
 
-            // check if the geoloation is already set (means we are editin) or not (means we are creating)
+            // check if the geoloation is already set (means we are editing) or not (means we are creating)
             // if yes, show show marker and dragging explanation
             // if no dont show marker and mapclicking explanation
             if (scope.copy_lat && scope.copy_lng) {
