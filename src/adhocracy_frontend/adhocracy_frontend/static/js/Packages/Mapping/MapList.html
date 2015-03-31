@@ -1,0 +1,14 @@
+<div class="row">
+	<div class="cols-2">
+		<div class="map"></div>
+	</div>
+	<div class="cols-2">
+		<table class="table">
+			<tr ng-repeat="proposal in proposals" data-ng-hide="proposal.hide" data-ng-class="{'highlighted': activeItem == proposal}">
+				<td>
+					<a ng-click="toggleItem(proposal);" href="#">{{ proposal.title }}</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>

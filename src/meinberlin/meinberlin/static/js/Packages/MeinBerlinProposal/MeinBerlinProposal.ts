@@ -65,6 +65,27 @@ export var listDirective = (adhConfig : AdhConfig.IService) => {
                  "budget": 1500,
                  "lat" : 52.50880341712083,
                  "lng" : 13.38460922241211
+                },
+                {"title": "Mein sechstes Proposal",
+                 "detail" : "Lorem ipsum dolor sit amet",
+                 "location": "Mein Lieblingsplatz",
+                 "budget": 1500,
+                 "lat" : 52.521845144015145,
+                 "lng" : 13.381776809692383
+                },
+                {"title": "Mein siebtes Proposal",
+                 "detail" : "Lorem ipsum dolor sit amet",
+                 "location": "Mein Lieblingsplatz",
+                 "budget": 1500,
+                 "lat" : 52.53792732888596,
+                 "lng" : 13.402719497680664
+                },
+                {"title": "Mein achtes Proposal",
+                 "detail" : "Lorem ipsum dolor sit amet",
+                 "location": "Mein Lieblingsplatz",
+                 "budget": 1500,
+                 "lat" : 52.53240953182129,
+                 "lng" : 13.39834213256836
                 }
             ];
         }

@@ -147,7 +147,7 @@ export var mapInput = (
     };
 };
 
-export var mapDetail = (leaflet : typeof L) => {
+export var mapdetail = (leaflet : typeof L) => {
     return {
         scope: {
             lat: "@",
@@ -178,7 +178,7 @@ export var mapDetail = (leaflet : typeof L) => {
     };
 };
 
-export var maplist = (leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
     return {
         scope: {
             height: "@",
@@ -186,14 +186,7 @@ export var maplist = (leaflet : typeof L, $timeout : angular.ITimeoutService) =>
             proposals: "="
         },
         restrict: "E",
-        template: "<div class=\"map\"></div>" +
-                  "<table class=\"table\">" +
-                        "<tr ng-repeat=\"proposal in proposals\" data-ng-hide=\"proposal.hide\" data-ng-class=\"{'highlighted': activeItem == proposal}\">" +
-                            "<td>" +
-                                "<a ng-click=\"toggleItem(proposal);\" href=\"#\">{{ proposal.title }}</a>" +
-                            "</td>" +
-                        "</tr>" +
-                  "</table>",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
         link: (scope, element, attrs) => {
 
             var mapElement = element.find(".map");
@@ -282,5 +275,5 @@ export var register = (angular) => {
         }])
         .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
         .directive("adhMapDetail", ["leaflet", mapdetail])
-        .directive("adhMapList", ["leaflet", "$timeout" , maplist]);
+        .directive("adhMapList", ["adhConfig", "leaflet", "$timeout" , maplist]);
 };
