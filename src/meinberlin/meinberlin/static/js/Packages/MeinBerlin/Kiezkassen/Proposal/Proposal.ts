@@ -2,11 +2,12 @@
 
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
+import AdhHttp = require("../../../Http/Http");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 
 
-var bindPath = (scope, pathKey : string = "path") : void => {
+var bindPath = (adhHttp : AdhHttp.Service<any>) => (scope, pathKey : string = "path") : void => {
     scope.$watch(pathKey, (value : string) => {
         if (value) {
             adhHttp.get(value).then((resource) => {
@@ -17,7 +18,7 @@ var bindPath = (scope, pathKey : string = "path") : void => {
                 scope.options = options;
             });
         }
-    };
+    });
 };
 
 export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
@@ -26,9 +27,9 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@"
-        }
+        },
         link: (scope) => {
-            bindPath(scope);
+            bindPath(adhHttp)(scope);
         }
     };
 };
@@ -39,9 +40,9 @@ export var listItemDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHtt
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
             path: "@"
-        }
+        },
         link: (scope) => {
-            bindPath(scope);
+            bindPath(adhHttp)(scope);
         }
     };
 };
@@ -73,15 +74,16 @@ export var moduleName = "adhMeinBerlinKiezkassenProposal";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhEmbed.moduleName
+            AdhEmbed.moduleName,
+            AdhHttp.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list-item");
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-create");
         }])
-        .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", detailDirective])
-        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", detailDirective])
+        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", ["adhConfig", createDirective])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
 };
