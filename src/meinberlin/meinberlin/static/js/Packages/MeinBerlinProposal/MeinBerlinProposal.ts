@@ -1,14 +1,56 @@
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 
 var pkgLocation = "/MeinBerlinProposal";
 
 
+var bindPath = (scope, pathKey : string = "path") : void => {
+    scope.$watch(pathKey, (value : string) => {
+        if (value) {
+            adhHttp.get(value).then((resource) => {
+                // FIXME: set individual fields on scope, not simply dump whole resource
+                scope.resource = resource;
+            });
+            adhHttp.options(value).then((options : AdhHttp.IOptions) => {
+                scope.options = options;
+            });
+        }
+    };
+};
+
+export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
+        scope: {
+            path: "@"
+        }
+        link: (scope) => {
+            bindPath(scope);
+        }
+    };
+};
+
+export var listItemDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
+        scope: {
+            path: "@"
+        }
+        link: (scope) => {
+            bindPath(scope);
+        }
+    };
+};
+
 export var createDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        link: (scope, element, attrs) => {
+        link: (scope) => {
             scope.data = {};
 
             // FIXME: These values have to come from somewhere
@@ -34,8 +76,12 @@ export var register = (angular) => {
             AdhEmbed.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-detail");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-list-item");
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-create");
         }])
+        .directive("adhMeinBerlinDetail", ["adhConfig", detailDirective])
+        .directive("adhMeinBerlinListItem", ["adhConfig", listItemDirective])
         .directive("adhMeinBerlinCreate", ["adhConfig", createDirective])
         .controller("meinBerlinProposalFormController", [meinBerlinProposalFormController]);
 };
