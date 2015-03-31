@@ -6,14 +6,9 @@
     "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET": "Bitte geben Sie einen Geldbetrag ein",
     "TR__MEINBERLIN_ERROR_REQUIRED_DETAIL": "Bitte geben Sie eine Detailbeschreibung an",
     "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART": "This must be checked",
-    "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION": "Please enter a Geolocation",
     "TR__MEINBERLIN_ERROR_REQUIRED_TITLE": "Bitte geben Sie einen Titel an",
     "TR__MEINBERLIN_I_WANT_TO_BE_PART": "Ich möchte selber an disem Projekt mitwirken",
     "TR__MEINBERLIN_LOCATION": "Sie können den Ort auf der Karte anzeigen (optional)",
     "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL": "Kiezkasse: Vorschlag einreichen",
-    "TR__MEINBERLIN_TITLE": "Titel ihres Projektvorschlages",
-    "TR__MEINBERLIN_MAP_EXPLAIN_CLICK" : "Klicken Sie auf die Karte, um den Marker zu setzen",
-    "TR__MEINBERLIN_MAP_EXPLAIN_DRAG" : "Ziehen Sie den Marker mit der Maus, um die Position verändern",
-    "TR__MEINBERLIN_MAP_MARKER_SAVED" : "Der Ort wurde gespeichert",
-    "TR__MEINBERLIN_MAP_MARKER_ERROR" : "Bitte setzen Sie den Marker innerhalb des markierten Bereichs"
+    "TR__MEINBERLIN_TITLE": "Titel ihres Projektvorschlages"
 }
