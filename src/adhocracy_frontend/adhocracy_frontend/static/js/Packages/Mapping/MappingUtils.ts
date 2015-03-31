@@ -1,15 +1,18 @@
+/// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
+
 // code comes from https://github.com/substack/point-in-polygon/blob/master/index.js
-export var pointInPolygon = (point : number[], polygon : number[][]) : Boolean => {
+export var pointInPolygon = (point : L.LatLng, polygon : L.Polygon) : Boolean => {
     "use strict";
 
-    var n = polygon.length;
-    var x = point[1], y = point[0];
+    var latLngs = polygon.getLatLngs();
+    var n = latLngs.length;
+    var x = point.lat, y = point.lng;
 
     var inside = false;
     for (var i = 0; i < n; i++) {
         var j = (i + n - 1) % n;
-        var xi = polygon[i][0], yi = polygon[i][1];
-        var xj = polygon[j][0], yj = polygon[j][1];
+        var xi = latLngs[i].lat, yi = latLngs[i].lng;
+        var xj = latLngs[j].lat, yj = latLngs[j].lng;
 
         //      *
         //     /

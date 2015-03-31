@@ -15,14 +15,14 @@ export interface IMapInputScope extends angular.IScope {
     lat : number;
     lng : number;
     height : number;
-    polygon : any;
+    polygon : L.Polygon;
+    rawPolygon : any;
     zoom? : number;
     text : string;
     error : boolean;
     mapClicked : boolean;
     saveCoordinates() : void;
     resetCoordinates() : void;
-    polygon_origin : any;
 }
 
 export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
@@ -31,7 +31,7 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             lat: "=",
             lng: "=",
             height: "@",
-            polygon: "=",
+            rawPolygon: "=polygon",
             zoom: "@?"
         },
         restrict: "E",
@@ -48,8 +48,7 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             // FIXME: Definetely Typed
-            scope.polygon_origin = _.clone(scope.polygon);
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
             scope.polygon.addTo(map);
 
             // limit map to polygon
@@ -101,7 +100,7 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             // only allow to change location by dragging if the new point is inside the polygon
             marker.on("dragend", (event : L.LeafletDragEndEvent) => {
                 var result = event.target.getLatLng();
-                var pointInPolygon = AdhMappingUtils.pointInPolygon([result.lat, result.lng], scope.polygon_origin);
+                var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
 
                 if (pointInPolygon) {
                     scope.mapClicked = true;
