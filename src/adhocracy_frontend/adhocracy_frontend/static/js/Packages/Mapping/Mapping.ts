@@ -25,7 +25,12 @@ export interface IMapInputScope extends angular.IScope {
     resetCoordinates() : void;
 }
 
-export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
+export var mapInput = (
+    adhConfig : AdhConfig.IService,
+    adhSingleClickWrapper,
+    $timeout : angular.ITimeoutService,
+    leaflet : typeof L
+) => {
     return {
         scope: {
             lat: "=",
@@ -77,8 +82,7 @@ export var mapInput = (adhConfig : AdhConfig.IService, adhClickContext, $timeout
             }
 
             // when the polygon is clicked, set the marker there
-            // sglclick checks if doubleclick needs to be fired (and zoom in)
-            adhClickContext(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
+            adhSingleClickWrapper(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 marker.setLatLng(event.latlng);
                 marker.addTo(map);
                 marker.dragging.enable();
@@ -182,6 +186,6 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail"]);
         }])
-        .directive("adhMapInput", ["adhConfig", "adhClickContext", "$timeout", "leaflet", mapInput])
+        .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
         .directive("adhMapDetail", ["leaflet", mapDetail]);
 };
