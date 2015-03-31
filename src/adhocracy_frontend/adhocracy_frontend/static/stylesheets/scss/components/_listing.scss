@@ -73,4 +73,8 @@ a form for creating new elements. This form is then always visible.
     &:hover, &:focus {
         color: $color-text-inverted;
     }
+
+    .load-more-text {
+        text-transform: uppercase;
+    }
 }
