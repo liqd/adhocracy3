@@ -792,6 +792,14 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     case "adhocracy_core.schema.FileStore":  // FIXME: this may be inappropriate, but it's a write-only field anyway
         resultType = "string";
         break;
+    case "adhocracy_core.sheets.geo.WebMercatorLongitude":
+        resultType = "number";
+        parser = stringToFloat;
+        break;
+    case "adhocracy_core.sheets.geo.WebMercatorLatitude":
+        resultType = "number";
+        parser = stringToFloat;
+        break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;
     }
