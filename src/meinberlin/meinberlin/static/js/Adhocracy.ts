@@ -15,6 +15,7 @@ import angularCache = require("angularCache");  if (angularCache) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
+import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");

@@ -50,7 +50,7 @@ export var mapInput = (
             mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             // FIXME: Definetely Typed
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
@@ -164,7 +164,7 @@ export var mapDetail = (leaflet : typeof L) => {
             mapElement.height(scope.height);
 
             scope.map = leaflet.map(mapElement[0]);
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
             scope.polygon.addTo(scope.map);
 
@@ -179,17 +179,111 @@ export var mapDetail = (leaflet : typeof L) => {
 };
 
 
+export interface IItem<T> {
+    value : T;
+    marker : L.Marker;
+    hide : boolean;
+};
+
+export interface IMapListScope<T> extends angular.IScope {
+    height : number;
+    polygon : L.Polygon;
+    rawPolygon : number[][];
+    items : IItem<T>[];
+    itemValues : T[];
+    selectedItem : IItem<T>;
+    toggleItem(item : IItem<T>) : void;
+}
+
+export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+    return {
+        scope: {
+            height: "@",
+            polygon: "=",
+            rawPolygon: "=polygon",
+            itemValues: "=items"
+        },
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
+        link: (scope : IMapListScope<any>, element) => {
+
+            var scrollContainer = angular.element(".scroll-container");
+            var scrollToItem = (key) : void => {
+                var element = angular.element(".item" + key);
+                (<any>scrollContainer).scrollToElement(element, 10, 300);
+            };
+
+            var mapElement = element.find(".map");
+            mapElement.height(scope.height);
+
+            var map = leaflet.map(mapElement[0]);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
+            scope.polygon.addTo(map);
+
+            // limit map to polygon
+            map.fitBounds(scope.polygon.getBounds());
+            leaflet.Util.setOptions(map, {
+                 minZoom: map.getZoom(),
+                 maxBounds: map.getBounds()
+            });
+
+            scope.items = [];
+            _.forEach(scope.itemValues, (value, key) => {
+                var item = {
+                    value: value,
+                    marker: L.marker(leaflet.latLng(value.lat, value.lng)),
+                    hide: false
+                };
+                item.marker.addTo(map);
+                item.marker.on("click", (e) => {
+                    $timeout(() => {
+                        scope.toggleItem(item);
+                        scrollToItem(key);
+                    });
+                });
+                scope.items.push(item);
+            });
+
+            map.on("moveend", () => {
+                var bounds = map.getBounds();
+                $timeout(() => {
+                    _.forEach(scope.items, (item) => {
+                        if (bounds.contains(item.marker.getLatLng())) {
+                            item.hide = false;
+                        } else {
+                            item.hide = true;
+                        }
+                    });
+                });
+            });
+
+            scope.toggleItem = (item) => {
+                if (typeof scope.selectedItem !== "undefined") {
+                    $((<any>scope.selectedItem.marker)._icon).removeClass("is-selected");
+                }
+                scope.selectedItem = item;
+                $((<any>item.marker)._icon).addClass("is-selected");
+            };
+        }
+    };
+};
+
+
 export var moduleName = "adhMapping";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
-            AdhEmbed.moduleName
+            AdhEmbed.moduleName,
+            "duScroll"
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail"]);
+            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-list"]);
         }])
         .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
-        .directive("adhMapDetail", ["leaflet", mapDetail]);
+        .directive("adhMapDetail", ["leaflet", mapDetail])
+        .directive("adhMapList", ["adhConfig", "leaflet", "$timeout" , mapList]);
 };
