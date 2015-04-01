@@ -16,6 +16,8 @@
             type="text"
             data-ng-model="data.title"
             name="title"
+            minlength="3"
+            maxlength="100"
             required="required" />
         <span class="input-error" data-ng-show="meinBerlinProposalForm.title.$error.required && (meinBerlinProposalForm.title.$dirty || meinBerlinProposalForm.$submitted)">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_TITLE" | translate }}
@@ -30,6 +32,7 @@
             data-msd-elastic=""
             data-ng-model="data.detail"
             name="detail"
+            maxlength="500"
             required="required"></textarea>
 
         <span class="input-error" data-ng-show="meinBerlinProposalForm.detail.$error.required && (meinBerlinProposalForm.detail.$dirty || meinBerlinProposalForm.$submitted)">
@@ -44,6 +47,8 @@
             type="number"
             data-ng-model="data.budget"
             name="budget"
+            min="0"
+            max="50000"
             required="required" />
         <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.required && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET" | translate }}
@@ -76,6 +81,7 @@
                 type="text"
                 data-ng-model="data.locationText"
                 name="locationText"
+                maxlength="100"
                 required="required" />
             <span class="input-error" data-ng-show="meinBerlinProposalForm.locationText.$error.required && (meinBerlinProposalForm.locationText.$dirty || meinBerlinProposalForm.$submitted)">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION_TEXT" | translate }}
