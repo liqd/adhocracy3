@@ -11,8 +11,18 @@ var bindPath = (adhHttp : AdhHttp.Service<any>) => (scope, pathKey : string = "p
     scope.$watch(pathKey, (value : string) => {
         if (value) {
             adhHttp.get(value).then((resource) => {
-                // FIXME: set individual fields on scope, not simply dump whole resource
-                scope.resource = resource;
+                var mainSheet : SIMain.Sheet = resource.data[SIMain.nick];
+                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+
+                scope.data = {
+                    title: mainSheet.title,
+                    budget: mainSheet.budget,
+                    detail: mainSheet.detail,
+                    creatorParticipate: mainSheet.creator_participate,
+                    locationText: mainSheet.location_text,
+                    lng: pointSheet.x,
+                    lat: pointSheet.y
+                };
             });
             adhHttp.options(value).then((options : AdhHttp.IOptions) => {
                 scope.options = options;
