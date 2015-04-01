@@ -30,6 +30,9 @@ export interface IScope extends angular.IScope {
     };
 }
 
+// FIXME: the following functions duplicate some of the adhResourceWidget functionality
+// They are an experiment on how adhResourceWidget can be improved.  This duplication
+// should be resolved at some point.
 var bindPath = (
     adhHttp : AdhHttp.Service<any>
 ) => (
