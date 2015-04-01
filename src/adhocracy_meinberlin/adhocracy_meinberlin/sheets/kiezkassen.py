@@ -17,10 +17,9 @@ class IMain(ISheet):
 
 class MainSchema(colander.MappingSchema):
 
-    """Data structure for organizational information.
+    """Data structure for organizational information."""
 
-    FIXME: check exact length restrictions
-    """
+    # TODO: check exact length restrictions
 
     title = SingleLine(validator=colander.Length(min=3, max=100))
     detail = Text(validator=colander.Length(max=500))

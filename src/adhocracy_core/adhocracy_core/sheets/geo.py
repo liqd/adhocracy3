@@ -8,9 +8,9 @@ from adhocracy_core.sheets import sheet_metadata_defaults
 
 class WebMercatorLongitude(colander.SchemaNode):
 
-    """Validates a web mercator longitude value.
+    """A a web mercator longitude value.
 
-    Values taken from http://epsg.io/3857.
+    Validation values taken from http://epsg.io/3857.
     """
 
     schema_type = colander.Float
@@ -21,9 +21,9 @@ class WebMercatorLongitude(colander.SchemaNode):
 
 class WebMercatorLatitude(colander.SchemaNode):
 
-    """Validates a web mercator latitude value.
+    """A a web mercator latitude value.
 
-    Values taken from http://epsg.io/3857.
+    Validation values taken from http://epsg.io/3857.
     """
 
     schema_type = colander.Float
