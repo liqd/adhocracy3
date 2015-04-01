@@ -56,11 +56,11 @@
     <label>
         <input
             type="checkbox"
-            data-ng-model="data.i_want"
-            name="iWant"
+            data-ng-model="data.creatorParticipate"
+            name="creatorParticipate"
             />
             {{ "TR__MEINBERLIN_I_WANT_TO_BE_PART" | translate }}
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.iWant.$error.required && (meinBerlinProposalForm.iWant.$dirty || meinBerlinProposalForm.$submitted)">
+        <span class="input-error" data-ng-show="meinBerlinProposalForm.creatorParticipate.$error.required && (meinBerlinProposalForm.creatorParticipate.$dirty || meinBerlinProposalForm.$submitted)">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART" | translate }}
         </span>
     </label>
@@ -70,14 +70,14 @@
     <!-- Related Place -->
     <div style="margin-top: 30px;">
         <label>
-            <span class="label-text">{{ "TR__MEINBERLIN_ADDRESS" | translate }}</span>
+            <span class="label-text">{{ "TR__MEINBERLIN_locationText" | translate }}</span>
             <input
                 type="text"
-                data-ng-model="data.address"
-                name="address"
+                data-ng-model="data.locationText"
+                name="locationText"
                 required="required" />
-            <span class="input-error" data-ng-show="meinBerlinProposalForm.address.$error.required && (meinBerlinProposalForm.address.$dirty || meinBerlinProposalForm.$submitted)">
-                {{ "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS" | translate }}
+            <span class="input-error" data-ng-show="meinBerlinProposalForm.locationText.$error.required && (meinBerlinProposalForm.locationText.$dirty || meinBerlinProposalForm.$submitted)">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_locationText" | translate }}
             </span>
         </label>
 
