@@ -1,3 +1,6 @@
+import AdhConfig = require("../../Config/Config");
+import AdhHttp = require("../../Http/Http");
+
 import AdhMeinBerlinKiezkassenProposal = require("./Proposal/Proposal");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen";
@@ -13,7 +16,7 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         link: (scope) => {
             scope.currentTab = 0;
 
-            scope.$watch(pathKey, (value : string) => {
+            scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
                         // FIXME: set individual fields on scope, not simply dump whole resource
