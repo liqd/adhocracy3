@@ -7,7 +7,15 @@ from adhocracy_core import root_factory
 def includeme(config):
     """Setup adhocracy extension."""
     # include adhocracy_core
-    config.include('adhocracy_sample')
+    config.include('adhocracy_core')
+    # include sample packages
+    # TODO: fix tests and remove
+    config.include('adhocracy_core.resources.sample_paragraph')
+    config.include('adhocracy_core.resources.sample_section')
+    config.include('adhocracy_core.resources.sample_proposal')
+    # include custom resource types
+    config.include('adhocracy_meinberlin.resources.kiezkassen')
+    config.include('adhocracy_meinberlin.sheets.kiezkassen')
 
 
 def main(global_config, **settings):
