@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[adhocracy3mercator.meinberlin]
+file_filter = meinberlin/static/i18n/meinberlin_<lang>.json
+source_file = meinberlin/static/i18n/meinberlin_en.json
+source_lang = en
+type = KEYVALUEJSON
