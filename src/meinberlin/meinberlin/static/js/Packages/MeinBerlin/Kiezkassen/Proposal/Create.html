@@ -19,7 +19,7 @@
             minlength="3"
             maxlength="100"
             required="required" />
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.title.$error.required && (meinBerlinProposalForm.title.$dirty || meinBerlinProposalForm.$submitted)">
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.title, 'required')">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_TITLE" | translate }}
         </span>
     </label>
@@ -35,7 +35,7 @@
             maxlength="500"
             required="required"></textarea>
 
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.detail.$error.required && (meinBerlinProposalForm.detail.$dirty || meinBerlinProposalForm.$submitted)">
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.detail, 'required')">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_DETAIL" | translate }}
         </span>
     </label>
@@ -50,10 +50,10 @@
             min="0"
             max="50000"
             required="required" />
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.required && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.budget, 'required')">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET" | translate }}
         </span>
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.budget.$error.number && (meinBerlinProposalForm.budget.$dirty || meinBerlinProposalForm.$submitted)">
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.budget, 'number')">
             {{ "TR__ERROR_MUST_BE_A_NUMBER" | translate }}
         </span>
     </label>
@@ -66,7 +66,7 @@
             name="creatorParticipate"
             />
             {{ "TR__MEINBERLIN_I_WANT_TO_BE_PART" | translate }}
-        <span class="input-error" data-ng-show="meinBerlinProposalForm.creatorParticipate.$error.required && (meinBerlinProposalForm.creatorParticipate.$dirty || meinBerlinProposalForm.$submitted)">
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.creatorParticipate, 'required')">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART" | translate }}
         </span>
     </label>
@@ -83,7 +83,7 @@
                 name="locationText"
                 maxlength="100"
                 required="required" />
-            <span class="input-error" data-ng-show="meinBerlinProposalForm.locationText.$error.required && (meinBerlinProposalForm.locationText.$dirty || meinBerlinProposalForm.$submitted)">
+            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.locationText, 'required')">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION_TEXT" | translate }}
             </span>
         </label>
