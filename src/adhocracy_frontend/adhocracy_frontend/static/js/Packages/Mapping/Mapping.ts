@@ -70,7 +70,7 @@ export var mapInput = (
             // FIXME: Definetely Typed
             var marker = (<any>leaflet).marker();
 
-            if (typeof scope.lat === "undefined" && typeof scope.lng === "undefined") {
+            if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
                 marker.setLatLng(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
                 marker.dragging.enable();
                 scope.text = "TR__MAP_EXPLAIN_DRAG";
