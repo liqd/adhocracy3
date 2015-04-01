@@ -157,3 +157,17 @@ def test_get_user_info(context, registry, request_, user):
 
     (user_name, user_path) = _get_user_info(request_)
     assert user_name == 'god'
+    assert user_path == '/user1'
+
+
+@mark.usefixtures('integration')
+def test_get_user_info_nouser_in_request(context, registry, request_, user):
+    from adhocracy_core.auditing import _get_user_info
+
+    request_.root = context
+    request_.registry = registry
+    request_.authenticated_userid = None
+
+    (user_name, user_path) = _get_user_info(request_)
+    assert user_name == ''
+    assert user_path == ''

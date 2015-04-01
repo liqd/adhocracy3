@@ -90,9 +90,12 @@ def audit_changes_callback(request, response):
 
 def _get_user_info(request):
     user = get_user(request)
-    user_name = get_sheet_field(user, IUserBasic, 'name')
-    user_path = resource_path(user)
-    return (user_name, user_path)
+    if user is None:
+        return ('', '')
+    else:
+        user_name = get_sheet_field(user, IUserBasic, 'name')
+        user_path = resource_path(user)
+        return (user_name, user_path)
 
 
 def _log_change(context, user_name, user_path, change):
