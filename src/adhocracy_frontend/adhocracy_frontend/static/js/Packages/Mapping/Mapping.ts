@@ -178,6 +178,14 @@ export var mapdetail = (leaflet : typeof L) => {
     };
 };
 
+export interface IMapListScope extends angular.IScope {
+    height : number;
+    polygon : L.Polygon;
+    rawPolygon : number[][];
+    proposals : any[];
+    activeItem : any;
+    toggleItem(proposal : any) : void;
+}
 export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
     return {
         scope: {
@@ -187,7 +195,7 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
         },
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
-        link: (scope, element, attrs) => {
+        link: (scope : IMapListScope , element) => {
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
