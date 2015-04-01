@@ -8,9 +8,9 @@ import AdhUtil = require("../../../Util/Util");
 
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIMain = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IMain");
 import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
@@ -42,7 +42,7 @@ var bindPath = (
     scope.$watch(pathKey, (value : string) => {
         if (value) {
             adhHttp.get(value).then((resource : RIProposalVersion) => {
-                var mainSheet : SIMain.Sheet = resource.data[SIMain.nick];
+                var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
                 var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
 
                 scope.data = {
@@ -66,7 +66,7 @@ var fill = (
     scope : IScope,
     proposalVersion : RIProposalVersion
 ) : void => {
-    proposalVersion.data[SIMain.nick] = new SIMain.Sheet({
+    proposalVersion.data[SIProposal.nick] = new SIProposal.Sheet({
         title: scope.data.title,
         budget: scope.data.budget,
         detail: scope.data.detail,
