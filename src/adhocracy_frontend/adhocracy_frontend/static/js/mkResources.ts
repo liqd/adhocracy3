@@ -360,7 +360,9 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
                     var fieldParser : string = mkFieldType(sheet.fields[x]).parser;
 
                     if (fieldParser) {
-                        codeLine = "this." + fieldName + " = (" + fieldParser + ")(args." + fieldName + ");";
+                        codeLine = "this.{0} = (typeof args.{0} === \"string\") ? ({1})(args.{0}) : args.{0};"
+                            .replace(/\{0\}/g, fieldName)
+                            .replace(/\{1\}/g, fieldParser);
                     } else {
                         codeLine = "this." + fieldName + " = args." + fieldName + ";";
                     }
@@ -440,7 +442,7 @@ mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : s
 mkFieldSignaturesSheetCons = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
     UtilR.mkThingList(
         fields,
-        (field) => field.name + (isWriteableField(field) ? "" : "?") + " : " + mkFieldType(field).constructorType,
+        (field) => field.name + (isWriteableField(field) ? "" : "?"),
         tab, separator
     );
 
