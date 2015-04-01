@@ -147,7 +147,7 @@ export var mapInput = (
     };
 };
 
-export var mapdetail = (leaflet : typeof L) => {
+export var mapDetail = (leaflet : typeof L) => {
     return {
         scope: {
             lat: "@",
@@ -187,7 +187,7 @@ export interface IMapListScope extends angular.IScope {
     toggleItem(proposal : any) : void;
 }
 
-export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
     return {
         scope: {
             height: "@",
@@ -197,38 +197,39 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
         },
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
-        link: (scope : IMapListScope , element) => {
+        link: (scope : IMapListScope, element) => {
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
+
             var map = leaflet.map(mapElement[0]);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
+            scope.polygon.addTo(map);
 
+            // limit map to polygon
             map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(map, {
                  minZoom: map.getZoom(),
                  maxBounds: map.getBounds()
             });
 
-            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            scope.polygon.addTo(map);
-
-            _.forEach(scope.proposals, (v, k) => {
-                var marker = L.marker(leaflet.latLng(v.lat, v.lng));
+            _.forEach(scope.proposals, (proposal, key) => {
+                var marker = L.marker(leaflet.latLng(proposal.lat, proposal.lng));
                 marker.addTo(map);
-                v.marker = marker;
-                v.id = k;
-                (<any>marker).index = k;
+                proposal.marker = marker;
+                proposal.id = key;
+                (<any>marker).index = key;
                 marker.on("click", (e) => {
-                    $timeout(function() {
+                    $timeout(() => {
                         if (typeof scope.activeItem !== "undefined") {
                             $(scope.activeItem.marker._icon).removeClass("highlighted");
                         }
                         scope.activeItem = scope.proposals[e.target.index];
                         $((<any>marker)._icon).addClass("highlighted");
-                        var string = "proposal" + e.target.index;
-                        var element = angular.element("#" + string);
+                        var _id = "proposal" + e.target.index;
+                        var element = angular.element("#" + _id);
                         var scrollContainer = angular.element("#scroll-container");
                         (<any>scrollContainer).scrollToElement(element, 10, 300);
                     });
@@ -238,7 +239,7 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             map.on("moveend", () => {
                 var bounds = map.getBounds();
                 $timeout(() => {
-                    _.forEach(scope.proposals, function(proposal) {
+                    _.forEach(scope.proposals, (proposal) => {
                         if (bounds.contains((<any>proposal).marker.getLatLng())) {
                             (<any>proposal).hide = false;
                         } else {
@@ -272,6 +273,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-list"]);
         }])
         .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
-        .directive("adhMapDetail", ["leaflet", mapdetail])
-        .directive("adhMapList", ["adhConfig", "leaflet", "$timeout" , maplist]);
+        .directive("adhMapDetail", ["leaflet", mapDetail])
+        .directive("adhMapList", ["adhConfig", "leaflet", "$timeout" , mapList]);
 };
