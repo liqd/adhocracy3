@@ -51,7 +51,7 @@ class PointSchema(colander.MappingSchema):
 
 point_meta = sheet_metadata_defaults._replace(isheet=IPoint,
                                               schema_class=PointSchema,
-                                              editable=False,
+                                              editable=True,
                                               create_mandatory=False,
                                               )
 
