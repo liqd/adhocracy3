@@ -63,12 +63,11 @@ class TestProposalSchema:
         from .kiezkassen import ProposalSchema
         return ProposalSchema()
 
+    def test_create(self, inst):
+        assert inst['title'].validator.max == 100
+        assert inst['detail'].validator.max == 500
+        assert inst['budget'].validator.max == 50000
+        assert inst['budget'].required
+        assert inst['location_text'].validator.max == 100
 
-    @fixture
-    def cstruct_required(self):
-        return {'title': 'My title',
-                'detail': 'My detail',
-                'budget': '100.00',
-                'creator_participate': True,
-                'location_text': 'My location',
-                }
+
