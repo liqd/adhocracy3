@@ -3,6 +3,15 @@
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
+import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
+import AdhUtil = require("../../../Util/Util");
+
+import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
+import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
+import SIMain = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IMain");
+import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
+import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 
@@ -29,7 +38,7 @@ var bindPath = (
 ) : void => {
     scope.$watch(pathKey, (value : string) => {
         if (value) {
-            adhHttp.get(value).then((resource) => {
+            adhHttp.get(value).then((resource : RIProposalVersion) => {
                 var mainSheet : SIMain.Sheet = resource.data[SIMain.nick];
                 var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
 
@@ -48,6 +57,63 @@ var bindPath = (
             });
         }
     });
+};
+
+var fill = (
+    scope : IScope,
+    proposalVersion : RIProposalVersion
+) : void => {
+    proposalVersion.data[SIMain.nick] = new SIMain.Sheet({
+        title: scope.data.title,
+        budget: scope.data.budget,
+        detail: scope.data.detail,
+        creator_participate: scope.data.creatorParticipate,
+        location_text: scope.data.locationText
+    });
+    proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+        x: scope.data.lat,
+        y: scope.data.lng
+    });
+};
+
+var postCreate = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (
+    scope : IScope,
+    poolPath : string
+) => {
+    var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
+    proposal.parent = poolPath;
+    proposal.data[SIName.nick] = new SIName.Sheet({
+        name: AdhUtil.normalizeName(scope.data.title)
+    });
+
+    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    proposalVersion.parent = proposal.path;
+    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+        follows: [proposal.first_version_path]
+    });
+    fill(scope, proposalVersion);
+
+    return adhHttp.deepPost([proposal, proposalVersion]);
+};
+
+var postEdit = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (
+    scope : IScope,
+    oldVersion : RIProposalVersion
+) => {
+    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    proposalVersion.parent = oldVersion.parent;
+    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+        follows: [oldVersion.path]
+    });
+    fill(scope, proposalVersion);
+
+    return adhHttp.deepPost([proposalVersion]);
 };
 
 export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
