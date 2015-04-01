@@ -27,9 +27,9 @@ input:
 # --------------------------------------------------------------------------- #
 
 output:
-  fonts: fonts                              # required
-  css: ../stylesheets
-  preview: preview
+  fonts: ../../static/icons/fonts                              # required
+  css: ../../static/stylesheets
+  preview: ../../static/icons/preview
 
 
 # --------------------------------------------------------------------------- #
