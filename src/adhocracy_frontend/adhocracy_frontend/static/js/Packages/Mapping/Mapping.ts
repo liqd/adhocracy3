@@ -212,7 +212,7 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
             scope.polygon.addTo(map);
 
-            angular.forEach(scope.proposals, (v, k) => {
+            _.forEach(scope.proposals, (v, k) => {
                 var marker = L.marker(leaflet.latLng(v.lat, v.lng));
                 marker.addTo(map);
                 v.marker = marker;
