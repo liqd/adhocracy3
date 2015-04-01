@@ -186,11 +186,13 @@ export interface IMapListScope extends angular.IScope {
     activeItem : any;
     toggleItem(proposal : any) : void;
 }
+
 export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
     return {
         scope: {
             height: "@",
             polygon: "=",
+            rawPolygon: "=polygon",
             proposals: "="
         },
         restrict: "E",
@@ -201,7 +203,7 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             mapElement.height(scope.height);
             var map = leaflet.map(mapElement[0]);
 
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
 
             map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(map, {
