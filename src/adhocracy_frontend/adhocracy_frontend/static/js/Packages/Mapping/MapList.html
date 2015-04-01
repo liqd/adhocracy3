@@ -4,7 +4,7 @@
     </div>
     <div class="cols-2 scroll-container" style="height: {{height}}px; overflow-y: scroll;">
         <table class="table">
-            <tr data-ng-repeat="(key, item) in items" data-ng-hide="item.hide" data-ng-class="{'highlighted': activeItem == item}">
+            <tr data-ng-repeat="(key, item) in items" data-ng-hide="item.hide" data-ng-class="{'is-selected': selectedItem == item}">
                 <td class="item{{key}}">
                     <a data-ng-click="toggleItem(item)" href="">{{ item.value.title }}</a>
                 </td>

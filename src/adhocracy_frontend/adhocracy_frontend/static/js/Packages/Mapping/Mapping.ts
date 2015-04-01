@@ -191,7 +191,7 @@ export interface IMapListScope<T> extends angular.IScope {
     rawPolygon : number[][];
     items : IItem<T>[];
     itemValues : T[];
-    activeItem : IItem<T>;
+    selectedItem : IItem<T>;
     toggleItem(item : IItem<T>) : void;
 }
 
@@ -260,11 +260,11 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             });
 
             scope.toggleItem = (item) => {
-                if (typeof scope.activeItem !== "undefined") {
-                    $((<any>scope.activeItem.marker)._icon).removeClass("highlighted");
+                if (typeof scope.selectedItem !== "undefined") {
+                    $((<any>scope.selectedItem.marker)._icon).removeClass("is-selected");
                 }
-                scope.activeItem = item;
-                $((<any>item.marker)._icon).addClass("highlighted");
+                scope.selectedItem = item;
+                $((<any>item.marker)._icon).addClass("is-selected");
             };
         }
     };
