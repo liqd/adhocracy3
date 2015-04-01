@@ -7,7 +7,26 @@ import AdhHttp = require("../../../Http/Http");
 var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 
 
-var bindPath = (adhHttp : AdhHttp.Service<any>) => (scope, pathKey : string = "path") : void => {
+export interface IScope extends angular.IScope {
+    path? : string;
+    options : AdhHttp.IOptions;
+    data : {
+        title : string;
+        budget : number;
+        detail : string;
+        creatorParticipate : boolean;
+        locationText : string;
+        lng : number;
+        lat : number;
+    };
+}
+
+var bindPath = (
+    adhHttp : AdhHttp.Service<any>
+) => (
+    scope : IScope,
+    pathKey : string = "path"
+) : void => {
     scope.$watch(pathKey, (value : string) => {
         if (value) {
             adhHttp.get(value).then((resource) => {
@@ -38,7 +57,7 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         scope: {
             path: "@"
         },
-        link: (scope) => {
+        link: (scope : IScope) => {
             bindPath(adhHttp)(scope);
         }
     };
@@ -51,7 +70,7 @@ export var listItemDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHtt
         scope: {
             path: "@"
         },
-        link: (scope) => {
+        link: (scope : IScope) => {
             bindPath(adhHttp)(scope);
         }
     };
