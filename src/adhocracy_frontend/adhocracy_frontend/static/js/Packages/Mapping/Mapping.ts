@@ -50,7 +50,7 @@ export var mapInput = (
             mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             // FIXME: Definetely Typed
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
@@ -164,7 +164,7 @@ export var mapdetail = (leaflet : typeof L) => {
             mapElement.height(scope.height);
 
             scope.map = leaflet.map(mapElement[0]);
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
             scope.polygon.addTo(scope.map);
 
@@ -201,8 +201,8 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                  maxBounds: scope.map.getBounds()
             });
 
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
-            scope.polygon.addTo(scope.map);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            scope.polygon.addTo(map);
 
             angular.forEach(scope.proposals, (v, k) => {
                 var marker = L.marker(leaflet.latLng(v.lat, v.lng));
