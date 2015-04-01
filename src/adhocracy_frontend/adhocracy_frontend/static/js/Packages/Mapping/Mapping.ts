@@ -191,14 +191,14 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
-            scope.map = leaflet.map(mapElement[0]);
+            var map = leaflet.map(mapElement[0]);
 
             scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
 
-            scope.map.fitBounds(scope.polygon.getBounds());
-            leaflet.Util.setOptions(scope.map, {
-                 minZoom: scope.map.getZoom(),
-                 maxBounds: scope.map.getBounds()
+            map.fitBounds(scope.polygon.getBounds());
+            leaflet.Util.setOptions(map, {
+                 minZoom: map.getZoom(),
+                 maxBounds: map.getBounds()
             });
 
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
@@ -206,7 +206,7 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
 
             angular.forEach(scope.proposals, (v, k) => {
                 var marker = L.marker(leaflet.latLng(v.lat, v.lng));
-                marker.addTo(scope.map);
+                marker.addTo(map);
                 v.marker = marker;
                 v.id = k;
                 (<any>marker).index = k;
@@ -225,21 +225,8 @@ export var maplist = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                 });
             });
 
-            scope.map.on("zoomend", () => {
-                var bounds = scope.map.getBounds();
-                $timeout(() => {
-                    _.forEach(scope.proposals, function(proposal) {
-                        if (bounds.contains((<any>proposal).marker.getLatLng())) {
-                            (<any>proposal).hide = false;
-                        } else {
-                            (<any>proposal).hide = true;
-                        }
-                    });
-                });
-            });
-
-            scope.map.on("dragend", function(){
-                var bounds = scope.map.getBounds();
+            map.on("moveend", () => {
+                var bounds = map.getBounds();
                 $timeout(() => {
                     _.forEach(scope.proposals, function(proposal) {
                         if (bounds.contains((<any>proposal).marker.getLatLng())) {
