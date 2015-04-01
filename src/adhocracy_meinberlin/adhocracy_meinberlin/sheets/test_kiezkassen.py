@@ -14,21 +14,19 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-class TestIncludeme:
-
-    def test_includeme_register_main_sheet(self, config):
-        from .kiezkassen import IMain
-        from adhocracy_core.utils import get_sheet
-        context = testing.DummyResource(__provides__=IMain)
-        assert get_sheet(context, IMain)
+def test_includeme_register_proposal_sheet(config):
+    from .kiezkassen import IProposal
+    from adhocracy_core.utils import get_sheet
+    context = testing.DummyResource(__provides__=IProposal)
+    assert get_sheet(context, IProposal)
 
 
-class TestMainSheet:
+class TestProposalSheet:
 
     @fixture
     def meta(self):
-        from .kiezkassen import main_meta
-        return main_meta
+        from .kiezkassen import proposal_meta
+        return proposal_meta
 
     @fixture
     def context(self):
@@ -38,13 +36,13 @@ class TestMainSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from .kiezkassen import IMain
-        from .kiezkassen import MainSchema
+        from .kiezkassen import IProposal
+        from .kiezkassen import ProposalSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
-        assert inst.meta.isheet == IMain
-        assert inst.meta.schema_class == MainSchema
+        assert inst.meta.isheet == IProposal
+        assert inst.meta.schema_class == ProposalSchema
 
     def test_get_empty(self, meta, context):
         from decimal import Decimal
@@ -58,12 +56,13 @@ class TestMainSheet:
         assert inst.get() == wanted
 
 
-class TestMainSchema:
+class TestProposalSchema:
 
     @fixture
     def inst(self):
-        from .kiezkassen import MainSchema
-        return MainSchema()
+        from .kiezkassen import ProposalSchema
+        return ProposalSchema()
+
 
     @fixture
     def cstruct_required(self):

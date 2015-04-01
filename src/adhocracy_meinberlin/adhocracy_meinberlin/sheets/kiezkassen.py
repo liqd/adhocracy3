@@ -10,12 +10,12 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 
 
-class IMain(ISheet):
+class IProposal(ISheet):
 
-    """Marker interface for the Kiezkassen main sheet."""
+    """Marker interface for the Kiezkassen propsal sheet."""
 
 
-class MainSchema(colander.MappingSchema):
+class ProposalSchema(colander.MappingSchema):
 
     """Data structure for organizational information."""
 
@@ -23,17 +23,16 @@ class MainSchema(colander.MappingSchema):
 
     title = SingleLine(validator=colander.Length(min=3, max=100))
     detail = Text(validator=colander.Length(max=500))
-    budget = CurrencyAmount(
-        missing=colander.required,
-        validator=colander.Range(min=0, max=50000))
+    budget = CurrencyAmount(missing=colander.required,
+                            validator=colander.Range(min=0, max=50000))
     creator_participate = Boolean()
     location_text = SingleLine(validator=colander.Length(max=100))
 
 
-main_meta = sheet_metadata_defaults._replace(
-    isheet=IMain, schema_class=MainSchema)
+proposal_meta = sheet_metadata_defaults._replace(isheet=IProposal,
+                                                 schema_class=ProposalSchema)
 
 
 def includeme(config):
     """Register sheets."""
-    add_sheet_to_registry(main_meta, config.registry)
+    add_sheet_to_registry(proposal_meta, config.registry)
