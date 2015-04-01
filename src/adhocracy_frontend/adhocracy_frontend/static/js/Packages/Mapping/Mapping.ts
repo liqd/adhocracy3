@@ -199,6 +199,12 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
         link: (scope : IMapListScope, element) => {
 
+            var scrollContainer = angular.element(".scroll-container");
+            var scrollToProposal = (key) : void => {
+                var element = angular.element(".proposal" + key);
+                (<any>scrollContainer).scrollToElement(element, 10, 300);
+            };
+
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
 
@@ -216,22 +222,12 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             });
 
             _.forEach(scope.proposals, (proposal, key) => {
-                var marker = L.marker(leaflet.latLng(proposal.lat, proposal.lng));
-                marker.addTo(map);
-                proposal.marker = marker;
-                proposal.id = key;
-                (<any>marker).index = key;
-                marker.on("click", (e) => {
+                proposal.marker = L.marker(leaflet.latLng(proposal.lat, proposal.lng));
+                proposal.marker.addTo(map);
+                proposal.marker.on("click", (e) => {
                     $timeout(() => {
-                        if (typeof scope.activeItem !== "undefined") {
-                            $(scope.activeItem.marker._icon).removeClass("highlighted");
-                        }
-                        scope.activeItem = scope.proposals[e.target.index];
-                        $((<any>marker)._icon).addClass("highlighted");
-                        var _id = "proposal" + e.target.index;
-                        var element = angular.element("#" + _id);
-                        var scrollContainer = angular.element("#scroll-container");
-                        (<any>scrollContainer).scrollToElement(element, 10, 300);
+                        scope.toggleItem(proposal);
+                        scrollToProposal(key);
                     });
                 });
             });
@@ -259,6 +255,7 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
         }
     };
 };
+
 
 export var moduleName = "adhMapping";
 
