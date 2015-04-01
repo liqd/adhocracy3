@@ -6,7 +6,7 @@
         <table class="table">
             <tr data-ng-repeat="(key, proposal) in proposals" data-ng-hide="proposal.hide" data-ng-class="{'highlighted': activeItem == proposal}">
                 <td class="proposal{{key}}">
-                    <a data-ng-click="toggleItem(proposal)" href="">{{ proposal.title }}</a>
+                    <a data-ng-click="toggleItem(proposal)" href="">{{ proposal.value.title }}</a>
                 </td>
             </tr>
         </table>

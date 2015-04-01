@@ -178,13 +178,21 @@ export var mapDetail = (leaflet : typeof L) => {
     };
 };
 
-export interface IMapListScope extends angular.IScope {
+
+export interface IProposal<T> {
+    value : T;
+    marker : L.Marker;
+    hide : boolean;
+};
+
+export interface IMapListScope<T> extends angular.IScope {
     height : number;
     polygon : L.Polygon;
     rawPolygon : number[][];
-    proposals : any[];
-    activeItem : any;
-    toggleItem(proposal : any) : void;
+    proposals : IProposal<T>[];
+    proposalValues : T[];
+    activeItem : IProposal<T>;
+    toggleItem(proposal : IProposal<T>) : void;
 }
 
 export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
@@ -193,11 +201,11 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             height: "@",
             polygon: "=",
             rawPolygon: "=polygon",
-            proposals: "="
+            proposalValues: "=proposals"
         },
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
-        link: (scope : IMapListScope, element) => {
+        link: (scope : IMapListScope<any>, element) => {
 
             var scrollContainer = angular.element(".scroll-container");
             var scrollToProposal = (key) : void => {
@@ -221,8 +229,13 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                  maxBounds: map.getBounds()
             });
 
-            _.forEach(scope.proposals, (proposal, key) => {
-                proposal.marker = L.marker(leaflet.latLng(proposal.lat, proposal.lng));
+            scope.proposals = [];
+            _.forEach(scope.proposalValues, (value, key) => {
+                var proposal = {
+                    value: value,
+                    marker: L.marker(leaflet.latLng(value.lat, value.lng)),
+                    hide: false
+                };
                 proposal.marker.addTo(map);
                 proposal.marker.on("click", (e) => {
                     $timeout(() => {
@@ -230,16 +243,17 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                         scrollToProposal(key);
                     });
                 });
+                scope.proposals.push(proposal);
             });
 
             map.on("moveend", () => {
                 var bounds = map.getBounds();
                 $timeout(() => {
                     _.forEach(scope.proposals, (proposal) => {
-                        if (bounds.contains((<any>proposal).marker.getLatLng())) {
-                            (<any>proposal).hide = false;
+                        if (bounds.contains(proposal.marker.getLatLng())) {
+                            proposal.hide = false;
                         } else {
-                            (<any>proposal).hide = true;
+                            proposal.hide = true;
                         }
                     });
                 });
@@ -247,10 +261,10 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
 
             scope.toggleItem = (proposal) => {
                 if (typeof scope.activeItem !== "undefined") {
-                    $(scope.activeItem.marker._icon).removeClass("highlighted");
+                    $((<any>scope.activeItem.marker)._icon).removeClass("highlighted");
                 }
                 scope.activeItem = proposal;
-                $(proposal.marker._icon).addClass("highlighted");
+                $((<any>proposal.marker)._icon).addClass("highlighted");
             };
         }
     };
