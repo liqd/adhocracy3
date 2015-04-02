@@ -67,6 +67,7 @@ from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
+from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
 
 logger = getLogger(__name__)
@@ -829,6 +830,13 @@ class MetaApiView(RESTView):
 
         return sheet_map
 
+    def _describe_workflows(self, appstructs: dict) -> dict:
+        cstructs = {}
+        for name, appstruct in appstructs.items():
+            schema = create_workflow_meta_schema(appstruct)
+            cstructs[name] = schema.serialize(appstruct)
+        return cstructs
+
     @view_config(request_method='GET')
     def get(self) -> dict:
         """Get the API specification of this installation as JSON."""
@@ -840,8 +848,12 @@ class MetaApiView(RESTView):
         sheet_metadata = self.request.registry.content.sheets_meta
         sheet_map = self._describe_sheets(sheet_metadata)
 
+        workflows_meta = self.request.registry.content.workflows_meta
+        workflows_map = self._describe_workflows(workflows_meta)
+
         struct = {'resources': resource_map,
                   'sheets': sheet_map,
+                  'workflows': workflows_map,
                   }
         return struct
 

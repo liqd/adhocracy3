@@ -63,6 +63,7 @@ class TestResourceContentRegistry:
         assert inst.sheets_meta == {}
         assert inst.resources_meta == {}
         assert inst.resources_meta_addable == {}
+        assert inst.workflows_meta == {}
 
     def test_sheets_all(self, inst, mock_sheet):
         assert inst.sheets_all == {IResource: [mock_sheet]}
@@ -228,6 +229,15 @@ class TestResourceContentRegistry:
         dotted = isheet.__identifier__ + ':' + field
         with raises(ValueError):
             inst.resolve_isheet_field_from_dotted_string(dotted)
+
+    def test_get_worfklow(self, inst, mock_workflow):
+        inst.workflows['sample'] = mock_workflow
+        assert inst.get_workflow('sample') == mock_workflow
+
+    def test_get_worfklow_raise_if_wrong_name(self, inst, mock_workflow):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            inst.get_workflow('sample')
 
 
 @fixture

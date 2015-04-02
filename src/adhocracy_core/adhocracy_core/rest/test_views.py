@@ -847,9 +847,9 @@ class TestMetaApiView:
     def test_get_empty(self, request, context):
         inst = self.make_one(request, context)
         response = inst.get()
-        assert sorted(response.keys()) == ['resources', 'sheets']
         assert response['resources'] == {}
         assert response['sheets'] == {}
+        assert response['workflows'] == {}
 
     def test_get_resources(self, request, context, resource_meta):
         request.registry.content.resources_meta[IResource] = resource_meta
@@ -1017,6 +1017,14 @@ class TestMetaApiView:
 
     # TODO test for single reference
 
+    def test_get_workflows(self, request, context):
+        inst = self.make_one(request, context)
+        request.registry.content.workflows_meta['sample'] = {'states': {},
+                                                             'transitions': {}}
+        workflows_meta = inst.get()['workflows']
+        assert workflows_meta == {'sample': {'states_order': [],
+                                             'states': {},
+                                             'transitions': {}}}
 
 class TestValidateLoginEmail:
 

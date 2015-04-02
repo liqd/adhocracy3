@@ -322,12 +322,22 @@ def mock_objectmap() -> Mock:
 
 
 @fixture
+def mock_workflow() -> Mock:
+    """Mock :class:`adhocracy_core.workflows.AdhocracyACLWorkflow`."""
+    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    mock = Mock(spec=AdhocracyACLWorkflow)
+    return mock
+
+
+@fixture
 def mock_content_registry() -> Mock:
     """Mock :class:`adhocracy_core.content.ResourceContentRegistry`."""
     from adhocracy_core.content import ResourceContentRegistry
     mock = Mock(spec=ResourceContentRegistry)
     mock.sheets_meta = {}
     mock.resources_meta = {}
+    mock.workflows_meta = {}
+    mock.workflows = {}
     mock.get_resources_meta_addable.return_value = []
     mock.resources_meta_addable = {}
     mock.get_sheets_read.return_value = []
