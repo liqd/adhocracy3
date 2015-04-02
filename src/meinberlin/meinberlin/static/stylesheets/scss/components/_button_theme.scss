@@ -1,0 +1,52 @@
+.button,
+button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"] {
+    @include button-base;
+    $button-height: 24px / $font-size-small;
+    background: transparent;
+    border: 0;
+    color: $color-text-highlight-introvert;
+    font-size: $font-size-small;
+    font-weight: $font-weight-extrovert;
+    line-height: $button-height;
+    height: $button-height * 1em;
+    padding: 0;
+    text-transform: uppercase;
+    min-width: 1px;
+
+    &:focus:not(:disabled):not(.ng-disabled),
+    &:hover:not(:disabled):not(.ng-disabled) {
+        background: transparent;
+        color: $color-text-highlight-normal;
+    }
+
+    &:disabled,
+    &.ng-disabled {
+        &, &:focus, &:hover {
+            @include opacity(0.5);
+            background: transparent;
+            cursor: default;
+        }
+    }
+
+    &.m-call-to-action {
+        @include button-color($color-text-highlight-normal, $color-text-inverted);
+        $button-height: 24px / $font-size-normal;
+        font-size: $font-size-normal;
+        line-height: $button-height;
+        height: $button-height * 1em;
+        padding: 0 1em;
+        min-width: 180px / $font-size-normal * 1em;
+
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
+            background: $color-brand-two-introvert;
+        }
+
+        &:active:not(:disabled):not(.ng-disabled) {
+            background-color: $color-brand-two-extrovert;
+        }
+    }
+}
