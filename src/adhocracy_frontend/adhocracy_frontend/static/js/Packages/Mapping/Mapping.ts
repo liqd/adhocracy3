@@ -52,8 +52,15 @@ export var mapInput = (
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
+            var style = {
+                fillColor: "#000",
+                color: "#000",
+                opacity: 0.5,
+                stroke: false
+            };
+
             // FIXME: Definetely Typed
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon), style);
             scope.polygon.addTo(map);
 
             // limit map to polygon
