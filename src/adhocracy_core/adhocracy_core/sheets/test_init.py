@@ -56,9 +56,9 @@ class TestResourcePropertySheet:
         context.__graph__ = mock_graph
         return context
 
-    def make_one(self, sheet_meta, context):
+    def make_one(self, sheet_meta, context, registry=None):
         from adhocracy_core.sheets import AnnotationStorageSheet
-        return AnnotationStorageSheet(sheet_meta, context)
+        return AnnotationStorageSheet(sheet_meta, context, registry=registry)
 
     def test_create_valid(self, sheet_meta, context):
         from zope.interface.verify import verifyObject
@@ -70,6 +70,16 @@ class TestResourcePropertySheet:
         assert inst._data_key == sheet_meta.isheet.__identifier__
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
+
+    def test_create_valid_set_registry_if_available(self, sheet_meta, context,
+                                                    registry):
+        inst = self.make_one(sheet_meta, context)
+        assert inst.registry is registry
+
+    def test_create_valid_set_registry_manually(self, sheet_meta, context):
+        registry = testing.DummyResource()
+        inst = self.make_one(sheet_meta, context, registry=registry)
+        assert inst.registry is registry
 
     def test_get_empty(self, sheet_meta, context):
         inst = self.make_one(sheet_meta, context)

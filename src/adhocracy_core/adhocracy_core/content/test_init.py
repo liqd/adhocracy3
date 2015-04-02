@@ -34,7 +34,7 @@ class TestResourceContentRegistry:
                                          create_mandatory=True,
                                          editable=True,
                                          readable=True,
-                                         sheet_class=lambda x, y: mock_sheet,
+                                         sheet_class=lambda x, y, z: mock_sheet,
                                        )
         mock_sheet.meta = sheet_meta
         return sheet_meta
