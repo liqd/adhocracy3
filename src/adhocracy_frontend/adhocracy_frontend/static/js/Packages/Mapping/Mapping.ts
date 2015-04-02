@@ -283,6 +283,7 @@ export interface IMapListHorizontalScope<T> extends angular.IScope {
     polygon : L.Polygon;
     rawPolygon : number[][];
     items : IItemHorizontalList<T>[];
+    tempItems : IItemHorizontalList<T>[];
     itemValues : T[];
     selectedItem : IItemHorizontalList<T>;
     toggleItem(item : IItemHorizontalList<T>) : void;
@@ -336,43 +337,45 @@ export var mapListHorizontal = (adhConfig : AdhConfig.IService, leaflet : typeof
                 scope.items.push(item);
             });
 
-            scope.selectedItem = scope.items[0];
+            scope.tempItems = _.clone(scope.items);
+            scope.selectedItem = scope.tempItems[0];
             $((<any>scope.selectedItem.marker)._icon).addClass("is-selected");
 
             map.on("moveend", () => {
+                var newList = [];
                 var bounds = map.getBounds();
                 $timeout(() => {
+                    var i = 0;
                     _.forEach(scope.items, (item) => {
                         if (bounds.contains(item.marker.getLatLng())) {
-                            item.hide = false;
-                        } else {
-                            item.hide = true;
+                            item.index = i;
+                            newList.push(item);
+                            i ++;
                         }
                     });
+                    scope.tempItems = newList;
                 });
             });
 
             scope.toggleItem = (item) => {
                 if (typeof scope.selectedItem !== "undefined") {
                     $((<any>scope.selectedItem.marker)._icon).removeClass("is-selected");
-
                 }
                 scope.selectedItem = item;
                 $((<any>item.marker)._icon).addClass("is-selected");
-                map.panTo(scope.selectedItem.marker.getLatLng());
             };
 
-             scope.getPreviousItem = (item) => {
+            scope.getPreviousItem = (item) => {
                 if ((item.index - 1) >= 0) {
-                    scope.toggleItem(scope.items[item.index - 1]);
+                    scope.toggleItem(scope.tempItems[item.index - 1]);
                 } else {
                     scope.toggleItem(item);
                 }
             };
 
             scope.getNextItem = (item) => {
-                if ((item.index + 1) < scope.items.length) {
-                    scope.toggleItem(scope.items[item.index + 1]);
+                if ((item.index + 1) < scope.tempItems.length) {
+                    scope.toggleItem(scope.tempItems[item.index + 1]);
                 } else {
                     scope.toggleItem(item);
                 }

@@ -11,7 +11,7 @@
             <p>{{ selectedItem.value.detail }}</p>
         </div>
         <div style="float: right; clear: none; margin-top: 50px;">
-            <a ng-if="selectedItem.index < items.length-1" href="" data-ng-click="getNextItem(selectedItem);">
+            <a ng-if="selectedItem.index < tempItems.length-1" href="" data-ng-click="getNextItem(selectedItem);">
                 next
             </a>
         </div>
