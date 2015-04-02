@@ -1,0 +1,22 @@
+form {
+    //FIXME : this will be related to moving columns when we have it
+    background-color: $color-background-base-introvert;
+    padding: 1em;
+}
+
+input[type="text"],
+input[type="url"],
+input[type="password"],
+input[type="email"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+select,
+textarea {
+    border: 0;
+
+    &:focus {
+        border-color: $color-brand-one-normal;
+        outline: 1px solid $color-brand-one-normal;
+    }
+}
