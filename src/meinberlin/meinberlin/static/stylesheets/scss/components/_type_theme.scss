@@ -3,7 +3,7 @@
 
     &, &:hover,
     &:focus {
-        color: $color-text-introvert !important;
+        color: $color-text-introvert;
     }
 
     &:hover,
@@ -12,6 +12,6 @@
     }
 
     &:active {
-        color: black;
+        color: $color-text-extrovert;
     }
 }
