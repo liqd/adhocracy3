@@ -12,7 +12,7 @@ from adhocracy_core.schema import Text
 
 class IProposal(ISheet):
 
-    """Marker interface for the Kiezkassen propsal sheet."""
+    """Marker interface for the Kiezkassen proposal sheet."""
 
 
 class ProposalSchema(colander.MappingSchema):
