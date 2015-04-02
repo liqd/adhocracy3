@@ -124,7 +124,9 @@ def validate_request_data(context: ILocation, request: Request,
     :raises _JSONError: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
-    schema_with_binding = schema.bind(context=context, request=request,
+    schema_with_binding = schema.bind(context=context,
+                                      request=request,
+                                      registry=request.registry,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
     if request.content_type == 'multipart/form-data':
