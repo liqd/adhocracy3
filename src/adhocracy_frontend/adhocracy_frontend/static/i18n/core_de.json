@@ -111,6 +111,7 @@
     "TR__REPORT_ABUSE_STATUS_OK": "Die Moderator*innen wurden benachrichtigt.",
     "TR__RESET": "Zurücksetzen",
     "TR__SAVE": "speichern",
+    "TR__SAVE_PIN": "Ort speichern",
     "TR__SHARE": "teilen",
     "TR__SHOWING_LIMIT_TOTAL": "Zeige {{currentLimit}}/{{totalCount}} an.",
     "TR__SORT_BY": "sortieren nach…",
