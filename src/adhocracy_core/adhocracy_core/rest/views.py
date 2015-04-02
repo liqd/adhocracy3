@@ -472,7 +472,6 @@ class SimpleRESTView(ResourceRESTView):
             name = sheet.meta.isheet.__identifier__
             if name in appstructs:
                 sheet.set(appstructs[name],
-                          registry=self.request.registry,
                           request=self.request)
 
         appstruct = {}
