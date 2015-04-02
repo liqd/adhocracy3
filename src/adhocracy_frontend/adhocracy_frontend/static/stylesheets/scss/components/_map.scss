@@ -3,4 +3,9 @@
     color: $color-text-inverted;
     font-size: $font-size-small;
     padding: 0.5em;
+
+    &.ng-invalid {
+        background: $color-function-invalid;
+        font-weight: $font-weight-extrovert;
+    }
 }
