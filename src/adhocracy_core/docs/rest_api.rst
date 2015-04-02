@@ -1402,6 +1402,27 @@ Not supported filters cannot be used for sorting::
     >>> resp_data['errors'][0]['description']
     '"path" is not one of content_type, name, text,...
 
+If *reverse* is set to ``True`` the sorting will be reversed::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sort': 'name', 'reverse': True}).json
+    >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    [... 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/']
+
+You can also specifiy a *limit* and an *offset* for pagination::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sort': 'name', 'limit': 1, 'offset': 1}).json
+    >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    ['http://localhost/adhocracy/Proposals/kommunismus/LAST/']
+
+The *count* is not affected by *limit*::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'count': 'true', 'limit': 1}).json
+    >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
+    >>> assert int(child_count) >= 10
+
 The *elements* parameter allows controlling how matching element are
 returned. By default, 'elements' in the IPool sheet contains a list of paths.
 This corresponds to setting *elements=paths*.

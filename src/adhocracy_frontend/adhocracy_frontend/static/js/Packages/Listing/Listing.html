@@ -7,6 +7,16 @@
             <adh-inject data-transclusion-id="element-id"></adh-inject>
         </li>
     </ol>
+    <a
+        href=""
+        class="load-more"
+        data-ng-if="currentLimit < totalCount"
+        data-ng-click="loadMore()">
+        <span class="load-more-numbers">
+            {{ "TR__SHOWING_LIMIT_TOTAL" | translate:{currentLimit: currentLimit, totalCount: totalCount} }}
+        </span>
+        <span class="load-more-text">{{ "TR__LOAD_MORE" | translate }}</span>
+    </a>
     <div class="listing-empty-text" data-ng-if="elements.length === 0">
         {{ emptyText }}
     </div>

@@ -1,17 +1,14 @@
 {
-    "TR__MEINBERLIN_ADDRESS": "Address",
-    "TR__MEINBERLIN_ADDRESSEE": "Addressee",
     "TR__MEINBERLIN_BUDGET": "Budget",
     "TR__MEINBERLIN_DETAIL": "Detail",
-    "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESS": "Please enter the address",
-    "TR__MEINBERLIN_ERROR_REQUIRED_ADDRESSEE": "Please enter the addressee",
     "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET": "Please enter the budget",
     "TR__MEINBERLIN_ERROR_REQUIRED_DETAIL": "Please enter detail",
     "TR__MEINBERLIN_ERROR_REQUIRED_I_WANT_TO_BE_PART": "This must be chcked",
-    "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION": "Please enter a Geolocation",
+    "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION_TEXT": "Please enter the address",
     "TR__MEINBERLIN_ERROR_REQUIRED_TITLE": "Please enter a proposal title",
     "TR__MEINBERLIN_I_WANT_TO_BE_PART": "I want to be a part",
     "TR__MEINBERLIN_LOCATION": "Geo location point",
+    "TR__MEINBERLIN_LOCATION_TEXT": "Address",
     "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL": "MeinBerlin Simple Proposal",
     "TR__MEINBERLIN_TITLE": "Title"
 }

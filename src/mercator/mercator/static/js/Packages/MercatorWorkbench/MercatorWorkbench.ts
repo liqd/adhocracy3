@@ -141,11 +141,12 @@ export var mercatorProposalListingColumnDirective = (
                     {key: "50000", name: "20000 - 50000 €"}
                 ]
             }];
-            scope.shared.sort = "rates";
+            scope.shared.sort = "item_creation_date";
+            scope.shared.reverse = true;
             scope.shared.setSort = (sort : string) => {
                 scope.shared.sort = sort;
             };
-            scope.frontendOrderReverse = true;
+            scope.initialLimit = 50;
         }
     };
 };

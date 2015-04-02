@@ -1,31 +1,63 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 
+import _ = require("lodash");
+
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
+import AdhMappingUtils = require("./MappingUtils");
+
+var pkgLocation = "/Mapping";
 
 
-export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaflet : typeof L) => {
+export interface IMapInputScope extends angular.IScope {
+    lat : number;
+    lng : number;
+    height : number;
+    polygon : L.Polygon;
+    rawPolygon : any;
+    zoom? : number;
+    text : string;
+    error : boolean;
+    mapClicked : boolean;
+    saveCoordinates() : void;
+    resetCoordinates() : void;
+}
+
+export var mapInput = (
+    adhConfig : AdhConfig.IService,
+    adhSingleClickWrapper,
+    $timeout : angular.ITimeoutService,
+    leaflet : typeof L
+) => {
     return {
         scope: {
             lat: "=",
             lng: "=",
             height: "@",
-            polygon: "=",
+            rawPolygon: "=polygon",
             zoom: "@?"
         },
         restrict: "E",
-        template: "<div class=\"map\"></div>",
-        link: (scope, element, attrs) => {
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Input.html",
+        link: (scope : IMapInputScope, element) => {
+
+            var tmpLng : number = _.clone(scope.lng);
+            var tmpLat : number = _.clone(scope.lat);
+
             var mapElement = element.find(".map");
-            mapElement.height(attrs.height);
+            mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            attrs.polygon.addTo(map);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+
+            // FIXME: Definetely Typed
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
+            scope.polygon.addTo(map);
 
             // limit map to polygon
-            map.fitBounds(attrs.polygon.getBounds());
+            map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(map, {
                 minZoom: map.getZoom(),
                 maxBounds: map.getBounds()
@@ -35,52 +67,205 @@ export var mapinput = (adhClickContext, $timeout : angular.ITimeoutService, leaf
                 map.setZoom(scope.zoom);
             }
 
-            var marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng), {draggable: true});
-            adhClickContext(attrs.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
+            // FIXME: Definetely Typed
+            var marker = (<any>leaflet).marker();
+
+            if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
+                marker.setLatLng(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
+                marker.dragging.enable();
+                scope.text = "TR__MAP_EXPLAIN_DRAG";
+            } else {
+                scope.text = "TR__MAP_EXPLAIN_CLICK";
+            }
+
+            // when the polygon is clicked, set the marker there
+            adhSingleClickWrapper(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 marker.setLatLng(event.latlng);
                 marker.addTo(map);
+                marker.dragging.enable();
                 $timeout(() => {
-                    scope.lat = event.latlng.lat;
-                    scope.lng = event.latlng.lng;
+                    tmpLat = event.latlng.lat;
+                    tmpLng = event.latlng.lng;
+                    scope.text = "TR__MAP_EXPLAIN_DRAG";
+                    scope.mapClicked = true;
                 });
             });
-            attrs.polygon.on("dblclick", (event : L.LeafletMouseEvent) => {
+
+            scope.polygon.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
             });
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
             });
+
+            // only allow to change location by dragging if the new point is inside the polygon
             marker.on("dragend", (event : L.LeafletDragEndEvent) => {
                 var result = event.target.getLatLng();
-                $timeout(() => {
-                    scope.lat = result.lat;
-                    scope.lng = result.lng;
-                });
+                var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
+
+                if (pointInPolygon) {
+                    scope.mapClicked = true;
+                    $timeout(() => {
+                        tmpLat = result.lat;
+                        tmpLng = result.lng;
+                    });
+                } else {
+                    marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
+                    marker.dragging.disable();
+                    $timeout(() => {
+                        scope.text = "TR__MAP_MARKER_ERROR";
+                        scope.error = true;
+                        $timeout(() => {
+                            scope.text = "TR__MAP_EXPLAIN_DRAG";
+                            marker.dragging.enable();
+                            scope.error = false;
+                        }, 2000);
+                    });
+                }
             });
+
+            scope.saveCoordinates = () => {
+                scope.lng = tmpLng;
+                scope.lat = tmpLat;
+                scope.mapClicked = false;
+                scope.text = "TR__MAP_MARKER_SAVED";
+                $timeout(() => {
+                    scope.text = "TR__MAP_EXPLAIN_DRAG";
+                }, 2000);
+            };
+
+            scope.resetCoordinates = () => {
+                tmpLng = undefined;
+                tmpLat = undefined;
+                scope.lng = undefined;
+                scope.lat = undefined;
+                map.removeLayer(marker);
+                scope.mapClicked = false;
+                scope.text = "TR__MAP_EXPLAIN_CLICK";
+            };
         }
     };
 };
 
-export var mapdetail = (leaflet : typeof L) => {
+export var mapDetail = (leaflet : typeof L) => {
     return {
         scope: {
             lat: "@",
             lng: "@",
+            polygon: "@",
             height: "@",
             zoom: "@?"
         },
         restrict: "E",
         template: "<div class=\"map\"></div>",
-        link: (scope, element, attrs) => {
-            var mapElement = element.find(".map");
-            mapElement.height(attrs.height);
+        link: (scope, element) => {
 
-            var map = leaflet.map(mapElement[0], {
-                center: leaflet.latLng(attrs.lat, attrs.lng),
-                zoom: attrs.zoom || 14
+            var mapElement = element.find(".map");
+            mapElement.height(scope.height);
+
+            scope.map = leaflet.map(mapElement[0]);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
+            scope.polygon.addTo(scope.map);
+
+            scope.map.fitBounds(scope.polygon.getBounds());
+            leaflet.Util.setOptions(scope.map, {
+                minZoom: scope.map.getZoom(),
+                maxBounds: scope.map.getBounds()
             });
-            leaflet.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
-            leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
+            leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map);
+        }
+    };
+};
+
+
+export interface IItem<T> {
+    value : T;
+    marker : L.Marker;
+    hide : boolean;
+};
+
+export interface IMapListScope<T> extends angular.IScope {
+    height : number;
+    polygon : L.Polygon;
+    rawPolygon : number[][];
+    items : IItem<T>[];
+    itemValues : T[];
+    selectedItem : IItem<T>;
+    toggleItem(item : IItem<T>) : void;
+}
+
+export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+    return {
+        scope: {
+            height: "@",
+            polygon: "=",
+            rawPolygon: "=polygon",
+            itemValues: "=items"
+        },
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
+        link: (scope : IMapListScope<any>, element) => {
+
+            var scrollContainer = angular.element(".scroll-container");
+            var scrollToItem = (key) : void => {
+                var element = angular.element(".item" + key);
+                (<any>scrollContainer).scrollToElement(element, 10, 300);
+            };
+
+            var mapElement = element.find(".map");
+            mapElement.height(scope.height);
+
+            var map = leaflet.map(mapElement[0]);
+            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+
+            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
+            scope.polygon.addTo(map);
+
+            // limit map to polygon
+            map.fitBounds(scope.polygon.getBounds());
+            leaflet.Util.setOptions(map, {
+                 minZoom: map.getZoom(),
+                 maxBounds: map.getBounds()
+            });
+
+            scope.items = [];
+            _.forEach(scope.itemValues, (value, key) => {
+                var item = {
+                    value: value,
+                    marker: L.marker(leaflet.latLng(value.lat, value.lng)),
+                    hide: false
+                };
+                item.marker.addTo(map);
+                item.marker.on("click", (e) => {
+                    $timeout(() => {
+                        scope.toggleItem(item);
+                        scrollToItem(key);
+                    });
+                });
+                scope.items.push(item);
+            });
+
+            map.on("moveend", () => {
+                var bounds = map.getBounds();
+                $timeout(() => {
+                    _.forEach(scope.items, (item) => {
+                        if (bounds.contains(item.marker.getLatLng())) {
+                            item.hide = false;
+                        } else {
+                            item.hide = true;
+                        }
+                    });
+                });
+            });
+
+            scope.toggleItem = (item) => {
+                if (typeof scope.selectedItem !== "undefined") {
+                    $((<any>scope.selectedItem.marker)._icon).removeClass("is-selected");
+                }
+                scope.selectedItem = item;
+                $((<any>item.marker)._icon).addClass("is-selected");
+            };
         }
     };
 };
@@ -92,11 +277,13 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
-            AdhEmbed.moduleName
+            AdhEmbed.moduleName,
+            "duScroll"
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail"]);
+            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-list"]);
         }])
-        .directive("adhMapInput", ["adhClickContext", "$timeout", "leaflet", mapinput])
-        .directive("adhMapDetail", ["leaflet", mapdetail]);
+        .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
+        .directive("adhMapDetail", ["leaflet", mapDetail])
+        .directive("adhMapList", ["adhConfig", "leaflet", "$timeout" , mapList]);
 };

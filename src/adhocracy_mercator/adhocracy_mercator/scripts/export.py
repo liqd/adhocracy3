@@ -1,4 +1,9 @@
-"""Export scripts for adhocracy_mercator."""
+"""Export scripts for adhocracy_mercator.
+
+This is registered as console script in setup.py and can be used as::
+
+    bin/export_mercator_proposals
+"""
 
 import csv
 import inspect
@@ -61,7 +66,7 @@ def export_proposals():
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
     wr.writerow(['Title', 'Username', 'First name', 'Last name', 'Country',
-                'Organisation', '# Rates', 'requested funding', 'budget'])
+                'Organisation', '# Rates', 'budget', 'requested funding'])
 
     for proposal in proposals:
 

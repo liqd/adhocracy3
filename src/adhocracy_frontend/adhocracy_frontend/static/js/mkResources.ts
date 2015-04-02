@@ -360,7 +360,9 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
                     var fieldParser : string = mkFieldType(sheet.fields[x]).parser;
 
                     if (fieldParser) {
-                        codeLine = "this." + fieldName + " = (" + fieldParser + ")(args." + fieldName + ");";
+                        codeLine = "this.{0} = (typeof args.{0} === \"string\") ? ({1})(args.{0}) : args.{0};"
+                            .replace(/\{0\}/g, fieldName)
+                            .replace(/\{1\}/g, fieldParser);
                     } else {
                         codeLine = "this." + fieldName + " = args." + fieldName + ";";
                     }
@@ -440,7 +442,7 @@ mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : s
 mkFieldSignaturesSheetCons = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
     UtilR.mkThingList(
         fields,
-        (field) => field.name + (isWriteableField(field) ? "" : "?") + " : " + mkFieldType(field).constructorType,
+        (field) => field.name + (isWriteableField(field) ? "" : "?"),
         tab, separator
     );
 
@@ -797,6 +799,14 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         break;
     case "adhocracy_core.schema.FileStore":  // FIXME: this may be inappropriate, but it's a write-only field anyway
         resultType = "string";
+        break;
+    case "adhocracy_core.sheets.geo.WebMercatorLongitude":
+        resultType = "number";
+        parser = stringToFloat;
+        break;
+    case "adhocracy_core.sheets.geo.WebMercatorLatitude":
+        resultType = "number";
+        parser = stringToFloat;
         break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;

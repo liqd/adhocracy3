@@ -678,13 +678,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                 delete data.introduction.picture;
             }
 
-            var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
+            var mercatorProposal = new RIMercatorProposal({preliminaryNames: this.adhPreliminaryNames});
             mercatorProposal.parent = instance.scope.poolPath;
             mercatorProposal.data[SIName.nick] = new SIName.Sheet({
                 name: AdhUtil.normalizeName(data.title + <any>data.introduction.nickInstance)
             });
 
-            var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
+            var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames: this.adhPreliminaryNames});
             mercatorProposalVersion.parent = mercatorProposal.path;
             mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
                 follows: [mercatorProposal.first_version_path]
@@ -870,8 +870,10 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             update: "=?",
             facets: "=?",
             sort: "=?",
+            reverse: "=?",
             frontendOrderPredicate: "=?",
             frontendOrderReverse: "=?",
+            initialLimit: "=?",
             params: "=?"
         }
     };
