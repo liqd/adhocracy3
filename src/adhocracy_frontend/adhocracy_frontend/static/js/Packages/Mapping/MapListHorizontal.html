@@ -1,0 +1,19 @@
+<div>
+    <div class="map"></div>
+    <div>
+        <div style="float: left; margin-top: 50px;">
+            <a ng-if="selectedItem.index > 0" href="" data-ng-click="getPreviousItem(selectedItem);">
+                back
+            </a>
+        </div>
+        <div style="float: left; padding-right: 10px; padding-left: 20px;">
+            <h3>{{ selectedItem.value.title }}</h3>
+            <p>{{ selectedItem.value.detail }}</p>
+        </div>
+        <div style="float: right; clear: none; margin-top: 50px;">
+            <a ng-if="selectedItem.index < items.length-1" href="" data-ng-click="getNextItem(selectedItem);">
+                next
+            </a>
+        </div>
+    </div>
+</div>
