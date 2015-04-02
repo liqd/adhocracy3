@@ -1,0 +1,17 @@
+.disguised-link {
+    font-weight: normal;
+
+    &, &:hover,
+    &:focus {
+        color: $color-text-introvert !important;
+    }
+
+    &:hover,
+    &:focus {
+        text-decoration: underline;
+    }
+
+    &:active {
+        color: black;
+    }
+}
