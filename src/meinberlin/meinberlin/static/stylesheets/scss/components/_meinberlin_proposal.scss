@@ -3,6 +3,14 @@
     .input-error {
         display: block;
     }
+
+    .mein-berlin-proposal-form-footer {
+        margin-top: 2em;
+    }
+
+    .form-footer-button {
+        @extend .disguised-link;
+    }
 }
 
 .is-selected {
