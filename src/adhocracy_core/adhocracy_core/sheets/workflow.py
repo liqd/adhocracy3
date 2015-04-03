@@ -1,4 +1,4 @@
-"""Assign workflows to resources and change states."""
+"""Sheets to assign workflows to resources and change states."""
 from datetime import datetime
 from colander import Invalid
 from colander import MappingSchema
@@ -19,12 +19,12 @@ from adhocracy_core.schema import Text
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets import AnnotationStorageSheet
-from adhocracy_core.interfaces import IPropertySheet
+from adhocracy_core.interfaces import IResourceSheet
 
 
 class WorkflowType(SchemaType):
 
-    """A workflow object.
+    """Workflow object type :class:`adhocracy_core.interfaces.IWorkflow`.
 
     Example value: 'sample'
     """
@@ -50,12 +50,19 @@ class WorkflowType(SchemaType):
 
 class Workflow(AdhocracySchemaNode):
 
+    """Workflow :class:`adhocracy_core.interfaces.IWorkflow`.
+
+    This schema node is readlony.
+    The default value is looked up in the registry according to the
+    `default_workflow_name` attribute.
+    """
+
     schema_type = WorkflowType
     readonly = True
     default_workflow_name = ''
 
     @deferred
-    def default(self, kw):
+    def default(self, kw: dict) -> IWorkflow:
         registry = kw['registry']
         workflow = registry.content.get_workflow(self.default_workflow_name)
         return workflow
@@ -63,7 +70,7 @@ class Workflow(AdhocracySchemaNode):
 
 class StateType(SchemaType):
 
-    """A workflow state object.
+    """Workflow state.
 
     Example value: 'draft'
     """
@@ -80,6 +87,12 @@ class StateType(SchemaType):
 
 
 class State(AdhocracySchemaNode):
+
+    """Workflow state.
+
+    The workflow to get the default value and validate is lookup in  the
+    registry according to the `workflow_name` attribute.
+    """
 
     workflow_name = ''
     schema_type = StateType
@@ -125,7 +138,7 @@ class StateAssignment(MappingSchema):
 
 class WorkflowAssignmentSchema(MappingSchema):
 
-    """Assign workflow to resource type, optional add StateAssignment data."""
+    """Workflow assignment sheets data structure."""
 
     workflow_name = 'WRONG'
 
@@ -144,19 +157,27 @@ class WorkflowAssignmentSchema(MappingSchema):
     workflow_state = State()
     """Workflow state of the sheet context resource.
 
-    Setting this excecutes a transition to the new state value.
+    Setting this executes a transition to the new state value.
     """
 
 
 class IWorkflowAssignment(ISheet):
 
-    """Market interface for the WorkflowAssignments sheets."""
+    """Market interface for the workflow assignment sheets."""
 
 
-@implementer(IPropertySheet)
+@implementer(IResourceSheet)
 class WorkflowAssignmentSheet(AnnotationStorageSheet):
 
-    """Generic sheet for IWorkflowAssignment isheets."""
+    """Sheet class for workflow assignment sheets.
+
+    The sheet schema has to be a sup type of
+    :class:`adhocracy_core.sheets.workflow.WorkflowAssignmentSchema`,
+    the isheet a subclass of
+    :class:`adhocracy_core.sheets.workflow.IWorkflowAssignment`.
+
+    If the you set a new workflow state a transition to this state is executed.
+    """
 
     def get_next_states(self, request: IRequest) -> [str]:
         """Get possible transition to states.
@@ -167,7 +188,7 @@ class WorkflowAssignmentSheet(AnnotationStorageSheet):
         states = workflow.get_next_states(self.context, request)
         return states
 
-    def _store_data(self, appstruct):
+    def _store_data(self, appstruct: dict):
         if 'workflow_state' in appstruct:
             self._set_state(appstruct['workflow_state'])
             del appstruct['workflow_state']
@@ -189,10 +210,12 @@ workflow_meta = sheet_metadata_defaults._replace(
 
 class ISample(IWorkflowAssignment):
 
-    """Assign workflow to resource type, optional add StateAssignment data."""
+    """Marker interface for the sample workflow assignment sheet."""
 
 
 class SampleWorkflowAssignmentSchema(WorkflowAssignmentSchema):
+
+    """Data structure the sample workflow assignment sheet."""
 
     workflow_name = 'sample'
 
