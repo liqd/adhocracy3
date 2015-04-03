@@ -52,7 +52,7 @@ class Workflow(AdhocracySchemaNode):
 
     """Workflow :class:`adhocracy_core.interfaces.IWorkflow`.
 
-    This schema node is readlony.
+    This schema node is readonly.
     The default value is looked up in the registry according to the
     `default_workflow_name` attribute.
     """
@@ -178,6 +178,17 @@ class WorkflowAssignmentSheet(AnnotationStorageSheet):
 
     If the you set a new workflow state a transition to this state is executed.
     """
+
+    def __init__(self, meta, context, registry=None):
+        super().__init__(meta, context, registry)
+        error_msg = '{0} is not a sub type of {1}.'
+        if not meta.isheet.isOrExtends(IWorkflowAssignment):
+            msg = error_msg.format(str(meta.isheet), str(IWorkflowAssignment))
+            raise RuntimeConfigurationError(msg)
+        if not isinstance(self.schema, WorkflowAssignmentSchema):
+            msg = error_msg.format(str(meta.schema_class),
+                                   str(WorkflowAssignmentSchema))
+            raise RuntimeConfigurationError(msg)
 
     def get_next_states(self, request: IRequest) -> [str]:
         """Get possible transition to states.

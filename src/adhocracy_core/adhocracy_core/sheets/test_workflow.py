@@ -183,6 +183,8 @@ class TestWorkflowAssignmentSheet:
         return registry_with_content
 
     def test_create(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         from adhocracy_core.sheets.workflow import WorkflowAssignmentSheet
         from adhocracy_core.sheets.workflow import WorkflowAssignmentSchema
@@ -190,6 +192,22 @@ class TestWorkflowAssignmentSheet:
         assert isinstance(inst, WorkflowAssignmentSheet)
         assert inst.meta.isheet == IWorkflowAssignment
         assert inst.meta.schema_class == WorkflowAssignmentSchema
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+
+    def test_create_raise_if_wrong_isheet(self, meta, context):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        meta = meta._replace(isheet=ISheet)
+        with raises(RuntimeConfigurationError):
+            meta.sheet_class(meta, context)
+
+    def test_create_raise_if_wrong_schema(self, meta, context):
+        from colander import MappingSchema
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        meta = meta._replace(schema_class=MappingSchema)
+        with raises(RuntimeConfigurationError):
+            meta.sheet_class(meta, context)
 
     def test_get_empty(self, meta, context, registry, mock_workflow):
         mock_workflow.state_of.return_value = None
