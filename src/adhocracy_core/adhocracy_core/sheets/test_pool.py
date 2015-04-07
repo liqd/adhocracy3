@@ -27,23 +27,23 @@ class TestPoolSchema:
     def request(self, cornice_request):
         return cornice_request
 
-    def _make_one(self):
+    def make_one(self):
         from .pool import PoolSchema
         return PoolSchema()
 
     def test_serialize_empty(self):
-        inst = self._make_one()
+        inst = self.make_one()
         assert inst.serialize() == {'elements': []}
 
     def test_serialize_empty_with_count_request_param(self, request):
         request.validated['count'] = True
-        inst = self._make_one().bind(request=request)
+        inst = self.make_one().bind(request=request)
         assert inst.serialize() == {'elements': [],
                                     'count': '0'}
 
     def test_serialize_empty_with_aggregateby_request_param(self, request):
         request.validated['aggregateby'] = 'index1'
-        inst = self._make_one().bind(request=request)
+        inst = self.make_one().bind(request=request)
         assert inst.serialize() == {'elements': [],
                                     'aggregateby': {}}
 
@@ -57,8 +57,8 @@ class TestFilteringPoolSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.pool import pool_metadata
-        return pool_metadata
+        from adhocracy_core.sheets.pool import pool_meta
+        return pool_meta
 
     @fixture
     def inst(self, meta, context):
@@ -81,8 +81,8 @@ class TestFilteringPoolSheet:
 
 
     def test_create(self, context):
-        from adhocracy_core.sheets.pool import pool_metadata
-        inst = pool_metadata.sheet_class(pool_metadata, context)
+        from adhocracy_core.sheets.pool import pool_meta
+        inst = pool_meta.sheet_class(pool_meta, context)
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_core.sheets.pool import IPool
         from adhocracy_core.sheets.pool import PoolSchema

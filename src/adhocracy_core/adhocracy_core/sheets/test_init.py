@@ -253,19 +253,19 @@ class TestAddSheetToRegistry:
     def registry(self, registry_with_content):
         return registry_with_content
 
-    def _call_fut(self, sheet_meta, registry):
+    def call_fut(self, sheet_meta, registry):
         from adhocracy_core.sheets import add_sheet_to_registry
         return add_sheet_to_registry(sheet_meta, registry)
 
     def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry):
-        self._call_fut(sheet_meta, registry)
+        self.call_fut(sheet_meta, registry)
         assert registry.content.sheets_meta == {sheet_meta.isheet: sheet_meta}
 
     def test_register_valid_sheet_sheet_meta_replace_exiting(self, sheet_meta,
                                                              registry):
-        self._call_fut(sheet_meta, registry)
+        self.call_fut(sheet_meta, registry)
         meta_b = sheet_meta._replace(permission_view='META_B')
-        self._call_fut(meta_b, registry)
+        self.call_fut(meta_b, registry)
         assert registry.content.sheets_meta == {sheet_meta.isheet: meta_b}
 
     def test_register_non_valid_readonly_and_createmandatory(self, sheet_meta, registry):
@@ -273,28 +273,28 @@ class TestAddSheetToRegistry:
                                    creatable=False,
                                    create_mandatory=True)
         with raises(AssertionError):
-            self._call_fut(meta, registry)
+            self.call_fut(meta, registry)
 
     def test_register_non_valid_non_isheet(self, sheet_meta, registry):
         from zope.interface import Interface
         meta = sheet_meta._replace(isheet=Interface)
         with raises(AssertionError):
-            self._call_fut(meta, registry)
+            self.call_fut(meta, registry)
 
     def test_register_non_valid_schema_without_default_values(self, sheet_meta, registry):
         del sheet_meta.schema_class.__class_schema_nodes__[0].default
         with raises(AssertionError):
-            self._call_fut(sheet_meta, registry)
+            self.call_fut(sheet_meta, registry)
 
     def test_register_non_valid_schema_with_default_colander_drop(self, sheet_meta, registry):
         sheet_meta.schema_class.__class_schema_nodes__[0].default = colander.drop
         with raises(AssertionError):
-            self._call_fut(sheet_meta, registry)
+            self.call_fut(sheet_meta, registry)
 
     def test_register_non_valid_non_mapping_schema(self, sheet_meta, registry):
         meta = sheet_meta._replace(schema_class=colander.TupleSchema)
         with raises(AssertionError):
-            self._call_fut(meta, registry)
+            self.call_fut(meta, registry)
 
     def test_register_non_valid_schema_subclass_has_changed_field_type(self, sheet_meta, registry):
         class SheetABSchema(sheet_meta.schema_class):
@@ -306,4 +306,4 @@ class TestAddSheetToRegistry:
         meta_b = sheet_meta._replace(isheet=ISheetAB,
                                      schema_class=SheetABSchema)
         with raises(AssertionError):
-            self._call_fut(meta_b, registry)
+            self.call_fut(meta_b, registry)

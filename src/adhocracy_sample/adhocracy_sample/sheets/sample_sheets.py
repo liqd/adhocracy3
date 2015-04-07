@@ -2,7 +2,7 @@
 import colander
 
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets.name import name_metadata
+from adhocracy_core.sheets.name import name_meta
 from adhocracy_core.sheets import AnnotationStorageSheet
 
 
@@ -13,15 +13,15 @@ class DummyNameSheet(AnnotationStorageSheet):
     _data = {}
 
 
-dummy_name_metadata = name_metadata._replace(sheet_class=DummyNameSheet)
+dummy_name_metadata = name_meta._replace(sheet_class=DummyNameSheet)
 
 
-class IExtendedName(name_metadata.isheet):
+class IExtendedName(name_meta.isheet):
 
     """Marker interface for the extended name sheet."""
 
 
-class ExtendedNameSchema(name_metadata.schema_class):
+class ExtendedNameSchema(name_meta.schema_class):
 
     """Data structure for the extended name sheet."""
 
@@ -30,7 +30,7 @@ class ExtendedNameSchema(name_metadata.schema_class):
                                         missing=colander.drop)
 
 
-extended_name_metadata = name_metadata._replace(
+extended_name_metadata = name_meta._replace(
     isheet=IExtendedName,
     schema_class=ExtendedNameSchema,
 )

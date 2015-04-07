@@ -4,7 +4,7 @@ from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import IBasicPool
-from adhocracy_core.resources.pool import pool_metadata
+from adhocracy_core.resources.pool import pool_meta
 
 import adhocracy_core.sheets.document
 import adhocracy_core.sheets.comment
@@ -18,7 +18,7 @@ class IExternalResource(IBasicPool):
     """
 
 
-external_resource_meta = pool_metadata._replace(
+external_resource_meta = pool_meta._replace(
     content_name='ExternalResource',
     iresource=IExternalResource,
     element_types=[IComment],
@@ -26,7 +26,7 @@ external_resource_meta = pool_metadata._replace(
     permission_add='add_externalresource',
     extended_sheets=[adhocracy_core.sheets.comment.ICommentable],
     after_creation=([add_commentsservice, add_ratesservice]
-                    + pool_metadata.after_creation),
+                    + pool_meta.after_creation),
 )
 
 

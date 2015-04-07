@@ -116,7 +116,7 @@ Modules API and separation of responsibility
 .. autosummary::
 
     adhocracy_core.resources
-    adhocracy_core.resources.resource
+    adhocracy_core.resources.base
     adhocracy_core.resources.simple
     adhocracy_core.resources.pool
     adhocracy_core.resources.item

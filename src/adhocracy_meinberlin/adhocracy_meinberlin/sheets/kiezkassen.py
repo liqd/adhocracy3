@@ -3,7 +3,7 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import SingleLine
@@ -29,8 +29,8 @@ class ProposalSchema(colander.MappingSchema):
     location_text = SingleLine(validator=colander.Length(max=100))
 
 
-proposal_meta = sheet_metadata_defaults._replace(isheet=IProposal,
-                                                 schema_class=ProposalSchema)
+proposal_meta = sheet_meta._replace(isheet=IProposal,
+                                    schema_class=ProposalSchema)
 
 
 def includeme(config):

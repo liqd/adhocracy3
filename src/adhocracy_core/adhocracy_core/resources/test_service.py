@@ -3,10 +3,10 @@ from pytest import fixture
 
 
 def test_service_meta():
-    from .service import service_metadata
+    from .service import service_meta
     from .service import IBasicService
     import adhocracy_core.sheets
-    meta = service_metadata
+    meta = service_meta
     meta.content_name == 'Service'
     meta.iresource == IBasicService
     meta.basic_sheet = [adhocracy_core.sheets.pool.IPool,

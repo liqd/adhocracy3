@@ -13,39 +13,39 @@ from pytest import fixture
 
 
 def test_principals_meta():
-    from .principal import principals_metadata
+    from .principal import principals_meta
     from .principal import IPrincipalsService
-    meta = principals_metadata
+    meta = principals_meta
     assert meta.iresource is IPrincipalsService
     assert meta.permission_add == 'add_service'
     assert meta.content_name == 'principals'
 
 
 def test_users_meta():
-    from .principal import users_metadata
+    from .principal import users_meta
     from .principal import IUsersService
-    meta = users_metadata
+    meta = users_meta
     assert meta.iresource is IUsersService
     assert meta.permission_add == 'add_service'
     assert meta.content_name == 'users'
 
 
 def test_groups_meta():
-    from .principal import groups_metadata
+    from .principal import groups_meta
     from .principal import IGroupsService
-    meta = groups_metadata
+    meta = groups_meta
     assert meta.iresource is IGroupsService
     assert meta.permission_add == 'add_service'
     assert meta.content_name == 'groups'
 
 
 def test_user_meta():
-    from .principal import user_metadata
+    from .principal import user_meta
     from .principal import IUser
     from .principal import send_registration_mail
     from .principal import User
     import adhocracy_core.sheets
-    meta = user_metadata
+    meta = user_meta
     assert meta.iresource is IUser
     assert meta.content_class == User  # TODO do we really need this class?
     assert meta.permission_add == 'add_user'
@@ -67,10 +67,10 @@ def test_user_meta():
 
 
 def test_group_meta():
-    from .principal import group_metadata
+    from .principal import group_meta
     from .principal import IGroup
     from .principal import Group
-    meta = group_metadata
+    meta = group_meta
     assert meta.iresource is IGroup
     assert meta.content_class == Group
     assert meta.permission_add == 'add_group'
@@ -79,9 +79,9 @@ def test_group_meta():
 
 
 def test_passwordresets_meta():
-    from .principal import passwordresets_metadata
+    from .principal import passwordresets_meta
     from .principal import IPasswordResetsService
-    meta = passwordresets_metadata
+    meta = passwordresets_meta
     assert meta.iresource is IPasswordResetsService
     assert meta.permission_add == 'add_service'
     assert meta.permission_view == "manage_password_reset"
@@ -90,9 +90,9 @@ def test_passwordresets_meta():
 
 def test_passwordreset_meta():
     import adhocracy_core.sheets
-    from .principal import passwordreset_metadata
+    from .principal import passwordreset_meta
     from .principal import IPasswordReset
-    meta = passwordreset_metadata
+    meta = passwordreset_meta
     assert meta.iresource is IPasswordReset
     assert meta.permission_add == 'add_password_reset'
     assert meta.permission_view == 'manage_password_reset'
@@ -247,14 +247,14 @@ class TestPasswordResetClass:
     def registry(self, registry_with_content):
         return registry_with_content
 
-    def _make_one(self):
+    def make_one(self):
         from adhocracy_core.resources.principal import PasswordReset
         return PasswordReset()
 
     def test_create(self):
         from zope.interface.verify import verifyObject
         from .principal import IPasswordReset
-        inst = self._make_one()
+        inst = self.make_one()
         assert IPasswordReset.providedBy(inst)
         assert verifyObject(IPasswordReset, inst)
 
@@ -294,7 +294,7 @@ class TestGroupClass:
 
 class TestUserLocatorAdapter:
 
-    def _make_one(self, context=None, request=None):
+    def make_one(self, context=None, request=None):
         from adhocracy_core.resources.principal import UserLocatorAdapter
         return UserLocatorAdapter(context, request)
 
@@ -318,54 +318,54 @@ class TestUserLocatorAdapter:
     def test_create(self):
         from adhocracy_core.interfaces import IRolesUserLocator
         from zope.interface.verify import verifyObject
-        inst = self._make_one()
+        inst = self.make_one()
         assert IRolesUserLocator.providedBy(inst)
         assert verifyObject(IRolesUserLocator, inst)
 
     def test_get_user_by_email_user_exists(self, context, request):
         user = testing.DummyResource(email='test@test.de')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_email('test@test.de') is user
 
     def test_get_user_by_email_user_not_exists(self, context, request):
         user = testing.DummyResource(email='')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_email('wrong@test.de') is None
 
     def test_get_user_by_login_user_exists(self, context, request):
         user = testing.DummyResource(name='login name')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_login('login name') is user
 
     def test_get_user_by_login_user_not_exists(self, context, request):
         user = testing.DummyResource(name='')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_login('wrong login name') is None
 
     def test_get_user_by_activation_path_user_exists(self, context, request):
         user = testing.DummyResource(activation_path='/activate/foo')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_activation_path('/activate/foo') is user
         
     def test_get_user_by_activation_path_user_not_exists(self, context, request):
         user = testing.DummyResource(activation_path=None)
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_activation_path('/activate/no_such_link') is None
 
     def test_get_user_by_userid_user_exists(self, context, request):
         user = testing.DummyResource()
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_userid('/principals/users/User1') is user
 
     def test_get_user_by_userid_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_userid('/principals/users/User1') is None
 
     def test_get_groupids_user_exists(self, context, mock_sheet, request):
@@ -377,15 +377,15 @@ class TestUserLocatorAdapter:
         user = testing.DummyResource()
         register_sheet(user, mock_sheet, request.registry)
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_groupids('/principals/users/User1') == ['group:group1']
 
     def test_get_groupids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_groupids('/principals/users/User1') is None
 
     def test_get_role_and_group_role_ids_user_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         inst.get_user_by_userid = Mock()
         inst.get_user_by_userid.return_value = context
         inst.get_roleids = Mock()
@@ -396,7 +396,7 @@ class TestUserLocatorAdapter:
                ['role:admin', 'role:reader']
 
     def test_get_role_and_group_roleids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_role_and_group_roleids('/principals/users/User1') is None
 
     def test_get_group_roleids_user_exists(self, context, mock_sheet, request):
@@ -409,11 +409,11 @@ class TestUserLocatorAdapter:
         register_sheet(user, mock_sheet, request.registry)
         group.roles = ['role1']
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_group_roleids('/principals/users/User1') == ['role:role1']
 
     def test_get_group_roleids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_group_roleids('/principals/users/User1') is None
 
     def test_get_roleids_user_exists(self, context, mock_sheet, request):
@@ -421,11 +421,11 @@ class TestUserLocatorAdapter:
         user = testing.DummyResource(roles=['role1'])
         register_sheet(user, mock_sheet, request.registry)
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_roleids('/principals/users/User1') == ['role:role1']
 
     def test_get_roleids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_roleids('/principals/users/User1') is None
 
 
@@ -455,22 +455,22 @@ class TestGroupsAndRolesFinder:
         request.registry = registry
         return request
 
-    def _call_fut(self, userid, request):
+    def call_fut(self, userid, request):
         from adhocracy_core.resources.principal import groups_and_roles_finder
         return groups_and_roles_finder(userid, request)
 
     def test_userid_wrong(self, request,  mock_user_locator):
-        assert self._call_fut('WRONG', request) == []
+        assert self.call_fut('WRONG', request) == []
         assert mock_user_locator.get_groupids.call_args[0] == ('WRONG',)
         assert mock_user_locator.get_role_and_group_roleids.call_args[0] == ('WRONG',)
 
     def test_userid_with_roles(self, request, mock_user_locator):
         mock_user_locator.get_role_and_group_roleids.return_value = ['role:reader']
-        assert self._call_fut('userid', request) == ['role:reader']
+        assert self.call_fut('userid', request) == ['role:reader']
 
     def test_userid_with_groups_and_group_roles(self, request, mock_user_locator):
         mock_user_locator.get_role_and_group_roleids.return_value = ['group:Readers']
-        assert self._call_fut('userid', request) == ['group:Readers']
+        assert self.call_fut('userid', request) == ['group:Readers']
 
 
 class TestIntegrationSendRegistrationMail:

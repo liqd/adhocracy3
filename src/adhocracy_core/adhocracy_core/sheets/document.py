@@ -4,7 +4,7 @@ import colander
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets.sample_image import ISampleImageMetadata
 from adhocracy_core.schema import Reference
@@ -80,9 +80,9 @@ class DocumentSchema(colander.MappingSchema):
     elements = UniqueReferences(reftype=DocumentElementsReference)
 
 
-document_meta = sheet_metadata_defaults._replace(isheet=IDocument,
-                                                 schema_class=DocumentSchema,
-                                                 )
+document_meta = sheet_meta._replace(isheet=IDocument,
+                                    schema_class=DocumentSchema,
+                                    )
 
 
 class SectionSchema(colander.MappingSchema):
@@ -98,8 +98,8 @@ class SectionSchema(colander.MappingSchema):
     subsections = UniqueReferences(reftype=SectionSubsectionsReference)
 
 
-section_meta = sheet_metadata_defaults._replace(isheet=ISection,
-                                                schema_class=SectionSchema)
+section_meta = sheet_meta._replace(isheet=ISection,
+                                   schema_class=SectionSchema)
 
 
 class ParagraphSchema(colander.MappingSchema):
@@ -115,8 +115,8 @@ class ParagraphSchema(colander.MappingSchema):
                                          backref=True)
 
 
-paragraph_meta = sheet_metadata_defaults._replace(isheet=IParagraph,
-                                                  schema_class=ParagraphSchema)
+paragraph_meta = sheet_meta._replace(isheet=IParagraph,
+                                     schema_class=ParagraphSchema)
 
 
 def includeme(config):

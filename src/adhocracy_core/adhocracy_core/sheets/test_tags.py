@@ -8,8 +8,8 @@ class TestTagsSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.tags import tags_metadata
-        return tags_metadata
+        from adhocracy_core.sheets.tags import tags_meta
+        return tags_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.tags import ITags
@@ -56,8 +56,8 @@ class TestTagSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.tags import tag_metadata
-        return tag_metadata
+        from adhocracy_core.sheets.tags import tag_meta
+        return tag_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.tags import ITag

@@ -2,7 +2,6 @@
 from persistent import Persistent
 from zope.interface import implementer
 from BTrees.Length import Length
-from adhocracy_core.interfaces import resource_metadata
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import to_dotted_name
@@ -27,12 +26,3 @@ class Base(Persistent):
         name = getattr(self, '__name__', None)
         identifier = str(oid)
         return '{0} oid: {1} name: {2}'.format(iface_dotted, identifier, name)
-
-
-resource_metadata_defaults = resource_metadata._replace(
-    iresource=IResource,
-    content_class=Base,
-    permission_add='add_resource',
-    permission_view='view',
-    after_creation=[],
-)

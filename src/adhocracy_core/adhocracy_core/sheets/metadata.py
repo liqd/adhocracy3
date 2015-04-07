@@ -9,7 +9,7 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import AttributeStorageSheet
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
@@ -89,7 +89,7 @@ class MetadataSchema(colander.MappingSchema):
     hidden = Boolean(validator=deferred_validate_hidden)
 
 
-metadata_metadata = sheet_metadata_defaults._replace(
+metadata_meta = sheet_meta._replace(
     isheet=IMetadata,
     schema_class=MetadataSchema,
     sheet_class=AttributeStorageSheet,
@@ -120,4 +120,4 @@ def view_blocked_by_metadata(resource: IResource, registry: Registry,
 
 def includeme(config):
     """Register sheets, add subscriber to update creation/modification date."""
-    add_sheet_to_registry(metadata_metadata, config.registry)
+    add_sheet_to_registry(metadata_meta, config.registry)

@@ -62,21 +62,21 @@ class TestAddChangelogModified:
         root['parent']['child'] = context
         return context
 
-    def _call_fut(self, event):
+    def call_fut(self, event):
         from .subscriber import add_changelog_modified_and_descendants
         return add_changelog_modified_and_descendants(event)
 
     def test_set_modified_changelog(self, event, changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent/child'].modified is True
 
     def test_dont_set_changed_descendants_for_context(self, event, changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent/child'].changed_descendants is False
 
     def test_set_changed_descendants_changelog_for_parents(self, event,
                                                            changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent'].changed_descendants is True
         assert changelog['/'].changed_descendants is True
 
@@ -84,13 +84,13 @@ class TestAddChangelogModified:
         """Stop iterating all parents if `changed_descendants` is already set"""
         changelog['/parent'] = \
             changelog['parent']._replace(changed_descendants=True)
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent'].changed_descendants is True
         assert changelog['/'].changed_descendants is False
 
     def test_increment_changed_descendants_counter_for_parents(self, event,
                                                                changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent'].resource.\
                    __changed_descendants_counter__() == 1
         assert changelog['/'].resource.__changed_descendants_counter__() == 1
@@ -109,28 +109,28 @@ class TestAddChangelogBackrefs:
         context.__changed_backrefs_counter__ = Length()
         return context
 
-    def _call_fut(self, event):
+    def call_fut(self, event):
         from .subscriber import add_changelog_backrefs
         return add_changelog_backrefs(event)
 
     def test_set_changed_backrefs_changelog(self, event, changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent/child'].changed_backrefs is True
 
     def test_set_changed_backrefs_counter(self, event, changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent/child'].resource.\
                    __changed_backrefs_counter__() == 1
 
     def test_set_changed_descendants_changelog_for_parents(self, event,
                                                            changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent'].changed_descendants is True
         assert changelog['/'].changed_descendants is True
 
     def test_increment_changed_descendants_counter_for_parents(self, event,
                                                                changelog):
-        self._call_fut(event)
+        self.call_fut(event)
         assert changelog['/parent'].resource.__changed_descendants_counter__() == 1
         assert changelog['/'].resource.__changed_descendants_counter__() == 1
 
