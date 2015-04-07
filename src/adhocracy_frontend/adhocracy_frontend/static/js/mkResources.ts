@@ -721,6 +721,28 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     // report about this, escpecially on the calling side.)
     var stringToBoolean : string = "(field : string) => typeof field === \"string\" ? field === \"true\" : <any>field";
 
+    var dictParser = (fields : {[key : string]: string}) => {
+        var outputFields : string[] = [];
+
+        for (var key in fields) {
+            if (fields.hasOwnProperty(key)) {
+                var parser : string = fields[key];
+                var outputField : string;
+
+                if (parser != null) {
+                    outputField = "{key}: ({parser})(field.{key})";
+                } else {
+                    outputField = "{key}: field.{key}";
+                }
+
+                outputFields.push(outputField
+                    .replace(/\{key\}/g, key)
+                    .replace(/\{parser\}/g, parser));
+                }
+        }
+        return "(field) => ({" + outputFields.join(",") + "})";
+    };
+
     switch (field.valuetype) {
     case "String":
         resultType = "string";
