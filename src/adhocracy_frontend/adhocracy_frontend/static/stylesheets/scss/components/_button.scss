@@ -77,13 +77,10 @@ input[type="button"] {
     height: $button-height * 1em;
     padding: 0;
     text-transform: uppercase;
-    min-width: 1px;
 
     &:focus:not(:disabled):not(.ng-disabled),
     &:hover:not(:disabled):not(.ng-disabled) {
-        @include button-color($color-text-highlight-introvert, $color-text-inverted);
-        background: transparent;
-        color: $color-text-highlight-normal;
+        @include button-color($color-text-highlight-normal, $color-text-inverted);
     }
 
     &:disabled,
