@@ -621,7 +621,6 @@ class ItemRESTView(PoolRESTView):
                 name = sheet.meta.isheet.__identifier__
                 if name in appstructs:  # pragma: no branch
                     sheet.set(appstructs[name],
-                              registry=self.request.registry,
                               request=self.request)
             resource = last_new_version
         else:
