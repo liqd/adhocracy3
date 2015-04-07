@@ -43,8 +43,7 @@ item_metadata = pool_metadata._replace(
     element_types=[IItemVersion,
                    ITag,
                    ],
-    after_creation=[create_initial_content_for_item] +
-    pool_metadata.after_creation,
+    after_creation=[create_initial_content_for_item],
     item_type=IItemVersion,
     permission_add='add_resource',
 )

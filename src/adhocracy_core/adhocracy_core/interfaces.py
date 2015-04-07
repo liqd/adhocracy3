@@ -1,7 +1,6 @@
 """Interfaces for plugable dependencies, basic metadata structures."""
 from collections import Iterable
 from collections import namedtuple
-from collections import OrderedDict
 from enum import Enum
 
 from pyramid.interfaces import ILocation
@@ -152,26 +151,22 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         """
 
 
-RESOURCE_METADATA = OrderedDict({
-    'content_name': '',
-    'iresource': None,
-    'content_class': None,
-    'permission_add': '',
-    'permission_view': '',
-    'is_implicit_addable': False,
-    'basic_sheets': [],
-    'extended_sheets': [],
-    'after_creation': [],
-    'element_types': [],
-    'item_type': None,
-    'use_autonaming': False,
-    'autonaming_prefix': '',
-    'use_autonaming_random': False,
-})
-
-
 class ResourceMetadata(namedtuple('ResourceMetadata',
-                                  RESOURCE_METADATA.keys())):
+                                  ['content_name',
+                                   'iresource',
+                                   'content_class',
+                                   'permission_add',
+                                   'permission_view',
+                                   'is_implicit_addable',
+                                   'basic_sheets',
+                                   'extended_sheets',
+                                   'after_creation',
+                                   'use_autonaming',
+                                   'autonaming_prefix',
+                                   'use_autonaming_random',
+                                   'element_types',
+                                   'item_type',
+                                   ])):
 
     """Metadata to register Resource Types.
 
@@ -221,9 +216,6 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     item_type:
         Set addable content types, class heritage is honored
     """
-
-
-resource_metadata = ResourceMetadata(**RESOURCE_METADATA)
 
 
 class IResource(ILocation):

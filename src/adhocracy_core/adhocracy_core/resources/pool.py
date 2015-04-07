@@ -10,9 +10,9 @@ import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.resource import Base
 from adhocracy_core.resources.resource import Length
-from adhocracy_core.resources.resource import resource_metadata_defaults
 
 
 class IBasicPool(IPool):
@@ -83,18 +83,20 @@ class Pool(Base, Folder):
 pool_metadata = resource_metadata_defaults._replace(
     iresource=IPool,
     content_class=Pool,
+    permission_add='add_pool',
+    permission_view='view',
+    is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.name.IName,
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
+    extended_sheets=[],
     element_types=[IPool],
-    permission_add='add_pool',
 )
 
 
 basicpool_metadata = pool_metadata._replace(
     iresource=IBasicPool,
-    permission_add='add_pool',
     is_implicit_addable=True,
 )
 

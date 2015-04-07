@@ -187,9 +187,9 @@ def pool_graph_catalog(config, pool_graph):
 @fixture
 def resource_meta() -> ResourceMetadata:
     """ Return basic resource metadata."""
-    from adhocracy_core.interfaces import resource_metadata
+    from adhocracy_core.resources import resource_meta
     from adhocracy_core.interfaces import IResource
-    return resource_metadata._replace(iresource=IResource)
+    return resource_meta._replace(iresource=IResource)
 
 
 @fixture

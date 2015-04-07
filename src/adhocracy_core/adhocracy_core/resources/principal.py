@@ -18,10 +18,10 @@ from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRolesUserLocator
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
-from adhocracy_core.resources.resource import resource_metadata
 from adhocracy_core.resources.resource import Base
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
@@ -272,7 +272,7 @@ class PasswordReset(Base):
         del self.__parent__[self.__name__]
 
 
-passwordreset_metadata = resource_metadata._replace(
+passwordreset_metadata = resource_meta._replace(
     iresource=IPasswordReset,
     content_class=PasswordReset,
     permission_add='add_password_reset',

@@ -6,14 +6,16 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.resource import resource_metadata_defaults
 
 
-simple_metadata = \
-    resource_metadata_defaults._replace(
-        iresource=ISimple,
-        basic_sheets=[adhocracy_core.sheets.name.IName,
-                      adhocracy_core.sheets.metadata.IMetadata,
-                      ],
-        permission_add='add_simple',
-    )
+    iresource=ISimple,
+    content_class=Base,
+    permission_add='add_simple',
+    permission_view='view',
+    is_implicit_addable=False,
+    basic_sheets=[adhocracy_core.sheets.name.IName,
+                  adhocracy_core.sheets.metadata.IMetadata,
+                  ],
+    extended_sheets=[],
+)
 
 
 def includeme(config):

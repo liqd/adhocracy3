@@ -9,11 +9,15 @@ import adhocracy_core.sheets.metadata
 
 tag_metadata = resource_metadata_defaults._replace(
     iresource=ITag,
+    content_class=Base,
+    permission_add='add_tag',
+    permission_view='view',
+    is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.name.IName,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.tags.ITag,
                   ],
-    permission_add='add_tag',
+    extended_sheets=[],
 )
 
 
