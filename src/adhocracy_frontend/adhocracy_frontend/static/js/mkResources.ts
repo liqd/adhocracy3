@@ -740,7 +740,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
                     .replace(/\{parser\}/g, parser));
                 }
         }
-        return "(field) => ({" + outputFields.join(",") + "})";
+        return "(field) => ({" + outputFields.join(", ") + "})";
     };
 
     switch (field.valuetype) {
@@ -831,7 +831,8 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         parser = stringToFloat;
         break;
     case "adhocracy_core.sheets.workflow.StateAssignment":
-        resultType = "{startData : string; description : string;}";
+        resultType = "{start_date : string; description : string;}";
+        constructorType = "{start_date : string; description : string;}";
         parser = dictParser({
             start_date: null,
             description: stringToDate
