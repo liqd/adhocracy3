@@ -307,6 +307,13 @@ export var mapListHorizontal = (adhConfig : AdhConfig.IService, leaflet : typeof
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
 
+            var scrollContainer = angular.element("#scroll-container");
+            var scrollToItem = (key) : void => {
+                var element = angular.element(".item" + key);
+                var left = element.width() * key;
+                (<any>scrollContainer).scrollTo(left, 0, 800);
+            };
+
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
@@ -332,6 +339,7 @@ export var mapListHorizontal = (adhConfig : AdhConfig.IService, leaflet : typeof
                 item.marker.on("click", (e) => {
                     $timeout(() => {
                         scope.toggleItem(item);
+                        scrollToItem(key);
                     });
                 });
                 scope.items.push(item);
@@ -368,16 +376,20 @@ export var mapListHorizontal = (adhConfig : AdhConfig.IService, leaflet : typeof
             scope.getPreviousItem = (item) => {
                 if ((item.index - 1) >= 0) {
                     scope.toggleItem(scope.tempItems[item.index - 1]);
+                    scrollToItem(item.index - 1);
                 } else {
                     scope.toggleItem(item);
+                    scrollToItem(item.index);
                 }
             };
 
             scope.getNextItem = (item) => {
                 if ((item.index + 1) < scope.tempItems.length) {
                     scope.toggleItem(scope.tempItems[item.index + 1]);
+                    scrollToItem(item.index + 1);
                 } else {
                     scope.toggleItem(item);
+                    scrollToItem(item.index);
                 }
             };
         }

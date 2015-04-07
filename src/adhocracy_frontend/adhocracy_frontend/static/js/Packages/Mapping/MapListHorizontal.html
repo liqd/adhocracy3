@@ -2,18 +2,21 @@
     <div class="map"></div>
     <div>
         <div style="float: left; margin-top: 50px;">
-            <a ng-if="selectedItem.index > 0" href="" data-ng-click="getPreviousItem(selectedItem);">
-                back
-            </a>
+            <a href="" data-ng-click="getPreviousItem(selectedItem);">back</a>
         </div>
-        <div style="float: left; padding-right: 10px; padding-left: 20px;">
-            <h3>{{ selectedItem.value.title }}</h3>
-            <p>{{ selectedItem.value.detail }}</p>
+        <div style="padding-right: 100px;">
+            <div style="overflow: hidden; white-space: nowrap;" id="scroll-container">
+                <ol>
+                    <li style=" width: 100%; display: inline-block;" ng-repeat="(key, item) in tempItems" class="listing-element item{{key}}">
+                        <h3>{{item.value.title}}</h3>
+                        <p>{{item.value.detail}}</p>
+                        <a data-ng-click="toggleItem(item)" href="">{{ item.value.title }}</a>
+                    </li>
+                </ol>
+            </div>
         </div>
         <div style="float: right; clear: none; margin-top: 50px;">
-            <a ng-if="selectedItem.index < tempItems.length-1" href="" data-ng-click="getNextItem(selectedItem);">
-                next
-            </a>
+            <a href="" data-ng-click="getNextItem(selectedItem);">next</a>
         </div>
     </div>
 </div>
