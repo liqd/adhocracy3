@@ -9,9 +9,9 @@ from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import IBasicPool
-from adhocracy_core.resources.pool import basicpool_metadata
-from adhocracy_core.resources.service import service_metadata
-from adhocracy_core.resources.simple import simple_metadata
+from adhocracy_core.resources.pool import basicpool_meta
+from adhocracy_core.resources.service import service_meta
+from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.sheets.asset import AssetFileDownload
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
@@ -28,7 +28,7 @@ class IAssetDownload(IPool):
     """View that makes an asset available for download."""
 
 
-asset_download_meta = simple_metadata._replace(
+asset_download_meta = simple_meta._replace(
     content_name='AssetDownload',
     iresource=IAssetDownload,
     basic_sheets=[IName, IAssetData],
@@ -127,7 +127,7 @@ def _create_asset_download(context: IAsset, name: str, registry: Registry,
                             registry=registry)
 
 
-asset_meta = basicpool_metadata._replace(
+asset_meta = basicpool_meta._replace(
     content_name='Asset',
     iresource=IAsset,
     basic_sheets=[
@@ -146,7 +146,7 @@ class IAssetsService(IServicePool):
     """The 'assets' ServicePool."""
 
 
-assets_service_meta = service_metadata._replace(
+assets_service_meta = service_meta._replace(
     iresource=IAssetsService,
     content_name='assets',
     element_types=[IAsset],
@@ -163,11 +163,11 @@ def add_assets_service(context: IPool, registry: Registry, options: dict):
     registry.content.create(IAssetsService.__identifier__, parent=context)
 
 
-pool_with_assets_meta = basicpool_metadata._replace(
+pool_with_assets_meta = basicpool_meta._replace(
     iresource=IPoolWithAssets,
-    basic_sheets=basicpool_metadata.basic_sheets + [
+    basic_sheets=basicpool_meta.basic_sheets + [
         adhocracy_core.sheets.asset.IHasAssetPool],
-    after_creation=basicpool_metadata.after_creation + [add_assets_service],
+    after_creation=basicpool_meta.after_creation + [add_assets_service],
 )
 
 

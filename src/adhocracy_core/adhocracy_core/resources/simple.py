@@ -3,9 +3,11 @@ from adhocracy_core.interfaces import ISimple
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.metadata
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.resource import resource_metadata_defaults
+from adhocracy_core.resources import resource_meta
+from adhocracy_core.resources.resource import Base
 
 
+simple_meta = resource_meta._replace(
     iresource=ISimple,
     content_class=Base,
     permission_add='add_simple',
@@ -20,4 +22,4 @@ from adhocracy_core.resources.resource import resource_metadata_defaults
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(simple_metadata, config)
+    add_resource_type_to_registry(simple_meta, config)

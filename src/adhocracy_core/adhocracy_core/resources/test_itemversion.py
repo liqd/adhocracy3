@@ -11,14 +11,14 @@ from adhocracy_core.testing import create_event_listener
 
 
 def test_itemversion_meta():
-    from .itemversion import itemversion_metadata
+    from .itemversion import itemversion_meta
     from .itemversion import IItemVersion
     from .itemversion import notify_new_itemversion_created
     import adhocracy_core.sheets
-    meta = itemversion_metadata
+    meta = itemversion_meta
     assert meta.iresource == IItemVersion
-    assert meta.basic_sheets == [adhocracy_core.sheets.versions.IVersionable,
-                                 adhocracy_core.sheets.metadata.IMetadata,
+    assert meta.basic_sheets == [adhocracy_core.sheets.metadata.IMetadata,
+                                 adhocracy_core.sheets.versions.IVersionable,
                                  ]
     assert notify_new_itemversion_created in meta.after_creation
     assert meta.use_autonaming
@@ -97,13 +97,13 @@ class TestItemVersion:
     def test_autoupdate_with_referencing_items(self, config, context):
         # for more tests see adhocracy_core.resources.subscriber
         from adhocracy_core.sheets.document import ISection
-        from adhocracy_core.resources.itemversion import itemversion_metadata
+        from adhocracy_core.resources.itemversion import itemversion_meta
         from adhocracy_core.resources import add_resource_type_to_registry
         from adhocracy_core.sheets.versions import IVersionable
         from adhocracy_core.utils import get_sheet
         config.include('adhocracy_core.sheets.document')
         config.include('adhocracy_core.sheets.versions')
-        metadata = itemversion_metadata._replace(extended_sheets=[ISection])
+        metadata = itemversion_meta._replace(extended_sheets=[ISection])
         add_resource_type_to_registry(metadata, config)
         referenced_v0 = self._make_one(config, context)
         appstructs={ISection.__identifier__: {'subsections': [referenced_v0]}}

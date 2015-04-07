@@ -5,7 +5,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.pool import pool_metadata
+from adhocracy_core.resources.pool import pool_meta
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.tags
 import adhocracy_core.sheets.pool
@@ -31,8 +31,7 @@ def create_initial_content_for_item(context, registry, options):
     create(ITag.__identifier__, parent=context, appstructs=tag_last_data)
 
 
-item_metadata = pool_metadata._replace(
-    content_name='Item',
+item_meta = pool_meta._replace(
     iresource=IItem,
     basic_sheets=[adhocracy_core.sheets.name.IName,
                   adhocracy_core.sheets.tags.ITags,
@@ -49,10 +48,10 @@ item_metadata = pool_metadata._replace(
 )
 
 
-item_basic_sheets_without_name_sheet = copy(item_metadata.basic_sheets)
+item_basic_sheets_without_name_sheet = copy(item_meta.basic_sheets)
 item_basic_sheets_without_name_sheet.remove(adhocracy_core.sheets.name.IName)
 
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(item_metadata, config)
+    add_resource_type_to_registry(item_meta, config)

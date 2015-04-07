@@ -4,7 +4,6 @@ from adhocracy_core.events import SheetReferenceNewVersion
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.resource import resource_metadata_defaults
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.resource import Base
 from adhocracy_core.sheets.versions import IVersionable
@@ -80,8 +79,7 @@ def _notify_referencing_resources_about_new_version(old_version,
         registry.notify(event)
 
 
-itemversion_metadata = resource_metadata_defaults._replace(
-    content_name='ItemVersion',
+itemversion_meta = resource_meta._replace(
     iresource=IItemVersion,
     content_class=Base,
     permission_add='add_tag',
@@ -99,4 +97,4 @@ itemversion_metadata = resource_metadata_defaults._replace(
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(itemversion_metadata, config)
+    add_resource_type_to_registry(itemversion_meta, config)

@@ -1,7 +1,7 @@
 """Basic Pool to give the client a endpoint to post specific resource types."""
 
 from adhocracy_core.interfaces import IServicePool
-from adhocracy_core.resources.pool import pool_metadata
+from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources import add_resource_type_to_registry
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.pool
@@ -16,7 +16,7 @@ class IBasicService(IServicePool):
     """
 
 
-service_metadata = pool_metadata._replace(
+service_meta = pool_meta._replace(
     content_name='Service',
     iresource=IBasicService,
     basic_sheets=[adhocracy_core.sheets.pool.IPool,
@@ -27,4 +27,4 @@ service_metadata = pool_metadata._replace(
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(service_metadata, config)
+    add_resource_type_to_registry(service_meta, config)

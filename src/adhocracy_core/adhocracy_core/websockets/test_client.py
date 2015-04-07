@@ -50,12 +50,12 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
 
     def setUp(self):
         from pyramid.testing import DummyResource
-        from adhocracy_core.changelog import changelog_metadata
+        from adhocracy_core.changelog import changelog_meta
         self._client = DummyClient()
         self._registry = DummyResource()
         self._registry.ws_client = self._client
         self._registry.changelog = dict()
-        self._changelog_metadata = changelog_metadata
+        self._changelog_metadata = changelog_meta
 
     def test_send_messages_after_commit_hook_success_and_empty_changelog(self):
         from adhocracy_core.websockets.client import send_messages_after_commit_hook

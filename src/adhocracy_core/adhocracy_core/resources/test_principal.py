@@ -13,39 +13,39 @@ from pytest import fixture
 
 
 def test_principals_meta():
-    from .principal import principals_metadata
+    from .principal import principals_meta
     from .principal import IPrincipalsService
-    meta = principals_metadata
+    meta = principals_meta
     assert meta.iresource is IPrincipalsService
     assert meta.permission_add == 'add_service'
     assert meta.content_name == 'principals'
 
 
 def test_users_meta():
-    from .principal import users_metadata
+    from .principal import users_meta
     from .principal import IUsersService
-    meta = users_metadata
+    meta = users_meta
     assert meta.iresource is IUsersService
     assert meta.permission_add == 'add_service'
     assert meta.content_name == 'users'
 
 
 def test_groups_meta():
-    from .principal import groups_metadata
+    from .principal import groups_meta
     from .principal import IGroupsService
-    meta = groups_metadata
+    meta = groups_meta
     assert meta.iresource is IGroupsService
     assert meta.permission_add == 'add_service'
     assert meta.content_name == 'groups'
 
 
 def test_user_meta():
-    from .principal import user_metadata
+    from .principal import user_meta
     from .principal import IUser
     from .principal import send_registration_mail
     from .principal import User
     import adhocracy_core.sheets
-    meta = user_metadata
+    meta = user_meta
     assert meta.iresource is IUser
     assert meta.content_class == User  # TODO do we really need this class?
     assert meta.permission_add == 'add_user'
@@ -67,10 +67,10 @@ def test_user_meta():
 
 
 def test_group_meta():
-    from .principal import group_metadata
+    from .principal import group_meta
     from .principal import IGroup
     from .principal import Group
-    meta = group_metadata
+    meta = group_meta
     assert meta.iresource is IGroup
     assert meta.content_class == Group
     assert meta.permission_add == 'add_group'
@@ -79,9 +79,9 @@ def test_group_meta():
 
 
 def test_passwordresets_meta():
-    from .principal import passwordresets_metadata
+    from .principal import passwordresets_meta
     from .principal import IPasswordResetsService
-    meta = passwordresets_metadata
+    meta = passwordresets_meta
     assert meta.iresource is IPasswordResetsService
     assert meta.permission_add == 'add_service'
     assert meta.permission_view == "manage_password_reset"
@@ -90,9 +90,9 @@ def test_passwordresets_meta():
 
 def test_passwordreset_meta():
     import adhocracy_core.sheets
-    from .principal import passwordreset_metadata
+    from .principal import passwordreset_meta
     from .principal import IPasswordReset
-    meta = passwordreset_metadata
+    meta = passwordreset_meta
     assert meta.iresource is IPasswordReset
     assert meta.permission_add == 'add_password_reset'
     assert meta.permission_view == 'manage_password_reset'

@@ -79,8 +79,7 @@ class Pool(Base, Folder):
         """Return  the :term:`service` for the given context."""
         return find_service(self, service_name, *sub_service_names)
 
-
-pool_metadata = resource_metadata_defaults._replace(
+pool_meta = resource_meta._replace(
     iresource=IPool,
     content_class=Pool,
     permission_add='add_pool',
@@ -94,8 +93,7 @@ pool_metadata = resource_metadata_defaults._replace(
     element_types=[IPool],
 )
 
-
-basicpool_metadata = pool_metadata._replace(
+basicpool_meta = pool_meta._replace(
     iresource=IBasicPool,
     is_implicit_addable=True,
 )
@@ -103,4 +101,4 @@ basicpool_metadata = pool_metadata._replace(
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(basicpool_metadata, config)
+    add_resource_type_to_registry(basicpool_meta, config)

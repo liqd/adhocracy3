@@ -830,11 +830,6 @@ class TestMetaApiView:
         return cornice_request
 
     @fixture
-    def resource_meta(self):
-        from adhocracy_core.interfaces import resource_metadata
-        return resource_metadata._replace(iresource=IResource)
-
-    @fixture
     def sheet_meta(self):
         from adhocracy_core.interfaces import sheet_metadata
         return sheet_metadata._replace(isheet=ISheet,

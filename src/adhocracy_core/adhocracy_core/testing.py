@@ -612,11 +612,11 @@ def add_test_users(root, registry, options):
 def includeme_root_with_test_users(config):
     """Override IRootPool to create initial test users."""
     from adhocracy_core.resources import add_resource_type_to_registry
-    from adhocracy_core.resources.root import root_metadata
+    from adhocracy_core.resources.root import root_meta
     config.commit()
-    after_creation = root_metadata.after_creation + [add_test_users]
-    root_metadata = root_metadata._replace(after_creation=after_creation)
-    add_resource_type_to_registry(root_metadata, config)
+    after_creation = root_meta.after_creation + [add_test_users]
+    root_meta = root_meta._replace(after_creation=after_creation)
+    add_resource_type_to_registry(root_meta, config)
 
 
 @fixture(scope='class')
