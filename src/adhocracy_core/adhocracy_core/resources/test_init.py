@@ -4,8 +4,8 @@ from pytest import fixture
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import sheet_metadata
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.testing import create_event_listener
 from adhocracy_core.testing import register_sheet
 
@@ -149,7 +149,7 @@ class TestResourceFactory:
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[ISheetY])
         register_sheet(None, mock_sheet, registry, ISheetY)
-        mock_sheet.meta = sheet_metadata._replace(creatable=False)
+        mock_sheet.meta = sheet_meta._replace(creatable=False)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
 
         self.make_one(meta)(appstructs=appstructs)

@@ -3,7 +3,7 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 
 
 class WebMercatorLongitude(colander.SchemaNode):
@@ -49,11 +49,11 @@ class PointSchema(colander.MappingSchema):
     y = WebMercatorLatitude()
 
 
-point_meta = sheet_metadata_defaults._replace(isheet=IPoint,
-                                              schema_class=PointSchema,
-                                              editable=True,
-                                              create_mandatory=False,
-                                              )
+point_meta = sheet_meta._replace(isheet=IPoint,
+                                 schema_class=PointSchema,
+                                 editable=True,
+                                 create_mandatory=False,
+                                 )
 
 
 def includeme(config):

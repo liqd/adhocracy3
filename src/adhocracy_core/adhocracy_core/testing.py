@@ -195,10 +195,10 @@ def resource_meta() -> ResourceMetadata:
 @fixture
 def sheet_meta() -> SheetMetadata:
     """ Return basic sheet metadata."""
-    from adhocracy_core.interfaces import sheet_metadata
+    from adhocracy_core.sheets import sheet_meta
     from adhocracy_core.interfaces import ISheet
-    return sheet_metadata._replace(isheet=ISheet,
-                                   schema_class=colander.MappingSchema)
+    return sheet_meta._replace(isheet=ISheet,
+                               schema_class=colander.MappingSchema)
 
 
 class CorniceDummyRequest(testing.DummyRequest):
@@ -292,13 +292,13 @@ def registry_with_changelog(registry, changelog):
 @fixture
 def mock_sheet() -> Mock:
     """Mock :class:`adhocracy_core.sheets.GenericResourceSheet`."""
-    from adhocracy_core.interfaces import sheet_metadata
+    from adhocracy_core.sheets import sheet_meta
     from adhocracy_core.interfaces import ISheet
     # Better would be spec=GenericResourceSheet for the mock object;
     # however this fails if the object is deepcopied.
     sheet = Mock()
-    sheet.meta = sheet_metadata._replace(isheet=ISheet,
-                                         schema_class=colander.MappingSchema)
+    sheet.meta = sheet_meta._replace(isheet=ISheet,
+                                     schema_class=colander.MappingSchema)
     sheet.schema = colander.MappingSchema()
     sheet.get.return_value = {}
     return sheet

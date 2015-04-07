@@ -8,8 +8,8 @@ class TestPasswordSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import password_metadata
-        return password_metadata
+        from adhocracy_core.sheets.principal import password_meta
+        return password_meta
 
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
@@ -200,8 +200,8 @@ class TestUserBasicSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import userbasic_metadata
-        return userbasic_metadata
+        from adhocracy_core.sheets.principal import userbasic_meta
+        return userbasic_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserBasic
@@ -222,8 +222,8 @@ class TestUserExtendedSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import userextended_metadata
-        return userextended_metadata
+        from adhocracy_core.sheets.principal import userextended_meta
+        return userextended_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserExtended
@@ -319,8 +319,8 @@ class TestPermissionsSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import permissions_metadata
-        return permissions_metadata
+        from adhocracy_core.sheets.principal import permissions_meta
+        return permissions_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IPermissions
@@ -363,8 +363,8 @@ class TestGroupSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import group_metadata
-        return group_metadata
+        from adhocracy_core.sheets.principal import group_meta
+        return group_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IGroup

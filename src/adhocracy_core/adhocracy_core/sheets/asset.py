@@ -21,7 +21,7 @@ from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.utils import get_sheet_field
 
 
@@ -37,7 +37,7 @@ class HasAssetPoolSchema(colander.MappingSchema):
     asset_pool = PostPool(iresource_or_service_name='assets')
 
 
-has_asset_pool_meta = sheet_metadata_defaults._replace(
+has_asset_pool_meta = sheet_meta._replace(
     isheet=IHasAssetPool,
     schema_class=HasAssetPoolSchema,
     editable=False,
@@ -69,7 +69,7 @@ class AssetMetadataSchema(colander.MappingSchema):
                                    reftype=AssetReference)
 
 
-asset_metadata_meta = sheet_metadata_defaults._replace(
+asset_metadata_meta = sheet_meta._replace(
     isheet=IAssetMetadata,
     schema_class=AssetMetadataSchema,
 )
@@ -87,7 +87,7 @@ class AssetDataSchema(colander.MappingSchema):
     data = FileStore(missing=colander.required)
 
 
-asset_data_meta = sheet_metadata_defaults._replace(
+asset_data_meta = sheet_meta._replace(
     isheet=IAssetData,
     schema_class=AssetDataSchema,
     readable=False,

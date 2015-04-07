@@ -17,8 +17,8 @@ class ISheetA(ISheet):
 
 @fixture
 def sheet_metas():
-    from adhocracy_core.interfaces import sheet_metadata
-    meta = sheet_metadata._replace(schema_class=colander.MappingSchema)
+    from adhocracy_core.sheets import sheet_meta
+    meta = sheet_meta._replace(schema_class=colander.MappingSchema)
     metas = [meta._replace(isheet=ISheet),
              meta._replace(isheet=ISheetA)]
     return metas

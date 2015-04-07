@@ -137,8 +137,8 @@ class TestVersionsSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.versions import versions_metadata
-        return versions_metadata
+        from adhocracy_core.sheets.versions import versions_meta
+        return versions_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.versions import IVersions
@@ -181,8 +181,8 @@ class TestVersionableSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.versions import versionable_metadata
-        return versionable_metadata
+        from adhocracy_core.sheets.versions import versionable_meta
+        return versionable_meta
 
     @fixture
     def context(self, context, mock_graph):

@@ -56,8 +56,8 @@ class TestFilteringPoolSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.pool import pool_metadata
-        return pool_metadata
+        from adhocracy_core.sheets.pool import pool_meta
+        return pool_meta
 
     @fixture
     def inst(self, meta, context):
@@ -69,8 +69,8 @@ class TestFilteringPoolSheet:
         return inst
 
     def test_create(self, context):
-        from adhocracy_core.sheets.pool import pool_metadata
-        inst = pool_metadata.sheet_class(pool_metadata, context)
+        from adhocracy_core.sheets.pool import pool_meta
+        inst = pool_meta.sheet_class(pool_meta, context)
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_core.sheets.pool import IPool
         from adhocracy_core.sheets.pool import PoolSchema

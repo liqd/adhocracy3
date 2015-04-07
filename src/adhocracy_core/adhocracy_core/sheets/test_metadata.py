@@ -72,8 +72,8 @@ class TestMetadataSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.metadata import metadata_metadata
-        return metadata_metadata
+        from adhocracy_core.sheets.metadata import metadata_meta
+        return metadata_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.metadata import IMetadata

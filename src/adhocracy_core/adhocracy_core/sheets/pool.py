@@ -12,7 +12,7 @@ import colander
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import AnnotationStorageSheet
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.utils import append_if_not_none
@@ -238,7 +238,7 @@ class PoolSchema(colander.MappingSchema):
             node.add(child)
 
 
-pool_metadata = sheet_metadata_defaults._replace(
+pool_meta = sheet_meta._replace(
     isheet=IPool,
     schema_class=PoolSchema,
     sheet_class=FilteringPoolSheet,
@@ -249,4 +249,4 @@ pool_metadata = sheet_metadata_defaults._replace(
 
 def includeme(config):
     """Register adapter."""
-    add_sheet_to_registry(pool_metadata, config.registry)
+    add_sheet_to_registry(pool_meta, config.registry)

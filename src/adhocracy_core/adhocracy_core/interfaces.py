@@ -26,22 +26,20 @@ Dimensions = namedtuple('Dimensions', ['width', 'height'])
 """Dimensions of a two-dimensional object (e.g. image)."""
 
 
-SHEET_METADATA = {'isheet': None,
-                  'sheet_class': None,
-                  'schema_class': None,
-                  'permission_view': '',
-                  'permission_edit': '',
-                  'permission_create': '',
-                  'readable': True,
-                  'editable': True,
-                  'creatable': True,
-                  'create_mandatory': False,
-                  'mime_type_validator': None,
-                  'image_sizes': None,
-                  }
-
-
-class SheetMetadata(namedtuple('SheetMetadata', SHEET_METADATA.keys())):
+class SheetMetadata(namedtuple('SheetMetadata',
+                               ['isheet',
+                                'sheet_class',
+                                'schema_class',
+                                'permission_view' '',
+                                'permission_edit' '',
+                                'permission_create' '',
+                                'readable',
+                                'editable',
+                                'creatable',
+                                'create_mandatory',
+                                'mime_type_validator',
+                                'image_sizes',
+                                ])):
 
     """Metadata to register a sheet type to set/get resource data.
 
@@ -81,9 +79,6 @@ class SheetMetadata(namedtuple('SheetMetadata', SHEET_METADATA.keys())):
         optional dictionary from names to :class:`Dimensions`, e.g.
         ``{ 'thumbnail': Dimensions(width=100, height=50) }``
     """
-
-
-sheet_metadata = SheetMetadata(**SHEET_METADATA)
 
 
 class ISheetReferenceAutoUpdateMarker(ISheet):

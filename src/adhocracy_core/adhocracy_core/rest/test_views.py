@@ -829,12 +829,6 @@ class TestMetaApiView:
         cornice_request.registry.content = mock_content_registry
         return cornice_request
 
-    @fixture
-    def sheet_meta(self):
-        from adhocracy_core.interfaces import sheet_metadata
-        return sheet_metadata._replace(isheet=ISheet,
-                                       schema_class=colander.MappingSchema)
-
     def make_one(self, request, context):
         from adhocracy_core.rest.views import MetaApiView
         return MetaApiView(context, request)

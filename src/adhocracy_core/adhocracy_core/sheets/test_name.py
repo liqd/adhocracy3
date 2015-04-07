@@ -6,8 +6,8 @@ class TestNameSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.name import name_metadata
-        return name_metadata
+        from adhocracy_core.sheets.name import name_meta
+        return name_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.name import IName
