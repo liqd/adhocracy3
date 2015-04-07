@@ -22,7 +22,7 @@ from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.service import service_meta
-from adhocracy_core.resources.resource import Base
+from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import get_sheet

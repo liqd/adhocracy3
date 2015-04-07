@@ -6,7 +6,7 @@ from adhocracy_core.utils import to_dotted_name
 class ResourceUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from adhocracy_core.resources.resource import Base
+        from adhocracy_core.resources.base import Base
         return Base()
 
     def test_create(self):

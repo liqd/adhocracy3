@@ -20,7 +20,7 @@ class ISheetX(ISheet):
 
 @fixture
 def resource_meta(resource_meta):
-    from adhocracy_core.resources.resource import Base
+    from adhocracy_core.resources.base import Base
     return resource_meta._replace(iresource=IResource,
                                   content_class=Base)
 
