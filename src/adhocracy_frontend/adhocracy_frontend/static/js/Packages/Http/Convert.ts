@@ -87,7 +87,7 @@ export var importContent = <Content extends ResourcesBase.Resource>(
         }
 
         var _sclass = Resources_.sheetRegistry[sheetName];
-        _obj.data[sheetName] = new _sclass(jsonSheet);
+        _obj.data[sheetName] = _sclass.parse(jsonSheet);
 
         // the above four lines compile because we leave
         // typescript in the dark about the actual type of _class.
