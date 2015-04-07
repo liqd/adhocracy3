@@ -44,18 +44,18 @@ def context(objectmap):
 
 class TestGraph:
 
-    def _make_one(self, context):
+    def make_one(self, context):
         from adhocracy_core.graph import Graph
         return Graph(context)
 
     def test_create(self, context):
         from persistent import Persistent
-        graph = self._make_one(context)
+        graph = self.make_one(context)
         assert issubclass(graph.__class__, Persistent)
         assert graph._objectmap is context.__objectmap__
 
     def test_create_with_missing_objectmap(self):
-        graph = self._make_one(None)
+        graph = self.make_one(None)
         assert graph._objectmap is None
 
 

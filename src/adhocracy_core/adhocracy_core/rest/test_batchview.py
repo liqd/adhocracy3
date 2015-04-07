@@ -15,20 +15,20 @@ class DummySubresponse:
 
 class TestBatchItemResponse:
 
-    def _make_one(self, code=200, body={}):
+    def make_one(self, code=200, body={}):
         from adhocracy_core.rest.batchview import BatchItemResponse
         return BatchItemResponse(code, body)
 
     def test_was_successful_true(self):
-        inst = self._make_one()
+        inst = self.make_one()
         assert inst.was_successful() is True
 
     def test_was_successful_false(self):
-        inst = self._make_one(404)
+        inst = self.make_one(404)
         assert inst.was_successful() is False
 
     def test_to_dict(self):
-        inst = self._make_one()
+        inst = self.make_one()
         assert inst.to_dict() == {'code': 200, 'body': {}}
 
 
@@ -47,7 +47,7 @@ class TestBatchView:
         cornice_request.method = 'POST'
         return cornice_request
 
-    def _make_one(self, context, request):
+    def make_one(self, context, request):
         from adhocracy_core.rest.batchview import BatchView
         return BatchView(context, request)
 
@@ -69,7 +69,7 @@ class TestBatchView:
 
     def test_post_empty(self, context, request):
         from adhocracy_core.utils import is_batchmode
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.post() == {'responses': [],
                                'updated_resources': {'changed_descendants': [],
                                                      'created': [],
@@ -79,7 +79,7 @@ class TestBatchView:
 
     def test_post_successful_subrequest(self, context, request, mock_invoke_subrequest):
         request.body = self._make_json_with_subrequest_cstructs()
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
@@ -105,7 +105,7 @@ class TestBatchView:
         request.authenticated_userid = resource_path(context)
         request.root = context
         request.script_name = '/virtual'
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
@@ -123,7 +123,7 @@ class TestBatchView:
     def test_post_successful_subrequest_with_updated_resources(
             self, context, request, mock_invoke_subrequest):
         request.body = self._make_json_with_subrequest_cstructs()
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         response_body = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1',
                  'updated_resources': {'created': ['/pool/item/v1']}}
@@ -143,7 +143,7 @@ class TestBatchView:
         cstruct1 = self._make_subrequest_cstruct(result_first_version_path='@item/v1')
         cstruct2 = self._make_subrequest_cstruct(body={'ISheet': {'ref': '@item/v1'}})
         request.body = json.dumps([cstruct1, cstruct2])
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
@@ -158,7 +158,7 @@ class TestBatchView:
         from cornice.util import _JSONError
         request.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=444)
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         with raises(_JSONError) as err:
             inst.post()
             assert err.status_code == 444
@@ -170,7 +170,7 @@ class TestBatchView:
         from pyramid.httpexceptions import HTTPUnauthorized
         request.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.side_effect = HTTPUnauthorized()
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         with raises(_JSONError) as err:
             inst.post()
             assert err.status_code == 401
@@ -180,7 +180,7 @@ class TestBatchView:
         from cornice.util import _JSONError
         request.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.side_effect = RuntimeError('Bad luck')
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         with raises(_JSONError) as err:
             inst.post()
             assert err.status_code == 500
@@ -197,7 +197,7 @@ class TestBatchView:
         return BatchItemResponse(code, body)
 
     def test_extend_path_map_just_path(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {}
         result_path = '@newpath'
         result_first_version_path = ''
@@ -206,7 +206,7 @@ class TestBatchView:
         assert path_map == {'@newpath': 'http://a.org/adhocracy/new_item'}
 
     def test_extend_path_map_just_path_and_missing_response_path(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {}
         result_path = '@newpath'
         result_first_version_path = ''
@@ -215,7 +215,7 @@ class TestBatchView:
         assert path_map == {}
 
     def test_extend_path_map_path_and_first_version_path(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {}
         result_path = '@newpath'
         result_first_version_path = '@newpath/v1'
@@ -228,14 +228,14 @@ class TestBatchView:
 
     def test_copy_header_if_exists_not_existing(self, context, request):
         from copy import deepcopy
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         subrequest = deepcopy(request)
         inst.copy_header_if_exists('non_existing', subrequest)
         assert 'non_existing' not in subrequest.headers
 
     def test_copy_header_if_exists_existing(self, context, request):
         from copy import deepcopy
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         subrequest = deepcopy(request)
         request.headers['existing'] = 'Test'
         inst.copy_header_if_exists('existing', subrequest)
@@ -243,21 +243,21 @@ class TestBatchView:
 
     def test_copy_attr_if_exists_not_existing(self, context, request):
         from copy import deepcopy
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         subrequest = deepcopy(request)
         inst.copy_attr_if_exists('non_existing', subrequest)
         assert not hasattr(subrequest, 'non_existing')
 
     def test_copy_attr_if_exists_not_exists(self, context, request):
         from copy import deepcopy
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         subrequest = deepcopy(request)
         request.existing = 'Buh'
         inst.copy_attr_if_exists('existing', subrequest)
         assert hasattr(subrequest, 'existing')
 
     def test_extend_path_map_no_result_path(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {}
         result_path = ''
         result_first_version_path = ''
@@ -266,7 +266,7 @@ class TestBatchView:
         assert path_map == {}
 
     def test_extend_path_map_failed_response(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {}
         result_path = '@newpath'
         result_first_version_path = ''
@@ -276,7 +276,7 @@ class TestBatchView:
         assert path_map == {}
 
     def test_make_subrequest_post_with_non_empty_body(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         body = {'content_type':
                     'adhocracy_core.resources.sample_paragraph.IParagraph',
                 'data': {'adhocracy_core.sheets.name.IName': {'name': 'par1'}}
@@ -289,7 +289,7 @@ class TestBatchView:
         assert subrequest.json == body
 
     def test_make_subrequest_get_with_empty_body(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         subrequest_cstrut = self._make_subrequest_cstruct(method='GET')
         subrequest = inst._make_subrequest(subrequest_cstrut)
         assert subrequest.method == 'GET'
@@ -297,21 +297,21 @@ class TestBatchView:
         assert len(subrequest.body) == 0
 
     def test_resolve_preliminary_paths_str_with_replacement(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {'@newpath': '/adhocracy/new_item'}
         json_value = '@newpath'
         result = inst._resolve_preliminary_paths(json_value, path_map)
         assert result == '/adhocracy/new_item'
 
     def test_resolve_preliminary_paths_str_without_replacement(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {'@newpath': '/adhocracy/new_item'}
         json_value = 'nopath'
         result = inst._resolve_preliminary_paths(json_value, path_map)
         assert result == json_value
 
     def test_resolve_preliminary_paths_dict_with_replacement(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {'@newpath': '/adhocracy/new_item'}
         json_value = {'item1': 'foo', 'item2': '@newpath', 'item3': 'bar'}
         result = inst._resolve_preliminary_paths(json_value, path_map)
@@ -320,50 +320,50 @@ class TestBatchView:
                           'item3': 'bar'}
 
     def test_resolve_preliminary_paths_dict_without_replacement(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {'@newpath': '/adhocracy/new_item'}
         json_value = {'item1': 'foo', 'item2': 'nopath', 'item3': 'bar'}
         result = inst._resolve_preliminary_paths(json_value, path_map)
         assert result == json_value
 
     def test_resolve_preliminary_paths_list_with_replacement(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {'@newpath': '/adhocracy/new_item'}
         json_value = ['@newpath', 'foo', 'bar']
         result = inst._resolve_preliminary_paths(json_value, path_map)
         assert result == ['/adhocracy/new_item', 'foo', 'bar']
 
     def test_resolve_preliminary_paths_list_without_replacement(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {'@newpath': '/adhocracy/new_item'}
         json_value = ['nopath', 'foo', 'bar']
         result = inst._resolve_preliminary_paths(json_value, path_map)
         assert result == json_value
 
     def test_resolve_preliminary_paths_other_type(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         path_map = {'@newpath': '/adhocracy/new_item'}
         json_value = 123.456
         result = inst._resolve_preliminary_paths(json_value, path_map)
         assert result == json_value
 
     def test_try_to_decode_json_empty(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         result = inst._try_to_decode_json(b'')
         assert result == {}
 
     def test_try_to_decode_json_valid(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         payload = b'{"item2": 2, "item3": null, "item1": "value1"}'
         result = inst._try_to_decode_json(payload)
         assert result == {'item1': 'value1', 'item2': 2, 'item3': None}
 
     def test_try_to_decode_json_invalid(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         payload = b'{this is not a JSON object}'
         result = inst._try_to_decode_json(payload)
         assert result == {'error': '{this is not a JSON object}'}
 
     def test_options_empty(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.options() == {}

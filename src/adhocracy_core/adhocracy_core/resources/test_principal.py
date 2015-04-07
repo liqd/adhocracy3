@@ -247,14 +247,14 @@ class TestPasswordResetClass:
     def registry(self, registry_with_content):
         return registry_with_content
 
-    def _make_one(self):
+    def make_one(self):
         from adhocracy_core.resources.principal import PasswordReset
         return PasswordReset()
 
     def test_create(self):
         from zope.interface.verify import verifyObject
         from .principal import IPasswordReset
-        inst = self._make_one()
+        inst = self.make_one()
         assert IPasswordReset.providedBy(inst)
         assert verifyObject(IPasswordReset, inst)
 
@@ -294,7 +294,7 @@ class TestGroupClass:
 
 class TestUserLocatorAdapter:
 
-    def _make_one(self, context=None, request=None):
+    def make_one(self, context=None, request=None):
         from adhocracy_core.resources.principal import UserLocatorAdapter
         return UserLocatorAdapter(context, request)
 
@@ -318,54 +318,54 @@ class TestUserLocatorAdapter:
     def test_create(self):
         from adhocracy_core.interfaces import IRolesUserLocator
         from zope.interface.verify import verifyObject
-        inst = self._make_one()
+        inst = self.make_one()
         assert IRolesUserLocator.providedBy(inst)
         assert verifyObject(IRolesUserLocator, inst)
 
     def test_get_user_by_email_user_exists(self, context, request):
         user = testing.DummyResource(email='test@test.de')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_email('test@test.de') is user
 
     def test_get_user_by_email_user_not_exists(self, context, request):
         user = testing.DummyResource(email='')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_email('wrong@test.de') is None
 
     def test_get_user_by_login_user_exists(self, context, request):
         user = testing.DummyResource(name='login name')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_login('login name') is user
 
     def test_get_user_by_login_user_not_exists(self, context, request):
         user = testing.DummyResource(name='')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_login('wrong login name') is None
 
     def test_get_user_by_activation_path_user_exists(self, context, request):
         user = testing.DummyResource(activation_path='/activate/foo')
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_activation_path('/activate/foo') is user
         
     def test_get_user_by_activation_path_user_not_exists(self, context, request):
         user = testing.DummyResource(activation_path=None)
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_activation_path('/activate/no_such_link') is None
 
     def test_get_user_by_userid_user_exists(self, context, request):
         user = testing.DummyResource()
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_userid('/principals/users/User1') is user
 
     def test_get_user_by_userid_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_user_by_userid('/principals/users/User1') is None
 
     def test_get_groupids_user_exists(self, context, mock_sheet, request):
@@ -377,15 +377,15 @@ class TestUserLocatorAdapter:
         user = testing.DummyResource()
         register_sheet(user, mock_sheet, request.registry)
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_groupids('/principals/users/User1') == ['group:group1']
 
     def test_get_groupids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_groupids('/principals/users/User1') is None
 
     def test_get_role_and_group_role_ids_user_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         inst.get_user_by_userid = Mock()
         inst.get_user_by_userid.return_value = context
         inst.get_roleids = Mock()
@@ -396,7 +396,7 @@ class TestUserLocatorAdapter:
                ['role:admin', 'role:reader']
 
     def test_get_role_and_group_roleids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_role_and_group_roleids('/principals/users/User1') is None
 
     def test_get_group_roleids_user_exists(self, context, mock_sheet, request):
@@ -409,11 +409,11 @@ class TestUserLocatorAdapter:
         register_sheet(user, mock_sheet, request.registry)
         group.roles = ['role1']
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_group_roleids('/principals/users/User1') == ['role:role1']
 
     def test_get_group_roleids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_group_roleids('/principals/users/User1') is None
 
     def test_get_roleids_user_exists(self, context, mock_sheet, request):
@@ -421,11 +421,11 @@ class TestUserLocatorAdapter:
         user = testing.DummyResource(roles=['role1'])
         register_sheet(user, mock_sheet, request.registry)
         context['principals']['users']['User1'] = user
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_roleids('/principals/users/User1') == ['role:role1']
 
     def test_get_roleids_user_not_exists(self, context, request):
-        inst = self._make_one(context, request)
+        inst = self.make_one(context, request)
         assert inst.get_roleids('/principals/users/User1') is None
 
 

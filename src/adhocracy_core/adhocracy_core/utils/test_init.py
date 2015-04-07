@@ -208,7 +208,7 @@ def test_get_sheet_sheet_not_registered(context, registry_with_content):
 
 class GetUserUnitTest(unittest.TestCase):
 
-    def _make_one(self, request):
+    def make_one(self, request):
         from adhocracy_core.utils import get_user
         return get_user(request)
 
@@ -226,15 +226,15 @@ class GetUserUnitTest(unittest.TestCase):
                                     _dummy_userid=None)
 
     def test_with_user_id_is_None(self):
-        assert self._make_one(self.request) is None
+        assert self.make_one(self.request) is None
 
     def test_with_user_id_is_not_resource_path(self):
-        assert self._make_one(self.request) is None
+        assert self.make_one(self.request) is None
 
     def test_with_user_id(self):
         user = self.context['user']
         self.request._dummy_userid = '/user'
-        assert self._make_one(self.request) == user
+        assert self.make_one(self.request) == user
 
 
 class TestNormalizeToTuple:

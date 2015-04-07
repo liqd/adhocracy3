@@ -42,7 +42,7 @@ class TestItemVersion:
     def context(self, pool_graph_catalog):
         return pool_graph_catalog
 
-    def _make_one(self, config, parent, follows=[], appstructs={}, creator=None,
+    def make_one(self, config, parent, follows=[], appstructs={}, creator=None,
                   is_batchmode=False):
         from adhocracy_core.sheets.versions import IVersionable
         follow = {IVersionable.__identifier__: {'follows': follows}}
@@ -63,15 +63,15 @@ class TestItemVersion:
         assert IItemVersion.__identifier__ in content_types
 
     def test_create(self, config, context):
-        version_0 = self._make_one(config, context)
+        version_0 = self.make_one(config, context)
         assert IItemVersion.providedBy(version_0)
 
     def test_create_new_version(self, config, context):
         events = create_event_listener(config, IItemVersionNewVersionAdded)
-        creator = self._make_one(config, context)
+        creator = self.make_one(config, context)
 
-        version_0 = self._make_one(config, context)
-        version_1 = self._make_one(config, context,
+        version_0 = self.make_one(config, context)
+        version_1 = self.make_one(config, context,
                                    follows=[version_0], creator=creator)
 
         assert len(events) == 1
@@ -82,12 +82,12 @@ class TestItemVersion:
     def test_create_new_version_with_referencing_resources(self, config,
                                                            context):
         events = create_event_listener(config, ISheetReferenceNewVersion)
-        creator = self._make_one(config, context)
+        creator = self.make_one(config, context)
 
-        version_0 = self._make_one(config, context)
-        other_version_0 = self._make_one(config, context)
+        version_0 = self.make_one(config, context)
+        other_version_0 = self.make_one(config, context)
         context.__objectmap__.connect(other_version_0, version_0, SheetToSheet)
-        self._make_one(config, context,
+        self.make_one(config, context,
                        follows=[version_0], creator=creator, is_batchmode=True)
 
         assert len(events) == 1
@@ -105,11 +105,11 @@ class TestItemVersion:
         config.include('adhocracy_core.sheets.versions')
         metadata = itemversion_meta._replace(extended_sheets=[ISection])
         add_resource_type_to_registry(metadata, config)
-        referenced_v0 = self._make_one(config, context)
+        referenced_v0 = self.make_one(config, context)
         appstructs={ISection.__identifier__: {'subsections': [referenced_v0]}}
-        referenceing_v0 = self._make_one(config, context, appstructs=appstructs)
+        referenceing_v0 = self.make_one(config, context, appstructs=appstructs)
         config.registry.changelog.clear()
-        referenced_v1 = self._make_one(config, context, follows=[referenced_v0])
+        referenced_v1 = self.make_one(config, context, follows=[referenced_v0])
 
         referencing_v0_versions = get_sheet(referenceing_v0, IVersionable).get()
         assert len(referencing_v0_versions['followed_by']) == 1
