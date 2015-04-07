@@ -22,13 +22,16 @@ export class TabSetController {
         this.$scope.tabs = [];
     }
 
-    public select(selectedTab : ITabScope) {
+    public select(selectedTab? : ITabScope) {
         _.forEach(this.$scope.tabs, (tab : ITabScope) => {
             if (tab.active && tab !== selectedTab) {
                 tab.active = false;
             }
         });
-        selectedTab.active = true;
+
+        if (typeof selectedTab !== "undefined") {
+            selectedTab.active = true;
+        }
     }
 
     public addTab(tab : ITabScope) {
@@ -78,7 +81,11 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
             scope.select = () => {
-                tabsetCtrl.select(scope);
+                if (scope.active) {
+                    tabsetCtrl.select();
+                } else {
+                    tabsetCtrl.select(scope);
+                }
             };
 
             tabsetCtrl.addTab(scope);
