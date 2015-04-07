@@ -830,6 +830,13 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         resultType = "number";
         parser = stringToFloat;
         break;
+    case "adhocracy_core.sheets.workflow.StateAssignment":
+        resultType = "{startData : string; description : string;}";
+        parser = dictParser({
+            start_date: null,
+            description: stringToDate
+        });
+        break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;
     }
