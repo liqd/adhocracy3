@@ -83,7 +83,7 @@ class TestAutoupdateVersionableHasNewVersion:
         mock_sheet.get.return_value = {'elements': []}
         return mock_sheet
 
-    def _call_fut(self, event):
+    def call_fut(self, event):
         from adhocracy_core.resources.subscriber import \
             autoupdate_versionable_has_new_version
         return autoupdate_versionable_has_new_version(event)
@@ -96,7 +96,7 @@ class TestAutoupdateVersionableHasNewVersion:
         version.__graph__ = mock_graph
         event = create_new_reference_event(version, registry,
                                            root_versions=[root_version])
-        self._call_fut(event)
+        self.call_fut(event)
         mock_graph.is_in_subtree.assert_called_once_with(version, [root_version])
         assert registry.content.create.called is False
 
@@ -105,7 +105,7 @@ class TestAutoupdateVersionableHasNewVersion:
         event = create_new_reference_event(version, registry)
         mock_sheet.meta = mock_sheet.meta._replace(editable=False)
         register_sheet(version, mock_sheet, registry)
-        self._call_fut(event)
+        self.call_fut(event)
         assert registry.content.create.called is False
 
     def test_transaction_version_created_multiple_elements(
@@ -117,7 +117,7 @@ class TestAutoupdateVersionableHasNewVersion:
         register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         registry.changelog['/'] = changelog_meta._replace(created=True)
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
         assert registry.content.create.called is False
 
@@ -130,7 +130,7 @@ class TestAutoupdateVersionableHasNewVersion:
         register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'element': 2}
         registry.changelog['/'] = changelog_meta._replace(created=True)
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'element': 3}
         assert registry.content.create.called is False
 
@@ -144,7 +144,7 @@ class TestAutoupdateVersionableHasNewVersion:
         register_sheet(followedby, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
         registry.changelog['/'] = changelog_meta._replace(followed_by=followedby)
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
         assert registry.content.create.called is False
 
@@ -164,7 +164,7 @@ class TestAutoupdateVersionableHasNewVersion:
         mock_sheet.get.return_value = {'elements': [1, 2]}
         registry.changelog[resource_path(item)] =\
             changelog_meta._replace(last_version=last_version)
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
         assert registry.content.create.called is False
 
@@ -201,7 +201,7 @@ class TestAutoupdateVersionableHasNewVersion:
         mock_get_last_version.return_value = version
         registry.content.get_sheets_all.return_value = [mock_sheet,
                                                         mock_versionable_sheet]
-        self._call_fut(event)
+        self.call_fut(event)
         assert registry.content.create.call_args[0][0] == IItemVersion.__identifier__
         assert registry.content.create.call_args[1]['root_versions'] == event.root_versions
         assert registry.content.create.call_args[1]['registry'] == event.registry
@@ -235,7 +235,7 @@ class TestAutoupdateVersionableHasNewVersion:
                                                         mock_sheet_readonly]
         registry.content.get_sheet.side_effect = [mock_sheet,
                                                   mock_sheet_readonly]
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet_readonly.meta.isheet.__identifier__ not in \
                registry.content.create.call_args[1]['appstructs']
 
@@ -254,7 +254,7 @@ class TestAutoupdateVersionableHasNewVersion:
         mock_get_last_version.return_value = last
         registry.content.get_sheets_all.return_value = [mock_sheet,
                                                         mock_versionable_sheet]
-        self._call_fut(event)
+        self.call_fut(event)
         assert registry.content.create.called is False
 
     def test_version_is_not_last_version_and_has_not_same_references(
@@ -276,7 +276,7 @@ class TestAutoupdateVersionableHasNewVersion:
         registry.content.get_sheets_all.return_value = [mock_sheet,
                                                         mock_versionable_sheet]
         with raises(AutoUpdateNoForkAllowedError) as err:
-            self._call_fut(event)
+            self.call_fut(event)
         assert err.value.resource is version
         assert err.value.event is event
 
@@ -289,7 +289,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         mock_sheet.get.return_value = {'elements': []}
         return mock_sheet
 
-    def _call_fut(self, event):
+    def call_fut(self, event):
         from adhocracy_core.resources.subscriber import \
             autoupdate_non_versionable_has_new_version
         return autoupdate_non_versionable_has_new_version(event)
@@ -303,7 +303,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         event = create_new_reference_event(version, registry,
                                            root_versions=[root_version])
         register_sheet(version, mock_sheet, registry)
-        self._call_fut(event)
+        self.call_fut(event)
         mock_graph.is_in_subtree.assert_called_once_with(version, [root_version])
         assert not mock_sheet.set.called
 
@@ -312,7 +312,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
         event = create_new_reference_event(version, registry)
         mock_sheet.meta = mock_sheet.meta._replace(editable=False)
         register_sheet(version, mock_sheet, registry)
-        self._call_fut(event)
+        self.call_fut(event)
         assert not mock_sheet.set.called
 
     def test_multiple_elements(self, version, registry, mock_sheet):
@@ -322,7 +322,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
                                            isheet_field='elements')
         register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
 
     def test_single_element(self, version, registry, mock_sheet):
@@ -332,7 +332,7 @@ class TestAutoupdateNoneVersionableHasNewVersion:
                                            isheet_field='elements')
         register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
 
 
@@ -345,7 +345,7 @@ class TestAutoupdateTagHasNewVersion:
         mock_sheet.get.return_value = {'elements': []}
         return mock_sheet
 
-    def _call_fut(self, event):
+    def call_fut(self, event):
         from adhocracy_core.resources.subscriber import \
             autoupdate_tag_has_new_version
         return autoupdate_tag_has_new_version(event)
@@ -357,7 +357,7 @@ class TestAutoupdateTagHasNewVersion:
                                            isheet_field='elements')
         register_sheet(version, mock_sheet, registry)
         mock_sheet.get.return_value = {'elements': [1, 2]}
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'elements': [1, 3]}
 
     def test_tag_name_is_first(self, version, registry, mock_sheet):
@@ -367,7 +367,7 @@ class TestAutoupdateTagHasNewVersion:
                                            new_version=3,
                                            isheet_field='elements')
         register_sheet(version, mock_sheet, registry)
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.called is False
 
 
@@ -416,7 +416,7 @@ class TestAddDefaultGroupToUserSubscriber:
 
 class TestUpdateModificationDate:
 
-    def _call_fut(self, event):
+    def call_fut(self, event):
         from .subscriber import update_modification_date_modified_by
         return update_modification_date_modified_by(event)
 
@@ -433,7 +433,7 @@ class TestUpdateModificationDate:
         event = testing.DummyResource(object=context,
                                       registry=registry,
                                       request=request)
-        self._call_fut(event)
+        self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'modification_date': now,
                                                   'modified_by': user}
         assert mock_sheet.set.call_args[1] ==\
@@ -456,7 +456,7 @@ class TestSendPasswordResetMail:
         event.registry = registry
         return event
 
-    def _call_fut(self, event):
+    def call_fut(self, event):
         from .subscriber import send_password_reset_mail
         return send_password_reset_mail(event)
 
@@ -466,7 +466,7 @@ class TestSendPasswordResetMail:
         mock_sheet.get.return_value = {'creator': user}
         registry.content.get_sheet.return_value = mock_sheet
         event.object.__name__ = '/reset'
-        self._call_fut(event)
+        self.call_fut(event)
         send_mail = registry.messenger.render_and_send_mail
         assert send_mail.call_args[1]['recipients'] == ['test@test.de']
         assert 'Reset' in send_mail.call_args[1]['subject']

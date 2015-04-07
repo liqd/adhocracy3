@@ -239,48 +239,48 @@ class GetUserUnitTest(unittest.TestCase):
 
 class TestNormalizeToTuple:
 
-    def _call_fut(self, value):
+    def call_fut(self, value):
         from adhocracy_core.utils import normalize_to_tuple
         return normalize_to_tuple(value)
 
     def test_with_tuple(self):
-        assert self._call_fut((1,)) == (1,)
+        assert self.call_fut((1,)) == (1,)
 
     def test_with_string(self):
-        assert self._call_fut("ab") == ("ab",)
+        assert self.call_fut("ab") == ("ab",)
 
     def test_with_non_string_sequence(self):
-        assert self._call_fut([1]) == (1,)
+        assert self.call_fut([1]) == (1,)
 
     def test_with_dict(self):
-        assert self._call_fut({1: 2}) == ({1: 2},)
+        assert self.call_fut({1: 2}) == ({1: 2},)
 
 
 class TestGetMatchingIsheet:
 
-    def _call_fut(self, context, isheet):
+    def call_fut(self, context, isheet):
         from adhocracy_core.utils import get_matching_isheet
         return get_matching_isheet(context, isheet)
 
     def test_provides_no_sheet(self):
         from adhocracy_core.interfaces import ISheet
         context = testing.DummyResource()
-        assert self._call_fut(context, ISheet) is None
+        assert self.call_fut(context, ISheet) is None
 
     def test_provides_sheet(self):
         from adhocracy_core.interfaces import ISheet
         context = testing.DummyResource(__provides__=ISheet)
-        assert self._call_fut(context, ISheet) is ISheet
+        assert self.call_fut(context, ISheet) is ISheet
 
     def test_provides_subclass_of_sheet(self):
         from adhocracy_core.interfaces import IPredicateSheet, ISheet
         context = testing.DummyResource(__provides__=IPredicateSheet)
-        assert self._call_fut(context, ISheet) is IPredicateSheet
+        assert self.call_fut(context, ISheet) is IPredicateSheet
 
     def test_provides_wrong_sheet(self):
         from adhocracy_core.interfaces import IPredicateSheet, ISheet
         context = testing.DummyResource(__provides__=ISheet)
-        assert self._call_fut(context, IPredicateSheet) is None
+        assert self.call_fut(context, IPredicateSheet) is None
 
 
 def test_get_reason_blocked_not_deleted_not_hidden(context):
@@ -313,7 +313,7 @@ def test_get_reason_blocked_is_hidden_is_hidden(context):
 
 class TestRaiseColanderStyleError:
 
-    def _call_fut(self, *args):
+    def call_fut(self, *args):
         from . import raise_colander_style_error
         return raise_colander_style_error(*args)
 
@@ -327,7 +327,7 @@ class TestRaiseColanderStyleError:
         from adhocracy_core.interfaces import ISheet
 
         def dummy_view(request):
-            self._call_fut(ISheet, 'fieldname', 'description')
+            self.call_fut(ISheet, 'fieldname', 'description')
             raise Exception()
 
         return dummy_view

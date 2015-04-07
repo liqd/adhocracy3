@@ -293,19 +293,19 @@ class TestGetSheetCstructs:
         request.registry.content = mock_content_registry
         return request
 
-    def _call_fut(self, context, request):
+    def call_fut(self, context, request):
         from . import get_sheet_cstructs
         return get_sheet_cstructs(context, request)
 
     def test_call_with_context_without_sheets(self, context, request):
-        assert self._call_fut(context, request) == {}
+        assert self.call_fut(context, request) == {}
 
     def test_call_with_context_with_sheets(self, context, request, mock_content_registry, mock_sheet):
         mock_sheet.get.return_value = {}
         mock_sheet.schema = colander.MappingSchema()
         isheet = mock_sheet.meta.isheet
         mock_content_registry.get_sheets_read.return_value = [mock_sheet]
-        assert self._call_fut(context, request) == {isheet.__identifier__: {}}
+        assert self.call_fut(context, request) == {isheet.__identifier__: {}}
         assert mock_content_registry.get_sheets_read.call_args[0] == (context, request)
 
 

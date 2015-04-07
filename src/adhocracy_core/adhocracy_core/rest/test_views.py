@@ -1015,19 +1015,19 @@ class TestValidateLoginEmail:
         cornice_request.validated['email'] = 'user@example.org'
         return cornice_request
 
-    def _call_fut(self, context, request):
+    def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_login_email
         return validate_login_email(context, request)
 
     def test_valid(self, request, context, mock_user_locator):
         user = testing.DummyResource()
         mock_user_locator.get_user_by_email.return_value = user
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert request.validated['user'] == user
 
     def test_invalid(self, request, context, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = None
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert 'user' not in request.validated
         assert 'User doesn\'t exist' in request.errors[0]['description']
 
@@ -1040,19 +1040,19 @@ class TestValidateLoginNameUnitTest:
         cornice_request.validated['name'] = 'user'
         return cornice_request
 
-    def _call_fut(self, context, request):
+    def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_login_name
         return validate_login_name(context, request)
 
     def test_invalid(self, request, context, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert 'User doesn\'t exist' in request.errors[0]['description']
 
     def test_valid(self, request, context, mock_user_locator):
         user = testing.DummyResource()
         mock_user_locator.get_user_by_login.return_value = user
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert request.validated['user'] == user
 
 
@@ -1067,31 +1067,31 @@ class TestValidateLoginPasswordUnitTest:
         cornice_request.validated['password'] = 'lalala'
         return cornice_request
 
-    def _call_fut(self, context, request):
+    def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_login_password
         return validate_login_password(context, request)
 
     def test_valid(self, request, context, mock_password_sheet):
         sheet = mock_password_sheet
         sheet.check_plaintext_password.return_value = True
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert request.errors == []
 
     def test_invalid(self, request, context, mock_password_sheet):
         sheet = mock_password_sheet
         sheet.check_plaintext_password.return_value = False
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert 'password is wrong' in request.errors[0]['description']
 
     def test_invalid_with_ValueError(self, request, context, mock_password_sheet):
         sheet = mock_password_sheet
         sheet.check_plaintext_password.side_effect = ValueError
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert 'password is wrong' in request.errors[0]['description']
 
     def test_user_is_None(self, request, context):
         request.validated['user'] = None
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert request.errors == []
 
 
@@ -1102,20 +1102,20 @@ class TestValidateAccountActiveUnitTest:
         cornice_request.registry = registry
         return cornice_request
 
-    def _call_fut(self, context, request):
+    def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_account_active
         return validate_account_active(context, request)
 
     def test_valid(self, request, context):
         user = testing.DummyResource(active=True)
         request.validated['user'] = user
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert not request.errors
 
     def test_invalid(self, request, context):
         user = testing.DummyResource(active=False)
         request.validated['user'] = user
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert 'not yet activated' in request.errors[0]['description']
 
     def test_no_error_added_after_other_errors(self, request, context):
@@ -1123,7 +1123,7 @@ class TestValidateAccountActiveUnitTest:
         request.validated['user'] = user
         request.errors.add('blah', 'blah', 'blah')
         assert len(request.errors) == 1
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert len(request.errors) == 1
 
 
@@ -1209,7 +1209,7 @@ class TestValidateActivationPathUnitTest:
         user.activate = Mock()
         return user
 
-    def _call_fut(self, context, request):
+    def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_activation_path
         return validate_activation_path(context, request)
 
@@ -1217,13 +1217,13 @@ class TestValidateActivationPathUnitTest:
                    mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = \
             user_with_metadata
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert request.validated['user'] == user_with_metadata
         assert user_with_metadata.activate.called
 
     def test_not_found(self, request, context, mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = None
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert 'Unknown or expired activation path' == request.errors[0][
             'description']
 
@@ -1240,7 +1240,7 @@ class TestValidateActivationPathUnitTest:
         appstruct['creation_date'] = datetime(
             year=2010, month=1, day=1, tzinfo=timezone.utc)
         metadata.set(appstruct, omit_readonly=False)
-        self._call_fut(context, request)
+        self.call_fut(context, request)
         assert 'Unknown or expired activation path' == request.errors[0][
             'description']
 

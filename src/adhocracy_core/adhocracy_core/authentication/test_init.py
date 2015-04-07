@@ -276,7 +276,7 @@ class GetTokenManagerUnitTest(unittest.TestCase):
         self.request = testing.DummyRequest(registry=self.config.registry,
                                             root=testing.DummyResource())
 
-    def _call_fut(self, request):
+    def call_fut(self, request):
         from adhocracy_core.authentication import get_tokenmanager
         return get_tokenmanager(request)
 
@@ -291,11 +291,11 @@ class GetTokenManagerUnitTest(unittest.TestCase):
     def test_tokenmanager_adapter_registered(self):
         from adhocracy_core.interfaces import ITokenManger
         self._register_tokenmanager_adapter()
-        inst = self._call_fut(self.request)
+        inst = self.call_fut(self.request)
         assert ITokenManger.providedBy(inst)
 
     def test_tokenmanager_adapter_not_registered(self):
-        inst = self._call_fut(self.request)
+        inst = self.call_fut(self.request)
         assert inst is None
 
 

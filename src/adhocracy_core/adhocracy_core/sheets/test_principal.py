@@ -137,27 +137,27 @@ class TestDeferredValidateUserName:
         return testing.DummyRequest(root=testing.DummyResource(),
                                     registry=registry)
 
-    def _call_fut(self, node, kw):
+    def call_fut(self, node, kw):
         from adhocracy_core.sheets.principal import deferred_validate_user_name
         return deferred_validate_user_name(node, kw)
 
     def test_name_is_empty_and_no_request_kw(self, node, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        assert self._call_fut(node, {}) is None
+        assert self.call_fut(node, {}) is None
 
     def test_name_is_empty(self, node, requestp, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        validator = self._call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, {'request': requestp})
         assert validator(node, '') is None
 
     def test_name_is_unique(self, node, requestp, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        validator = self._call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, {'request': requestp})
         assert validator(node, 'unique') is None
 
     def test_name_is_not_unique(self, node, requestp, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = object()
-        validator = self._call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, {'request': requestp})
         with raises(colander.Invalid):
             validator(node, 'not unique')
 
@@ -169,29 +169,29 @@ class TestDeferredValidateUserEmail:
         return testing.DummyRequest(root=testing.DummyResource(),
                                     registry=registry)
 
-    def _call_fut(self, node, kw):
+    def call_fut(self, node, kw):
         from adhocracy_core.sheets.principal import deferred_validate_user_email
         return deferred_validate_user_email(node, kw)
 
     def test_email_is_empty(self, node, request, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = None
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         with raises(colander.Invalid):
             validator(node, '') is None
 
     def test_email_is_wrong(self, node, request, mock_user_locator):
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         with raises(colander.Invalid):
              validator(node, 'wrong_email') is None
 
     def test_email_is_unique(self, node, request, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = None
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         assert validator(node, 'test@test.de') is None
 
     def test_email_is_not_unique(self, node, request, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = object()
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         with raises(colander.Invalid):
             validator(node, 'not unique')
 

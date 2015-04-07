@@ -455,22 +455,22 @@ class TestGroupsAndRolesFinder:
         request.registry = registry
         return request
 
-    def _call_fut(self, userid, request):
+    def call_fut(self, userid, request):
         from adhocracy_core.resources.principal import groups_and_roles_finder
         return groups_and_roles_finder(userid, request)
 
     def test_userid_wrong(self, request,  mock_user_locator):
-        assert self._call_fut('WRONG', request) == []
+        assert self.call_fut('WRONG', request) == []
         assert mock_user_locator.get_groupids.call_args[0] == ('WRONG',)
         assert mock_user_locator.get_role_and_group_roleids.call_args[0] == ('WRONG',)
 
     def test_userid_with_roles(self, request, mock_user_locator):
         mock_user_locator.get_role_and_group_roleids.return_value = ['role:reader']
-        assert self._call_fut('userid', request) == ['role:reader']
+        assert self.call_fut('userid', request) == ['role:reader']
 
     def test_userid_with_groups_and_group_roles(self, request, mock_user_locator):
         mock_user_locator.get_role_and_group_roleids.return_value = ['group:Readers']
-        assert self._call_fut('userid', request) == ['group:Readers']
+        assert self.call_fut('userid', request) == ['group:Readers']
 
 
 class TestIntegrationSendRegistrationMail:
