@@ -232,8 +232,8 @@ def cornice_request():
 @fixture
 def changelog_meta() -> ChangelogMetadata:
     """ Return changelog metadata."""
-    from adhocracy_core.changelog import changelog_metadata
-    return changelog_metadata
+    from adhocracy_core.changelog import changelog_meta
+    return changelog_meta
 
 
 @fixture
@@ -275,7 +275,7 @@ def node() -> colander.MappingSchema:
 
 
 @fixture
-def changelog(changelog_meta):
+def changelog(changelog_meta) -> dict:
     """Return transaction_changelog dictionary."""
     from collections import defaultdict
     metadata = lambda: changelog_meta
