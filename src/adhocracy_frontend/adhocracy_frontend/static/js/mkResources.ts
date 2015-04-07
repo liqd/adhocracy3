@@ -891,7 +891,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         break;
     case "adhocracy_core.sheets.workflow.StateAssignment":
         resultType = "{start_date : string; description : string;}";
-        constructorType = "{start_date : string; description : string;}";
+        jsonType = "{start_date : string; description : string;}";
         parser = dictParser({
             start_date: null,
             description: stringToDate
