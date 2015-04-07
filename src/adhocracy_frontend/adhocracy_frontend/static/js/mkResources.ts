@@ -116,7 +116,7 @@ var config : IConfig = {
 
 interface FieldType {
     resultType : string;
-    constructorType : string;
+    jsonType : string;
     parser? : string;
 }
 
@@ -126,6 +126,7 @@ var compileAll : (metaApi: MetaApi.IMetaApi, outPath : string) => void;
 var renderSheet : (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
 var mkFieldSignatures : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldSignaturesSheetCons : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
+var mkFieldSignaturesSheetParse : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldAssignments : (fields : MetaApi.ISheetField[], tab : string) => string;
 var enabledFields : (fields : MetaApi.ISheetField[], enableFlags ?: string) => MetaApi.ISheetField[];
 var mkSheetSetter : (modulePath : string, fields : MetaApi.ISheetField[], _selfType : string) => string;
@@ -355,17 +356,8 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
 
             for (var x in sheet.fields) {
                 if (sheet.fields.hasOwnProperty(x)) {
-                    var codeLine : string;
                     var fieldName : string = sheet.fields[x].name;
-                    var fieldParser : string = mkFieldType(sheet.fields[x]).parser;
-
-                    if (fieldParser) {
-                        codeLine = "this.{0} = (typeof args.{0} === \"string\") ? ({1})(args.{0}) : args.{0};"
-                            .replace(/\{0\}/g, fieldName)
-                            .replace(/\{1\}/g, fieldParser);
-                    } else {
-                        codeLine = "this." + fieldName + " = args." + fieldName + ";";
-                    }
+                    var codeLine : string = "this." + fieldName + " = args." + fieldName + ";";
 
                     if (!isWriteableField(sheet.fields[x])) {
                         codeLine = "if (args.hasOwnProperty(\"" + fieldName + "\")) { " + codeLine + "}";
@@ -398,6 +390,65 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         return s;
     };
 
+    var mkParse = () => {
+        var args : string[] = [];
+        var lines : string[] = [];
+
+        if (sheet.fields.length > 0) {
+            args.push("args : {");
+            args.push(mkFieldSignaturesSheetParse(sheet.fields, "        ", ";\n") + ";");
+            args.push("    }");
+
+            lines.push("        var parsedArgs = {");
+            for (var x in sheet.fields) {
+                if (sheet.fields.hasOwnProperty(x)) {
+                    var codeLine : string;
+                    var fieldName : string = sheet.fields[x].name;
+                    var fieldParser : string = mkFieldType(sheet.fields[x]).parser;
+
+                    if (fieldParser) {
+                        codeLine = "(" + fieldParser + ")(args." + fieldName + ")";
+                    } else {
+                        codeLine = "args." + fieldName;
+                    }
+
+                    if (!isWriteableField(sheet.fields[x])) {
+                        codeLine = "args.hasOwnProperty(\"" + fieldName + "\") ? " + codeLine + " : undefined";
+                    }
+
+                    lines.push("            " + fieldName + ": " + codeLine + ",");
+                }
+            }
+            lines.push("        };");
+        }
+
+        var s = "";
+        s += "    static parse(" + args.join("\n") + ") {\n";
+        if (lines.length > 0) {
+            s += lines.join("\n") + "\n";
+        }
+
+        // FIXME: workaround for #261.  Remove if ticket is closed.
+        if (sheet.fields.length > 0) {
+            s += "\n";
+            s += "        // FIXME: workaround for #261.  Remove if ticket is closed.\n";
+            s += "        _.forOwn(args, (value, key) => {\n";
+            s += "            if (!_.contains(" + JSON.stringify(sheet.fields.map((fieldName) => fieldName.name)) + ", key)) {\n";
+            s += "                parsedArgs[key] = value;\n";
+            s += "            }\n";
+            s += "        });\n";
+        }
+
+        if (sheet.fields.length > 0) {
+            s += "        return new Sheet(parsedArgs);\n";
+        } else {
+            s += "        return new Sheet();\n";
+        }
+
+        s += "    }\n";
+        return s;
+    };
+
     var showList = (elems : string[]) : string => {
         if (elems.length === 0) {
             return "[]";
@@ -419,6 +470,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     sheetI += "    };\n\n";
 
     sheetI += mkConstructor() + "\n";
+    sheetI += mkParse() + "\n";
     sheetI += mkFieldSignatures(sheet.fields, "    public ", ";\n") + "\n";
     sheetI += "}\n\n";
 
@@ -442,7 +494,14 @@ mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : s
 mkFieldSignaturesSheetCons = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
     UtilR.mkThingList(
         fields,
-        (field) => field.name + (isWriteableField(field) ? "" : "?"),
+        (field) => field.name + (isWriteableField(field) ? "" : "?") + " : " + mkFieldType(field).resultType,
+        tab, separator
+    );
+
+mkFieldSignaturesSheetParse = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
+    UtilR.mkThingList(
+        fields,
+        (field) => field.name + (isWriteableField(field) ? "" : "?") + " : " + mkFieldType(field).jsonType,
         tab, separator
     );
 
@@ -707,7 +766,7 @@ mkNick = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
 
 mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     var resultType : string;
-    var constructorType : string = "string";
+    var jsonType : string = "string";
     var parser : string;
 
     // parsers
@@ -846,7 +905,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         switch (field.containertype) {
         case "list":
             resultType += "[]";
-            constructorType += "[]";
+            jsonType += "[]";
             if (parser) {
                 throw "not implemented: parsers for list fields.  email mf@zerobuzz.net to fix this.";
 
@@ -865,7 +924,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
 
     return {
         resultType: resultType,
-        constructorType: constructorType,
+        jsonType: jsonType,
         parser: parser
     };
 };
