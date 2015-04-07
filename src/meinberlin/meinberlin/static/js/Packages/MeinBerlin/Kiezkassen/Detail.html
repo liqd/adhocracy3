@@ -3,9 +3,9 @@
         {{ title }}
     </div>
 
-    <div class="mein-berlin-kiezkassen-detail-tabs tabs">
-        <div class="tab" data-ng-if="currentTab === 0">Tab1</div>
-        <div class="tab" data-ng-if="currentTab === 1">Tab2</div>
-        <div class="tab" data-ng-if="currentTab === 2">Tab3</div>
-    </div>
+    <tabset>
+        <tab data-ng-repeat="tab in tabs" data-heading="{{tab.heading}}">
+            {{tab.content}}
+        </tab>
+    </tabset>
 </div>
