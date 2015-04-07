@@ -11,6 +11,11 @@
         }
     }
 
+    .map-buttons {
+        @include clearfix;
+        margin: 2px 0 -7px;
+    }
+
     .map-buttons .map-button-save {
         &, &:hover, &:focus {
             color: $color-brand-two-introvert;
@@ -30,5 +35,4 @@
         @extend .disguised-link;
         float: right;
     }
-
 }
