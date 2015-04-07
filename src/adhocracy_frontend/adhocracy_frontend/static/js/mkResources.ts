@@ -116,7 +116,7 @@ var config : IConfig = {
 
 interface FieldType {
     resultType : string;
-    constructorType : string;
+    jsonType : string;
     parser? : string;
 }
 
@@ -440,7 +440,7 @@ mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : s
 mkFieldSignaturesSheetCons = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
     UtilR.mkThingList(
         fields,
-        (field) => field.name + (isWriteableField(field) ? "" : "?") + " : " + mkFieldType(field).constructorType,
+        (field) => field.name + (isWriteableField(field) ? "" : "?") + " : " + mkFieldType(field).jsonType,
         tab, separator
     );
 
@@ -705,7 +705,7 @@ mkNick = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
 
 mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     var resultType : string;
-    var constructorType : string = "string";
+    var jsonType : string = "string";
     var parser : string;
 
     // parsers
@@ -808,7 +808,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         switch (field.containertype) {
         case "list":
             resultType += "[]";
-            constructorType += "[]";
+            jsonType += "[]";
             if (parser) {
                 throw "not implemented: parsers for list fields.  email mf@zerobuzz.net to fix this.";
 
@@ -827,7 +827,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
 
     return {
         resultType: resultType,
-        constructorType: constructorType,
+        jsonType: jsonType,
         parser: parser
     };
 };
