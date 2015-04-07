@@ -14,9 +14,15 @@ input[type="number"],
 select,
 textarea {
     border: 0;
+    margin-bottom: 16px / $font-size-normal * 1em;
 
     &:focus {
         border-color: $color-brand-one-normal;
         outline: 1px solid $color-brand-one-normal;
     }
+}
+
+.input-error {
+    position: relative;
+    top: -(16px / $font-size-small * 1em);
 }
