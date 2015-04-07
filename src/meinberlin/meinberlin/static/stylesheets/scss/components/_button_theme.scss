@@ -3,10 +3,13 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
+    color: $color-text-normal;
+
     &:focus:not(:disabled):not(.ng-disabled),
     &:hover:not(:disabled):not(.ng-disabled) {
         background: transparent;
         color: $color-text-normal;
+        text-decoration: underline;
     }
 
     &:active:not(:disabled):not(.ng-disabled) {

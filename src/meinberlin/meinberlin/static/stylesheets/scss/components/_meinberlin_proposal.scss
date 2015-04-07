@@ -4,12 +4,8 @@
         display: block;
     }
 
-    .mein-berlin-proposal-form-footer {
-        margin-top: 2em;
-    }
-
-    .form-footer-button {
-        @extend .disguised-link;
+    .map-wrapper {
+        margin-bottom: 10px / $font-size-normal * 1em;
     }
 }
 

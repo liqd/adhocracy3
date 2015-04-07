@@ -11,14 +11,19 @@
         }
     }
 
+    .map-buttons .map-button-save {
+        &, &:hover, &:focus {
+            color: $color-brand-two-introvert;
+        }
+
+        &:focus {
+            color: $color-brand-one-introvert;
+        }
+    }
+
     .map-button-save {
         float: left;
         font-weight: $font-weight-extrovert;
-
-        &:hover, &:focus {
-            color: $color-text-highlight-normal;
-            text-decoration: underline;
-        }
     }
 
     .map-button-cancel {
