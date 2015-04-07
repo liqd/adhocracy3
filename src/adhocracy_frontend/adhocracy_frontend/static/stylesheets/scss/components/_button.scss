@@ -14,7 +14,6 @@
 
 @mixin button-color($fg, $bg) {
     color: $fg;
-    border-color: $fg;
     background-color: $bg;
 
     &.m-call-to-action {
@@ -68,32 +67,44 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
-    @include button-color($color-text-highlight-normal, $color-text-inverted);
-
-    $border-width: 0.25em;
-
-    border: $border-width solid;
-    font-weight: $font-weight-extrovert;
+    $button-height: 24px / $font-size-normal;
+    background: transparent;
+    border: 0;
+    color: $color-text-highlight-introvert;
+    font-size: $font-size-normal;
+    font-weight: $font-weight-normal;
+    line-height: $button-height;
+    height: $button-height * 1em;
+    padding: 0;
     text-transform: uppercase;
 
-    min-width: 9em;
-    line-height: 2em;
-    height: 2em + 2 * $border-width;  // fix height in firefox
-    padding: 0 0.5em;
-
-    &:active:not(:disabled):not(.ng-disabled),
-    &:focus:not(:disabled):not(.ng-disabled) {
-        outline: 0;
-    }
-
-    &:hover:not(:disabled):not(.ng-disabled),
-    &:focus:not(:disabled):not(.ng-disabled) {
-        @include button-color($color-text-highlight-introvert, $color-text-inverted);
+    &:focus:not(:disabled):not(.ng-disabled),
+    &:hover:not(:disabled):not(.ng-disabled) {
+        @include button-color($color-text-highlight-normal, $color-text-inverted);
     }
 
     &:disabled,
     &.ng-disabled {
-        @include button-color($color-text-introvert, $color-structure-introvert);
-        cursor: default;
+        &, &:focus, &:hover {
+            @include opacity(0.5);
+            background: transparent;
+            cursor: default;
+        }
+    }
+
+    &.m-call-to-action,
+    &.m-call-to-action2 {
+        @include button-color($color-text-highlight-normal, $color-text-inverted);
+        padding: 0 1em;
+        min-width: 110px / $font-size-normal * 1em;
+
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
+            background: $color-brand-two-extrovert;
+        }
+
+        &:active:not(:disabled):not(.ng-disabled) {
+            background-color: $color-brand-four-normal;
+        }
     }
 }
