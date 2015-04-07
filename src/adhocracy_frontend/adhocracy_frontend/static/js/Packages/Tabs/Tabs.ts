@@ -11,6 +11,7 @@ export interface ITabScope extends angular.IScope {
     active : boolean;
     heading : string;
     select() : void;
+    height : number;
 }
 
 export interface ITabsetScope extends angular.IScope {
@@ -18,7 +19,9 @@ export interface ITabsetScope extends angular.IScope {
 }
 
 export class TabSetController {
-    constructor(private $scope : ITabsetScope) {
+    private unregister : Function;
+
+    constructor(private $scope : ITabsetScope, private $element) {
         this.$scope.tabs = [];
     }
 
@@ -29,8 +32,18 @@ export class TabSetController {
             }
         });
 
+        if (typeof this.unregister !== "undefined") {
+            this.unregister();
+        }
+
         if (typeof selectedTab !== "undefined") {
             selectedTab.active = true;
+
+            this.unregister = selectedTab.$watch("height", (height) => {
+                this.$element.find(".tabset-panes").css("height", height);
+            });
+        } else {
+            this.$element.find(".tabset-panes").css("height", 0);
         }
     }
 
@@ -65,7 +78,7 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
         scope: {},
         transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tabset.html",
-        controller: ["$scope", TabSetController]
+        controller: ["$scope", "$element", TabSetController]
     };
 };
 
@@ -80,6 +93,13 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
             heading: "@"
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
+            scope.height = 0;
+            scope.$watch(() => element.find(".tab-pane").height(), (value : number) => {
+                if (value !== 0) {
+                    scope.height = value;
+                }
+            });
+
             scope.select = () => {
                 if (scope.active) {
                     tabsetCtrl.select();
