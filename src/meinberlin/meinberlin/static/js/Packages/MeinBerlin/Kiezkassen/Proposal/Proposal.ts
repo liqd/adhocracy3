@@ -9,6 +9,7 @@ import AdhUtil = require("../../../Util/Util");
 
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
+import SIMetadata = require("../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
@@ -26,6 +27,8 @@ export interface IScope extends angular.IScope {
         detail : string;
         creatorParticipate : boolean;
         locationText : string;
+        creator : string;
+        creationDate : string;
         lng : number;
         lat : number;
     };
@@ -45,6 +48,7 @@ var bindPath = (
             adhHttp.get(value).then((resource : RIProposalVersion) => {
                 var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
                 var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
 
                 scope.data = {
                     title: mainSheet.title,
@@ -52,6 +56,8 @@ var bindPath = (
                     detail: mainSheet.detail,
                     creatorParticipate: mainSheet.creator_participate,
                     locationText: mainSheet.location_text,
+                    creator: metadataSheet.creator,
+                    creationDate: metadataSheet.item_creation_date,
                     lng: pointSheet.x,
                     lat: pointSheet.y
                 };
