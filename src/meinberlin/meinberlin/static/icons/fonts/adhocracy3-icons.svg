@@ -5,7 +5,7 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Wed Apr  8 17:08:58 2015
+Created by FontForge 20120731 at Wed Apr  8 17:11:20 2015
  By Tobias Bengfort
 Created by Tobias Bengfort with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -65,8 +65,8 @@ d="M204 448c113 0 203 -92 203 -204s-203 -308 -203 -308s-204 195 -204 308s92 204 
 s50 112 112 112zM198 320v-53h-53v-11h53v-53h11v53h53v11h-53v53h-11z" />
     <glyph glyph-name="uniF100" unicode="&#xf100;" horiz-adv-x="513" 
 d="M492 427h-471v-470h471v470zM513 448v-512h-513v512h513zM267 335h-21v-286h21v286zM113 202v-20h287v20h-287z" />
-    <glyph glyph-name="uniF121" unicode="&#xf121;" horiz-adv-x="512" 
-d="M0 448h512v-512h-512v512zM40 361l216 -374l216 374h-432z" />
+    <glyph glyph-name="uniF121" unicode="&#xf121;" horiz-adv-x="507" 
+d="M33 358c9 0 18 -5 24 -11l196 -224l197 224c12 14 32 16 46 4s15 -32 3 -46l-246 -280l-245 280c-12 14 -11 34 3 46c6 5 15 7 22 7z" />
     <glyph glyph-name="uniF112" unicode="&#xf112;" horiz-adv-x="520" 
 d="M297 256c-237 -19 -260 117 -284 123l-13 3v-13c0 -270 241 -274 297 -271v-105l223 185l-223 184v-106zM318 236v81l169 -139l-169 -140v83l-12 -1c-4 0 -256 -29 -283 208c33 -44 113 -111 286 -93z" />
     <glyph glyph-name="uniF104" unicode="&#xf104;" horiz-adv-x="402" 
@@ -101,8 +101,8 @@ c27 29 50 89 48 173c0 50 -50 65 -94 65zM450 -64h-450v17c0 121 108 144 211 144h8h
     <glyph glyph-name="uniF107" unicode="&#xf107;" 
 d="M480 355h-330v-30h330v30zM511 385v-88h-390v88h390zM59 355h-30v-30h30v30zM90 385v-88h-90v88h90zM59 207h-30v-30h30v30zM90 237v-89h-90v89h90zM59 59h-30v-30h30v30zM90 87v-88h-90v88h90zM480 59h-330v-30h330v30zM511 87v-88h-390v88h390zM480 207h-330v-30h330
 v30zM480 237h31v-89h-390v89h359z" />
-    <glyph glyph-name="uniF122" unicode="&#xf122;" horiz-adv-x="512" 
-d="M0 448h512v-512h-512v512zM256 397l-216 -374h432z" />
+    <glyph glyph-name="uniF122" unicode="&#xf122;" horiz-adv-x="507" 
+d="M474 26c-9 0 -18 5 -24 11l-197 224l-196 -224c-12 -14 -32 -16 -46 -4s-15 32 -3 46l245 280l246 -280c12 -14 11 -34 -3 -46c-6 -5 -15 -7 -22 -7z" />
     <glyph glyph-name="uniF108" unicode="&#xf108;" horiz-adv-x="509" 
 d="M509 385v-88h-388v88h388zM89 385v-88h-89v88h89zM89 237v-89h-89v89h89zM89 87v-88h-89v88h89zM509 87v-88h-388v88h388zM479 237h30v-89h-388v89h358z" />
     <glyph glyph-name="uniF11F" unicode="&#xf11f;" horiz-adv-x="350" 
