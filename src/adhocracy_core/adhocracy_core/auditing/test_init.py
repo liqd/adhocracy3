@@ -175,7 +175,49 @@ class TestAuditlog:
 
 
 class TestSetAuditlog:
-    """ TODO public function called from root factory"""
+
+    @fixture
+    def mock_auditlog(self, monkeypatch):
+        from adhocracy_core import auditing
+        mock = Mock(spec=auditing.AuditLog)
+        monkeypatch.setattr(auditing, 'AuditLog', mock)
+        return mock
+
+    @fixture
+    def context_emptyroot(self):
+        context = Mock()
+        mocked_conn = Mock()
+        mocked_auditconn = Mock()
+        mocked_auditconn.root.return_value = {}
+        mocked_conn.get_connection.return_value = mocked_auditconn
+        context._p_jar = mocked_conn
+        return context
+
+    @fixture
+    def context(self):
+        context = Mock()
+        mocked_conn = Mock()
+        mocked_auditconn = Mock()
+        mocked_auditconn.root.return_value = {'auditlog': Mock()}
+        mocked_conn.get_connection.return_value = mocked_auditconn
+        context._p_jar = mocked_conn
+        return context
+
+    def call_fut(self, ctx):
+        from . import set_auditlog
+        return set_auditlog(ctx)
+
+    def test_set_auditlog_no_previous_auditlog(self,
+                                               context_emptyroot,
+                                               mock_auditlog):
+        from . import set_auditlog
+        set_auditlog(context_emptyroot)
+        assert mock_auditlog.called is True
+
+    def test_set_auditlog_previous_auditlog(self, context, mock_auditlog):
+        from . import set_auditlog
+        set_auditlog(context)
+        assert mock_auditlog.called is False
 
 
 class TestGetAuditlog:
