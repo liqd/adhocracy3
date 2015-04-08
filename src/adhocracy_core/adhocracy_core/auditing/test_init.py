@@ -66,14 +66,14 @@ def request_(registry, context):
     return request
 
 
-def test_get_auditlog_no_audit_connection(context):
-    from . import log_auditevent
+def test_set_auditlog_no_audit_connection(context):
     from . import get_auditlog
+    from . import set_auditlog
 
     context._p_jar.get_connection \
         = Mock(name='method', side_effect=KeyError('audit'))
 
-    log_auditevent(context, 'eventName', '/resource1', 'user1', '/user1')
+    set_auditlog(context)
 
     assert get_auditlog(context) is None
 
@@ -198,8 +198,9 @@ class TestAddAuditEvent:
     @fixture
     def mock_get_auditlog(self, monkeypatch):
         from adhocracy_core import auditing
-        monkeypatch.setattr(auditing, 'get_auditlog', Mock())
-        return monkeypatch
+        mock = Mock()
+        monkeypatch.setattr(auditing, 'get_auditlog', mock)
+        return mock
 
     def call_fut(self, context, name, resource_path, user_name, user_path):
         from . import log_auditevent
@@ -212,8 +213,8 @@ class TestAddAuditEvent:
         self.call_fut(context, 'created', '/resource1', 'user1', '/user1')
         assert mock_auditlog.add.called is False
 
-    def test_add_if_auditlog(self, context, mock_get_auditlog,
-                             mock_auditlog):
+    def test_add_if_auditlog(self, context, mock_auditlog,
+                             mock_get_auditlog):
         mock_get_auditlog.return_value = mock_auditlog
         self.call_fut(context, 'created', '/resource1', 'user1', '/user1')
         assert mock_auditlog.add.called_with('/',
