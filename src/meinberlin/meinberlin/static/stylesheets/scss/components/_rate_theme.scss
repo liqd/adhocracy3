@@ -1,0 +1,37 @@
+.rate {
+    color: $color-text-introvert;
+
+    .rate-difference {
+        &,
+        &.is-positive,
+        &.is-negative {
+            color: inherit;
+        }
+    }
+
+    .rate-pro,
+    .rate-contra {
+        @include inline-block;
+        background: $color-background-base-introvert;
+        border: 1px solid $color-background-base-introvert;
+        color: $color-text-normal;
+        min-width: 1.4em;
+        text-align: center;
+
+        &:active,
+        &.is-rate-button-active,
+        &:hover,
+        &:focus {
+            background: $color-brand-two-normal;
+            color: $color-text-inverted;
+        }
+
+        &:active,
+        &.is-rate-button-active {
+            &:hover,
+            &:focus {
+                background: $color-text-normal;
+            }
+        }
+    }
+}

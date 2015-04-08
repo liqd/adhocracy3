@@ -22,3 +22,6 @@
             enabled: false
         QualifyingElement:
             allow_element_with_attribute: true
+        NestingDepth:
+            enabled: true
+            max_depth: 5
