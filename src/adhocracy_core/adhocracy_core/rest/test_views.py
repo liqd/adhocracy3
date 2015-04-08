@@ -811,7 +811,6 @@ class TestItemRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
         mock_sheet.set.assert_called_with({'x':'y'},
-                                          registry=request.registry,
                                           request=request)
         wanted = {'path': request.application_url + '/last_new_version/',
                   'content_type': IItemVersion.__identifier__,
