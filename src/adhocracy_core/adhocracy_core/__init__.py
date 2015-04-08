@@ -2,12 +2,19 @@
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
 from substanced.db import RootAdded
+from logging import getLogger
+
 import transaction
 
 from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
 from adhocracy_core.authorization import RoleACLAuthorizationPolicy
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.resources.principal import groups_and_roles_finder
+from adhocracy_core.auditing import set_auditlog
+from adhocracy_core.auditing import get_auditlog
+
+
+logger = getLogger(__name__)
 
 
 def root_factory(request):
@@ -16,8 +23,21 @@ def root_factory(request):
     # Workaround to make the subrequests in adhocracy_core.rest.batchview work.
     if getattr(request, 'root', False):
         return request.root
+    _set_app_root_if_missing(request)
+    _set_auditlog_if_missing(request)
+    add_after_commit_hooks(request)
+    add_request_callbacks(request)
+    return _get_zodb_root(request)
+
+
+def _get_zodb_root(request):
     connection = get_connection(request)
     zodb_root = connection.root()
+    return zodb_root
+
+
+def _set_app_root_if_missing(request):
+    zodb_root = _get_zodb_root(request)
     if 'app_root' not in zodb_root:
         registry = request.registry
         app_root = registry.content.create(IRootPool.__identifier__,
@@ -27,9 +47,20 @@ def root_factory(request):
         registry.notify(RootAdded(app_root))
         transaction.commit()
 
-    add_after_commit_hooks(request)
-    add_request_callbacks(request)
-    return zodb_root['app_root']
+
+def _set_auditlog_if_missing(request):
+    root = _get_zodb_root(request)
+    if get_auditlog(root) is None:
+        set_auditlog(root)
+        transaction.commit()
+        auditlog = get_auditlog(root)
+        # auditlog can still be None after _set_auditlog if not audit
+        # conn has been configured
+        if auditlog is None:
+            logger.info('zodbconn.uri.audit is not specified.\
+            No auditing will be done.')
+        else:
+            logger.info('Auditlog created')
 
 
 def add_after_commit_hooks(request):

@@ -40,21 +40,11 @@ class AuditLog(OOBTree):
 
 
 def get_auditlog(context):
-    """Return the auditlog. Create one if none exits."""
-    auditlog = substanced.util.get_auditlog(context)
-    if auditlog is None:
-        _set_auditlog(context)
-        transaction.commit()
-        auditlog = substanced.util.get_auditlog(context)
-        # auditlog can still be None after _set_auditlog if not audit
-        # conn has been configured
-        if auditlog is not None:
-            logger.info('Auditlog created')
-        return auditlog
-    return auditlog
+    """Return the auditlog."""
+    return substanced.util.get_auditlog(context)
 
 
-def _set_auditlog(context):
+def set_auditlog(context):
     """Set an auditlog for the context."""
     conn = context._p_jar
     try:
