@@ -130,7 +130,9 @@ def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config.include('pyramid_cachebust')
     config.include('pyramid_mako')
-    if config.get_settings()['cachebust.enabled'] == 'true':
+    settings = config.registry.settings
+    cachebust_enabled = asbool(settings.get('cachebust.enabled', 'false'))
+    if cachebust_enabled:
         cache_max_age = 30 * 24 * 60 * 60  # 30 days
     else:
         cache_max_age = 0
