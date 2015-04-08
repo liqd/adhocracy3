@@ -1,0 +1,39 @@
+button,
+.button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"] {
+    color: $color-text-normal;
+
+    &:focus:not(:disabled):not(.ng-disabled),
+    &:hover:not(:disabled):not(.ng-disabled) {
+        background: transparent;
+        color: $color-text-normal;
+        text-decoration: underline;
+    }
+
+    &:active:not(:disabled):not(.ng-disabled) {
+        color: $color-shadow;
+    }
+
+    &.m-call-to-action {
+        font-weight: $font-weight-extrovert;
+
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
+            background: $color-brand-two-introvert;
+        }
+
+        &:active:not(:disabled):not(.ng-disabled) {
+            background: $color-brand-two-extrovert;
+        }
+    }
+
+    &.m-call-to-action2 {
+        &:hover:not(:disabled):not(.ng-disabled),
+        &:focus:not(:disabled):not(.ng-disabled) {
+            color: $color-text-highlight-normal;
+            text-decoration: underline;
+        }
+    }
+}

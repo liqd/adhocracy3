@@ -1,4 +1,3 @@
-<!-- FIXME: remove inline CSS -->
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
@@ -74,30 +73,27 @@
     <!-- LOCATION RELATED INFORMATION -->
 
     <!-- Related Place -->
-    <div style="margin-top: 30px;">
-        <label>
-            <span class="label-text">{{ "TR__MEINBERLIN_LOCATION_TEXT" | translate }}</span>
-            <input
-                type="text"
-                data-ng-model="data.locationText"
-                name="locationText"
-                maxlength="100"
-                required="required" />
-            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.locationText, 'required')">
-                {{ "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION_TEXT" | translate }}
-            </span>
-        </label>
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_LOCATION_TEXT" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.locationText"
+            name="locationText"
+            maxlength="100"
+            required="required" />
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.locationText, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_LOCATION_TEXT" | translate }}
+        </span>
+    </label>
 
-        <!-- Map -->
-        <label>
-            <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
-            <adh-map-input data-ng-if="data.polygon" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="400"></adh-map-input>
-        </label>
-    </div>
-
+    <!-- Map -->
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_LOCATION" | translate }}</span>
+        <adh-map-input data-ng-if="data.polygon" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="400"></adh-map-input>
+    </label>
 
     <!-- DATA SUBMIT -->
-    <footer style="margin-top: 10px;" class="form-footer mein-berlin-proposal-form-footer">
+    <footer class="form-footer mein-berlin-proposal-form-footer">
         <input
             type="submit"
             name="submit"
