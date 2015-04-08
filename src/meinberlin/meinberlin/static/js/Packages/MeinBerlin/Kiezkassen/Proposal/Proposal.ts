@@ -5,6 +5,7 @@ import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
+import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhUtil = require("../../../Util/Util");
 
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
@@ -23,6 +24,7 @@ var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
+    errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
         budget : number;
@@ -168,12 +170,15 @@ export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhShowError
+    adhShowError,
+    adhResourceUrlFilter,
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope) => {
+            scope.errors = [];
             scope.data = {};
             scope.showError = adhShowError;
 
@@ -186,7 +191,13 @@ export var createDirective = (
 
             scope.submit = () => {
                 // FIXME: handle success/error
-                postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url);
+                postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url)
+                    .then((result) => {
+                        scope.errors = [];
+                        $location.url(adhResourceUrlFilter(result[1].path));
+                    }, (errors : AdhHttp.IBackendErrorItem[]) => {
+                        scope.errors = errors;
+                    });
             };
         }
     };
@@ -275,7 +286,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
-            AdhHttp.moduleName
+            AdhHttp.moduleName,
+            AdhResourceArea.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
@@ -286,7 +298,7 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", detailDirective])
         .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", createDirective])
+            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhResourceUrlFilter", "$location", createDirective])
         .directive("adhMeinBerlinKiezkassenProposalList", ["adhConfig", listDirective])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
 };
