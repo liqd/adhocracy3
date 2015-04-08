@@ -68,8 +68,8 @@ def log_auditevent(context, name, resource_path, user_name, user_path):
         auditlog.add(name, resource_path, user_name, user_path)
 
 
-def audit_changes_callback(request, response):
-    """Add audit entries to the auditlog when the data is changed."""
+def audit_resources_changes_callback(request, response):
+    """Add audit entries to the auditlog when the resources are changed."""
     registry = request.registry
     changelog_metadata = registry.changelog.values()
     if len(changelog_metadata) == 0:

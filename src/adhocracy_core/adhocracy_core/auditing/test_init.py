@@ -1,5 +1,4 @@
 from pyramid import testing
-import transaction
 
 from unittest.mock import Mock
 from pytest import fixture
@@ -61,37 +60,13 @@ def context(context):
 
 
 @fixture()
-def request_(registry):
+def request_(registry, context):
     request = testing.DummyResource(registry=registry)
+    request.context = context
     return request
 
 
-def test_add_events(context):
-    from . import log_auditevent
-    from . import get_auditlog
-
-    nb_events = 100
-
-    for idx in range(nb_events):
-        log_auditevent(context,
-                       _get_event_name(idx),
-                       _get_resource_path(idx),
-                       _get_user_name(idx),
-                       _get_user_path(idx))
-    transaction.commit()
-
-    all_entries = get_auditlog(context).itervalues()
-    assert len(list(all_entries)) == nb_events
-
-    for i, entry in zip(range(nb_events), all_entries):
-        event = entry[2]
-        assert event.name == _get_event_name(i)
-        assert event.resource_path == _get_resource_path(i)
-        assert event.user_name == _get_user_name(i)
-        assert event.user_path == _get_user_path(i)
-
-
-def test_no_audit_connection_adding_entry(context):
+def test_get_auditlog_no_audit_connection(context):
     from . import log_auditevent
     from . import get_auditlog
 
@@ -103,43 +78,32 @@ def test_no_audit_connection_adding_entry(context):
     assert get_auditlog(context) is None
 
 
-def test_auditlog_already_exits(context):
-    from . import _set_auditlog
-    from . import get_auditlog
-
-    _set_auditlog(context)
-    auditlog1 = get_auditlog(context)
-
-    _set_auditlog(context)
-    auditlog2 = get_auditlog(context)
-
-    assert auditlog1 == auditlog2
-
-
 @mark.usefixtures('integration')
-def test_audit_changes_callback_empty_changelog(context, registry, request_):
-    from . import audit_changes_callback
+def test_audit_resources_changes_callback_empty_changelog(registry, request_):
+    from . import audit_resources_changes_callback
     from . import get_auditlog
+    from . import set_auditlog
 
     request_.registry = registry
-    request_.context = context
 
+    set_auditlog(request_.context)
     response = Mock()
-    audit_changes_callback(request_, response)
+    audit_resources_changes_callback(request_, response)
 
-    all_entries = get_auditlog(context).values()
+    all_entries = get_auditlog(request_.context).values()
     assert len(all_entries) == 0
 
 
 @mark.usefixtures('integration')
-def test_audit_changes_callback(context, registry, request_, changelog,
-                                mock_get_user_info):
-    from . import audit_changes_callback
+def test_audit_resource_changes_callback(registry, request_, changelog,
+                                         mock_get_user_info):
+    from . import audit_resources_changes_callback
     from . import get_auditlog
+    from . import set_auditlog
 
     request_.registry = registry
-    request_.context = context
     changelog = registry.changelog
+    set_auditlog(request_.context)
 
     changelog['/blublu'] \
         = changelog['/blublu']._replace(resource=testing.DummyResource())
@@ -149,9 +113,9 @@ def test_audit_changes_callback(context, registry, request_, changelog,
     registry.changelog = changelog
 
     response = Mock()
-    audit_changes_callback(request_, response)
+    audit_resources_changes_callback(request_, response)
 
-    all_entries = get_auditlog(context).values()
+    all_entries = get_auditlog(request_.context).values()
     assert len(all_entries) == 2
 
 
