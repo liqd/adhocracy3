@@ -1,11 +1,9 @@
 from pyramid import testing
 import transaction
-import json
 
 from unittest.mock import Mock
 from pytest import fixture
 from pytest import mark
-from pyramid import testing
 
 
 @fixture()
@@ -40,8 +38,16 @@ def _get_event_name(index):
     return 'event_{}'.format(index)
 
 
-def _get_payload_value1(index):
-    return 'value1_{}'.format(index)
+def _get_resource_path(index):
+    return '/value1_{}'.format(index)
+
+
+def _get_user_name(index):
+    return 'user{}'.format(index)
+
+
+def _get_user_path(index):
+    return '/principals/users/user{}'.format(index)
 
 
 @fixture
@@ -64,12 +70,14 @@ def test_add_events(context):
     from . import log_auditevent
     from . import get_auditlog
 
-    nb_events = 10000
+    nb_events = 100
 
     for idx in range(nb_events):
         log_auditevent(context,
                        _get_event_name(idx),
-                       key1=_get_payload_value1(idx))
+                       _get_resource_path(idx),
+                       _get_user_name(idx),
+                       _get_user_path(idx))
     transaction.commit()
 
     all_entries = get_auditlog(context).itervalues()
@@ -78,9 +86,9 @@ def test_add_events(context):
     for i, entry in zip(range(nb_events), all_entries):
         event = entry[2]
         assert event.name == _get_event_name(i)
-        expected_payload \
-            = json.dumps(['key1', _get_payload_value1(idx)])
-        assert event.payload == expected_payload
+        assert event.resource_path == _get_resource_path(i)
+        assert event.user_name == _get_user_name(i)
+        assert event.user_path == _get_user_path(i)
 
 
 def test_no_audit_connection_adding_entry(context):
@@ -90,7 +98,7 @@ def test_no_audit_connection_adding_entry(context):
     context._p_jar.get_connection \
         = Mock(name='method', side_effect=KeyError('audit'))
 
-    log_auditevent(context, 'eventName')
+    log_auditevent(context, 'eventName', '/resource1', 'user1', '/user1')
 
     assert get_auditlog(context) is None
 
@@ -187,18 +195,19 @@ class TestAuditlog:
 
     def test_add(self, inst):
         import datetime
-        import json
         from . import AuditEntry
-        appstruct = {'data': 1}
-        inst.add('created', **appstruct)
+        name = 'created'
+        resource_path = '/resource1'
+        user_name = 'user1'
+        user_path = '/user1'
+        inst.add(name, resource_path, user_name, user_path)
         key, value = inst.items()[0]
         assert isinstance(key, datetime.datetime)
         assert isinstance(value, AuditEntry)
-        assert value.name == 'created'
-        assert value.payload == json.dumps(appstruct)
-        # TODO Do we really want an arbitrary payload build from keywords?
-        # NOTE: to have a proper unit test for the add method we could
-        # mock the AuditLog object, but in this case its quite complicated
+        assert value.name == name
+        assert value.resource_path == resource_path
+        assert value.user_name == user_name
+        assert value.user_path == user_path
 
 
 class TestSetAuditlog:
@@ -215,6 +224,7 @@ class TestAddAuditEvent:
     def user(self):
         return testing.DummyResource(__name__='user',
                                      name='name')
+
     @fixture
     def mock_auditlog(self):
         from . import AuditLog
@@ -227,19 +237,23 @@ class TestAddAuditEvent:
         monkeypatch.setattr(auditing, 'get_auditlog', Mock())
         return monkeypatch
 
-    def call_fut(self, resource, action, user):
-        from . import add_auditevent
-        return add_auditevent(resource, action, user)
+    def call_fut(self, context, name, resource_path, user_name, user_path):
+        from . import log_auditevent
+        return log_auditevent(context,
+                              name, resource_path, user_name, user_path)
 
-    def test_ignore_if_no_auditlog(self, context, user, mock_get_auditlog,
+    def test_ignore_if_no_auditlog(self, context, mock_get_auditlog,
                                    mock_auditlog):
         mock_get_auditlog.return_value = None
-        self.call_fut(context, 'created', user)
+        self.call_fut(context, 'created', '/resource1', 'user1', '/user1')
         assert mock_auditlog.add.called is False
 
-    def test_add_if_auditlog(self, context, user, mock_get_auditlog,
+    def test_add_if_auditlog(self, context, mock_get_auditlog,
                              mock_auditlog):
         mock_get_auditlog.return_value = mock_auditlog
-        self.call_fut(context, 'created', user)
-        assert mock_auditlog.add.called_with('/', 'created', 'name', '/user')
-
+        self.call_fut(context, 'created', '/resource1', 'user1', '/user1')
+        assert mock_auditlog.add.called_with('/',
+                                             'created',
+                                             '/resource1',
+                                             'user1',
+                                             '/user1')

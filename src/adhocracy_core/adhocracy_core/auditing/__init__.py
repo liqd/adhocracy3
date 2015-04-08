@@ -1,6 +1,5 @@
-"""Auditlog of events stored in a ZODB database."""
+"""Log which user modifies resources in additional 'audit' database."""
 import transaction
-import json
 import substanced.util
 
 from pyramid.traversal import resource_path
@@ -15,25 +14,29 @@ from adhocracy_core.utils import get_sheet_field
 
 logger = getLogger(__name__)
 
-AuditEntry = namedtuple('AuditEntry', ['name', 'payload'])
+AuditEntry = namedtuple('AuditEntry', ['name',
+                                       'resource_path',
+                                       'user_name',
+                                       'user_path'])
 
-RESOURCE_CREATED = 'resourceCreated'
-RESOURCE_MODIFIED = 'resourceModified'
+RESOURCE_CREATED = 'created'
+RESOURCE_MODIFIED = 'modified'
 
 
 class AuditLog(OOBTree):
 
-    """An Auditlog composed of entries."""
+    """An Auditlog composed of audit entries."""
 
-    def add(self, name, **kw):
-        """ Add a record the audit log.
-
-        ``_name`` should be the event name,
-        ``_oid`` should be an object oid or ``None``, and ``kw`` should be a
-        json-serializable dictionary.
-        """
-        payload = json.dumps(kw)
-        self[datetime.utcnow()] = AuditEntry(name, payload)
+    def add(self,
+            name: str,
+            resource_path: str,
+            user_name: str,
+            user_path: str) -> None:
+        """ Add an audit entry to the audit log."""
+        self[datetime.utcnow()] = AuditEntry(name,
+                                             resource_path,
+                                             user_name,
+                                             user_path)
 
 
 def get_auditlog(context):
@@ -64,15 +67,15 @@ def _set_auditlog(context):
         root['auditlog'] = auditlog
 
 
-def log_auditevent(context, name, **kw):
-    """Add a an audit entry to the audit database.
+def log_auditevent(context, name, resource_path, user_name, user_path):
+    """Add an audit entry to the audit database.
 
     The audit database is created if missing. If the zodbconn.uri.audit
     value is not specified in the config, auditing does not happen.
     """
     auditlog = get_auditlog(context)
     if auditlog is not None:
-        auditlog.add(name, **kw)
+        auditlog.add(name, resource_path, user_name, user_path)
 
 
 def audit_changes_callback(request, response):
