@@ -7,10 +7,13 @@ import AdhHttp = require("../../../Http/Http");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhUtil = require("../../../Util/Util");
 
+import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
+import SIMetadata = require("../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIPool = require("../../../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -26,6 +29,9 @@ export interface IScope extends angular.IScope {
         detail : string;
         creatorParticipate : boolean;
         locationText : string;
+        creator : string;
+        creationDate : string;
+        commentCount : number;
         lng : number;
         lat : number;
     };
@@ -42,19 +48,31 @@ var bindPath = (
 ) : void => {
     scope.$watch(pathKey, (value : string) => {
         if (value) {
-            adhHttp.get(value).then((resource : RIProposalVersion) => {
-                var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
-                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+            adhHttp.get(AdhUtil.parentPath(value), {
+                content_type: RICommentVersion.content_type,
+                depth: "all",
+                tag: "LAST",
+                count: true
+            }).then((pool) => {
+                adhHttp.get(value).then((resource : RIProposalVersion) => {
+                    var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
+                    var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+                    var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
+                    var poolSheet = pool.data[SIPool.nick];
 
-                scope.data = {
-                    title: mainSheet.title,
-                    budget: mainSheet.budget,
-                    detail: mainSheet.detail,
-                    creatorParticipate: mainSheet.creator_participate,
-                    locationText: mainSheet.location_text,
-                    lng: pointSheet.x,
-                    lat: pointSheet.y
-                };
+                    scope.data = {
+                        title: mainSheet.title,
+                        budget: mainSheet.budget,
+                        detail: mainSheet.detail,
+                        creatorParticipate: mainSheet.creator_participate,
+                        locationText: mainSheet.location_text,
+                        creator: metadataSheet.creator,
+                        creationDate: metadataSheet.item_creation_date,
+                        commentCount: poolSheet.count,
+                        lng: pointSheet.x,
+                        lat: pointSheet.y
+                    };
+                });
             });
             adhHttp.options(value).then((options : AdhHttp.IOptions) => {
                 scope.options = options;

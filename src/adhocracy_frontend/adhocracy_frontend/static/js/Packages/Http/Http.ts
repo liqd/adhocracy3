@@ -128,7 +128,7 @@ export class Service<Content extends ResourcesBase.Resource> {
                 .then(this.importOptions, AdhError.logBackendError));
     }
 
-    public getRaw(path : string, params ?: { [key : string] : string }) : angular.IHttpPromise<any> {
+    public getRaw(path : string, params?) : angular.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
@@ -148,7 +148,7 @@ export class Service<Content extends ResourcesBase.Resource> {
      */
     public get(
         path : string,
-        params ?: { [key : string] : string },
+        params?,
         warmupPoolCache ?: boolean
     ) : angular.IPromise<Content> {
         var query = (typeof params === "undefined") ? "" : "?" + $.param(params);
