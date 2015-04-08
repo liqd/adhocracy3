@@ -23,7 +23,6 @@ pyramid.includes =
 tm.attempts = 5
 
 zodbconn.uri = memory://
-zodbconn.uri.audit = memory://auditlog
 
 substanced.secret = seekri1
 substanced.initial_login = admin
