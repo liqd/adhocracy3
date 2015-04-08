@@ -1,3 +1,4 @@
+from pyramid import testing
 import transaction
 import json
 
@@ -171,3 +172,74 @@ def test_get_user_info_nouser_in_request(context, registry, request_, user):
     (user_name, user_path) = _get_user_info(request_)
     assert user_name == ''
     assert user_path == ''
+
+
+class TestAuditlog:
+
+    @fixture
+    def inst(self):
+        from . import AuditLog
+        return AuditLog()
+
+    def test_create(self, inst):
+        from BTrees.OOBTree import OOBTree
+        assert isinstance(inst, OOBTree)
+
+    def test_add(self, inst):
+        import datetime
+        import json
+        from . import AuditEntry
+        appstruct = {'data': 1}
+        inst.add('created', **appstruct)
+        key, value = inst.items()[0]
+        assert isinstance(key, datetime.datetime)
+        assert isinstance(value, AuditEntry)
+        assert value.name == 'created'
+        assert value.payload == json.dumps(appstruct)
+        # TODO Do we really want an arbitrary payload build from keywords?
+        # NOTE: to have a proper unit test for the add method we could
+        # mock the AuditLog object, but in this case its quite complicated
+
+
+class TestSetAuditlog:
+    """ TODO public function called from root factory"""
+
+
+class TestGetAuditlog:
+    """ not really needed, we could use substanced.util.get_auditlog for now"""
+
+
+class TestAddAuditEvent:
+
+    @fixture
+    def user(self):
+        return testing.DummyResource(__name__='user',
+                                     name='name')
+    @fixture
+    def mock_auditlog(self):
+        from . import AuditLog
+        mock = Mock(spec=AuditLog)
+        return mock
+
+    @fixture
+    def mock_get_auditlog(self, monkeypatch):
+        from adhocracy_core import auditing
+        monkeypatch.setattr(auditing, 'get_auditlog', Mock())
+        return monkeypatch
+
+    def call_fut(self, resource, action, user):
+        from . import add_auditevent
+        return add_auditevent(resource, action, user)
+
+    def test_ignore_if_no_auditlog(self, context, user, mock_get_auditlog,
+                                   mock_auditlog):
+        mock_get_auditlog.return_value = None
+        self.call_fut(context, 'created', user)
+        assert mock_auditlog.add.called is False
+
+    def test_add_if_auditlog(self, context, user, mock_get_auditlog,
+                             mock_auditlog):
+        mock_get_auditlog.return_value = mock_auditlog
+        self.call_fut(context, 'created', user)
+        assert mock_auditlog.add.called_with('/', 'created', 'name', '/user')
+
