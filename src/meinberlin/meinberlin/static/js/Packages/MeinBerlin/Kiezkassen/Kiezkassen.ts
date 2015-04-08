@@ -1,5 +1,6 @@
 import AdhConfig = require("../../Config/Config");
 import AdhHttp = require("../../Http/Http");
+import AdhTabs = require("../../Tabs/Tabs");
 
 import AdhMeinBerlinKiezkassenProposal = require("./Proposal/Proposal");
 
@@ -15,6 +16,14 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         },
         link: (scope) => {
             scope.currentTab = 0;
+
+            scope.tabs = [{
+                heading: "Tab1",
+                content: "foo1"
+            }, {
+                heading: "Tab2",
+                content: "foo2"
+            }];
 
             scope.$watch("path", (value : string) => {
                 if (value) {
@@ -39,6 +48,7 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhTabs.moduleName,
             AdhMeinBerlinKiezkassenProposal.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", detailDirective]);
