@@ -3,6 +3,8 @@ import transaction
 import substanced.util
 
 from pyramid.traversal import resource_path
+from pyramid.request import Request
+from pyramid.response import Response
 from BTrees.OOBTree import OOBTree
 from datetime import datetime
 from logging import getLogger
@@ -10,7 +12,8 @@ from collections import namedtuple
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.utils import get_sheet_field
-
+from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import ChangelogMetadata
 
 logger = getLogger(__name__)
 
@@ -39,12 +42,12 @@ class AuditLog(OOBTree):
                                              user_path)
 
 
-def get_auditlog(context):
+def get_auditlog(context: IResource) -> AuditLog:
     """Return the auditlog."""
     return substanced.util.get_auditlog(context)
 
 
-def set_auditlog(context):
+def set_auditlog(context: IResource) -> None:
     """Set an auditlog for the context."""
     conn = context._p_jar
     try:
@@ -58,7 +61,11 @@ def set_auditlog(context):
     root['auditlog'] = auditlog
 
 
-def log_auditevent(context, name, resource_path, user_name, user_path):
+def log_auditevent(context: IResource,
+                   name: str,
+                   resource_path: str,
+                   user_name: str,
+                   user_path: str) -> None:
     """Add an audit entry to the audit database.
 
     The audit database is created if missing. If the zodbconn.uri.audit
@@ -69,7 +76,8 @@ def log_auditevent(context, name, resource_path, user_name, user_path):
         auditlog.add(name, resource_path, user_name, user_path)
 
 
-def audit_resources_changes_callback(request, response):
+def audit_resources_changes_callback(request: Request,
+                                     response: Response) -> None:
     """Add audit entries to the auditlog when the resources are changed."""
     registry = request.registry
     changelog_metadata = registry.changelog.values()
@@ -78,7 +86,7 @@ def audit_resources_changes_callback(request, response):
         _log_change(request.context, user_name, user_path, meta)
 
 
-def _get_user_info(request):
+def _get_user_info(request: Request) -> (str, str):
     if not hasattr(request, 'authenticated_userid'):
         # request has no associated user
         return ('', '')
@@ -91,7 +99,10 @@ def _get_user_info(request):
         return (user_name, user_path)
 
 
-def _log_change(context, user_name, user_path, change):
+def _log_change(context: IResource,
+                user_name: str,
+                user_path: str,
+                change: ChangelogMetadata) -> None:
     path = resource_path(change.resource)
     if change.created:
         log_auditevent(context,
