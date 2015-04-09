@@ -73,16 +73,15 @@ def audit_resources_changes_callback(request, response):
     """Add audit entries to the auditlog when the resources are changed."""
     registry = request.registry
     changelog_metadata = registry.changelog.values()
-    if len(changelog_metadata) == 0:
-        return
-
-    (user_name, user_path) = _get_user_info(request)
-
+    user_name, user_path = _get_user_info(request)
     for meta in changelog_metadata:
         _log_change(request.context, user_name, user_path, meta)
 
 
 def _get_user_info(request):
+    if not hasattr(request, 'authenticated_userid'):
+        # request has no associated user
+        return ('', '')
     user = get_user(request)
     if user is None:
         return ('', '')

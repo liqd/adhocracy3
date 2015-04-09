@@ -139,6 +139,21 @@ def test_get_user_info_nouser_in_request(context, registry, request_, user):
 
     request_.root = context
     request_.registry = registry
+
+    (user_name, user_path) = _get_user_info(request_)
+    assert user_name == ''
+    assert user_path == ''
+
+
+@mark.usefixtures('integration')
+def test_get_user_info_no_associated_user_in_request(context,
+                                                     registry,
+                                                     request_,
+                                                     user):
+    from adhocracy_core.auditing import _get_user_info
+
+    request_.root = context
+    request_.registry = registry
     request_.authenticated_userid = None
 
     (user_name, user_path) = _get_user_info(request_)
