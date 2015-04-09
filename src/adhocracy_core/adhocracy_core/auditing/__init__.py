@@ -135,4 +135,4 @@ def _get_entry_name(change) -> str:
     elif change.visibility == VisibilityChange.revealed:
         return EntryName.revealed
     else:
-        raise Exception('Invalid change state', change)
+        raise ValueError('Invalid change state', change)

@@ -366,5 +366,5 @@ class TestGetEntryName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.visible)
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             _get_entry_name(change)
