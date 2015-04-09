@@ -1,7 +1,16 @@
 .rate {
     color: $color-text-introvert;
 
+    .rate-difference,
+    .rate-pro,
+    .rate-contra {
+        float: left;
+        line-height: 25px / $font-size-small * 1em;
+    }
+
     .rate-difference {
+        margin-right: 8px / $font-size-small * 1em;
+
         &,
         &.is-positive,
         &.is-negative {
@@ -15,7 +24,7 @@
         background: $color-background-base-introvert;
         border: 1px solid $color-background-base-introvert;
         color: $color-text-normal;
-        min-width: 1.4em;
+        min-width: 25px / $font-size-small * 1em;
         text-align: center;
 
         &:active,
