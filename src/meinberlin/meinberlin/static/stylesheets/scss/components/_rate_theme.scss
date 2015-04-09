@@ -22,6 +22,7 @@
     .rate-contra {
         @include inline-block;
         background: $color-background-base-introvert;
+        border: 1px solid $color-background-base-introvert;
         color: $color-text-normal;
         min-width: 25px / $font-size-small * 1em;
         text-align: center;
