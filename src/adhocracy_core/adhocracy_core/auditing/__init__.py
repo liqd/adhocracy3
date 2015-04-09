@@ -52,9 +52,10 @@ def set_auditlog(context):
     except KeyError:
         return
     root = auditconn.root()
-    if 'auditlog' not in root:
-        auditlog = AuditLog()
-        root['auditlog'] = auditlog
+    if 'auditlog' in root:
+        return
+    auditlog = AuditLog()
+    root['auditlog'] = auditlog
 
 
 def log_auditevent(context, name, resource_path, user_name, user_path):
