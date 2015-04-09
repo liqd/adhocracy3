@@ -27,7 +27,7 @@ def root_factory(request):
     _set_auditlog_if_missing(request)
     add_after_commit_hooks(request)
     add_request_callbacks(request)
-    return _get_zodb_root(request)
+    return _get_zodb_root(request)['app_root']
 
 
 def _get_zodb_root(request):
