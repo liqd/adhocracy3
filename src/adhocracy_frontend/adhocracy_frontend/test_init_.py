@@ -23,7 +23,15 @@ class ConfigViewTest(unittest.TestCase):
              'support_email': 'support@unconfigured.domain',
              'locale': 'en',
              'site_name': 'Adhocracy',
-             }
+             'canonical_url': 'http://localhost:6551',
+             'custom': {},
+             'debug': False,
+             'piwik_enabled': False,
+             'piwik_host': None,
+             'piwik_site_id': None,
+             'piwik_track_user_id': False,
+             'piwik_use_cookies': False,
+             'terms_url': None}
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
         request = testing.DummyRequest(scheme='https')
@@ -65,7 +73,7 @@ class RootViewTest(unittest.TestCase):
         return root_view(request)
 
     def test_call_and_root_html_exists(self):
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(scheme='https')
         resp = self.call_fut(request)
         assert resp.status_code == 200
         assert resp.body_file
@@ -79,6 +87,7 @@ class ViewsFunctionalTest(unittest.TestCase):
         app = main({})
         self.testapp = TestApp(app)
 
+    @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
     def test_static_view(self):
         resp = self.testapp.get('/static/root.html', status=200)
         assert '200' in resp.status
@@ -87,10 +96,12 @@ class ViewsFunctionalTest(unittest.TestCase):
         resp = self.testapp.get('/config.json', status=200)
         assert '200' in resp.status
 
+    @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
     def test_embed_view(self):
         resp = self.testapp.get('/embed/XX', status=200)
         assert '200' in resp.status
 
+    @mark.xfail(reason='asset build:/stylesheets/a3.css must exists')
     def test_register_view(self):
         resp = self.testapp.get('/register', status=200)
         assert '200' in resp.status
@@ -109,6 +120,6 @@ class TestIntegrationIncludeme:
         assert True
 
     def test_register_subscriber(self, registry):
-        from adhocracy_core.rest.views import add_cors_headers_subscriber
+        from . import add_cors_headers
         handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-        assert add_cors_headers_subscriber.__name__ in handlers
+        assert add_cors_headers.__name__ in handlers
