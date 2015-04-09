@@ -56,10 +56,7 @@ def _set_auditlog_if_missing(request):
         auditlog = get_auditlog(root)
         # auditlog can still be None after _set_auditlog if not audit
         # conn has been configured
-        if auditlog is None:
-            logger.info('zodbconn.uri.audit is not specified.\
-            No auditing will be done.')
-        else:
+        if auditlog is not None:
             logger.info('Auditlog created')
 
 
