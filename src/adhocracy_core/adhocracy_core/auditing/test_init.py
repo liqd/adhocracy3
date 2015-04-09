@@ -1,8 +1,12 @@
+import pytest
+
 from pyramid import testing
 
 from unittest.mock import Mock
 from pytest import fixture
 from pytest import mark
+from adhocracy_core.interfaces import ChangelogMetadata
+from adhocracy_core.interfaces import VisibilityChange
 
 
 @fixture()
@@ -279,3 +283,88 @@ class TestAddAuditEvent:
                                              '/resource1',
                                              'user1',
                                              '/user1')
+
+
+class TestGetEntryName:
+
+    def call_fut(change):
+        from . import _get_entry_name
+        return _get_entry_name(change)
+
+    def test_get_entry_name_created(self):
+        from . import EntryName
+        from . import _get_entry_name
+        change = ChangelogMetadata(modified=False,
+                                   created=True,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.visible)
+        assert _get_entry_name(change) is EntryName.created
+
+    def test_get_entry_name_modified(self):
+        from . import EntryName
+        from . import _get_entry_name
+        change = ChangelogMetadata(modified=True,
+                                   created=False,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.visible)
+        assert _get_entry_name(change) is EntryName.modified
+
+    def test_get_entry_name_invisible(self):
+        from . import EntryName
+        from . import _get_entry_name
+        change = ChangelogMetadata(modified=False,
+                                   created=False,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.invisible)
+        assert _get_entry_name(change) is EntryName.invisible
+
+    def test_get_entry_name_concealed(self):
+        from . import EntryName
+        from . import _get_entry_name
+        change = ChangelogMetadata(modified=False,
+                                   created=False,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.concealed)
+        assert _get_entry_name(change) is EntryName.concealed
+
+    def test_get_entry_name_revealed(self):
+        from . import EntryName
+        from . import _get_entry_name
+        change = ChangelogMetadata(modified=False,
+                                   created=False,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.revealed)
+        assert _get_entry_name(change) is EntryName.revealed
+
+    def test_get_entry_name_visible(self):
+        from . import _get_entry_name
+        change = ChangelogMetadata(modified=False,
+                                   created=False,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.visible)
+        with pytest.raises(Exception):
+            _get_entry_name(change)

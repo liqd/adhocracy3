@@ -9,11 +9,13 @@ from BTrees.OOBTree import OOBTree
 from datetime import datetime
 from logging import getLogger
 from collections import namedtuple
+from enum import Enum
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ChangelogMetadata
+from adhocracy_core.interfaces import VisibilityChange
 
 logger = getLogger(__name__)
 
@@ -22,8 +24,15 @@ AuditEntry = namedtuple('AuditEntry', ['name',
                                        'user_name',
                                        'user_path'])
 
-RESOURCE_CREATED = 'created'
-RESOURCE_MODIFIED = 'modified'
+
+class EntryName(Enum):
+    created = 'created'
+    modified = 'modified'
+    # visible = 'visible' is not necessary since
+    # VisibilityChange.visible is only a state, not a change
+    invisible = 'invisible'
+    concealed = 'concealed'
+    revealed = 'revealed'
 
 
 class AuditLog(OOBTree):
@@ -103,18 +112,27 @@ def _log_change(context: IResource,
                 user_name: str,
                 user_path: str,
                 change: ChangelogMetadata) -> None:
-    path = resource_path(change.resource)
+    if change.created or change.modified or \
+       change.visibility is not None and \
+       change.visibility is not VisibilityChange.visible:
+        log_auditevent(context,
+                       _get_entry_name(change),
+                       resource_path=resource_path(change.resource),
+                       user_name=user_name,
+                       user_path=user_path)
+        transaction.commit()
+
+
+def _get_entry_name(change) -> str:
     if change.created:
-        log_auditevent(context,
-                       RESOURCE_CREATED,
-                       resource_path=path,
-                       user_name=user_name,
-                       user_path=user_path)
+        return EntryName.created
     elif change.modified:
-        log_auditevent(context,
-                       RESOURCE_MODIFIED,
-                       resource_path=path,
-                       user_name=user_name,
-                       user_path=user_path)
-    # else: log visibility changes?
-    transaction.commit()
+        return EntryName.modified
+    elif change.visibility == VisibilityChange.invisible:
+        return EntryName.invisible
+    elif change.visibility == VisibilityChange.concealed:
+        return EntryName.concealed
+    elif change.visibility == VisibilityChange.revealed:
+        return EntryName.revealed
+    else:
+        raise Exception('Invalid change state', change)
