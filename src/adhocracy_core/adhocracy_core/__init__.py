@@ -38,26 +38,28 @@ def _get_zodb_root(request):
 
 def _set_app_root_if_missing(request):
     zodb_root = _get_zodb_root(request)
-    if 'app_root' not in zodb_root:
-        registry = request.registry
-        app_root = registry.content.create(IRootPool.__identifier__,
-                                           registry=request.registry)
-        zodb_root['app_root'] = app_root
-        transaction.savepoint()  # give app_root a _p_jar
-        registry.notify(RootAdded(app_root))
-        transaction.commit()
+    if 'app_root' in zodb_root:
+        return
+    registry = request.registry
+    app_root = registry.content.create(IRootPool.__identifier__,
+                                       registry=request.registry)
+    zodb_root['app_root'] = app_root
+    transaction.savepoint()  # give app_root a _p_jar
+    registry.notify(RootAdded(app_root))
+    transaction.commit()
 
 
 def _set_auditlog_if_missing(request):
     root = _get_zodb_root(request)
-    if get_auditlog(root) is None:
-        set_auditlog(root)
-        transaction.commit()
-        auditlog = get_auditlog(root)
-        # auditlog can still be None after _set_auditlog if not audit
-        # conn has been configured
-        if auditlog is not None:
-            logger.info('Auditlog created')
+    if get_auditlog(root) is not None:
+        return
+    set_auditlog(root)
+    transaction.commit()
+    auditlog = get_auditlog(root)
+    # auditlog can still be None after _set_auditlog if not audit
+    # conn has been configured
+    if auditlog is not None:
+        logger.info('Auditlog created')
 
 
 def add_after_commit_hooks(request):
