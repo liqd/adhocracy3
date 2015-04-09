@@ -23,6 +23,7 @@ var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
+    toggleMap() : void;
     data : {
         title : string;
         budget : number;
@@ -70,7 +71,8 @@ var bindPath = (
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: poolSheet.count,
                         lng: pointSheet.x,
-                        lat: pointSheet.y
+                        lat: pointSheet.y,
+                        mapOpen : false
                     };
                 });
             });
@@ -145,8 +147,11 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         scope: {
             path: "@"
         },
-        link: (scope : IScope) => {
+        link: (scope : IScope, element) => {
             bindPath(adhHttp)(scope);
+            scope.toggleMap = () => {
+                angular.element( document.querySelector( '#map' )).toggleClass("is-open");
+            };
         }
     };
 };
