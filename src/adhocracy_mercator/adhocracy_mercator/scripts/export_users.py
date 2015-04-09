@@ -4,12 +4,10 @@ This is registered as console script 'export_mercator_users' in setup.py.
 
 """
 
+import argparse
 import csv
 import inspect
-import optparse
 import os
-import sys
-import textwrap
 import time
 from pyramid.paster import bootstrap
 from substanced.util import find_catalog
@@ -27,7 +25,7 @@ from adhocracy_mercator.sheets.mercator import ITitle
 from adhocracy_core.sheets.tags import filter_by_tag
 
 
-def _get_most_rated_proposals(root, min_rate=100):
+def _get_most_rated_proposals(root, min_rate=0):
     catalog = find_catalog(root, 'system')
     adhocracy_catalog = find_catalog(root, 'adhocracy')
     path = catalog['path']
@@ -75,19 +73,16 @@ def export_users():
 
         bin/export_mercator_users etc/development.ini  10
     """
-    usage = 'usage: %prog config_file'
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=textwrap.dedent(inspect.getdoc(export_users))
-    )
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 1:
-        print('You must provide at least one argument')
-        return 2
-
-    env = bootstrap(args[0])
-
-    root = (env['root'])
+    docstring = inspect.getdoc(export_users)
+    parser = argparse.ArgumentParser(description=docstring)
+    parser.add_argument('ini_file',
+                        help='path to the adhocracy backendini file')
+    parser.add_argument('min_rate',
+                        type=int,
+                        help='minimal rate to restrict listed proposals')
+    args = parser.parse_args()
+    env = bootstrap(args.ini_file)
+    root = env['root']
     catalog = find_catalog(root, 'system')
     path = catalog['path']
     interfaces = catalog['interfaces']
@@ -97,8 +92,7 @@ def export_users():
 
     users = query.execute()
 
-    # FIXME: set 100 instead of 0 on prod
-    proposals = _get_most_rated_proposals(root, 100)
+    proposals = _get_most_rated_proposals(root, min_rate=args.min_rate)
     proposals_titles = _get_proposals_titles(proposals)
 
     if not os.path.exists('./var/export/'):
