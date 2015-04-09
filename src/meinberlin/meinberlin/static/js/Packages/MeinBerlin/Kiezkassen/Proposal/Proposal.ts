@@ -71,8 +71,7 @@ var bindPath = (
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: poolSheet.count,
                         lng: pointSheet.x,
-                        lat: pointSheet.y,
-                        mapOpen : false
+                        lat: pointSheet.y
                     };
                 });
             });
@@ -147,7 +146,7 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         scope: {
             path: "@"
         },
-        link: (scope : IScope, element) => {
+        link: (scope : IScope) => {
             bindPath(adhHttp)(scope);
             scope.toggleMap = () => {
                 angular.element( document.querySelector( '#map' )).toggleClass("is-open");
