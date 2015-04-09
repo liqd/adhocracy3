@@ -1,8 +1,7 @@
-"""Export scripts for adhocracy_mercator.
+"""Export users and their proposal rates.
 
-This is registered as console script in setup.py and can be used as::
+This is registered as console script 'export_mercator_users' in setup.py.
 
-    bin/export_mercator_users
 """
 
 import csv
@@ -70,7 +69,12 @@ def _get_user_rate(user_name, proposal):
 
 
 def export_users():
-    """Export all users from database and write them to csv file. """
+    """Export all users and their proposal rates to csv file.
+
+    usage::
+
+        bin/export_mercator_users etc/development.ini  10
+    """
     usage = 'usage: %prog config_file'
     parser = optparse.OptionParser(
         usage=usage,
