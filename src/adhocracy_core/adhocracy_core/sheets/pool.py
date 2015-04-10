@@ -1,4 +1,4 @@
-"""Pool Sheet."""
+"""List, search and filter child resources."""
 from copy import deepcopy
 from collections.abc import Iterable
 from collections import namedtuple
@@ -35,6 +35,8 @@ class PoolSheet(AnnotationStorageSheet):
 
     """Generic pool resource sheet."""
 
+    # TODO remove, this class is not used
+
     def _get_reference_appstruct(self, params):
         appstruct = {'elements': []}
         reftype = self._reference_nodes['elements'].reftype
@@ -49,41 +51,44 @@ class FilteringPoolSheet(PoolSheet):
 
     """Pool resource sheet that allows filtering and aggregating elements."""
 
-    def _get_reference_appstruct(self, params: dict={}) -> dict:
-        """Get appstruct with references according to `params` query.
+    def get(self, params: dict={}) -> dict:
+        """Search for child resources.
 
-        :param params: Query parameter to modify the returned references.
-        This data structure is specified in
+        :param params: Query parameters to search / filter the
+        returned references.
+        The query data structure is specified in
         :class:`adhocracy_core.rest.schemas.GETPoolRequestSchema`
+        For detailed usage information read :docs:`../../docs/rest_api`.
+        Additional arbitrary filters are defined in
+        :class:`adhocracy_core.catalog.adhocracy.AdhocracyCatalogIndexes`.
+
+        If empty only direct child resources are returned and filtered by
+        the target_isheet of the elements field.
         """
-        depth = self._build_depth(params)
-        ifaces = self._build_iface_filter(params)
-        arbitraries = self._get_arbitrary_filters(params)
-        references = self._get_reference_filters(params)
+        return super().get(params)
+
+    def _get_reference_appstruct(self, params: dict={}) -> dict:
+        """Get appstruct with references according to `params` query."""
         serialization_form = params.get('elements', 'path')
-        resolve_resources = serialization_form != 'omit'
-        sort = params.get('sort', '')
-        reverse = params.get('reverse', False)
-        limit = params.get('limit', None)
-        offset = params.get('offset', 0)
-        aggregate_filter = params.get('aggregateby', '')
-        result = self._filter_elements(depth=depth,
-                                       ifaces=ifaces,
-                                       arbitrary_filters=arbitraries,
-                                       resolve_resources=resolve_resources,
-                                       references=references,
-                                       sort_filter=sort,
-                                       reverse=reverse,
-                                       limit=limit,
-                                       offset=offset,
-                                       aggregate_filter=aggregate_filter,
-                                       )
+        resolve_resources = False if serialization_form == 'omit' else True
+        query = {'depth': self._build_depth(params),
+                 'ifaces': self._build_iface_filter(params),
+                 'arbitrary_filters': self._get_arbitrary_filters(params),
+                 'resolve_resources': resolve_resources,
+                 'references': self._get_reference_filters(params),
+                 'sort_filter': params.get('sort', ''),
+                 'reverse': params.get('reverse', False),
+                 'limit': params.get('limit', None),
+                 'offset': params.get('offset', 0),
+                 'aggregate_filter': params.get('aggregateby', ''),
+                 }
+        result = self._filter_elements(**query)
         appstruct = {}
         if resolve_resources:
             appstruct['elements'] = list(result.elements)
         if params.get('count', False):
             appstruct['count'] = result.count
-        if aggregate_filter:
+        if params.get('aggregateby', ''):
             appstruct['aggregateby'] = result.aggregateby
         return appstruct
 

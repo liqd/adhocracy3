@@ -126,6 +126,7 @@ Modules API and separation of responsibility
     adhocracy_core.resources.principal
     adhocracy_core.resources.subscriber
     adhocracy_core.sheets
+    adhocracy_core.sheets.pool
     adhocracy_core.catalog
     adhocracy_core.catalog.adhocracy
     adhocracy_core.catalog.subscriber
