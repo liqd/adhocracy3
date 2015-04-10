@@ -8,11 +8,8 @@ import argparse
 import csv
 import inspect
 from pyramid.paster import bootstrap
-from pyramid.registry import Registry
-from substanced.util import find_catalog
 from substanced.util import find_service
 
-from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.metadata import IMetadata
@@ -21,10 +18,11 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import create_filename
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import ITitle
-from adhocracy_core.sheets.tags import filter_by_tag
+from adhocracy_core.sheets.pool import IPool
 
 
 def export_users():
@@ -37,36 +35,43 @@ def export_users():
     docstring = inspect.getdoc(export_users)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
-                        help='path to the adhocracy backendini file')
+                        help='path to the adhocracy backend ini file')
     parser.add_argument('min_rate',
                         type=int,
                         help='minimal rate to restrict listed proposals')
-    filename = create_filename(dir='./var/export/',
-                               prefix='adhocracy-users',
-                               suffix='csv')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    _export_users(env['root'], env['registry'], filename,
-                  min_rate=args.min_rate)
+    filename = create_filename(directory='./var/export/',
+                               prefix='adhocracy-users',
+                               suffix='.csv')
+    _export_users_and_proposals_rates(env['root'], filename,
+                                      min_rate=args.min_rate)
     env['closer']()
 
 
-def _export_users(root: IResource, registry: Registry, filename: str,
-                  min_rate=0):
-    users = _get_users(root)
-    proposals = _get_most_rated_proposals(root, min_rate=min_rate)
+def _export_users_and_proposals_rates(root: IResource, filename: str,
+                                      min_rate=0):
+    proposals = _get_most_rated_proposals(root, min_rate)
     proposals_titles = _get_titles(proposals)
-    columns = ['Username', 'Email', 'Creation date'] + proposals_titles
+    column_names = ['Username', 'Email', 'Creation date'] + proposals_titles
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',
                         quoting=csv.QUOTE_MINIMAL)
-        wr.writerow(columns)
-        for user in users:
+        wr.writerow(column_names)
+        users = _get_users(root)
+        proposals_users_map = _map_rating_users(proposals)
+        for pos, user in enumerate(users):
             row = []
             _append_user_data(user, row)
-            _append_proposals_rate(user, proposals, row)
+            _append_rate_dates(user, proposals_users_map, row)
             wr.writerow(row)
-    print('Users exported to %s' % filename)
+            print('exported user {0} of {1}'.format(pos, len(users)))
+    print('Users exported to {0}'.format(filename))
+
+
+def _get_titles(resources: [ITitle]) -> [str]:
+    titles = [get_sheet_field(p, ITitle, 'title') for p in resources]
+    return titles
 
 
 def _get_users(root: IResource) -> [IUser]:
@@ -74,56 +79,76 @@ def _get_users(root: IResource) -> [IUser]:
     return users.values()
 
 
-def _get_most_rated_proposals(root: IResource, min_rate=0):
-    catalog = find_catalog(root, 'system')
-    adhocracy_catalog = find_catalog(root, 'adhocracy')
-    path = catalog['path']
-    interfaces = catalog['interfaces']
-    tag = adhocracy_catalog['tag']
-
-    query = path.eq('/mercator') \
-        & interfaces.eq(IMercatorProposalVersion) \
-        & tag.eq('LAST')
-
-    proposals = query.execute()
-    proposals = [p for p in proposals if index_rates(p, None) > min_rate]
-    proposals = list(reversed(sorted(proposals,
-                                     key=lambda p: index_rates(p, None))))
+def _get_most_rated_proposals(root: IResource,
+                              min_rate: int) -> [IMercatorProposalVersion]:
+    pool = get_sheet(root, IPool)
+    params = {'depth': 3,
+              'content_type': IMercatorProposalVersion,
+              'sort': 'rates',
+              'reverse': True,
+              'tag': 'LAST',
+              'aggregateby': 'rates',
+              'aggregateby_elements': 'content',
+              'elements': 'content',
+              }
+    results = pool.get(params)
+    proposals = results['elements']
+    aggregates = results['aggregateby']['rates']
+    for rate, aggregated_proposals in aggregates.items():
+        if int(rate) < min_rate:
+            for p in aggregated_proposals:
+                try:
+                    proposals.remove(p)
+                except ValueError:
+                    pass
     return proposals
 
 
-def _get_titles(proposals: [ITitle]) -> [str]:
-    return [get_sheet_field(p, ITitle, 'title') for p in proposals]
+def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
+    rateables_users_map = []
+    for rateable in rateables:
+        params = {'depth': 3,
+                  'content_type': IRate,
+                  'tag': 'LAST',
+                  'elements': 'content',
+                  IRate.__identifier__ + ':object': rateable,
+                  }
+        pool = get_sheet(rateable.__parent__, IPool)
+        rates = pool.get(params)['elements']
+        users = [get_sheet_field(x, IRate, 'subject') for x in rates]
+        rateables_users_map.append((rateable, set(users)))
+    return rateables_users_map
 
 
-def _append_user_data(user: IUser, row: list):
-            name = get_sheet_field(user, IUserBasic, 'name')
-            email = get_sheet_field(user, IUserExtended, 'email')
-            creation_date = get_sheet_field(user, IMetadata, 'creation_date')
-            creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
-            row.extend([name, email, creation_date_str])
+def _append_user_data(user: IUser, row: [str]):
+    name = get_sheet_field(user, IUserBasic, 'name')
+    email = get_sheet_field(user, IUserExtended, 'email')
+    creation_date = get_sheet_field(user, IMetadata, 'creation_date')
+    creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
+    row.extend([name, email, creation_date_str])
 
 
-def _append_proposals_rate(user: IUser, proposals: list, row: list):
-        for proposal in proposals:
-            rate, date = _get_user_rate(user.__name__, proposal)
-            row.append(date)
+def _append_rate_dates(user: IUser, rateables: [(IRateable, set(IUser))],
+                       row: [str]):
+    for rateable, users in rateables:
+        date = ''
+        if user in users:
+            date = _get_rate_date(user, rateable)
+        row.append(date)
 
 
-def _get_user_rate(user_name: str, proposal: IRateable) -> (int, str):
-    rates = get_sheet_field(proposal, IRateable, 'rates')
-    last_rates = filter_by_tag(rates, 'LAST')
-    rated = [rate for rate in last_rates
-             if _get_rate_subject_name(rate) == user_name]
-
-    if len(rated) == 1:
-        rate = rated[0]
-        creation_date = get_sheet_field(rate, IMetadata, 'item_creation_date')
-        return (get_sheet_field(rate, IRate, 'rate'),
-                creation_date.strftime('%Y-%m-%d_%H:%M:%S'))
-    return 0, ''
-
-
-def _get_rate_subject_name(rate: IRate):
-    rater = get_sheet_field(rate, IRate, 'subject')
-    return get_sheet_field(rater, IUserBasic, 'name')
+def _get_rate_date(user: IUser, rateable: IRateable) -> str:
+    pool = get_sheet(rateable.__parent__, IPool)
+    params = {'depth': 3,
+              'content_type': IRate,
+              'tag': 'LAST',
+              IRate.__identifier__ + ':subject': user,
+              IRate.__identifier__ + ':object': rateable,
+              'elements': 'content',
+              'count': True
+              }
+    result = pool.get(params)
+    rate = result['elements'][0]
+    creation_date = get_sheet_field(rate, IMetadata, 'item_creation_date')
+    creation_date_str = creation_date.strftime('%Y-%m-%d_%H:%M:%S')
+    return creation_date_str
