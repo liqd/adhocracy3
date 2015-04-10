@@ -8,13 +8,12 @@ This is registered as console script in setup.py and can be used as::
 import csv
 import inspect
 import optparse
-import os
 import sys
 import textwrap
-import time
 
 from pyramid.paster import bootstrap
 from substanced.util import find_catalog
+from adhocracy_core.utils import create_filename
 
 from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.sheets.metadata import IMetadata
@@ -56,12 +55,9 @@ def export_proposals():
 
     proposals = query.execute()
 
-    if not os.path.exists('./var/export/'):
-        os.makedirs('./var/export/')
-
-    timestr = time.strftime('%Y%m%d-%H%M%S')
-
-    filename = './var/export/MercatorProposalExport-%s.csv' % timestr
+    filename = create_filename(directory='./var/export',
+                               prefix='MercatorProposalExport',
+                               suffix='.csv')
     result_file = open(filename, 'w', newline='')
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)

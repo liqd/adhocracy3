@@ -476,3 +476,19 @@ def get_modification_date(registry: Registry) -> datetime:
         date = now()
         registry.__modification_date__ = date
     return date
+
+
+def create_filename(directory='.', prefix='', suffix='.csv') -> str:
+    """Use current time to generate a unique filename.
+
+    :params dir: directory path for the filename.
+                 If non existing the directory is created.
+    :params prefix: prefix for the generated filename
+    :params suffix: type suffix for the generated filename, like 'csv'
+    """
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    time_str = time.strftime('%Y%m%d-%H%M%S')
+    name = '{0}-{1}{2}'.format(prefix, time_str, suffix)
+    path = os.path.join(directory, name)
+    return path

@@ -7,8 +7,6 @@ This is registered as console script 'export_mercator_users' in setup.py.
 import argparse
 import csv
 import inspect
-import os
-import time
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from substanced.util import find_catalog
@@ -23,25 +21,10 @@ from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import create_filename
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import ITitle
 from adhocracy_core.sheets.tags import filter_by_tag
-
-
-def create_filename(dir='.', prefix='', suffix='') -> str:
-    """Use current time to create unique filename.
-
-    :params dir: directory path for the filename.
-                 If non existing the directory is created.
-    :params prefix: prefix for the generated name
-    :params suffix: type suffix for the generated name, like 'csv'
-    """
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    timestr = time.strftime('%Y%m%d-%H%M%S')
-    name = '{0}-{1}.{2}'.format(prefix, timestr, suffix)
-    path = os.path.join(dir, name)
-    return path
 
 
 def export_users():
