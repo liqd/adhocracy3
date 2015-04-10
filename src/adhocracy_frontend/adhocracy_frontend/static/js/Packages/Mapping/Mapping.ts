@@ -66,8 +66,7 @@ export var mapInput = (
             // limit map to polygon
             map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(map, {
-                minZoom: map.getZoom(),
-                maxBounds: map.getBounds()
+                minZoom: map.getZoom()
             });
 
             if (typeof scope.zoom !== "undefined") {
@@ -150,6 +149,16 @@ export var mapInput = (
                 scope.mapClicked = false;
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
+
+            scope.$watch((<any>map), function(){
+                $timeout(() => {
+                    map.invalidateSize();
+                    map.fitBounds(scope.polygon.getBounds());
+                    leaflet.Util.setOptions(map, {
+                        minZoom: map.getZoom()
+                    });
+                }, 350);
+            });
         }
     };
 };
