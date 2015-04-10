@@ -920,13 +920,11 @@ class TestValidatePasswordResetPath:
 
     def test_path_is_reset_password(self, node,  request, context, registry,
                                     mock_sheet):
-        from datetime import datetime
-        from pytz import UTC
         from adhocracy_core.resources.principal import IPasswordReset
+        from adhocracy_core.utils import now
         user = testing.DummyResource()
-        creation_date = datetime.utcnow().replace(tzinfo=UTC)
         mock_sheet.get.return_value = {'creator': user,
-                                       'creation_date': creation_date}
+                                       'creation_date': now()}
         registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(node, {'request': request, 'context': context})
 
@@ -937,12 +935,10 @@ class TestValidatePasswordResetPath:
 
     def test_path_is_not_reset_password(self, node,  request, context, registry,
                                         mock_sheet):
-        from datetime import datetime
-        from pytz import UTC
+        from adhocracy_core.utils import now
         user = testing.DummyResource()
-        creation_date = datetime.utcnow().replace(tzinfo=UTC)
         mock_sheet.get.return_value = {'creator': user,
-                                       'creation_date': creation_date}
+                                       'creation_date': now()}
         registry.content.get_sheet.return_value = mock_sheet
         validator = self.call_fut(node, {'request': request, 'context': context})
 
@@ -953,11 +949,10 @@ class TestValidatePasswordResetPath:
     def test_path_is_reset_password_but_8_days_old(
             self, node,  request, context, registry, mock_sheet):
         import datetime
-        from pytz import UTC
         from adhocracy_core.resources.principal import IPasswordReset
+        from adhocracy_core.utils import now
         user = testing.DummyResource()
-        creation_date = datetime.datetime.utcnow().replace(tzinfo=UTC) -\
-                        datetime.timedelta(days=7)
+        creation_date = now() - datetime.timedelta(days=7)
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': creation_date}
         registry.content.get_sheet.return_value = mock_sheet

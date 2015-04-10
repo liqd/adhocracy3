@@ -10,7 +10,6 @@ import re
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
-from pytz import UTC
 from pyramid.traversal import find_interface
 from substanced.file import File
 from substanced.file import USE_MAGIC
@@ -25,6 +24,7 @@ from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
+from adhocracy_core.utils import now
 from adhocracy_core.interfaces import SheetReference
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
@@ -605,7 +605,7 @@ class Password(AdhocracySchemaNode):
 @colander.deferred
 def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
     """Return current date."""
-    return datetime.utcnow().replace(tzinfo=UTC)
+    return now()
 
 
 class DateTime(AdhocracySchemaNode):
