@@ -24,7 +24,8 @@ dotted_name_resolver = DottedNameResolver()
 
 filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
                                  'count', 'sort', 'reverse', 'limit', 'offset',
-                                 'aggregateby']
+                                 'aggregateby', 'aggregateby_elements',
+                                 ]
 
 
 FilterElementsResult = namedtuple('FilterElementsResult',
@@ -81,6 +82,7 @@ class FilteringPoolSheet(PoolSheet):
                  'limit': params.get('limit', None),
                  'offset': params.get('offset', 0),
                  'aggregate_filter': params.get('aggregateby', ''),
+                 'aggregate_form': params.get('aggregateby_elements', 'count')
                  }
         result = self._filter_elements(**query)
         appstruct = {}
@@ -127,7 +129,9 @@ class FilteringPoolSheet(PoolSheet):
                          reverse: bool=False,
                          limit: int=None,
                          offset: int=0,
-                         aggregate_filter: str=None) -> FilterElementsResult:
+                         aggregate_filter: str=None,
+                         aggregate_form: str='count',
+                         ) -> FilterElementsResult:
         system_catalog = find_catalog(self.context, 'system')
         # filter path
         path_index = system_catalog['path']
@@ -178,10 +182,15 @@ class FilteringPoolSheet(PoolSheet):
                 or system_catalog.get(aggregate_filter)
             for value in index.unique_values():
                 value_query = query & index.eq(value)
-                value_elements = value_query.execute(resolver=identity)
+                if aggregate_form == 'count':
+                    value_elements = len(value_query.execute(
+                        resolver=identity))
+                else:
+                    # TODO do we really want to  destroy the generator here?
+                    value_elements = list(value_query.execute(
+                        resolver=None))
                 if value_elements:
-                    aggregateby[aggregate_filter][str(value)] = len(
-                        value_elements)
+                    aggregateby[aggregate_filter][str(value)] = value_elements
         return FilterElementsResult(elements, count, aggregateby)
 
     def _get_schema_for_cstruct(self, request, params: dict):

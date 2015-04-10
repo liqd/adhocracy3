@@ -91,6 +91,7 @@ class TestFilteringPoolSheet:
                           'limit': None,
                           'offset': 0,
                           'aggregate_filter': '',
+                          'aggregate_form': 'count',
                           }
         return default_kwargs
 
@@ -150,6 +151,11 @@ class TestFilteringPoolSheet:
         filter_elements_kwargs['aggregate_filter'] = 'interfaces'
         assert inst._filter_elements.call_args[1] == filter_elements_kwargs
         assert appstruct == {'elements': ['Dummy'], 'aggregateby': {}}
+
+    def test_get_with_aggregateby_elements(self, inst, filter_elements_kwargs):
+        inst.get({'aggregateby_elements': 'content'})
+        filter_elements_kwargs['aggregate_form'] = 'content'
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
 
     def test_get_with_arbitrary_filters(self, inst):
         """remove all standard  and reference filter in get pool requests."""
@@ -384,7 +390,7 @@ class TestIntegrationPoolSheet:
         result = set(poolsheet._filter_elements(references=reference_filters).elements)
         assert result == set([tag_child])
 
-    def test_filter_elements_with_aggregateby(self, registry, pool_graph_catalog):
+    def test_filter_elements_with_aggregate_filter(self, registry, pool_graph_catalog):
         from adhocracy_core.resources.item import IItem
         from adhocracy_core.resources.itemversion import IItemVersion
         from adhocracy_core.sheets.pool import IPool
@@ -397,6 +403,20 @@ class TestIntegrationPoolSheet:
         # Values not matched by the query shouldn't be reported in the
         # aggregate
         assert str(IItem) not in result['interfaces']
+
+    def test_filter_elements_with_aggregate_form_content(self, registry,
+                                                         pool_graph_catalog):
+        from adhocracy_core.resources.item import IItem
+        from adhocracy_core.resources.itemversion import IItemVersion
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        item = self._make_resource(registry, parent=pool_graph_catalog,
+                                   content_type=IItem)
+        poolsheet = get_sheet(item, IPool)
+        result = poolsheet._filter_elements(aggregate_filter='interfaces',
+                                            aggregate_form='content').aggregateby
+        itemversion = item['VERSION_0000000']
+        assert result['interfaces'][str(IItemVersion)] == [itemversion]
 
     def test_filter_elements_with_sort_filter(self, registry, pool_graph_catalog):
         from adhocracy_core.sheets.pool import IPool
