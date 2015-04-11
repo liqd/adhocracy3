@@ -1,8 +1,7 @@
-"""Export scripts for adhocracy_mercator.
+"""Export proposal.
 
-This is registered as console script in setup.py and can be used as::
-
-    bin/export_mercator_proposals
+This is registered as console script 'export_mercator_proposals'
+in setup.py.
 """
 
 import csv
