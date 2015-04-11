@@ -19,7 +19,7 @@ pyramid.includes =
 
 tm.attempts = 5
 
-zodbconn.uri = zeo://localhost:9963?cache_size=200MB&connection_cache_size=50000&storage=main&blob_dir=var/blobs&shared_blob_dir=True
+zodbconn.uri = zeo://localhost:9963?cache_size=200MB&connection_cache_size=250000&storage=main&blob_dir=var/blobs&shared_blob_dir=True
 
 substanced.secret = seekri1
 substanced.initial_email = admin@example.com
