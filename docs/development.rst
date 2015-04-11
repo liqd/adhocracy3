@@ -27,7 +27,7 @@ frontend unit tests:
 
     A.  Integrated with py.test::
 
-            bin/py.test ./src/adhocracy_frontend/adhocracy_frontend/tests/unit/
+           bin/polytester jsunit
 
     B.  In browser::
 
@@ -49,7 +49,7 @@ frontend unit tests:
                xdg-open http://localhost:6551/static/test-no-blanket.html
 
 
-frontend integration tests:
+frontend integration tests (jsint):
 
     Frontend integration tests behave like unit tests in the sense
     that they are driven by jasmine and can access all exports of all
@@ -72,7 +72,7 @@ frontend integration tests:
 
     A.  Integrated with py.test::
 
-            bin/py.test ./tests/integration/
+           bin/polytester jsint
 
     B.  In browser::
 
@@ -90,19 +90,30 @@ frontend integration tests:
 
 protractor acceptance tests::
 
-    bin/protractor etc/protractorConf.js
+     bin/polytester acceptance
 
 run backend functional tests::
 
-    bin/py.test -m"functional" src/adhocracy_core/adhocracy_core/websocket src/adhocracy_core/docs
+    bin/polytester pyfunc
 
 run backend unit tests and show python test code coverage::
 
-    bin/py.test_run_unittests_with_coverage
+    bin/polytester pyunit
+    xdg-open ./htmlcov/index.html
 
-run all tests (without protractor acceptance tests)::
+run all test::
 
-    bin/py.test_run_all
+    bin/polytester
+
+to display console output::
+
+    bin/polytester -v
+
+modify test config:
+
+     tests.ini  (run all tests with polytester)
+     pytest.ini (python/jasmin tests with pytest)
+     etc/protractorConf (acceptantance tests with protractor)
 
 delete database (works best on development systems without valuable data!)::
 
