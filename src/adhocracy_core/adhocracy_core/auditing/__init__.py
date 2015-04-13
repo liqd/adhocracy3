@@ -131,8 +131,6 @@ def _get_entry_name(change) -> str:
         return AuditActionName.created
     elif change.modified:
         return AuditActionName.modified
-    elif change.visibility == VisibilityChange.invisible:
-        return AuditActionName.invisible
     elif change.visibility == VisibilityChange.concealed:
         return AuditActionName.concealed
     elif change.visibility == VisibilityChange.revealed:

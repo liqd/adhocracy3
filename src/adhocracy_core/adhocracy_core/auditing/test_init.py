@@ -321,19 +321,6 @@ class TestGetAuditActionName:
                                    visibility=VisibilityChange.visible)
         assert _get_entry_name(change) is AuditActionName.modified
 
-    def test_get_entry_name_invisible(self):
-        from . import AuditActionName
-        from . import _get_entry_name
-        change = ChangelogMetadata(modified=False,
-                                   created=False,
-                                   followed_by=None,
-                                   resource=None,
-                                   last_version=None,
-                                   changed_descendants=False,
-                                   changed_backrefs=False,
-                                   visibility=VisibilityChange.invisible)
-        assert _get_entry_name(change) is AuditActionName.invisible
-
     def test_get_entry_name_concealed(self):
         from . import AuditActionName
         from . import _get_entry_name
