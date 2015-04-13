@@ -62,8 +62,9 @@ adhocracy.trusted_domains =
 #     http://localhost:9000
 #     http://localhost:9001
 
-adhocracy.custom = mercator_platform_path financial_plan_url_de financial_plan_url_en
+adhocracy.custom = mercator_platform_path financial_plan_url_de financial_plan_url_en show_add_button
 adhocracy.custom.mercator_platform_path = /mercator/
+adhocracy.custom.show_add_button = true
 
 cachebust.enabled = false
 cachebust.method = init
