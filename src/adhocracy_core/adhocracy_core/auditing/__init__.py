@@ -8,31 +8,16 @@ from pyramid.response import Response
 from BTrees.OOBTree import OOBTree
 from datetime import datetime
 from logging import getLogger
-from collections import namedtuple
-from enum import Enum
 from adhocracy_core.utils import get_user
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import VisibilityChange
+from adhocracy_core.interfaces import AuditActionName
+from adhocracy_core.interfaces import AuditlogEntry
 
 logger = getLogger(__name__)
-
-AuditEntry = namedtuple('AuditEntry', ['name',
-                                       'resource_path',
-                                       'user_name',
-                                       'user_path'])
-
-
-class EntryName(Enum):
-    created = 'created'
-    modified = 'modified'
-    # visible = 'visible' is not necessary since
-    # VisibilityChange.visible is only a state, not a change
-    invisible = 'invisible'
-    concealed = 'concealed'
-    revealed = 'revealed'
 
 
 class AuditLog(OOBTree):
@@ -54,15 +39,15 @@ class AuditLog(OOBTree):
     """
 
     def add(self,
-            name: str,
+            name: AuditActionName,
             resource_path: str,
             user_name: str,
             user_path: str) -> None:
-        """ Add an audit entry to the audit log."""
-        self[datetime.utcnow()] = AuditEntry(name,
-                                             resource_path,
-                                             user_name,
-                                             user_path)
+        """ Add an auditlog entry to the audit log."""
+        self[datetime.utcnow()] = AuditlogEntry(name,
+                                                resource_path,
+                                                user_name,
+                                                user_path)
 
 
 def get_auditlog(context: IResource) -> AuditLog:
@@ -85,7 +70,7 @@ def set_auditlog(context: IResource) -> None:
 
 
 def log_auditevent(context: IResource,
-                   name: str,
+                   name: AuditActionName,
                    resource_path: str,
                    user_name: str,
                    user_path: str) -> None:
@@ -142,14 +127,14 @@ def _log_change(context: IResource,
 
 def _get_entry_name(change) -> str:
     if change.created:
-        return EntryName.created
+        return AuditActionName.created
     elif change.modified:
-        return EntryName.modified
+        return AuditActionName.modified
     elif change.visibility == VisibilityChange.invisible:
-        return EntryName.invisible
+        return AuditActionName.invisible
     elif change.visibility == VisibilityChange.concealed:
-        return EntryName.concealed
+        return AuditActionName.concealed
     elif change.visibility == VisibilityChange.revealed:
-        return EntryName.revealed
+        return AuditActionName.revealed
     else:
         raise ValueError('Invalid change state', change)

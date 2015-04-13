@@ -525,6 +525,41 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     """
 
 
+class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
+                                                 'resource_path',
+                                                 'user_name',
+                                                 'user_path'])):
+
+    """Metadata to log which user modifies resources.
+
+    Fields:
+    -------
+
+    name (AuditActionName):
+        action executed by user
+    resource_path: (str):
+        modified resource path (:term:`location`)
+    user_name: (str):
+        name of responsible user
+    user_path:
+        :term:`user_id` of responsible user
+    """
+
+# TODO change name in action
+# TODO EntryName in AuditlogAction
+
+
+class AuditActionName(Enum):
+
+    """Resource modification action."""
+
+    created = 'created'
+    modified = 'modified'
+    invisible = 'invisible'
+    concealed = 'concealed'
+    revealed = 'revealed'
+
+
 class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
     """Adapter responsible for returning a user or get info about it."""

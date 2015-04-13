@@ -178,7 +178,7 @@ class TestAuditlog:
 
     def test_add(self, inst):
         import datetime
-        from . import AuditEntry
+        from adhocracy_core.interfaces import AuditlogEntry
         name = 'created'
         resource_path = '/resource1'
         user_name = 'user1'
@@ -186,7 +186,7 @@ class TestAuditlog:
         inst.add(name, resource_path, user_name, user_path)
         key, value = inst.items()[0]
         assert isinstance(key, datetime.datetime)
-        assert isinstance(value, AuditEntry)
+        assert isinstance(value, AuditlogEntry)
         assert value.name == name
         assert value.resource_path == resource_path
         assert value.user_name == user_name
@@ -287,14 +287,14 @@ class TestAddAuditEvent:
                                              '/user1')
 
 
-class TestGetEntryName:
+class TestGetAuditActionName:
 
     def call_fut(change):
         from . import _get_entry_name
         return _get_entry_name(change)
 
     def test_get_entry_name_created(self):
-        from . import EntryName
+        from . import AuditActionName
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=True,
@@ -304,10 +304,10 @@ class TestGetEntryName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.visible)
-        assert _get_entry_name(change) is EntryName.created
+        assert _get_entry_name(change) is AuditActionName.created
 
     def test_get_entry_name_modified(self):
-        from . import EntryName
+        from . import AuditActionName
         from . import _get_entry_name
         change = ChangelogMetadata(modified=True,
                                    created=False,
@@ -317,10 +317,10 @@ class TestGetEntryName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.visible)
-        assert _get_entry_name(change) is EntryName.modified
+        assert _get_entry_name(change) is AuditActionName.modified
 
     def test_get_entry_name_invisible(self):
-        from . import EntryName
+        from . import AuditActionName
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=False,
@@ -330,10 +330,10 @@ class TestGetEntryName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.invisible)
-        assert _get_entry_name(change) is EntryName.invisible
+        assert _get_entry_name(change) is AuditActionName.invisible
 
     def test_get_entry_name_concealed(self):
-        from . import EntryName
+        from . import AuditActionName
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=False,
@@ -343,10 +343,10 @@ class TestGetEntryName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.concealed)
-        assert _get_entry_name(change) is EntryName.concealed
+        assert _get_entry_name(change) is AuditActionName.concealed
 
     def test_get_entry_name_revealed(self):
-        from . import EntryName
+        from . import AuditActionName
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=False,
@@ -356,7 +356,7 @@ class TestGetEntryName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.revealed)
-        assert _get_entry_name(change) is EntryName.revealed
+        assert _get_entry_name(change) is AuditActionName.revealed
 
     def test_get_entry_name_visible(self):
         from . import _get_entry_name
