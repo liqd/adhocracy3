@@ -39,6 +39,29 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
     logger.info('Finished substanced evolve step 1: add new ITitle sheet')
 
 
+def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
+    """Disable add_proposal permissions."""
+    from substanced.util import set_acl
+    from substanced.util import get_acl
+    from pyramid.threadlocal import get_current_registry
+    from pyramid.security import Deny
+
+    logger.info('Running substanced evolve step 2:'
+                'remove add_proposal permission')
+
+    registry = get_current_registry()
+    acl = get_acl(root)
+    acl.extend([(Deny, 'role:contributor', 'add_proposal'),
+                (Deny, 'role:creator', 'add_mercator_proposal_version')])
+    set_acl(root, acl, registry=registry)
+    # TODO substanced bug, _p_changed is not set
+    root._p_changed = True
+
+    logger.info('Finished substanced evolve step 2:'
+                'remove add_proposal permission')
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
+    config.add_evolution_step(evolve2_disable_add_proposal_permission)
