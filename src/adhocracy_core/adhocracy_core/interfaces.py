@@ -522,8 +522,8 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
     Fields:
     -------
 
-    name (AuditActionName):
-        action executed by user
+    name (AuditlogAction):
+        name of action executed by user
     resource_path: (str):
         modified resource path (:term:`location`)
     user_name: (str):
@@ -533,9 +533,9 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
     """
 
 
-class AuditActionName(Enum):
+class AuditlogAction(Enum):
 
-    """Resource modification action."""
+    """Name of the Resource modification action."""
 
     created = 'created'
     modified = 'modified'
