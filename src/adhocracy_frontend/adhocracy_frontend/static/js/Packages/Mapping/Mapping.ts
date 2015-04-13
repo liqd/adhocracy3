@@ -151,7 +151,7 @@ export var mapInput = (
             };
 
             $timeout(() => {
-                map.invalidateSize();
+                map.invalidateSize(false);
                 map.fitBounds(scope.polygon.getBounds());
                 leaflet.Util.setOptions(map, {
                     minZoom: map.getZoom()
