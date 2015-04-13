@@ -545,9 +545,6 @@ class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
         :term:`user_id` of responsible user
     """
 
-# TODO change name in action
-# TODO EntryName in AuditlogAction
-
 
 class AuditActionName(Enum):
 

@@ -239,10 +239,12 @@ class TestSetAuditlog:
         assert mock_auditlog.called is False
 
 
-def test_get_auditlog():
-    import substanced.util
+def test_get_auditlog(context, monkeypatch):
     from . import get_auditlog
-    assert get_auditlog == substanced.util.get_auditlog
+    mock = Mock()
+    monkeypatch.setattr('substanced.util.get_auditlog', mock)
+    get_auditlog(context)
+    assert mock.called
 
 
 class TestAddAuditEvent:
