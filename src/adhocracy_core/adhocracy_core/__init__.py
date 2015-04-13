@@ -30,12 +30,6 @@ def root_factory(request):
     return _get_zodb_root(request)['app_root']
 
 
-def _get_zodb_root(request):
-    connection = get_connection(request)
-    zodb_root = connection.root()
-    return zodb_root
-
-
 def _set_app_root_if_missing(request):
     zodb_root = _get_zodb_root(request)
     if 'app_root' in zodb_root:
@@ -47,6 +41,12 @@ def _set_app_root_if_missing(request):
     transaction.savepoint()  # give app_root a _p_jar
     registry.notify(RootAdded(app_root))
     transaction.commit()
+
+
+def _get_zodb_root(request):
+    connection = get_connection(request)
+    zodb_root = connection.root()
+    return zodb_root
 
 
 def _set_auditlog_if_missing(request):
