@@ -94,6 +94,9 @@ def _get_most_rated_proposals(root: IResource,
     results = pool.get(params)
     proposals = results['elements']
     aggregates = results['aggregateby']['rates']
+    # remove proposals with rate < min_rate.
+    # TODO extend query parameters to allow comparators, like
+    # 'rate': '>=3'
     for rate, aggregated_proposals in aggregates.items():
         if int(rate) < min_rate:
             for p in aggregated_proposals:
