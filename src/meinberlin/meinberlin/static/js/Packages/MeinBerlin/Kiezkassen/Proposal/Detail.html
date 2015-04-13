@@ -46,8 +46,11 @@
         </footer>
     </section>
 
-    <section class="mein-berlin-kiezkassen-proposal-detail-map" data-ng-class="{'is-open': mapIsOpen}">
-        <!-- FIXME: Map please ! -->
-        MAP HERE ?
+    <section>
+        <!--<adh-recompile-on-change data-value="{{data.lng}}" data-key="lng">-->
+        <adh-map-detail data-ng-if="data.polygon && data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="400"></adh-map-detail>
+        <!--</adh-recompile-on-change>-->
     </section>
+
+
 </article>
