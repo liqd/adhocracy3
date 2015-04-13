@@ -54,6 +54,8 @@ def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     acl.extend([(Deny, 'role:contributor', 'add_proposal'),
                 (Deny, 'role:creator', 'add_mercator_proposal_version')])
     set_acl(root, acl, registry=registry)
+    # TODO substanced bug, _p_changed is not set
+    root._p_changed = True
 
     logger.info('Finished substanced evolve step 2:'
                 'remove add_proposal permission')
