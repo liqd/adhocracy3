@@ -156,7 +156,7 @@ export var mapInput = (
                 leaflet.Util.setOptions(map, {
                     minZoom: map.getZoom()
                 });
-            }, 350);
+            }, 500);  // FIXME: moving column transition duration
         }
     };
 };
