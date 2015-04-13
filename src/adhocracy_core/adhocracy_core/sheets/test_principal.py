@@ -8,8 +8,8 @@ class TestPasswordSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import password_metadata
-        return password_metadata
+        from adhocracy_core.sheets.principal import password_meta
+        return password_meta
 
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
@@ -137,27 +137,27 @@ class TestDeferredValidateUserName:
         return testing.DummyRequest(root=testing.DummyResource(),
                                     registry=registry)
 
-    def _call_fut(self, node, kw):
+    def call_fut(self, node, kw):
         from adhocracy_core.sheets.principal import deferred_validate_user_name
         return deferred_validate_user_name(node, kw)
 
     def test_name_is_empty_and_no_request_kw(self, node, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        assert self._call_fut(node, {}) is None
+        assert self.call_fut(node, {}) is None
 
     def test_name_is_empty(self, node, requestp, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        validator = self._call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, {'request': requestp})
         assert validator(node, '') is None
 
     def test_name_is_unique(self, node, requestp, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
-        validator = self._call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, {'request': requestp})
         assert validator(node, 'unique') is None
 
     def test_name_is_not_unique(self, node, requestp, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = object()
-        validator = self._call_fut(node, {'request': requestp})
+        validator = self.call_fut(node, {'request': requestp})
         with raises(colander.Invalid):
             validator(node, 'not unique')
 
@@ -169,29 +169,29 @@ class TestDeferredValidateUserEmail:
         return testing.DummyRequest(root=testing.DummyResource(),
                                     registry=registry)
 
-    def _call_fut(self, node, kw):
+    def call_fut(self, node, kw):
         from adhocracy_core.sheets.principal import deferred_validate_user_email
         return deferred_validate_user_email(node, kw)
 
     def test_email_is_empty(self, node, request, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = None
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         with raises(colander.Invalid):
             validator(node, '') is None
 
     def test_email_is_wrong(self, node, request, mock_user_locator):
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         with raises(colander.Invalid):
              validator(node, 'wrong_email') is None
 
     def test_email_is_unique(self, node, request, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = None
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         assert validator(node, 'test@test.de') is None
 
     def test_email_is_not_unique(self, node, request, mock_user_locator):
         mock_user_locator.get_user_by_email.return_value = object()
-        validator = self._call_fut(node, {'request': request})
+        validator = self.call_fut(node, {'request': request})
         with raises(colander.Invalid):
             validator(node, 'not unique')
 
@@ -200,8 +200,8 @@ class TestUserBasicSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import userbasic_metadata
-        return userbasic_metadata
+        from adhocracy_core.sheets.principal import userbasic_meta
+        return userbasic_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserBasic
@@ -222,8 +222,8 @@ class TestUserExtendedSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import userextended_metadata
-        return userextended_metadata
+        from adhocracy_core.sheets.principal import userextended_meta
+        return userextended_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IUserExtended
@@ -319,8 +319,8 @@ class TestPermissionsSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import permissions_metadata
-        return permissions_metadata
+        from adhocracy_core.sheets.principal import permissions_meta
+        return permissions_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IPermissions
@@ -363,8 +363,8 @@ class TestGroupSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.principal import group_metadata
-        return group_metadata
+        from adhocracy_core.sheets.principal import group_meta
+        return group_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.principal import IGroup

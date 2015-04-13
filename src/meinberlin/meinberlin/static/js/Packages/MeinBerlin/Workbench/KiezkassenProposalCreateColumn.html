@@ -1,0 +1,12 @@
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <i class="icon-document moving-column-icon"></i>
+
+        <div class="moving-column-menu-nav">
+            <a data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        </div>
+    </div>
+
+    <adh-mein-berlin-kiezkassen-proposal-create data-ng-switch-when="body">
+    </adh-mein-berlin-kiezkassen-proposal-create>
+</div>

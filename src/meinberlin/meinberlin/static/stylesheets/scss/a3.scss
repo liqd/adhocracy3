@@ -19,9 +19,13 @@
 @import "layout";
 
 @import "components/type";
+@import "components/type_theme";
 @import "components/forms";
+@import "components/forms_theme";
 @import "components/button";
+@import "components/button_theme";
 @import "components/login";
+@import "components/map";
 @import "components/navbar";
 @import "components/meinberlin_proposal";
 @import "components/moving_columns";
@@ -37,6 +41,7 @@
 @import "components/user_list";
 @import "components/user_profile";
 @import "components/rate";
+@import "components/rate_theme";
 @import "components/facets";
 @import "components/unsupported_browser";
 @import "components/busy";

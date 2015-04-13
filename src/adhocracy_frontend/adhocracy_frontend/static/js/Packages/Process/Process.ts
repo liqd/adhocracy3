@@ -4,7 +4,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
 export class Provider implements angular.IServiceProvider {
-    public templateFactories : {[processType : string]: Function};
+    public templateFactories : {[processType : string]: any};
     public $get;
 
     constructor () {

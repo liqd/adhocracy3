@@ -8,7 +8,7 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
@@ -44,8 +44,8 @@ class CommentSchema(colander.MappingSchema):
     content = Text()
 
 
-comment_meta = sheet_metadata_defaults._replace(isheet=IComment,
-                                                schema_class=CommentSchema)
+comment_meta = sheet_meta._replace(isheet=IComment,
+                                   schema_class=CommentSchema)
 
 
 class CommentableSchema(PostPoolMappingSchema):
@@ -62,7 +62,7 @@ class CommentableSchema(PostPoolMappingSchema):
     post_pool = PostPool(iresource_or_service_name='comments')
 
 
-commentable_meta = sheet_metadata_defaults._replace(
+commentable_meta = sheet_meta._replace(
     isheet=ICommentable,
     schema_class=CommentableSchema,
     editable=False,

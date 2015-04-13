@@ -3,9 +3,27 @@ from collections import defaultdict
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import VisibilityChange
 
+changelog_meta = ChangelogMetadata(modified=False,
+                                   created=False,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.visible,
+                                   )
 
-changelog_metadata = ChangelogMetadata(False, False, None, None, None,
-                                       False, False, VisibilityChange.visible)
+
+class Changelog(defaultdict):
+
+    """Transaction changelog for resources.
+
+    Dictionary with resource path as key and default value
+    :class:`ChangelogMetadata`.
+    """
+
+    def __init__(self, default_factory=lambda: changelog_meta):
+        super().__init__(default_factory)
 
 
 def clear_changelog_callback(request):
@@ -17,7 +35,7 @@ def clear_changelog_callback(request):
 
 def create_changelog() -> dict:
     """Return dict that maps resource path to :class:`ChangelogMetadata`."""
-    metadata = lambda: changelog_metadata
+    metadata = lambda: changelog_meta
     return defaultdict(metadata)
 
 
@@ -34,6 +52,5 @@ def clear_modification_date_callback(request):
 
 def includeme(config):
     """Add transaction changelog to the registry and register subscribers."""
-    changelog = create_changelog()
-    config.registry.changelog = changelog
+    config.registry.changelog = Changelog()
     config.include('.subscriber')

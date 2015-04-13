@@ -6,7 +6,7 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.asset import asset_metadata_meta
 from adhocracy_core.schema import AdhocracySchemaNode
@@ -102,8 +102,8 @@ class TitleSchema(colander.MappingSchema):
     title = SingleLine(validator=colander.Length(min=1, max=100))
 
 
-title_meta = sheet_metadata_defaults._replace(isheet=ITitle,
-                                              schema_class=TitleSchema)
+title_meta = sheet_meta._replace(isheet=ITitle,
+                                 schema_class=TitleSchema)
 
 
 class UserInfoSchema(colander.MappingSchema):
@@ -115,8 +115,8 @@ class UserInfoSchema(colander.MappingSchema):
     country = ISOCountryCode()
 
 
-userinfo_meta = sheet_metadata_defaults._replace(isheet=IUserInfo,
-                                                 schema_class=UserInfoSchema)
+userinfo_meta = sheet_meta._replace(isheet=IUserInfo,
+                                    schema_class=UserInfoSchema)
 
 
 class OrganizationInfoReference(SheetToSheet):
@@ -211,7 +211,7 @@ class MercatorSubResourcesSchema(colander.MappingSchema):
     experience = Reference(reftype=ExperienceReference)
 
 
-mercator_sub_resources_meta = sheet_metadata_defaults._replace(
+mercator_sub_resources_meta = sheet_meta._replace(
     isheet=IMercatorSubResources,
     schema_class=MercatorSubResourcesSchema)
 
@@ -263,7 +263,7 @@ class OrganizationInfoSchema(colander.MappingSchema):
                                        msg='Required iff status != other')
 
 
-organizationinfo_meta = sheet_metadata_defaults._replace(
+organizationinfo_meta = sheet_meta._replace(
     isheet=IOrganizationInfo, schema_class=OrganizationInfoSchema)
 
 
@@ -301,7 +301,7 @@ class IntroductionSchema(colander.MappingSchema):
     picture = Reference(reftype=IntroImageReference)
 
 
-introduction_meta = sheet_metadata_defaults._replace(
+introduction_meta = sheet_meta._replace(
     isheet=IIntroduction, schema_class=IntroductionSchema)
 
 
@@ -312,7 +312,7 @@ class DescriptionSchema(colander.MappingSchema):
     description = Text(validator=colander.Length(min=1, max=1000))
 
 
-description_meta = sheet_metadata_defaults._replace(
+description_meta = sheet_meta._replace(
     isheet=IDescription, schema_class=DescriptionSchema)
 
 
@@ -328,23 +328,23 @@ class LocationSchema(colander.MappingSchema):
     location_is_linked_to_ruhr = Boolean()
 
 
-location_meta = sheet_metadata_defaults._replace(isheet=ILocation,
-                                                 schema_class=LocationSchema)
+location_meta = sheet_meta._replace(isheet=ILocation,
+                                    schema_class=LocationSchema)
 
 
 class StorySchema(colander.MappingSchema):
     story = Text(validator=colander.Length(min=1, max=800))
 
 
-story_meta = sheet_metadata_defaults._replace(isheet=IStory,
-                                              schema_class=StorySchema)
+story_meta = sheet_meta._replace(isheet=IStory,
+                                 schema_class=StorySchema)
 
 
 class OutcomeSchema(colander.MappingSchema):
     outcome = Text(validator=colander.Length(min=1, max=800))
 
 
-outcome_meta = sheet_metadata_defaults._replace(
+outcome_meta = sheet_meta._replace(
     isheet=IOutcome, schema_class=OutcomeSchema)
 
 
@@ -352,7 +352,7 @@ class StepsSchema(colander.MappingSchema):
     steps = Text(validator=colander.Length(min=1, max=800))
 
 
-steps_meta = sheet_metadata_defaults._replace(
+steps_meta = sheet_meta._replace(
     isheet=ISteps, schema_class=StepsSchema)
 
 
@@ -360,7 +360,7 @@ class ValueSchema(colander.MappingSchema):
     value = Text(validator=colander.Length(min=1, max=800))
 
 
-values_meta = sheet_metadata_defaults._replace(
+values_meta = sheet_meta._replace(
     isheet=IValue, schema_class=ValueSchema)
 
 
@@ -368,7 +368,7 @@ class PartnersSchema(colander.MappingSchema):
     partners = Text(validator=colander.Length(min=1, max=800))
 
 
-partners_meta = sheet_metadata_defaults._replace(
+partners_meta = sheet_meta._replace(
     isheet=IPartners, schema_class=PartnersSchema)
 
 
@@ -384,8 +384,8 @@ class FinanceSchema(colander.MappingSchema):
     granted = Boolean()
 
 
-finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
-                                                schema_class=FinanceSchema)
+finance_meta = sheet_meta._replace(isheet=IFinance,
+                                   schema_class=FinanceSchema)
 
 
 class ExperienceSchema(colander.MappingSchema):
@@ -395,7 +395,7 @@ class ExperienceSchema(colander.MappingSchema):
     experience = Text()
 
 
-experience_meta = sheet_metadata_defaults._replace(
+experience_meta = sheet_meta._replace(
     isheet=IExperience,
     schema_class=ExperienceSchema)
 
@@ -411,7 +411,7 @@ class HeardFromSchema(colander.MappingSchema):
     heard_elsewhere = Text()
 
 
-heardfrom_meta = sheet_metadata_defaults._replace(
+heardfrom_meta = sheet_meta._replace(
     isheet=IHeardFrom,
     schema_class=HeardFromSchema,
     permission_view='view_sensitive',

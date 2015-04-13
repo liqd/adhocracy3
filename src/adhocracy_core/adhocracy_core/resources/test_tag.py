@@ -4,10 +4,10 @@ from pytest import mark
 
 
 def test_tag_meta():
-    from .tag import tag_metadata
+    from .tag import tag_meta
     from .tag import ITag
     import adhocracy_core.sheets
-    meta = tag_metadata
+    meta = tag_meta
     assert meta.iresource is ITag
     assert meta.basic_sheets==[adhocracy_core.sheets.name.IName,
                                adhocracy_core.sheets.metadata.IMetadata,

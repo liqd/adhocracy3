@@ -14,22 +14,22 @@ class TestValidateLinearHistoryNoMerge:
     def node(self):
         return testing.DummyResource()
 
-    def _call_fut(self, node, value):
+    def call_fut(self, node, value):
         from .versions import validate_linear_history_no_merge
         return validate_linear_history_no_merge(node, value)
 
     def test_value_length_lt_1(self, node):
         with raises(colander.Invalid) as err:
-            self._call_fut(node, [])
+            self.call_fut(node, [])
         assert err.value.msg.startswith('No merge allowed')
 
     def test_value_length_gt_1(self, node, last_version):
         with raises(colander.Invalid) as err:
-            self._call_fut(node, [last_version, last_version])
+            self.call_fut(node, [last_version, last_version])
         assert err.value.msg.startswith('No merge allowed')
 
     def test_value_length_eq_1(self, node, last_version):
-        assert self._call_fut(node, [last_version]) is None
+        assert self.call_fut(node, [last_version]) is None
 
 
 class TestValidateLinearHistoryNoFork:
@@ -72,21 +72,21 @@ class TestValidateLinearHistoryNoFork:
         register_sheet(tag, mock_sheet, registry_with_content)
         return mock_sheet
 
-    def _call_fut(self, node, value):
+    def call_fut(self, node, value):
         from .versions import validate_linear_history_no_fork
         return validate_linear_history_no_fork(node, value)
 
     def test_value_last_version_is_last_version(
             self, node, last_version, mock_tag_sheet):
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        assert self._call_fut(node, [last_version]) is None
+        assert self.call_fut(node, [last_version]) is None
 
     def test_value_last_versions_is_not_last_version(
             self, node, last_version, mock_tag_sheet):
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         other_version = object()
         with raises(colander.Invalid) as err:
-            self._call_fut(node, [other_version])
+            self.call_fut(node, [other_version])
         assert err.value.msg == 'No fork allowed - valid follows resources '\
                                 'are: /last_version'
 
@@ -95,7 +95,7 @@ class TestValidateLinearHistoryNoFork:
         from adhocracy_core.utils import set_batchmode
         set_batchmode(request)
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
-        assert self._call_fut(node, [last_version]) is None
+        assert self.call_fut(node, [last_version]) is None
 
     def test_batchmode_value_last_versions_is_not_last_version(
             self, node, last_version, mock_tag_sheet, request):
@@ -104,7 +104,7 @@ class TestValidateLinearHistoryNoFork:
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         other_version = object()
         with raises(colander.Invalid):
-            self._call_fut(node, [other_version])
+            self.call_fut(node, [other_version])
 
     def test_batchmode_value_last_versions_is_not_last_version_but_last_new_version_exists(
             self, node, last_version, mock_tag_sheet, registry, changelog, request):
@@ -113,7 +113,7 @@ class TestValidateLinearHistoryNoFork:
         mock_tag_sheet.get.return_value = {'elements': [last_version]}
         other_version = object()
         registry.changelog['/'] = changelog['/']._replace(last_version=other_version)
-        self._call_fut(node, [other_version])
+        self.call_fut(node, [other_version])
 
 
 class TestVersionsSchema:
@@ -137,8 +137,8 @@ class TestVersionsSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.versions import versions_metadata
-        return versions_metadata
+        from adhocracy_core.sheets.versions import versions_meta
+        return versions_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.versions import IVersions
@@ -181,8 +181,8 @@ class TestVersionableSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.versions import versionable_metadata
-        return versionable_metadata
+        from adhocracy_core.sheets.versions import versionable_meta
+        return versionable_meta
 
     @fixture
     def context(self, context, mock_graph):
