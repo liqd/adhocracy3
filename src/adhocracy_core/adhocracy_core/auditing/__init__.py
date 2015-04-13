@@ -14,7 +14,7 @@ from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import VisibilityChange
-from adhocracy_core.interfaces import AuditActionName
+from adhocracy_core.interfaces import AuditlogAction
 from adhocracy_core.interfaces import AuditlogEntry
 
 logger = getLogger(__name__)
@@ -26,7 +26,7 @@ class AuditLog(OOBTree):
 
     This is a dictionary (:class:`collections.abc.Mapping`) with key
     :class:`datetime.datetime` and value
-    :class:`adhocracy_core.interfaces.AuditEntry`.
+    :class:`adhocracy_core.interfaces.AuditlogEntry`.
 
     The methods `items`, `keys`, and `values` have the additional kwargs
     `max_key` and `min_key` to allow range queries::
@@ -39,7 +39,7 @@ class AuditLog(OOBTree):
     """
 
     def add(self,
-            name: AuditActionName,
+            name: AuditlogAction,
             resource_path: str,
             user_name: str,
             user_path: str) -> None:
@@ -70,7 +70,7 @@ def set_auditlog(context: IResource) -> None:
 
 
 def log_auditevent(context: IResource,
-                   name: AuditActionName,
+                   name: AuditlogAction,
                    user_name: str,
                    user_path: str) -> None:
     """Add an auditlog entry for `context` to the audit database.
@@ -128,14 +128,14 @@ def _log_change(context: IResource,
 
 def _get_entry_name(change) -> str:
     if change.created:
-        return AuditActionName.created
+        return AuditlogAction.created
     elif change.modified:
-        return AuditActionName.modified
+        return AuditlogAction.modified
     elif change.visibility == VisibilityChange.invisible:
-        return AuditActionName.invisible
+        return AuditlogAction.invisible
     elif change.visibility == VisibilityChange.concealed:
-        return AuditActionName.concealed
+        return AuditlogAction.concealed
     elif change.visibility == VisibilityChange.revealed:
-        return AuditActionName.revealed
+        return AuditlogAction.revealed
     else:
         raise ValueError('Invalid change state', change)

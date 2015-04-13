@@ -296,7 +296,7 @@ class TestGetAuditActionName:
         return _get_entry_name(change)
 
     def test_get_entry_name_created(self):
-        from . import AuditActionName
+        from . import AuditlogAction
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=True,
@@ -306,10 +306,10 @@ class TestGetAuditActionName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.visible)
-        assert _get_entry_name(change) is AuditActionName.created
+        assert _get_entry_name(change) is AuditlogAction.created
 
     def test_get_entry_name_modified(self):
-        from . import AuditActionName
+        from . import AuditlogAction
         from . import _get_entry_name
         change = ChangelogMetadata(modified=True,
                                    created=False,
@@ -319,10 +319,10 @@ class TestGetAuditActionName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.visible)
-        assert _get_entry_name(change) is AuditActionName.modified
+        assert _get_entry_name(change) is AuditlogAction.modified
 
     def test_get_entry_name_invisible(self):
-        from . import AuditActionName
+        from . import AuditlogAction
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=False,
@@ -332,10 +332,10 @@ class TestGetAuditActionName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.invisible)
-        assert _get_entry_name(change) is AuditActionName.invisible
+        assert _get_entry_name(change) is AuditlogAction.invisible
 
     def test_get_entry_name_concealed(self):
-        from . import AuditActionName
+        from . import AuditlogAction
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=False,
@@ -345,10 +345,10 @@ class TestGetAuditActionName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.concealed)
-        assert _get_entry_name(change) is AuditActionName.concealed
+        assert _get_entry_name(change) is AuditlogAction.concealed
 
     def test_get_entry_name_revealed(self):
-        from . import AuditActionName
+        from . import AuditlogAction
         from . import _get_entry_name
         change = ChangelogMetadata(modified=False,
                                    created=False,
@@ -358,7 +358,7 @@ class TestGetAuditActionName:
                                    changed_descendants=False,
                                    changed_backrefs=False,
                                    visibility=VisibilityChange.revealed)
-        assert _get_entry_name(change) is AuditActionName.revealed
+        assert _get_entry_name(change) is AuditlogAction.revealed
 
     def test_get_entry_name_visible(self):
         from . import _get_entry_name
