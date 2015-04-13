@@ -71,17 +71,17 @@ def set_auditlog(context: IResource) -> None:
 
 def log_auditevent(context: IResource,
                    name: AuditActionName,
-                   resource_path: str,
                    user_name: str,
                    user_path: str) -> None:
-    """Add an auditlog entry to the audit database.
+    """Add an auditlog entry for `context` to the audit database.
 
     The audit database is created if missing. If the `zodbconn.uri.audit`
     value is not specified in the config, auditing does not happen.
     """
     auditlog = get_auditlog(context)
+    path = resource_path(context)
     if auditlog is not None:
-        auditlog.add(name, resource_path, user_name, user_path)
+        auditlog.add(name, path, user_name, user_path)
 
 
 def audit_resources_changes_callback(request: Request,
@@ -119,7 +119,6 @@ def _log_change(context: IResource,
        change.visibility is not VisibilityChange.visible:
         log_auditevent(context,
                        _get_entry_name(change),
-                       resource_path=resource_path(change.resource),
                        user_name=user_name,
                        user_path=user_path)
         transaction.commit()

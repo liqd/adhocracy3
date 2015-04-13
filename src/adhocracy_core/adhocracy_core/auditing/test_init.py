@@ -267,21 +267,21 @@ class TestAddAuditEvent:
         monkeypatch.setattr(auditing, 'get_auditlog', mock)
         return mock
 
-    def call_fut(self, context, name, resource_path, user_name, user_path):
+    def call_fut(self, context, name, user_name, user_path):
         from . import log_auditevent
         return log_auditevent(context,
-                              name, resource_path, user_name, user_path)
+                              name, user_name, user_path)
 
     def test_ignore_if_no_auditlog(self, context, mock_get_auditlog,
                                    mock_auditlog):
         mock_get_auditlog.return_value = None
-        self.call_fut(context, 'created', '/resource1', 'user1', '/user1')
+        self.call_fut(context, 'created', 'user1', '/user1')
         assert mock_auditlog.add.called is False
 
     def test_add_if_auditlog(self, context, mock_auditlog,
                              mock_get_auditlog):
         mock_get_auditlog.return_value = mock_auditlog
-        self.call_fut(context, 'created', '/resource1', 'user1', '/user1')
+        self.call_fut(context, 'created', 'user1', '/user1')
         assert mock_auditlog.add.called_with('/',
                                              'created',
                                              '/resource1',
