@@ -150,15 +150,13 @@ export var mapInput = (
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
 
-            scope.$watch((<any>map), function(){
-                $timeout(() => {
-                    map.invalidateSize();
-                    map.fitBounds(scope.polygon.getBounds());
-                    leaflet.Util.setOptions(map, {
-                        minZoom: map.getZoom()
-                    });
-                }, 350);
-            });
+            $timeout(() => {
+                map.invalidateSize();
+                map.fitBounds(scope.polygon.getBounds());
+                leaflet.Util.setOptions(map, {
+                    minZoom: map.getZoom()
+                });
+            }, 350);
         }
     };
 };
