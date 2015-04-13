@@ -438,6 +438,7 @@ mercator_proposal_meta = item_meta._replace(
     ],
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
+    permission_add='add_mercator_proposal'
 )
 
 
