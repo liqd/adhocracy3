@@ -114,11 +114,13 @@ def _log_change(context: IResource,
                 user_name: str,
                 user_path: str,
                 change: ChangelogMetadata) -> None:
-    if change.created or change.modified or \
-       change.visibility is not None and \
-       change.visibility is not VisibilityChange.visible:
+    data_changed = change.created or change.modified
+    visibility_changed = change.visibility in [VisibilityChange.concealed,
+                                               VisibilityChange.revealed]
+    if data_changed or visibility_changed:
+        action_name = _get_entry_name(change),
         log_auditevent(context,
-                       _get_entry_name(change),
+                       action_name,
                        user_name=user_name,
                        user_path=user_path)
         transaction.commit()
