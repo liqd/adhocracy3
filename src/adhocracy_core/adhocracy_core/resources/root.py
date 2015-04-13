@@ -32,7 +32,6 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:annotator', 'view'),
             (Allow, 'role:annotator', 'add_resource'),  # post request default,
                                                         # create resource def.
-            (Allow, 'role:annotator', 'add_mercator_proposal'),
             (Allow, 'role:annotator', 'create_sheet'),  # create sheet default
             (Allow, 'role:annotator', 'add_asset'),
             (Allow, 'role:annotator', 'add_comment'),
@@ -40,7 +39,6 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             # Contributor role
             (Allow, 'role:contributor', 'view'),
             (Allow, 'role:contributor', 'add_resource'),
-            (Allow, 'role:contributor', 'add_mercator_proposal'),
             (Allow, 'role:contributor', 'create_sheet'),
             (Allow, 'role:contributor', 'add_proposal'),
             (Allow, 'role:contributor', 'add_section'),
@@ -57,7 +55,6 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:creator', 'edit_metadata'),
             (Allow, 'role:creator', 'view_userextended'),
             (Allow, 'role:creator', 'edit_userextended'),
-            (Allow, 'role:creator', 'add_mercator_proposal'),
             (Allow, 'role:creator', 'add_mercator_proposal_version'),
             # Manager role
             (Allow, 'role:manager', 'view'),
