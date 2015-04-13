@@ -3,4 +3,12 @@
     .input-error {
         display: block;
     }
+
+    .map-wrapper {
+        margin-bottom: 10px / $font-size-normal * 1em;
+    }
+}
+
+.is-selected {
+    background-color: $color-text-highlight-normal;
 }

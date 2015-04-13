@@ -6,9 +6,9 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.itemversion import itemversion_metadata
-from adhocracy_core.resources.item import item_metadata
-from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.resources.itemversion import itemversion_meta
+from adhocracy_core.resources.item import item_meta
+from adhocracy_core.resources.service import service_meta
 
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.rate
@@ -19,7 +19,7 @@ class ICommentVersion(IItemVersion):
     """A comment in a discussion."""
 
 
-commentversion_meta = itemversion_metadata._replace(
+commentversion_meta = itemversion_meta._replace(
     content_name='CommentVersion',
     iresource=ICommentVersion,
     extended_sheets=[adhocracy_core.sheets.comment.IComment,
@@ -34,7 +34,7 @@ class IComment(IItem):
     """Comment versions pool."""
 
 
-comment_meta = item_metadata._replace(
+comment_meta = item_meta._replace(
     content_name='Comment',
     iresource=IComment,
     element_types=[ICommentVersion,
@@ -51,7 +51,7 @@ class ICommentsService(IServicePool):
     """The 'comments' ServicePool."""
 
 
-comments_meta = service_metadata._replace(
+comments_meta = service_meta._replace(
     iresource=ICommentsService,
     content_name='comments',
     element_types=[IComment],

@@ -7,6 +7,7 @@ from pytest import raises
 
 from adhocracy_core.resources.pool import IBasicPool
 
+import itertools
 
 @fixture
 def integration(config):
@@ -26,23 +27,23 @@ class TestPoolSchema:
     def request(self, cornice_request):
         return cornice_request
 
-    def _make_one(self):
+    def make_one(self):
         from .pool import PoolSchema
         return PoolSchema()
 
     def test_serialize_empty(self):
-        inst = self._make_one()
+        inst = self.make_one()
         assert inst.serialize() == {'elements': []}
 
     def test_serialize_empty_with_count_request_param(self, request):
         request.validated['count'] = True
-        inst = self._make_one().bind(request=request)
+        inst = self.make_one().bind(request=request)
         assert inst.serialize() == {'elements': [],
                                     'count': '0'}
 
     def test_serialize_empty_with_aggregateby_request_param(self, request):
         request.validated['aggregateby'] = 'index1'
-        inst = self._make_one().bind(request=request)
+        inst = self.make_one().bind(request=request)
         assert inst.serialize() == {'elements': [],
                                     'aggregateby': {}}
 
@@ -56,8 +57,8 @@ class TestFilteringPoolSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.pool import pool_metadata
-        return pool_metadata
+        from adhocracy_core.sheets.pool import pool_meta
+        return pool_meta
 
     @fixture
     def inst(self, meta, context):
@@ -68,9 +69,20 @@ class TestFilteringPoolSheet:
                                                                     1, {})
         return inst
 
+    @fixture
+    def biginst(self, meta, context):
+        from adhocracy_core.sheets.pool import FilterElementsResult
+        inst = meta.sheet_class(meta, context)
+        inst._filter_elements = Mock(spec=inst._filter_elements)
+        elements = ['Dummy{}'.format(i) for i in range(97)]
+        inst._filter_elements.return_value \
+            = FilterElementsResult(elements, len(elements), {})
+        return inst
+
+
     def test_create(self, context):
-        from adhocracy_core.sheets.pool import pool_metadata
-        inst = pool_metadata.sheet_class(pool_metadata, context)
+        from adhocracy_core.sheets.pool import pool_meta
+        inst = pool_meta.sheet_class(pool_meta, context)
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_core.sheets.pool import IPool
         from adhocracy_core.sheets.pool import PoolSchema
@@ -134,6 +146,25 @@ class TestFilteringPoolSheet:
                 'aggregate_filter': '',
                 }
         assert appstruct == {'elements': ['Dummy']}
+
+    def test_get_reference_appstruct_with_limit(self, biginst):
+        from adhocracy_core.interfaces import ISheet
+        limit = 100
+        appstruct = biginst._get_reference_appstruct({'limit': limit})
+        assert biginst._filter_elements.call_args[1] == \
+            {'depth': 1,
+             'ifaces': [ISheet],  # default target isheet
+             'arbitrary_filters': {},
+             'resolve_resources': True,
+             'references': {},
+             'sort_filter': '',
+             'reverse': False,
+             'limit': limit,
+             'offset': 0,
+             'aggregate_filter': '',
+             }
+        assert appstruct == {'elements':
+                             biginst._filter_elements.return_value.elements}
 
     def test_get_reference_appstruct_with_elements_omit(self, inst):
         appstruct = inst._get_reference_appstruct({'elements': 'omit'})
@@ -428,6 +459,67 @@ class TestIntegrationPoolSheet:
         poolsheet = get_sheet(item, IPool)
         with raises(AssertionError):
             poolsheet._filter_elements(sort_filter='path').elements
+
+    def test_filter_elements_with_limit(self, registry, pool_graph_catalog):
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        parentitem = self._make_resource(registry, parent=pool_graph_catalog,
+                                         name='parentitem')
+        items = [self._make_resource(registry,
+                                     parent=parentitem,
+                                     name='item{}'.format(i))
+                 for i in range(97)]
+        poolsheet = get_sheet(parentitem, IPool)
+        limit = 17
+        result = poolsheet._filter_elements(limit=limit).elements
+        assert [x.__name__ for x in result] == \
+            [item.__name__ for item in items][:limit]
+
+    def test_filter_elements_with_limit_and_offset(self,
+                                                   registry,
+                                                   pool_graph_catalog):
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        parentitem = self._make_resource(registry, parent=pool_graph_catalog,
+                                         name='parentitem')
+        nb_items = 23
+        items = [self._make_resource(registry,
+                                     parent=parentitem,
+                                     name='item{}'.format(i))
+                 for i in range(nb_items)]
+        poolsheet = get_sheet(parentitem, IPool)
+
+        def assert_properties(offset, limit):
+            result = poolsheet._filter_elements(limit=limit,
+                                                offset=offset).elements
+            assert [x.__name__ for x in result] == \
+                [item.__name__ for item in items][offset:offset+limit]
+
+        assert_properties(17, 3)
+
+        for (offset, limit) in itertools.product(range(nb_items),
+                                                 range(nb_items)):
+            assert_properties(offset, limit)
+
+    def test_filter_elements_with_limit_and_offset_notenough_elements(
+            self,
+            registry,
+            pool_graph_catalog):
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        parentitem = self._make_resource(registry, parent=pool_graph_catalog,
+                                         name='parentitem')
+        items = [self._make_resource(registry,
+                                     parent=parentitem,
+                                     name='item{}'.format(i))
+                 for i in range(97)]
+        poolsheet = get_sheet(parentitem, IPool)
+        limit = 20
+        offset = 90
+        result = poolsheet._filter_elements(limit=limit,
+                                            offset=offset).elements
+        assert [x.__name__ for x in result] == \
+            [item.__name__ for item in items][offset:offset+limit]
 
 
 @mark.usefixtures('integration')

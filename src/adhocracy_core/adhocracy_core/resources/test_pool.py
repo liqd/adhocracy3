@@ -4,11 +4,11 @@ from pytest import fixture
 
 
 def test_pool_meta():
-    from .pool import pool_metadata
+    from .pool import pool_meta
     from .pool import IPool
     from .pool import Pool
     import adhocracy_core.sheets
-    meta = pool_metadata
+    meta = pool_meta
     assert meta.iresource is IPool
     assert meta.content_class is Pool
     assert meta.is_implicit_addable is False
@@ -22,9 +22,9 @@ def test_pool_meta():
 
 
 def test_poolbasic_meta():
-    from .pool import basicpool_metadata
+    from .pool import basicpool_meta
     from .pool import IBasicPool
-    meta = basicpool_metadata
+    meta = basicpool_meta
     assert meta.iresource is IBasicPool
     assert meta.is_implicit_addable
 

@@ -3,6 +3,13 @@ from pytest import fixture
 from pyramid import testing
 
 
+def test_changelog_create():
+    from . import Changelog
+    from . import changelog_meta
+    inst = Changelog()
+    assert inst['/path/'] == changelog_meta
+
+
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')
@@ -16,8 +23,9 @@ def request_(registry):
 
 
 @mark.usefixtures('integration')
-def test_add_changelog(registry):
-    assert hasattr(registry, 'changelog')
+def test_includeme_add_changelog(registry):
+    from . import Changelog
+    assert isinstance(registry.changelog, Changelog)
 
 
 @mark.usefixtures('integration')

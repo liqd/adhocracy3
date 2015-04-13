@@ -4,9 +4,9 @@ from pytest import mark
 
 
 def test_simple_meta():
-    from .simple import simple_metadata
+    from .simple import simple_meta
     from .simple import ISimple
-    meta = simple_metadata
+    meta = simple_meta
     assert meta.iresource is ISimple
     assert meta.permission_add == 'add_simple'
 

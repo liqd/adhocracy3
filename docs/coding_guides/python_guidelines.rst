@@ -4,12 +4,12 @@ Python Guidelines
 Testing
 -------
 
-* 100% test coverage (must)
-* Test driven development with acceptance/functional, integration and unit test (should)
-
-  * testing guideline: http://pyramid.readthedocs.org/en/latest/narr/testing.html
-  * unit test examples substanced code, http://www.diveintopython.net/unit_testing/
-  * testdriven concept: http://www.c2.com/cgi/wiki?TestDrivenDevelopment)
+* 100% unit test coverage (must)
+* Test driven development with functional, integration and unit test (should)
+  * test driven concept: http://en.wikipedia.org/wiki/Test-driven_development
+  * programming work flow: functional/integration test <-> unit tests <-> code
+  * use `pytest <http://pytest.org/>`_ fixtures, functional tests have the
+   `functional` marker, integration are using a fixture called `integration`.
 
 Imports
 -------

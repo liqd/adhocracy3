@@ -1,18 +1,16 @@
-<!-- FIXME: remove inline CSS -->
 <div class="map-wrapper">
-    <div data-ng-class="{'m-error': error}" style="padding: 5px; background-color: #FFCCFF;">
+    <div class="map-info" data-ng-class="{'ng-invalid': error}">
        {{ text | translate }}
     </div>
     <div class="map"></div>
-    <div data-ng-if="mapClicked" style="padding: 5px; background-color: #FFCCFF;">
+    <div data-ng-if="mapClicked" class="map-buttons">
         <a
             href=""
-            class="button form-footer-button"
-            data-ng-click="saveCoordinates();"
-            style="margin-right: 5px;" >{{ "TR__SAVE" | translate }}</a>
+            class="button map-button-save"
+            data-ng-click="saveCoordinates()">{{ "TR__SAVE_PIN" | translate }}</a>
         <a
             href=""
-            class="button form-footer-button"
-            data-ng-click="resetCoordinates()">{{ "TR__DELETE" | translate }}</a>
+            class="button map-button-cancel"
+            data-ng-click="resetCoordinates()">{{ "TR__CANCEL" | translate }}</a>
     </div>
 </div>

@@ -8,7 +8,7 @@ from adhocracy_core.interfaces import ISheet
 from substanced.interfaces import IUserLocator
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationStorageSheet
 from adhocracy_core.sheets import AttributeStorageSheet
 from adhocracy_core.schema import Email
@@ -58,7 +58,7 @@ class GroupSchema(colander.MappingSchema):
     roles = Roles()
 
 
-group_metadata = sheet_metadata_defaults._replace(
+group_meta = sheet_meta._replace(
     isheet=IGroup,
     schema_class=GroupSchema,
     sheet_class=AttributeStorageSheet,
@@ -125,7 +125,7 @@ class UserBasicSchema(colander.MappingSchema):
                       validator=deferred_validate_user_name)
 
 
-userbasic_metadata = sheet_metadata_defaults._replace(
+userbasic_meta = sheet_meta._replace(
     isheet=IUserBasic,
     schema_class=UserBasicSchema,
     sheet_class=AttributeStorageSheet,
@@ -147,7 +147,7 @@ class UserExtendedSchema(colander.MappingSchema):
     tzname = TimeZoneName()
 
 
-userextended_metadata = sheet_metadata_defaults._replace(
+userextended_meta = sheet_meta._replace(
     isheet=IUserExtended,
     schema_class=UserExtendedSchema,
     sheet_class=AttributeStorageSheet,
@@ -201,7 +201,7 @@ class PermissionsAttributeStorageSheet(AttributeStorageSheet):
             self.context.group_ids = group_ids
 
 
-permissions_metadata = sheet_metadata_defaults._replace(
+permissions_meta = sheet_meta._replace(
     isheet=IPermissions,
     schema_class=PermissionsSchema,
     permission_view='view_userextended',
@@ -264,7 +264,7 @@ class PasswordAuthenticationSheet(AnnotationStorageSheet):
         return self.context.pwd_manager.check(stored_password, password)
 
 
-password_metadata = sheet_metadata_defaults._replace(
+password_meta = sheet_meta._replace(
     isheet=IPasswordAuthentication,
     schema_class=PasswordAuthenticationSchema,
     sheet_class=PasswordAuthenticationSheet,
@@ -275,19 +275,10 @@ password_metadata = sheet_metadata_defaults._replace(
 )
 
 
-# def add_user_catalog(root):
-#     """Add the user catalog if it doesn't exist yet."""
-#     catalogs = root['catalogs']
-#     if 'usercatalog' not in catalogs:
-#        catalogs.add_catalog('usercatalog', update_indexes=True)
-
-
 def includeme(config):
     """Register sheets and activate catalog factory."""
-    add_sheet_to_registry(userbasic_metadata, config.registry)
-    add_sheet_to_registry(userextended_metadata, config.registry)
-    add_sheet_to_registry(password_metadata, config.registry)
-    add_sheet_to_registry(group_metadata, config.registry)
-    add_sheet_to_registry(permissions_metadata, config.registry)
-    # config.scan('.')
-    # config.add_evolution_step(add_user_catalog)
+    add_sheet_to_registry(userbasic_meta, config.registry)
+    add_sheet_to_registry(userextended_meta, config.registry)
+    add_sheet_to_registry(password_meta, config.registry)
+    add_sheet_to_registry(group_meta, config.registry)
+    add_sheet_to_registry(permissions_meta, config.registry)

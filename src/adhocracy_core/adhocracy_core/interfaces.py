@@ -1,7 +1,6 @@
 """Interfaces for plugable dependencies, basic metadata structures."""
 from collections import Iterable
 from collections import namedtuple
-from collections import OrderedDict
 from enum import Enum
 
 from pyramid.interfaces import ILocation
@@ -27,22 +26,20 @@ Dimensions = namedtuple('Dimensions', ['width', 'height'])
 """Dimensions of a two-dimensional object (e.g. image)."""
 
 
-SHEET_METADATA = {'isheet': None,
-                  'sheet_class': None,
-                  'schema_class': None,
-                  'permission_view': '',
-                  'permission_edit': '',
-                  'permission_create': '',
-                  'readable': True,
-                  'editable': True,
-                  'creatable': True,
-                  'create_mandatory': False,
-                  'mime_type_validator': None,
-                  'image_sizes': None,
-                  }
-
-
-class SheetMetadata(namedtuple('SheetMetadata', SHEET_METADATA.keys())):
+class SheetMetadata(namedtuple('SheetMetadata',
+                               ['isheet',
+                                'sheet_class',
+                                'schema_class',
+                                'permission_view' '',
+                                'permission_edit' '',
+                                'permission_create' '',
+                                'readable',
+                                'editable',
+                                'creatable',
+                                'create_mandatory',
+                                'mime_type_validator',
+                                'image_sizes',
+                                ])):
 
     """Metadata to register a sheet type to set/get resource data.
 
@@ -82,9 +79,6 @@ class SheetMetadata(namedtuple('SheetMetadata', SHEET_METADATA.keys())):
         optional dictionary from names to :class:`Dimensions`, e.g.
         ``{ 'thumbnail': Dimensions(width=100, height=50) }``
     """
-
-
-sheet_metadata = SheetMetadata(**SHEET_METADATA)
 
 
 class ISheetReferenceAutoUpdateMarker(ISheet):
@@ -152,26 +146,22 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         """
 
 
-RESOURCE_METADATA = OrderedDict({
-    'content_name': '',
-    'iresource': None,
-    'content_class': None,
-    'permission_add': '',
-    'permission_view': '',
-    'is_implicit_addable': False,
-    'basic_sheets': [],
-    'extended_sheets': [],
-    'after_creation': [],
-    'element_types': [],
-    'item_type': None,
-    'use_autonaming': False,
-    'autonaming_prefix': '',
-    'use_autonaming_random': False,
-})
-
-
 class ResourceMetadata(namedtuple('ResourceMetadata',
-                                  RESOURCE_METADATA.keys())):
+                                  ['content_name',
+                                   'iresource',
+                                   'content_class',
+                                   'permission_add',
+                                   'permission_view',
+                                   'is_implicit_addable',
+                                   'basic_sheets',
+                                   'extended_sheets',
+                                   'after_creation',
+                                   'use_autonaming',
+                                   'autonaming_prefix',
+                                   'use_autonaming_random',
+                                   'element_types',
+                                   'item_type',
+                                   ])):
 
     """Metadata to register Resource Types.
 
@@ -221,9 +211,6 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     item_type:
         Set addable content types, class heritage is honored
     """
-
-
-resource_metadata = ResourceMetadata(**RESOURCE_METADATA)
 
 
 class IResource(ILocation):

@@ -6,7 +6,7 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import NewVersionToOldVersion
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.pool import PoolSheet
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.utils import get_last_version
@@ -94,7 +94,7 @@ class VersionableSchema(colander.MappingSchema):
                                    reftype=VersionableFollowsReference)
 
 
-versionable_metadata = sheet_metadata_defaults._replace(
+versionable_meta = sheet_meta._replace(
     isheet=IVersionable,
     schema_class=VersionableSchema,
 )
@@ -109,7 +109,7 @@ class IForkableVersionable(IVersionable):
     """
 
 
-forkable_versionable_metadata = versionable_metadata._replace(
+forkable_versionable_meta = versionable_meta._replace(
     isheet=IForkableVersionable,
 )
 
@@ -139,7 +139,7 @@ class VersionsSchema(colander.MappingSchema):
         reftype=IVersionsElementsReference)
 
 
-versions_metadata = sheet_metadata_defaults._replace(
+versions_meta = sheet_meta._replace(
     isheet=IVersions,
     sheet_class=PoolSheet,
     schema_class=VersionsSchema,
@@ -150,6 +150,6 @@ versions_metadata = sheet_metadata_defaults._replace(
 
 def includeme(config):
     """Register sheets."""
-    add_sheet_to_registry(versionable_metadata, config.registry)
-    add_sheet_to_registry(forkable_versionable_metadata, config.registry)
-    add_sheet_to_registry(versions_metadata, config.registry)
+    add_sheet_to_registry(versionable_meta, config.registry)
+    add_sheet_to_registry(forkable_versionable_meta, config.registry)
+    add_sheet_to_registry(versions_meta, config.registry)
