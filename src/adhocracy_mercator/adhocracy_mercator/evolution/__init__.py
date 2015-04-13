@@ -51,9 +51,10 @@ def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
 
     registry = get_current_registry()
     acl = get_acl(root)
-    acl.extend([(Deny, 'role:contributor', 'add_proposal'),
-                (Deny, 'role:creator', 'add_mercator_proposal_version')])
-    set_acl(root, acl, registry=registry)
+    deny_acl = [(Deny, 'role:contributor', 'add_proposal'),
+                (Deny, 'role:creator', 'add_mercator_proposal_version')]
+    updated_acl = deny_acl + acl
+    set_acl(root, updated_acl, registry=registry)
     # TODO substanced bug, _p_changed is not set
     root._p_changed = True
 
