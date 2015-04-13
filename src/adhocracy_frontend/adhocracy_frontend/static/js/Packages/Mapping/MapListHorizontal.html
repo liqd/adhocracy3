@@ -1,0 +1,21 @@
+<div>
+    <div class="map"></div>
+    <div>
+        <div style="float: left; margin-top: 50px;">
+            <a href="" data-ng-click="getPreviousItem(selectedItem);">back</a>
+        </div>
+         <div style="float: right; margin-top: 50px;">
+            <a href="" data-ng-click="getNextItem(selectedItem);">next</a>
+        </div>
+        <div style="overflow: hidden; white-space: nowrap;" class="scroll-container">
+            <ol>
+                <li style =" width: 100%; display: inline-block;"
+                    ng-repeat ="(key, item) in items"
+                    class="listing-element item{{key}}">
+                    <h3>{{item.value.title}}</h3>
+                    <p>{{item.value.detail}}</p>
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>

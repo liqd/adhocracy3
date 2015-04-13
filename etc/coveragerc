@@ -1,6 +1,8 @@
 [run]
 branch = True
 omit =
+    # bcc code
+    src/adhocracy_core/adhocracy_core/resources/resource.py
     *export*.py
     *version.py
     *test*py
@@ -8,17 +10,15 @@ omit =
     # indirectly tested via websocket fixture:
     src/adhocracy_core/adhocracy_core/websockets/start_ws_server.py
     # no unit test coverage
-    src/adhocracy_core/adhocracy_core/__init__.py
     src/adhocracy/adhocracy/scaffolds/__init__
-    src/adhocracy_sample/adhocracy_sample/__init__.py
-    src/adhocracy_core/setup.py
-    src/adhocracy_mercator/setup.py
-    src/adhocracy_sample/setup.py
-    src/adhocracy_mercator/adhocracy_mercator/__init__.py
+    src/adhocracy_*/adhocracy_*/__init__.py
+    src/adhocracy_*/setup.py
 source =
     src/adhocracy_core
     src/adhocracy_mercator
     src/adhocracy_sample
+    src/adhocracy_meinberlin
+    src/adhocracy_frontend
 
 [report]
 # Regexes for lines to exclude from consideration

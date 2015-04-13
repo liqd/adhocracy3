@@ -41,9 +41,6 @@ def config_view(request):
     config['site_name'] = settings.get('adhocracy.frontend.site_name',
                                        'Adhocracy')
     config['debug'] = asbool(settings.get('adhocracy.frontend.debug', 'false'))
-
-    config['cachebust'] = asbool(settings.get('cachebust.enabled', 'false'))
-    config['cachebust_suffix'] = cachebust_query_params(request)
     config['terms_url'] = settings.get('adhocracy.frontend.terms_url')
     config['piwik_enabled'] = asbool(settings.get(
         'adhocracy.frontend.piwik_enabled', 'false'))
@@ -53,14 +50,22 @@ def config_view(request):
         'adhocracy.frontend.piwik_use_cookies', 'false'))
     config['piwik_track_user_id'] = asbool(settings.get(
         'adhocracy.frontend.piwik_track_user_id', 'false'))
+    use_cachbust = asbool(settings.get('cachebust.enabled', 'false'))
+    if not use_cachbust:  # ease testing
+        return config
+    config['cachebust'] = use_cachbust
+    config['cachebust_suffix'] = cachebust_query_params(request)
     return config
 
 
-def cachebust_query_params(request):
+def cachebust_query_params(request) -> dict:
     """Return cachebust query params.
 
     Due to simplicity, we currently use the same query parameter for all
     static resources. If we use individual checksums, this will go away.
+
+    :raises FileNotFoundError: if asset 'build/stylesheets/a3.css' is not
+    available.
     """
     url = request.cachebusted_url('adhocracy_frontend:build/'
                                   'stylesheets/a3.css')
@@ -87,6 +92,8 @@ def require_config_view(request):
 
 def root_view(request):
     """Return the embeddee HTML."""
+    if not hasattr(request, 'cachebusted_url'):  # ease testing
+        return Response()
     debug = config_view(request)['debug']
     css_path = 'stylesheets/a3.css' if debug else 'stylesheets/min/a3.css'
     query_params = cachebust_query_params(request)
@@ -130,7 +137,9 @@ def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config.include('pyramid_cachebust')
     config.include('pyramid_mako')
-    if config.get_settings()['cachebust.enabled'] == 'true':
+    settings = config.registry.settings
+    cachebust_enabled = asbool(settings.get('cachebust.enabled', 'false'))
+    if cachebust_enabled:
         cache_max_age = 30 * 24 * 60 * 60  # 30 days
     else:
         cache_max_age = 0

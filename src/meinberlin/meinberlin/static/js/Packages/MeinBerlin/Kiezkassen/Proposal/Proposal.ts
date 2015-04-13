@@ -25,6 +25,7 @@ export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
+    toggleMap() : void;
     data : {
         title : string;
         budget : number;
@@ -149,6 +150,9 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         },
         link: (scope : IScope) => {
             bindPath(adhHttp)(scope);
+            scope.toggleMap = () => {
+                angular.element( document.querySelector( '#map' )).toggleClass("is-open");
+            };
         }
     };
 };

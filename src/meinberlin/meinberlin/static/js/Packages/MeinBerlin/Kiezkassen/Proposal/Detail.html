@@ -1,24 +1,53 @@
 <article class="mein-berlin-kiezkassen-proposal-detail">
-    <header>
-        <h1>{{ data.title }}</h1>
-        <adh-rate data-refers-to="{{path}}"></adh-rate>
+    <header class="mein-berlin-kiezkassen-proposal-detail-header">
+        <h1 class="mein-berlin-kiezkassen-proposal-detail-header-title">{{ data.title }}</h1>
+        <ul class="mein-berlin-kiezkassen-proposal-detail-meta">
+            <li class="mein-berlin-kiezkassen-proposal-detail-meta-item">
+                <p class="mein-berlin-kiezkassen-proposal-detail-meta-item-text">
+                    {{ "TR__BY" | translate }}
+                    <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta><br/>
+                    {{ "TR__ON" | translate }}
+                    <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+                </p>
+            </li>
+            <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-budget">
+                <i class="mein-berlin-kiezkassen-proposal-detail-meta-item-icon icon-budget"></i>
+                <p class="mein-berlin-kiezkassen-proposal-detail-meta-item-text">
+                    {{ "TR__BUDGET" | translate }}:<br/>
+                    {{data.budget}} &euro;
+                </p>
+            </li>
+            <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-participation">
+                <adh-rate data-refers-to="{{path}}"></adh-rate>
+            </li>
+        </ul>
     </header>
 
-    <div>
-        <p>{{data.detail}}</p>
-        <div>
-            {{ "TR__BY" | translate }}
-            <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
-            <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
-        </div>
-    </div>
-
-    <footer>
-        <!-- FIXME: Show map -->
-        <a href=""><i class="icon-pin"></i> {{data.locationText}}</a>
-        <a href="{{ path | adhResourceUrl:'comments' }}">
-            <i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
+    <section class="mein-berlin-kiezkassen-proposal-detail-body">
+        <a href="{{ path | adhResourceUrl:'comments' }}" class="disguised-link mein-berlin-kiezkassen-proposal-detail-body-comments">
+            <i class="icon-speechbubble-unfilled"></i> {{ data.commentCount }}
         </a>
-        <adh-rate data-refers-to="{{path}}"></adh-rate>
-    </footer>
+        <p>{{data.detail}}</p>
+
+        <footer class="mein-berlin-kiezkassen-proposal-detail-body-footer">
+            <ul class="mein-berlin-kiezkassen-proposal-detail-meta">
+                <li class="mein-berlin-kiezkassen-proposal-detail-meta-item">
+                    <a href="" ng-click="toggleMap()" class="disguised-link"><i class="icon-pin-detail"></i> {{data.locationText}}</a>
+                </li>
+                <li class="mein-berlin-kiezkassen-proposal-detail-meta-item">
+                    <a href="{{ path | adhResourceUrl:'comments' }}" class="disguised-link">
+                        <i class="icon-speechbubble-unfilled"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
+                    </a>
+                </li>
+                <li class="mein-berlin-kiezkassen-proposal-detail-meta-item">
+                    <adh-rate data-refers-to="{{path}}"></adh-rate>
+                </li>
+            </ul>
+        </footer>
+    </section>
+
+    <section class="mein-berlin-kiezkassen-proposal-detail-map" id="map">
+        <!-- FIXME: Map please ! -->
+        MAP HERE ?
+    </section>
 </article>

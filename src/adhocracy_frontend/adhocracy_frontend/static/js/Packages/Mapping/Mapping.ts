@@ -190,6 +190,7 @@ export interface IItem<T> {
     value : T;
     marker : L.Marker;
     hide : boolean;
+    index : number;
 };
 
 export interface IMapListScope<T> extends angular.IScope {
@@ -200,6 +201,8 @@ export interface IMapListScope<T> extends angular.IScope {
     itemValues : T[];
     selectedItem : IItem<T>;
     toggleItem(item : IItem<T>) : void;
+    getPreviousItem(item : IItem<T>) : void;
+    getNextItem(item : IItem<T>) : void;
 }
 
 export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
@@ -211,13 +214,26 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             itemValues: "=items"
         },
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapList.html",
-        link: (scope : IMapListScope<any>, element) => {
+
+        templateUrl: (element, attrs) => {
+            if ( attrs.orientation === "vertical") {
+                return adhConfig.pkg_path + pkgLocation + "/MapList.html";
+            } else {
+                return adhConfig.pkg_path + pkgLocation + "/MapListHorizontal.html";
+            }
+        },
+
+        link: (scope : IMapListScope<any>, element, attrs) => {
 
             var scrollContainer = angular.element(".scroll-container");
             var scrollToItem = (key) : void => {
                 var element = angular.element(".item" + key);
-                (<any>scrollContainer).scrollToElement(element, 10, 300);
+                if (attrs.orientation === "vertical") {
+                    (<any>scrollContainer).scrollToElement(element, 10, 300);
+                } else {
+                    var left = element.width() * key;
+                    (<any>scrollContainer).scrollTo(left, 0, 800);
+                }
             };
 
             var mapElement = element.find(".map");
@@ -241,17 +257,21 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                 var item = {
                     value: value,
                     marker: L.marker(leaflet.latLng(value.lat, value.lng)),
-                    hide: false
+                    hide: false,
+                    index: key
                 };
                 item.marker.addTo(map);
                 item.marker.on("click", (e) => {
                     $timeout(() => {
                         scope.toggleItem(item);
-                        scrollToItem(key);
+                        scrollToItem(item.index);
                     });
                 });
                 scope.items.push(item);
             });
+
+            scope.selectedItem = scope.items[0];
+            $((<any>scope.selectedItem.marker)._icon).addClass("is-selected");
 
             map.on("moveend", () => {
                 var bounds = map.getBounds();
@@ -273,10 +293,35 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                 scope.selectedItem = item;
                 $((<any>item.marker)._icon).addClass("is-selected");
             };
+
+            scope.getPreviousItem = (item) => {
+                var index = item.index - 1;
+                while (scope.items[index] && scope.items[index].hide) {
+                    index --;
+
+                }
+                if (index >= 0) {
+                    scope.toggleItem(scope.items[index]);
+                    scrollToItem(index);
+                }
+            };
+
+            scope.getNextItem = (item) => {
+
+                var index = item.index + 1;
+                while (scope.items[index] && scope.items[index].hide ) {
+                    index ++;
+
+                }
+                if (index < (scope.items.length)) {
+                    scope.toggleItem(scope.items[index]);
+                    scrollToItem(index);
+                }
+
+            };
         }
     };
 };
-
 
 export var moduleName = "adhMapping";
 
