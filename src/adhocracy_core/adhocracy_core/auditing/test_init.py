@@ -239,8 +239,10 @@ class TestSetAuditlog:
         assert mock_auditlog.called is False
 
 
-class TestGetAuditlog:
-    """ not really needed, we could use substanced.util.get_auditlog for now"""
+def test_get_auditlog():
+    import substanced.util
+    from . import get_auditlog
+    assert get_auditlog == substanced.util.get_auditlog
 
 
 class TestAddAuditEvent:

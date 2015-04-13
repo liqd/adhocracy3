@@ -37,7 +37,21 @@ class EntryName(Enum):
 
 class AuditLog(OOBTree):
 
-    """An Auditlog composed of audit entries."""
+    """An Auditlog composed of audit entries.
+
+    This is a dictionary (:class:`collections.abc.Mapping`) with key
+    :class:`datetime.datetime` and value
+    :class:`adhocracy_core.interfaces.AuditEntry`.
+
+    The methods `items`, `keys`, and `values` have the additional kwargs
+    `max_key` and `min_key` to allow range queries::
+
+       january = datetime(2015, 1, 1)
+       february = datetime(2015, 2, 1)
+       audit = get_auditlog(context)
+       audit.items(min=january, max=february)
+       ...
+    """
 
     def add(self,
             name: str,
@@ -60,10 +74,10 @@ def set_auditlog(context: IResource) -> None:
     """Set an auditlog for the context."""
     conn = context._p_jar
     try:
-        auditconn = conn.get_connection('audit')
+        connection = conn.get_connection('audit')
     except KeyError:
         return
-    root = auditconn.root()
+    root = connection.root()
     if 'auditlog' in root:
         return
     auditlog = AuditLog()
@@ -75,9 +89,9 @@ def log_auditevent(context: IResource,
                    resource_path: str,
                    user_name: str,
                    user_path: str) -> None:
-    """Add an audit entry to the audit database.
+    """Add an auditlog entry to the audit database.
 
-    The audit database is created if missing. If the zodbconn.uri.audit
+    The audit database is created if missing. If the `zodbconn.uri.audit`
     value is not specified in the config, auditing does not happen.
     """
     auditlog = get_auditlog(context)
@@ -87,7 +101,11 @@ def log_auditevent(context: IResource,
 
 def audit_resources_changes_callback(request: Request,
                                      response: Response) -> None:
-    """Add audit entries to the auditlog when the resources are changed."""
+    """Add auditlog entries to the auditlog when the resources are changed.
+
+    This is a :term:`response- callback` that run after a request has
+    finished. To store the audit entry it adds an additional transaction.
+    """
     registry = request.registry
     changelog_metadata = registry.changelog.values()
     user_name, user_path = _get_user_info(request)
@@ -97,8 +115,7 @@ def audit_resources_changes_callback(request: Request,
 
 def _get_user_info(request: Request) -> (str, str):
     if not hasattr(request, 'authenticated_userid'):
-        # request has no associated user
-        return ('', '')
+        return ('', '')  # ease scripting without user and testing
     user = get_user(request)
     if user is None:
         return ('', '')
