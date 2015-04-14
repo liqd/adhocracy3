@@ -77,8 +77,7 @@ export var mapInput = (
             // limit map to polygon
             map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(map, {
-                minZoom: map.getZoom(),
-                maxBounds: map.getBounds()
+                minZoom: map.getZoom()
             });
 
             if (typeof scope.zoom !== "undefined") {
@@ -165,6 +164,14 @@ export var mapInput = (
                 scope.mapClicked = false;
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
+
+            $timeout(() => {
+                map.invalidateSize(false);
+                map.fitBounds(scope.polygon.getBounds());
+                leaflet.Util.setOptions(map, {
+                    minZoom: map.getZoom()
+                });
+            }, 500);  // FIXME: moving column transition duration
         }
     };
 };
@@ -172,9 +179,9 @@ export var mapInput = (
 export var mapDetail = (leaflet : typeof L) => {
     return {
         scope: {
-            lat: "@",
-            lng: "@",
-            polygon: "@",
+            lat: "=",
+            lng: "=",
+            polygon: "=",
             height: "@",
             zoom: "@?"
         },
@@ -195,9 +202,16 @@ export var mapDetail = (leaflet : typeof L) => {
                 minZoom: scope.map.getZoom(),
                 maxBounds: scope.map.getBounds()
             });
+
             leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map).setIcon((<any>leaflet).icon(selectedItemIcon));
+            scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map);
+
+            scope.$watchGroup(["lat","lng"], function(newValues, oldValues, scope){
+                scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
+            });
 
         }
+
     };
 };
 

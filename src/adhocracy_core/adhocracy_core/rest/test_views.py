@@ -425,30 +425,43 @@ class TestResourceRESTView:
                   'OPTIONS': {}}
         assert wanted == response
 
-    def test_inject_removal_permissions_no_metadata(self, request_, context):
-        from adhocracy_core.sheets.metadata import IMetadata
+    def test_add_metadata_permissions_info_no_metadata(self, request_, context):
         inst = self.make_one(context, request_)
         d = {'DummySheet': {}}
-        inst._inject_removal_permissions(d)
+        inst._add_metadata_edit_permission_info(d)
         assert d == {'DummySheet': {}}
 
-    def test_inject_removal_permissions_metadata_without_hide_permission(
+    def test_add_metadata_permissions_info_without_hide_permission(
             self, request_, context):
         from adhocracy_core.sheets.metadata import IMetadata
         request_.has_permission = Mock(return_value=False)
         inst = self.make_one(context, request_)
         d = {IMetadata.__identifier__: {}}
-        inst._inject_removal_permissions(d)
-        assert d == {IMetadata.__identifier__: {'deleted': ''}}
+        inst._add_metadata_edit_permission_info(d)
+        assert d == {IMetadata.__identifier__: {'deleted': [True, False]}}
 
-    def test_inject_removal_permissions_metadata_with_hide_permission(
+    def test_add_metadata_permissions_info_with_hide_permission(
             self, request_, context):
         from adhocracy_core.sheets.metadata import IMetadata
         request_.has_permission = Mock(return_value=True)
         inst = self.make_one(context, request_)
         d = {IMetadata.__identifier__: {}}
-        inst._inject_removal_permissions(d)
-        assert d == {IMetadata.__identifier__: {'deleted': '', 'hidden': ''}}
+        inst._add_metadata_edit_permission_info(d)
+        assert d == {IMetadata.__identifier__: {'deleted': [True, False],
+                                                'hidden': [True, False]}}
+
+    def test_add_workflow_permissions_info(self, request_, context, mock_sheet,
+                                           mock_workflow):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        mock_workflow.get_next_states.return_value = ['draft']
+        mock_sheet.get.return_value = {'workflow': mock_workflow}
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IWorkflowAssignment)
+        editable_sheets = [mock_sheet]
+        inst = self.make_one(context, request_)
+        d = {}
+        inst._add_workflow_edit_permission_info(d, editable_sheets)
+        assert d ==\
+            {IWorkflowAssignment.__identifier__: {'workflow_state': ['draft']}}
 
     def test_get_valid_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
@@ -798,7 +811,6 @@ class TestItemRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
         mock_sheet.set.assert_called_with({'x':'y'},
-                                          registry=request.registry,
                                           request=request)
         wanted = {'path': request.application_url + '/last_new_version/',
                   'content_type': IItemVersion.__identifier__,
@@ -836,9 +848,9 @@ class TestMetaApiView:
     def test_get_empty(self, request, context):
         inst = self.make_one(request, context)
         response = inst.get()
-        assert sorted(response.keys()) == ['resources', 'sheets']
         assert response['resources'] == {}
         assert response['sheets'] == {}
+        assert response['workflows'] == {}
 
     def test_get_resources(self, request, context, resource_meta):
         request.registry.content.resources_meta[IResource] = resource_meta
@@ -1005,6 +1017,15 @@ class TestMetaApiView:
         assert field_metadata['containertype'] == 'list'
 
     # TODO test for single reference
+
+    def test_get_workflows(self, request, context):
+        inst = self.make_one(request, context)
+        request.registry.content.workflows_meta['sample'] = {'states': {},
+                                                             'transitions': {}}
+        workflows_meta = inst.get()['workflows']
+        assert workflows_meta == {'sample': {'states_order': [],
+                                             'states': {},
+                                             'transitions': {}}}
 
 
 class TestValidateLoginEmail:

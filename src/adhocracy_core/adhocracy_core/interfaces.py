@@ -5,6 +5,7 @@ from enum import Enum
 
 from pyramid.interfaces import ILocation
 from pyramid.interfaces import IAuthorizationPolicy
+from pyramid.interfaces import IRequest
 from pyramid.security import ACLPermitsResult
 from zope.interface import Attribute
 from zope.interface import Interface
@@ -15,6 +16,7 @@ from substanced.interfaces import IPropertySheet
 from substanced.interfaces import ReferenceClass
 from substanced.interfaces import IUserLocator
 from substanced.interfaces import IService
+from substanced.interfaces import IWorkflow
 
 
 class ISheet(Interface):
@@ -116,13 +118,13 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     """Sheet for resources to get/set the sheet data structure."""
 
     meta = Attribute('SheetMetadata')
+    registry = Attribute('pyramid registry')
 
-    def set(appstruct, omit=(), send_event=True, registry=None, request=None,
+    def set(appstruct, omit=(), send_event=True, request=None,
             omit_readonly=True) -> bool:
         """ Store ``appstruct`` dictionary data.
 
         :param send_event: throw edit event.
-        :param registry: the pyramid registry to use.
         :param request: the current pyramid request for additional permission
                         checks, may be None.
         :param omit_readonly: do not store readonly ``appstruct`` data.
@@ -512,6 +514,38 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     """
 
 
+class AuditlogEntry(namedtuple('AuditlogEntry', ['name',
+                                                 'resource_path',
+                                                 'user_name',
+                                                 'user_path'])):
+
+    """Metadata to log which user modifies resources.
+
+    Fields:
+    -------
+
+    name (AuditlogAction):
+        name of action executed by user
+    resource_path: (str):
+        modified resource path (:term:`location`)
+    user_name: (str):
+        name of responsible user
+    user_path:
+        :term:`user_id` of responsible user
+    """
+
+
+class AuditlogAction(Enum):
+
+    """Name of the Resource modification action."""
+
+    created = 'created'
+    modified = 'modified'
+    invisible = 'invisible'
+    concealed = 'concealed'
+    revealed = 'revealed'
+
+
 class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
     """Adapter responsible for returning a user or get info about it."""
@@ -603,3 +637,9 @@ class IHTTPCacheStrategy(Interface):  # pragma: no cover
 
     def check_conditional_request():
         """Check if conditional_request and raise 304 Error if needed."""
+
+
+class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
+
+    def get_next_states(context, request: IRequest) -> [str]:
+        """Get states you can trigger a transition to."""

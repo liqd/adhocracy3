@@ -46,6 +46,7 @@ def test_mercator_proposal_meta():
     assert meta.item_type == IMercatorProposalVersion
     assert add_ratesservice in meta.after_creation
     assert add_commentsservice in meta.after_creation
+    assert meta.permission_add == 'add_proposal'
 
 
 def test_mercator_proposal_version_meta():
@@ -53,6 +54,7 @@ def test_mercator_proposal_version_meta():
     from .mercator import IMercatorProposalVersion
     meta = mercator_proposal_version_meta
     assert meta.iresource == IMercatorProposalVersion
+    assert meta.permission_add == 'add_mercator_proposal_version'
 
 
 @fixture
@@ -113,7 +115,7 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
     from adhocracy_core.sheets.name import IName
     iresource = IMercatorProposal
     sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post(path, iresource, sheets_cstruct)
+    resp = app_user.post_resource(path, iresource, sheets_cstruct)
     return resp
 
 

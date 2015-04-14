@@ -16,7 +16,7 @@ from adhocracy_core.testing import register_sheet
 ############
 
 def add_node_binding(node, context=None, request=None):
-    node.bindings = dict()
+    node.bindings = {}
     if context is not None:
         node.bindings['context'] = context
     if request is not None:
@@ -1150,3 +1150,79 @@ class TestFileStoreType:
         with raises(colander.Invalid) as err_info:
             inst.deserialize(None, value)
         assert 'too large' in err_info.value.msg
+
+
+class TestACLPrincipalType:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.schema import ACEPrincipalType
+        return ACEPrincipalType()
+
+    def test_create(self, inst):
+        from . import ROLE_PRINCIPALS
+        from . import SYSTEM_PRINCIPALS
+        assert inst.valid_principals == ROLE_PRINCIPALS + SYSTEM_PRINCIPALS
+
+    def test_serialize_empty(self, node, inst):
+        assert inst.serialize(node, colander.null) == colander.null
+
+    def test_serialize_system_user(self, node, inst):
+        assert inst.serialize(node, 'system.User') == 'User'
+
+    def test_serialize_role(self, node, inst):
+        assert inst.serialize(node, 'role:reader') == 'reader'
+
+    def test_serialize_str_without_prefix(self, node, inst):
+        with raises(ValueError):
+            inst.serialize(node, 'User')
+
+    def test_deserialize_empty_str(self, node, inst):
+        assert inst.deserialize(node, '') == ''
+
+    def test_deserialize_role(self, node, inst):
+        assert inst.deserialize(node, 'reader') == 'role:reader'
+
+    def test_deserialize_system_user(self, node, inst):
+        assert inst.deserialize(node, 'Everyone') == 'system.Everyone'
+
+    def test_deserialize_raise_if_raise_else(self, node, inst):
+        with raises(colander.Invalid):
+            inst.deserialize(node, 'WRONG')
+
+
+class TestACEPrincipal:
+
+    @fixture
+    def inst(self):
+        from . import ACEPrincipal
+        return ACEPrincipal()
+
+    def test_create(self, inst):
+        from . import ACEPrincipalType
+        inst.schema_type = ACEPrincipalType
+
+
+class TestACE:
+
+    @fixture
+    def inst(self):
+        from . import ACE
+        return ACE()
+
+    def test_create(self, inst):
+        assert inst['action'].validator.choices == ['Allow', 'Deny']
+        assert inst['action'].required
+        assert inst['principal'].required
+        assert inst['permissions'].required
+
+
+class TestACL:
+
+    @fixture
+    def inst(self):
+        from . import ACL
+        return ACL()
+
+    def serialize_empty(self, inst):
+        assert inst.serialize() == []

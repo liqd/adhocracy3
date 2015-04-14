@@ -1,6 +1,8 @@
 [run]
 branch = True
 omit =
+    # bcc code
+    src/adhocracy_core/adhocracy_core/resources/resource.py
     *export*.py
     *version.py
     *test*py

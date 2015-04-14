@@ -35,14 +35,20 @@ class AnnotationStorageSheet(PropertySheet):
     request = None
     """Pyramid request object, just to fulfill the interface."""
 
-    def __init__(self, metadata, context):
-        self.schema = metadata.schema_class()
+    def __init__(self, meta, context, registry=None):
+        self.schema = meta.schema_class()
         """:class:`colander.MappingSchema` to define the data structure."""
         self.context = context
         """Resource to adapt."""
-        self.meta = metadata
+        self.meta = meta
         """SheetMetadata"""
         self._data_key = self.meta.isheet.__identifier__
+        if registry is None:
+            registry = get_current_registry(context)
+        self.registry = registry
+        """Pyramid :class:`pyramid.registry.Registry`. If `None`
+           :func:`pyramid.threadlocal.get_current_registry` is used get it.
+        """
 
     def get(self, params: dict={}) -> dict:
         """Return appstruct."""
@@ -54,11 +60,19 @@ class AnnotationStorageSheet(PropertySheet):
 
     @property
     def _default_appstruct(self) -> dict:
-        """Bind `context` to schema and return schema node default values."""
-        # context might have changed, so we don`t bind it until needed
-        schema = self.schema.bind(context=self.context)
+        """Return schema default values."""
+        schema = self._get_schema_for_default_values()
         items = [(n.name, n.default) for n in schema]
         return dict(items)
+
+    def _get_schema_for_default_values(self) -> colander.SchemaNode:
+        """Return customized schema to get default values.
+
+        This might be overridden in subclasses.
+        """
+        schema = self.schema.bind(context=self.context,
+                                  registry=self.registry)
+        return schema
 
     def _get_data_appstruct(self, params: dict={}) -> iter:
         """Return non references data.
@@ -168,7 +182,6 @@ class AnnotationStorageSheet(PropertySheet):
             appstruct: dict,
             omit=(),
             send_event=True,
-            registry=None,
             request: Request=None,
             omit_readonly: bool=True) -> bool:
         """Store appstruct."""
@@ -177,12 +190,10 @@ class AnnotationStorageSheet(PropertySheet):
         if omit_readonly:
             appstruct = self._omit_readonly_keys(appstruct)
         self._store_data(appstruct)
-        if registry is None:
-            registry = get_current_registry(self.context)
-        self._store_references(appstruct, registry)
+        self._store_references(appstruct, self.registry)
         # TODO: only store struct if values have changed
         self._notify_resource_sheet_modified(send_event,
-                                             registry,
+                                             self.registry,
                                              appstruct_old,
                                              appstruct,
                                              request)
@@ -247,6 +258,7 @@ class AnnotationStorageSheet(PropertySheet):
         This might be overridden in subclasses.
         """
         schema = self.schema.bind(context=self.context,
+                                  registry=self.registry,
                                   request=request)
         return schema
 
@@ -322,3 +334,4 @@ def includeme(config):  # pragma: no cover
     config.include('.asset')
     config.include('.sample_image')
     config.include('.geo')
+    config.include('.workflow')

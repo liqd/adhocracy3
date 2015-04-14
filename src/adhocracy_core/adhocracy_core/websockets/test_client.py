@@ -54,7 +54,7 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
         self._client = DummyClient()
         self._registry = DummyResource()
         self._registry.ws_client = self._client
-        self._registry.changelog = dict()
+        self._registry.changelog = {}
         self._changelog_metadata = changelog_meta
 
     def test_send_messages_after_commit_hook_success_and_empty_changelog(self):
@@ -262,7 +262,6 @@ class TestClient:
 
     def test_send_messages_resource_is_blocked(self, changelog_meta):
         """If a resource is blocked, no event should be sent."""
-        from adhocracy_core.interfaces import VisibilityChange
         client = self.make_one(None)
         client._is_running = True
         resource = DummyResource()
