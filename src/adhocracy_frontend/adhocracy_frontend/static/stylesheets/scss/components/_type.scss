@@ -462,3 +462,14 @@ parent: inline
 <time datetime="2013-04-18T13:50:47+02:00">18. April 2013 13:50</time>
 ```
 */
+
+
+@media print {
+    // scss-lint:disable ImportantRule, ColorVariable
+
+    * {
+        background: white !important;
+        color: black !important;
+        border-color: black !important;
+    }
+}

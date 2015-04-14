@@ -409,3 +409,26 @@ A list of alert messages to notify users in the moving column
         @include opacity(1);
     }
 }
+
+
+@media print {
+    .moving-column,
+    .moving-column-body {
+        position: static;
+    }
+
+    .moving-column {
+        // scss-lint:disable ImportantRule
+
+        width: auto !important;
+        border: 0;
+    }
+
+    .moving-column-menu,
+    .moving-column-sidebar,
+    .moving-column-overlay,
+    .moving-column-mask,
+    .moving-column-alerts {
+        display: none;
+    }
+}
