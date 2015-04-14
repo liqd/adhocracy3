@@ -288,8 +288,8 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                  maxBounds: map.getBounds()
             });
 
-            var selectedItemLeafletIcon = leaflet.divIcon({cssSelectedItemIcon});
-            var itemLeafletIcon = (<any>leaflet).divIcon({cssItemIcon});
+            var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
+            var itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
 
             scope.items = [];
             _.forEach(scope.itemValues, (value, key) => {
@@ -299,6 +299,7 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                     hide: false,
                     index: key
                 };
+                console.log(item.marker);
                 item.marker.addTo(map);
                 item.marker.on("click", (e) => {
                     $timeout(() => {
