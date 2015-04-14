@@ -156,9 +156,6 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         },
         link: (scope : IScope) => {
             bindPath(adhHttp)(scope);
-            scope.toggleMap = () => {
-                scope.mapIsOpen = !scope.mapIsOpen;
-            };
         }
     };
 };
