@@ -1,0 +1,13 @@
+.comment-main {
+    background: $color-background-base;
+    padding: 1em;
+    margin-bottom: 1em;
+
+    .comment-children & {
+        border-left: 1px solid $color-text-highlight-normal;
+    }
+}
+
+.comment-children {
+    border: 0;
+}
