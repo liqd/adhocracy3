@@ -11,7 +11,7 @@ changelog_metadata = ChangelogMetadata(False, False, None, None, None,
 
 def clear_changelog_after_commit_hook(success: bool, registry: Registry):
     """Delete all entries in the transaction changelog."""
-    changelog = getattr(registry, 'changelog', dict())
+    changelog = getattr(registry, 'changelog', {})
     changelog.clear()
 
 

@@ -16,7 +16,7 @@ from adhocracy_core.testing import register_sheet
 ############
 
 def add_node_binding(node, context=None, request=None):
-    node.bindings = dict()
+    node.bindings = {}
     if context is not None:
         node.bindings['context'] = context
     if request is not None:

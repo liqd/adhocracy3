@@ -54,7 +54,7 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
         self._client = DummyClient()
         self._registry = DummyResource()
         self._registry.ws_client = self._client
-        self._registry.changelog = dict()
+        self._registry.changelog = {}
         self._changelog_metadata = changelog_metadata
 
     def test_send_messages_after_commit_hook_success_and_empty_changelog(self):

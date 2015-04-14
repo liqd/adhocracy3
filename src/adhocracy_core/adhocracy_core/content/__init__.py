@@ -37,13 +37,13 @@ class ResourceContentRegistry(ContentRegistry):
         Dictionary with key isheet (`sheet type` interface) and value
         :class:`adhocracy_core.interfaces.SheetMetadata`.
         """
-        self.workflows_meta = dict()
+        self.workflows_meta = {}
         """Dictionary with key workflow name and value data.
 
         The value data structure is defined in
         :class:`adhocracy_core.workflows.schemas.Workflow`
         """
-        self.workflows = dict()
+        self.workflows = {}
         """Dictionary with key workflow name and value
         :class:`substanced.workflow.IWorkflow`.
         """

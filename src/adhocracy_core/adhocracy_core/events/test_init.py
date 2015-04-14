@@ -132,8 +132,8 @@ class TestLocalRolesModified:
     def test_create(self):
         from adhocracy_core.interfaces import ILocalRolesModfied
         context = testing.DummyResource()
-        old_local_roles = dict()
-        new_local_roles = dict()
+        old_local_roles = {}
+        new_local_roles = {}
         registry = testing.DummyResource()
         inst = self._make_one(context, new_local_roles, old_local_roles,
                               registry)
