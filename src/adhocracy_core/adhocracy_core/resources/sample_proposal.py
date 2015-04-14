@@ -12,6 +12,7 @@ from adhocracy_core.resources.rate import add_ratesservice
 
 import adhocracy_core.sheets.document
 import adhocracy_core.sheets.comment
+import adhocracy_core.sheets.workflow
 
 
 class IProposalVersion(IItemVersion):
@@ -40,6 +41,7 @@ class IProposal(IItem):
 proposal_meta = item_meta._replace(
     content_name='Proposal',
     iresource=IProposal,
+    extended_sheets=[adhocracy_core.sheets.workflow.ISample],
     element_types=[ITag,
                    ISection,
                    IParagraph,

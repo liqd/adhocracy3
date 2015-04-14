@@ -185,7 +185,6 @@ class ResourceFactory:
             if sheet.meta.creatable:
                 sheet.set(struct,
                           send_event=False,
-                          registry=registry,
                           request=request)
 
         # Fixme: Sideffect. We change here the passed creator because the
@@ -206,7 +205,6 @@ class ResourceFactory:
             sheet = get_sheet(resource, IMetadata, registry=registry)
             sheet.set(metadata,
                       send_event=False,
-                      registry=registry,
                       request=request,
                       omit_readonly=False)
 

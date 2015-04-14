@@ -24,6 +24,7 @@ def test_proposal_meta():
     from .comment import add_commentsservice
     from .rate import add_ratesservice
     from .tag import ITag
+    from adhocracy_core.sheets.workflow import ISample
     meta = proposal_meta
     assert meta.iresource is IProposal
     assert meta.element_types == [ITag,
@@ -31,6 +32,7 @@ def test_proposal_meta():
                                   IParagraph,
                                   IProposalVersion,
                                   ]
+    assert meta.extended_sheets == [ISample]
     assert meta.item_type == IProposalVersion
     assert meta.permission_add == 'add_proposal'
     assert add_commentsservice in meta.after_creation

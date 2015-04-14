@@ -8,6 +8,7 @@ from pyramid.traversal import resource_path
 from substanced.content import ContentRegistry
 from substanced.content import add_content_type
 from substanced.content import add_service_type
+from substanced.workflow import IWorkflow
 from zope.interface.interfaces import IInterface
 
 from adhocracy_core.exceptions import RuntimeConfigurationError
@@ -35,6 +36,16 @@ class ResourceContentRegistry(ContentRegistry):
 
         Dictionary with key isheet (`sheet type` interface) and value
         :class:`adhocracy_core.interfaces.SheetMetadata`.
+        """
+        self.workflows_meta = {}
+        """Dictionary with key workflow name and value data.
+
+        The value data structure is defined in
+        :class:`adhocracy_core.workflows.schemas.Workflow`
+        """
+        self.workflows = {}
+        """Dictionary with key workflow name and value
+        :class:`substanced.workflow.IWorkflow`.
         """
 
     def get_resources_meta_addable(self, context: object,
@@ -83,7 +94,7 @@ class ResourceContentRegistry(ContentRegistry):
                 .format(isheet.__identifier__, resource_path(context))
             raise RuntimeConfigurationError(msg)
         meta = self.sheets_meta[isheet]
-        sheet = meta.sheet_class(meta, context)
+        sheet = meta.sheet_class(meta, context, self.registry)
         return sheet
 
     def get_sheets_all(self, context: object) -> list:
@@ -154,6 +165,7 @@ class ResourceContentRegistry(ContentRegistry):
         Mind to set the `context` attribute before set/get sheet data.
         """
         resource_sheets_all = {}
+        registry = self.registry
         for resource_meta in self.resources_meta.values():
             isheets = set(resource_meta.basic_sheets +
                           resource_meta.extended_sheets)
@@ -161,7 +173,7 @@ class ResourceContentRegistry(ContentRegistry):
             for isheet in isheets:
                 sheet_meta = self.sheets_meta[isheet]
                 context = None
-                sheet = sheet_meta.sheet_class(sheet_meta, context)
+                sheet = sheet_meta.sheet_class(sheet_meta, context, registry)
                 sheets.append(sheet)
             resource_sheets_all[resource_meta.iresource] = sheets
         return resource_sheets_all
@@ -233,6 +245,18 @@ class ResourceContentRegistry(ContentRegistry):
         if not node:
             raise ValueError('No such field: {}'.format(dotted))
         return isheet, field, node
+
+    def get_workflow(self, name: str) -> IWorkflow:
+        """Get workflow with name `name`.
+
+        :raises RuntimeConfigurationError: if workflow is not registered
+        """
+        try:
+            workflow = self.workflows[name]
+        except KeyError:
+            msg = 'Workflow is not registered: {0}'.format(name)
+            raise RuntimeConfigurationError(msg)
+        return workflow
 
 
 def includeme(config):  # pragma: no cover

@@ -58,6 +58,7 @@ from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
@@ -67,6 +68,7 @@ from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.principal import IPasswordAuthentication
+from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
 
 logger = getLogger(__name__)
@@ -123,7 +125,9 @@ def validate_request_data(context: ILocation, request: Request,
     :raises _JSONError: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
-    schema_with_binding = schema.bind(context=context, request=request,
+    schema_with_binding = schema.bind(context=context,
+                                      request=request,
+                                      registry=request.registry,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
     if request.content_type == 'multipart/form-data':
@@ -380,7 +384,8 @@ class ResourceRESTView(RESTView):
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
             if put_sheets:
                 put_sheets_dict = dict(put_sheets)
-                self._inject_removal_permissions(put_sheets_dict)
+                self._add_metadata_edit_permission_info(put_sheets_dict)
+                self._add_workflow_edit_permission_info(put_sheets_dict, edits)
                 cstruct['PUT']['request_body']['data'] = put_sheets_dict
             else:
                 del cstruct['PUT']
@@ -420,13 +425,25 @@ class ResourceRESTView(RESTView):
             del cstruct['POST']
         return cstruct
 
-    def _inject_removal_permissions(self, put_sheets_dict: dict):
-        """Show whether a user is allowed to delete or hide a resource."""
-        if IMetadata.__identifier__ in put_sheets_dict:
-            # everybody who can PUT metadata can delete the resource
-            put_sheets_dict[IMetadata.__identifier__] = {'deleted': ''}
-            if self.request.has_permission('hide_resource', self.context):
-                put_sheets_dict[IMetadata.__identifier__]['hidden'] = ''
+    def _add_metadata_edit_permission_info(self, cstruct: dict):
+        """Add info if a user may set the deleted/hidden metadata fields."""
+        if IMetadata.__identifier__ not in cstruct:
+            return
+        # everybody who can PUT metadata can delete the resource
+        permission_info = {'deleted': [True, False]}
+        if self.request.has_permission('hide_resource', self.context):
+            permission_info['hidden'] = [True, False]
+        cstruct[IMetadata.__identifier__] = permission_info
+
+    def _add_workflow_edit_permission_info(self, cstruct: dict, edit_sheets):
+        """Add info if a user may set the workflow_state workflow field."""
+        workflow_sheets = [s for s in edit_sheets
+                           if s.meta.isheet.isOrExtends(IWorkflowAssignment)]
+        for sheet in workflow_sheets:
+            workflow = sheet.get()['workflow']
+            states = workflow.get_next_states(self.context, self.request)
+            isheet = sheet.meta.isheet
+            cstruct[isheet.__identifier__] = {'workflow_state': states}
 
     @view_config(request_method='GET',
                  permission='view')
@@ -471,7 +488,6 @@ class SimpleRESTView(ResourceRESTView):
             name = sheet.meta.isheet.__identifier__
             if name in appstructs:
                 sheet.set(appstructs[name],
-                          registry=self.request.registry,
                           request=self.request)
 
         appstruct = {}
@@ -605,7 +621,6 @@ class ItemRESTView(PoolRESTView):
                 name = sheet.meta.isheet.__identifier__
                 if name in appstructs:  # pragma: no branch
                     sheet.set(appstructs[name],
-                              registry=self.request.registry,
                               request=self.request)
             resource = last_new_version
         else:
@@ -829,6 +844,13 @@ class MetaApiView(RESTView):
 
         return sheet_map
 
+    def _describe_workflows(self, appstructs: dict) -> dict:
+        cstructs = {}
+        for name, appstruct in appstructs.items():
+            schema = create_workflow_meta_schema(appstruct)
+            cstructs[name] = schema.serialize(appstruct)
+        return cstructs
+
     @view_config(request_method='GET')
     def get(self) -> dict:
         """Get the API specification of this installation as JSON."""
@@ -840,8 +862,12 @@ class MetaApiView(RESTView):
         sheet_metadata = self.request.registry.content.sheets_meta
         sheet_map = self._describe_sheets(sheet_metadata)
 
+        workflows_meta = self.request.registry.content.workflows_meta
+        workflows_map = self._describe_workflows(workflows_meta)
+
         struct = {'resources': resource_map,
                   'sheets': sheet_map,
+                  'workflows': workflows_map,
                   }
         return struct
 
