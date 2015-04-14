@@ -32,6 +32,16 @@ class TestAdhocracyACLWorkflow:
         assert mock_workflow.get_transitions.called_with(context, request,
                                                          from_state='draft')
 
+    def test_get_next_states_with_two_transitions_same_state(
+            self, inst, context, request, mock_workflow):
+        fut = inst.__class__.get_next_states
+        mock_workflow.state_of.return_value = 'draft'
+        mock_workflow.get_transitions.return_value = [{'to_state': 'announced'},
+                                                      {'to_state': 'announced'}]
+        assert fut(mock_workflow, context, request) == ['announced']
+        assert mock_workflow.get_transitions.called_with(context, request,
+                                                         from_state='draft')
+
 
 class TestAddWorkflow:
 

@@ -23,7 +23,7 @@ class AdhocracyACLWorkflow(ACLWorkflow):
         state = self.state_of(context)
         transitions = self.get_transitions(context, request, from_state=state)
         states = [t['to_state'] for t in transitions]
-        return states
+        return list(set(states))
 
 
 def add_workflow(registry: Registry, cstruct: dict, name: str):
