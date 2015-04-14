@@ -17,16 +17,16 @@ export var style = {
     stroke: false
 };
 
-export var selectedItemIcon = {
-    iconUrl: "static/icons/png/Pin_Active.png",
-    iconSize: [35, 42],
-    iconAnchor: [17, 42]
+export var cssItemIcon = {
+    className: "icon-map-pin",
+    iconAnchor: [17.5, 41],
+    iconSize: [35, 42]
 };
 
-export var itemIcon = {
-    iconUrl: "static/icons/png/Pin_Inactive.png",
-    iconSize: [35, 42],
-    iconAnchor: [17, 42]
+export var cssSelectedItemIcon = {
+    className: "icon-map-pin is-active",
+    iconAnchor: [17.5, 41],
+    iconSize: [33, 42]
 };
 
 export interface IMapInputScope extends angular.IScope {
@@ -84,7 +84,7 @@ export var mapInput = (
                 map.setZoom(scope.zoom);
             }
 
-            var selectedItemLeafletIcon = (<any>leaflet).icon(selectedItemIcon);
+            var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
 
             // FIXME: Definetely Typed
             var marker = (<any>leaflet).marker();
@@ -203,10 +203,10 @@ export var mapDetail = (leaflet : typeof L) => {
                 maxBounds: scope.map.getBounds()
             });
 
-            leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map).setIcon((<any>leaflet).icon(selectedItemIcon));
-            scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map);
+            scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng))
+                .addTo(scope.map).setIcon((<any>leaflet).divIcon(cssSelectedItemIcon));
 
-            scope.$watchGroup(["lat","lng"], function(newValues, oldValues, scope){
+            scope.$watchGroup(["lat", "lng"], (newValues, oldValues, scope) => {
                 scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
             });
 
@@ -282,8 +282,8 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                  maxBounds: map.getBounds()
             });
 
-            var selectedItemLeafletIcon = leaflet.icon({selectedItemIcon});
-            var itemLeafletIcon = (<any>leaflet).icon(itemIcon);
+            var selectedItemLeafletIcon = leaflet.divIcon({cssSelectedItemIcon});
+            var itemLeafletIcon = (<any>leaflet).divIcon({cssItemIcon});
 
             scope.items = [];
             _.forEach(scope.itemValues, (value, key) => {
