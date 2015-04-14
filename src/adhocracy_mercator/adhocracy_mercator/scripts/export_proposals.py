@@ -25,6 +25,26 @@ from adhocracy_mercator.sheets.mercator import IMercatorSubResources
 from adhocracy_mercator.sheets.mercator import IOrganizationInfo
 from adhocracy_mercator.sheets.mercator import ITitle
 from adhocracy_mercator.sheets.mercator import IUserInfo
+from adhocracy_mercator.sheets.mercator import ILocation
+from adhocracy_mercator.sheets.mercator import IIntroduction
+from adhocracy_mercator.sheets.mercator import IDescription
+from adhocracy_mercator.sheets.mercator import IStory
+from adhocracy_mercator.sheets.mercator import IOutcome
+from adhocracy_mercator.sheets.mercator import IValue
+from adhocracy_mercator.sheets.mercator import IPartners
+from adhocracy_mercator.sheets.mercator import IExperience
+
+
+def get_text_from_sheet(proposal, field, sheet):
+    """Get text from sheetfields and return it. """
+    retrieved_field = get_sheet_field(proposal, IMercatorSubResources, field)
+    field_text = get_sheet_field(
+        retrieved_field,
+        sheet,
+        field).replace(
+        ';',
+        '')
+    return field_text
 
 
 def export_proposals():
@@ -60,41 +80,73 @@ def export_proposals():
     result_file = open(filename, 'w', newline='')
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
-    wr.writerow(['Title', 'Username', 'First name', 'Last name', 'Country',
-                'Organisation', '# Rates', 'budget', 'requested funding'])
+    wr.writerow(['Creation date',
+                 'Title',
+                 'Username',
+                 'First name',
+                 'Last name',
+                 'Creator email',
+                 'Creator country',
+                 'Organisation status',
+                 'Organisation name',
+                 'Organisation country',
+                 'Rates (Votes)',
+                 'Budget',
+                 'Requested Funding',
+                 'Other Funding',
+                 'Granted?',
+                 'Ruhr-Connection',
+                 'Proposal Pitch',
+                 'Description',
+                 'Story',
+                 'Outcome',
+                 'Value',
+                 'Partners',
+                 'Experience'])
 
     for proposal in proposals:
 
         result = []
 
-        # Title
-        title = get_sheet_field(proposal, ITitle, 'title')
-        result.append(title)
+        # Creationdate
+        creation_date = get_sheet_field(
+            proposal,
+            IMetadata,
+            'item_creation_date')
+        date = creation_date.date().strftime('%d.%m.%Y')
+        result.append(date)
 
-        # Username
-        creator = get_sheet_field(proposal, IMetadata, 'creator')
-        email = creator.email
-        result.append(email)
-
-        # First name
-        first_name = get_sheet_field(proposal, IUserInfo, 'personal_name')
-        result.append(first_name)
-
-        # Last name
-        last_name = get_sheet_field(proposal, IUserInfo, 'family_name')
-        result.append(last_name)
-
-        # Country
-        country = get_sheet_field(proposal, IUserInfo, 'country')
-        result.append(country)
+        result.append(get_sheet_field(proposal, ITitle, 'title'))
+        result.append(get_sheet_field(proposal, IMetadata, 'creator').name)
+        result.append(get_sheet_field(proposal, IUserInfo, 'personal_name'))
+        result.append(get_sheet_field(proposal, IUserInfo, 'family_name'))
+        result.append(get_sheet_field(proposal, IMetadata, 'creator').email)
+        result.append(get_sheet_field(proposal, IUserInfo, 'country'))
 
         # Organisation
         organization_info = get_sheet_field(proposal,
                                             IMercatorSubResources,
                                             'organization_info')
+
+        # status
         status = get_sheet_field(organization_info, IOrganizationInfo,
                                  'status')
         result.append(status)
+
+        # name
+        result.append(get_sheet_field(organization_info,
+                                      IOrganizationInfo,
+                                      'name'))
+
+        # country (somehow this always returns a country even if none has been
+        # set)
+        if status == 'other':
+            result.append('')
+        else:
+            organization_country = get_sheet_field(organization_info,
+                                                   IOrganizationInfo,
+                                                   'country')
+            result.append(organization_country)
 
         # Rates
         rates = get_sheet_field(proposal, ILikeable, 'post_pool')
@@ -102,12 +154,55 @@ def export_proposals():
         result.append(rates)
 
         # requested funding
-        finance = get_sheet_field(proposal, IMercatorSubResources, 'finance')
+        finance = get_sheet_field(proposal,
+                                  IMercatorSubResources,
+                                  'finance')
         budget = get_sheet_field(finance, IFinance, 'budget')
         result.append(str(budget))
         requested_funding = get_sheet_field(finance, IFinance,
                                             'requested_funding')
         result.append(str(requested_funding))
+        other_funding = get_sheet_field(finance, IFinance,
+                                        'other_sources')
+        result.append(other_funding)
+        if other_funding:
+            granted = get_sheet_field(finance, IFinance,
+                                      'granted')
+        else:
+            granted = ''
+
+        result.append(granted)
+
+        # Ruhr-Connection
+        location = get_sheet_field(proposal,
+                                   IMercatorSubResources,
+                                   'location')
+        ruhr_connection = get_sheet_field(
+            location,
+            ILocation,
+            'location_is_linked_to_ruhr')
+        result.append(ruhr_connection)
+
+        # Proposal Pitch
+        introduction = get_sheet_field(
+            proposal,
+            IMercatorSubResources,
+            'introduction')
+        teaser = get_sheet_field(introduction,
+                                 IIntroduction,
+                                 'teaser')
+        result.append(teaser)
+
+        result.append(
+            get_text_from_sheet(
+                proposal,
+                'description',
+                IDescription))
+        result.append(get_text_from_sheet(proposal, 'story', IStory))
+        result.append(get_text_from_sheet(proposal, 'outcome', IOutcome))
+        result.append(get_text_from_sheet(proposal, 'value', IValue))
+        result.append(get_text_from_sheet(proposal, 'partners', IPartners))
+        result.append(get_text_from_sheet(proposal, 'experience', IExperience))
 
         wr.writerow(result)
 

@@ -1,6 +1,5 @@
 """Transaction changelog for resources."""
 from collections import defaultdict
-from pyramid.registry import Registry
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import VisibilityChange
 
@@ -27,18 +26,25 @@ class Changelog(defaultdict):
         super().__init__(default_factory)
 
 
-def clear_changelog_after_commit_hook(success: bool, registry: Registry):
+def clear_changelog_callback(request):
     """Delete all entries in the transaction changelog."""
+    registry = request.registry
     changelog = getattr(registry, 'changelog', dict())
     changelog.clear()
 
 
-def clear_modification_date_after_commit_hook(success: bool,
-                                              registry: Registry):
+def create_changelog() -> dict:
+    """Return dict that maps resource path to :class:`ChangelogMetadata`."""
+    metadata = lambda: changelog_meta
+    return defaultdict(metadata)
+
+
+def clear_modification_date_callback(request):
     """Delete the shared modification date for the transaction.
 
     The date is set by :func:`adhocracy_utils.get_modification_date`.
     """
+    registry = request.registry
     if getattr(registry, '__modification_date__',  # pragma: no branch
                None) is not None:
         del registry.__modification_date__

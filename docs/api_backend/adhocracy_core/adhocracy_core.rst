@@ -11,15 +11,17 @@ Subpackages
 
 .. toctree::
 
+    adhocracy_core.auditing
     adhocracy_core.authentication
     adhocracy_core.authorization
     adhocracy_core.caching
     adhocracy_core.catalog
+    adhocracy_core.changelog
+    adhocracy_core.content
     adhocracy_core.events
     adhocracy_core.evolution
     adhocracy_core.graph
     adhocracy_core.messaging
-    adhocracy_core.registry
     adhocracy_core.resources
     adhocracy_core.rest
     adhocracy_core.scaffolds
