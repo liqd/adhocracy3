@@ -23,6 +23,12 @@ export var cssItemIcon = {
     iconSize: [35, 42]
 };
 
+export var cssAddIcon = {
+    className: "icon-map-pin-add",
+    iconAnchor: [16.5, 41],
+    iconSize: [35, 42]
+};
+
 export var cssSelectedItemIcon = {
     className: "icon-map-pin is-active",
     iconAnchor: [17.5, 41],
@@ -84,7 +90,7 @@ export var mapInput = (
                 map.setZoom(scope.zoom);
             }
 
-            var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
+            var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssAddIcon);
 
             // FIXME: Definetely Typed
             var marker = (<any>leaflet).marker();
