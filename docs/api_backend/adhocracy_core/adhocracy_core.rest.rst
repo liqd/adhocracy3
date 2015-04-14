@@ -14,9 +14,11 @@ Submodules
    adhocracy_core.rest.batchview
    adhocracy_core.rest.exceptions
    adhocracy_core.rest.schemas
+   adhocracy_core.rest.subscriber
    adhocracy_core.rest.test_batchview
    adhocracy_core.rest.test_exceptions
    adhocracy_core.rest.test_schemas
+   adhocracy_core.rest.test_subscriber
    adhocracy_core.rest.test_views
    adhocracy_core.rest.views
 

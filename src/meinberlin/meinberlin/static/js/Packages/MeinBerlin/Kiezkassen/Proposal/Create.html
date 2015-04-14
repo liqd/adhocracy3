@@ -6,6 +6,10 @@
 
     <h2 class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL" | translate }}</h2>
 
+    <div class="form-error" data-ng-repeat="error in errors track by $index">
+        <p>{{ error | adhFormatError | translate }}</p>
+    </div>
+
     <!-- BASIC INFORMATION -->
 
     <!-- Title -->
@@ -100,7 +104,7 @@
             value="{{ 'TR__PUBLISH' | translate }}"
             class="m-call-to-action form-footer-button-cta" />
 
-        <a href="" data-ng-click="cancel()" class="button form-footer-button">
+        <a href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
         {{ "TR__CANCEL" | translate }}</a>
     </footer>
 </form>
