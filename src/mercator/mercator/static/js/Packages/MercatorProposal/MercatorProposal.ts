@@ -955,6 +955,17 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
 };
 
 
+export var addButton = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
+        link: (scope) => {
+            scope.showAddButton = (adhConfig.custom["show_add_button"] === "true");
+        }
+    };
+};
+
+
 export var imageUriFilter = () => {
     return (path? : string, format : string = "detail") : string => {
         if (path) {
@@ -1219,6 +1230,7 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
+        .directive("adhMercatorProposalAddButton", ["adhConfig", addButton])
         .filter("adhImageUri", imageUriFilter)
         .controller("mercatorProposalFormController", ["$scope", "$element", "$window", "adhShowError", mercatorProposalFormController]);
 };
