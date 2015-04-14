@@ -62,7 +62,7 @@ class TransitionMeta(MappingSchema):
     to_state = SingleLine(missing=required)
     permission = SingleLine(missing='')
 
-    # FIXME add default permission to do transitions
+    # TODO add default permission to do transitions
 
 
 class StateMeta(MappingSchema):
@@ -85,6 +85,7 @@ class WorkflowMeta(MappingSchema):
                         missing=required)
     transitions = SchemaNode(Mapping(unknown='preserve'),
                              missing=required)
+    # TODO validate there is only on transition between two states
 
 
 def create_workflow_meta_schema(data: dict) -> SchemaNode:

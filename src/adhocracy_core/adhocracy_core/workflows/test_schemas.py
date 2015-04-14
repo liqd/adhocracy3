@@ -101,5 +101,3 @@ def test_create_workflow_meta_add_transition_and_state_meta():
     node = create_workflow_meta_schema(data)
     assert isinstance(node['transitions']['to_draft'], TransitionMeta)
     assert isinstance(node['states']['draft'], StateMeta)
-
-    # TODO More validators for sanity checks
