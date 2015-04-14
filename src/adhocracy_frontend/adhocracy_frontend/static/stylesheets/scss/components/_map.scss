@@ -42,7 +42,7 @@
     color: $color-brand-one-introvert;
     font-size: 42px;
 
-    &.is-active {
+    &.is-active, &:hover, &:focus {
         color: $color-brand-two-normal;
     }
 }
