@@ -269,7 +269,7 @@ export var bindVariablesAndClearFactory = (
     keys : string[]
 ) : void => {
     // NOTE: column directives are typically injected mutliple times
-    // with different transcludionIds. But we to trigger clear() only once.
+    // with different transcludionIds. But we want to trigger clear() only once.
     var clear = () => {
         if (scope.transclusionId === "body") {
             column.clear();

@@ -1,0 +1,69 @@
+/*
+  Icon Font: adhocracy3-icons
+*/
+
+@font-face {
+  font-family: "adhocracy3-icons";
+  src: url("../icons/fonts/adhocracy3-icons.eot");
+  src: url("../icons/fonts/adhocracy3-icons.eot?#iefix") format("embedded-opentype"),
+       url("../icons/fonts/adhocracy3-icons.woff") format("woff"),
+       url("../icons/fonts/adhocracy3-icons.ttf") format("truetype"),
+       url("../icons/fonts/adhocracy3-icons.svg#adhocracy3-icons") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: "adhocracy3-icons";
+    src: url("../icons/fonts/adhocracy3-icons.svg#adhocracy3-icons") format("svg");
+  }
+}
+
+[data-icon]:before { content: attr(data-icon); }
+
+[data-icon]:before,
+.icon-budget:before,
+.icon-document:before,
+.icon-group:before,
+.icon-location:before,
+.icon-map-pin-add:before,
+.icon-pin-detail:before,
+.icon-process:before,
+.icon-project:before,
+.icon-reply:before,
+.icon-search:before,
+.icon-speechbubbles:before,
+.icon-vote-down:before,
+.icon-vote-up:before,
+.icon-voting:before,
+.icon-x:before {
+  display: inline-block;
+  font-family: "adhocracy3-icons";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+
+.icon-budget:before { content: "\f100"; }
+.icon-document:before { content: "\f101"; }
+.icon-group:before { content: "\f102"; }
+.icon-location:before { content: "\f10e"; }
+.icon-map-pin-add:before { content: "\f103"; }
+.icon-pin-detail:before { content: "\f104"; }
+.icon-process:before { content: "\f105"; }
+.icon-project:before { content: "\f106"; }
+.icon-reply:before { content: "\f107"; }
+.icon-search:before { content: "\f108"; }
+.icon-speechbubbles:before { content: "\f109"; }
+.icon-vote-down:before { content: "\f10a"; }
+.icon-vote-up:before { content: "\f10b"; }
+.icon-voting:before { content: "\f10c"; }
+.icon-x:before { content: "\f10d"; }

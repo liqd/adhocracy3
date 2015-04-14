@@ -1,6 +1,38 @@
-.map-info {
-    background: $color-text-normal;
-    color: $color-text-inverted;
-    font-size: $font-size-small;
-    padding: 0.5em;
+.map-wrapper {
+    .map-info {
+        background: $color-text-normal;
+        color: $color-text-inverted;
+        font-size: $font-size-small;
+        padding: 0.5em;
+
+        &.ng-invalid {
+            background: $color-function-invalid;
+            font-weight: $font-weight-extrovert;
+        }
+    }
+
+    .map-buttons {
+        @include clearfix;
+        margin: 2px 0 -7px;
+    }
+
+    .map-buttons .map-button-save {
+        &, &:hover, &:focus {
+            color: $color-brand-two-introvert;
+        }
+
+        &:active {
+            color: $color-brand-one-introvert;
+        }
+    }
+
+    .map-button-save {
+        float: left;
+        font-weight: $font-weight-extrovert;
+    }
+
+    .map-button-cancel {
+        @extend .disguised-link;
+        float: right;
+    }
 }

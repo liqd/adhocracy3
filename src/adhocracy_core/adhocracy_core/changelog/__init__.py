@@ -1,32 +1,50 @@
 """Transaction changelog for resources."""
 from collections import defaultdict
-from pyramid.registry import Registry
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import VisibilityChange
 
+changelog_meta = ChangelogMetadata(modified=False,
+                                   created=False,
+                                   followed_by=None,
+                                   resource=None,
+                                   last_version=None,
+                                   changed_descendants=False,
+                                   changed_backrefs=False,
+                                   visibility=VisibilityChange.visible,
+                                   )
 
-changelog_metadata = ChangelogMetadata(False, False, None, None, None,
-                                       False, False, VisibilityChange.visible)
+
+class Changelog(defaultdict):
+
+    """Transaction changelog for resources.
+
+    Dictionary with resource path as key and default value
+    :class:`ChangelogMetadata`.
+    """
+
+    def __init__(self, default_factory=lambda: changelog_meta):
+        super().__init__(default_factory)
 
 
-def clear_changelog_after_commit_hook(success: bool, registry: Registry):
+def clear_changelog_callback(request):
     """Delete all entries in the transaction changelog."""
+    registry = request.registry
     changelog = getattr(registry, 'changelog', {})
     changelog.clear()
 
 
 def create_changelog() -> dict:
     """Return dict that maps resource path to :class:`ChangelogMetadata`."""
-    metadata = lambda: changelog_metadata
+    metadata = lambda: changelog_meta
     return defaultdict(metadata)
 
 
-def clear_modification_date_after_commit_hook(success: bool,
-                                              registry: Registry):
+def clear_modification_date_callback(request):
     """Delete the shared modification date for the transaction.
 
     The date is set by :func:`adhocracy_utils.get_modification_date`.
     """
+    registry = request.registry
     if getattr(registry, '__modification_date__',  # pragma: no branch
                None) is not None:
         del registry.__modification_date__
@@ -34,6 +52,5 @@ def clear_modification_date_after_commit_hook(success: bool,
 
 def includeme(config):
     """Add transaction changelog to the registry and register subscribers."""
-    changelog = create_changelog()
-    config.registry.changelog = changelog
+    config.registry.changelog = Changelog()
     config.include('.subscriber')

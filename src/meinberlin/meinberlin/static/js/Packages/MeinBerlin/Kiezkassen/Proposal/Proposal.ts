@@ -5,12 +5,16 @@ import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
+import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhUtil = require("../../../Util/Util");
 
+import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
+import SIMetadata = require("../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIPool = require("../../../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -20,12 +24,18 @@ var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
+    errors? : AdhHttp.IBackendErrorItem[];
+    toggleMap() : void;
+    mapIsOpen : boolean;
     data : {
         title : string;
         budget : number;
         detail : string;
         creatorParticipate : boolean;
         locationText : string;
+        creator : string;
+        creationDate : string;
+        commentCount : number;
         lng : number;
         lat : number;
     };
@@ -42,19 +52,31 @@ var bindPath = (
 ) : void => {
     scope.$watch(pathKey, (value : string) => {
         if (value) {
-            adhHttp.get(value).then((resource : RIProposalVersion) => {
-                var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
-                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+            adhHttp.get(AdhUtil.parentPath(value), {
+                content_type: RICommentVersion.content_type,
+                depth: "all",
+                tag: "LAST",
+                count: true
+            }).then((pool) => {
+                adhHttp.get(value).then((resource : RIProposalVersion) => {
+                    var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
+                    var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+                    var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
+                    var poolSheet = pool.data[SIPool.nick];
 
-                scope.data = {
-                    title: mainSheet.title,
-                    budget: mainSheet.budget,
-                    detail: mainSheet.detail,
-                    creatorParticipate: mainSheet.creator_participate,
-                    locationText: mainSheet.location_text,
-                    lng: pointSheet.x,
-                    lat: pointSheet.y
-                };
+                    scope.data = {
+                        title: mainSheet.title,
+                        budget: mainSheet.budget,
+                        detail: mainSheet.detail,
+                        creatorParticipate: mainSheet.creator_participate,
+                        locationText: mainSheet.location_text,
+                        creator: metadataSheet.creator,
+                        creationDate: metadataSheet.item_creation_date,
+                        commentCount: poolSheet.count,
+                        lng: pointSheet.x,
+                        lat: pointSheet.y
+                    };
+                });
             });
             adhHttp.options(value).then((options : AdhHttp.IOptions) => {
                 scope.options = options;
@@ -129,6 +151,9 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         },
         link: (scope : IScope) => {
             bindPath(adhHttp)(scope);
+            scope.toggleMap = () => {
+                scope.mapIsOpen = !scope.mapIsOpen;
+            };
         }
     };
 };
@@ -150,12 +175,15 @@ export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhShowError
+    adhShowError,
+    adhResourceUrlFilter,
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope) => {
+            scope.errors = [];
             scope.data = {};
             scope.showError = adhShowError;
 
@@ -168,7 +196,13 @@ export var createDirective = (
 
             scope.submit = () => {
                 // FIXME: handle success/error
-                postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url);
+                postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url)
+                    .then((result) => {
+                        scope.errors = [];
+                        $location.url(adhResourceUrlFilter(result[1].path));
+                    }, (errors : AdhHttp.IBackendErrorItem[]) => {
+                        scope.errors = errors;
+                    });
             };
         }
     };
@@ -257,7 +291,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
-            AdhHttp.moduleName
+            AdhHttp.moduleName,
+            AdhResourceArea.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
@@ -268,7 +303,7 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", detailDirective])
         .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", createDirective])
+            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhResourceUrlFilter", "$location", createDirective])
         .directive("adhMeinBerlinKiezkassenProposalList", ["adhConfig", listDirective])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
 };

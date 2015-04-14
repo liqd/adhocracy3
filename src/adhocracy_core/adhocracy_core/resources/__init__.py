@@ -27,6 +27,23 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_modification_date
 
 
+resource_meta = ResourceMetadata(content_name='',
+                                 iresource=None,
+                                 content_class=None,
+                                 permission_add='',
+                                 permission_view='',
+                                 is_implicit_addable=False,
+                                 basic_sheets=[],
+                                 extended_sheets=[],
+                                 after_creation=[],
+                                 use_autonaming=False,
+                                 autonaming_prefix='',
+                                 use_autonaming_random=False,
+                                 element_types=[],
+                                 item_type=False,
+                                 )
+
+
 def generate_random_name():
     """Return random name (alpha/num)."""
     length = random.choice(range(40, 60))

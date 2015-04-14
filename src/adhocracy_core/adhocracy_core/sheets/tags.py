@@ -6,7 +6,7 @@ import colander
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.pool import PoolSheet
 from adhocracy_core.schema import UniqueReferences
@@ -40,9 +40,9 @@ class TagSchema(colander.MappingSchema):
     elements = UniqueReferences(reftype=TagElementsReference)
 
 
-tag_metadata = sheet_metadata_defaults._replace(isheet=ITag,
-                                                schema_class=TagSchema,
-                                                )
+tag_meta = sheet_meta._replace(isheet=ITag,
+                               schema_class=TagSchema,
+                               )
 
 
 class ITags(ISheet):
@@ -69,12 +69,12 @@ class TagsSchema(colander.MappingSchema):
     elements = UniqueReferences(reftype=TagsElementsReference)
 
 
-tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,
-                                                 schema_class=TagsSchema,
-                                                 sheet_class=PoolSheet,
-                                                 editable=False,
-                                                 creatable=False,
-                                                 )
+tags_meta = sheet_meta._replace(isheet=ITags,
+                                schema_class=TagsSchema,
+                                sheet_class=PoolSheet,
+                                editable=False,
+                                creatable=False,
+                                )
 
 
 def filter_by_tag(resources: list, tag_name: str) -> list:
@@ -94,5 +94,5 @@ def filter_by_tag(resources: list, tag_name: str) -> list:
 
 def includeme(config):
     """Register sheets and add indexviews."""
-    add_sheet_to_registry(tag_metadata, config.registry)
-    add_sheet_to_registry(tags_metadata, config.registry)
+    add_sheet_to_registry(tag_meta, config.registry)
+    add_sheet_to_registry(tags_meta, config.registry)

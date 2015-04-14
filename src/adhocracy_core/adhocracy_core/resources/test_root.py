@@ -4,10 +4,10 @@ from pytest import mark
 
 
 def test_root_meta():
-    from .root import root_metadata
+    from .root import root_meta
     from .root import IRootPool
     from .root import create_initial_content_for_app_root
-    meta = root_metadata
+    meta = root_meta
     assert meta.iresource is IRootPool
     assert create_initial_content_for_app_root in meta.after_creation
 

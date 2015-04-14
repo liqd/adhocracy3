@@ -14,7 +14,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
 from adhocracy_core.utils import get_user
@@ -159,9 +159,9 @@ class RateSchema(colander.MappingSchema):
             raise err
 
 
-rate_meta = sheet_metadata_defaults._replace(isheet=IRate,
-                                             schema_class=RateSchema,
-                                             create_mandatory=True)
+rate_meta = sheet_meta._replace(isheet=IRate,
+                                schema_class=RateSchema,
+                                create_mandatory=True)
 
 
 class CanRateSchema(colander.MappingSchema):
@@ -169,8 +169,8 @@ class CanRateSchema(colander.MappingSchema):
     """CanRate sheet data structure."""
 
 
-can_rate_meta = sheet_metadata_defaults._replace(isheet=ICanRate,
-                                                 schema_class=CanRateSchema)
+can_rate_meta = sheet_meta._replace(isheet=ICanRate,
+                                    schema_class=CanRateSchema)
 
 
 class RateableSchema(PostPoolMappingSchema):
@@ -186,7 +186,7 @@ class RateableSchema(PostPoolMappingSchema):
     post_pool = PostPool(iresource_or_service_name='rates')
 
 
-rateable_meta = sheet_metadata_defaults._replace(
+rateable_meta = sheet_meta._replace(
     isheet=IRateable,
     schema_class=RateableSchema,
     editable=False,

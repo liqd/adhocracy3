@@ -21,18 +21,18 @@ class TestIMetadataSchema:
     def request(self):
         return testing.DummyRequest()
 
-    def _make_one(self, **kwargs):
+    def make_one(self, **kwargs):
         from adhocracy_core.sheets.metadata import MetadataSchema
         return MetadataSchema(**kwargs)
 
     def test_deserialize_empty(self):
-        inst = self._make_one()
+        inst = self.make_one()
         result = inst.deserialize({})
         assert result == {'deleted': False, 'hidden': False}
 
     def test_serialize_empty(self):
         from colander import null
-        inst = self._make_one()
+        inst = self.make_one()
         result = inst.serialize({})
         assert result['creation_date'] == null
         assert result['creator'] == ''
@@ -44,7 +44,7 @@ class TestIMetadataSchema:
 
     def test_serialize_empty_and_bind(self, context):
         from datetime import datetime
-        inst = self._make_one().bind(context=context)
+        inst = self.make_one().bind(context=context)
         result = inst.serialize({})
         this_year = str(datetime.now().year)
         assert this_year in result['creation_date']
@@ -53,7 +53,7 @@ class TestIMetadataSchema:
 
     def test_deserialize_hiding_requires_permission(self, context, request):
         import colander
-        inst = self._make_one().bind(context=context, request=request)
+        inst = self.make_one().bind(context=context, request=request)
         request.has_permission = Mock(return_value=False)
         with raises(colander.Invalid):
             inst.deserialize({'hidden': False})
@@ -62,7 +62,7 @@ class TestIMetadataSchema:
         assert result['hidden'] is False
 
     def test_deserialize_delete_doesnt_require_permission(self, context, request):
-        inst = self._make_one().bind(context=context, request=request)
+        inst = self.make_one().bind(context=context, request=request)
         request.has_permission = Mock(return_value=True)
         result = inst.deserialize({'deleted': False})
         assert result['deleted'] is False
@@ -72,8 +72,8 @@ class TestMetadataSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.metadata import metadata_metadata
-        return metadata_metadata
+        from adhocracy_core.sheets.metadata import metadata_meta
+        return metadata_meta
 
     def test_create(self, meta, context):
         from adhocracy_core.sheets.metadata import IMetadata

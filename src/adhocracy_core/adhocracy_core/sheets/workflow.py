@@ -17,7 +17,7 @@ from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import AnnotationStorageSheet
 from adhocracy_core.interfaces import IResourceSheet
 
@@ -212,7 +212,7 @@ class WorkflowAssignmentSheet(AnnotationStorageSheet):
         workflow.transition_to_state(self.context, request, to_state=name)
 
 
-workflow_meta = sheet_metadata_defaults._replace(
+workflow_meta = sheet_meta._replace(
     isheet=IWorkflowAssignment,
     schema_class=WorkflowAssignmentSchema,
     sheet_class=WorkflowAssignmentSheet,

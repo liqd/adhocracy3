@@ -1,0 +1,25 @@
+a {
+    text-decoration: none;
+
+    &:hover, &:focus {
+        text-decoration: underline;
+    }
+}
+
+.disguised-link {
+    font-weight: normal;
+
+    &, &:hover,
+    &:focus {
+        color: $color-text-introvert;
+    }
+
+    &:hover,
+    &:focus {
+        text-decoration: underline;
+    }
+
+    &:active {
+        color: $color-text-extrovert;
+    }
+}

@@ -11,7 +11,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.asset import IPoolWithAssets
-from adhocracy_core.resources.pool import pool_metadata
+from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
@@ -195,13 +195,12 @@ def _add_initial_user_and_group(context, registry):
     user.activate()
 
 
-root_metadata = pool_metadata._replace(
+root_meta = pool_meta._replace(
     iresource=IRootPool,
-    after_creation=[create_initial_content_for_app_root] +
-    pool_metadata.after_creation,
+    after_creation=[create_initial_content_for_app_root]
 )
 
 
 def includeme(config):
     """Add resource types to registry."""
-    add_resource_type_to_registry(root_metadata, config)
+    add_resource_type_to_registry(root_meta, config)

@@ -12,12 +12,12 @@ from adhocracy_core.interfaces import ITag
 
 
 def test_item_meta():
-    from .item import item_metadata
+    from .item import item_meta
     from .item import create_initial_content_for_item
     from .item import IItem
     from .item import IItemVersion
     import adhocracy_core.sheets
-    meta = item_metadata
+    meta = item_meta
     assert meta.iresource == IItem
     assert meta.basic_sheets == [adhocracy_core.sheets.name.IName,
                                  adhocracy_core.sheets.tags.ITags,
@@ -43,17 +43,17 @@ def test_item_without_name_sheet_meta():
 def make_itemversion(parent=None, follows=[]):
     from adhocracy_core.resources import ResourceFactory
     from adhocracy_core.sheets.versions import IVersionable
-    from adhocracy_core.resources.itemversion import itemversion_metadata
+    from adhocracy_core.resources.itemversion import itemversion_meta
     appstructs = {IVersionable.__identifier__: {'follows': follows}}
-    return ResourceFactory(itemversion_metadata)(parent=parent,
+    return ResourceFactory(itemversion_meta)(parent=parent,
                                                  appstructs=appstructs)
 
 
 def make_forkable_itemversion(parent=None, follows=[]):
     from adhocracy_core.resources import ResourceFactory
     from adhocracy_core.sheets.versions import IForkableVersionable
-    from adhocracy_core.resources.itemversion import itemversion_metadata
-    forkable_itemversion_metadata = itemversion_metadata._replace(
+    from adhocracy_core.resources.itemversion import itemversion_meta
+    forkable_itemversion_metadata = itemversion_meta._replace(
         extended_sheets=[IForkableVersionable]
     )
     appstructs = {IForkableVersionable.__identifier__: {'follows': follows}}

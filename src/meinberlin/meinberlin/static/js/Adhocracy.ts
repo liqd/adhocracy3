@@ -46,6 +46,7 @@ import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 import AdhShareSocial = require("./Packages/ShareSocial/ShareSocial");
 import AdhSticky = require("./Packages/Sticky/Sticky");
+import AdhTabs = require("./Packages/Tabs/Tabs");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhTracking = require("./Packages/Tracking/Tracking");
 import AdhUser = require("./Packages/User/User");
@@ -181,6 +182,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhResourceWidgets.register(angular);
     AdhShareSocial.register(angular);
     AdhSticky.register(angular);
+    AdhTabs.register(angular);
     AdhTopLevelState.register(angular);
     AdhTracking.register(angular);
     AdhUser.register(angular);

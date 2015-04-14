@@ -6,9 +6,9 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.itemversion import itemversion_metadata
-from adhocracy_core.resources.item import item_metadata
-from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.resources.itemversion import itemversion_meta
+from adhocracy_core.resources.item import item_meta
+from adhocracy_core.resources.service import service_meta
 from adhocracy_core.resources.item import item_basic_sheets_without_name_sheet
 
 from adhocracy_core.sheets.rate import IRate
@@ -19,7 +19,7 @@ class IRateVersion(IItemVersion):
     """Rate version."""
 
 
-rateversion_meta = itemversion_metadata._replace(
+rateversion_meta = itemversion_meta._replace(
     iresource=IRateVersion,
     extended_sheets=[IRate],
     permission_add='add_rateversion',
@@ -31,7 +31,7 @@ class IRate(IItem):
     """Rate versions pool."""
 
 
-rate_meta = item_metadata._replace(
+rate_meta = item_meta._replace(
     iresource=IRate,
     basic_sheets=item_basic_sheets_without_name_sheet,
     element_types=[IRateVersion],
@@ -47,7 +47,7 @@ class IRatesService(IServicePool):
     """The 'rates' ServicePool."""
 
 
-rates_meta = service_metadata._replace(
+rates_meta = service_meta._replace(
     iresource=IRatesService,
     content_name='rates',
     element_types=[IRate],

@@ -18,11 +18,11 @@ from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRolesUserLocator
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.pool import Pool
-from adhocracy_core.resources.pool import pool_metadata
-from adhocracy_core.resources.service import service_metadata
-from adhocracy_core.resources.resource import resource_metadata
-from adhocracy_core.resources.resource import Base
+from adhocracy_core.resources.pool import pool_meta
+from adhocracy_core.resources.service import service_meta
+from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import get_sheet
@@ -63,11 +63,11 @@ def create_initial_content_for_principals(context: IPool, registry: Registry,
                             parent=context, registry=registry)
 
 
-principals_metadata = service_metadata._replace(
+principals_meta = service_meta._replace(
     iresource=IPrincipalsService,
     content_name='principals',
     after_creation=[create_initial_content_for_principals] +
-    service_metadata.after_creation,
+    service_meta.after_creation,
     element_types=[],  # we don't want the frontend to post resources here
     permission_add='add_service',
 )
@@ -184,10 +184,10 @@ def _generate_activation_path() -> str:
     return '/activate/' + b64encode(random_bytes, altchars=b'+_').decode()
 
 
-user_metadata = pool_metadata._replace(
+user_meta = pool_meta._replace(
     iresource=IUser,
     content_class=User,
-    after_creation=[send_registration_mail] + pool_metadata.after_creation,
+    after_creation=[send_registration_mail] + pool_meta.after_creation,
     basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
                   adhocracy_core.sheets.principal.IUserExtended,
                   adhocracy_core.sheets.principal.IPermissions,
@@ -207,7 +207,7 @@ class IUsersService(IServicePool):
     """Service Pool for Users."""
 
 
-users_metadata = service_metadata._replace(
+users_meta = service_meta._replace(
     iresource=IUsersService,
     content_name='users',
     element_types=[IUser],
@@ -230,7 +230,7 @@ class Group(Pool):
         self.roles = []
 
 
-group_metadata = pool_metadata._replace(
+group_meta = pool_meta._replace(
     iresource=IGroup,
     content_class=Group,
     extended_sheets=[adhocracy_core.sheets.principal.IGroup,
@@ -245,7 +245,7 @@ class IGroupsService(IServicePool):
     """Pool for Groups."""
 
 
-groups_metadata = service_metadata._replace(
+groups_meta = service_meta._replace(
     iresource=IGroupsService,
     content_name='groups',
     element_types=[IGroup],
@@ -272,7 +272,7 @@ class PasswordReset(Base):
         del self.__parent__[self.__name__]
 
 
-passwordreset_metadata = resource_metadata._replace(
+passwordreset_meta = resource_meta._replace(
     iresource=IPasswordReset,
     content_class=PasswordReset,
     permission_add='add_password_reset',
@@ -287,7 +287,7 @@ class IPasswordResetsService(IServicePool):
     """Service Pool for Password Resets."""
 
 
-passwordresets_metadata = service_metadata._replace(
+passwordresets_meta = service_meta._replace(
     iresource=IPasswordResetsService,
     content_name='resets',
     element_types=[IPasswordReset],
@@ -400,13 +400,13 @@ def groups_and_roles_finder(userid: str, request: Request) -> list:
 
 def includeme(config):
     """Add resource types to registry."""
-    add_resource_type_to_registry(principals_metadata, config)
-    add_resource_type_to_registry(user_metadata, config)
-    add_resource_type_to_registry(users_metadata, config)
-    add_resource_type_to_registry(group_metadata, config)
-    add_resource_type_to_registry(groups_metadata, config)
-    add_resource_type_to_registry(passwordresets_metadata, config)
-    add_resource_type_to_registry(passwordreset_metadata, config)
+    add_resource_type_to_registry(principals_meta, config)
+    add_resource_type_to_registry(user_meta, config)
+    add_resource_type_to_registry(users_meta, config)
+    add_resource_type_to_registry(group_meta, config)
+    add_resource_type_to_registry(groups_meta, config)
+    add_resource_type_to_registry(passwordresets_meta, config)
+    add_resource_type_to_registry(passwordreset_meta, config)
     config.registry.registerAdapter(UserLocatorAdapter,
                                     (Interface, Interface),
                                     IRolesUserLocator)

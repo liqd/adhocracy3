@@ -3,8 +3,96 @@
     .input-error {
         display: block;
     }
+
+    .map-wrapper {
+        margin-bottom: 10px / $font-size-normal * 1em;
+    }
 }
 
 .is-selected {
-    background-color: #ff7800;
+    background-color: $color-text-highlight-normal;
+}
+
+.mein-berlin-kiezkassen-proposal-detail {
+    .rate {
+        float: right;
+    }
+}
+
+.mein-berlin-kiezkassen-proposal-detail-header,
+.mein-berlin-kiezkassen-proposal-detail-body {
+    @include clearfix;
+    background: $color-background-base;
+    margin-bottom: 10px / $font-size-normal * 1em;
+    padding: (20px / $font-size-normal * 1em) (10px / $font-size-normal * 1em) (12px / $font-size-normal * 1em);
+}
+
+.mein-berlin-kiezkassen-proposal-detail-body-comments {
+    float: right;
+    padding-left: 40px / $font-size-small * 1em;
+    text-align: center;
+}
+
+.mein-berlin-kiezkassen-proposal-detail-body-comments-icon,
+.mein-berlin-kiezkassen-proposal-detail-meta-item-icon {
+    font-size: 20px;
+}
+
+.mein-berlin-kiezkassen-proposal-detail-body-comments-icon {
+    display: block;
+}
+
+.mein-berlin-kiezkassen-proposal-detail-header {
+    padding-top: 36px / $font-size-normal * 1em;
+
+    .mein-berlin-kiezkassen-proposal-detail-header-title {
+        color: $color-text-normal;
+        font-size: $font-size-normal;
+        font-weight: $font-weight-extrovert;
+        margin: 0 0 (20px / $font-size-normal * 1em);
+    }
+}
+
+.mein-berlin-kiezkassen-proposal-detail-meta {
+    list-style-type: none;
+    padding: 0;
+
+    .mein-berlin-kiezkassen-proposal-detail-meta-item {
+        @include gallery(4 of 12);
+        color: $color-text-introvert;
+        font-size: $font-size-small;
+
+        &:nth-child(2) {
+            text-align: center;
+        }
+    }
+
+    .mein-berlin-kiezkassen-proposal-detail-meta-participation {
+        text-align: right;
+    }
+
+    .mein-berlin-kiezkassen-proposal-detail-meta-item-icon {
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    .mein-berlin-kiezkassen-proposal-detail-meta-item-text {
+        @include inline-block;
+        margin: 0;
+        text-align: left;
+    }
+}
+
+.mein-berlin-kiezkassen-proposal-detail-map {
+    //FIXME: just to annoy people
+    @include opacity(0);
+    background: $color-function-invalid;
+    height: 1px;
+    overflow: hidden;
+    transition: all 0.5s ease-out;
+
+    &.is-open {
+        @include opacity(1);
+        height: 80px / $font-size-normal * 1em;
+    }
 }

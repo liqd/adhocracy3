@@ -19,7 +19,6 @@ from adhocracy_core.utils import is_deleted
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import sheet_metadata
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import remove_keys_from_dict
@@ -274,14 +273,19 @@ class AttributeStorageSheet(AnnotationStorageSheet):
         return self.context.__dict__
 
 
-sheet_metadata_defaults = sheet_metadata._replace(
-    isheet=ISheet,
-    sheet_class=AnnotationStorageSheet,
-    schema_class=colander.MappingSchema,
-    permission_view='view',
-    permission_edit='edit_sheet',
-    permission_create='create_sheet',
-)
+sheet_meta = SheetMetadata(isheet=ISheet,
+                           sheet_class=AnnotationStorageSheet,
+                           schema_class=colander.MappingSchema,
+                           permission_view='view',
+                           permission_edit='edit_sheet',
+                           permission_create='create_sheet',
+                           readable=True,
+                           editable=True,
+                           creatable=True,
+                           create_mandatory=False,
+                           mime_type_validator=None,
+                           image_sizes=None,
+                           )
 
 
 def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):

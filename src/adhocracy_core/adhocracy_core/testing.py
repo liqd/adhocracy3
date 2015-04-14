@@ -187,18 +187,18 @@ def pool_graph_catalog(config, pool_graph):
 @fixture
 def resource_meta() -> ResourceMetadata:
     """ Return basic resource metadata."""
-    from adhocracy_core.interfaces import resource_metadata
+    from adhocracy_core.resources import resource_meta
     from adhocracy_core.interfaces import IResource
-    return resource_metadata._replace(iresource=IResource)
+    return resource_meta._replace(iresource=IResource)
 
 
 @fixture
 def sheet_meta() -> SheetMetadata:
     """ Return basic sheet metadata."""
-    from adhocracy_core.interfaces import sheet_metadata
+    from adhocracy_core.sheets import sheet_meta
     from adhocracy_core.interfaces import ISheet
-    return sheet_metadata._replace(isheet=ISheet,
-                                   schema_class=colander.MappingSchema)
+    return sheet_meta._replace(isheet=ISheet,
+                               schema_class=colander.MappingSchema)
 
 
 class CorniceDummyRequest(testing.DummyRequest):
@@ -232,8 +232,8 @@ def cornice_request():
 @fixture
 def changelog_meta() -> ChangelogMetadata:
     """ Return changelog metadata."""
-    from adhocracy_core.changelog import changelog_metadata
-    return changelog_metadata
+    from adhocracy_core.changelog import changelog_meta
+    return changelog_meta
 
 
 @fixture
@@ -275,7 +275,7 @@ def node() -> colander.MappingSchema:
 
 
 @fixture
-def changelog(changelog_meta):
+def changelog(changelog_meta) -> dict:
     """Return transaction_changelog dictionary."""
     from collections import defaultdict
     metadata = lambda: changelog_meta
@@ -292,13 +292,13 @@ def registry_with_changelog(registry, changelog):
 @fixture
 def mock_sheet() -> Mock:
     """Mock :class:`adhocracy_core.sheets.GenericResourceSheet`."""
-    from adhocracy_core.interfaces import sheet_metadata
+    from adhocracy_core.sheets import sheet_meta
     from adhocracy_core.interfaces import ISheet
     # Better would be spec=GenericResourceSheet for the mock object;
     # however this fails if the object is deepcopied.
     sheet = Mock()
-    sheet.meta = sheet_metadata._replace(isheet=ISheet,
-                                         schema_class=colander.MappingSchema)
+    sheet.meta = sheet_meta._replace(isheet=ISheet,
+                                     schema_class=colander.MappingSchema)
     sheet.schema = colander.MappingSchema()
     sheet.get.return_value = {}
     return sheet
@@ -622,11 +622,11 @@ def add_test_users(root, registry, options):
 def includeme_root_with_test_users(config):
     """Override IRootPool to create initial test users."""
     from adhocracy_core.resources import add_resource_type_to_registry
-    from adhocracy_core.resources.root import root_metadata
+    from adhocracy_core.resources.root import root_meta
     config.commit()
-    after_creation = root_metadata.after_creation + [add_test_users]
-    root_metadata = root_metadata._replace(after_creation=after_creation)
-    add_resource_type_to_registry(root_metadata, config)
+    after_creation = root_meta.after_creation + [add_test_users]
+    root_meta = root_meta._replace(after_creation=after_creation)
+    add_resource_type_to_registry(root_meta, config)
 
 
 @fixture(scope='class')
