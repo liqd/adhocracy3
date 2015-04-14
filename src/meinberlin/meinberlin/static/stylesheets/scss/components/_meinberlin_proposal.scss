@@ -82,17 +82,3 @@
         text-align: left;
     }
 }
-
-.mein-berlin-kiezkassen-proposal-detail-map {
-    //FIXME: just to annoy people
-    @include opacity(0);
-    background: $color-function-invalid;
-    height: 1px;
-    overflow: hidden;
-    transition: all 0.5s ease-out;
-
-    &.is-open {
-        @include opacity(1);
-        height: 80px / $font-size-normal * 1em;
-    }
-}

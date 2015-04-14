@@ -32,7 +32,7 @@
         <footer class="mein-berlin-kiezkassen-proposal-detail-body-footer">
             <ul class="mein-berlin-kiezkassen-proposal-detail-meta">
                 <li class="mein-berlin-kiezkassen-proposal-detail-meta-item">
-                    <a href="" ng-click="toggleMap()" class="disguised-link"><i class="icon-pin-detail"></i> {{data.locationText}}</a>
+                    <a href="" class="disguised-link"><i class="icon-pin-detail"></i> {{data.locationText}}</a>
                 </li>
                 <li class="mein-berlin-kiezkassen-proposal-detail-meta-item">
                     <a href="{{ path | adhResourceUrl:'comments' }}" class="disguised-link">
@@ -46,8 +46,9 @@
         </footer>
     </section>
 
-    <section class="mein-berlin-kiezkassen-proposal-detail-map" data-ng-class="{'is-open': mapIsOpen}">
-        <!-- FIXME: Map please ! -->
-        MAP HERE ?
+    <section>
+        <adh-map-detail data-ng-if="data.polygon && data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="400"></adh-map-detail>
     </section>
+
+
 </article>
