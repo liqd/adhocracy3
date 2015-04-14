@@ -45,4 +45,8 @@
     &.is-active, &:hover, &:focus {
         color: $color-brand-one-introvert;
     }
+
+    &:before {
+        display: block;
+    }
 }
