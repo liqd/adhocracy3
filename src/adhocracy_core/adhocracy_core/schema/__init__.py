@@ -10,6 +10,7 @@ import re
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
+from pyramid import security
 from pyramid.traversal import find_interface
 from substanced.file import File
 from substanced.file import USE_MAGIC
@@ -184,6 +185,19 @@ class TimeZoneName(AdhocracySchemaNode):
     missing = colander.drop
     validator = colander.OneOf(_ZONES)
 
+ROLE_PRINCIPALS = ['reader',
+                   'annotator',
+                   'contributor',
+                   'editor',
+                   'manager',
+                   'admin',
+                   'god',
+                   ]
+
+SYSTEM_PRINCIPALS = ['Everyone',
+                     'Authenticated',
+                     ]
+
 
 class Role(AdhocracySchemaNode):
 
@@ -195,14 +209,7 @@ class Role(AdhocracySchemaNode):
     schema_type = colander.String
     default = 'reader'
     missing = colander.drop
-    validator = colander.OneOf(['reader',
-                                'annotator',
-                                'contributor',
-                                'editor',
-                                'manager',
-                                'admin',
-                                'god',
-                                ])
+    validator = colander.OneOf(ROLE_PRINCIPALS)
 
 
 class Roles(colander.SequenceSchema):
@@ -815,3 +822,78 @@ class FileStore(AdhocracySchemaNode):
     schema_type = FileStoreType
     default = None
     missing = colander.drop
+
+
+class SingleLineList(colander.SequenceSchema):
+
+    """List of SingleLines."""
+
+    item = SingleLine()
+
+
+class ACEPrincipalType(colander.SchemaType):
+
+    """Adhocracy :term:`role` or pyramid system principal."""
+
+    valid_principals = ROLE_PRINCIPALS + SYSTEM_PRINCIPALS
+    """Valid principal strings."""
+
+    def serialize(self, node, value) -> str:
+        """Serialize principal and remove prefix ("system." or "role:").
+
+        :raises ValueError: if value has no '.' or ':' char
+        """
+        if value in (colander.null, ''):
+            return value
+        if '.' in value:
+            prefix, name = value.split('.')
+        elif ':' in value:
+            prefix, name = value.split(':')
+        else:
+            raise ValueError()
+        return str(name)
+
+    def deserialize(self, node, value) -> str:
+        """Deserialize principal and add prefix ("system." or "role:")."""
+        if value in (colander.null, ''):
+            return value
+        if value in ROLE_PRINCIPALS:
+            return 'role:' + value
+        elif value in SYSTEM_PRINCIPALS:
+            return 'system.' + value
+        else:
+            msg = '{0} is not one of {1}'.format(value, self.valid_principals)
+            raise colander.Invalid(node, msg=msg, value=value)
+
+
+class ACEPrincipal(colander.SchemaNode):
+
+    """Adhocracy :term:`role` or pyramid system principal."""
+
+    schema_type = ACEPrincipalType
+
+
+class ACE(colander.TupleSchema):
+
+    """Pyramid :term:`ace` tuple."""
+
+    action = SingleLine(missing=colander.required,
+                        validator=colander.OneOf([security.Allow,
+                                                  security.Deny,
+                                                  ]),
+                        )
+    principal = ACEPrincipal(missing=colander.required)
+    permissions = SingleLineList(missing=colander.required)
+
+
+class ACL(colander.SequenceSchema):
+
+    """Pyramid :term:`acl`, a list of :term:`ace`s."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'default' not in kwargs:  # pragma: no branch
+            self.default = []
+            self.missing = []
+
+    ace = ACE()

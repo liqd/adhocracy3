@@ -201,15 +201,14 @@ it::
     >>> resp_data = testapp.options(rest_url + "/adhocracy/pool2",
     ...                             headers=admin_header).json
     >>> resp_data['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata']
-    {'deleted': ''}
+    {'deleted': [True, False]}
 
 But they cannot hide it -- that special right is reserved to managers::
 
     >>> resp_data = testapp.options(rest_url + "/adhocracy/pool2",
     ...                             headers=manager_header).json
-    >>> sorted(resp_data['PUT']['request_body']['data']
-    ...                 ['adhocracy_core.sheets.metadata.IMetadata'])
-    ['deleted', 'hidden']
+    >>> pprint(resp_data['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
+    {'deleted': [True, False], 'hidden': [True, False]}
 
 Note: normally the sheets listed in the OPTIONS response are just mapped to
 empty dictionaries, the contained fields are not listed. But IMetadata is a

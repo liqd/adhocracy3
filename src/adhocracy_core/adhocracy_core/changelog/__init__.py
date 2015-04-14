@@ -29,7 +29,7 @@ class Changelog(defaultdict):
 def clear_changelog_callback(request):
     """Delete all entries in the transaction changelog."""
     registry = request.registry
-    changelog = getattr(registry, 'changelog', dict())
+    changelog = getattr(registry, 'changelog', {})
     changelog.clear()
 
 

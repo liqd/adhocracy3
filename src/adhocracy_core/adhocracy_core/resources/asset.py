@@ -94,7 +94,6 @@ def _store_size_and_filename_as_metadata(file: File,
     metadata_appstruct['size'] = file.size
     metadata_appstruct['filename'] = file.title
     metadata_sheet.set(metadata_appstruct,
-                       registry=registry,
                        omit_readonly=False)
 
 
