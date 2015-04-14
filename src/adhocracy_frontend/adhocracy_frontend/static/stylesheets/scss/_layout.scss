@@ -54,3 +54,15 @@
     margin: 5em auto 10em;
     padding: 0.5em;
 }
+
+
+@media print {
+    .l-header-center,
+    .l-content {
+        position: static;
+    }
+
+    .main-header {
+        display: none;
+    }
+}
