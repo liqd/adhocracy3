@@ -322,12 +322,22 @@ def mock_objectmap() -> Mock:
 
 
 @fixture
+def mock_workflow() -> Mock:
+    """Mock :class:`adhocracy_core.workflows.AdhocracyACLWorkflow`."""
+    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    mock = Mock(spec=AdhocracyACLWorkflow)
+    return mock
+
+
+@fixture
 def mock_content_registry() -> Mock:
     """Mock :class:`adhocracy_core.content.ResourceContentRegistry`."""
     from adhocracy_core.content import ResourceContentRegistry
     mock = Mock(spec=ResourceContentRegistry)
     mock.sheets_meta = {}
     mock.resources_meta = {}
+    mock.workflows_meta = {}
+    mock.workflows = {}
     mock.get_resources_meta_addable.return_value = []
     mock.resources_meta_addable = {}
     mock.get_sheets_read.return_value = []
@@ -744,12 +754,20 @@ class AppUser:
         """default header for requests, mostly for authentication."""
         self._resolver = DottedNameResolver()
 
-    def post(self,
-             path: str, iresource: IInterface, cstruct: dict) -> TestResponse:
-        """Build and post request to the backend rest server."""
+    def post_resource(self, path: str,
+                      iresource: IInterface,
+                      cstruct: dict) -> TestResponse:
+        """Build and post request to create a new resource."""
         url = self.rest_url + self.base_path + path
         props = self._build_post_body(iresource, cstruct)
         resp = self.app.post_json(url, props, headers=self.header,
+                                  expect_errors=True)
+        return resp
+
+    def post(self, path: str, cstruct: dict={}) -> TestResponse:
+        """Post request to create a new resource."""
+        url = self.rest_url + self.base_path + path
+        resp = self.app.post_json(url, cstruct, headers=self.header,
                                   expect_errors=True)
         return resp
 

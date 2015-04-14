@@ -48,7 +48,6 @@ def update_modification_date_modified_by(event):
         appstruct['modified_by'] = get_user(request)
     sheet.set(appstruct,
               send_event=False,
-              registry=event.registry,
               request=request,
               omit_readonly=False,
               )
@@ -72,7 +71,7 @@ def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
     sheet = get_sheet(user, IPermissions)
     groups = sheet.get()['groups']
     groups.append(group)
-    sheet.set({'groups': groups}, registry=registry)
+    sheet.set({'groups': groups})
 
 
 def autoupdate_versionable_has_new_version(event):
@@ -219,7 +218,7 @@ def autoupdate_tag_has_new_version(event):
         return
     sheet = get_sheet(event.object, event.isheet, event.registry)
     appstruct = _get_updated_appstruct(event, sheet)
-    sheet.set(appstruct, registry=event.registry)
+    sheet.set(appstruct)
 
 
 def includeme(config):

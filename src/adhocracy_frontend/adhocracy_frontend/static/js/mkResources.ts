@@ -780,6 +780,28 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     // report about this, escpecially on the calling side.)
     var stringToBoolean : string = "(field : string) => typeof field === \"string\" ? field === \"true\" : <any>field";
 
+    var dictParser = (fields : {[key : string]: string}) => {
+        var outputFields : string[] = [];
+
+        for (var key in fields) {
+            if (fields.hasOwnProperty(key)) {
+                var parser : string = fields[key];
+                var outputField : string;
+
+                if (parser != null) {
+                    outputField = "{key}: ({parser})(field.{key})";
+                } else {
+                    outputField = "{key}: field.{key}";
+                }
+
+                outputFields.push(outputField
+                    .replace(/\{key\}/g, key)
+                    .replace(/\{parser\}/g, parser));
+                }
+        }
+        return "(field) => ({" + outputFields.join(", ") + "})";
+    };
+
     switch (field.valuetype) {
     case "String":
         resultType = "string";
@@ -844,6 +866,12 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     case "adhocracy_core.schema.ISOCountryCode":
         resultType = "string";
         break;
+    case "adhocracy_core.sheets.workflow.State":
+        resultType = "string";
+        break;
+    case "adhocracy_core.sheets.workflow.Workflow":
+        resultType = "string";
+        break;
     case "adhocracy_mercator.sheets.mercator.StatusEnum":  // FIXME: this needs to go to the mercator package
         resultType = "string";
         break;
@@ -860,6 +888,14 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     case "adhocracy_core.sheets.geo.WebMercatorLatitude":
         resultType = "number";
         parser = stringToFloat;
+        break;
+    case "adhocracy_core.sheets.workflow.StateAssignment":
+        resultType = "{start_date : string; description : string;}";
+        jsonType = "{start_date : string; description : string;}";
+        parser = dictParser({
+            start_date: null,
+            description: stringToDate
+        });
         break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;

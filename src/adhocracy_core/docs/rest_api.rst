@@ -100,7 +100,7 @@ result is a JSON object with two main keys, "resources" and "sheets"::
 
     >>> resp_data = testapp.get("/meta_api/").json
     >>> sorted(resp_data.keys())
-    ['resources', 'sheets']
+    ['resources', 'sheets', 'workflows']
 
 The "resources" key points to an object whose keys are all the resources
 (content types) defined by the system::
