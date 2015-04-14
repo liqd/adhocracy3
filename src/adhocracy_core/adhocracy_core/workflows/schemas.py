@@ -73,7 +73,7 @@ class StateMeta(MappingSchema):
     description = Text(missing='')
     acl = ACL()
     display_only_to_roles = Roles(missing=[])
-    """Hint for the fronted, this not security related."""
+    """Hint for the fronted, this is not security related."""
 
 
 class WorkflowMeta(MappingSchema):

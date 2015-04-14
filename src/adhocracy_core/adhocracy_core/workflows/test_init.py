@@ -90,7 +90,8 @@ class TestAddWorkflow:
         states = sorted(workflow.get_states(None, None),
                         key=lambda x: x['name'])
         assert states[0]['initial'] is False
-        assert workflow._states['draft'].acl == [('Deny', 'role:reader', ['view'])]
+        assert workflow._states['draft'].acl == [('Deny', 'role:reader',
+                                                  ['view'])]
         assert states[1]['initial'] is True
         assert workflow._states['announced'].acl == []
 
