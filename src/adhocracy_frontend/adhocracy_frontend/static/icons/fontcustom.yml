@@ -27,8 +27,8 @@ input:
 # --------------------------------------------------------------------------- #
 
 output:
-  fonts: ../../static/icons/fonts                              # required
-  css: ../../static/stylesheets
+  fonts: ../../static/fonts                              # required
+  css: ../../static/stylesheets/scss/third_party/
   preview: ../../static/icons/preview
 
 
@@ -40,5 +40,5 @@ output:
 # --------------------------------------------------------------------------- #
 
 templates:
- - css
+ - scss-rails
  - preview
