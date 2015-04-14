@@ -67,6 +67,14 @@ class TestResourceFactory:
     def registry(self, registry_with_content):
         return registry_with_content
 
+    @fixture
+    def mock_mod_date(self, monkeypatch):
+        from adhocracy_core.utils import now
+        date = now()
+        monkeypatch.setattr('adhocracy_core.resources.get_modification_date',
+                            lambda x: date)
+        return date
+
     def make_one(self, resource_meta):
         from adhocracy_core.resources import ResourceFactory
         return ResourceFactory(resource_meta)
@@ -245,9 +253,9 @@ class TestResourceFactory:
         assert 'Service' in pool
         assert resource.__is_service__
 
+
     def test_without_creator_and_resource_implements_imetadata(
-            self, resource_meta, registry, mock_sheet):
-        from datetime import datetime
+            self, resource_meta, registry, mock_sheet, mock_mod_date):
         from adhocracy_core.sheets.metadata import IMetadata
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IMetadata])
@@ -258,10 +266,9 @@ class TestResourceFactory:
         set_appstructs = mock_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] is None
         assert set_appstructs['modified_by'] is None
-        today = datetime.utcnow().date()
-        assert set_appstructs['creation_date'].date() == today
-        assert set_appstructs['item_creation_date'] == set_appstructs['creation_date']
-        assert set_appstructs['modification_date'].date() == today
+        assert set_appstructs['creation_date'] == mock_mod_date
+        assert set_appstructs['item_creation_date'] == mock_mod_date
+        assert set_appstructs['modification_date'] == mock_mod_date
         set_send_event = mock_sheet.set.call_args[1]['send_event']
         assert set_send_event is False
 

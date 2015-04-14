@@ -5,6 +5,8 @@ from collections.abc import Sequence
 from datetime import datetime
 from functools import reduce
 from pytz import UTC
+import os
+import time
 import copy
 import json
 import pprint
@@ -456,6 +458,12 @@ def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
             return VisibilityChange.invisible
 
 
+def now() -> datetime:
+    """Return current date time with 'UTC' time zone."""
+    date = datetime.utcnow().replace(tzinfo=UTC)
+    return date
+
+
 def get_modification_date(registry: Registry) -> datetime:
     """Get the shared modification date for the current transaction.
 
@@ -465,6 +473,22 @@ def get_modification_date(registry: Registry) -> datetime:
     """
     date = getattr(registry, '__modification_date__', None)
     if date is None:
-        date = datetime.utcnow().replace(tzinfo=UTC)
+        date = now()
         registry.__modification_date__ = date
     return date
+
+
+def create_filename(directory='.', prefix='', suffix='.csv') -> str:
+    """Use current time to generate a unique filename.
+
+    :params dir: directory path for the filename.
+                 If non existing the directory is created.
+    :params prefix: prefix for the generated filename
+    :params suffix: type suffix for the generated filename, like 'csv'
+    """
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    time_str = time.strftime('%Y%m%d-%H%M%S')
+    name = '{0}-{1}{2}'.format(prefix, time_str, suffix)
+    path = os.path.join(directory, name)
+    return path

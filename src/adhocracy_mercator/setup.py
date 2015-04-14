@@ -43,7 +43,7 @@ setup(name='adhocracy_mercator',
       main = adhocracy_mercator:main
       [console_scripts]
       export_mercator_proposals =\
-          adhocracy_mercator.scripts.export:export_proposals
+          adhocracy_mercator.scripts.export_proposals:export_proposals
       export_mercator_users =\
           adhocracy_mercator.scripts.export_users:export_users
       """,

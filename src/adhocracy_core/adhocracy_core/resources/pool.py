@@ -1,5 +1,4 @@
 """Basic type with children typically to create process structures."""
-import datetime
 from substanced.folder import Folder
 from substanced.util import find_service
 from substanced.interfaces import IFolder
@@ -13,6 +12,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.base import Base
 from adhocracy_core.resources.base import Length
+from adhocracy_core.utils import now
 
 
 class IBasicPool(IPool):
@@ -59,7 +59,7 @@ class Pool(Base, Folder):
         name = prefix + self._zfill(intifiable)
         self._autoname_last = intifiable
         if name in self.data:
-            timestamp = datetime.datetime.now().isoformat()
+            timestamp = now().isoformat()
             name += '_' + timestamp
         return name
 
