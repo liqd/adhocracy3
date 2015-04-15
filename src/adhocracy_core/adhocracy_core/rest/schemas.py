@@ -3,7 +3,6 @@ from datetime import datetime
 from hypatia.interfaces import IIndexSort
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
-from pytz import UTC
 from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
 from colander import SchemaNode
@@ -32,6 +31,7 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import now
 from adhocracy_core.interfaces import IUserLocator
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.sheets.principal import IUserExtended
@@ -560,8 +560,7 @@ def _raise_if_no_password_reset(node: SchemaNode, value: IPasswordReset):
 
 def _raise_if_outdated(node: SchemaNode, value: IPasswordReset,
                        creation_date: datetime):
-        now = datetime.utcnow().replace(tzinfo=UTC)
-        if (now - creation_date).days >= 7:
+        if (now() - creation_date).days >= 7:
             value.__parent__ = None  # commit_suicide
             msg = 'This password reset is older than 7 days.'
             raise colander.Invalid(node, msg)

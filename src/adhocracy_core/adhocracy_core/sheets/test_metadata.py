@@ -14,12 +14,18 @@ def mock_metadata_sheet(context, mock_sheet, registry_with_content):
     return mock_sheet
 
 
-
 class TestIMetadataSchema:
 
     @fixture
-    def request(self):
+    def request_(self):
         return testing.DummyRequest()
+
+    @fixture
+    def mock_now(self, monkeypatch):
+        from adhocracy_core.utils import now
+        date = now()
+        monkeypatch.setattr('adhocracy_core.schema.now', lambda: date)
+        return date
 
     def make_one(self, **kwargs):
         from adhocracy_core.sheets.metadata import MetadataSchema
@@ -42,28 +48,27 @@ class TestIMetadataSchema:
         assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
-    def test_serialize_empty_and_bind(self, context):
-        from datetime import datetime
+    def test_serialize_empty_and_bind(self, context, mock_now):
         inst = self.make_one().bind(context=context)
         result = inst.serialize({})
-        this_year = str(datetime.now().year)
-        assert this_year in result['creation_date']
-        assert this_year in result['item_creation_date']
-        assert this_year in result['modification_date']
+        now_str = mock_now.isoformat()
+        assert result['creation_date'] == now_str
+        assert result['item_creation_date'] == now_str
+        assert result['modification_date'] == now_str
 
-    def test_deserialize_hiding_requires_permission(self, context, request):
+    def test_deserialize_hiding_requires_permission(self, context, request_):
         import colander
-        inst = self.make_one().bind(context=context, request=request)
-        request.has_permission = Mock(return_value=False)
+        inst = self.make_one().bind(context=context, request=request_)
+        request_.has_permission = Mock(return_value=False)
         with raises(colander.Invalid):
             inst.deserialize({'hidden': False})
-        request.has_permission = Mock(return_value=True)
+        request_.has_permission = Mock(return_value=True)
         result = inst.deserialize({'hidden': False})
         assert result['hidden'] is False
 
-    def test_deserialize_delete_doesnt_require_permission(self, context, request):
-        inst = self.make_one().bind(context=context, request=request)
-        request.has_permission = Mock(return_value=True)
+    def test_deserialize_delete_doesnt_require_permission(self, context, request_):
+        inst = self.make_one().bind(context=context, request=request_)
+        request_.has_permission = Mock(return_value=True)
         result = inst.deserialize({'deleted': False})
         assert result['deleted'] is False
 

@@ -509,3 +509,43 @@ def test_is_hidden_parent_attrib_true_child_attrib_false(context):
     context.hidden = True
     child.hidden = False
     assert is_hidden(child) is True
+
+
+def test_now():
+    from datetime import datetime
+    from pytz import UTC
+    from . import now
+    date = now()
+    assert isinstance(date, datetime)
+    assert date.tzinfo == UTC
+
+
+def test_create_filename():
+    from datetime import datetime
+    from . import create_filename
+    name = create_filename()
+    now = datetime.now()
+    assert str(now.year) in name
+    assert name.startswith('./')
+    assert name.endswith('.csv')
+
+
+def test_create_filename_with_kwargs():
+    from datetime import datetime
+    from . import create_filename
+    name = create_filename(directory='.', prefix='pre', suffix='.suf')
+    now = datetime.now()
+    assert str(now.year) in name
+    assert name.startswith('./')
+    assert name.endswith('.suf')
+
+
+def test_create_filename_create_directory_if_not_exists():
+    import random
+    from os import path
+    from . import create_filename
+    subdir = str(random.random())
+    create_filename(directory='/tmp/' + subdir + '/x')
+    path.exists('/tmp/' + subdir + '/x')
+
+

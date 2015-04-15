@@ -61,26 +61,41 @@ class TestFilteringPoolSheet:
         return pool_meta
 
     @fixture
-    def inst(self, meta, context):
+    def filter_elements_result(self):
         from adhocracy_core.sheets.pool import FilterElementsResult
+        return FilterElementsResult(['Dummy'], 1, {})
+
+    @fixture
+    def mock_filter_elements(self, meta, filter_elements_result):
+        mock = Mock(spec=meta.sheet_class._filter_elements)
+        mock.return_value = filter_elements_result
+        return mock
+
+    @fixture
+    def inst(self, meta, context, mock_filter_elements):
         inst = meta.sheet_class(meta, context)
-        inst._filter_elements = Mock(spec=inst._filter_elements)
-        inst._filter_elements.return_value = FilterElementsResult(['Dummy'],
-                                                                    1, {})
+        inst._filter_elements = mock_filter_elements
         return inst
 
     @fixture
-    def biginst(self, meta, context):
-        from adhocracy_core.sheets.pool import FilterElementsResult
-        inst = meta.sheet_class(meta, context)
-        inst._filter_elements = Mock(spec=inst._filter_elements)
-        elements = ['Dummy{}'.format(i) for i in range(97)]
-        inst._filter_elements.return_value \
-            = FilterElementsResult(elements, len(elements), {})
-        return inst
+    def filter_elements_kwargs(self):
+        """Return default kwargs for the _filter_elements method."""
+        from adhocracy_core.interfaces import ISheet
+        default_kwargs = {'depth': 1,
+                          'ifaces': [ISheet],
+                          'arbitrary_filters': {},
+                          'resolve_resources': True,
+                          'references': {},
+                          'sort_filter': '',
+                          'reverse': False,
+                          'limit': None,
+                          'offset': 0,
+                          'aggregate_filter': '',
+                          'aggregate_form': 'count',
+                          }
+        return default_kwargs
 
-
-    def test_create(self, context):
+    def test_create(self, context, meta):
         from adhocracy_core.sheets.pool import pool_meta
         inst = pool_meta.sheet_class(pool_meta, context)
         from adhocracy_core.interfaces import IResourceSheet
@@ -96,118 +111,69 @@ class TestFilteringPoolSheet:
         assert inst.meta.editable is False
         assert inst.meta.creatable is False
 
-    def test_get_reference_appstruct_with_depth(self, inst):
-        appstruct = inst._get_reference_appstruct(
-            {'depth': '3', 'content_type': 'BlahType', 'count': True})
-        assert inst._filter_elements.call_args[1] == {'depth': 3,
-                                                      'ifaces': ['BlahType'],
-                                                      'arbitrary_filters': {},
-                                                      'resolve_resources': True,
-                                                      'references': {},
-                                                      'sort_filter': '',
-                                                      'reverse': False,
-                                                      'limit': None,
-                                                      'offset': 0,
-                                                      'aggregate_filter': '',
-                                                      }
-        assert appstruct == {'elements': ['Dummy'], 'count': 1}
+    def test_get(self, inst,  filter_elements_kwargs,  filter_elements_result):
+        appstruct = inst.get()
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
+        assert appstruct == {'elements': filter_elements_result.elements}
 
-    def test_get_reference_appstruct_with_two_ifaces_and_two_arbitraryfilters(self, inst):
-        appstruct = inst._get_reference_appstruct(
-            {'content_type': 'BlahType', 'sheet': 'BlubSheet',
-             'tag': 'BEST', 'rating': 'outstanding'})
-        assert inst._filter_elements.call_args[1] == {
-            'depth': 1,
-            'ifaces': ['BlahType', 'BlubSheet'],
-            'arbitrary_filters': {'tag': 'BEST', 'rating': 'outstanding'},
-            'resolve_resources': True,
-            'references': {},
-            'sort_filter': '',
-            'reverse': False,
-            'limit': None,
-            'offset': 0,
-            'aggregate_filter': '',
-            }
-        assert appstruct == {'elements': ['Dummy']}
+    def test_get_depth(self, inst, filter_elements_kwargs):
+        inst.get({'depth': '3', 'content_type': 'BlahType', 'count': True})
+        filter_elements_kwargs['depth'] = 3
+        filter_elements_kwargs['ifaces'] = ['BlahType']
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
 
-    def test_get_reference_appstruct_with_depth_all(self, inst):
-        from adhocracy_core.interfaces import ISheet
-        appstruct = inst._get_reference_appstruct({'depth': 'all'})
-        assert inst._filter_elements.call_args[1] == \
-               {'depth': None,
-                'ifaces': [ISheet],  # default target isheet
-                'arbitrary_filters': {},
-                'resolve_resources': True,
-                'references': {},
-                'sort_filter': '',
-                'reverse': False,
-                'limit': None,
-                'offset': 0,
-                'aggregate_filter': '',
-                }
-        assert appstruct == {'elements': ['Dummy']}
+    def test_get_with_two_ifaces_and_two_arbitraryfilters(self, inst,
+                                                          filter_elements_kwargs):
+        inst.get({'content_type': 'BlahType', 'sheet': 'BlubSheet',
+                  'tag': 'BEST', 'rating': 'outstanding'})
+        filter_elements_kwargs['arbitrary_filters'] = {'tag': 'BEST',
+                                                       'rating': 'outstanding'}
+        filter_elements_kwargs['ifaces'] = ['BlahType', 'BlubSheet']
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
 
-    def test_get_reference_appstruct_with_limit(self, biginst):
-        from adhocracy_core.interfaces import ISheet
-        limit = 100
-        appstruct = biginst._get_reference_appstruct({'limit': limit})
-        assert biginst._filter_elements.call_args[1] == \
-            {'depth': 1,
-             'ifaces': [ISheet],  # default target isheet
-             'arbitrary_filters': {},
-             'resolve_resources': True,
-             'references': {},
-             'sort_filter': '',
-             'reverse': False,
-             'limit': limit,
-             'offset': 0,
-             'aggregate_filter': '',
-             }
-        assert appstruct == {'elements':
-                             biginst._filter_elements.return_value.elements}
+    def test_get_with_depth_all(self, inst, filter_elements_kwargs):
+        inst.get({'depth': 'all'})
+        filter_elements_kwargs['depth'] = None
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
 
-    def test_get_reference_appstruct_with_elements_omit(self, inst):
-        appstruct = inst._get_reference_appstruct({'elements': 'omit'})
+    def test_get_with_limit(self, inst, filter_elements_kwargs):
+        inst.get({'limit': 2})
+        filter_elements_kwargs['limit'] = 2
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
+
+    def test_get_with_elements_omit(self, inst):
+        appstruct = inst.get({'elements': 'omit'})
         assert inst._filter_elements.call_args[1]['resolve_resources'] is False
-        assert 'elements' not in appstruct
+        assert appstruct == {'elements': []}
 
-    def test_get_reference_appstruct_aggregateby(self, inst):
-        from adhocracy_core.interfaces import ISheet
-        appstruct = inst._get_reference_appstruct({'aggregateby': 'interfaces'})
-        assert inst._filter_elements.call_args[1] == \
-               {'depth': 1,
-                'ifaces': [ISheet],  # default target isheet
-                'arbitrary_filters': {},
-                'resolve_resources': True,
-                'references': {},
-                'sort_filter': '',
-                'reverse': False,
-                'limit': None,
-                'offset': 0,
-                'aggregate_filter': 'interfaces',
-                }
+    def test_get_with_aggregateby(self, inst, filter_elements_kwargs):
+        appstruct = inst.get({'aggregateby': 'interfaces'})
+        filter_elements_kwargs['aggregate_filter'] = 'interfaces'
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
         assert appstruct == {'elements': ['Dummy'], 'aggregateby': {}}
 
-    def test_get_arbitrary_filters(self, meta, context):
+    def test_get_with_aggregateby_elements(self, inst, filter_elements_kwargs):
+        inst.get({'aggregateby_elements': 'content'})
+        filter_elements_kwargs['aggregate_form'] = 'content'
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
+
+    def test_get_with_arbitrary_filters(self, inst):
         """remove all standard  and reference filter in get pool requests."""
         from adhocracy_core.rest.schemas import GETPoolRequestSchema
-        inst = meta.sheet_class(meta, context)
         filters = GETPoolRequestSchema().serialize({})
         arbitrary_filters = {'index1': None}
         filters.update(arbitrary_filters)
         assert inst._get_arbitrary_filters(filters) == arbitrary_filters
 
-    def test_get_reference_filters(self, meta, context):
+    def test_get_reference_filters(self, inst):
         """remove all standard  and arbitrary filter in get pool requests."""
         from adhocracy_core.rest.schemas import GETPoolRequestSchema
-        inst = meta.sheet_class(meta, context)
         filters = GETPoolRequestSchema().serialize({})
         reference_filters = {'sheet.ISheet1.reference:field1': None}
         filters.update(reference_filters)
         assert inst._get_reference_filters(filters) == reference_filters
 
-    def test_get_cstruct_with_params_content(self, meta, context, request):
-        inst = meta.sheet_class(meta, context)
+    def test_get_cstruct_with_params_content(self, inst, request):
         inst.get = Mock()
         child = testing.DummyResource()
         inst.get.return_value = {'elements': [child]}
@@ -217,14 +183,12 @@ class TestFilteringPoolSheet:
               'data': {},
               'path': 'http://example.com/'}]
 
-    def test_get_cstruct_without_params_content(self, meta, context, request):
-        inst = meta.sheet_class(meta, context)
+    def test_get_cstruct_without_params_content(self, inst, request):
         inst.get = Mock()
         child = testing.DummyResource()
         inst.get.return_value = {'elements': [child]}
         cstruct = inst.get_cstruct(request)
         assert cstruct['elements'] == ['http://example.com/']
-
 
 
 @mark.usefixtures('integration')
@@ -426,7 +390,7 @@ class TestIntegrationPoolSheet:
         result = set(poolsheet._filter_elements(references=reference_filters).elements)
         assert result == set([tag_child])
 
-    def test_filter_elements_with_aggregateby(self, registry, pool_graph_catalog):
+    def test_filter_elements_with_aggregate_filter(self, registry, pool_graph_catalog):
         from adhocracy_core.resources.item import IItem
         from adhocracy_core.resources.itemversion import IItemVersion
         from adhocracy_core.sheets.pool import IPool
@@ -439,6 +403,20 @@ class TestIntegrationPoolSheet:
         # Values not matched by the query shouldn't be reported in the
         # aggregate
         assert str(IItem) not in result['interfaces']
+
+    def test_filter_elements_with_aggregate_form_content(self, registry,
+                                                         pool_graph_catalog):
+        from adhocracy_core.resources.item import IItem
+        from adhocracy_core.resources.itemversion import IItemVersion
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        item = self._make_resource(registry, parent=pool_graph_catalog,
+                                   content_type=IItem)
+        poolsheet = get_sheet(item, IPool)
+        result = poolsheet._filter_elements(aggregate_filter='interfaces',
+                                            aggregate_form='content').aggregateby
+        itemversion = item['VERSION_0000000']
+        assert result['interfaces'][str(IItemVersion)] == [itemversion]
 
     def test_filter_elements_with_sort_filter(self, registry, pool_graph_catalog):
         from adhocracy_core.sheets.pool import IPool
