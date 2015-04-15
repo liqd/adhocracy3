@@ -8,8 +8,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.pool import IBasicPool
-from adhocracy_core.resources.pool import basicpool_meta
+from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.service import service_meta
 from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.sheets.asset import AssetFileDownload
@@ -23,7 +22,7 @@ import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
 
 
-class IAssetDownload(IPool):
+class IAssetDownload(ISimple):
 
     """Downloadable binary file for Assets."""
 
@@ -126,7 +125,7 @@ def _create_asset_download(context: IAsset, name: str, registry: Registry,
                             registry=registry)
 
 
-asset_meta = basicpool_meta._replace(
+asset_meta = pool_meta._replace(
     content_name='Asset',
     iresource=IAsset,
     basic_sheets=[
@@ -152,7 +151,7 @@ assets_service_meta = service_meta._replace(
 )
 
 
-class IPoolWithAssets(IBasicPool):
+class IPoolWithAssets(IPool):
 
     """A pool with an auto-created asset service pool."""
 
@@ -162,11 +161,12 @@ def add_assets_service(context: IPool, registry: Registry, options: dict):
     registry.content.create(IAssetsService.__identifier__, parent=context)
 
 
-pool_with_assets_meta = basicpool_meta._replace(
+pool_with_assets_meta = pool_meta._replace(
     iresource=IPoolWithAssets,
-    basic_sheets=basicpool_meta.basic_sheets + [
+    basic_sheets=pool_meta.basic_sheets + [
         adhocracy_core.sheets.asset.IHasAssetPool],
-    after_creation=basicpool_meta.after_creation + [add_assets_service],
+    after_creation=[add_assets_service],
+    is_implicit_addable=True,
 )
 
 

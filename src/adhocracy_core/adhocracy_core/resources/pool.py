@@ -7,6 +7,7 @@ from zope.interface import implementer
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
+import adhocracy_core.sheets.title
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
@@ -86,6 +87,7 @@ pool_meta = resource_meta._replace(
     permission_view='view',
     is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.name.IName,
+                  adhocracy_core.sheets.title.ITitle,
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
