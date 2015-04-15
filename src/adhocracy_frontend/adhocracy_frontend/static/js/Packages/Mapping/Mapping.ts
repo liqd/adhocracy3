@@ -92,11 +92,41 @@ export var mapInput = (
             var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssAddIcon);
             var marker : L.Marker;
 
-            if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
+            var createMarker = (latlng : L.LatLng) : void => {
                 marker = leaflet
-                    .marker(leaflet.latLng(scope.lat, scope.lng))
+                    .marker(latlng)
                     .setIcon(selectedItemLeafletIcon)
-                    .addTo(map);
+                    .addTo(map)
+
+                    // only allow to change location by dragging if the new point is inside the polygon
+                    .on("dragend", (event : L.LeafletDragEndEvent) => {
+                        var result = event.target.getLatLng();
+                        var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
+
+                        if (pointInPolygon) {
+                            scope.mapClicked = true;
+                            $timeout(() => {
+                                tmpLat = result.lat;
+                                tmpLng = result.lng;
+                            });
+                        } else {
+                            marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
+                            marker.dragging.disable();
+                            $timeout(() => {
+                                scope.text = "TR__MAP_MARKER_ERROR";
+                                scope.error = true;
+                                $timeout(() => {
+                                    scope.text = "TR__MAP_EXPLAIN_DRAG";
+                                    marker.dragging.enable();
+                                    scope.error = false;
+                                }, 2000);
+                            });
+                        }
+                    });
+            };
+
+            if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
+                createMarker(leaflet.latLng(scope.lat, scope.lng));
                 marker.dragging.enable();
 
                 scope.text = "TR__MAP_EXPLAIN_DRAG";
@@ -107,10 +137,7 @@ export var mapInput = (
             // when the polygon is clicked, set the marker there
             adhSingleClickWrapper(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
                 if (typeof marker === "undefined") {
-                    marker = leaflet
-                        .marker(event.latlng)
-                        .setIcon(selectedItemLeafletIcon)
-                        .addTo(map);
+                    createMarker(event.latlng);
                 } else {
                     marker.setLatLng(event.latlng);
                 }
@@ -130,32 +157,6 @@ export var mapInput = (
                 map.zoomIn();
             });
 
-            // only allow to change location by dragging if the new point is inside the polygon
-            marker.on("dragend", (event : L.LeafletDragEndEvent) => {
-                var result = event.target.getLatLng();
-                var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
-
-                if (pointInPolygon) {
-                    scope.mapClicked = true;
-                    $timeout(() => {
-                        tmpLat = result.lat;
-                        tmpLng = result.lng;
-                    });
-                } else {
-                    marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
-                    marker.dragging.disable();
-                    $timeout(() => {
-                        scope.text = "TR__MAP_MARKER_ERROR";
-                        scope.error = true;
-                        $timeout(() => {
-                            scope.text = "TR__MAP_EXPLAIN_DRAG";
-                            marker.dragging.enable();
-                            scope.error = false;
-                        }, 2000);
-                    });
-                }
-            });
-
             scope.saveCoordinates = () => {
                 scope.lng = tmpLng;
                 scope.lat = tmpLat;
@@ -172,6 +173,7 @@ export var mapInput = (
                 scope.lng = undefined;
                 scope.lat = undefined;
                 map.removeLayer(marker);
+                marker = undefined;
                 scope.mapClicked = false;
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
