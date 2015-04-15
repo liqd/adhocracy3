@@ -25,7 +25,7 @@ var renderBackendError = (response : angular.IHttpPromiseCallbackArg<any>) : voi
 
     console.log("http response with error status: " + response.status);
     console.log("request (.config):", sanitize(response.config));
-    if (typeof <any>response.headers !== "undefined") {
+    if (typeof response.headers !== "undefined") {
         // FIXME: DefinitelyTyped borisyankov/DefinitelyTyped#4116
         console.log("headers (.headers()):", sanitize((<any>response).headers()));
     }
