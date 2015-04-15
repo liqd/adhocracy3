@@ -67,6 +67,8 @@
 
     .map-list-scroll-container {
         overflow: hidden;
+        margin-top: 20px / $font-size-normal * 1em;
+        //FIXME: remove this when we are in moving columns
         white-space: nowrap;
     }
 
@@ -81,5 +83,23 @@
 
     .map-list-item-col-right {
         @include span(4 of 12 last);
+
+        .map-list-meta-item {
+            margin-bottom: 20px / $font-size-small * 1em;
+        }
+    }
+
+    .map-list-item-title {
+        font-size: $font-size-normal;
+        margin: 0 0 (20px / $font-size-normal * 1em);
+    }
+
+    .map-list-meta-item {
+        font-size: $font-size-small;
+    }
+
+    .map-list-meta-item-icon {
+        font-size: $font-size-normal;
+        margin-right: 8px / $font-size-normal * 1em;
     }
 }
