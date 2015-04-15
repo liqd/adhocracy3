@@ -34,7 +34,7 @@ class WebMercatorLatitude(colander.SchemaNode):
 
 class IPoint(ISheet):
 
-    """Market interface for the name sheet."""
+    """Market interface for the point sheet."""
 
 
 class PointSchema(colander.MappingSchema):

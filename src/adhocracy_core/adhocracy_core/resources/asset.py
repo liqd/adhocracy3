@@ -25,7 +25,7 @@ import adhocracy_core.sheets.asset
 
 class IAssetDownload(IPool):
 
-    """View that makes an asset available for download."""
+    """Downloadable binary file for Assets."""
 
 
 asset_download_meta = simple_meta._replace(
@@ -154,7 +154,7 @@ assets_service_meta = service_meta._replace(
 
 class IPoolWithAssets(IBasicPool):
 
-    """A pool with an auto-created asset pool."""
+    """A pool with an auto-created asset service pool."""
 
 
 def add_assets_service(context: IPool, registry: Registry, options: dict):

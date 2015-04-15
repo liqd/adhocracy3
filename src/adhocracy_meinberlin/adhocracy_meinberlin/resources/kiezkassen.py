@@ -14,7 +14,7 @@ import adhocracy_meinberlin.sheets.kiezkassen
 
 class IProposalVersion(IItemVersion):
 
-    """A Kiezkasse proposal."""
+    """Kiezkassen proposal version."""
 
 
 proposal_version_meta = itemversion_meta._replace(
@@ -30,7 +30,7 @@ proposal_version_meta = itemversion_meta._replace(
 
 class IProposal(IItem):
 
-    """Kiezkasse proposal versions pool."""
+    """Kiezkassen proposal versions pool."""
 
 
 proposal_meta = item_meta._replace(

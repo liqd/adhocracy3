@@ -34,10 +34,10 @@ def test_item_meta():
 
 
 def test_item_without_name_sheet_meta():
-    from .item import item_basic_sheets_without_name_sheet
+    from .item import item_basic_sheets_without_name
     import adhocracy_core.sheets
     assert adhocracy_core.sheets.name.IName\
-        not in item_basic_sheets_without_name_sheet
+        not in item_basic_sheets_without_name
 
 
 def make_itemversion(parent=None, follows=[]):
