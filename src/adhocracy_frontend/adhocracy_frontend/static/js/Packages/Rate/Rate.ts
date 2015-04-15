@@ -194,7 +194,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         },
         link: (scope : IRateScope) : void => {
             var myRateResource : RIRateVersion;
-            var webSocketOff : Function;
+            var webSocketOff : () => void;
             var postPoolPath : string;
             var rates : {[key : string]: number};
             var lock : boolean;

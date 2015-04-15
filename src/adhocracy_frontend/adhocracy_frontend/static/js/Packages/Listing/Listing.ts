@@ -86,7 +86,7 @@ export interface ListingScope<Container> extends angular.IScope {
     frontendOrderReverse : boolean;
     update : (boolean?) => angular.IPromise<void>;
     loadMore : () => void;
-    wsOff : Function;
+    wsOff : () => void;
     clear : () => void;
     onCreate : () => void;
 }

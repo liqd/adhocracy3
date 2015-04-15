@@ -398,7 +398,7 @@ export class Service {
         }
     }
 
-    public on(key : string, fn, space? : string) : Function {
+    public on(key : string, fn, space? : string) : () => void {
         // initially trigger callback
         fn(this.get(key, space));
 

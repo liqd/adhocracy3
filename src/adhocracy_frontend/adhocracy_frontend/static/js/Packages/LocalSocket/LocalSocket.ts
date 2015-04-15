@@ -24,7 +24,7 @@ export class Service {
         this.messageEventManager = new adhEventManagerClass();
     }
 
-    public register(path : string, callback : (msg : ILocalEvent) => void) : Function {
+    public register(path : string, callback : (msg : ILocalEvent) => void) : () => void {
         return this.messageEventManager.on(path, callback);
     }
 
