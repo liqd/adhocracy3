@@ -262,6 +262,12 @@ class AnnotationStorageSheet(PropertySheet):
                                   request=request)
         return schema
 
+    def delete_field_values(self, fields: [str]):
+        """Delete value for every field name in `fields`."""
+        for key in fields:
+            if key in self._data:
+                del self._data[key]
+
 
 @implementer(IResourceSheet)
 class AttributeStorageSheet(AnnotationStorageSheet):
