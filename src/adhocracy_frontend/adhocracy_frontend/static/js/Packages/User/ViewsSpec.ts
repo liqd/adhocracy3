@@ -4,8 +4,6 @@ import q = require("q");
 
 import AdhUserViews = require("./Views");
 
-// FIXME: DefinitelyTyped is not yet compatible with jasmine 2.0.0
-declare var beforeEach : (any) => void;
 
 export var register = () => {
     describe("UserViews", () => {
