@@ -59,8 +59,7 @@ export var mapInput = (
                 stroke: false
             };
 
-            // FIXME: Definetely Typed
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon), style);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
             scope.polygon.addTo(map);
 
             // limit map to polygon
@@ -179,7 +178,7 @@ export var mapDetail = (leaflet : typeof L) => {
 
             scope.map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon));
             scope.polygon.addTo(scope.map);
 
             scope.map.fitBounds(scope.polygon.getBounds());
@@ -254,7 +253,7 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon));
             scope.polygon.addTo(map);
 
             // limit map to polygon
