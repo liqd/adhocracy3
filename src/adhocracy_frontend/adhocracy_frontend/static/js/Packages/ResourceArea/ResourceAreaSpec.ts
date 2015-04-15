@@ -66,7 +66,7 @@ export var register = () => {
 
                 it("sets resourceUrl", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
-                        expect(data["resourceUrl"]).toBe("rest_url/platform/wlog");
+                        expect(data["resourceUrl"]).toBe("rest_url/platform/wlog/");
                         done();
                     });
                 });
