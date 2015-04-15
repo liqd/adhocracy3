@@ -299,7 +299,6 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                     hide: false,
                     index: key
                 };
-                console.log(item.marker);
                 item.marker.addTo(map);
                 item.marker.on("click", (e) => {
                     $timeout(() => {
