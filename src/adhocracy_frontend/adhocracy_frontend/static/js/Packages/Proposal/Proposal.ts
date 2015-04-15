@@ -67,8 +67,7 @@ export class ProposalDetail {
                         });
                 };
 
-                // FIXME DefinitelyTyped
-                (<any>$scope).$on("$destroy", adhWebSocket.register($scope.path, () => {
+                $scope.$on("$destroy", adhWebSocket.register($scope.path, () => {
                     fetchAndUpdateContent($scope.path);
                 }));
 
