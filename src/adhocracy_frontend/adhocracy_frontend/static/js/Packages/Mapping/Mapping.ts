@@ -194,7 +194,7 @@ export var mapDetail = (leaflet : typeof L) => {
             });
             scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map);
 
-            scope.$watchGroup(["lat","lng"], function(newValues, oldValues, scope){
+            scope.$watchGroup(["lat", "lng"], (newValues) => {
                 scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
             });
         }
