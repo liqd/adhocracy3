@@ -61,6 +61,22 @@ A highlighted button. Each page should have one CTA at maxiumum.
 <input type="submit" class="m-call-to-action" value="Disabled" disabled="disabled" />
 ```
 */
+
+/*doc
+---
+title: call-to-action-secondary modifier
+name: button.m-call-to-action-secondary
+parent: button
+---
+If a more than one CTA is required please use m-call-to-action-secondary modifier.
+
+```html_example
+<a class="button m-call-to-action-secondary">Link</a>
+<button type="button" class="m-call-to-action-secondary">Button</button>
+<input type="submit" class="m-call-to-action-secondary" value="Disabled" disabled="disabled" />
+```
+
+*/
 .button,
 button,
 input[type="reset"],
