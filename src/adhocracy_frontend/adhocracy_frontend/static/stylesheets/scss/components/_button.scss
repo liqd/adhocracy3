@@ -68,7 +68,9 @@ title: call-to-action-secondary modifier
 name: button.m-call-to-action-secondary
 parent: button
 ---
-If a more than one CTA is required please use m-call-to-action-secondary modifier.
+
+If more than one CTA is required per page, `m-call-to-action-secondary` should
+be used instead.
 
 ```html_example
 <a class="button m-call-to-action-secondary">Link</a>
