@@ -83,7 +83,7 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
 
 class IRootPool(IPool, IRoot):
 
-    """The appplication root object."""
+    """The application root object."""
 
 
 def create_initial_content_for_app_root(context: IPool, registry: Registry,

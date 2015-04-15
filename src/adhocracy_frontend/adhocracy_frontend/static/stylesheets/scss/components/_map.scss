@@ -36,3 +36,17 @@
         float: right;
     }
 }
+
+.leaflet-marker-icon {
+    -webkit-text-stroke: 1px $color-text-inverted;
+    color: $color-brand-two-normal;
+    font-size: 42px;
+
+    &.is-active, &:hover, &:focus {
+        color: $color-brand-one-introvert;
+    }
+
+    &:before {
+        display: block;
+    }
+}
