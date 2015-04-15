@@ -9,9 +9,12 @@ import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhListing = require("../Listing/Listing");
+import AdhWebSocket = require("../WebSocket/WebSocket");
+
 import AdhMappingUtils = require("./MappingUtils");
 
 var pkgLocation = "/Mapping";
+
 
 export var style = {
     fillColor: "#000",
@@ -384,6 +387,12 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
 
 export class Listing<Container extends ResourcesBase.Resource> extends AdhListing.Listing<Container> {
     public static templateUrl : string = pkgLocation + "/Listing.html";
+
+    public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.Service) {
+        var directive = super.createDirective(adhConfig, adhWebSocket);
+        directive.scope["polygon"] = "=";
+        return directive;
+    }
 }
 
 

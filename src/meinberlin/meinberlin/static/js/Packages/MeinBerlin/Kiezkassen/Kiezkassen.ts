@@ -30,6 +30,9 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
                     adhHttp.get(value).then((resource) => {
                         // FIXME: set individual fields on scope, not simply dump whole resource
                         scope.resource = resource;
+
+                        // FIXME: get actual polygon for this process
+                        scope.polygon = [[0, 0]];
                     });
                     adhHttp.options(value).then((options : AdhHttp.IOptions) => {
                         scope.options = options;
