@@ -15,13 +15,13 @@ from adhocracy_core.utils import create_filename
 
 from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.utils import get_sheet
 
 from pyramid.traversal import resource_path
 
+from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IFinance
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
@@ -83,9 +83,6 @@ def export_proposals():
     result_file = open(filename, 'w', newline='')
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
-    '''
-    - Anzahl der Kommentare (nur wenn möglich)
-    '''
 
     wr.writerow(['URL',
                  'Creation date',
@@ -99,6 +96,7 @@ def export_proposals():
                  'Organisation name',
                  'Organisation country',
                  'Rates (Votes)',
+                 'Number of Comments',
                  'Budget',
                  'Requested Funding',
                  'Other Funding',
@@ -152,8 +150,7 @@ def export_proposals():
                                       IOrganizationInfo,
                                       'name'))
 
-        # country (somehow this always returns a country even if none has been
-        # set)
+        # country
         if status == 'other':
             result.append('')
         else:
@@ -163,9 +160,19 @@ def export_proposals():
             result.append(organization_country)
 
         # Rates
-        rates = get_sheet_field(proposal, ILikeable, 'post_pool')
         rates = index_rates(proposal, None)
         result.append(rates)
+
+        # Comments
+        query = {'content_type': ICommentVersion,
+                 'depth': 'all',
+                 'tag': 'LAST',
+                 'count': 'true',
+                 'elements': 'omit'}
+        proposal_item = proposal.__parent__
+        proposal_sheet = get_sheet(proposal_item, IPool)
+        query_result = proposal_sheet.get(query)
+        result.append(query_result['count'])
 
         # requested funding
         finance = get_sheet_field(proposal,
@@ -191,11 +198,6 @@ def export_proposals():
                                    IMercatorSubResources,
                                    'location')
 
-        '''
-         'Location Places',
-         'Location Online',
-         'Location Ruhr-Connection',
-        '''
         # Location Places
 
         location_is_specific = get_sheet_field(
