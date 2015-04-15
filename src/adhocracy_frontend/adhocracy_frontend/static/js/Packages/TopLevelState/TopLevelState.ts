@@ -139,7 +139,6 @@ export class Service {
     private area : IArea;
     private currentSpace : string;
     private blockTemplate : boolean;
-    private locationHasChanged : boolean;
     private lock : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
@@ -163,12 +162,9 @@ export class Service {
         this.currentSpace = "";
         this.data = {"": <any>{}};
 
-        this.locationHasChanged = false;
         this.lock = false;
 
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
-            self.locationHasChanged = true;
-
             if (!self.lock) {
                 self.fromLocation();
             }
@@ -235,10 +231,9 @@ export class Service {
 
     private fromLocation() : angular.IPromise<void> {
         var area = this.getArea();
+        var absUrl = this.$location.absUrl();
         var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
-
-        this.locationHasChanged = false;
 
         if (area.skip) {
             return this.$q.when();
@@ -249,7 +244,7 @@ export class Service {
             return <any>area.route(path, search)
                 .catch((error) => this.handleRoutingError(error))
                 .then((data) => {
-                    if (this.locationHasChanged) {
+                    if (absUrl !== this.$location.absUrl()) {
                         return this.fromLocation();
                     }
 
