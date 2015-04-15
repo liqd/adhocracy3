@@ -72,11 +72,12 @@ export var mapInput = (
                 map.setZoom(scope.zoom);
             }
 
-            // FIXME: Definetely Typed
-            var marker = (<any>leaflet).marker();
+            var marker : L.Marker;
 
             if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
-                marker.setLatLng(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
+                marker = leaflet
+                    .marker(leaflet.latLng(scope.lat, scope.lng))
+                    .addTo(map);
                 marker.dragging.enable();
                 scope.text = "TR__MAP_EXPLAIN_DRAG";
             } else {
@@ -85,8 +86,13 @@ export var mapInput = (
 
             // when the polygon is clicked, set the marker there
             adhSingleClickWrapper(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
-                marker.setLatLng(event.latlng);
-                marker.addTo(map);
+                if (typeof marker === "undefined") {
+                    marker = leaflet
+                        .marker(event.latlng)
+                        .addTo(map);
+                } else {
+                    marker.setLatLng(event.latlng);
+                }
                 marker.dragging.enable();
                 $timeout(() => {
                     tmpLat = event.latlng.lat;
