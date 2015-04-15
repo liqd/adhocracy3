@@ -212,10 +212,9 @@ export var mapDetail = (leaflet : typeof L) => {
             scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng))
                 .addTo(scope.map).setIcon((<any>leaflet).divIcon(cssSelectedItemIcon));
 
-            scope.$watchGroup(["lat", "lng"], (newValues, oldValues, scope) => {
+            scope.$watchGroup(["lat", "lng"], (newValues) => {
                 scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
             });
-
         }
 
     };
