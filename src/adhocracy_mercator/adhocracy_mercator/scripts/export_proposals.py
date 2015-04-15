@@ -11,14 +11,17 @@ import sys
 import textwrap
 
 from pyramid.paster import bootstrap
-from substanced.util import find_catalog
 from adhocracy_core.utils import create_filename
 
 from adhocracy_core.catalog.adhocracy import index_rates
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.utils import get_sheet
 
+from pyramid.traversal import resource_path
+
+from adhocracy_core.resources.comment import ICommentVersion
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IFinance
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
@@ -33,6 +36,7 @@ from adhocracy_mercator.sheets.mercator import IOutcome
 from adhocracy_mercator.sheets.mercator import IValue
 from adhocracy_mercator.sheets.mercator import IPartners
 from adhocracy_mercator.sheets.mercator import IExperience
+from adhocracy_mercator.sheets.mercator import ISteps
 
 
 def get_text_from_sheet(proposal, field, sheet):
@@ -62,17 +66,16 @@ def export_proposals():
     env = bootstrap(args[0])
 
     root = (env['root'])
-    catalog = find_catalog(root, 'system')
-    adhocracy_catalog = find_catalog(root, 'adhocracy')
-    path = catalog['path']
-    interfaces = catalog['interfaces']
-    tag = adhocracy_catalog['tag']
-
-    query = path.eq('/mercator') \
-        & interfaces.eq(IMercatorProposalVersion) \
-        & tag.eq('LAST')
-
-    proposals = query.execute()
+    pool = get_sheet(root, IPool)
+    params = {'depth': 3,
+              'content_type': IMercatorProposalVersion,
+              'sort': 'rates',
+              'reverse': True,
+              'tag': 'LAST',
+              'elements': 'content',
+              }
+    results = pool.get(params)
+    proposals = results['elements']
 
     filename = create_filename(directory='./var/export',
                                prefix='MercatorProposalExport',
@@ -80,7 +83,9 @@ def export_proposals():
     result_file = open(filename, 'w', newline='')
     wr = csv.writer(result_file, delimiter=';', quotechar='"',
                     quoting=csv.QUOTE_MINIMAL)
-    wr.writerow(['Creation date',
+
+    wr.writerow(['URL',
+                 'Creation date',
                  'Title',
                  'Username',
                  'First name',
@@ -91,13 +96,17 @@ def export_proposals():
                  'Organisation name',
                  'Organisation country',
                  'Rates (Votes)',
+                 'Number of Comments',
                  'Budget',
                  'Requested Funding',
                  'Other Funding',
                  'Granted?',
-                 'Ruhr-Connection',
+                 'Location Places',
+                 'Location Online',
+                 'Location Ruhr-Connection',
                  'Proposal Pitch',
                  'Description',
+                 'How do you want to get there?',
                  'Story',
                  'Outcome',
                  'Value',
@@ -107,6 +116,9 @@ def export_proposals():
     for proposal in proposals:
 
         result = []
+
+        url = resource_path(proposal)
+        result.append('https://advocate-europe.eu/en/idea-space#!/r' + url)
 
         # Creationdate
         creation_date = get_sheet_field(
@@ -138,8 +150,7 @@ def export_proposals():
                                       IOrganizationInfo,
                                       'name'))
 
-        # country (somehow this always returns a country even if none has been
-        # set)
+        # country
         if status == 'other':
             result.append('')
         else:
@@ -149,9 +160,19 @@ def export_proposals():
             result.append(organization_country)
 
         # Rates
-        rates = get_sheet_field(proposal, ILikeable, 'post_pool')
         rates = index_rates(proposal, None)
         result.append(rates)
+
+        # Comments
+        query = {'content_type': ICommentVersion,
+                 'depth': 'all',
+                 'tag': 'LAST',
+                 'count': 'true',
+                 'elements': 'omit'}
+        proposal_item = proposal.__parent__
+        proposal_sheet = get_sheet(proposal_item, IPool)
+        query_result = proposal_sheet.get(query)
+        result.append(query_result['count'])
 
         # requested funding
         finance = get_sheet_field(proposal,
@@ -173,10 +194,51 @@ def export_proposals():
 
         result.append(granted)
 
-        # Ruhr-Connection
         location = get_sheet_field(proposal,
                                    IMercatorSubResources,
                                    'location')
+
+        # Location Places
+
+        location_is_specific = get_sheet_field(
+            location,
+            ILocation,
+            'location_is_specific')
+
+        locations = []
+
+        if location_is_specific:
+            location1 = locations.append(get_sheet_field(
+                location,
+                ILocation,
+                'location_specific_1'))
+            if location1:
+                locations.append(location1)
+
+            location2 = locations.append(get_sheet_field(
+                location,
+                ILocation,
+                'location_specific_2'))
+            if location2:
+                locations.append(location2)
+
+            location3 = locations.append(get_sheet_field(
+                location,
+                ILocation,
+                'location_specific_3'))
+            if location3:
+                locations.append(location3)
+
+        result.append('  '.join(locations))
+
+        is_online = get_sheet_field(
+            location,
+            ILocation,
+            'location_is_online')
+        result.append(is_online)
+
+        # Ruhr-Connection
+
         ruhr_connection = get_sheet_field(
             location,
             ILocation,
@@ -198,6 +260,7 @@ def export_proposals():
                 proposal,
                 'description',
                 IDescription))
+        result.append(get_text_from_sheet(proposal, 'steps', ISteps))
         result.append(get_text_from_sheet(proposal, 'story', IStory))
         result.append(get_text_from_sheet(proposal, 'outcome', IOutcome))
         result.append(get_text_from_sheet(proposal, 'value', IValue))
