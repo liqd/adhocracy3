@@ -50,3 +50,24 @@
         display: block;
     }
 }
+
+.map-list {
+    .map-list-navigate {
+        float: left;
+        margin-top: 50px / $font-size-normal * 1em;
+    }
+
+    .map-list-navigate-next {
+        float: right;
+    }
+
+    .scroll-container {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .scroll-container-item {
+        @include inline-block;
+        width: 100%;
+    }
+}
