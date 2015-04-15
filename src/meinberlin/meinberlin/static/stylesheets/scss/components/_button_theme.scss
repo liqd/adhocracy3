@@ -29,7 +29,7 @@ input[type="button"] {
         }
     }
 
-    &.m-call-to-action2 {
+    &.m-call-to-action-secondary {
         &:hover:not(:disabled):not(.ng-disabled),
         &:focus:not(:disabled):not(.ng-disabled) {
             color: $color-text-highlight-normal;
