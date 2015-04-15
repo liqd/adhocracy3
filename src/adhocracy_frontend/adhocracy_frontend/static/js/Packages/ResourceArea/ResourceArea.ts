@@ -195,9 +195,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
         ]).then((values : any[]) => {
             var resource : ResourcesBase.Resource = values[0];
             var processType : string = values[1];
-            var abort : boolean = values[2];
+            var hasRedirected : boolean = values[2];
 
-            if (abort) {
+            if (hasRedirected) {
                 return;
             }
 
