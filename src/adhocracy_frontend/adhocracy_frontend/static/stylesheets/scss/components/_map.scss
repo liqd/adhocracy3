@@ -61,13 +61,25 @@
         float: right;
     }
 
-    .scroll-container {
+    .map-list-scroll-container-inner {
+        margin: 0;
+    }
+
+    .map-list-scroll-container {
         overflow: hidden;
         white-space: nowrap;
     }
 
-    .scroll-container-item {
+    .map-list-item {
         @include inline-block;
         width: 100%;
+    }
+
+    .map-list-item-col-left {
+        @include span(8 of 12 first);
+    }
+
+    .map-list-item-col-right {
+        @include span(4 of 12 last);
     }
 }
