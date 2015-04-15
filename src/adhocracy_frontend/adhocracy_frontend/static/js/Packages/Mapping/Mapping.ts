@@ -264,7 +264,7 @@ export interface IMapListScope<T> extends angular.IScope {
     getNextItem(item : IItem<T>) : void;
 }
 
-export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+export var mapListingInternal = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
     return {
         scope: {
             height: "@",
@@ -274,10 +274,10 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
         restrict: "E",
 
         templateUrl: (element, attrs) => {
-            if ( attrs.orientation === "vertical") {
-                return adhConfig.pkg_path + pkgLocation + "/MapList.html";
+            if (attrs.orientation === "vertical") {
+                return adhConfig.pkg_path + pkgLocation + "/ListingInternal.html";
             } else {
-                return adhConfig.pkg_path + pkgLocation + "/MapListHorizontal.html";
+                return adhConfig.pkg_path + pkgLocation + "/ListingInternalHorizontal.html";
             }
         },
 
@@ -407,11 +407,11 @@ export var register = (angular) => {
             "duScroll"
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-list"]);
+            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-listing-internal"]);
         }])
         .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
         .directive("adhMapDetail", ["leaflet", "$timeout", mapDetail])
-        .directive("adhMapList", ["adhConfig", "leaflet", "$timeout" , mapList])
+        .directive("adhMapListingInternal", ["adhConfig", "leaflet", "$timeout" , mapListingInternal])
         .directive("adhMapListing", ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
                 new Listing(new AdhListing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 };
