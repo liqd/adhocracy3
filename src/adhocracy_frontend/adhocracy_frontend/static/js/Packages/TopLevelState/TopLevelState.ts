@@ -245,8 +245,7 @@ export class Service {
         } else {
             this.lock = true;
 
-            // FIXME: finally seems to be broken in DefinitlyTyped, so <any>
-            return <any>area.route(path, search)
+            return area.route(path, search)
                 .catch((error) => this.handleRoutingError(error))
                 .then((data) => {
                     if (this.locationHasChanged) {
@@ -275,7 +274,7 @@ export class Service {
 
                     this.blockTemplate = false;
                 })
-                .finally(() => {
+                .finally<void>(() => {
                     this.lock = false;
                 });
         }
