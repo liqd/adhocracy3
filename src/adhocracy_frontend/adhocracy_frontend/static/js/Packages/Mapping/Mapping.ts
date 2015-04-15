@@ -11,6 +11,11 @@ import AdhEmbed = require("../Embed/Embed");
 import AdhListing = require("../Listing/Listing");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 
+// FIXME: See #1008
+import AdhHttp = require("../Http/Http");  if (AdhHttp) { ; }
+import AdhPermissions = require("../Permissions/Permissions");  if (AdhPermissions) { ; }
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");  if (AdhPreliminaryNames) { ; }
+
 import AdhMappingUtils = require("./MappingUtils");
 
 var pkgLocation = "/Mapping";
