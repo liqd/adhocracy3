@@ -244,7 +244,6 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
     return {
         scope: {
             height: "@",
-            polygon: "=",
             rawPolygon: "=polygon",
             itemValues: "=items"
         },
