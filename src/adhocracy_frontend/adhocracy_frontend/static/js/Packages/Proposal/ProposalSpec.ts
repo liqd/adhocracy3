@@ -8,7 +8,7 @@ import AdhProposal = require("./Proposal");
 
 
 var createAdhHttpMock = () => {
-    var mock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "options", "postToPool"]);
+    var mock = jasmine.createSpyObj("adhHttpMock", ["get", "options", "postToPool"]);
     mock.get.and.returnValue(q.when({}));
     mock.options.and.returnValue(q.when());
     mock.postToPool.and.returnValue(q.when({}));

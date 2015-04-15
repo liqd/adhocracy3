@@ -20,7 +20,7 @@ var config : AdhConfig.IService = <any>{
 };
 
 var createAdhHttpMock = () => {
-    return <any>jasmine.createSpyObj("adhHttpMock", ["get"]);
+    return jasmine.createSpyObj("adhHttpMock", ["get"]);
 
     // FIXME: typescript should know from description file that
     // jasmine has this method!  (there are other instances of the
@@ -86,9 +86,9 @@ export var register = () => {
                     }
                 };
 
-                var adhWebSocketMock = <any>jasmine.createSpyObj("WebSocketMock", ["register"]);
+                var adhWebSocketMock = jasmine.createSpyObj("WebSocketMock", ["register"]);
 
-                var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs", "totalCount", "poolPath"]);
+                var adapter = jasmine.createSpyObj("adapter", ["elemRefs", "totalCount", "poolPath"]);
                 adapter.elemRefs.and.returnValue(elements);
                 adapter.totalCount.and.returnValue(elements.length);
                 adapter.poolPath.and.returnValue(poolPath);
@@ -197,7 +197,7 @@ export var register = () => {
                         var updatePromise;
 
                         beforeEach(() => {
-                            updatePromise = <any>jasmine.createSpyObj("updatePromise", ["then"]);
+                            updatePromise = jasmine.createSpyObj("updatePromise", ["then"]);
                             spyOn(scope, "update").and.returnValue(updatePromise);
                             spyOn(scope, "clear");
                             callback = scope.$watch.calls.mostRecent().args[1];

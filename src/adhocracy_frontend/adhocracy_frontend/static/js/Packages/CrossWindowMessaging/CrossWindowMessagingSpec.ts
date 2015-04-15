@@ -13,10 +13,10 @@ export var register = () => {
         var adhUserMock;
 
         beforeEach(() => {
-            locationMock = <any>jasmine.createSpyObj("locationMock", ["absUrl"]);
-            windowMock = <any>jasmine.createSpyObj("windowMock", ["addEventListener"]);
-            rootScopeMock = <any>jasmine.createSpyObj("rootScopeMock", ["$watch"]);
-            adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["loggedIn"]);
+            locationMock = jasmine.createSpyObj("locationMock", ["absUrl"]);
+            windowMock = jasmine.createSpyObj("windowMock", ["addEventListener"]);
+            rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
+            adhUserMock = jasmine.createSpyObj("adhUserMock", ["loggedIn"]);
         });
 
         describe("Service", () => {
@@ -24,7 +24,7 @@ export var register = () => {
             var service;
 
             beforeEach(() => {
-                postMessageMock = <any>jasmine.createSpy("postMessageMock");
+                postMessageMock = jasmine.createSpy("postMessageMock");
                 service = new AdhCrossWindowMessaging.Service(
                     postMessageMock, locationMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhUserMock);
             });
@@ -170,7 +170,7 @@ export var register = () => {
                     embedded: true,
                     trusted_domains: []
                 };
-                windowMock.parent = <any>jasmine.createSpyObj("parentMock", ["postMessage"]);
+                windowMock.parent = jasmine.createSpyObj("parentMock", ["postMessage"]);
             });
 
             it("returns a service instance", () => {

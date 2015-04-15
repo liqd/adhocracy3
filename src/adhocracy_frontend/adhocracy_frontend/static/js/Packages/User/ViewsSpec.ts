@@ -21,9 +21,9 @@ export var register = () => {
                     embedded: true,
                     support_email: "support@adhocracy.com"
                 };
-                adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
+                adhUserMock = jasmine.createSpyObj("adhUserMock", ["logIn"]);
                 adhUserMock.logIn.and.returnValue(q.when(undefined));
-                adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
+                adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
                 directive = AdhUserViews.loginDirective(adhConfigMock, adhUserMock, adhTopLevelStateMock, "adhShowError");
             });
 
@@ -100,10 +100,10 @@ export var register = () => {
                     embedded: true,
                     support_email: "support@adhocracy.com"
                 };
-                adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
+                adhUserMock = jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                 adhUserMock.register.and.returnValue(q.when(undefined));
                 adhUserMock.logIn.and.returnValue(q.when(undefined));
-                adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
+                adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
 
                 directive = AdhUserViews.registerDirective(adhConfigMock, adhUserMock, adhTopLevelStateMock, "adhShowError");
             });
@@ -189,7 +189,7 @@ export var register = () => {
 
                 beforeEach(() => {
                     scopeMock = {};
-                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logOut"]);
+                    adhUserMock = jasmine.createSpyObj("adhUserMock", ["logOut"]);
                     controller = <any>(directive.controller[2]);
                     controller(adhUserMock, scopeMock);
                 });
