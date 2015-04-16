@@ -103,14 +103,14 @@ export class Service {
         return this.connected;
     }
 
-    public register(path : string, callback : (msg : IServerEvent) => void) : Function {
+    public register(path : string, callback : (msg : IServerEvent) => void) : () => void {
         if (!this.registrations[path]) {
             this.registrations[path] = 1;
             this.send("subscribe", path);
         } else {
             this.registrations[path] += 1;
         }
-        var off : Function = this.messageEventManager.on(path, callback);
+        var off = this.messageEventManager.on(path, callback);
 
         return () => {
             if (!this.registrations[path]) {
@@ -124,7 +124,7 @@ export class Service {
         };
     }
 
-    public addEventListener(event : string, callback : (arg?) => void) : Function {
+    public addEventListener(event : string, callback : (arg?) => void) : () => void {
         return this.domEventManager.on(event, callback);
     }
 

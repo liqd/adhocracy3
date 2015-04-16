@@ -240,8 +240,7 @@ export class Service {
         } else {
             this.lock = true;
 
-            // FIXME: finally seems to be broken in DefinitlyTyped, so <any>
-            return <any>area.route(path, search)
+            return area.route(path, search)
                 .catch((error) => this.handleRoutingError(error))
                 .then((data) => {
                     if (absUrl !== this.$location.absUrl()) {
@@ -270,7 +269,7 @@ export class Service {
 
                     this.blockTemplate = false;
                 })
-                .finally(() => {
+                .finally<void>(() => {
                     this.lock = false;
                 });
         }
@@ -393,7 +392,7 @@ export class Service {
         }
     }
 
-    public on(key : string, fn, space? : string) : Function {
+    public on(key : string, fn, space? : string) : () => void {
         // initially trigger callback
         fn(this.get(key, space));
 

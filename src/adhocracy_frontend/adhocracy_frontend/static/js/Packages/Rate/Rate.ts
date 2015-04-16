@@ -194,7 +194,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         },
         link: (scope : IRateScope) : void => {
             var myRateResource : RIRateVersion;
-            var webSocketOff : Function;
+            var webSocketOff : () => void;
             var postPoolPath : string;
             var rates : {[key : string]: number};
             var lock : boolean;
@@ -249,8 +249,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                         updateMyRate();
                         updateAggregatedRates();
                     });
-                    // FIXME DefinitelyTyped
-                    (<any>scope).$on("$destroy", webSocketOff);
+                    scope.$on("$destroy", webSocketOff);
                 }
             };
 
@@ -321,8 +320,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             // sync with other local rate buttons
-            // FIXME DefinitelyTyped
-            (<any>scope).$on("$destroy", adhRateEventManager.on(scope.refersTo, () => {
+            scope.$on("$destroy", adhRateEventManager.on(scope.refersTo, () => {
                 updateMyRate();
                 updateAggregatedRates();
             }));

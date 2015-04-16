@@ -76,8 +76,7 @@ export var mapInput = (
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            // FIXME: Definetely Typed
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon), style);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
             scope.polygon.addTo(map);
 
             // limit map to polygon
@@ -91,13 +90,43 @@ export var mapInput = (
             }
 
             var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssAddIcon);
+            var marker : L.Marker;
 
-            // FIXME: Definetely Typed
-            var marker = (<any>leaflet).marker();
-            marker.setIcon(selectedItemLeafletIcon);
+            var createMarker = (latlng : L.LatLng) : void => {
+                marker = leaflet
+                    .marker(latlng)
+                    .setIcon(selectedItemLeafletIcon)
+                    .addTo(map)
+
+                    // only allow to change location by dragging if the new point is inside the polygon
+                    .on("dragend", (event : L.LeafletDragEndEvent) => {
+                        var result = event.target.getLatLng();
+                        var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
+
+                        if (pointInPolygon) {
+                            scope.mapClicked = true;
+                            $timeout(() => {
+                                tmpLat = result.lat;
+                                tmpLng = result.lng;
+                            });
+                        } else {
+                            marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
+                            marker.dragging.disable();
+                            $timeout(() => {
+                                scope.text = "TR__MAP_MARKER_ERROR";
+                                scope.error = true;
+                                $timeout(() => {
+                                    scope.text = "TR__MAP_EXPLAIN_DRAG";
+                                    marker.dragging.enable();
+                                    scope.error = false;
+                                }, 2000);
+                            });
+                        }
+                    });
+            };
 
             if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
-                marker.setLatLng(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
+                createMarker(leaflet.latLng(scope.lat, scope.lng));
                 marker.dragging.enable();
 
                 scope.text = "TR__MAP_EXPLAIN_DRAG";
@@ -107,8 +136,11 @@ export var mapInput = (
 
             // when the polygon is clicked, set the marker there
             adhSingleClickWrapper(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
-                marker.setLatLng(event.latlng);
-                marker.addTo(map);
+                if (typeof marker === "undefined") {
+                    createMarker(event.latlng);
+                } else {
+                    marker.setLatLng(event.latlng);
+                }
                 marker.dragging.enable();
                 $timeout(() => {
                     tmpLat = event.latlng.lat;
@@ -123,32 +155,6 @@ export var mapInput = (
             });
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
-            });
-
-            // only allow to change location by dragging if the new point is inside the polygon
-            marker.on("dragend", (event : L.LeafletDragEndEvent) => {
-                var result = event.target.getLatLng();
-                var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
-
-                if (pointInPolygon) {
-                    scope.mapClicked = true;
-                    $timeout(() => {
-                        tmpLat = result.lat;
-                        tmpLng = result.lng;
-                    });
-                } else {
-                    marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
-                    marker.dragging.disable();
-                    $timeout(() => {
-                        scope.text = "TR__MAP_MARKER_ERROR";
-                        scope.error = true;
-                        $timeout(() => {
-                            scope.text = "TR__MAP_EXPLAIN_DRAG";
-                            marker.dragging.enable();
-                            scope.error = false;
-                        }, 2000);
-                    });
-                }
             });
 
             scope.saveCoordinates = () => {
@@ -167,6 +173,7 @@ export var mapInput = (
                 scope.lng = undefined;
                 scope.lat = undefined;
                 map.removeLayer(marker);
+                marker = undefined;
                 scope.mapClicked = false;
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
@@ -200,7 +207,7 @@ export var mapDetail = (leaflet : typeof L) => {
 
             scope.map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon), style);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon), style);
             scope.polygon.addTo(scope.map);
 
             scope.map.fitBounds(scope.polygon.getBounds());
@@ -209,8 +216,10 @@ export var mapDetail = (leaflet : typeof L) => {
                 maxBounds: scope.map.getBounds()
             });
 
-            scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng))
-                .addTo(scope.map).setIcon((<any>leaflet).divIcon(cssSelectedItemIcon));
+            scope.marker = leaflet
+                .marker(leaflet.latLng(scope.lat, scope.lng))
+                .setIcon((<any>leaflet).divIcon(cssSelectedItemIcon))
+                .addTo(scope.map);
 
             scope.$watchGroup(["lat", "lng"], (newValues) => {
                 scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
@@ -276,7 +285,7 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon), style);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
             scope.polygon.addTo(map);
 
             // limit map to polygon

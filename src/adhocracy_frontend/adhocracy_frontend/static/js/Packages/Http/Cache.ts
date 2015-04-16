@@ -10,7 +10,7 @@ import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhHttp = require("./Http");
 
 export interface IHttpCacheItem {
-    wsOff : Function;
+    wsOff : () => void;
     promises : {[query : string] : angular.IPromise<any>};
 }
 
@@ -101,7 +101,7 @@ export class Service {
 
         var cached = this.cache.get(path);
         if (typeof cached === "undefined") {
-            var wsOff : Function;
+            var wsOff : () => void;
             if (!_.contains(this.nonResourceUrls, path)) {
                 wsOff = this.adhWebSocket.register(path, (msg) => {
                     this.invalidate(path);

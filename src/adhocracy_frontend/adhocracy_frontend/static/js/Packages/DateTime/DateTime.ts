@@ -15,7 +15,7 @@ export var createDirective = (config : AdhConfig.IService, moment : moment.Momen
             format: "@?"
         },
         link: (scope) => {
-            (<any>moment).locale(config.locale);
+            moment.locale(config.locale);
 
             var intervalPromise;
 

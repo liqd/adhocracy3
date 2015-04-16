@@ -13,7 +13,7 @@ export class EventManager {
         return this.nextID++;
     }
 
-    public on(event : string, handler : (arg : any) => void) : Function {
+    public on(event : string, handler : (arg : any) => void) : () => void {
         this.handlers[event] = this.handlers[event] || {};
         var id = this.getNextID();
         this.handlers[event][id] = handler;
