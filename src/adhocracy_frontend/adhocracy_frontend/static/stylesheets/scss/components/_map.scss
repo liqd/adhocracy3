@@ -57,6 +57,15 @@
         display: table;
     }
 
+    .map-list-navigate {
+        font-weight: bold;
+        font-size: 40px;
+
+        &:hover, &:focus {
+            text-decoration: none;
+        }
+    }
+
     .map-list-navigate-container,
     .map-list-scroll-container {
         display: table-cell;
