@@ -295,7 +295,7 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
 
         link: (scope : IMapListScope<any>, element, attrs) => {
 
-            var scrollContainer = angular.element(".map-list-scroll-container");
+            var scrollContainer = angular.element(".map-list-scroll-container-inner");
             var scrollToItem = (key) : void => {
                 var element = angular.element(".map-list-item" + key);
                 if (attrs.orientation === "vertical") {
