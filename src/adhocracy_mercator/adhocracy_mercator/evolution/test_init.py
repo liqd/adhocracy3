@@ -18,3 +18,13 @@ def test_disable_add_proposal_permission_mark_context_as_dirty(context):
     context.__acl__ = []
     evolve2_disable_add_proposal_permission(context)
     assert context._p_changed
+
+def test_disable_voting_and_commenting(context):
+    from . import evolve3_disable_voting_and_commenting
+    context.__acl__ = []
+    to_disable = set([(Deny, 'role:annotator', 'add_rate'),
+                      (Deny, 'role:annotator', 'add_comment'),
+                      (Deny, 'role:creator', 'add_commentversion'),
+                      (Deny, 'role:creator', 'add_rateversion')])
+    evolve3_disable_voting_and_commenting(context)
+    assert set(context.__acl__[:4]) == to_disable
