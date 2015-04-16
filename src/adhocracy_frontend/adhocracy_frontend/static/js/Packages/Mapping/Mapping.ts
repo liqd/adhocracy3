@@ -182,7 +182,7 @@ export var mapInput = (
     };
 };
 
-export var mapDetail = (leaflet : typeof L) => {
+export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) => {
     return {
         scope: {
             lat: "=",
@@ -205,8 +205,7 @@ export var mapDetail = (leaflet : typeof L) => {
 
             scope.map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(scope.map, {
-                minZoom: scope.map.getZoom(),
-                maxBounds: scope.map.getBounds()
+                minZoom: scope.map.getZoom()
             });
 
             scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng))
@@ -215,6 +214,14 @@ export var mapDetail = (leaflet : typeof L) => {
             scope.$watchGroup(["lat", "lng"], (newValues) => {
                 scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
             });
+
+            $timeout(() => {
+                scope.map.invalidateSize(false);
+                scope.map.fitBounds(scope.polygon.getBounds());
+                leaflet.Util.setOptions(scope.map, {
+                    minZoom: scope.map.getZoom()
+                });
+            }, 500);  // FIXME: moving column transition duration
         }
 
     };
@@ -373,6 +380,6 @@ export var register = (angular) => {
             adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-list"]);
         }])
         .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
-        .directive("adhMapDetail", ["leaflet", mapDetail])
+        .directive("adhMapDetail", ["leaflet", "$timeout", mapDetail])
         .directive("adhMapList", ["adhConfig", "leaflet", "$timeout" , mapList]);
 };
