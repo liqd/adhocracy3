@@ -92,6 +92,7 @@ class TestFilteringPoolSheet:
                           'offset': 0,
                           'aggregate_filter': '',
                           'aggregate_form': 'count',
+                          'only_visible': True,
                           }
         return default_kwargs
 
@@ -139,6 +140,11 @@ class TestFilteringPoolSheet:
     def test_get_with_limit(self, inst, filter_elements_kwargs):
         inst.get({'limit': 2})
         filter_elements_kwargs['limit'] = 2
+        assert inst._filter_elements.call_args[1] == filter_elements_kwargs
+
+    def test_get_with_only_visible(self, inst, filter_elements_kwargs):
+        inst.get({'only_visible': False})
+        filter_elements_kwargs['only_visible'] = False
         assert inst._filter_elements.call_args[1] == filter_elements_kwargs
 
     def test_get_with_elements_omit(self, inst):
@@ -300,6 +306,18 @@ class TestIntegrationPoolSheet:
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(depth=None).elements)
         assert result == {child, grandchild, greatgrandchild}
+
+    def test_filter_elements_only_visible(self, registry, pool_graph_catalog):
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        child1 = self._make_resource(registry, parent=pool, name='child1')
+        child1.hidden = True
+        index = pool_graph_catalog['catalogs']['adhocracy']['private_visibility']
+        index.reindex_resource(child1)
+        poolsheet = get_sheet(pool, IPool)
+        result = set(poolsheet._filter_elements(only_visible=True).elements)
+        assert result == set()
 
     def test_filter_elements_by_interface(
             self, registry, pool_graph_catalog):
