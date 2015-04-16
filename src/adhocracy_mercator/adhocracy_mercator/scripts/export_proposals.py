@@ -10,6 +10,7 @@ import optparse
 import sys
 import textwrap
 
+from pyramid.registry import Registry
 from pyramid.paster import bootstrap
 from adhocracy_core.utils import create_filename
 
@@ -65,7 +66,8 @@ def export_proposals():
 
     env = bootstrap(args[0])
 
-    root = (env['root'])
+    root = env['root']
+    registry = env['registry']
     pool = get_sheet(root, IPool)
     params = {'depth': 3,
               'content_type': IMercatorProposalVersion,
@@ -117,8 +119,7 @@ def export_proposals():
 
         result = []
 
-        url = resource_path(proposal)
-        result.append('https://advocate-europe.eu/en/idea-space#!/r' + url)
+        result.append(_get_proposal_url(proposal, registry))
 
         # Creationdate
         creation_date = get_sheet_field(
@@ -271,3 +272,10 @@ def export_proposals():
 
     env['closer']()
     print('Exported mercator proposals to %s' % filename)
+
+
+def _get_proposal_url(proposal: IMercatorProposalVersion,
+                      registry: Registry) -> str:
+    path = resource_path(proposal)
+    frontend_url = registry.settings.get('adhocracy.frontend_url')
+    return frontend_url + '/r' + path
