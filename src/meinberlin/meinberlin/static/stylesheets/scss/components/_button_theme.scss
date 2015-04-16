@@ -37,3 +37,22 @@ input[type="button"] {
         }
     }
 }
+
+.arrow-button {
+    @extend .button;
+    background: $color-text-inverted;
+    color: $color-text-highlight-normal;
+    min-width: 100px;
+    outline: 1px solid $color-text-highlight-normal;
+    font-weight: $font-weight-extrovert;
+    text-align: center;
+
+    &:after {
+        content: ">";
+    }
+
+    &:hover, &:focus {
+        background: $color-text-highlight-normal;
+        color: $color-text-inverted;
+    }
+}
