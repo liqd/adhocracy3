@@ -429,6 +429,12 @@ export class Listing<Container extends ResourcesBase.Resource> extends AdhListin
     public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.Service) {
         var directive = super.createDirective(adhConfig, adhWebSocket);
         directive.scope["polygon"] = "=";
+        directive.link = (scope) => {
+            // FIXME: only here for manual testing
+            scope.changeData = () => {
+                scope.elements.splice(0, 1);
+            };
+        };
         return directive;
     }
 }
