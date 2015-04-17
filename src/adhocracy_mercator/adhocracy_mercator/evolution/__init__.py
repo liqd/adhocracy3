@@ -41,7 +41,7 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
 
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     """Disable add_proposal permissions."""
-    from substanced.util import set_acl
+    from adhocracy_core.utils import set_acl
     from substanced.util import get_acl
     from pyramid.threadlocal import get_current_registry
     from pyramid.security import Deny
@@ -55,14 +55,38 @@ def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
                 (Deny, 'role:creator', 'add_mercator_proposal_version')]
     updated_acl = deny_acl + acl
     set_acl(root, updated_acl, registry=registry)
-    # TODO substanced bug, _p_changed is not set
-    root._p_changed = True
 
     logger.info('Finished substanced evolve step 2:'
                 'remove add_proposal permission')
+
+
+def evolve3_disable_voting_and_commenting(root):
+    """Disable rate and comment permissions."""
+    from adhocracy_core.utils import set_acl
+    from substanced.util import get_acl
+    from pyramid.threadlocal import get_current_registry
+    from pyramid.security import Deny
+
+    logger.info('Running substanced evolve step 3:'
+                'remove add_rate, add_rateversion, add_comment and'
+                'add_commentversion permissions')
+
+    registry = get_current_registry()
+    acl = get_acl(root)
+    deny_acl = [(Deny, 'role:annotator', 'add_comment'),
+                (Deny, 'role:annotator', 'add_rate'),
+                (Deny, 'role:creator', 'add_commentversion'),
+                (Deny, 'role:creator', 'add_rateversion')]
+    updated_acl = deny_acl + acl
+    set_acl(root, updated_acl, registry=registry)
+
+    logger.info('Finished substanced evolve step 3:'
+                'remove add_rate, add_rateversion, add_comment and'
+                'add_commentversion permissions')
 
 
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
     config.add_evolution_step(evolve2_disable_add_proposal_permission)
+    config.add_evolution_step(evolve3_disable_voting_and_commenting)
