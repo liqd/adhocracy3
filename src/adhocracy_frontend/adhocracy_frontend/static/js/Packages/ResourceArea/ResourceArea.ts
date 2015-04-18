@@ -1,9 +1,14 @@
 import _ = require("lodash");
 
+import ResourcesBase = require("../../ResourcesBase");
+
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUtil = require("../Util/Util");
 
 var pkgLocation = "/ResourceArea";
 
@@ -22,8 +27,9 @@ export class Provider implements angular.IServiceProvider {
         var self = this;
         this.defaults = {};
         this.specifics = {};
-        this.$get = ["$q", "$injector", "adhHttp", "adhConfig",
-            ($q, $injector, adhHttp, adhConfig) => new Service(self, $q, $injector, adhHttp, adhConfig)];
+        this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhResourceUrlFilter",
+            ($q, $injector, $location, adhHttp, adhConfig, adhResourceUrlFilter) => new Service(
+        self, $q, $injector, $location, adhHttp, adhConfig, adhResourceUrlFilter)];
     }
 
     public default(resourceType : string, view : string, processType : string, defaults : Dict) : Provider {
@@ -103,8 +109,10 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private provider : Provider,
         private $q : angular.IQService,
         private $injector : angular.auto.IInjectorService,
+        private $location : angular.ILocationService,
         private adhHttp : AdhHttp.Service<any>,
-        private adhConfig : AdhConfig.IService
+        private adhConfig : AdhConfig.IService,
+        private adhResourceUrlFilter
     ) {
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
     }
@@ -142,6 +150,27 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return this.$q.when("");
     }
 
+    private conditionallyRedirectVersionToLast(resourceUrl : string) : angular.IPromise<boolean> {
+        var self : Service = this;
+
+        return self.adhHttp.get(resourceUrl).then((resource : ResourcesBase.Resource) => {
+            if (resource.data.hasOwnProperty(SIVersionable.nick)) {
+                if (resource.data[SIVersionable.nick].followed_by.length === 0) {
+                    return false;
+                } else {
+                    var itemUrl = AdhUtil.parentPath(resourceUrl);
+                    return self.adhHttp.getNewestVersionPathNoFork(itemUrl).then((lastUrl) => {
+                        self.$location.path(self.adhResourceUrlFilter(lastUrl));
+                        return true;
+                    });
+
+                }
+            } else {
+                return false;
+            }
+        });
+    }
+
     public route(path : string, search : Dict) : angular.IPromise<Dict> {
         var self : Service = this;
         var segs : string[] = path.replace(/\/+$/, "").split("/");
@@ -157,14 +186,20 @@ export class Service implements AdhTopLevelState.IAreaInput {
             view = segs.pop().replace(/^@/, "");
         }
 
-        var resourceUrl : string = this.adhConfig.rest_url + segs.join("/");
+        var resourceUrl : string = this.adhConfig.rest_url + segs.join("/") + "/";
 
         return self.$q.all([
             self.adhHttp.get(resourceUrl),
-            self.getProcessType(resourceUrl)
+            self.getProcessType(resourceUrl),
+            self.conditionallyRedirectVersionToLast(resourceUrl)
         ]).then((values : any[]) => {
-            var resource = values[0];
+            var resource : ResourcesBase.Resource = values[0];
             var processType : string = values[1];
+            var hasRedirected : boolean = values[2];
+
+            if (hasRedirected) {
+                return;
+            }
 
             return self.getSpecifics(resource, view, processType).then((specifics : Dict) => {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType);

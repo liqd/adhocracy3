@@ -10,6 +10,7 @@ import time
 import copy
 import json
 import pprint
+import substanced.util
 
 from pyramid.compat import is_nonstr_iter
 from pyramid.location import lineage
@@ -492,3 +493,9 @@ def create_filename(directory='.', prefix='', suffix='.csv') -> str:
     name = '{0}-{1}{2}'.format(prefix, time_str, suffix)
     path = os.path.join(directory, name)
     return path
+
+
+def set_acl(resource: IResource, acl: list, registry=None) -> bool:
+    """Set the acl and mark the resource as dirty."""
+    substanced.util.set_acl(resource, acl, registry)
+    resource._p_changed = True

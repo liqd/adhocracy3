@@ -549,3 +549,19 @@ def test_create_filename_create_directory_if_not_exists():
     path.exists('/tmp/' + subdir + '/x')
 
 
+def test_set_acl_set_changes_acl():
+    from . import set_acl
+    from pyramid.security import Allow
+    resource = testing.DummyResource()
+    resource.__acl__ = []
+    acl = [(Allow, 'role:creator', 'add_commentversion')]
+    set_acl(resource, acl)
+    assert resource.__acl__ == acl
+
+
+def test_set_acl_set_resource_dirty():
+    from . import set_acl
+    from pyramid.security import Deny
+    resource = testing.DummyResource()
+    set_acl(resource, [(Deny, 'role:creator', 'add_commentversion')])
+    assert resource._p_changed is True

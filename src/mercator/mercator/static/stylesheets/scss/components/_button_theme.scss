@@ -3,7 +3,7 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
-    &.m-call-to-action2 {
+    &.m-call-to-action-secondary {
         outline: 2px solid $color-text-highlight-normal;
 
         &:hover:not(:disabled):not(.ng-disabled),

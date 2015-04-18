@@ -5,8 +5,6 @@ import _ = require("lodash");
 
 import AdhUser = require("./User");
 
-// FIXME: DefinitelyTyped is not yet compatible with jasmine 2.0.0
-declare var beforeEach : (any) => void;
 
 export var register = () => {
     describe("User", () => {
@@ -28,7 +26,7 @@ export var register = () => {
             };
 
             beforeEach(() => {
-                adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post", "postRaw"]);
+                adhHttpMock = jasmine.createSpyObj("adhHttpMock", ["get", "post", "postRaw"]);
                 adhHttpMock.post.and.returnValue(q.when({}));
                 adhHttpMock.get.and.returnValue(q.when({
                     data: {
@@ -44,7 +42,7 @@ export var register = () => {
 
                 adhTrackingMock = jasmine.createSpyObj("adhTrackingMock", ["trackPageView", "setLoginState", "setUserId"]);
 
-                httpMock = <any>jasmine.createSpyObj("httpMock", ["head", "post"]);
+                httpMock = jasmine.createSpyObj("httpMock", ["head", "post"]);
                 httpMock.defaults = {
                     headers: {
                         common: {}
@@ -56,7 +54,7 @@ export var register = () => {
                 rootScopeMock = jasmine.createSpyObj("rootScope", ["$apply", "$watch"]);
 
                 windowMock = {
-                    localStorage: <any>jasmine.createSpyObj("localStorage", ["getItem", "setItem", "removeItem"])
+                    localStorage: jasmine.createSpyObj("localStorage", ["getItem", "setItem", "removeItem"])
                 };
                 windowMock.localStorage.getItem.and.returnValue(null);
 

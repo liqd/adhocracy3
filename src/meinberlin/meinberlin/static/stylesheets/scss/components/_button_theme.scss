@@ -29,11 +29,30 @@ input[type="button"] {
         }
     }
 
-    &.m-call-to-action2 {
+    &.m-call-to-action-secondary {
         &:hover:not(:disabled):not(.ng-disabled),
         &:focus:not(:disabled):not(.ng-disabled) {
             color: $color-text-highlight-normal;
             text-decoration: underline;
         }
+    }
+}
+
+.arrow-button {
+    @extend .button;
+    background: $color-text-inverted;
+    color: $color-text-highlight-normal;
+    min-width: 100px;
+    outline: 1px solid $color-text-highlight-normal;
+    font-weight: $font-weight-extrovert;
+    text-align: center;
+
+    &:after {
+        content: ">";
+    }
+
+    &:hover, &:focus {
+        background: $color-text-highlight-normal;
+        color: $color-text-inverted;
     }
 }

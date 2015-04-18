@@ -12,6 +12,8 @@ export var register = () => {
             var adhHttpMock;
             var adhConfigMock;
             var $injectorMock;
+            var $locationMock;
+            var adhResourceUrlFilterMock;
             var service;
 
             beforeEach(() => {
@@ -22,16 +24,22 @@ export var register = () => {
 
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get"]);
                 adhHttpMock.get.and.returnValue(q.when({
-                    content_type: "content_type"
+                    content_type: "content_type",
+                    data: {}
                 }));
 
                 $injectorMock = jasmine.createSpyObj("$injector", ["invoke"]);
+
+                $locationMock = jasmine.createSpyObj("$location", ["path"]);
 
                 adhConfigMock = {
                     rest_url: "rest_url"
                 };
 
-                service = new AdhResourceArea.Service(providerMock, <any>q, $injectorMock, adhHttpMock, adhConfigMock);
+                adhResourceUrlFilterMock = (path) => path;
+
+                service = new AdhResourceArea.Service(providerMock, <any>q, $injectorMock, $locationMock, adhHttpMock, adhConfigMock,
+                    adhResourceUrlFilterMock);
             });
 
             describe("route", () => {
@@ -66,7 +74,7 @@ export var register = () => {
 
                 it("sets resourceUrl", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
-                        expect(data["resourceUrl"]).toBe("rest_url/platform/wlog");
+                        expect(data["resourceUrl"]).toBe("rest_url/platform/wlog/");
                         done();
                     });
                 });

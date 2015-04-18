@@ -162,7 +162,7 @@ export var register = (angular, config, meta_api) => {
                                 rateVersionResource.data[SIRate.nick] = new SIRate.Sheet({
                                     subject: adhUser.userPath,
                                     object: _commentVersion.path,
-                                    rate: <any>1
+                                    rate: 1
                                 });
                                 rateVersionResource.data[SIVersionable.nick] = new SIVersionable.Sheet({
                                     follows: [rate.first_version_path]

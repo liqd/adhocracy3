@@ -118,8 +118,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
             };
         }
 
-        // FIXME DefinitelyTyped
-        (<any>scope).$on("$destroy", this.adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
+        scope.$on("$destroy", this.adhTopLevelState.on("commentUrl", (commentVersionUrl) => {
             if (!commentVersionUrl) {
                 scope.selectedState = "";
             } else if (AdhUtil.parentPath(commentVersionUrl) === scope.path) {

@@ -40,7 +40,7 @@ export class Provider {
     public registerEmbeddableDirectives(directives : string[]) : void {
         for (var i = 0; i < directives.length; i++) {
             var directive = directives[i];
-            // FIXME DefinitelyTyped
+            // remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
             if (!(<any>_).includes(this.embeddableDirectives, directive)) {
                 this.embeddableDirectives.push(directive);
             }
@@ -56,7 +56,7 @@ export class Service {
         var search = $location.search();
 
         var attrs = [];
-        // FIXME DefinitelyTyped
+        // remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
         if (!(<any>_).includes(this.provider.embeddableDirectives, widget)) {
             throw "unknown widget: " + widget;
         }

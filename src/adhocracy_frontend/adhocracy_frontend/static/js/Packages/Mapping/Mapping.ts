@@ -10,6 +10,30 @@ import AdhMappingUtils = require("./MappingUtils");
 
 var pkgLocation = "/Mapping";
 
+export var style = {
+    fillColor: "#000",
+    color: "#000",
+    opacity: 0.5,
+    stroke: false
+};
+
+export var cssItemIcon = {
+    className: "icon-map-pin",
+    iconAnchor: [17.5, 41],
+    iconSize: [35, 42]
+};
+
+export var cssAddIcon = {
+    className: "icon-map-pin-add",
+    iconAnchor: [16.5, 41],
+    iconSize: [35, 42]
+};
+
+export var cssSelectedItemIcon = {
+    className: "icon-map-pin is-active",
+    iconAnchor: [17.5, 41],
+    iconSize: [33, 42]
+};
 
 export interface IMapInputScope extends angular.IScope {
     lat : number;
@@ -52,15 +76,7 @@ export var mapInput = (
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            var style = {
-                fillColor: "#000",
-                color: "#000",
-                opacity: 0.5,
-                stroke: false
-            };
-
-            // FIXME: Definetely Typed
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon), style);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
             scope.polygon.addTo(map);
 
             // limit map to polygon
@@ -73,12 +89,46 @@ export var mapInput = (
                 map.setZoom(scope.zoom);
             }
 
-            // FIXME: Definetely Typed
-            var marker = (<any>leaflet).marker();
+            var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssAddIcon);
+            var marker : L.Marker;
+
+            var createMarker = (latlng : L.LatLng) : void => {
+                marker = leaflet
+                    .marker(latlng)
+                    .setIcon(selectedItemLeafletIcon)
+                    .addTo(map)
+
+                    // only allow to change location by dragging if the new point is inside the polygon
+                    .on("dragend", (event : L.LeafletDragEndEvent) => {
+                        var result = event.target.getLatLng();
+                        var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
+
+                        if (pointInPolygon) {
+                            scope.mapClicked = true;
+                            $timeout(() => {
+                                tmpLat = result.lat;
+                                tmpLng = result.lng;
+                            });
+                        } else {
+                            marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
+                            marker.dragging.disable();
+                            $timeout(() => {
+                                scope.text = "TR__MAP_MARKER_ERROR";
+                                scope.error = true;
+                                $timeout(() => {
+                                    scope.text = "TR__MAP_EXPLAIN_DRAG";
+                                    marker.dragging.enable();
+                                    scope.error = false;
+                                }, 2000);
+                            });
+                        }
+                    });
+            };
 
             if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
-                marker.setLatLng(leaflet.latLng(scope.lat, scope.lng)).addTo(map);
+                createMarker(leaflet.latLng(scope.lat, scope.lng));
                 marker.dragging.enable();
+
                 scope.text = "TR__MAP_EXPLAIN_DRAG";
             } else {
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
@@ -86,8 +136,11 @@ export var mapInput = (
 
             // when the polygon is clicked, set the marker there
             adhSingleClickWrapper(scope.polygon).on("sglclick", (event : L.LeafletMouseEvent) => {
-                marker.setLatLng(event.latlng);
-                marker.addTo(map);
+                if (typeof marker === "undefined") {
+                    createMarker(event.latlng);
+                } else {
+                    marker.setLatLng(event.latlng);
+                }
                 marker.dragging.enable();
                 $timeout(() => {
                     tmpLat = event.latlng.lat;
@@ -102,32 +155,6 @@ export var mapInput = (
             });
             map.on("dblclick", (event : L.LeafletMouseEvent) => {
                 map.zoomIn();
-            });
-
-            // only allow to change location by dragging if the new point is inside the polygon
-            marker.on("dragend", (event : L.LeafletDragEndEvent) => {
-                var result = event.target.getLatLng();
-                var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
-
-                if (pointInPolygon) {
-                    scope.mapClicked = true;
-                    $timeout(() => {
-                        tmpLat = result.lat;
-                        tmpLng = result.lng;
-                    });
-                } else {
-                    marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
-                    marker.dragging.disable();
-                    $timeout(() => {
-                        scope.text = "TR__MAP_MARKER_ERROR";
-                        scope.error = true;
-                        $timeout(() => {
-                            scope.text = "TR__MAP_EXPLAIN_DRAG";
-                            marker.dragging.enable();
-                            scope.error = false;
-                        }, 2000);
-                    });
-                }
             });
 
             scope.saveCoordinates = () => {
@@ -146,6 +173,7 @@ export var mapInput = (
                 scope.lng = undefined;
                 scope.lat = undefined;
                 map.removeLayer(marker);
+                marker = undefined;
                 scope.mapClicked = false;
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
@@ -179,7 +207,7 @@ export var mapDetail = (leaflet : typeof L) => {
 
             scope.map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.polygon));
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon), style);
             scope.polygon.addTo(scope.map);
 
             scope.map.fitBounds(scope.polygon.getBounds());
@@ -187,9 +215,13 @@ export var mapDetail = (leaflet : typeof L) => {
                 minZoom: scope.map.getZoom(),
                 maxBounds: scope.map.getBounds()
             });
-            scope.marker = leaflet.marker(leaflet.latLng(scope.lat, scope.lng)).addTo(scope.map);
 
-            scope.$watchGroup(["lat","lng"], function(newValues, oldValues, scope){
+            scope.marker = leaflet
+                .marker(leaflet.latLng(scope.lat, scope.lng))
+                .setIcon((<any>leaflet).divIcon(cssSelectedItemIcon))
+                .addTo(scope.map);
+
+            scope.$watchGroup(["lat", "lng"], (newValues) => {
                 scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
             });
         }
@@ -221,7 +253,6 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
     return {
         scope: {
             height: "@",
-            polygon: "=",
             rawPolygon: "=polygon",
             itemValues: "=items"
         },
@@ -237,9 +268,9 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
 
         link: (scope : IMapListScope<any>, element, attrs) => {
 
-            var scrollContainer = angular.element(".scroll-container");
+            var scrollContainer = angular.element(".map-list-scroll-container");
             var scrollToItem = (key) : void => {
-                var element = angular.element(".item" + key);
+                var element = angular.element(".map-list-item" + key);
                 if (attrs.orientation === "vertical") {
                     (<any>scrollContainer).scrollToElement(element, 10, 300);
                 } else {
@@ -248,13 +279,13 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                 }
             };
 
-            var mapElement = element.find(".map");
+            var mapElement = element.find(".map-list-map");
             mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            scope.polygon = leaflet.polygon((<any>leaflet.GeoJSON).coordsToLatLngs(scope.rawPolygon));
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
             scope.polygon.addTo(map);
 
             // limit map to polygon
@@ -264,11 +295,14 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
                  maxBounds: map.getBounds()
             });
 
+            var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
+            var itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
+
             scope.items = [];
             _.forEach(scope.itemValues, (value, key) => {
                 var item = {
                     value: value,
-                    marker: L.marker(leaflet.latLng(value.lat, value.lng)),
+                    marker: L.marker(leaflet.latLng(value.lat, value.lng), {icon: itemLeafletIcon}),
                     hide: false,
                     index: key
                 };
@@ -283,7 +317,7 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
             });
 
             scope.selectedItem = scope.items[0];
-            $((<any>scope.selectedItem.marker)._icon).addClass("is-selected");
+            <any>scope.selectedItem.marker.setIcon(selectedItemLeafletIcon);
 
             map.on("moveend", () => {
                 var bounds = map.getBounds();
@@ -300,10 +334,10 @@ export var mapList = (adhConfig : AdhConfig.IService, leaflet : typeof L, $timeo
 
             scope.toggleItem = (item) => {
                 if (typeof scope.selectedItem !== "undefined") {
-                    $((<any>scope.selectedItem.marker)._icon).removeClass("is-selected");
+                    scope.selectedItem.marker.setIcon(itemLeafletIcon);
                 }
                 scope.selectedItem = item;
-                $((<any>item.marker)._icon).addClass("is-selected");
+                item.marker.setIcon(selectedItemLeafletIcon);
             };
 
             scope.getPreviousItem = (item) => {
