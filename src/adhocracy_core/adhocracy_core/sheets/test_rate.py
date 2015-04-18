@@ -65,8 +65,8 @@ class TestRateSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'subject': '',
-                              'object': '',
+        assert inst.get() == {'subject': None,
+                              'object': None,
                               'rate': 0,
                               }
 

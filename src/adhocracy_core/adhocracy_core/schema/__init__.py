@@ -470,7 +470,7 @@ class Resource(AdhocracySchemaNode):
     Example value:  'http://a.org/bluaABC/_123/3'
     """
 
-    default = ''
+    default = None
     missing = colander.drop
     schema_type = ResourceObject
 
