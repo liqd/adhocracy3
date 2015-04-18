@@ -15,13 +15,16 @@ class IBasicService(IServicePool):
     The resource name is always set to the `content_name`.
     """
 
+# TODO remove IBasicService, use IService instead
+
 
 service_meta = pool_meta._replace(
-    content_name='Service',
+    content_name='service',
     iresource=IBasicService,
     basic_sheets=[adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
+    permission_add='add_service'
 )
 
 
