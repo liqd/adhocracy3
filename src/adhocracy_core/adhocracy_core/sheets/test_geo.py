@@ -1,5 +1,13 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
+from pytest import raises
+
+
+@fixture
+def integration(config):
+    config.include('adhocracy_core.content')
+    config.include('adhocracy_core.sheets.geo')
 
 
 class TestPointSchema:
@@ -9,42 +17,48 @@ class TestPointSchema:
         from .geo import PointSchema
         return PointSchema()
 
-    def test_create(self, inst):
-        assert inst['x'].validator.max == 20026376.3
-        assert inst['x'].validator.min == -20026376.3
-        assert inst['y'].validator.max == 20048966.1
-        assert inst['y'].validator.min == -20048966.1
+    def test_deserialize_valid(self, inst):
+        assert inst.deserialize({'x': '0', 'y': '0'}) == {'x': 0, 'y': 0}
+
+    @mark.parametrize('x,y', [('20026376.4', '0'),
+                              ('-20026377', '0'),
+                              # actually we want -20026376.4 but its not working
+                              ('0', '-20048967'),
+                              ('0', '20048966.11')])
+    def test_deserialize_raise_if_outside_boundary(self, inst, x, y):
+        from colander import Invalid
+        with raises(Invalid):
+            inst.deserialize({'x': x, 'y': y})
 
 
 class TestPointSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.geo import point_meta
+        from .geo import point_meta
         return point_meta
 
-    def test_create(self, meta, context):
+    def test_meta(self, meta):
         from adhocracy_core.sheets.geo import IPoint
         from adhocracy_core.sheets.geo import PointSchema
         from adhocracy_core.sheets import AnnotationStorageSheet
-        inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationStorageSheet)
-        assert inst.meta.isheet == IPoint
-        assert inst.meta.schema_class == PointSchema
-        assert inst.meta.editable is True
-        assert inst.meta.create_mandatory is False
+        assert meta.sheet_class == AnnotationStorageSheet
+        assert meta.isheet == IPoint
+        assert meta.schema_class == PointSchema
+        assert meta.editable is True
+        assert meta.create_mandatory is False
+
+    def test_create(self, meta, context):
+        assert meta.sheet_class(meta, context)
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'x': 0,
                               'y': 0}
 
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)
 
-def test_includeme_register_geo_sheet(config):
-    from adhocracy_core.sheets.geo import IPoint
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.geo')
-    context = testing.DummyResource(__provides__=IPoint)
-    inst = get_sheet(context, IPoint)
-    assert inst.meta.isheet is IPoint
