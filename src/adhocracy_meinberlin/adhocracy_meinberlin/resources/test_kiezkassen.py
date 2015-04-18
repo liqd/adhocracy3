@@ -10,6 +10,7 @@ def integration(config):
     config.include('adhocracy_core.resources.tag')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.process')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
     config.include('adhocracy_meinberlin.resources.kiezkassen')
 
@@ -49,3 +50,30 @@ def test_kiezkassenversion_meta():
 def test_kiezkassenversion_create(registry):
     from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
     assert registry.content.create(IProposalVersion.__identifier__)
+
+
+class TestProcess:
+
+    @fixture
+    def meta(self):
+        from .kiezkassen import process_meta
+        return process_meta
+
+    def test_meta(self, meta):
+        import adhocracy_core.resources.process
+        import adhocracy_meinberlin.sheets.kiezkassen
+        from .kiezkassen import IProcess
+        assert meta.iresource is IProcess
+        assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
+        assert meta.is_implicit_addable is True
+        assert meta.permission_add == 'add_kiezkassen_process'
+        assert meta.extended_sheets == [
+            adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
+            adhocracy_core.sheets.geo.ILocationReference,
+        ]
+
+
+    @mark.usefixtures('integration')
+    def test_create(self, registry, meta):
+        res = registry.content.create(meta.iresource.__identifier__)
+        assert meta.iresource.providedBy(res)
