@@ -47,8 +47,7 @@ class TestProposalSheet:
     def test_get_empty(self, meta, context):
         from decimal import Decimal
         inst = meta.sheet_class(meta, context)
-        wanted = {'title': '',
-                  'detail': '',
+        wanted = {'detail': '',
                   'budget': Decimal(0),
                   'creator_participate': False,
                   'location_text': '',

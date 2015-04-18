@@ -19,6 +19,7 @@ def test_proposal_meta():
     from .kiezkassen import IProposalVersion
     assert proposal_meta.element_types == [IProposalVersion]
     assert proposal_meta.item_type == IProposalVersion
+    # TODO assert proposal_meta.permission_add == 'add_kiezkassen_proposal'
 
 
 @mark.usefixtures('integration')
@@ -28,16 +29,19 @@ def test_create_kiezkassen(registry, context):
 
 
 def test_kiezkassenversion_meta():
-    from .kiezkassen import proposal_version_meta
+    from .kiezkassen import proposal_version_meta as meta
     from adhocracy_core.sheets.geo import IPoint
     from adhocracy_core.sheets.comment import ICommentable
     from adhocracy_core.sheets.rate import IRateable
+    from adhocracy_core.sheets.title import ITitle
     from adhocracy_meinberlin.sheets.kiezkassen import IProposal
-    assert proposal_version_meta.extended_sheets == [IProposal,
-                                                     IPoint,
-                                                     ICommentable,
-                                                     IRateable,
-                                                     ]
+    assert meta.extended_sheets == [ITitle,
+                                    IProposal,
+                                    IPoint,
+                                    ICommentable,
+                                    IRateable,
+                                    ]
+    assert meta.permission_add == 'add_kiezkassen_proposal_version'
 
 @mark.usefixtures('integration')
 def test_kiezkassenversion_create(registry):

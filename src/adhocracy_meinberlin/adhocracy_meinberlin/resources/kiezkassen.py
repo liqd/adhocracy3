@@ -9,6 +9,7 @@ from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.sheets.geo import IPoint
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.comment import ICommentable
+from adhocracy_core.sheets.title import ITitle
 import adhocracy_meinberlin.sheets.kiezkassen
 
 
@@ -20,7 +21,8 @@ class IProposalVersion(IItemVersion):
 proposal_version_meta = itemversion_meta._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
-    extended_sheets=[adhocracy_meinberlin.sheets.kiezkassen.IProposal,
+    extended_sheets=[ITitle,
+                     adhocracy_meinberlin.sheets.kiezkassen.IProposal,
                      IPoint,
                      ICommentable,
                      IRateable],
