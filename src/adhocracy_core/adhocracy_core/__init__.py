@@ -122,6 +122,7 @@ def includeme(config):
     config.include('.resources.rate')
     config.include('.resources.subscriber')
     config.include('.resources.sample_image')
+    config.include('.resources.geo')
     config.include('.workflows')
     config.include('.websockets')
     config.include('.rest')

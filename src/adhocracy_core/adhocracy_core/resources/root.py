@@ -16,6 +16,7 @@ from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
+from adhocracy_core.resources.geo import add_locations_service
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
 
@@ -97,6 +98,7 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
     _add_platform(context, registry)
+    add_locations_service(context, registry, {})
     # TODO: Move mercator platform creation to mercator package
     _add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
 
