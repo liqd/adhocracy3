@@ -10,6 +10,63 @@ def integration(config):
     config.include('adhocracy_core.sheets.geo')
 
 
+class TestPolygonSchema:
+
+    @fixture
+    def inst(self):
+        from .geo import PolygonSchema
+        return PolygonSchema()
+
+    def test_create(self, inst):
+        from .geo import Polygon
+        assert isinstance(inst['location'], Polygon)
+
+    def test_deserialize_empty(self, inst):
+        assert inst.deserialize({}) == {'location': []}
+
+    def test_deserialize_valid_points(self, inst):
+        wanted = {'location': [(1.0, 1.0)]}
+        assert inst.deserialize({'location': [[1, 1]]}) == wanted
+
+    def test_serialize_empty(self, inst):
+        assert inst.serialize({}) == {'location': []}
+
+    def test_serialize_valid_points(self, inst):
+        wanted = {'location': [('1.0', '1.0')]}
+        assert inst.serialize({'location': [(1.0, 1.0)]}) == wanted
+
+
+class TestPolygonSheet:
+
+    @fixture
+    def meta(self):
+        from .geo import polygon_meta
+        return polygon_meta
+
+    def test_meta(self, meta):
+        from adhocracy_core.sheets.geo import IPolygon
+        from adhocracy_core.sheets.geo import PolygonSchema
+        from adhocracy_core.sheets import AnnotationStorageSheet
+        assert meta.sheet_class == AnnotationStorageSheet
+        assert meta.isheet == IPolygon
+        assert meta.schema_class == PolygonSchema
+        assert meta.editable is False
+        assert meta.create_mandatory is True
+
+    def test_create(self, meta, context):
+        assert meta.sheet_class(meta, context)
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'location': []}
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)
+
+
 class TestPointSchema:
 
     @fixture
@@ -61,4 +118,39 @@ class TestPointSheet:
         from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=meta.isheet)
         assert get_sheet(context, meta.isheet)
+
+
+class TestLocationReferenceSheet:
+
+    @fixture
+    def meta(self):
+        from .geo import location_reference_meta
+        return location_reference_meta
+
+    def test_meta(self, meta):
+        from adhocracy_core.sheets.geo import ILocationReference
+        from adhocracy_core.sheets.geo import LocationReferenceSchema
+        from adhocracy_core.sheets import AnnotationStorageSheet
+        assert meta.sheet_class == AnnotationStorageSheet
+        assert meta.isheet == ILocationReference
+        assert meta.schema_class == LocationReferenceSchema
+        assert meta.editable is True
+        assert meta.create_mandatory is False
+
+    def test_create(self, meta, context):
+        assert meta.sheet_class(meta, context)
+
+    def test_get_empty(self, meta, context, mock_graph):
+        mock_graph.get_references_for_isheet.return_value = {}
+        context.__graph__ = mock_graph
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'location': None}
+        assert mock_graph.get_references_for_isheet.called
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)
+
 
