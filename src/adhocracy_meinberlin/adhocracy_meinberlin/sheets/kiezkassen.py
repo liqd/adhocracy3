@@ -8,7 +8,6 @@ from adhocracy_core.sheets import workflow
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import SingleLine
-from adhocracy_core.schema import Text
 
 
 class IProposal(ISheet):
@@ -22,7 +21,6 @@ class ProposalSchema(colander.MappingSchema):
 
     # TODO: check exact length restrictions
 
-    detail = Text(validator=colander.Length(max=500))
     budget = CurrencyAmount(missing=colander.required,
                             validator=colander.Range(min=0, max=50000))
     creator_participate = Boolean()

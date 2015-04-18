@@ -47,8 +47,7 @@ class TestProposalSheet:
     def test_get_empty(self, meta, context):
         from decimal import Decimal
         inst = meta.sheet_class(meta, context)
-        wanted = {'detail': '',
-                  'budget': Decimal(0),
+        wanted = {'budget': Decimal(0),
                   'creator_participate': False,
                   'location_text': '',
                   }
@@ -63,8 +62,6 @@ class TestProposalSchema:
         return ProposalSchema()
 
     def test_create(self, inst):
-        assert inst['title'].validator.max == 100
-        assert inst['detail'].validator.max == 500
         assert inst['budget'].validator.max == 50000
         assert inst['budget'].required
         assert inst['location_text'].validator.max == 100

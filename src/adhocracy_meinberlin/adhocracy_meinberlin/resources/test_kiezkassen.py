@@ -34,8 +34,10 @@ def test_kiezkassenversion_meta():
     from adhocracy_core.sheets.comment import ICommentable
     from adhocracy_core.sheets.rate import IRateable
     from adhocracy_core.sheets.title import ITitle
+    from adhocracy_core.sheets.description import IDescription
     from adhocracy_meinberlin.sheets.kiezkassen import IProposal
     assert meta.extended_sheets == [ITitle,
+                                    IDescription,
                                     IProposal,
                                     IPoint,
                                     ICommentable,

@@ -18,6 +18,7 @@ import SIPool = require("../../../../Resources_/adhocracy_core/sheets/pool/IPool
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
+import SIDescription = require("../../../../Resources_/adhocracy_core/sheets/description/IDescription");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
 
@@ -62,6 +63,7 @@ var bindPath = (
             }).then((pool) => {
                 adhHttp.get(value).then((resource : RIProposalVersion) => {
                     var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
+                    var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
                     var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
                     var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
                     var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
@@ -70,7 +72,7 @@ var bindPath = (
                     scope.data = {
                         title: titleSheet.title,
                         budget: mainSheet.budget,
-                        detail: mainSheet.detail,
+                        detail: descriptionSheet.description,
                         creatorParticipate: mainSheet.creator_participate,
                         locationText: mainSheet.location_text,
                         creator: metadataSheet.creator,
