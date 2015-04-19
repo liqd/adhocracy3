@@ -960,7 +960,7 @@ export var addButton = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
         link: (scope) => {
-            scope.showAddButton = (adhConfig.custom["show_add_button"] === "true");
+            scope.showAddButton = (adhConfig.custom["show_add_button"].toLowerCase() === "true");
         }
     };
 };

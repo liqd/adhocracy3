@@ -339,7 +339,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     adhDone();
                 });
 
-            scope.allowRate = (adhConfig.custom["allow_rate"] === "true");
+            scope.allowRate = (adhConfig.custom["allow_rate"].toLowerCase() === "true");
         }
     };
 };
