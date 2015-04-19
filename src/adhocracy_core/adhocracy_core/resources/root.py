@@ -46,22 +46,26 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:contributor', 'add_paragraph'),
             (Allow, 'role:contributor', 'add_externalresource'),
             (Allow, 'role:contributor', 'message_to_user'),
+            (Allow, 'role:contributor', 'add_kiezkassen_proposal'),
             # Creator role
             (Allow, 'role:creator', 'add_commentversion'),
             (Allow, 'role:creator', 'add_rateversion'),
             (Allow, 'role:creator', 'add_proposalversion'),
             (Allow, 'role:creator', 'add_sectionversion'),
             (Allow, 'role:creator', 'add_paragraphversion'),
+            # TODO reuse edit instead of custom add_xx_version permission?
             (Allow, 'role:creator', 'edit_some_sheets'),  # put request default
             (Allow, 'role:creator', 'edit_metadata'),
             (Allow, 'role:creator', 'view_userextended'),
             (Allow, 'role:creator', 'edit_userextended'),
             (Allow, 'role:creator', 'add_mercator_proposal_version'),
+            (Allow, 'role:creator', 'add_kiezkassen_proposal_version'),
             # Manager role
             (Allow, 'role:manager', 'view'),
             (Allow, 'role:manager', 'hide_resource'),
             (Allow, 'role:manager', 'edit_some_sheets'),
             (Allow, 'role:manager', 'edit_metadata'),
+
             # Admin role
             (Allow, 'role:admin', 'view'),
             (Allow, 'role:admin', 'view_sensitive'),  # sensitive info that
@@ -70,6 +74,8 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:admin', 'create_sheet'),
             (Allow, 'role:admin', 'add_group'),
             (Allow, 'role:admin', 'add_pool'),
+            (Allow, 'role:admin', 'add_process'),
+            (Allow, 'role:admin', 'add_kiezkassen_process'),
             (Allow, 'role:admin', 'edit_group'),
             (Allow, 'role:admin', 'edit_some_sheets'),
             (Allow, 'role:admin', 'edit_sheet'),  # edit sheets default

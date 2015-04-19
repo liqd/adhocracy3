@@ -2,11 +2,14 @@
 import logging
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
+from pyramid.security import Allow
 from zope.interface.interfaces import IInterface
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
 from substanced.evolution import add_evolution_step
+from substanced.util import get_acl
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import set_acl
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
@@ -77,8 +80,25 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
                       remove_isheet_old=False)
 
 
+def add_kiezkassen_permissions(root):
+    """Add permission to use the kiezkassen process."""
+    logger.info('Running evolve step:' + add_kiezkassen_permissions.__doc__)
+
+    registry = get_current_registry()
+    acl = get_acl(root)
+    new_acl = [(Allow, 'role:contributor', 'add_kiezkassen_proposal'),
+               (Allow, 'role:creator', 'add_kiezkassen_proposal_version'),
+               (Allow, 'role:admin', 'add_kiezkassen_process'),
+               (Allow, 'role:admin', 'add_process')]
+    updated_acl = acl + new_acl
+    set_acl(root, updated_acl, registry=registry)
+
+    logger.info('Finished evolve step:' + add_kiezkassen_permissions.__doc__)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
     config.scan('substanced.evolution.subscribers')
     config.add_evolution_step(evolve1_add_title_sheet_to_pools)
+    config.add_evolution_step(add_kiezkassen_permissions)
