@@ -1,4 +1,28 @@
+.moving-column {
+    @include border-radius((10px / $font-size-normal * 1em) (10px / $font-size-normal * 1em) 0 0);
+}
+
 .moving-column-body {
     background: $color-background-base-introvert;
-    padding: 12px / $font-size-normal * 1em;
+    border: 0;
+    padding: (12px / $font-size-normal * 1em) (15px / $font-size-normal * 1em);
+}
+
+.moving-column-icon {
+    margin-right: 5px / $font-size-normal * 1em;
+}
+
+.moving-column-menu {
+    padding: 0;
+}
+
+.moving-column-tab {
+    @include inline-block;
+    background: $color-background-base-introvert;
+    color: $color-text-introvert;
+    font-size: $font-size-small;
+    font-weight: $font-weight-extrovert;
+    padding: 0 (15px / $font-size-small * 1em);
+    text-transform: uppercase;
+    vertical-align: baseline;
 }

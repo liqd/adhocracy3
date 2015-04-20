@@ -1,6 +1,7 @@
 <div data-ng-switch="transclusionId">
-    <div data-ng-switch-when="menu">
+    <div class="moving-column-tab" data-ng-switch-when="menu">
         <i class="icon-process moving-column-icon"></i>
+        {{ "TR__PROPOSAL_LIST" | translate }}
     </div>
 
     <a data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}"><i class="icon-process moving-column-icon"></i></a>
