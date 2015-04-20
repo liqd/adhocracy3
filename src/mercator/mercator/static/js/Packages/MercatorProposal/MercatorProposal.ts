@@ -232,7 +232,8 @@ export var uploadImageFile = (
         .then((mercatorPool) => {
             var postPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
             return adhHttp.postRaw(postPath, formData)
-                .then((rsp) => rsp.data.path);
+                .then((rsp) => rsp.data.path)
+                .catch(<any>AdhHttp.logBackendError);
         });
 };
 
