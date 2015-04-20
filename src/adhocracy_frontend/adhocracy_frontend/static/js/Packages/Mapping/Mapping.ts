@@ -35,6 +35,20 @@ export var cssSelectedItemIcon = {
     iconSize: [33, 42]
 };
 
+
+var refreshAfterColumnExpandHack = (
+    $timeout : angular.ITimeoutService,
+    leaflet : typeof L
+) => (map : L.Map, bounds : L.LatLngBounds) => {
+    $timeout(() => {
+        map.invalidateSize(false);
+        map.fitBounds(bounds);
+        leaflet.Util.setOptions(map, {
+            minZoom: map.getZoom()
+        });
+    }, 500);  // FIXME: moving column transition duration
+};
+
 export interface IMapInputScope extends angular.IScope {
     lat : number;
     lng : number;
@@ -171,13 +185,7 @@ export var mapInput = (
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
 
-            $timeout(() => {
-                map.invalidateSize(false);
-                map.fitBounds(scope.polygon.getBounds());
-                leaflet.Util.setOptions(map, {
-                    minZoom: map.getZoom()
-                });
-            }, 500);  // FIXME: moving column transition duration
+            refreshAfterColumnExpandHack($timeout, leaflet)(map, scope.polygon.getBounds());
         }
     };
 };
@@ -215,13 +223,7 @@ export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) 
                 scope.marker.setLatLng(leaflet.latLng(newValues[0], newValues[1]));
             });
 
-            $timeout(() => {
-                scope.map.invalidateSize(false);
-                scope.map.fitBounds(scope.polygon.getBounds());
-                leaflet.Util.setOptions(scope.map, {
-                    minZoom: scope.map.getZoom()
-                });
-            }, 500);  // FIXME: moving column transition duration
+            refreshAfterColumnExpandHack($timeout, leaflet)(scope.map, scope.polygon.getBounds());
         }
 
     };
