@@ -26,3 +26,15 @@
     text-transform: uppercase;
     vertical-align: baseline;
 }
+
+.moving-column-menu-nav a {
+    background: $color-structure-transparent;
+    color: $color-text-highlight-normal;
+    padding: 0 (15px / $font-size-small * 1em);
+    min-width: 1px;
+    vertical-align: middle;
+}
+
+.moving-column-menu-nav-icon {
+    font-size: $font-size-small;
+}
