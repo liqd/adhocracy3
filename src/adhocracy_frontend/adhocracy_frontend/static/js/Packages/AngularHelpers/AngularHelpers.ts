@@ -178,7 +178,7 @@ export var showError = (form : angular.IFormController, field : angular.INgModel
 /**
  * Wrapper around clickable element that adds a sglclick event.
  *
- * sglclick is triggered with on a click event that is not followed
+ * sglclick is triggered on a click event that is not followed
  * by another click or dblclick event within given timeout.
  */
 export var singleClickWrapperFactory = ($timeout : angular.ITimeoutService) => {

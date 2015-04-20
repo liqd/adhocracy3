@@ -1082,14 +1082,14 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
 
         if ($scope.mercatorProposalForm.$valid) {
             // append a random number to the nick to allow duplicate titles
-            $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance  ||
+            $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance ||
                 Math.floor((Math.random() * 10000) + 1);
 
             $scope.submit()
-                .catch((error) => {
-                    if (error && _.every(error, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
+                .catch((errors) => {
+                    if (errors && _.every(errors, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
                         $scope.data.introduction.nickInstance++;
-                        $scope.submitIfValid(callCount + 1);
+                        return $scope.submitIfValid(callCount + 1);
                     } else {
                         container.scrollTopAnimated(0);
                     }
