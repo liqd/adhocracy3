@@ -220,13 +220,20 @@ export var singleClickWrapperFactory = ($timeout : angular.ITimeoutService) => {
 /**
  * Return the first element within a form that has an error.
  *
+ * Will also search through all subforms.
  * Used to scroll to that element on submit atempt.
  */
 export var getFirstFormError = (form, element) => {
-    var getErrorControllers = (ctrl) => _.flatten(_.values(ctrl.$error));
+    var getErrorControllers = (ctrl) => {
+        if (ctrl.hasOwnProperty("$modelValue")) {
+            return [ctrl];
+        } else {
+            var childCtrls = _.flatten(_.values(ctrl.$error));
+            return _.flatten(_.map(childCtrls, getErrorControllers));
+        }
+    };
 
-    var errorForms = getErrorControllers(form);
-    var errorControllers = _.flatten(_.map(errorForms, getErrorControllers));
+    var errorControllers = getErrorControllers(form);
     var names = _.unique(_.map(errorControllers, "$name"));
     var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
 
