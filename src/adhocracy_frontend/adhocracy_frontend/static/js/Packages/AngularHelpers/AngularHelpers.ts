@@ -236,6 +236,7 @@ export var getFirstFormError = (form, element) => {
 export var submitIfValid = (
     $q : angular.IQService
 ) => (
+    scope : {errors : AdhHttp.IBackendErrorItem[]},
     element,
     form : angular.IFormController,
     submitFn : () => angular.IPromise<any>
@@ -245,8 +246,12 @@ export var submitIfValid = (
     if (form.$valid) {
         return submitFn()
             .then((result) => {
+                scope.errors = [];
                 return result;
             }, (errors : AdhHttp.IBackendErrorItem[]) => {
+                // FIXME this also happens in resourceWidgets. Should not do any harm though.
+                scope.errors = errors;
+
                 container.scrollTopAnimated(0);
                 throw errors;
             });

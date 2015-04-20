@@ -1074,7 +1074,7 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
             imgUploadController.$setValidity("required", imageExists());
         }
 
-        return adhSubmitIfValid($element, $scope.mercatorProposalForm, () => {
+        return adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
             // append a random number to the nick to allow duplicate titles
             $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance ||
                 Math.floor((Math.random() * 10000) + 1);
