@@ -977,7 +977,7 @@ export var imageUriFilter = () => {
 };
 
 
-export var mercatorProposalFormController = ($scope : IControllerScope, $element, $window, adhShowError) => {
+export var mercatorProposalFormController = ($scope : IControllerScope, $element, $window, adhShowError, adhSubmitIfValid) => {
     var heardFromCheckboxes = [
         "heard-from-colleague",
         "heard-from-website",
@@ -1068,43 +1068,31 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
         }
     });
 
-    $scope.submitIfValid = (callCount = 0) => {
-        var container = $element.parents("[data-du-scroll-container]");
-
-        if (callCount > 10) {
-            throw "maximum number of post attempts reached!";
-        }
-
+    $scope.submitIfValid = (callCount = 0) : angular.IPromise<any> => {
         if ($scope.$flow && $scope.$flow.support) {
             var imgUploadController = $scope.mercatorProposalIntroductionForm["introduction-picture-upload"];
             imgUploadController.$setValidity("required", imageExists());
         }
 
-        if ($scope.mercatorProposalForm.$valid) {
+        return adhSubmitIfValid($element, $scope.mercatorProposalForm, () => {
             // append a random number to the nick to allow duplicate titles
             $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance ||
                 Math.floor((Math.random() * 10000) + 1);
 
-            $scope.submit()
+            return $scope.submit()
                 .catch((errors) => {
                     if (errors && _.every(errors, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
                         $scope.data.introduction.nickInstance++;
-                        return $scope.submitIfValid(callCount + 1);
+                        if (callCount < 10) {
+                            return $scope.submitIfValid(callCount + 1);
+                        } else {
+                            throw "maximum number of post attempts reached!";
+                        }
                     } else {
-                        container.scrollTopAnimated(0);
+                        throw errors;
                     }
                 });
-        } else {
-            var getErrorControllers = (ctrl) => _.flatten(_.values(ctrl.$error));
-
-            var errorForms = getErrorControllers($scope.mercatorProposalForm);
-            var errorControllers = _.flatten(_.map(errorForms, getErrorControllers));
-            var names = _.unique(_.map(errorControllers, "$name"));
-            var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
-
-            var element = $element.find(selector).first();
-            container.scrollToElementAnimated(element, 20);
-        }
+        });
     };
 };
 
@@ -1232,5 +1220,6 @@ export var register = (angular) => {
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
         .directive("adhMercatorProposalAddButton", ["adhConfig", addButton])
         .filter("adhImageUri", imageUriFilter)
-        .controller("mercatorProposalFormController", ["$scope", "$element", "$window", "adhShowError", mercatorProposalFormController]);
+        .controller("mercatorProposalFormController", [
+            "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", mercatorProposalFormController]);
 };

@@ -217,6 +217,46 @@ export var singleClickWrapperFactory = ($timeout : angular.ITimeoutService) => {
 };
 
 
+/**
+ * Return the first element within a form that has an error.
+ *
+ * Used to scroll to that element on submit atempt.
+ */
+export var getFirstFormError = (form, element) => {
+    var getErrorControllers = (ctrl) => _.flatten(_.values(ctrl.$error));
+
+    var errorForms = getErrorControllers(form);
+    var errorControllers = _.flatten(_.map(errorForms, getErrorControllers));
+    var names = _.unique(_.map(errorControllers, "$name"));
+    var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
+
+    return element.find(selector).first();
+};
+
+export var submitIfValid = (
+    $q : angular.IQService
+) => (
+    element,
+    form : angular.IFormController,
+    submitFn : () => angular.IPromise<any>
+) : angular.IPromise<any> => {
+    var container = element.parents("[data-du-scroll-container]");
+
+    if (form.$valid) {
+        return submitFn()
+            .then((result) => {
+                return result;
+            }, (errors : AdhHttp.IBackendErrorItem[]) => {
+                container.scrollTopAnimated(0);
+                throw errors;
+            });
+    } else {
+        container.scrollToElementAnimated(getFirstFormError(form, element), 20);
+        return $q.reject([]);
+    }
+};
+
+
 export var moduleName = "adhAngularHelpers";
 
 export var register = (angular) => {
@@ -228,6 +268,7 @@ export var register = (angular) => {
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .factory("adhShowError", () => showError)
         .factory("adhSingleClickWrapper", ["$timeout", singleClickWrapperFactory])
+        .factory("adhSubmitIfValid", ["$q", submitIfValid])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .directive("adhWait", waitForCondition)
