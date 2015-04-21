@@ -75,9 +75,14 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.graph')
+    config.include('adhocracy_core.authentication')
     config.include('adhocracy_core.resources.tag')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.principal')
+    config.include('adhocracy_core.resources.pool')
+    config.include('adhocracy_core.resources.asset')
     config.include('adhocracy_mercator.sheets.mercator')
     config.include('adhocracy_mercator.resources.mercator')
 
@@ -108,6 +113,13 @@ class TestIncludemeIntegration:
                                       parent=context,
                                       )
         assert IMercatorProposalVersion.providedBy(res)
+
+    def test_create_mercator_root_with_initial_content(self, registry):
+        from adhocracy_core.resources.root import IRootPool
+        from adhocracy_core.resources.asset import IPoolWithAssets
+        inst = registry.content.create(IRootPool.__identifier__)
+        assert IRootPool.providedBy(inst)
+        assert IPoolWithAssets.providedBy(inst['mercator'])
 
 @fixture(scope='class')
 def app_anonymous(app_anonymous):
