@@ -457,6 +457,7 @@ def create_initial_content(context: IPool, registry: Registry,
 mercator_root_meta = root_meta._replace(after_creation=root_meta.after_creation
                                         + [create_initial_content])
 
+
 def includeme(config):
     """Add resource type to content."""
     add_resource_type_to_registry(mercator_proposal_meta, config)
