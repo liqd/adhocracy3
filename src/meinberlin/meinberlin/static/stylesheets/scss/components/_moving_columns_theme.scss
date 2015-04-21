@@ -3,24 +3,18 @@
         background: $color-structure-normal;
         border: 0;
 
-        .moving-column-icon {
-            margin-right: 0;
-        }
-
-        .moving-column-collapsed-icon-container {
-            background: $color-structure-extrovert;
-            color: $color-text-inverted;
-            display: block;
+        .moving-column-expand {
+            color: $color-text-introvert;
 
             &:hover, &:focus, &:active {
-                background: $color-text-highlight-normal;
-                color: $color-text-inverted;
+                color: $color-text-highlight-normal;
             }
 
-            &:active {
-                background: $color-text-highlight-introvert;
+            .moving-column-icon {
+                margin-right: 0;
             }
         }
+
     }
 
     &.is-first-visible-child {

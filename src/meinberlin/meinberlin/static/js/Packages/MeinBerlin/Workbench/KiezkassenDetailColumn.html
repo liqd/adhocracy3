@@ -4,8 +4,8 @@
         {{ "TR__PROPOSAL_LIST" | translate }}
     </div>
 
-    <a data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}">
-        <span class="moving-column-collapsed-icon-container"><i class="icon-process moving-column-icon"></i></span>
+    <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}">
+        <i class="icon-process moving-column-icon"></i>
     </a>
 
     <adh-mein-berlin-kiezkassen-detail
