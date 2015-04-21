@@ -44,6 +44,7 @@
     @include inline-block;
     background: $color-background-base-introvert;
     color: $color-text-introvert;
+    float: left;
     font-size: $font-size-small;
     font-weight: $font-weight-extrovert;
     padding: 0 (15px / $font-size-small * 1em);
@@ -51,8 +52,21 @@
     vertical-align: baseline;
 }
 
+.moving-column-menu-switch {
+    float: right;
+
+    .moving-column-menu-switch-item {
+        color: $color-text-introvert;
+        margin-right: 15px / $font-size-normal * 1em;
+
+        &:hover, &:active, &.is-active {
+            color: $color-brand-two-normal;
+        }
+    }
+}
+
 .moving-column-menu-nav {
-    a {
+    .moving-column-menu-switch-item {
         background: $color-structure-transparent;
         color: $color-text-highlight-normal;
         padding: 0 (15px / $font-size-small * 1em);
