@@ -22,11 +22,11 @@ class TestPolygon:
     def test_meta(self, meta):
         from adhocracy_core.interfaces import ISimple
         import adhocracy_core.sheets
-        from .geo import IPolygon
+        from .geo import IMultiPolygon
         assert meta.iresource is IPolygon
         assert IPolygon.isOrExtends(ISimple)
-        assert meta.permission_add == 'add_polygon'
-        assert meta.extended_sheets == [adhocracy_core.sheets.geo.IPolygon,
+        assert meta.permission_add == 'add_multipolygon'
+        assert meta.extended_sheets == [adhocracy_core.sheets.geo.IMultiPolygon,
                                         ]
 
     @mark.usefixtures('integration')
@@ -48,14 +48,13 @@ class TestService:
 
     def test_meta(self, meta):
         from adhocracy_core.interfaces import IServicePool
-        from .geo import IPolygon
+        from .geo import IMultiPolygon
         from .geo import ILocationsService
         assert meta.iresource is ILocationsService
         assert ILocationsService.isOrExtends(IServicePool)
         assert meta.content_name == 'locations'
         assert meta.permission_add == 'add_service'
-        assert meta.element_types == [IPolygon,
-                                      ]
+        assert meta.element_types == [IMultiPolygon]
 
     @mark.usefixtures('integration')
     def test_create(self, pool, registry, meta):

@@ -9,9 +9,9 @@ from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.resources.service import service_meta
 
 
-class IPolygon(ISimple):
+class IMultiPolygon(ISimple):
 
-    """Geo location Polygon.
+    """Geo location MultiPolygon.
 
     Polygons can store a large list of geo location points.
     To allow long term caching it cannot be modified after creation.
@@ -20,12 +20,12 @@ class IPolygon(ISimple):
     # TODO add cache for ever cache strategy
 
 
-polygon_meta = simple_meta._replace(
-    iresource=IPolygon,
-    permission_add='add_polygon',
+multipolygon_meta = simple_meta._replace(
+    iresource=IMultiPolygon,
+    permission_add='add_multipolygon',
     is_implicit_addable=False,
     extended_sheets=[
-        adhocracy_core.sheets.geo.IPolygon,
+        adhocracy_core.sheets.geo.IMultiPolygon,
     ],
 )
 
@@ -39,7 +39,7 @@ locations_service_meta = service_meta._replace(
     iresource=ILocationsService,
     content_name='locations',
     element_types=[
-        IPolygon,
+        IMultiPolygon,
     ],
 )
 
@@ -51,5 +51,5 @@ def add_locations_service(context: IPool, registry: Registry, options: dict):
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(polygon_meta, config)
+    add_resource_type_to_registry(multipolygon_meta, config)
     add_resource_type_to_registry(locations_service_meta, config)

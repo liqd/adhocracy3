@@ -10,55 +10,84 @@ def integration(config):
     config.include('adhocracy_core.sheets.geo')
 
 
-class TestPolygonSchema:
+@fixture
+def multipolygon_default() -> dict:
+    return {'coordinates': [],
+            'administrative_division': '',
+            'part_of': None,
+            'type': 'MultiPolygon'}
+
+
+class TestMultiPolygonSchema:
 
     @fixture
     def inst(self):
-        from .geo import PolygonSchema
-        return PolygonSchema()
+        from .geo import MultiPolygonSchema
+        return MultiPolygonSchema()
 
     def test_create(self, inst):
-        from .geo import Polygon
-        assert isinstance(inst['location'], Polygon)
+        from .geo import MultiPolygon
+        from .geo import AdministrativeDivisionName
+        assert isinstance(inst['coordinates'], MultiPolygon)
+        assert isinstance(inst['administrative_division'],
+                          AdministrativeDivisionName)
+        assert inst['type'].readonly
 
     def test_deserialize_empty(self, inst):
-        assert inst.deserialize({}) == {'location': []}
+        assert inst.deserialize({}) == {'coordinates': []}
 
-    def test_deserialize_valid_points(self, inst):
-        wanted = {'location': [(1.0, 1.0)]}
-        assert inst.deserialize({'location': [[1, 1]]}) == wanted
+    def test_deserialize_coordinates(self, inst):
+        cstruct = {'coordinates': [[[['1', '1']]]]}
+        assert inst.deserialize(cstruct) == {'coordinates': [[[(1.0, 1.0)]]]}
 
-    def test_serialize_empty(self, inst):
-        assert inst.serialize({}) == {'location': []}
+    def test_deserialize_division(self, inst):
+        cstruct = {'administrative_division': 'stadt'}
+        assert inst.deserialize(cstruct) == {'coordinates': [],
+                                             'administrative_division': 'stadt'}
 
-    def test_serialize_valid_points(self, inst):
-        wanted = {'location': [('1.0', '1.0')]}
-        assert inst.serialize({'location': [(1.0, 1.0)]}) == wanted
+    def test_deserialize_raise_if_wrong_division(self, inst):
+        from colander import Invalid
+        cstruct = {'administrative_division': 'wrong'}
+        with raises(Invalid):
+            inst.deserialize(cstruct)
+
+    def test_serialize_empty(self, inst, multipolygon_default):
+        assert inst.serialize({}) == multipolygon_default
+
+    def test_serialize_coordinates(self, inst):
+        appstruct = {'coordinates': [[[(1.0, 1.0)]]]}
+        cstruct = inst.serialize(appstruct)
+        assert cstruct['coordinates'] == [[[('1.0', '1.0')]]]
+
+    def test_serialize_administrative_division(self, inst):
+        appstruct = {'administrative_division': 'stadt'}
+        cstruct = inst.serialize(appstruct)
+        assert cstruct['administrative_division'] == 'stadt'
 
 
-class TestPolygonSheet:
+class TestMultiPolygonSheet:
 
     @fixture
     def meta(self):
-        from .geo import polygon_meta
-        return polygon_meta
+        from .geo import multipolygon_meta
+        return multipolygon_meta
 
     def test_meta(self, meta):
-        from adhocracy_core.sheets.geo import IPolygon
-        from adhocracy_core.sheets.geo import PolygonSchema
+        from adhocracy_core.sheets.geo import IMultiPolygon
+        from adhocracy_core.sheets.geo import MultiPolygonSchema
         from adhocracy_core.sheets import AnnotationStorageSheet
         assert meta.sheet_class == AnnotationStorageSheet
-        assert meta.isheet == IPolygon
-        assert meta.schema_class == PolygonSchema
+        assert meta.isheet == IMultiPolygon
+        assert meta.schema_class == MultiPolygonSchema
         assert meta.editable is False
         assert meta.create_mandatory is True
 
     def test_create(self, meta, context):
         assert meta.sheet_class(meta, context)
 
-    def test_get_empty(self, meta, context):
+    def test_get_empty(self, meta, context, multipolygon_default):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'location': []}
+        assert inst.get() == multipolygon_default
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):

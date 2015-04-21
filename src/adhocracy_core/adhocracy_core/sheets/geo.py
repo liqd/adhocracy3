@@ -1,4 +1,5 @@
 """Sheets related to geographical information."""
+from enum import Enum
 import colander
 
 from adhocracy_core.interfaces import ISheet
@@ -6,6 +7,7 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import Reference
+from adhocracy_core.schema import SingleLine
 
 
 class WebMercatorLongitude(colander.SchemaNode):
@@ -46,9 +48,9 @@ class Point(colander.TupleSchema):
     y = WebMercatorLatitude()
 
 
-class Polygon(colander.SequenceSchema):
+class LineString(colander.SequenceSchema):
 
-    """List of geographical point on the earth."""
+    """List of geographical points on the earth."""
 
     point = Point()
 
@@ -59,23 +61,99 @@ class Polygon(colander.SequenceSchema):
             self.missing = []
 
 
-class IPolygon(ISheet):
+class Polygon(colander.SequenceSchema):
 
-    """Market interface for the polygon sheet."""
+    """List of geographical lines on the earth."""
+
+    line = LineString()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'default' not in kwargs:  # pragma: no branch
+            self.default = []
+            self.missing = []
 
 
-class PolygonSchema(colander.MappingSchema):
+class MultiPolygon(colander.SequenceSchema):
 
-    """A geographical polygon on the earth."""
+    """List of geographical polygons on the earth."""
 
-    location = Polygon()
+    polygon = Polygon()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'default' not in kwargs:  # pragma: no branch
+            self.default = []
+            self.missing = []
 
 
-polygon_meta = sheet_meta._replace(isheet=IPolygon,
-                                   schema_class=PolygonSchema,
-                                   editable=False,
-                                   create_mandatory=True,
-                                   )
+class IMultiPolygon(ISheet):
+
+    """Market interface for the multi polygon sheet."""
+
+
+class PartOfReference(SheetToSheet):
+
+    """Reference to a geographical object."""
+
+    source_isheet = IMultiPolygon
+    target_isheet = IMultiPolygon
+
+
+class GermanAdministrativeDivisions(Enum):
+
+    """Administrative division names/levels based on the wikidata ontology."""
+
+    staat = 2
+    bundesland = 4
+    regierungsbezirk = 5
+    kreis = 6
+    landkreis = 6
+    gemeinde = 8
+    stadt = 8
+    stadtbezirk = 9
+    ortsteil = 10
+    bezirksregion = 10
+    """Custom definition. Is part of stadtbezirk but not part of ortsteil."""
+
+
+class AdministrativeDivisionName(SingleLine):
+
+    """Administrative division, see :class`GermanAdministrativeDivisions`."""
+
+    def validator(self, node, cstruct):
+        division_names = GermanAdministrativeDivisions.__members__.keys()
+        return colander.OneOf(division_names)(node, cstruct)
+
+
+class MultiPolygonSchema(colander.MappingSchema):
+
+    """A geographical MultiPolygon object.
+
+    GeoJSON like geometry object fields:
+
+    `type`: 'MultiPolygon' (geometry object type)
+    `coordinates`: list of list of list of points with (longitude, latitude).
+
+    Metadata property fields:
+
+    `administrative_level`: administrative division level
+    `administrative_division`: administrative division name
+    `part_of`: surrounding geographical object
+    """
+
+    type = SingleLine(default='MultiPolygon', readonly=True)
+    coordinates = MultiPolygon()
+
+    administrative_division = AdministrativeDivisionName()
+    part_of = Reference(reftype=PartOfReference)
+
+
+multipolygon_meta = sheet_meta._replace(isheet=IMultiPolygon,
+                                        schema_class=MultiPolygonSchema,
+                                        editable=False,
+                                        create_mandatory=True,
+                                        )
 
 
 class ILocationReference(ISheet):
@@ -85,10 +163,10 @@ class ILocationReference(ISheet):
 
 class LocationReference(SheetToSheet):
 
-    """Reference to a geo location."""
+    """Reference to a geographical object."""
 
     source_isheet = ILocationReference
-    target_isheet = IPolygon
+    target_isheet = IMultiPolygon
 
 
 class LocationReferenceSchema(colander.MappingSchema):
@@ -120,7 +198,7 @@ class PointSchema(colander.MappingSchema):
     x = WebMercatorLongitude()
     y = WebMercatorLatitude()
 
-# FIXME use Point tuple instead, for example: location = Point()
+# FIXME use Point tuple instead, for example: coordinates = Point()
 
 point_meta = sheet_meta._replace(isheet=IPoint,
                                  schema_class=PointSchema,
@@ -132,5 +210,5 @@ point_meta = sheet_meta._replace(isheet=IPoint,
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(point_meta, config.registry)
-    add_sheet_to_registry(polygon_meta, config.registry)
+    add_sheet_to_registry(multipolygon_meta, config.registry)
     add_sheet_to_registry(location_reference_meta, config.registry)
