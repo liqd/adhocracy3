@@ -178,13 +178,14 @@ export var createDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
+    adhSubmitIfValid,
     adhResourceUrlFilter,
     $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        link: (scope) => {
+        link: (scope, element) => {
             scope.errors = [];
             scope.data = {};
             scope.showError = adhShowError;
@@ -197,14 +198,12 @@ export var createDirective = (
             scope.data.lng = undefined;
 
             scope.submit = () => {
-                // FIXME: handle success/error
-                postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url)
-                    .then((result) => {
-                        scope.errors = [];
-                        $location.url(adhResourceUrlFilter(result[1].path));
-                    }, (errors : AdhHttp.IBackendErrorItem[]) => {
-                        scope.errors = errors;
-                    });
+                return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url)
+                        .then((result) => {
+                            $location.url(adhResourceUrlFilter(result[1].path));
+                        });
+                });
             };
         }
     };
@@ -305,7 +304,15 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", detailDirective])
         .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhResourceUrlFilter", "$location", createDirective])
+            "adhConfig",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            "$location",
+            createDirective
+        ])
         .directive("adhMeinBerlinKiezkassenProposalList", ["adhConfig", listDirective])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
 };
