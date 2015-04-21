@@ -6,6 +6,7 @@ import AdhHttp = require("../../Http/Http");
 import AdhMovingColumns = require("../../MovingColumns/MovingColumns");
 import AdhProcess = require("../../Process/Process");
 import AdhResourceArea = require("../../ResourceArea/ResourceArea");
+import AdhUser = require("../../User/User");
 
 import RICommentVersion = require("../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIKiezkassenProcess = require("../../../Resources_/adhocracy_core/resources/pool/IBasicPool");  // FIXME
@@ -88,7 +89,8 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
-            AdhResourceArea.moduleName
+            AdhResourceArea.moduleName,
+            AdhUser.moduleName
         ])
         // FIXME: the following should be specific to kiezkassen process
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
@@ -106,10 +108,21 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "create_proposal", "", [() => (resource : RIKiezkassenProcess) => {
-                    return {
-                        processUrl: resource.path
-                    };
+                .specific(RIKiezkassenProcess.content_type, "create_proposal", "", ["adhHttp", "adhUser", (
+                    adhHttp : AdhHttp.Service<any>,
+                    adhUser : AdhUser.Service
+                ) => (resource : RIKiezkassenProcess) => {
+                    return adhUser.ready.then(() => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    processUrl: resource.path
+                                };
+                            }
+                        });
+                    });
                 }])
                 .default(RIProposalVersion.content_type, "", "", {
                     space: "content",
