@@ -1,5 +1,6 @@
 import _ = require("lodash");
 
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhEventManager = require("../EventManager/EventManager");
 import AdhHttp = require("../Http/Http");
@@ -82,8 +83,59 @@ export interface IRateAdapter<T extends ResourcesBase.Resource> {
 }
 
 
+export class Service {
+    constructor(
+        private $q : angular.IQService,
+        private adhHttp : AdhHttp.Service<any>
+    ) {}
+
+    /**
+     * Promise rate of specified subject.  Reject if none could be found.
+     *
+     * NOTE: This will return the first match. The backend must make sure that
+     * there is never more than one rate item per subject-object pair.
+     */
+    public fetchRate(poolPath : string, object : string, subject : string) : angular.IPromise<RIRateVersion> {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST"
+        };
+        query[SIRate.nick + ":subject"] = subject;
+        query[SIRate.nick + ":object"] = object;
+
+        return this.adhHttp.get(poolPath, query).then((pool) => {
+            if (pool.data[SIPool.nick].elements.length > 0) {
+                return this.adhHttp.get(pool.data[SIPool.nick].elements[0]);
+            } else {
+                return this.$q.reject("Not Found");
+            }
+        });
+    }
+
+    /**
+     * Promise aggregates rates of all users.
+     */
+    public fetchAggregatedRates(poolPath : string, object : string) : angular.IPromise<{[key : string]: number}> {
+        var query : any = {
+            content_type: RIRateVersion.content_type,
+            depth: 2,
+            tag: "LAST",
+            count: "true",
+            aggregateby: "rate"
+        };
+        query[SIRate.nick + ":object"] = object;
+
+        return this.adhHttp.get(poolPath, query).then((pool) => {
+            return pool.data[SIPool.nick].aggregateby.rate;
+        });
+    }
+}
+
+
 export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateVersion>) => (
     $q : angular.IQService,
+    adhRate : Service,
     adhRateEventManager : AdhEventManager.EventManager,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -95,48 +147,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     adhDone
 ) => {
     "use strict";
-
-    /**
-     * Promise rate of specified subject.  Reject if none could be found.
-     *
-     * NOTE: This will return the first match. The backend must make sure that
-     * there is never more than one rate item per subject-object pair.
-     */
-    var fetchRate = (poolPath : string, object : string, subject : string) : angular.IPromise<RIRateVersion> => {
-        var query : any = {
-            content_type: RIRateVersion.content_type,
-            depth: 2,
-            tag: "LAST"
-        };
-        query[SIRate.nick + ":subject"] = subject;
-        query[SIRate.nick + ":object"] = object;
-
-        return adhHttp.get(poolPath, query).then((pool) => {
-            if (pool.data[SIPool.nick].elements.length > 0) {
-                return adhHttp.get(pool.data[SIPool.nick].elements[0]);
-            } else {
-                return $q.reject("Not Found");
-            }
-        });
-    };
-
-    /**
-     * Promise aggregates rates of all users.
-     */
-    var fetchAggregatedRates = (poolPath : string, object : string) : angular.IPromise<{[key : string]: number}> => {
-        var query : any = {
-            content_type: RIRateVersion.content_type,
-            depth: 2,
-            tag: "LAST",
-            count: "true",
-            aggregateby: "rate"
-        };
-        query[SIRate.nick + ":object"] = object;
-
-        return adhHttp.get(poolPath, query).then((pool) => {
-            return pool.data[SIPool.nick].aggregateby.rate;
-        });
-    };
 
     /**
      * Collect detailed information about poolPath specific to ratings for object.
@@ -204,7 +214,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
             var updateMyRate = () : angular.IPromise<void> => {
                 if (adhUser.loggedIn) {
-                    return fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
+                    return adhRate.fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
                         storeMyRateResource(resource);
                         scope.myRate = adapter.rate(resource);
                     }, () => undefined);
@@ -214,7 +224,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             };
 
             var updateAggregatedRates = () : angular.IPromise<void> => {
-                return fetchAggregatedRates(postPoolPath, scope.refersTo).then((r) => {
+                return adhRate.fetchAggregatedRates(postPoolPath, scope.refersTo).then((r) => {
                     rates = r;
                 });
             };
@@ -350,6 +360,7 @@ export var moduleName = "adhRate";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhAngularHelpers.moduleName,
             AdhEventManager.moduleName,
             AdhHttp.moduleName,
             AdhPermissions.moduleName,
@@ -359,8 +370,10 @@ export var register = (angular) => {
             AdhWebSocket.moduleName
         ])
         .service("adhRateEventManager", ["adhEventManagerClass", (cls) => new cls()])
+        .service("adhRate", ["$q", "adhHttp", Service])
         .directive("adhRate", [
             "$q",
+            "adhRate",
             "adhRateEventManager",
             "adhConfig",
             "adhHttp",
@@ -373,6 +386,7 @@ export var register = (angular) => {
             directiveFactory("/Rate.html", new Adapter.RateAdapter())])
         .directive("adhLike", [
             "$q",
+            "adhRate",
             "adhRateEventManager",
             "adhConfig",
             "adhHttp",
