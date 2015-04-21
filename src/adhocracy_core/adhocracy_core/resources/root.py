@@ -10,7 +10,6 @@ from substanced.util import find_service
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
@@ -95,9 +94,7 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_acl_to_app_root(context, registry)
     _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
-    _add_platform(context, registry)
-    # TODO: Move mercator platform creation to mercator package
-    _add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
+    add_platform(context, registry)
 
 
 def _add_objectmap_to_app_root(root):
@@ -127,8 +124,9 @@ def _add_acl_to_app_root(context, registry):
     set_acl(context, root_acl, registry=registry)
 
 
-def _add_platform(context, registry, platform_id=None,
-                  resource_type: IResource=IBasicPool):
+def add_platform(context, registry, platform_id=None,
+                 resource_type: IResource=IBasicPool):
+    """Register the platform in the content registry."""
     if platform_id is None:
         platform_id = registry.settings.get('adhocracy.platform_id',
                                             'adhocracy')

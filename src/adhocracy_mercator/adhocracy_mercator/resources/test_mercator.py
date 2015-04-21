@@ -10,6 +10,18 @@ from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_b
 from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
 
 
+def test_root_meta():
+    from adhocracy_core.resources.root import root_meta
+    from adhocracy_core.resources.root import \
+        create_initial_content_for_app_root
+    from .mercator import create_initial_content
+    from .mercator import mercator_root_meta
+    assert create_initial_content not in root_meta.after_creation
+    assert create_initial_content in mercator_root_meta.after_creation
+    assert create_initial_content_for_app_root in \
+        mercator_root_meta.after_creation
+
+
 def test_mercator_proposal_meta():
     from .mercator import mercator_proposal_meta
     from .mercator import IMercatorProposal
@@ -97,6 +109,10 @@ class TestIncludemeIntegration:
                                       )
         assert IMercatorProposalVersion.providedBy(res)
 
+@fixture(scope='class')
+def app_anonymous(app_anonymous):
+    app_anonymous.base_path = '/mercator'
+    return app_anonymous
 
 @fixture(scope='class')
 def app_contributor(app_contributor):

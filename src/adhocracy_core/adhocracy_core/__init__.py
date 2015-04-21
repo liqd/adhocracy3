@@ -126,8 +126,8 @@ def includeme(config):
     config.include('.websockets')
     config.include('.rest')
     if settings.get('adhocracy.add_test_users', False):
-        from adhocracy_core.testing import includeme_root_with_test_users
-        config.include(includeme_root_with_test_users)
+        from adhocracy_core.testing import add_create_test_users_subscriber
+        add_create_test_users_subscriber(config)
 
 
 def main(global_config, **settings):
