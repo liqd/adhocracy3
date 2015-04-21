@@ -43,6 +43,8 @@ class Point(colander.TupleSchema):
     `x`: longitude in web mercator
     `y`: latitude in web mercator
     """
+    default = (0, 0)
+    missing = colander.drop
 
     x = WebMercatorLongitude()
     y = WebMercatorLatitude()
@@ -189,16 +191,17 @@ class IPoint(ISheet):
 
 class PointSchema(colander.MappingSchema):
 
-    """A geographical point on the earth.
+    """A geographical Point object.
 
-    `x`: longitude in web mercator
-    `y`: latitude in web mercator
+    GeoJSON like geometry object fields:
+
+    `type`: 'Point' (geometry object type)
+    `coordinates`: tuple of points with (longitude, latitude).
     """
 
-    x = WebMercatorLongitude()
-    y = WebMercatorLatitude()
+    type = SingleLine(default='Point', readonly=True)
+    coordinates = Point()
 
-# FIXME use Point tuple instead, for example: coordinates = Point()
 
 point_meta = sheet_meta._replace(isheet=IPoint,
                                  schema_class=PointSchema,

@@ -104,7 +104,8 @@ class TestPointSchema:
         return PointSchema()
 
     def test_deserialize_valid(self, inst):
-        assert inst.deserialize({'x': '0', 'y': '0'}) == {'x': 0, 'y': 0}
+        cstruct = {'coordinates': ('0', '0')}
+        assert inst.deserialize(cstruct) == {'coordinates': (0, 0)}
 
     @mark.parametrize('x,y', [('20026376.4', '0'),
                               ('-20026377', '0'),
@@ -114,7 +115,7 @@ class TestPointSchema:
     def test_deserialize_raise_if_outside_boundary(self, inst, x, y):
         from colander import Invalid
         with raises(Invalid):
-            inst.deserialize({'x': x, 'y': y})
+            inst.deserialize((x, y))
 
 
 class TestPointSheet:
@@ -139,8 +140,8 @@ class TestPointSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'x': 0,
-                              'y': 0}
+        assert inst.get() == {'coordinates': (0, 0),
+                              'type': 'Point'}
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
