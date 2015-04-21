@@ -387,11 +387,7 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                 });
             });
 
-            var loopCarousel = (index, total) => {
-                index = index < 0 ? total : index;
-                index = index > total ? 0 : index;
-                return index;
-            };
+            var loopCarousel = (index, total) => (index + total) % total;
 
             scope.toggleItem = (item) => {
                 if (typeof scope.selectedItem !== "undefined") {
@@ -402,18 +398,18 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
             };
 
             scope.getPreviousItem = (item) => {
-                var index = loopCarousel(item.index - 1, scope.items.length - 1);
+                var index = loopCarousel(item.index - 1, scope.items.length);
                 while (scope.items[index].hide) {
-                    index = loopCarousel(index - 1, scope.items.length - 1);
+                    index = loopCarousel(index - 1, scope.items.length);
                 }
                 scope.toggleItem(scope.items[index]);
                 scrollToItem(index);
             };
 
             scope.getNextItem = (item) => {
-                var index = loopCarousel(item.index + 1, scope.items.length - 1);
+                var index = loopCarousel(item.index + 1, scope.items.length);
                 while (scope.items[index].hide) {
-                    index = loopCarousel(index + 1, scope.items.length - 1);
+                    index = loopCarousel(index + 1, scope.items.length);
                 }
                 scope.toggleItem(scope.items[index]);
                 scrollToItem(index);
