@@ -1,7 +1,7 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
-
+from unittest.mock import Mock
 
 def test_root_meta():
     from .root import root_meta
@@ -11,6 +11,20 @@ def test_root_meta():
     assert meta.iresource is IRootPool
     assert create_initial_content_for_app_root in meta.after_creation
 
+
+def test_add_platform_no_platform_id():
+    from .root import add_platform
+    registry = Mock()
+    context = testing.DummyResource()
+    add_platform(context, registry)
+    assert registry.settings.get.called is True
+
+def test_add_platform():
+    from .root import add_platform
+    registry = Mock()
+    context = testing.DummyResource()
+    add_platform(context, registry, 'meinberlin')
+    assert registry.settings.get.called is False
 
 @fixture
 def integration(config):
