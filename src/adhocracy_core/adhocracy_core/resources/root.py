@@ -94,7 +94,6 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_acl_to_app_root(context, registry)
     _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
-    add_platform(context, registry)
 
 
 def _add_objectmap_to_app_root(root):
@@ -133,6 +132,11 @@ def add_platform(context, registry, platform_id=None,
     appstructs = {'adhocracy_core.sheets.name.IName': {'name': platform_id}}
     registry.content.create(resource_type.__identifier__, context,
                             appstructs=appstructs, registry=registry)
+
+
+def _add_adhocracy_platform(context: IPool, registry: Registry,
+                            options: dict):
+    add_platform(context, registry)
 
 
 def _add_default_group(context, registry):
@@ -194,7 +198,8 @@ def _add_initial_user_and_group(context, registry):
 
 root_meta = pool_meta._replace(
     iresource=IRootPool,
-    after_creation=[create_initial_content_for_app_root]
+    after_creation=[create_initial_content_for_app_root,
+                    _add_adhocracy_platform]
 )
 
 
