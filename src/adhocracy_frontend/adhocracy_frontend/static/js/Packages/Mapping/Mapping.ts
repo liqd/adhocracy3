@@ -311,8 +311,7 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, leaflet : typeo
             // limit map to polygon
             map.fitBounds(scope.polygon.getBounds());
             leaflet.Util.setOptions(map, {
-                 minZoom: map.getZoom(),
-                 maxBounds: map.getBounds()
+                 minZoom: map.getZoom()
             });
 
             var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
