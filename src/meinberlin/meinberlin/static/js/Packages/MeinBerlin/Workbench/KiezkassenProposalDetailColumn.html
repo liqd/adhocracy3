@@ -10,7 +10,9 @@
         </div>
     </div>
 
-    <a data-ng-switch-when="collapsed" data-ng-href="{{ proposalUrl | adhResourceUrl }}"><i class="icon-document moving-column-icon"></i></a>
+    <a data-ng-switch-when="collapsed" data-ng-href="{{ proposalUrl | adhResourceUrl }}">
+        <span class="moving-column-collapsed-icon-container"><i class="icon-document moving-column-icon"></i></span>
+    </a>
 
     <adh-mein-berlin-kiezkassen-proposal-detail
         data-ng-switch-when="body"

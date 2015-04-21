@@ -6,6 +6,21 @@
         .moving-column-icon {
             margin-right: 0;
         }
+
+        .moving-column-collapsed-icon-container {
+            background: $color-structure-extrovert;
+            color: $color-text-inverted;
+            display: block;
+
+            &:hover, &:focus, &:active {
+                background: $color-text-highlight-normal;
+                color: $color-text-inverted;
+            }
+
+            &:active {
+                background: $color-text-highlight-introvert;
+            }
+        }
     }
 
     &.is-first-visible-child {
