@@ -1,5 +1,6 @@
 import _ = require("lodash");
 
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhEventManager = require("../EventManager/EventManager");
 import AdhHttp = require("../Http/Http");
@@ -359,6 +360,7 @@ export var moduleName = "adhRate";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhAngularHelpers.moduleName,
             AdhEventManager.moduleName,
             AdhHttp.moduleName,
             AdhPermissions.moduleName,

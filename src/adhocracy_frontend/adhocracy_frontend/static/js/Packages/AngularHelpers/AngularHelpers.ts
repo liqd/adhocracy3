@@ -225,6 +225,7 @@ export var register = (angular) => {
             AdhHttp.moduleName
         ])
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
+        .filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString())
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .factory("adhShowError", () => showError)
         .factory("adhSingleClickWrapper", ["$timeout", singleClickWrapperFactory])
