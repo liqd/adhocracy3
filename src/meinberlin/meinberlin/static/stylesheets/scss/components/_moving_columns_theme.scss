@@ -1,5 +1,20 @@
 .moving-column {
-    @include border-radius((10px / $font-size-normal * 1em) (10px / $font-size-normal * 1em) 0 0);
+    &.is-collapse {
+        background: $color-structure-normal;
+        border: 0;
+
+        .moving-column-icon {
+            margin-right: 0;
+        }
+    }
+
+    &.is-first-visible-child {
+        @include border-top-left-radius(10px / $font-size-small * 1em);
+    }
+
+    &.is-last-visible-child {
+        @include border-top-right-radius(10px / $font-size-small * 1em);
+    }
 }
 
 .moving-column-body {
