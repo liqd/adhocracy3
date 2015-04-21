@@ -347,10 +347,12 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                             lat: pointSheet.y
                         };
 
+                        var hide = (value.lat === 0 && value.lat === 0);
+
                         var item = {
                             value: value,
                             marker: L.marker(leaflet.latLng(value.lat, value.lng), {icon: itemLeafletIcon}),
-                            hide: false,
+                            hide: hide,
                             index: key
                         };
 
