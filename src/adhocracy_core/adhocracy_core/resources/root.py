@@ -78,7 +78,6 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             # God role
             (Allow, 'role:god', ALL_PERMISSIONS),
             ]
-# TODO? every sheet/resource should have the posibility to add the needed ACEs
 
 
 class IRootPool(IPool, IRoot):
