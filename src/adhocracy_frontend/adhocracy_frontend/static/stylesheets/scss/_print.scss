@@ -18,9 +18,9 @@
     }
 
     * {
-        // scss-lint:disable ImportantRule
-        // scss-lint:disable ColorVariable
+        // scss-lint:disable ImportantRule, ColorVariable
         background-color: #fff !important;
         color: #000 !important;
+        // scss-lint:enable ImportantRule, ColorVariable
     }
 }
