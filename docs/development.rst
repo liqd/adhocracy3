@@ -88,10 +88,6 @@ frontend integration tests:
            any tricks, because we don't run blanket for test coverage
            reporting.
 
-frontend functional tests::
-
-    bin/py.test ./src/adhocracy_frontend/adhocracy_frontend/tests/functional
-
 protractor acceptance tests::
 
     bin/protractor etc/protractorConf.js
