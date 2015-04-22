@@ -2,6 +2,7 @@ from copy import deepcopy
 from pytest import fixture
 from pytest import raises
 from pytest import mark
+from unittest.mock import Mock
 
 from pyramid import testing
 
@@ -51,6 +52,12 @@ class TestResourceContentRegistry:
         request = testing.DummyRequest()
         request.registry.content = inst
         return request
+
+    @fixture
+    def mock_registry(self):
+        registry = Mock()
+        registry.introspector.get_category.return_value = []
+        return registry
 
     def make_one(self, registry):
         from adhocracy_core.content import ResourceContentRegistry
@@ -181,6 +188,67 @@ class TestResourceContentRegistry:
         inst.resources_meta_addable = {IResource: [simple_meta]}
         config.testing_securitypolicy(userid='hank', permissive=False)
         assert inst.get_resources_meta_addable(context, request_) == []
+
+    def test_permissions_resource_permission_add_defined(
+            self, inst, resource_meta, mock_registry):
+        simple_meta = resource_meta._replace(
+            iresource=ISimple,
+            permission_add='add_simple')
+        inst.registry = mock_registry
+        inst.resources_meta[ISimple] = simple_meta
+        assert 'add_simple' in inst.permissions
+
+    def test_permissions_resource_permission_view_defined(
+            self, inst, resource_meta, mock_registry):
+        simple_meta = resource_meta._replace(
+            iresource=ISimple,
+            permission_view='view_simple')
+        inst.registry = mock_registry
+        inst.resources_meta[ISimple] = simple_meta
+        assert 'view_simple' in inst.permissions
+
+    def test_permissions_sheet_permission_view_defined(
+            self, inst, sheet_meta, mock_registry):
+        sheet_meta = sheet_meta._replace(permission_view='view_p')
+        inst.registry = mock_registry
+        inst.sheets_meta[sheet_meta] = sheet_meta
+        assert 'view_p' in inst.permissions
+
+    def test_permissions_sheet_permission_edit_defined(
+            self, inst, sheet_meta, mock_registry):
+        sheet_meta = sheet_meta._replace(permission_edit='edit_p')
+        inst.registry = mock_registry
+        inst.sheets_meta[sheet_meta] = sheet_meta
+        assert 'edit_p' in inst.permissions
+
+    def test_permissions_sheet_permission_create_defined(
+            self, inst, sheet_meta, mock_registry):
+        sheet_meta = sheet_meta._replace(permission_create='create_p')
+        inst.registry = mock_registry
+        inst.sheets_meta[sheet_meta] = sheet_meta
+        assert 'create_p' in inst.permissions
+
+    def test_permissions_workflow_permission(self, inst, mock_registry):
+        from adhocracy_core.workflows.sample import sample_meta
+        inst.workflows_meta['sample'] = sample_meta
+        inst.registry = mock_registry
+        assert 'do_transitions' in inst.permissions
+
+    def test_permissions_view_permission(self, inst, mock_registry):
+        from pyramid.view import view_config
+
+        permission_name = 'view_xyz'
+        mock_introspectable = Mock()
+        mock_introspectable.title = permission_name
+        inst.registry = mock_registry
+        inst.registry.introspector.get_category.return_value \
+            = [{'introspectable': mock_introspectable}]
+
+        @view_config(permission=permission_name)
+        def test_view_xyz(context, request):
+            pass
+
+        assert permission_name in inst.permissions
 
     @fixture
     def sheet_meta_a(self, sheet_meta):
