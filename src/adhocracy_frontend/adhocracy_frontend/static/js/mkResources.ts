@@ -900,12 +900,6 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         parser = "(polygon) => _.map(polygon, (line) " +
                  "=> _.map(line, (point) => _.map(point, (x) => parseInt(x, 10))))";
         break;
-    case "adhocracy_core.sheets.geo.MultiPolygon":
-        resultType = "number[][][][]";
-        jsonType = "string[][][][]";
-        parser = "(multi) => _.map(multi, (polygon) => _.map(polygon, (line) " +
-                 "=> _.map(line, (point) => _.map(point, (x) => parseInt(x, 10)))))";
-        break;
     case "adhocracy_core.sheets.geo.AdministrativeDivisionName":
         resultType = "string";
         break;
