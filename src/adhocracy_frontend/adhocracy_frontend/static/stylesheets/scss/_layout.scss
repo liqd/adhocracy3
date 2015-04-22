@@ -47,6 +47,11 @@
     left: 0;
     right: 0;
     overflow: hidden;
+
+    @media print {
+        position: static;
+        overflow: visible;
+    }
 }
 
 .l-center {

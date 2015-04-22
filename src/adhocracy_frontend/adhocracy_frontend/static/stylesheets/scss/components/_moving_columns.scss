@@ -417,11 +417,19 @@ A list of alert messages to notify users in the moving column
         position: static;
     }
 
+    .moving-column-body {
+        border: 0;
+    }
+
     .moving-column {
         // scss-lint:disable ImportantRule
 
         width: auto !important;
         border: 0;
+
+        &.is-hide, &.is-collapse {
+            display: none;
+        }
     }
 
     .moving-column-menu,
@@ -430,5 +438,12 @@ A list of alert messages to notify users in the moving column
     .moving-column-mask,
     .moving-column-alerts {
         display: none;
+    }
+
+    .moving-columns[class^="is-show-show"],
+    .moving-columns[class*=" is-show-show"] {
+        .moving-column.is-show:first-child {
+            display: none;
+        }
     }
 }

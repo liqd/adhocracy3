@@ -172,16 +172,20 @@ category: Type
 */
 
 .inline-box {
-    @include inline-block;
-    color: $color-text-highlight-introvert;
-    border: 1px solid $color-text-highlight-introvert;
-    font-size: $font-size-small;
-    padding: 0 1em;
+    @media screen {
+        @include inline-block;
+        color: $color-text-highlight-introvert;
+        border: 1px solid $color-text-highlight-introvert;
+        font-size: $font-size-small;
+        padding: 0 1em;
+    }
 }
 
 .inline-boxes {
-    margin: 0;
-    padding: 0;
+    @media screen {
+        margin: 0;
+        padding: 0;
+    }
 
     li {
         @extend .inline-box;

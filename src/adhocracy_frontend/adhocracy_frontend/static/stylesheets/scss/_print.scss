@@ -2,10 +2,24 @@
     .print-only {
         display: none;
     }
+
+    .screen-only {
+        display: block;
+    }
 }
 
 @media print {
     .print-only {
         display: block;
+    }
+
+    .screen-only {
+        display: none;
+    }
+
+    * {
+        // scss-lint:disable ImportantRule
+        background-color: #fff !important;
+        color: #000 !important;
     }
 }

@@ -248,6 +248,7 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         scope: true,
         transclude: true,
+        replace: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
         controller: ["$timeout", "$scope", MovingColumnController]
     };
