@@ -342,8 +342,8 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                             title: mainSheet.title,
                             locationText: mainSheet.location_text,
                             commentCount: poolSheet.count,
-                            lng: pointSheet.x,
-                            lat: pointSheet.y
+                            lng: pointSheet.coordinates[0],
+                            lat: pointSheet.coordinates[1]
                         };
 
                         var hide = (value.lat === 0 && value.lat === 0);
