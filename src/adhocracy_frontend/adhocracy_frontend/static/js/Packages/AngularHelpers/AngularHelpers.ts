@@ -178,7 +178,7 @@ export var showError = (form : angular.IFormController, field : angular.INgModel
 /**
  * Wrapper around clickable element that adds a sglclick event.
  *
- * sglclick is triggered with on a click event that is not followed
+ * sglclick is triggered on a click event that is not followed
  * by another click or dblclick event within given timeout.
  */
 export var singleClickWrapperFactory = ($timeout : angular.ITimeoutService) => {
@@ -217,6 +217,58 @@ export var singleClickWrapperFactory = ($timeout : angular.ITimeoutService) => {
 };
 
 
+/**
+ * Return the first element within a form that has an error.
+ *
+ * Will also search through all subforms.
+ * Used to scroll to that element on submit atempt.
+ */
+export var getFirstFormError = (form, element) => {
+    var getErrorControllers = (ctrl) => {
+        if (ctrl.hasOwnProperty("$modelValue")) {
+            return [ctrl];
+        } else {
+            var childCtrls = _.flatten(_.values(ctrl.$error));
+            return _.flatten(_.map(childCtrls, getErrorControllers));
+        }
+    };
+
+    var errorControllers = getErrorControllers(form);
+    var names = _.unique(_.map(errorControllers, "$name"));
+    var selector = _.map(names, (name) => "[name=\"" + name + "\"]").join(", ");
+
+    return element.find(selector).first();
+};
+
+export var submitIfValid = (
+    $q : angular.IQService
+) => (
+    scope : {errors : AdhHttp.IBackendErrorItem[]},
+    element,
+    form : angular.IFormController,
+    submitFn : () => angular.IPromise<any>
+) : angular.IPromise<any> => {
+    var container = element.parents("[data-du-scroll-container]");
+
+    if (form.$valid) {
+        return submitFn()
+            .then((result) => {
+                scope.errors = [];
+                return result;
+            }, (errors : AdhHttp.IBackendErrorItem[]) => {
+                // FIXME this also happens in resourceWidgets. Should not do any harm though.
+                scope.errors = errors;
+
+                container.scrollTopAnimated(0);
+                throw errors;
+            });
+    } else {
+        container.scrollToElementAnimated(getFirstFormError(form, element), 20);
+        return $q.reject([]);
+    }
+};
+
+
 export var moduleName = "adhAngularHelpers";
 
 export var register = (angular) => {
@@ -225,9 +277,11 @@ export var register = (angular) => {
             AdhHttp.moduleName
         ])
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
+        .filter("signum", () => (n : number) : string => (typeof n === "number") ? (n > 0 ? "+" + n.toString() : n.toString()) : "0")
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .factory("adhShowError", () => showError)
         .factory("adhSingleClickWrapper", ["$timeout", singleClickWrapperFactory])
+        .factory("adhSubmitIfValid", ["$q", submitIfValid])
         .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .directive("adhWait", waitForCondition)

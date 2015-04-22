@@ -65,7 +65,7 @@ export var logBackendBatchError = (
     response : angular.IHttpPromiseCallbackArg<{
         responses : {
             code : number;
-            body : IBackendError;
+            body? : IBackendError;
         }[];
         /* tslint:disable:variable-name */
         updated_resources : any;
@@ -76,9 +76,19 @@ export var logBackendBatchError = (
 
     renderBackendError(response);
 
-    var lastBatchItemResponse : IBackendError = response.data.responses[response.data.responses.length - 1].body;
-    var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
-    throw errors;
+    var lastBatchItemResponse = response.data.responses[response.data.responses.length - 1];
+
+    // FIXME: work around #1019
+    if (lastBatchItemResponse.code === 403) {
+        throw [{
+            name: "forbidden",
+            location: "unknown",
+            description: "TR__ERROR_HTTP_FORBIDDEN"
+        }];
+    } else {
+        var errors : IBackendErrorItem[] = lastBatchItemResponse.body.errors;
+        throw errors;
+    }
 };
 
 

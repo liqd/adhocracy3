@@ -154,8 +154,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     app.value("moment", moment);
     app.value("leaflet", leaflet);
 
-    app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
-
     // register our modules
     app.value("adhConfig", config);
     AdhAbuse.register(angular);

@@ -261,7 +261,9 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             self.setMode(instance, mode));
 
         var submitOff = wrapper.eventManager.on("submit", () =>
-            self.provide(instance).then((resources) => instance.deferred.resolve(resources)));
+            self.provide(instance).then(
+                (resources) => instance.deferred.resolve(resources),
+                (reason) => instance.deferred.reject(reason)));
 
         var cancelOff = wrapper.eventManager.on("cancel", () => {
             if (scope.mode === Mode.edit) {
