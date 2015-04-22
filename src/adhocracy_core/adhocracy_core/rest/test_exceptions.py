@@ -138,7 +138,7 @@ class TestHandleError410:
         inst = self.make_one(error, request_)
         assert inst.content_type == 'application/json'
         assert inst.json_body['modification_date'] == ''
-        assert inst.json_body['modified_by'] == ''
+        assert inst.json_body['modified_by'] is None
         assert inst.json_body['reason'] == ''
 
     def test_with_detail_no_imetadata(self, error, request_):
