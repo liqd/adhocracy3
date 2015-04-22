@@ -7,6 +7,7 @@ import AdhHttp = require("../../../Http/Http");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../../../Rate/Rate");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
@@ -42,6 +43,7 @@ export interface IScope extends angular.IScope {
         lat : number;
         polygon: number[][];
     };
+    selectedState? : string;
 }
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
@@ -168,7 +170,12 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
     };
 };
 
-export var listItemDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, adhRate : AdhRate.Service) => {
+export var listItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
@@ -177,6 +184,16 @@ export var listItemDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHtt
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhRate)(scope);
+
+            scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    scope.selectedState = "";
+                } else if (proposalVersionUrl === scope.path) {
+                    scope.selectedState = "is-selected";
+                } else {
+                    scope.selectedState = "is-not-selected";
+                }
+            }));
         }
     };
 };
@@ -302,7 +319,8 @@ export var register = (angular) => {
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhRate.moduleName,
-            AdhResourceArea.moduleName
+            AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
@@ -311,7 +329,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list");
         }])
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", "adhRate", detailDirective])
-        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", "adhRate", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", "adhRate", "adhTopLevelState", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
             "adhConfig",
             "adhHttp",
