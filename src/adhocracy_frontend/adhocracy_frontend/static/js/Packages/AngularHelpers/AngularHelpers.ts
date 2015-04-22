@@ -105,7 +105,10 @@ export var recompileOnChange = ($compile : angular.ICompileService) => {
                         }
 
                         innerScope = scope.$new();
-                        innerScope[attrs["key"]] = value;
+
+                        if (typeof attrs["key"] !== "undefined") {
+                            innerScope[attrs["key"]] = value;
+                        }
 
                         compiledContents(innerScope, (clone) => {
                             element.append(clone);
