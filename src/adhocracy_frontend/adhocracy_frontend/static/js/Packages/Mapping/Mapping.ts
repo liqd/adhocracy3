@@ -20,8 +20,6 @@ import AdhUtil = require("../Util/Util");
 import AdhMappingUtils = require("./MappingUtils");
 
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 
@@ -333,8 +331,9 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                     tag: "LAST",
                     count: true
                 }).then((pool) => {
-                    adhHttp.get(url).then((resource : RIProposalVersion) => {
-                        var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
+                    adhHttp.get(url).then((resource) => {
+                        // FIXME: This is specific to meinberlin and should not be on adhocracy_core
+                        var mainSheet = resource.data["adhocracy_meinberlin.sheets.kiezkassen.IProposal"];
                         var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
                         var poolSheet = pool.data[SIPool.nick];
 
