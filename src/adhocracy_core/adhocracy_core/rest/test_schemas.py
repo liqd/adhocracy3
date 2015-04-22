@@ -80,7 +80,7 @@ class TestItemResponseSchema:
 
     def test_serialize_no_appstruct(self, request, context):
         inst = self.make_one().bind(request=request, context=context)
-        assert inst.serialize()['first_version_path'] == ''
+        assert inst.serialize()['first_version_path'] == None
 
     def test_serialize_with_appstruct(self, request, context):
         inst = self.make_one().bind(request=request, context=context)

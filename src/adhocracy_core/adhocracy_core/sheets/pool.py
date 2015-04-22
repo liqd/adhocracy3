@@ -158,7 +158,6 @@ class FilteringPoolSheet(PoolSheet):
                 isheet = dotted_name_resolver.resolve(isheet_name)
                 query &= index.eq(isheet, isheet_field, value)
         # Only show visible elements (not hidden or deleted)
-        # FIXME make this optional
         if only_visible:
             visibility_index = adhocracy_catalog['private_visibility']
             query &= visibility_index.eq('visible')

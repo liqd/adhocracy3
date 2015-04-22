@@ -12,6 +12,7 @@ def test_disable_add_proposal_permission(context):
     assert context.__acl__[1] == (Deny, 'role:creator',
                                   'add_mercator_proposal_version')
 
+
 def test_disable_add_proposal_permission_mark_context_as_dirty(context):
     """set _p_changed attribute true to fix substanced.util.set_acl"""
     from . import evolve2_disable_add_proposal_permission
@@ -19,12 +20,13 @@ def test_disable_add_proposal_permission_mark_context_as_dirty(context):
     evolve2_disable_add_proposal_permission(context)
     assert context._p_changed
 
+
 def test_disable_voting_and_commenting(context):
-    from . import evolve3_disable_voting_and_commenting
+    from . import evolve4_disable_voting_and_commenting
     context.__acl__ = []
     to_disable = set([(Deny, 'role:annotator', 'add_rate'),
                       (Deny, 'role:annotator', 'add_comment'),
                       (Deny, 'role:creator', 'add_commentversion'),
                       (Deny, 'role:creator', 'add_rateversion')])
-    evolve3_disable_voting_and_commenting(context)
+    evolve4_disable_voting_and_commenting(context)
     assert set(context.__acl__[:4]) == to_disable

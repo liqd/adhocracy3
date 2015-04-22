@@ -12,19 +12,19 @@ def integration(config):
     config.include('adhocracy_core.resources.geo')
 
 
-class TestPolygon:
+class TestMultiPolygon:
 
     @fixture
     def meta(self):
-        from .geo import polygon_meta
-        return polygon_meta
+        from .geo import multipolygon_meta
+        return multipolygon_meta
 
     def test_meta(self, meta):
         from adhocracy_core.interfaces import ISimple
         import adhocracy_core.sheets
         from .geo import IMultiPolygon
-        assert meta.iresource is IPolygon
-        assert IPolygon.isOrExtends(ISimple)
+        assert meta.iresource is IMultiPolygon
+        assert IMultiPolygon.isOrExtends(ISimple)
         assert meta.permission_add == 'add_multipolygon'
         assert meta.extended_sheets == [adhocracy_core.sheets.geo.IMultiPolygon,
                                         ]

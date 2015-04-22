@@ -316,6 +316,8 @@ class TestIntegrationPoolSheet:
         index = pool_graph_catalog['catalogs']['adhocracy']['private_visibility']
         index.reindex_resource(child1)
         poolsheet = get_sheet(pool, IPool)
+        result = set(poolsheet._filter_elements(only_visible=False).elements)
+        assert result == set([child1])
         result = set(poolsheet._filter_elements(only_visible=True).elements)
         assert result == set()
 
