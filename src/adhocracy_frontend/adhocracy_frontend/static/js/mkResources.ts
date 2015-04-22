@@ -897,8 +897,9 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     case "adhocracy_core.sheets.geo.Polygon":
         resultType = "number[][][]";
         jsonType = "string[][][]";
-        parser = "(polygon) => _.map(polygon, (line) " +
-                 "=> _.map(line, (point) => _.map(point, (x) => parseInt(x, 10))))";
+        // FIXME: Definitely Typed does not seem to have good definitions for _.map
+        parser = "(polygon : string[][][]) => _.map(polygon, (line : string[][]) " +
+                 "=> _.map(line, (point : string[]) => _.map(point, (x) => parseInt(x, 10))))";
         break;
     case "adhocracy_core.sheets.geo.AdministrativeDivisionName":
         resultType = "string";
