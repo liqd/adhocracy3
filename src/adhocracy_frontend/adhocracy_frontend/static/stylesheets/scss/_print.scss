@@ -6,7 +6,7 @@ category: Print
 ---
 
 These classes display or hide things depending on whether print or screen. These should only be used if no other method
-is useable such as the modifiers listed below. Don't forget to hide from screen-readers where appropriate.
+is useable such as the modifiers listed in this category. Don't forget to hide from screen-readers where appropriate.
 
 ```html_example
 <h1 class="print-only" aria-hidden="true">This heading only appears in print mode</h1>
