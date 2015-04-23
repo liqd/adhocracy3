@@ -76,7 +76,7 @@ If this is placed on an icon the icon will be replaced by the text.
         }
     }
 
-    &.m-definition-before {
+    .m-definition-before {
         &:after {
             content: "";
         }
