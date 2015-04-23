@@ -69,6 +69,13 @@ States:
 
 .moving-columns {
     overflow: hidden;
+
+    &[class^="is-show-show"],
+    &[class*=" is-show-show"] {
+        .moving-column.is-show:first-child {
+            display: none;
+        }
+    }
 }
 
 /*doc
@@ -123,6 +130,10 @@ The menu should always have the same state as its columns.
         .moving-column-collapsed {
             display: block;
         }
+
+        @media print {
+            display: none;
+        }
     }
 
     &.is-collapse {
@@ -135,6 +146,14 @@ The menu should always have the same state as its columns.
         .moving-column-icon {
             float: none;
         }
+    }
+
+    @media print {
+        position: static;
+        // scss-lint:disable ImportantRule
+        width: auto !important;
+        // scss-lint:enable ImportantRule
+        border: 0;
     }
 }
 
@@ -171,6 +190,11 @@ The menu should always have the same state as its columns.
     border: 0 solid $color-structure-normal;
     border-width: 0 $moving-column-border-width $moving-column-border-width;
     font-size: $font-size-normal;
+
+    @media print {
+        border: 0;
+        position: static;
+    }
 }
 
 .moving-column-collapsed a {
@@ -261,6 +285,10 @@ States:
             }
         }
     }
+
+    @media print {
+        display: none;
+    }
 }
 
 .moving-column-icon {
@@ -330,12 +358,20 @@ States:
             color: $color-text-extrovert;
         }
     }
+
+    @media print {
+        display: none;
+    }
 }
 
 .moving-column-mask {
     @include opacity(0.5);
     background-color: $color-background-mask;
     z-index: 2;
+
+    @media print {
+        display: none;
+    }
 }
 
 /*doc
@@ -361,6 +397,10 @@ A list of alert messages to notify users in the moving column
     padding: 0;
     list-style: none;
     z-index: 3;
+
+    @media print {
+        display: none;
+    }
 }
 
 .moving-column-alert {
@@ -408,42 +448,8 @@ A list of alert messages to notify users in the moving column
     &.ng-enter.ng-enter-active {
         @include opacity(1);
     }
-}
 
-
-@media print {
-    .moving-column,
-    .moving-column-body {
-        position: static;
-    }
-
-    .moving-column-body {
-        border: 0;
-    }
-
-    .moving-column {
-        // scss-lint:disable ImportantRule
-
-        width: auto !important;
-        border: 0;
-
-        &.is-hide, &.is-collapse {
-            display: none;
-        }
-    }
-
-    .moving-column-menu,
-    .moving-column-sidebar,
-    .moving-column-overlay,
-    .moving-column-mask,
-    .moving-column-alerts {
+    @media print {
         display: none;
-    }
-
-    .moving-columns[class^="is-show-show"],
-    .moving-columns[class*=" is-show-show"] {
-        .moving-column.is-show:first-child {
-            display: none;
-        }
     }
 }
