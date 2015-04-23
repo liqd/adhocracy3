@@ -1,11 +1,11 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
-2015-4-20: Created.
+2015-4-22: Created.
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Mon Apr 20 11:48:06 2015
+Created by FontForge 20120731 at Wed Apr 22 12:07:22 2015
  By Caroline Clifford,,,
 Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -22,7 +22,7 @@ Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
     bbox="-0.75 -65 515 449"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+F100-F12A"
+    unicode-range="U+F100-F12B"
   />
     <missing-glyph />
     <glyph glyph-name="uniF129" unicode="&#xf129;" horiz-adv-x="279" 
@@ -91,6 +91,9 @@ l222 176c2 2 5 2 7 2c6 0 11 -4 11 -10c0 -3 -2 -7 -4 -9l-229 -181c-2 -1 -5 -2 -7 
     <glyph glyph-name="uniF101" unicode="&#xf101;" horiz-adv-x="402" 
 d="M17 446h1h1h241c5 0 11 -3 14 -6l123 -139c3 -3 5 -8 5 -12v-333c0 -10 -9 -18 -19 -18h-2h-362c-10 0 -19 8 -19 18v472v0c0 9 8 17 17 18zM37 409v-434h328v292h-107c-10 0 -19 9 -19 19v123h-202zM276 381v-76h68zM116 171h181v-43h-181v43zM116 64h181v-43h-181v43z
 " />
+    <glyph glyph-name="uniF12B" unicode="&#xf12b;" horiz-adv-x="507" 
+d="M461 320h-415c-26 0 -46 14 -46 37s20 38 46 38h415c26 0 46 -15 46 -38s-20 -37 -46 -37zM461 149h-415c-26 0 -46 20 -46 43s20 43 46 43h415c26 0 46 -20 46 -43s-20 -43 -46 -43zM461 -11h-415c-26 0 -46 15 -46 38s20 37 46 37h415c26 0 46 -14 46 -37
+s-20 -38 -46 -38z" />
     <glyph glyph-name="uniF125" unicode="&#xf125;" horiz-adv-x="489" 
 d="M279 176h-2c-21 0 -37 6 -48 20c-23 23 -45 73 -43 132c2 39 41 60 91 62h2c50 -2 87 -23 89 -62c2 -59 -16 -109 -39 -132c-16 -13 -33 -20 -50 -20zM274 358c-35 0 -60 -8 -62 -29c-2 -51 16 -94 32 -112c7 -6 16 -12 27 -12h3c12 0 20 4 27 12c16 16 37 61 35 111
 c0 21 -25 30 -62 30zM428 56h-304v16c0 80 78 107 144 107h7c64 0 153 -27 153 -107v-16zM153 85h244c-12 57 -95 62 -119 62h-7c-25 0 -107 -5 -118 -62zM489 -6h-428v455h428v-455zM91 26h366v394h-366v-394zM31 -36h397v-29h-428v423h31v-394z" />

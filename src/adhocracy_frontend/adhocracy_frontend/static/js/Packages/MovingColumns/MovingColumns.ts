@@ -31,6 +31,8 @@ export var movingColumns = (
                 element.removeClass("is-show");
                 element.removeClass("is-collapse");
                 element.removeClass("is-hide");
+                element.removeClass("is-first-visible-child");
+                element.removeClass("is-last-visible-child");
                 element.removeClass("has-focus");
             };
 
@@ -116,6 +118,10 @@ export var movingColumns = (
                         offset += spacing;
                     }
                 }
+
+                element.find(".moving-column:not(.is-hide):first-child").addClass("is-first-visible-child");
+                element.find(".moving-column:not(.is-hide):last").addClass("is-last-visible-child");
+
             };
 
             var resizeNoTransition = () => {
@@ -256,8 +262,8 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         scope: true,
-        transclude: true,
         replace: true,
+        transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
         controller: ["$timeout", "$scope", MovingColumnController]
     };
