@@ -14,7 +14,7 @@
             </li>
             <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-total-comments">
                 <i class="icon-speechbubbles"></i>
-                {{ data.commentCountTotal }}
+                {{ data.commentCountTotal }} <span class="print-only" aria-hidden="true">{{ "TR__COMMENTS" | translate }}</span>
             </li>
             <li class="mercator-propsal-list-item-meta-item  mercator-propsal-list-item-meta-item-supporters">
                 <i class="icon-pointy-rectangle-left"></i>
@@ -22,7 +22,7 @@
                 {{ "TR__SUPPORTERS" | translate }}
             </li>
             <li class="mercator-propsal-list-item-meta-item mercator-propsal-list-item-meta-item-budget">
-                {{ data.finance.requested_funding | number }} &euro;
+                {{ data.finance.requested_funding | number }} &euro; <span class="print-only" aria-hidden="true">{{ "TR__REQUESTED_FUNDING" | translate }}</span>
             </li>
         </ul>
     </div>
