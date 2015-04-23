@@ -9,6 +9,7 @@ import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
@@ -75,7 +76,9 @@ export var mercatorProposalCreateColumnDirective = (
 
 
 export var mercatorProposalDetailColumnDirective = (
+    $window : Window,
     bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
     adhConfig : AdhConfig.IService
 ) => {
@@ -89,6 +92,12 @@ export var mercatorProposalDetailColumnDirective = (
 
             scope.delete = () => {
                 column.$broadcast("triggerDelete", scope.proposalUrl);
+            };
+
+            scope.print = () => {
+                // only the focused column is printed
+                adhTopLevelState.set("focus", 1);
+                $window.print();
             };
         }
     };
@@ -165,6 +174,7 @@ export var register = (angular) => {
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
@@ -239,7 +249,12 @@ export var register = (angular) => {
         .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", ["adhBindVariablesAndClear", "adhConfig", "$location",
             mercatorProposalCreateColumnDirective])
-        .directive("adhMercatorProposalDetailColumn", ["adhBindVariablesAndClear", "adhPermissions", "adhConfig",
+        .directive("adhMercatorProposalDetailColumn", [
+            "$window",
+            "adhBindVariablesAndClear",
+            "adhTopLevelState",
+            "adhPermissions",
+            "adhConfig",
             mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", ["adhBindVariablesAndClear", "adhConfig", "$location",
             mercatorProposalEditColumnDirective])
