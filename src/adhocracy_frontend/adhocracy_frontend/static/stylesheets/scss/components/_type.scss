@@ -8,11 +8,15 @@ category: Type
 
 body {
     @include text(running);
+
+    @media print {
+        // scss-lint:disable ImportantRule, ColorVariable
+        padding: 0 1.5em !important;
+    }
 }
 
 @media print {
     * {
-        // scss-lint:disable ImportantRule, ColorVariable
         background-color: #fff !important;
         border-color: #000 !important;
         color: #000 !important;
