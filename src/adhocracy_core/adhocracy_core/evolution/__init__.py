@@ -27,7 +27,7 @@ def migrate_new_sheet(context: IPool,
                       fields_mapping: [(str, str)]=[]):
     """Add new `isheet` to `iresource` resources and migrate field values.
 
-    :param : Pool to search for `iresource` resources
+    :param context: Pool to search for `iresource` resources
     :param iresource: resource type to migrate
     :param isheet: new sheet interface to add
     :param isheet_old: old sheet interface
