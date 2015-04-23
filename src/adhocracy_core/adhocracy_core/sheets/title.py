@@ -10,7 +10,7 @@ from adhocracy_core.schema import SingleLine
 
 class ITitle(ISheet, ISheetReferenceAutoUpdateMarker):
 
-    """Market interface for the title sheet."""
+    """Marker interface for the title sheet."""
 
 
 class TitleSchema(colander.MappingSchema):
