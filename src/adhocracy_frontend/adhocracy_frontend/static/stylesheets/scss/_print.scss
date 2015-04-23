@@ -1,3 +1,20 @@
+/*doc
+---
+title: Print Utility Classes
+name: print-utility-classes
+category: Print
+---
+
+These classes display or hide things depending on whether print or screen. These should only be used if no other method
+is useable such as the modifiers listed below. Don't forget to hide from screen-readers where appropriate.
+
+```html_example
+<h1 class="print-only" aria-hidden="true">This heading only appears in print mode</h1>
+<h1 class="screen-only">This heading only appears in screen mode</h1>
+<br/><i>Press Ctrl+P to see this in action</i>
+```
+*/
+
 @media screen {
     .print-only {
         display: none;
@@ -9,6 +26,21 @@
         display: none;
     }
 
+/*doc
+---
+title: Print HREF modifier
+name: print-href
+category: Print
+---
+
+Use this class to display the href of a link after the link text in print mode only.
+<br/><i>Press Ctrl+P to see this in action</i>
+
+```html_example
+<a class="m-print-href" href="http://google.com">Google</a>
+```
+*/
+
     .m-print-href {
         text-decoration: none;
 
@@ -16,6 +48,23 @@
             content: " [" attr(href) "]";
         }
     }
+
+/*doc
+---
+title: Print definition modifier
+name: print-definition
+category: Print
+---
+
+Use this class to display extra information as written in the title tag in print mode only.
+If this is placed on an icon the icon will be replaced by the text.
+<br/><i>Press Ctrl+P to see this in action</i>
+
+```html_example
+<p><i class="icon-speechbubble m-definition" title="Comments:"></i> 23</p>
+<p class="m-definition m-definition-after" title="Total budget">50000 &euro;</p>
+```
+*/
 
     .m-definition {
         text-transform: capitalize;
