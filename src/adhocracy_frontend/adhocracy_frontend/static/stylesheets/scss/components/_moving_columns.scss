@@ -70,10 +70,16 @@ States:
 .moving-columns {
     overflow: hidden;
 
-    &[class^="is-show-show"],
-    &[class*=" is-show-show"] {
-        .moving-column.is-show:first-child {
-            display: none;
+    @media print {
+        &[class^="is-show-show"],
+        &[class*=" is-show-show"] {
+            .moving-column.is-show:first-child {
+                display: none;
+            }
+
+            .moving-column.is-show:first-child[aria-visible="true"] {
+                display: block;
+            }
         }
     }
 }
