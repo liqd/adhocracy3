@@ -69,19 +69,6 @@ States:
 
 .moving-columns {
     overflow: hidden;
-
-    @media print {
-        &[class^="is-show-show"],
-        &[class*=" is-show-show"] {
-            .moving-column.is-show:first-child {
-                display: none;
-            }
-
-            .moving-column.is-show:first-child[aria-visible="true"] {
-                display: block;
-            }
-        }
-    }
 }
 
 /*doc
@@ -160,6 +147,10 @@ The menu should always have the same state as its columns.
         width: auto !important;
         // scss-lint:enable ImportantRule
         border: 0;
+
+        &:not(.has-focus) {
+            display: none;
+        }
     }
 }
 
