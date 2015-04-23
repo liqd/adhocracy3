@@ -256,8 +256,8 @@ class TestResourcePropertySheet:
         inst.set({'count': 2})
         assert inst.get_cstruct(request_) == {'count': '2'}
 
-    def test_delete_field_values_ingnore_if_wrong_field(self, sheet_meta,
-                                                        request_, context):
+    def test_delete_field_values_ignore_if_wrong_field(self, sheet_meta,
+                                                       request_, context):
         inst = self.make_one(sheet_meta, context)
         inst._data['count'] = 2
         inst.delete_field_values(['count'])
