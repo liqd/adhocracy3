@@ -237,7 +237,7 @@ States:
     line-height: $moving-column-menu-height * ($font-size-normal / $font-size-small) / 1em;
     padding: 0 0 0 $padding-small;
 
-    .moving-column-menu-nav-button {
+    a {
         text-decoration: none;
 
         &:hover, &:focus {
@@ -249,7 +249,7 @@ States:
          }
     }
 
-    .moving-column-menu-nav-button,
+    a,
     .moving-column-menu-sort-label {
         @include inline-block;
         color: $color-text-highlight-introvert;
@@ -298,7 +298,7 @@ States:
 .moving-column-menu-nav {
     float: right;
 
-    a {
+    .moving-column-menu-nav-button {
         @include inline-block;
         font-weight: $font-weight-extrovert;
         min-width: 3.5em;
