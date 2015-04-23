@@ -84,7 +84,7 @@ class ResourceContentRegistry(ContentRegistry):
         return resources_addables
 
     @reify
-    def permissions(self):
+    def permissions(self) -> [str]:
         """Set of all permissions defined in the system."""
         perms = {'hide_resource', 'edit_group'}  # built-in permissions
         for resource_meta in self.resources_meta.values():
