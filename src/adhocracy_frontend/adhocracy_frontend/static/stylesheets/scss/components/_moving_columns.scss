@@ -258,7 +258,7 @@ States:
         font-size: $font-size-small;
         font-weight: $font-weight-introvert;
         float: left;
-        margin-left: 2.5em;
+        margin-right: 2.5em;
     }
 
     .moving-column-menu-sort-label {
@@ -295,6 +295,7 @@ States:
     font-size: 17px;
     line-height: (24/17);
     vertical-align: middle;
+    margin-right: 30px / 17px * 1em;
 }
 
 .moving-column-menu-nav {
