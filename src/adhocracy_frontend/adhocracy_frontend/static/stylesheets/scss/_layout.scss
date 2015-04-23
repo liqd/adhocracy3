@@ -51,7 +51,6 @@
     overflow: hidden;
 
     @media print {
-        position: static;
         overflow: visible;
     }
 }
