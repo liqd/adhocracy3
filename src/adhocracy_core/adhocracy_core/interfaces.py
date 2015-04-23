@@ -186,7 +186,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     permission_view:
         Permission to view resource data and view in listings
     is_implicit_addable:
-        Make this type adddable if supertype is addable.
+        Make this type addable if supertype is addable.
     basic_sheets:
         Basic property interfaces to define data
     extended_sheets:
