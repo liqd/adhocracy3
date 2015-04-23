@@ -1,0 +1,11 @@
+@media screen {
+    .print-only {
+        display: none;
+    }
+}
+
+@media print {
+    .screen-only {
+        display: none;
+    }
+}

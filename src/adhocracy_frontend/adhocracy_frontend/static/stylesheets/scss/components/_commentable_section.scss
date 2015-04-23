@@ -27,6 +27,10 @@ A mixin to show comments somewhere
 
 .show-comments {
     @include show-comments;
+
+    @media print {
+        display: none;
+    }
 }
 
 /*doc
@@ -70,5 +74,13 @@ States:
         position: absolute;
         right: 1em;
         top: 1em;
+    }
+
+    @media print {
+        padding: 0 0 1em;
+
+        .commentable-section-show-comments {
+            display: none;
+        }
     }
 }

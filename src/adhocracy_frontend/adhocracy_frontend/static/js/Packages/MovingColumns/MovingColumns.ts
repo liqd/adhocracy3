@@ -31,18 +31,23 @@ export var movingColumns = (
                 element.removeClass("is-show");
                 element.removeClass("is-collapse");
                 element.removeClass("is-hide");
+                element.removeClass("has-focus");
+            };
+
+            var getFocus = (cls : string) : number => {
+                var parts = cls.split("-");
+                var focus = parseInt(adhTopLevelState.get("focus"), 10);
+                if (isNaN(focus)) {
+                    focus = parts.lastIndexOf("show") - 1;
+                }
+                return focus;
             };
 
             // if there is not enough space, collapse all but one column.
             var responsiveClass = (cls : string) : string => {
                 if ($($window).width() < 2 * minShowWidth + collapseWidth) {
                     var s = "is";
-                    var parts = cls.split("-");
-
-                    var focus = parseInt(adhTopLevelState.get("focus"), 10);
-                    if (isNaN(focus)) {
-                        focus = parts.lastIndexOf("show") - 1;
-                    }
+                    var focus = getFocus(cls);
 
                     for (var i = 0; i < 3; i++) {
                         if (i > focus) {
@@ -66,6 +71,7 @@ export var movingColumns = (
                 }
 
                 var parts = responsiveClass(cls).split("-");
+                var focus = getFocus(cls);
 
                 var collapseCount : number = parts.filter((v) => v === "collapse").length;
                 var showCount : number = parts.filter((v) => v === "show").length;
@@ -102,6 +108,9 @@ export var movingColumns = (
                             child.addClass("is-hide");
                             child.attr("aria-visible", "false");
                             child.width(0);
+                    }
+                    if (i === focus) {
+                        child.addClass("has-focus");
                     }
                     if (parts[i] !== "hide" && parts[i + 1] !== "hide") {
                         offset += spacing;
@@ -248,6 +257,7 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         scope: true,
         transclude: true,
+        replace: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
         controller: ["$timeout", "$scope", MovingColumnController]
     };
