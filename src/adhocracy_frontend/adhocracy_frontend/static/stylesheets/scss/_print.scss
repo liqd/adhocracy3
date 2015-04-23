@@ -16,11 +16,4 @@
     .screen-only {
         display: none;
     }
-
-    * {
-        // scss-lint:disable ImportantRule, ColorVariable
-        background-color: #fff !important;
-        color: #000 !important;
-        // scss-lint:enable ImportantRule, ColorVariable
-    }
 }
