@@ -135,7 +135,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     width: 100%;
 
     @media print {
-        display: none;
+        float: none;
+        height: auto;
+        max-width: 250px;
+        margin-bottom: 1em;
     }
 }
 
