@@ -180,6 +180,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     &:last-child {
         float: right;
         margin-right: 0;
+
+        @media print {
+            float: none;
+        }
     }
 
     &.mercator-propsal-list-item-meta-item-budget {

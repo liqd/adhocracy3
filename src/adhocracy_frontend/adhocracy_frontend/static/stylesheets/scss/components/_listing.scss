@@ -56,6 +56,10 @@ a form for creating new elements. This form is then always visible.
     .form-footer {
         padding: 0;
     }
+
+    @media print {
+        display: none;
+    }
 }
 
 .listing-elements + .listing-create-form {
