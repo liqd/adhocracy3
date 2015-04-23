@@ -8,4 +8,42 @@
     .screen-only {
         display: none;
     }
+
+    .m-print-href {
+        text-decoration: none;
+
+        &:after {
+            content: " [" attr(href) "]";
+        }
+    }
+
+    .m-definition {
+        text-transform: capitalize;
+
+        &:after {
+            content: " " attr(title);
+        }
+
+        &.m-definition-before {
+            &:after {
+                content: "";
+            }
+
+            &:before {
+                content: attr(title) " ";
+                display: inline;
+            }
+        }
+    }
+    // scss-lint:disable ImportantRule, QualifyingElement
+    i.m-definition {
+        font-size: $font-size-normal !important;
+        font-style: normal;
+        vertical-align: baseline;
+
+        &:before {
+            display: none;
+        }
+    }
+    // scss-lint:enable ImportantRule, QualifyingElement
 }

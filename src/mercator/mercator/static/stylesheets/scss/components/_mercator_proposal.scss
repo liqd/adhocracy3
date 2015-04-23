@@ -135,7 +135,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     width: 100%;
 
     @media print {
-        display: none;
+        float: none;
+        height: auto;
+        max-width: 250px;
+        margin-bottom: 1em;
     }
 }
 
@@ -195,7 +198,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         float: none;
         font-size: $font-size-normal;
 
-        i, &.mercator-propsal-detail-meta-item-rate {
+        i:not(.m-definition), &.mercator-propsal-detail-meta-item-rate {
             display: none;
         }
     }
@@ -214,7 +217,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         }
     }
     @media print {
-        i {
+        i:not(.m-definition) {
             display: none;
         }
     }
@@ -332,6 +335,10 @@ $mercator-proposal-detail-nav-width: 2em;
         line-height: 1.15;
         margin: 0 0 (15px / $font-size-small * 1em);
         text-transform: uppercase;
+
+        @media print {
+            margin-bottom: 3px;
+        }
     }
 
     @media print {

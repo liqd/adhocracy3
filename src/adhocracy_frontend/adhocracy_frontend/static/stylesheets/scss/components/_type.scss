@@ -8,6 +8,11 @@ category: Type
 
 body {
     @include text(running);
+
+    @media print {
+        // scss-lint:disable ImportantRule
+        padding: 0 1.5em !important;
+    }
 }
 
 @media print {
@@ -60,6 +65,10 @@ p {
     hyphens: auto;
     line-height: 1.15;
     margin: 0 0 1em;
+
+    @media print {
+        text-align: justify;
+    }
 }
 
 /*doc
