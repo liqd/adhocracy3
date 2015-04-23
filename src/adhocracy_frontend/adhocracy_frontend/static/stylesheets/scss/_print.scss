@@ -17,14 +17,14 @@
         }
     }
 
-    .definition {
+    .m-definition {
         text-transform: capitalize;
 
         &:after {
             content: " " attr(title);
         }
 
-        &.definition-before {
+        &.m-definition-before {
             &:after {
                 content: "";
             }
@@ -36,7 +36,7 @@
         }
     }
     // scss-lint:disable ImportantRule, QualifyingElement
-    i.definition {
+    i.m-definition {
         font-size: $font-size-normal !important;
         font-style: normal;
         vertical-align: baseline;
