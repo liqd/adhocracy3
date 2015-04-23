@@ -1,5 +1,4 @@
 <div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
-    <h1 class="print-only" data-aria-hidden="true">{{ "TR__ADVOCATE_EUROPE" | translate }}</h1>
     <h2 class="print-only mercator-proposal-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
     <div class="mercator-proposal-detail-cover">
@@ -89,7 +88,7 @@
                         </div>
                     </div>
 
-                    <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
+                    <h3>{{ "TR__LOCATION" | translate }}:</h3>
                     <ul class="inline-boxes">
                         <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "TR__ONLINE" | translate }}</li>
                         <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
