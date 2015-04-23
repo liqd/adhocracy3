@@ -1224,5 +1224,5 @@ class TestACL:
         from . import ACL
         return ACL()
 
-    def serialize_empty(self, inst):
+    def test_serialize_empty(self, inst):
         assert inst.serialize() == []
