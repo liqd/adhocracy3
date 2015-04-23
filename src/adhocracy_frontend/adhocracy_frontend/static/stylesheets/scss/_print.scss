@@ -8,4 +8,12 @@
     .screen-only {
         display: none;
     }
+
+    .print-href {
+        text-decoration: none;
+
+        &:after {
+            content: " " attr(href);
+        }
+    }
 }
