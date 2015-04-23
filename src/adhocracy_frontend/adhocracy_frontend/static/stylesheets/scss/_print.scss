@@ -13,7 +13,37 @@
         text-decoration: none;
 
         &:after {
-            content: " " attr(href);
+            content: " [" attr(href) "]";
         }
     }
+
+    .definition {
+        text-transform: capitalize;
+
+        &:after {
+            content: " " attr(title);
+        }
+
+        &.definition-before {
+            &:after {
+                content: "";
+            }
+
+            &:before {
+                content: attr(title) " ";
+                display: inline;
+            }
+        }
+    }
+    // scss-lint:disable ImportantRule, QualifyingElement
+    i.definition {
+        font-size: $font-size-normal !important;
+        font-style: normal;
+        vertical-align: baseline;
+
+        &:before {
+            display: none;
+        }
+    }
+    // scss-lint:enable ImportantRule, QualifyingElement
 }

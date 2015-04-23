@@ -9,11 +9,11 @@
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
             </li>
             <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-date">
-                <i class="icon-calendar"></i>
+                <i class="icon-calendar definition" title="{{ 'TR__CREATION_DATE' | translate }}:"></i>
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-budget">
-                <i class="icon-pig"></i>
+            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-budget screen-only">
+                <i class="icon-pig" title="{{ 'TR__MERCATOR_PROPOSAL_REQUESTED' | translate }}"></i>
                 {{data.finance.requested_funding | number}} &euro;
             </li>
             <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-rate">
