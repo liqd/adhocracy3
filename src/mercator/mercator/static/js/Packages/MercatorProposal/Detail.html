@@ -255,12 +255,13 @@
 
             <section class="chapter" id="mercator-detail-view-additional">
                 <section class="commentable-section {{subResourceSelectedState('experience')}}">
-                    <h2 class="chapter-header"
-                        data-du-scrollspy="mercator-detail-view-additional"
-                        data-offset="50">{{ "TR__MERCATOR_PROPOSAL_EXTRA" | translate }}</h2>
-                    <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
-                    <p>{{ data.experience }}</p>
-
+                    <div data-ng-if="data.experience">
+                        <h2 class="chapter-header"
+                            data-du-scrollspy="mercator-detail-view-additional"
+                            data-offset="50">{{ "TR__MERCATOR_PROPOSAL_EXTRA" | translate }}</h2>
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
+                        <p>{{ data.experience }}</p>
+                    </div>
                     <div data-ng-if="data.heard_from">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }}</h3>
                         <p>

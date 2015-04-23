@@ -332,6 +332,10 @@ $mercator-proposal-detail-nav-width: 2em;
         line-height: 1.15;
         margin: 0 0 (15px / $font-size-small * 1em);
         text-transform: uppercase;
+
+        @media print {
+            margin-bottom: 3px;
+        }
     }
 
     @media print {
