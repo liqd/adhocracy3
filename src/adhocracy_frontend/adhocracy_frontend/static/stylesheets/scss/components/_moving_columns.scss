@@ -237,7 +237,8 @@ States:
     line-height: $moving-column-menu-height * ($font-size-normal / $font-size-small) / 1em;
     padding: 0 0 0 $padding-small;
 
-    a {
+    .moving-column-menu-sort-option,
+    .moving-column-menu-button {
         text-decoration: none;
 
         &:hover, &:focus {
@@ -249,7 +250,8 @@ States:
          }
     }
 
-    a,
+    .moving-column-menu-sort-option,
+    .moving-column-menu-button,
     .moving-column-menu-sort-label {
         @include inline-block;
         color: $color-text-highlight-introvert;
