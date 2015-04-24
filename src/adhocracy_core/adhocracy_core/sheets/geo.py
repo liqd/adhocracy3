@@ -43,6 +43,7 @@ class Point(colander.TupleSchema):
     `x`: longitude in web mercator
     `y`: latitude in web mercator
     """
+
     default = (0, 0)
     missing = colander.drop
 
@@ -99,6 +100,7 @@ class PartOfReference(SheetToSheet):
     """Reference to a geographical object."""
 
     source_isheet = IMultiPolygon
+    source_isheet_field = 'part_of'
     target_isheet = IMultiPolygon
 
 
@@ -168,6 +170,7 @@ class LocationReference(SheetToSheet):
     """Reference to a geographical object."""
 
     source_isheet = ILocationReference
+    source_isheet_field = 'location'
     target_isheet = IMultiPolygon
 
 
