@@ -166,8 +166,7 @@ def import_bezirke():
                 multipolygon_meta.iresource.__identifier__,
                 appstructs=appstructs,
                 parent=locations)
-            root._p_changed = True
-            transaction.commit()
         except Exception:
             t, e = sys.exc_info()[:2]
             print(e)
+    transaction.commit()
