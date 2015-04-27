@@ -906,6 +906,15 @@ class ACMCell(colander.SchemaNode):
     schema_type = colander.String
 
 
+@colander.deferred
+def _deferred_valid_permission_name(node, kw) -> callable:
+    print('kw', kw)
+
+    def validate_permission_name(node, value):
+        raise colander.Invalid(node, 'No such permission', value=value)
+    return validate_permission_name
+
+
 class ACMRow(colander.SequenceSchema):
 
     """ACM Row."""
@@ -923,15 +932,15 @@ class ACMPrincipals(colander.SequenceSchema):
 
 class ACMPermissions(colander.SequenceSchema):
 
-    """ ACM Permissions."""
+    """ACM Permissions."""
 
-    row = ACMRow()
+    row = ACMRow(validator=_deferred_valid_permission_name)
     default = []
 
 
 class ACM(colander.MappingSchema):
 
-    """ Access Control Matrix."""
+    """Access Control Matrix."""
 
     principals = ACMPrincipals()
     permissions = ACMPermissions()

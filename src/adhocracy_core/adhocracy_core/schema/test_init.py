@@ -1228,6 +1228,30 @@ class TestACL:
     def test_serialize_empty(self, inst):
         assert inst.serialize() == []
 
+class TestACMRow:
+
+    @fixture
+    def inst(self):
+        from . import ACMRow
+        return ACMRow()
+
+    def test_deserialize_invalid_permission_name(self, inst):
+        inst.bind(context=42)
+        inst.deserialize(['edit', 'Allow'])
+
+
+class TestACMPermissions:
+
+    @fixture
+    def inst(self):
+        from . import ACMPermissions
+        return ACMPermissions()
+
+    def test_deserialize(self, inst):
+        inst.bind(context=42)
+        inst.deserialize([['edit', 'Allow']])
+
+
 class TestACM:
 
     @fixture
