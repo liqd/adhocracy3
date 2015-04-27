@@ -273,7 +273,7 @@ export interface IMapListScope<T> extends angular.IScope {
     getPreviousItem(item : IItem<T>) : void;
     getNextItem(item : IItem<T>) : void;
     showZoomButton: boolean;
-    zoomOut(): void;
+    resetMap(): void;
     visible: number;
 }
 
@@ -329,6 +329,7 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService,
             var itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
 
             scope.items = [];
+            scope.visible = 0;
             _.forEach(scope.itemValues, (url, key) => {
 
                 adhHttp.get(AdhUtil.parentPath(url), {
@@ -353,6 +354,9 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService,
                         };
 
                         var hide = (value.lat === 0 && value.lat === 0);
+                        if (!hide) {
+                            scope.visible++;
+                        }
 
                         var item = {
                             value: value,
@@ -393,15 +397,7 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService,
                     });
 
                 });
-
-            });
-
-            map.on("zoomend", () => {
-                if (map.getZoom() > map.getMinZoom()) {
-                    scope.showZoomButton = true;
-                } else {
-                    scope.showZoomButton = false;
-                }
+                scope.showZoomButton = true;
             });
 
             var loopCarousel = (index, total) => (index + total) % total;
@@ -432,8 +428,15 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService,
                 scrollToItem(index);
             };
 
-            scope.zoomOut = () => {
-                map.zoomOut();
+            scope.resetMap = () => {
+                map.fitBounds(scope.polygon.getBounds());
+
+                // this is hacky but I could not find how to add
+                // a callbackfunction to fitbounds as this always
+                // triggers the moveend event.
+                $timeout(() => {
+                    scope.showZoomButton = false;
+                }, 300);
             };
         }
     };
