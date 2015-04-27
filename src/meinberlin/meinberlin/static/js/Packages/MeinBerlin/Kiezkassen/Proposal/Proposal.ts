@@ -4,6 +4,7 @@ import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
+import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../../../Rate/Rate");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
@@ -28,8 +29,6 @@ export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
-    toggleMap() : void;
-    mapIsOpen : boolean;
     data : {
         title : string;
         budget : number;
@@ -184,7 +183,6 @@ export var listItemDirective = (
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhRate)(scope);
-
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
