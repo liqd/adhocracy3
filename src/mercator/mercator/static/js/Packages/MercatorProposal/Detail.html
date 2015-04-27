@@ -1,4 +1,5 @@
 <div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
+    <h2 class="print-only mercator-proposal-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
     <div class="mercator-proposal-detail-cover">
         <ul class="mercator-proposal-detail-meta">
@@ -7,18 +8,18 @@
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
             </li>
             <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-date">
-                <i class="icon-calendar"></i>
+                <i class="icon-calendar m-definition" title="{{ 'TR__CREATION_DATE' | translate }}:"></i>
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-budget">
-                <i class="icon-pig"></i>
+            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-budget screen-only">
+                <i class="icon-pig" title="{{ 'TR__MERCATOR_PROPOSAL_REQUESTED' | translate }}"></i>
                 {{data.finance.requested_funding | number}} &euro;
             </li>
             <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-rate">
                 <adh-like data-refers-to="{{path}}"></adh-like>
             </li>
         </ul>
-        <h1 class="mercator-proposal-cover-header">{{ data.title }}
+        <h1 class="mercator-proposal-cover-header screen-only">{{ data.title }}
             <a class="mercator-proposal-cover-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments' }}">
                 <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>
@@ -87,6 +88,7 @@
                         </div>
                     </div>
 
+                    <h3>{{ "TR__MERCATOR_PROPOSAL_LOCATION_LABEL" | translate }}:</h3>
                     <ul class="inline-boxes">
                         <li data-ng-if="data.location.location_is_online" class="inline-box-online">{{ "TR__ONLINE" | translate }}</li>
                         <li data-ng-if="data.location.location_specific_1">{{ data.location.location_specific_1 }}</li>
@@ -121,6 +123,7 @@
                             <ul class="mercator-proposal-detail-orgs-columns">
                                 <li>
                                     <a
+                                        class="m-print-href"
                                         data-ng-if="data.organization_info.website"
                                         data-ng-href="{{ data.organization_info.website }}"
                                         target="_new">
@@ -139,12 +142,14 @@
                             <ul class="mercator-proposal-detail-orgs-columns">
                                 <li>
                                     <a
+                                        class="m-print-href"
                                         data-ng-if="data.organization_info.website"
                                         data-ng-href="{{ data.organization_info.website }}"
                                         target="_new">
                                         {{ data.organization_info.name }}</a>
                                     <span ng-if="!data.organization_info.website">{{ data.organization_info.name }}</span>
                                     <a
+                                        class="m-print-href"
                                         data-ng-if="data.organization_info.email"
                                         data-ng-href="mailto:{{ data.organization_info.email }}">
                                         {{ data.organization_info.name }}</a></li>
@@ -159,12 +164,14 @@
                             <ul class="mercator-proposal-detail-orgs-columns">
                                 <li>
                                     <a
+                                        class="m-print-href"
                                         data-ng-if="data.organization_info.website"
                                         data-ng-href="{{ data.organization_info.website }}"
                                         target="_new">
                                         {{ data.organization_info.name }}</a>
                                     <span ng-if="!data.organization_info.website">{{ data.organization_info.name }}</span>
                                     <a
+                                        class="m-print-href"
                                         data-ng-if="data.organization_info.email"
                                         data-ng-href="mailto:{{ data.organization_info.email }}">
                                         {{ data.organization_info.name }}</a></li>
@@ -248,12 +255,13 @@
 
             <section class="chapter" id="mercator-detail-view-additional">
                 <section class="commentable-section {{subResourceSelectedState('experience')}}">
-                    <h2 class="chapter-header"
-                        data-du-scrollspy="mercator-detail-view-additional"
-                        data-offset="50">{{ "TR__MERCATOR_PROPOSAL_EXTRA" | translate }}</h2>
-                    <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
-                    <p>{{ data.experience }}</p>
-
+                    <div data-ng-if="data.experience">
+                        <h2 class="chapter-header"
+                            data-du-scrollspy="mercator-detail-view-additional"
+                            data-offset="50">{{ "TR__MERCATOR_PROPOSAL_EXTRA" | translate }}</h2>
+                        <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
+                        <p>{{ data.experience }}</p>
+                    </div>
                     <div data-ng-if="data.heard_from">
                         <h3>{{ "TR__MERCATOR_PROPOSAL_HEARD_FROM_LABEL" | translate }}</h3>
                         <p>
