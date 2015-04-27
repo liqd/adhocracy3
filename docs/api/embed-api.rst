@@ -64,6 +64,9 @@ markers are replaced by iframes, which show the actual content.
 SDK snippet
 +++++++++++
 
+This is our JavaScript code that runs in the host page.  It was
+carefully written to not interfere with the hosts own JavaScript code.
+
 - Bootstraps everything, initializes widgets
 - Selects Adhocracy version to be used
 - Opens `adhocracy` namespace
