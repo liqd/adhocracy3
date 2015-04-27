@@ -87,3 +87,16 @@ def get_local_roles_all(resource) -> dict:
                                            roles)
             local_roles_all[principal].update(roles_without_creator)
     return local_roles_all
+
+
+def acm_to_acl(acm: dict) -> [str]:
+    """Convert an Access Control Matrix into a pyramid ACL."""
+    acl = []
+    idx = 0
+    for principal in acm['principals']:
+        for permissions in acm['permissions']:
+            permission_name = permissions[0]
+            ace = (permissions[idx + 1], principal, permission_name)
+            acl.append(ace)
+        idx = idx + 1
+    return acl
