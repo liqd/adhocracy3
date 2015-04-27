@@ -873,32 +873,6 @@ class ACEPrincipal(colander.SchemaNode):
     schema_type = ACEPrincipalType
 
 
-class ACE(colander.TupleSchema):
-
-    """Pyramid :term:`ace` tuple."""
-
-    action = SingleLine(missing=colander.required,
-                        validator=colander.OneOf([security.Allow,
-                                                  security.Deny,
-                                                  ]),
-                        )
-    principal = ACEPrincipal(missing=colander.required)
-    permissions = SingleLineList(missing=colander.required)
-
-
-class ACL(colander.SequenceSchema):
-
-    """Pyramid :term:`acl`, a list of :term:`ace`s."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:  # pragma: no branch
-            self.default = []
-            self.missing = []
-
-    ace = ACE()
-
-
 class ACMCell(colander.SchemaNode):
 
     """ACM Cell."""

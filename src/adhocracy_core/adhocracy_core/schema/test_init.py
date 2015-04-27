@@ -1205,31 +1205,6 @@ class TestACEPrincipal:
         inst.schema_type = ACEPrincipalType
 
 
-class TestACE:
-
-    @fixture
-    def inst(self):
-        from . import ACE
-        return ACE()
-
-    def test_create(self, inst):
-        assert inst['action'].validator.choices == ['Allow', 'Deny']
-        assert inst['action'].required
-        assert inst['principal'].required
-        assert inst['permissions'].required
-
-
-class TestACL:
-
-    @fixture
-    def inst(self):
-        from . import ACL
-        return ACL()
-
-    def test_serialize_empty(self, inst):
-        assert inst.serialize() == []
-
-
 @fixture
 def mock_registry():
     registry = Mock()
