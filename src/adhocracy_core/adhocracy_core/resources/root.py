@@ -1,7 +1,6 @@
 """Root type to create initial object hierarchy and set global Permissions."""
 from pyramid.registry import Registry
 from pyramid.security import Allow
-from pyramid.security import ALL_PERMISSIONS
 from substanced.interfaces import IRoot
 from substanced.objectmap import ObjectMap
 from substanced.util import set_acl
@@ -15,68 +14,48 @@ from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
+from adhocracy_core.authorization import acm_to_acl
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
 
-# Permissons to roles mapping (ACL)
+
+# Access Control Matrix. Permissions are mapped to a role.
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
-root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
-                                                 # view sheet default,
-                                                 # view resource default
-            (Allow, 'system.Everyone', 'add_user'),
-            (Allow, 'system.Everyone', 'create_sheet_password'),
-            (Allow, 'system.Everyone', 'create_sheet_userbasic'),
-            # Annotator role
-            (Allow, 'role:annotator', 'view'),
-            (Allow, 'role:annotator', 'add_resource'),  # post request default,
-                                                        # create resource def.
-            (Allow, 'role:annotator', 'create_sheet'),  # create sheet default
-            (Allow, 'role:annotator', 'add_asset'),
-            (Allow, 'role:annotator', 'add_comment'),
-            (Allow, 'role:annotator', 'add_rate'),
-            # Contributor role
-            (Allow, 'role:contributor', 'view'),
-            (Allow, 'role:contributor', 'add_resource'),
-            (Allow, 'role:contributor', 'create_sheet'),
-            (Allow, 'role:contributor', 'add_proposal'),
-            (Allow, 'role:contributor', 'add_section'),
-            (Allow, 'role:contributor', 'add_paragraph'),
-            (Allow, 'role:contributor', 'add_externalresource'),
-            (Allow, 'role:contributor', 'message_to_user'),
-            # Creator role
-            (Allow, 'role:creator', 'add_commentversion'),
-            (Allow, 'role:creator', 'add_rateversion'),
-            (Allow, 'role:creator', 'add_proposalversion'),
-            (Allow, 'role:creator', 'add_sectionversion'),
-            (Allow, 'role:creator', 'add_paragraphversion'),
-            (Allow, 'role:creator', 'edit_some_sheets'),  # put request default
-            (Allow, 'role:creator', 'edit_metadata'),
-            (Allow, 'role:creator', 'view_userextended'),
-            (Allow, 'role:creator', 'edit_userextended'),
-            (Allow, 'role:creator', 'add_mercator_proposal_version'),
-            # Manager role
-            (Allow, 'role:manager', 'view'),
-            (Allow, 'role:manager', 'hide_resource'),
-            (Allow, 'role:manager', 'edit_some_sheets'),
-            (Allow, 'role:manager', 'edit_metadata'),
-            # Admin role
-            (Allow, 'role:admin', 'view'),
-            (Allow, 'role:admin', 'view_sensitive'),  # sensitive info that
-                                                      # only admins should see
-            (Allow, 'role:admin', 'add_resource'),
-            (Allow, 'role:admin', 'create_sheet'),
-            (Allow, 'role:admin', 'add_group'),
-            (Allow, 'role:admin', 'add_pool'),
-            (Allow, 'role:admin', 'edit_group'),
-            (Allow, 'role:admin', 'edit_some_sheets'),
-            (Allow, 'role:admin', 'edit_sheet'),  # edit sheets default
-            (Allow, 'role:admin', 'manage_principals'),
-            (Allow, 'role:admin', 'view_userextended'),
-            (Allow, 'role:admin', 'edit_userextended'),
-            # God role
-            (Allow, 'role:god', ALL_PERMISSIONS),
-            ]
+root_acm = \
+    {'principals':                                   ['system.Everyone', 'role:annotator', 'role:contributor', 'role:creator', 'role:manager', 'role:admin', 'role:god'],  # noqa
+     'permissions': [['add_asset',                     None,              Allow,            None,               None,           None,           None,         Allow],  # noqa
+                     ['add_comment',                   None,              Allow,            None,               None,           None,           None,         Allow],  # noqa
+                     ['add_commentversion',            None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
+                     ['add_externalresource',          None,              None,             Allow,              None,           None,           None,         Allow],  # noqa
+                     ['add_group',                     None,              None,             None,               None,           None,           Allow,        Allow],  # noqa
+                     ['add_mercator_proposal_version', None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
+                     ['add_paragraph',                 None,              None,             Allow,              None,           None,           None,         Allow],  # noqa
+                     ['add_paragraphversion',          None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
+                     ['add_pool',                      None,              None,             None,               None,           None,           Allow,        Allow],  # noqa
+                     ['add_proposal',                  None,              None,             Allow,              None,           None,           None,         Allow],  # noqa
+                     ['add_proposalversion',           None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
+                     ['add_rate',                      None,              Allow,            None,               None,           None,           None,         Allow],  # noqa
+                     ['add_rateversion',               None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
+                     ['add_resource',                  None,              Allow,            Allow,              None,           None,           Allow,        Allow],  # noqa
+                     ['add_section',                   None,              None,             Allow,              None,           None,           None,         Allow],  # noqa
+                     ['add_sectionversion',            None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
+                     ['add_user',                      Allow,             None,             None,               None,           None,           None,         Allow],  # noqa
+                     ['create_sheet',                  None,              Allow,            Allow,              None,           None,           Allow,        Allow],  # noqa
+                     ['create_sheet_password',         Allow,             None,             None,               None,           None,           None,         Allow],  # noqa
+                     ['create_sheet_userbasic',        Allow,             None,             None,               None,           None,           None,         Allow],  # noqa
+                     ['edit_group',                    None,              None,             None,               None,           None,           Allow,        Allow],  # noqa
+                     ['edit_metadata',                 None,              None,             None,               Allow,          Allow,          None,         Allow],  # noqa
+                     ['edit_sheet',                    None,              None,             None,               None,           None,           Allow,        Allow],  # noqa
+                     ['edit_some_sheets',              None,              None,             None,               Allow,          Allow,          Allow,        Allow],  # noqa
+                     ['edit_userextended',             None,              None,             None,               Allow,          None,           Allow,        Allow],  # noqa
+                     ['hide_resource',                 None,              None,             None,               None,           Allow,          None,         Allow],  # noqa
+                     ['manage_principals',             None,              None,             None,               None,           None,           Allow,        Allow],  # noqa
+                     ['message_to_user',               None,              None,             Allow,              None,           None,           None,         Allow],  # noqa
+                     ['view',                          Allow,             Allow,            Allow,              None,           Allow,          Allow,        Allow],  # noqa
+                     ['view_sensitive',                None,              None,             None,               None,           None,           Allow,        Allow],  # noqa
+                     ['view_userextended',             None,              None,             None,               Allow,          None,           Allow,        Allow],  # noqa
+                     ]}
 
 
 class IRootPool(IPool, IRoot):
@@ -120,7 +99,7 @@ def _add_principals_service(context, registry):
 
 
 def _add_acl_to_app_root(context, registry):
-    set_acl(context, root_acl, registry=registry)
+    set_acl(context, acm_to_acl(root_acm), registry=registry)
 
 
 def add_platform(context, registry, platform_id=None,

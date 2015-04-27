@@ -83,7 +83,6 @@ class TestRoot:
     def test_create_root_with_acl(self, registry):
         from adhocracy_core.resources.root import IRootPool
         from substanced.util import get_acl
-        from pyramid.security import ALL_PERMISSIONS
         from pyramid.security import Allow
         inst = registry.content.create(IRootPool.__identifier__)
         acl = get_acl(inst)
@@ -91,7 +90,8 @@ class TestRoot:
         assert (Allow, 'system.Everyone', 'add_user') in acl
         assert (Allow, 'system.Everyone', 'create_sheet_password') in acl
         assert (Allow, 'system.Everyone', 'create_sheet_userbasic') in acl
-        assert (Allow, 'role:god', ALL_PERMISSIONS) in acl
+        assert (Allow, 'role:god', 'view_userextended') in acl
+        assert (Allow, 'role:god', 'message_to_user') in acl
 
     def test_create_root_with_initial_god_user(self, registry, request_):
         from substanced.interfaces import IUserLocator
