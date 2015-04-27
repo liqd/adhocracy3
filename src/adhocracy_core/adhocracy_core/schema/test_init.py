@@ -1264,3 +1264,11 @@ class TestACM:
         assert inst.bind(registry=mock_registry).deserialize({}) \
             == {'principals': [],
                 'permissions': []}
+
+    def test_deserialize_noaction(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry).deserialize(
+            {'principals': ['Everyone'],
+             'permissions': [['edit', '']]}) == \
+            {'principals': ['system.Everyone'],
+             'permissions': [['edit', None]]}

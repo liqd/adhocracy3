@@ -878,6 +878,7 @@ class ACMCell(colander.SchemaNode):
     """ACM Cell."""
 
     schema_type = colander.String
+    missing = None
 
 
 class ACMRow(colander.SequenceSchema):
@@ -898,7 +899,7 @@ class ACMRow(colander.SequenceSchema):
 
         def validate_actions_names(node, value):
             for action in value[1:]:
-                if action != security.Allow and action != security.Deny:
+                if action not in [security.Allow, security.Deny, None]:
                     msg = 'Invalid action: {0}'.format(action)
                     raise colander.Invalid(node, msg, value=action)
 
