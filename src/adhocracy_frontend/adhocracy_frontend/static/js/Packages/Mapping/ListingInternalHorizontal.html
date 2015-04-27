@@ -1,5 +1,6 @@
 <div class="map-list map-list-horizontal">
     <div class="map-list-map"></div>
+    <a ng-show="showZoomButton" ng-click="zoomOut();" href="">Zoom out</a>
     <div class="map-list-container">
         <div class="map-list-navigate-container">
             <a class="map-list-navigate map-list-navigate-back" href="" data-ng-click="getPreviousItem(selectedItem);" title="{{ 'TR__PREVIOUS' | translate }}">

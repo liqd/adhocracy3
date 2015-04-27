@@ -272,9 +272,14 @@ export interface IMapListScope<T> extends angular.IScope {
     toggleItem(item : IItem<T>) : void;
     getPreviousItem(item : IItem<T>) : void;
     getNextItem(item : IItem<T>) : void;
+    showZoomButton: boolean;
+    zoomOut(): void;
 }
 
-export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+export var mapListingInternal = (adhConfig : AdhConfig.IService,
+                                 adhHttp : AdhHttp.Service<any>,
+                                 leaflet : typeof L,
+                                 $timeout : angular.ITimeoutService) => {
     return {
         scope: {
             height: "@",
@@ -386,6 +391,14 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                 });
             });
 
+            map.on("zoomend", () => {
+                if (map.getZoom() > map.getMinZoom()) {
+                    scope.showZoomButton = true;
+                } else {
+                    scope.showZoomButton = false;
+                }
+            });
+
             var loopCarousel = (index, total) => (index + total) % total;
 
             scope.toggleItem = (item) => {
@@ -412,6 +425,10 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                 }
                 scope.toggleItem(scope.items[index]);
                 scrollToItem(index);
+            };
+
+            scope.zoomOut = () => {
+                map.zoomOut();
             };
         }
     };
