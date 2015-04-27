@@ -1,5 +1,6 @@
 import AdhConfig = require("../../Config/Config");
 import AdhHttp = require("../../Http/Http");
+import AdhMovingColumns = require("../../MovingColumns/MovingColumns");
 import AdhTabs = require("../../Tabs/Tabs");
 
 import AdhMeinBerlinKiezkassenProposal = require("./Proposal/Proposal");
@@ -14,9 +15,9 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         scope: {
             path: "@"
         },
-        link: (scope) => {
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             scope.currentTab = 0;
-
             scope.tabs = [{
                 heading: "Tab1",
                 content: "foo1"
@@ -24,7 +25,9 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
                 heading: "Tab2",
                 content: "foo2"
             }];
-
+            scope.$watch(() => column.$scope.shared.isShowMap, function(value) {
+                scope.showMap = (typeof value === "undefined") ? true : value;
+            });
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {

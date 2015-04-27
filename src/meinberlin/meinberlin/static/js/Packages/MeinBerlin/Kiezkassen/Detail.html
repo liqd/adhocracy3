@@ -8,12 +8,9 @@
             {{tab.content}}
         </tab>
     </tabset>
-
     <a href="{{path | adhResourceUrl:'create_proposal'}}">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
 
     <div class="mein-berlin-kiezkassen-detail-listing">
-        <a href="" data-ng-click="showMap = !showMap">toggle map</a>
-
         <adh-listing
             data-path="/"
             data-ng-show="!showMap"

@@ -28,8 +28,6 @@ export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
-    toggleMap() : void;
-    mapIsOpen : boolean;
     data : {
         title : string;
         budget : number;
@@ -184,7 +182,6 @@ export var listItemDirective = (
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhRate)(scope);
-
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
