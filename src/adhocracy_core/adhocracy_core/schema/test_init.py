@@ -1283,3 +1283,8 @@ class TestACM:
              'permissions': [['edit', 'Allow']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', Allow]]}
+
+    def test_deserialize_empty(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry).deserialize({}) \
+        == {}

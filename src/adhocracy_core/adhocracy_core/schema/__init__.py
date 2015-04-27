@@ -938,6 +938,7 @@ class ACMPrincipals(colander.SequenceSchema):
 
     principal = ACEPrincipal()
     default = []
+    missing = colander.drop
 
 
 class ACMPermissions(colander.SequenceSchema):
@@ -946,6 +947,7 @@ class ACMPermissions(colander.SequenceSchema):
 
     row = ACMRow()
     default = []
+    missing = colander.drop
 
 
 class ACM(colander.MappingSchema):
