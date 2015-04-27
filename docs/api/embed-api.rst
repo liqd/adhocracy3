@@ -27,8 +27,7 @@ Frontend URL
 Platform URL
     This is where the full adhocracy is available (as opposed to a
     widget).  The term *platform* also refers to the complete set of
-    functionality and navigation that sets the it apart from a mere
-    widget.
+    functionality and navigation that sets it apart from a mere widget.
 
 Canonical URL
     Content can show up in different places (i.e. with different URLs),
