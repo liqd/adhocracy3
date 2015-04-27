@@ -112,6 +112,31 @@ Example (current HTML5 syntax)::
     <div class="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
 
 
+Special parameters
+~~~~~~~~~~~~~~~~~~
+
+-   the special widget ``"plain"`` will embed the full platform instead
+    of a single widget::
+
+        <div class="adhocracy_marker" data-widget="plain"></div>
+
+-   ``autoresize`` will control whether the iframe will automatically be
+    resized to fit its contents.  Defaults to ``true``.  It is
+    recommended to set this to ``false`` if the embedded widget contains
+    moving columns::
+
+        <div class="adhocracy_marker" data-widget="plain" data-autoresize="false"></div>
+
+-   ``locale`` can be used to set a locale.
+
+-   ``autourl``: If set to ``true``, the URL of the embedded adhocracy
+    will be appended (and constantly updated) to the host URL via ``#!``.
+    This is only possible once per host page for obvious reasons.
+
+-   ``initial-url`` will set the initial URL (i.e. path, query and
+    anchor) for the embedded platform if widget is ``"plain"``.
+
+
 What happens internally
 +++++++++++++++++++++++
 
