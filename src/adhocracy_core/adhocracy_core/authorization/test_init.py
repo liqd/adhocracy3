@@ -190,12 +190,18 @@ def test_get_local_roles_all_parents_with_creator_role(context):
     child = context['child']
     assert get_local_roles_all(child) == {'principal': {'role:editor'}}
 
-def test_acm_to_acl():
+@fixture
+def mock_registry():
+    registry = Mock()
+    return registry
+
+def test_acm_to_acl(mock_registry):
+    mock_registry.content.permissions = ['view', 'edit']
     from . import acm_to_acl
     appstruct = {'principals':           ['Everyone', 'role:creator', 'role:annotator'],
                  'permissions': [['view',  Allow,      Allow,          Allow],
                                  ['edit',  Deny,       Allow,          None]]}
-    acl = acm_to_acl(appstruct)
+    acl = acm_to_acl(appstruct, mock_registry)
     assert (Allow, 'Everyone', 'view') in acl
     assert (Deny,  'Everyone', 'view') not in acl
     assert (Deny,  'Everyone', 'edit') in acl
@@ -207,10 +213,6 @@ def test_acm_to_acl():
     assert (Deny,  'role:annotator', 'edit') not in acl
     assert (None,  'role:annotator', 'edit') not in acl
 
-@fixture
-def mock_registry():
-    registry = Mock()
-    return registry
 
 def test_acm_to_acl_invalid_permission(mock_registry):
     from . import acm_to_acl
