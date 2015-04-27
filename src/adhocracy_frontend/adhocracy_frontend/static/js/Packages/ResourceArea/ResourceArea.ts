@@ -187,7 +187,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         }
 
         var view : string = "";
-        var embedContext  = (<any>this.adhEmbed).widget || "";
+        var embedContext = this.adhEmbed.getContext();
 
         // if path has a view segment
         if (_.last(segs).match(/^@/)) {

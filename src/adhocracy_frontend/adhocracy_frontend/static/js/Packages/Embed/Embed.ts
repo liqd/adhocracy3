@@ -59,7 +59,7 @@ export class Provider {
 }
 
 export class Service {
-    public widget : string;
+    private widget : string;
 
     constructor(private provider : Provider) {}
 
@@ -75,6 +75,18 @@ export class Service {
             }
         }
         return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(widget), attrs.join(" "));
+    }
+
+    public isEmbedded() : boolean {
+        return typeof this.widget !== "undefined";
+    }
+
+    public getContext() : string {
+        if (!this.isEmbedded() || this.widget === "plain") {
+            return "";
+        } else {
+            return this.widget;
+        }
     }
 
     public route($location : angular.ILocationService) : AdhTopLevelState.IAreaInput {
