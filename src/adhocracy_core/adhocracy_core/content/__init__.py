@@ -86,7 +86,7 @@ class ResourceContentRegistry(ContentRegistry):
     @reify
     def permissions(self) -> [str]:
         """Set of all permissions defined in the system."""
-        perms = {'hide_resource', 'edit_group', 'do_transitions'}  # built-in permissions
+        perms = {'hide_resource', 'edit_group', 'do_transition'}  # built-in permissions
         for resource_meta in self.resources_meta.values():
             perms.update(self._get_resource_permissions(resource_meta))
         for sheet_meta in self.sheets_meta.values():

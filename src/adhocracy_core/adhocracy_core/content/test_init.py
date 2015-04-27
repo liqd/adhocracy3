@@ -232,7 +232,7 @@ class TestResourceContentRegistry:
         from adhocracy_core.workflows.sample import sample_meta
         inst.workflows_meta['sample'] = sample_meta
         inst.registry = mock_registry
-        assert 'do_transitions' in inst.permissions
+        assert 'do_transition' in inst.permissions
 
     def test_permissions_view_permission(self, inst, mock_registry):
         from pyramid.view import view_config

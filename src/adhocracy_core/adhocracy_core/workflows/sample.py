@@ -19,7 +19,7 @@ sample_meta = {
         'to_announced': {'from_state': 'draft',
                          'to_state': 'announced',
                          'callback': None,
-                         'permission': 'do_transitions',
+                         'permission': 'do_transition',
                          },
     },
 }
