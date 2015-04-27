@@ -210,7 +210,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
     }
 
     public has(resourceType : string, view : string = "", processType : string = "") : boolean {
-        var key : string = resourceType + "@" + view + "@" + processType;
+        var embedContext = this.adhEmbed.getContext();
+        var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
         return this.provider.defaults.hasOwnProperty(key) || this.provider.specifics.hasOwnProperty(key);
     }
 
