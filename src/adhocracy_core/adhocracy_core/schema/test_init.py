@@ -1237,7 +1237,8 @@ class TestACMRow:
 
     def test_deserialize_invalid_permission_name(self, inst):
         inst.bind(context=42)
-        inst.deserialize(['edit', 'Allow'])
+        with raises(colander.Invalid):
+            inst.deserialize(['edit', 'Allow'])
 
 
 class TestACMPermissions:
@@ -1249,7 +1250,8 @@ class TestACMPermissions:
 
     def test_deserialize(self, inst):
         inst.bind(context=42)
-        inst.deserialize([['edit', 'Allow']])
+        with raises(colander.Invalid):
+            inst.deserialize([['edit', 'Allow']])
 
 
 class TestACM:
