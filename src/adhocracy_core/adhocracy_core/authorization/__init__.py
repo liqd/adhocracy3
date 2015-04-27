@@ -90,13 +90,20 @@ def get_local_roles_all(resource) -> dict:
 
 
 def acm_to_acl(acm: dict) -> [str]:
-    """Convert an Access Control Matrix into a pyramid ACL."""
+    """Convert an Access Control Matrix into a pyramid ACL.
+
+    To avoid generating too many ACE, action which are None will not
+    generate an ACE.
+
+    """
     acl = []
     idx = 0
     for principal in acm['principals']:
         for permissions in acm['permissions']:
             permission_name = permissions[0]
-            ace = (permissions[idx + 1], principal, permission_name)
-            acl.append(ace)
+            action = permissions[idx + 1]
+            if action is not None:
+                ace = (action, principal, permission_name)
+                acl.append(ace)
         idx = idx + 1
     return acl

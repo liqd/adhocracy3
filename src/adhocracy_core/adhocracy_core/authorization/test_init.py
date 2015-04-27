@@ -192,9 +192,9 @@ def test_get_local_roles_all_parents_with_creator_role(context):
 
 def test_acm_to_acl():
     from . import acm_to_acl
-    appstruct = {'principals':           ['Everyone', 'role:creator'],
-                 'permissions': [['view',  Allow,      Allow],
-                                 ['edit',  Deny,       Allow]]}
+    appstruct = {'principals':           ['Everyone', 'role:creator', 'role:annotator'],
+                 'permissions': [['view',  Allow,      Allow,          Allow],
+                                 ['edit',  Deny,       Allow,          None]]}
     acl = acm_to_acl(appstruct)
     assert (Allow, 'Everyone', 'view') in acl
     assert (Deny,  'Everyone', 'view') not in acl
@@ -204,3 +204,5 @@ def test_acm_to_acl():
     assert (Deny,  'role:creator', 'view') not in acl
     assert (Allow, 'role:creator', 'edit') in acl
     assert (Deny,  'role:creator', 'edit') not in acl
+    assert (Deny,  'role:annotator', 'edit') not in acl
+    assert (None,  'role:annotator', 'edit') not in acl
