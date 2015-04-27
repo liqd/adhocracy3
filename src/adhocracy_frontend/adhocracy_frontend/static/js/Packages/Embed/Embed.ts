@@ -15,6 +15,7 @@ var metaParams = [
 
 export class Provider {
     public embeddableDirectives : string[];
+    public contexts : string[];
     public $get;
 
     /**
@@ -34,6 +35,10 @@ export class Provider {
             "empty"
         ];
 
+        this.contexts = [
+            "plain"
+        ];
+
         this.$get = () => new Service(this);
     }
 
@@ -46,11 +51,16 @@ export class Provider {
             }
         }
     }
+
+    public registerContext(name : string) : void {
+        this.contexts.push(name);
+    }
 }
 
 export class Service {
-    constructor(private provider : Provider) {}
+    public widget : string;
 
+    constructor(private provider : Provider) {}
 
     private location2template(widget : string, search) {
         var attrs = [];
@@ -87,6 +97,13 @@ export class Service {
 
             return {
                 template: template
+            };
+        } else if ((<any>_).includes(this.provider.contexts, widget)) {
+            $location.url(search.initialUrl || "/");
+            $location.replace();
+
+            return {
+                skip: true
             };
         } else {
             throw "unknown widget: " + widget;
