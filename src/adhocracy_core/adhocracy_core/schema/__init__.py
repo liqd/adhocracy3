@@ -938,7 +938,7 @@ class ACMPrincipals(colander.SequenceSchema):
 
     principal = ACEPrincipal()
     default = []
-    missing = colander.drop
+    missing = []
 
 
 class ACMPermissions(colander.SequenceSchema):
@@ -947,7 +947,7 @@ class ACMPermissions(colander.SequenceSchema):
 
     row = ACMRow()
     default = []
-    missing = colander.drop
+    missing = []
 
 
 class ACM(colander.MappingSchema):
@@ -956,3 +956,7 @@ class ACM(colander.MappingSchema):
 
     principals = ACMPrincipals()
     permissions = ACMPermissions()
+    default = {'principals': [],
+               'permissions': []}
+    missing = {'principals': [],
+               'permissions': []}
