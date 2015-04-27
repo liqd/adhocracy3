@@ -269,7 +269,7 @@ export var indicatorDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var metaDirective = (adhConfig : AdhConfig.IService) => {
+export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
@@ -282,7 +282,7 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
-                        $scope.isAnonymous = false;
+                        $scope.noLink = !adhResourceArea.has(RIUser.content_type);
                     });
             } else {
                 $translate("TR__GUEST").then((translated) => {
@@ -290,7 +290,7 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                         name: translated
                     };
                 });
-                $scope.isAnonymous = true;
+                $scope.noLink = true;
             }
         }]
     };
@@ -531,7 +531,7 @@ export var register = (angular) => {
         .directive("adhCreatePasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
-        .directive("adhUserMeta", ["adhConfig", metaDirective])
+        .directive("adhUserMeta", ["adhConfig", "adhResourceArea", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
         .directive("adhUserDetailColumn", ["adhBindVariablesAndClear", "adhPermissions", "adhConfig", userDetailColumnDirective])
         .directive("adhUserListingColumn", ["adhBindVariablesAndClear", "adhConfig", userListingColumnDirective]);
