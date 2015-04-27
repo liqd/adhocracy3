@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import Mock
+from pytest import mark
 
 from pyramid import testing
 import colander
@@ -1228,6 +1229,13 @@ class TestACL:
     def test_serialize_empty(self, inst):
         assert inst.serialize() == []
 
+
+@fixture
+def mock_registry():
+    registry = Mock()
+    return registry
+
+
 class TestACMRow:
 
     @fixture
@@ -1235,23 +1243,20 @@ class TestACMRow:
         from . import ACMRow
         return ACMRow()
 
-    def test_deserialize_invalid_permission_name(self, inst):
-        inst.bind(context=42)
+    def test_deserialize(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry) \
+        .deserialize(['edit', 'Allow']) == ['edit', Allow]
+
+    def test_deserialize_invalid_permission_name(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
         with raises(colander.Invalid):
-            inst.deserialize(['edit', 'Allow'])
+            inst.bind(registry=mock_registry).deserialize(['modify', 'Allow'])
 
-
-class TestACMPermissions:
-
-    @fixture
-    def inst(self):
-        from . import ACMPermissions
-        return ACMPermissions()
-
-    def test_deserialize(self, inst):
-        inst.bind(context=42)
+    def test_deserialize_invalid_action_name(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
         with raises(colander.Invalid):
-            inst.deserialize([['edit', 'Allow']])
+            inst.bind(registry=mock_registry).deserialize(['edit', 'Agree'])
 
 
 class TestACM:
@@ -1271,8 +1276,10 @@ class TestACM:
         assert inst.serialize(appstruct) == {'principals': ['Everyone'],
                                              'permissions': [['edit', 'Allow']]}
 
-    def test_deserialize(self, inst):
-        assert inst.deserialize({'principals': ['Everyone'],
-                                 'permissions': [['edit', 'Allow']]}) == \
+    def test_deserialize(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry).deserialize(
+            {'principals': ['Everyone'],
+             'permissions': [['edit', 'Allow']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', Allow]]}

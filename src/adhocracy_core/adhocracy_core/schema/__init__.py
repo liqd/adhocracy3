@@ -906,20 +906,30 @@ class ACMCell(colander.SchemaNode):
     schema_type = colander.String
 
 
-@colander.deferred
-def _deferred_valid_permission_name(node, kw) -> callable:
-    print('kw', kw)
-
-    def validate_permission_name(node, value):
-        raise colander.Invalid(node, 'No such permission', value=value)
-    return validate_permission_name
-
-
 class ACMRow(colander.SequenceSchema):
 
     """ACM Row."""
 
     item = ACMCell()
+
+    @colander.deferred
+    def validator(node, kw):
+        registry = kw.get('registry')
+
+        def validate_permission_name(node, value):
+            permission_name = value[0]
+            if permission_name not in registry.content.permissions():
+                msg = 'No such permission: {0}'.format(permission_name)
+                raise colander.Invalid(node, msg, value=permission_name)
+
+        def validate_actions_names(node, value):
+            for action in value[1:]:
+                if action != security.Allow and action != security.Deny:
+                    msg = 'Invalid action: {0}'.format(action)
+                    raise colander.Invalid(node, msg, value=action)
+
+        return colander.All(validate_permission_name,
+                            validate_actions_names)
 
 
 class ACMPrincipals(colander.SequenceSchema):
@@ -934,7 +944,7 @@ class ACMPermissions(colander.SequenceSchema):
 
     """ACM Permissions."""
 
-    row = ACMRow(validator=_deferred_valid_permission_name)
+    row = ACMRow()
     default = []
 
 
