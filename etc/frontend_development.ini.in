@@ -36,7 +36,7 @@ adhocracy.frontend.locale = de
 adhocracy.frontend.debug = true
 
 # Name of the entire site. Used in account registration information etc.
-adhocracy.frontend.site_name = Adhocracy Test Site
+adhocracy.site_name = Adhocracy Test Site
 
 # URL to terms and services
 adhocracy.frontend.terms_url =

@@ -1,5 +1,59 @@
-Embed-API
+Embedding
 =========
+
+Adhocracy 3 is designed to be "embed first". This means that it will
+usually not be used on its own, but embedded in some website, e.g. a
+content management system (CMS).  But it should also be possible to
+embed individual widgets.
+
+Terms
+-----
+
+The following terms are used in the context of embedding:
+
+Host
+    The website where adhocracy is embedded.
+
+Widget
+    A piece of adhocracy that can be embedded on its own.  Some
+    functionality (e.g. registration) will require the user to switch
+    to the *platform*.  See also :doc:`css_guidelines`.
+
+Frontend URL
+    This is where the actual adhocracy frontend is available.  Users are
+    not supposed to interact with this directly.  Instead, the frontend
+    should be embedded somewhere.
+
+Platform URL
+    This is where the full adhocracy is available (as opposed to a
+    widget).  The term *platform* also refers to the complete set of
+    functionality and navigation that sets it apart from a mere widget.
+
+Canonical URL
+    Content can show up in different places (i.e. with different URLs),
+    namely at the frontend URL, the platform URL and embedded in many
+    more places.  The canonical URL is the *default* URL. In most cases
+    (but not in all!), it will point to the platform.  See also `RFC6596
+    <https://tools.ietf.org/html/rfc6596>`_.
+
+
+General notes
+-------------
+
+-   Accout activation (after registration) and password reset require
+    that the backend sends a URL to the user via email.  So the backend
+    needs to know canonical URLs for that.
+
+-   If a feature is not available in an embedded widget, all aspects of
+    that widget that rely on that feature need to be modified.  For
+    example, whenever a user is referenced, we include a link to their
+    profile page.  If profile pages are not available in an embedded
+    widget, these links either need to be removed or point to the
+    platform instead.
+
+
+Embed-API
+---------
 
 The general idea consists of two parts: the SDK javascript code, which has to
 be loaded once, and widget markers in the DOM. On initialization, the widget
@@ -7,7 +61,10 @@ markers are replaced by iframes, which show the actual content.
 
 
 SDK snippet
------------
++++++++++++
+
+This is our JavaScript code that runs in the host page.  It was
+carefully written to not interfere with the hosts own JavaScript code.
 
 - Bootstraps everything, initializes widgets
 - Selects Adhocracy version to be used
@@ -36,7 +93,7 @@ One or more markers can appear anywhere in the document::
 
 
 Widget markers
---------------
+++++++++++++++
 
 A widget is defined by
 
@@ -54,8 +111,33 @@ Example (current HTML5 syntax)::
     <div class="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
 
 
+Special parameters
+~~~~~~~~~~~~~~~~~~
+
+-   the special widget ``"plain"`` will embed the full platform instead
+    of a single widget::
+
+        <div class="adhocracy_marker" data-widget="plain"></div>
+
+-   ``autoresize`` will control whether the iframe will automatically be
+    resized to fit its contents.  Defaults to ``true``.  It is
+    recommended to set this to ``false`` if the embedded widget contains
+    moving columns::
+
+        <div class="adhocracy_marker" data-widget="plain" data-autoresize="false"></div>
+
+-   ``locale`` can be used to set a locale.
+
+-   ``autourl``: If set to ``true``, the URL of the embedded adhocracy
+    will be appended (and constantly updated) to the host URL via ``#!``.
+    This is only possible once per host page for obvious reasons.
+
+-   ``initial-url`` will set the initial URL (i.e. path, query and
+    anchor) for the embedded platform if widget is ``"plain"``.
+
+
 What happens internally
------------------------
++++++++++++++++++++++++
 
 Say we use the following marker::
 
@@ -71,7 +153,7 @@ The template inside of that iframe will look roughly like this::
 
 
 Allowing a directive to be embedded
------------------------------------
++++++++++++++++++++++++++++++++++++
 
 Not every directive is allowed to be embedded.  You need to register it
 with the embed provider::
@@ -98,7 +180,7 @@ with the embed provider::
 
 
 Embed Widget for testing
-------------------------
+++++++++++++++++++++++++
 
 As a side effect, the embed API can be used to develop and test
 functionalities of frontend widgets in an isolated way.
