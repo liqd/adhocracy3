@@ -171,6 +171,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
         });
     }
 
+    public has(resourceType : string, view : string = "", processType : string = "") : boolean {
+        var key : string = resourceType + "@" + view + "@" + processType;
+        return this.provider.defaults.hasOwnProperty(key) || this.provider.specifics.hasOwnProperty(key);
+    }
+
     public route(path : string, search : Dict) : angular.IPromise<Dict> {
         var self : Service = this;
         var segs : string[] = path.replace(/\/+$/, "").split("/");
