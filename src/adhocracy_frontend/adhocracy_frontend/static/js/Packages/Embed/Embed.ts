@@ -8,6 +8,7 @@ import AdhUtil = require("../Util/Util");
 
 var metaParams = [
     "autoresize",
+    "initialUrl",
     "locale",
     "nocenter",
     "noheader"
