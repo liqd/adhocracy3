@@ -80,6 +80,9 @@ export class Service {
         var widget : string = $location.path().split("/")[2];
         var search = $location.search();
 
+        // For later use
+        this.widget = widget;
+
         // FIXME: DefinitelyTyped: remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
         if ((<any>_).includes(this.provider.embeddableDirectives, widget)) {
             var template = this.location2template(widget, search);
