@@ -51,15 +51,9 @@ export class Provider {
 export class Service {
     constructor(private provider : Provider) {}
 
-    public location2template($location : angular.ILocationService) {
-        var widget : string = $location.path().split("/")[2];
-        var search = $location.search();
 
+    private location2template(widget : string, search) {
         var attrs = [];
-        // remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
-        if (!(<any>_).includes(this.provider.embeddableDirectives, widget)) {
-            throw "unknown widget: " + widget;
-        }
 
         if (widget === "empty") {
             return "";
@@ -70,6 +64,33 @@ export class Service {
             }
         }
         return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(widget), attrs.join(" "));
+    }
+
+    public route($location : angular.ILocationService) : AdhTopLevelState.IAreaInput {
+        var widget : string = $location.path().split("/")[2];
+        var search = $location.search();
+
+        // FIXME: DefinitelyTyped: remove <any> when borisyankov/DefinitelyTyped#3573 is resolved
+        if ((<any>_).includes(this.provider.embeddableDirectives, widget)) {
+            var template = this.location2template(widget, search);
+
+            if (!search.hasOwnProperty("nocenter")) {
+                template = "<div class=\"l-center\">" + template + "</div>";
+            }
+
+            if (!search.hasOwnProperty("noheader")) {
+                template = "<header class=\"l-header main-header\">" +
+                "<div class=\"l-header-wrapper\"><div class=\"l-header-right\">" +
+                "<adh-user-indicator></adh-user-indicator>" +
+                "</div></div></header>" + template;
+            }
+
+            return {
+                template: template
+            };
+        } else {
+            throw "unknown widget: " + widget;
+        }
     }
 }
 
@@ -144,22 +165,7 @@ export var register = (angular) => {
                     $location : angular.ILocationService,
                     adhEmbed : Service
                 ) : AdhTopLevelState.IAreaInput => {
-                    var params = $location.search();
-                    var template = adhEmbed.location2template($location);
-
-                    if (!params.hasOwnProperty("nocenter")) {
-                        template = "<div class=\"l-center\">" + template + "</div>";
-                    }
-
-                    if (!params.hasOwnProperty("noheader")) {
-                        template = "<header class=\"l-header main-header\">" +
-                        "<div class=\"l-header-wrapper\"><div class=\"l-header-right\">" +
-                        "<adh-user-indicator></adh-user-indicator>" +
-                        "</div></div></header>" + template;
-                    }
-                    return {
-                        template: template
-                    };
+                    return adhEmbed.route($location);
                 }]);
         }])
         .run(["$location", "$translate", "adhConfig", ($location, $translate, adhConfig) => {
