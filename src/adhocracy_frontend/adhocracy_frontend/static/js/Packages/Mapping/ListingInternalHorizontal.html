@@ -2,7 +2,7 @@
     <div class="map-list-map"></div>
     <a ng-show="showZoomButton" ng-click="zoomOut();" href="">Zoom out</a>
     <div class="map-list-container">
-        <div class="map-list-navigate-container">
+        <div ng-show="visible>1" class="map-list-navigate-container">
             <a class="map-list-navigate map-list-navigate-back" href="" data-ng-click="getPreviousItem(selectedItem);" title="{{ 'TR__PREVIOUS' | translate }}">
             <i class="icon-chevron-prev"></i></a>
         </div>
@@ -24,7 +24,7 @@
                 </li>
             </ol>
         </div>
-        <div class="map-list-navigate-container">
+        <div ng-show="visible>1" class="map-list-navigate-container">
             <a class="map-list-navigate map-list-navigate-next" href="" data-ng-click="getNextItem(selectedItem);" title="{{ 'TR__NEXT' | translate }}">
             <i class="icon-chevron-next"></i></a>
         </div>

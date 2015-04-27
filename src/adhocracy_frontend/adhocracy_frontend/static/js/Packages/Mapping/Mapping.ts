@@ -274,6 +274,7 @@ export interface IMapListScope<T> extends angular.IScope {
     getNextItem(item : IItem<T>) : void;
     showZoomButton: boolean;
     zoomOut(): void;
+    visible: number;
 }
 
 export var mapListingInternal = (adhConfig : AdhConfig.IService,
@@ -380,15 +381,19 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService,
 
             map.on("moveend", () => {
                 var bounds = map.getBounds();
+                scope.visible = 0;
                 $timeout(() => {
                     _.forEach(scope.items, (item) => {
                         if (bounds.contains(item.marker.getLatLng())) {
                             item.hide = false;
+                            scope.visible++;
                         } else {
                             item.hide = true;
                         }
                     });
+
                 });
+
             });
 
             map.on("zoomend", () => {
