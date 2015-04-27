@@ -23,11 +23,13 @@ export class Provider implements angular.IServiceProvider {
     public $get;
     public defaults : {[key : string]: Dict};
     public specifics : {[key : string]: (resource) => any};  // values return either Dict or angular.IPromise<Dict>
+    public templates : {[embedContext : string]: any};
 
     constructor() {
         var self = this;
         this.defaults = {};
         this.specifics = {};
+        this.templates = {};
         this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhEmbed", "adhResourceUrlFilter",
             ($q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter) => new Service(
         self, $q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter)];
@@ -44,6 +46,11 @@ export class Provider implements angular.IServiceProvider {
     public specific(resourceType, view, processType, embedContext, factory) {
         var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
         this.specifics[key] = factory;
+        return this;
+    }
+
+    public template(embedContext : string, templateFn : any) : Provider {
+        this.templates[embedContext] = templateFn;
         return this;
     }
 }
@@ -104,7 +111,9 @@ export class Provider implements angular.IServiceProvider {
  * possible. In those cases, search overwrites specifics overwrites meta overwrites defaults.
  */
 export class Service implements AdhTopLevelState.IAreaInput {
-    public templateUrl : string;
+    public template : string;
+    private hasRun : boolean;
+    private templateDeferred;
 
     constructor(
         private provider : Provider,
@@ -116,7 +125,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private adhEmbed : AdhEmbed.Service,
         private adhResourceUrlFilter
     ) {
-        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
+        this.template = "<adh-resource-area></adh-resource-area>";
+        this.hasRun = false;
+        this.templateDeferred = this.$q.defer();
     }
 
     private getDefaults(resourceType : string, view : string, processType : string, embedContext : string) : Dict {
@@ -173,6 +184,31 @@ export class Service implements AdhTopLevelState.IAreaInput {
         });
     }
 
+    private resolveTemplate(embedContext) : void {
+        var templateFn;
+        if (this.provider.templates.hasOwnProperty(embedContext)) {
+            templateFn = this.provider.templates[embedContext];
+        } else {
+            var templateUrl = this.adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
+            templateFn = ["$templateRequest", ($templateRequest) => $templateRequest(templateUrl)];
+        }
+
+        if (typeof templateFn === "string") {
+            var templateString = templateFn;
+            templateFn = () => templateString;
+        }
+
+        this.$q.when(this.$injector.invoke(templateFn)).then((template) => {
+            this.templateDeferred.resolve(template);
+        }, (reason) => {
+            this.templateDeferred.reject(reason);
+        });
+    }
+
+    public getTemplate() : angular.IPromise<string> {
+        return this.templateDeferred.promise;
+    }
+
     public has(resourceType : string, view : string = "", processType : string = "") : boolean {
         var key : string = resourceType + "@" + view + "@" + processType;
         return this.provider.defaults.hasOwnProperty(key) || this.provider.specifics.hasOwnProperty(key);
@@ -188,6 +224,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         var view : string = "";
         var embedContext = this.adhEmbed.getContext();
+
+        if (!this.hasRun) {
+            this.hasRun = true;
+            this.resolveTemplate(embedContext);
+        }
 
         // if path has a view segment
         if (_.last(segs).match(/^@/)) {
@@ -273,6 +314,20 @@ export var resourceUrl = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var directive = (adhResourceArea : Service, $compile : angular.ICompileService) => {
+    return {
+        restrict: "E",
+        link: (scope : angular.IScope, element) => {
+            adhResourceArea.getTemplate().then((template : string) => {
+                var childScope = scope.$new();
+                element.html(template);
+                $compile(element.contents())(childScope);
+            });
+        }
+    };
+};
+
+
 export var moduleName = "adhResourceArea";
 
 export var register = (angular) => {
@@ -288,5 +343,6 @@ export var register = (angular) => {
                 .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
         }])
         .provider("adhResourceArea", Provider)
+        .directive("adhResourceArea", ["adhResourceArea", "$compile", directive])
         .filter("adhResourceUrl", ["adhConfig", resourceUrl]);
 };
