@@ -55,7 +55,8 @@ class TestAddWorkflow:
         """Return example workflow cstruct with required data."""
         cstruct = \
             {'states_order': ['draft', 'announced'],
-             'states': {'draft': {'acl': [('Deny', 'reader', ['view'])]},
+             'states': {'draft': {'acm': {'principals':          ['reader'],
+                                          'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []}},
              'transitions': {'to_announced': {'from_state': 'draft',
                                               'to_state': 'announced',
@@ -90,10 +91,9 @@ class TestAddWorkflow:
         states = sorted(workflow.get_states(None, None),
                         key=lambda x: x['name'])
         assert states[0]['initial'] is False
-        assert workflow._states['draft'].acm == {'principals': ['reader'],
-                                                 'permissions': [['view', 'Deny']]}
+        assert workflow._states['draft'].acl == [('Deny', 'role:reader', 'view')]
         assert states[1]['initial'] is True
-        assert workflow._states['announced'].acl == []
+
 
     def test_create_workflow_and_add_transitions(self, registry, cstruct):
         self.call_fut(registry, cstruct, 'sample')
