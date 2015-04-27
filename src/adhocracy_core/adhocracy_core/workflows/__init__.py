@@ -11,6 +11,7 @@ from zope.interface import implementer
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
+from adhocracy_core.authorization import acm_to_acl
 
 
 @implementer(IAdhocracyWorkflow)
@@ -61,7 +62,8 @@ def _create_workflow(appstruct: dict, name: str) -> ACLWorkflow:
     initial_state = appstruct['states_order'][0]
     workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
     for name, data in appstruct['states'].items():
-        workflow.add_state(name, callback=None, acl=data['acl'])
+        acl = acm_to_acl(data['acm'])
+        workflow.add_state(name, callback=None, acl=acl)
     for name, data in appstruct['transitions'].items():
         workflow.add_transition(name, **data)
     workflow.check()
