@@ -86,7 +86,7 @@ class ResourceContentRegistry(ContentRegistry):
     @reify
     def permissions(self) -> [str]:
         """Set of all permissions defined in the system."""
-        perms = {'hide_resource', 'edit_group'}  # built-in permissions
+        perms = {'hide_resource', 'edit_group', 'do_transitions'}  # built-in permissions
         for resource_meta in self.resources_meta.values():
             perms.update(self._get_resource_permissions(resource_meta))
         for sheet_meta in self.sheets_meta.values():
@@ -108,8 +108,10 @@ class ResourceContentRegistry(ContentRegistry):
                 if p != '']
 
     def _get_views_permissions(self):
-        return [v['introspectable'].title for v
-                in self.registry.introspector.get_category('permissions')]
+        permissions = self.registry.introspector.get_category('permissions')
+        if permissions is None:
+            return []
+        return [v['introspectable'].title for v in permissions]
 
     def _get_workflow_permissions(self, workflow_meta):
         return [t['permission'] for t in workflow_meta['transitions'].values()]

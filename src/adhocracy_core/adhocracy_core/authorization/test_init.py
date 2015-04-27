@@ -3,7 +3,7 @@ from pytest import fixture
 from pytest import raises
 from pyramid.security import Allow
 from pyramid.security import Deny
-
+from unittest.mock import Mock
 
 class TestRuleACLAuthorizaitonPolicy:
 
@@ -206,3 +206,16 @@ def test_acm_to_acl():
     assert (Deny,  'role:creator', 'edit') not in acl
     assert (Deny,  'role:annotator', 'edit') not in acl
     assert (None,  'role:annotator', 'edit') not in acl
+
+@fixture
+def mock_registry():
+    registry = Mock()
+    return registry
+
+def test_acm_to_acl_invalid_permission(mock_registry):
+    from . import acm_to_acl
+    mock_registry.content.permissions = ['view']
+    appstruct = {'principals':             ['Everyone'],
+                 'permissions': [['viewxyz', Allow]]}
+    with raises(ValueError):
+        acm_to_acl(appstruct, mock_registry)

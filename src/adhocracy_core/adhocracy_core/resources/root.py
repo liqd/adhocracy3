@@ -99,7 +99,8 @@ def _add_principals_service(context, registry):
 
 
 def _add_acl_to_app_root(context, registry):
-    set_acl(context, acm_to_acl(root_acm), registry=registry)
+    acl = acm_to_acl(root_acm, registry)
+    set_acl(context, acl, registry=registry)
 
 
 def add_platform(context, registry, platform_id=None,
