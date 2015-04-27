@@ -2,7 +2,6 @@ import AdhConfig = require("../../Config/Config");
 import AdhHttp = require("../../Http/Http");
 import AdhMovingColumns = require("../../MovingColumns/MovingColumns");
 import AdhTabs = require("../../Tabs/Tabs");
-import AdhTopLevelState = require("../../TopLevelState/TopLevelState");
 
 import AdhMeinBerlinKiezkassenProposal = require("./Proposal/Proposal");
 
@@ -57,7 +56,6 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhTabs.moduleName,
-            AdhTopLevelState.moduleName,
             AdhMeinBerlinKiezkassenProposal.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", detailDirective]);
