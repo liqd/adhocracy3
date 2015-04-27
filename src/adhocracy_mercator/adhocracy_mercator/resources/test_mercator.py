@@ -83,6 +83,7 @@ def integration(config):
     config.include('adhocracy_core.resources.principal')
     config.include('adhocracy_core.resources.pool')
     config.include('adhocracy_core.resources.asset')
+    config.include('adhocracy_core.resources.external_resource')
     config.include('adhocracy_mercator.sheets.mercator')
     config.include('adhocracy_mercator.resources.mercator')
 

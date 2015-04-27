@@ -47,7 +47,8 @@ class TestAddWorkflow:
 
     @fixture
     def registry(self, mock_content_registry):
-        registry = testing.DummyResource(content=mock_content_registry)
+        registry = Mock(content=mock_content_registry)
+        registry.content.permissions = ['view']
         return registry
 
     @fixture
