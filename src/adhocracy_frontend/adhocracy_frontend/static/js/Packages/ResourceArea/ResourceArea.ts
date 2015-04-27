@@ -5,6 +5,7 @@ import ResourcesBase = require("../../ResourcesBase");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 import AdhConfig = require("../Config/Config");
+import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
@@ -27,21 +28,21 @@ export class Provider implements angular.IServiceProvider {
         var self = this;
         this.defaults = {};
         this.specifics = {};
-        this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhResourceUrlFilter",
-            ($q, $injector, $location, adhHttp, adhConfig, adhResourceUrlFilter) => new Service(
-        self, $q, $injector, $location, adhHttp, adhConfig, adhResourceUrlFilter)];
+        this.$get = ["$q", "$injector", "$location", "adhHttp", "adhConfig", "adhEmbed", "adhResourceUrlFilter",
+            ($q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter) => new Service(
+        self, $q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter)];
     }
 
-    public default(resourceType : string, view : string, processType : string, defaults : Dict) : Provider {
-        var key : string = resourceType + "@" + view + "@" + processType;
+    public default(resourceType : string, view : string, processType : string, embedContext : string, defaults : Dict) : Provider {
+        var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
         this.defaults[key] = defaults;
         return this;
     }
 
-    public specific(resourceType : string, view : string, processType : string, factory : Function) : Provider;
-    public specific(resourceType : string, view : string, processType : string, factory : any[]) : Provider;
-    public specific(resourceType, view, processType, factory) {
-        var key : string = resourceType + "@" + view + "@" + processType;
+    public specific(resourceType : string, view : string, processType : string, embedContext : string, factory : Function) : Provider;
+    public specific(resourceType : string, view : string, processType : string, embedContext : string, factory : any[]) : Provider;
+    public specific(resourceType, view, processType, embedContext, factory) {
+        var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
         this.specifics[key] = factory;
         return this;
     }
@@ -112,18 +113,19 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private $location : angular.ILocationService,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService,
+        private adhEmbed : AdhEmbed.Service,
         private adhResourceUrlFilter
     ) {
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ResourceArea.html";
     }
 
-    private getDefaults(resourceType : string, view : string, processType : string) : Dict {
-        var key : string = resourceType + "@" + view + "@" + processType;
+    private getDefaults(resourceType : string, view : string, processType : string, embedContext : string) : Dict {
+        var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
         return <Dict>_.extend({}, this.provider.defaults[key]);
     }
 
-    private getSpecifics(resource, view : string, processType : string) : angular.IPromise<Dict> {
-        var key : string = resource.content_type + "@" + view + "@" + processType;
+    private getSpecifics(resource, view : string, processType : string, embedContext : string) : angular.IPromise<Dict> {
+        var key : string = resource.content_type + "@" + view + "@" + processType + "@" + embedContext;
         var specifics;
 
         if (this.provider.specifics.hasOwnProperty(key)) {
@@ -185,6 +187,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         }
 
         var view : string = "";
+        var embedContext  = (<any>this.adhEmbed).widget || "";
 
         // if path has a view segment
         if (_.last(segs).match(/^@/)) {
@@ -206,7 +209,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return;
             }
 
-            return self.getSpecifics(resource, view, processType).then((specifics : Dict) => {
+            return self.getSpecifics(resource, view, processType, embedContext).then((specifics : Dict) => {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType);
 
                 var meta : Dict = {
@@ -274,6 +277,7 @@ export var moduleName = "adhResourceArea";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhProcess.moduleName,
             AdhTopLevelState.moduleName
