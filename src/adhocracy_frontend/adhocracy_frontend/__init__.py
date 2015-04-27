@@ -38,7 +38,7 @@ def config_view(request):
     custom_keys = settings.get('adhocracy.custom', '').split()
     config['custom'] = {k: settings.get('adhocracy.custom.%s' % k)
                         for k in custom_keys}
-    config['site_name'] = settings.get('adhocracy.frontend.site_name',
+    config['site_name'] = settings.get('adhocracy.site_name',
                                        'Adhocracy')
     config['debug'] = asbool(settings.get('adhocracy.frontend.debug', 'false'))
     config['terms_url'] = settings.get('adhocracy.frontend.terms_url')
