@@ -14,8 +14,6 @@ export var register = () => {
             $locationMock.protocol.and.returnValue("http");
             $locationMock.path.and.returnValue("/embed/document-workbench");
             $locationMock.search.and.returnValue({
-                path: "/this/is/a/path",
-                test: "\"'&"
             });
             $compileMock = jasmine.createSpy("$compileMock")
                 .and.returnValue(() => undefined);
@@ -71,30 +69,41 @@ export var register = () => {
                 it("compiles a template from the parameters given in $location", () => {
                     var expected = "<adh-document-workbench data-path=\"/this/is/a/path\" " +
                         "data-test=\"&quot;&#39;&amp;\"></adh-document-workbench>";
-                    expect(service.location2template($locationMock)).toBe(expected);
+                    var widget = "document-workbench";
+                    var search = {
+                        path: "/this/is/a/path",
+                        test: "\"'&"
+                    };
+                    expect(service.location2template(widget, search)).toBe(expected);
                 });
                 it("does not include meta params as attributes", () => {
                     var expected = "<adh-document-workbench data-path=\"/this/is/a/path\"></adh-document-workbench>";
-                    $locationMock.search.and.returnValue({
+                    var widget = "document-workbench";
+                    var search = {
                         path: "/this/is/a/path",
                         noheader: "",
                         nocenter: "",
                         locale: "de"
-                    });
-                    expect(service.location2template($locationMock)).toBe(expected);
+                    };
+                    expect(service.location2template(widget, search)).toBe(expected);
                 });
                 it("returns '' if widget is 'empty'", () => {
                     var expected = "";
-                    $locationMock.path.and.returnValue("/embed/empty");
-                    expect(service.location2template($locationMock)).toBe(expected);
+                    var widget = "empty";
+                    var search =  {};
+                    expect(service.location2template(widget, search)).toBe(expected);
                 });
+
+            });
+
+            describe("route", () => {
                 it("throws if $location does not specify a widget", () => {
                     $locationMock.path.and.returnValue("/embed/");
-                    expect(() => service.location2template($locationMock)).toThrow();
+                    expect(() => service.route($locationMock)).toThrow();
                 });
                 it("throws if the requested widget is not available for embedding", () => {
                     $locationMock.path.and.returnValue("/embed/do-not-embed");
-                    expect(() => service.location2template($locationMock)).toThrow();
+                    expect(() => service.route($locationMock)).toThrow();
                 });
             });
         });
