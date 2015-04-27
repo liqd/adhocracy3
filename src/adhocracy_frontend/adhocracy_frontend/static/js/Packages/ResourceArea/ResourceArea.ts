@@ -210,9 +210,10 @@ export class Service implements AdhTopLevelState.IAreaInput {
             }
 
             return self.getSpecifics(resource, view, processType, embedContext).then((specifics : Dict) => {
-                var defaults : Dict = self.getDefaults(resource.content_type, view, processType);
+                var defaults : Dict = self.getDefaults(resource.content_type, view, processType, embedContext);
 
                 var meta : Dict = {
+                    embedContext: embedContext,
                     processType: processType,
                     platformUrl: self.adhConfig.rest_url + "/" + segs[1],
                     contentType: resource.content_type,
@@ -228,7 +229,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
     }
 
     public reverse(data : Dict) : { path : string; search : Dict; } {
-        var defaults = this.getDefaults(data["contentType"], data["view"], data["processType"]);
+        var defaults = this.getDefaults(data["contentType"], data["view"], data["processType"], data["embedContext"]);
         var path = path = data["resourceUrl"].replace(this.adhConfig.rest_url, "");
 
         if (path.substr(-1) !== "/") {
