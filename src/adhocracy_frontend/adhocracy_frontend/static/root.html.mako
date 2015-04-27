@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <title>adhocracy root page</title>
+        <title>Adhocracy</title>
         <meta charset="utf-8">
         % for url in css:
             <link rel="stylesheet" href="${url}"/>
