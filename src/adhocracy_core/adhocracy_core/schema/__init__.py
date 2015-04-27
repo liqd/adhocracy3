@@ -897,3 +897,41 @@ class ACL(colander.SequenceSchema):
             self.missing = []
 
     ace = ACE()
+
+
+class ACMCell(colander.SchemaNode):
+
+    """ACM Cell."""
+
+    schema_type = colander.String
+
+
+class ACMRow(colander.SequenceSchema):
+
+    """ACM Row."""
+
+    item = ACMCell()
+
+
+class ACMPrincipals(colander.SequenceSchema):
+
+    """ACM Principals."""
+
+    principal = ACEPrincipal()
+    default = []
+
+
+class ACMPermissions(colander.SequenceSchema):
+
+    """ ACM Permissions."""
+
+    row = ACMRow()
+    default = []
+
+
+class ACM(colander.MappingSchema):
+
+    """ Access Control Matrix."""
+
+    principals = ACMPrincipals()
+    permissions = ACMPermissions()

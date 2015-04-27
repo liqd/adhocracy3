@@ -10,6 +10,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.testing import register_sheet
 
+from pyramid.security import Allow
 
 ############
 #  helper  #
@@ -1226,3 +1227,26 @@ class TestACL:
 
     def test_serialize_empty(self, inst):
         assert inst.serialize() == []
+
+class TestACM:
+
+    @fixture
+    def inst(self):
+        from . import ACM
+        return ACM()
+
+    def test_serialize_empty(self, inst):
+       assert inst.serialize() == {'principals': [],
+                                   'permissions': []}
+
+    def test_serialize(self, inst):
+        appstruct = {'principals': ['system.Everyone'],
+                     'permissions': [['edit', Allow]]}
+        assert inst.serialize(appstruct) == {'principals': ['Everyone'],
+                                             'permissions': [['edit', 'Allow']]}
+
+    def test_deserialize(self, inst):
+        assert inst.deserialize({'principals': ['Everyone'],
+                                 'permissions': [['edit', 'Allow']]}) == \
+            {'principals': ['system.Everyone'],
+             'permissions': [['edit', Allow]]}
