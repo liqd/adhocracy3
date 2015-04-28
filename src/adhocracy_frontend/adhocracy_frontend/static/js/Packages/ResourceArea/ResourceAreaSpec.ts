@@ -20,7 +20,8 @@ export var register = () => {
             beforeEach(() => {
                 providerMock = {
                     defaults: {},
-                    specifics: {}
+                    specifics: {},
+                    templates: {}
                 };
 
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get"]);
@@ -37,7 +38,8 @@ export var register = () => {
                     rest_url: "rest_url"
                 };
 
-                adhEmbedMock = {};
+                adhEmbedMock = jasmine.createSpyObj("adhEmbed", ["getContext"]);
+                adhEmbedMock.getContext.and.returnValue("");
 
                 adhResourceUrlFilterMock = (path) => path;
 
