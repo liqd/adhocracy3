@@ -5,7 +5,9 @@
     "TR__ACTIVATION_ERROR_SUPPORT": "To request a new link, please contact our support team, explicitly stating the email address you registered with, via",
     "TR__AUTHOR": "author",
     "TR__BACK_TO_TOP": "back to top",
-    "TR__CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can procede using {{siteName}}.",
+    "TR__REGISTRATION_THANKS_FOR_REGISTERING": "HI, {{userName}}! Thanks for registering with {{siteName}}.",
+    "TR__REGISTRATION_CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can procede using {{siteName}}.",
+    "TR__REGISTRATION_CLOSE_THIS_TAB_AND_PROCEED": "You can close this tab and proceed on the {{siteName}} website.",
     "TR__CANCEL": "cancel",
     "TR__CLOSE": "close",
     "TR__COMMENTS": "comments",
@@ -111,6 +113,10 @@
     "TR__REGISTER_SUCCESS": "Thank you for your registration. We sent you an email with an activation link. In case you do not recieve that email, please also check your spam folder.",
     "TR__REGISTRATION_LOGIN_INSTEAD": "I already have an account. Log in [[link:here]].",
     "TR__REGISTRATION_SUPPORT": "Having trouble with the registration?",
+    "TR__REGISTRATION_ALREADY_LOGGED_IN": {
+        "text1": "You are already logged in, you must",
+        "text2": "to re-register."
+    },
     "TR__REPLY": "reply",
     "TR__REPORT": "report",
     "TR__REPORT_ABUSE_STATUS_OK": "The moderators have been notified.",
