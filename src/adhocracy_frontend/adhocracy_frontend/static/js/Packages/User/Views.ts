@@ -158,7 +158,6 @@ export var registerDirective = (
                 scope.loggedIn = value;
             });
 
-
             scope.$watch(() => adhUser.data, function(value) {
                 if (value) {
                     scope.userName = value.name;
