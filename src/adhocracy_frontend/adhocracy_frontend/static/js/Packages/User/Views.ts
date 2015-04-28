@@ -160,8 +160,7 @@ export var registerDirective = (
 
 
             scope.$watch(() => adhUser.data, function(value) {
-                if(value) {
-                    console.log(adhUser);
+                if (value) {
                     scope.userName = value.name;
                     scope.logOut = () => {
                         adhUser.logOut();
