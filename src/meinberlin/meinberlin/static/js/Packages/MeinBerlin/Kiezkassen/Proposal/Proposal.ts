@@ -214,7 +214,7 @@ export var mapListItemDirective = (
 
             var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
                 if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
-                    scope.$on("$destroy", mapListing.registerListItem(values[0], values[1]));
+                    scope.$on("$destroy", mapListing.registerListItem(scope.path, values[0], values[1]));
                     unregister();
                 }
             });

@@ -250,28 +250,18 @@ export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) 
 };
 
 
-export interface IItem<T> {
-    value : T;
-    marker : L.Marker;
-    hide : boolean;
-    index : number;
-};
-
-export interface IMapListScope<T> extends angular.IScope {
+export interface IMapListScope extends angular.IScope {
     height : number;
     polygon : L.Polygon;
     rawPolygon : number[][];
-    items : IItem<T>[];
-    itemValues : T[];
-    selectedItem : IItem<T>;
-    toggleItem(item : IItem<T>) : void;
-    getPreviousItem(item : IItem<T>) : void;
-    getNextItem(item : IItem<T>) : void;
+    itemValues : string[];
+    selectedPath : string;
+    selectItem(path : string) : void;
+    getPreviousItem() : void;
+    getNextItem() : void;
     showZoomButton : boolean;
     resetMap() : void;
     visibleItems : number;
-
-    map : L.Map;
 }
 
 export class MapListingController {
@@ -279,118 +269,41 @@ export class MapListingController {
     private scrollContainer;
     private selectedItemLeafletIcon;
     private itemLeafletIcon;
+    private markers : {[path : string]: L.Marker};
 
     constructor(
-        private $scope : IMapListScope<any>,
+        private $scope : IMapListScope,
         private $element,
         private $attrs,
         private $timeout : angular.ITimeoutService,
         private leaflet : typeof L
     ) {
         this.scrollContainer = this.$element.find(".map-list-scroll-container-inner");
-
         this.selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
         this.itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
+        this.markers = {};
 
         this.map = this.createMap();
 
-        this.$scope.items = [];
         this.$scope.visibleItems = 0;
-        // _.forEach(this.$scope.itemValues, (url, key) => {
-        //
-        //     adhHttp.get(AdhUtil.parentPath(url), {
-        //         content_type: RICommentVersion.content_type,
-        //         depth: "all",
-        //         tag: "LAST",
-        //         count: true
-        //     }).then((pool) => {
-        //         adhHttp.get(url).then((resource) => {
-        //             // FIXME: This is specific to meinberlin and should not be on adhocracy_core
-        //             var mainSheet = resource.data["adhocracy_meinberlin.sheets.kiezkassen.IProposal"];
-        //             var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
-        //             var poolSheet = pool.data[SIPool.nick];
-        //
-        //             var value = {
-        //                 url: url,
-        //                 title: mainSheet.title,
-        //                 locationText: mainSheet.location_text,
-        //                 commentCount: poolSheet.count,
-        //                 lng: pointSheet.x,
-        //                 lat: pointSheet.y
-        //             };
-        //
-        //             var hide = (value.lat === 0 && value.lat === 0);
-        //             if (!hide) {
-        //                 this.$scope.visibleItems++;
-        //             }
-        //
-        //             var item = {
-        //                 value: value,
-        //                 marker: L.marker(leaflet.latLng(value.lat, value.lng), {icon: this.itemLeafletIcon}),
-        //                 hide: hide,
-        //                 index: key
-        //             };
-        //
-        //             item.marker.addTo(this.map);
-        //             item.marker.on("click", (e) => {
-        //                 this.$timeout(() => {
-        //                     this.$scope.toggleItem(item);
-        //                     this.scrollToItem(item.index);
-        //                 });
-        //             });
-        //
-        //             if (key === 0) {
-        //                 this.$scope.selectedItem = item;
-        //                 <any>this.$scope.selectedItem.marker.setIcon(this.selectedItemLeafletIcon);
-        //             }
-        //             // this.$scope.items.push(item);
-        //
-        //         });
-        //     });
-        // });
 
-        this.map.on("moveend", () => {
-            var bounds = this.map.getBounds();
-            this.$scope.visibleItems = 0;
-            this.$timeout(() => {
-                _.forEach(this.$scope.items, (item) => {
-                    if (bounds.contains(item.marker.getLatLng())) {
-                        item.hide = false;
-                        this.$scope.visibleItems++;
-                    } else {
-                        item.hide = true;
-                    }
-                });
-            });
-            this.$scope.showZoomButton = true;
-        });
-
-        var loopCarousel = (index, total) => (index + total) % total;
-
-        this.$scope.toggleItem = (item) => {
-            if (typeof this.$scope.selectedItem !== "undefined") {
-                this.$scope.selectedItem.marker.setIcon(this.itemLeafletIcon);
+        this.$scope.selectItem = (path : string) => {
+            if (this.isVisible(path)) {
+                if (this.markers.hasOwnProperty(this.$scope.selectedPath)) {
+                    this.markers[this.$scope.selectedPath].setIcon(this.itemLeafletIcon);
+                }
+                this.$scope.selectedPath = path;
+                this.markers[this.$scope.selectedPath].setIcon(this.selectedItemLeafletIcon);
+                this.scrollToItem(path);
             }
-            this.$scope.selectedItem = item;
-            item.marker.setIcon(this.selectedItemLeafletIcon);
         };
 
-        this.$scope.getPreviousItem = (item) => {
-            var index = loopCarousel(item.index - 1, this.$scope.items.length);
-            while (this.$scope.items[index].hide) {
-                index = loopCarousel(index - 1, this.$scope.items.length);
-            }
-            this.$scope.toggleItem(this.$scope.items[index]);
-            this.scrollToItem(<any>index);
+        this.$scope.getPreviousItem = () => {
+            this.getRelativeItem(-1);
         };
 
-        this.$scope.getNextItem = (item) => {
-            var index = loopCarousel(item.index + 1, this.$scope.items.length);
-            while (this.$scope.items[index].hide) {
-                index = loopCarousel(index + 1, this.$scope.items.length);
-            }
-            this.$scope.toggleItem(this.$scope.items[index]);
-            this.scrollToItem(<any>index);
+        this.$scope.getNextItem = () => {
+            this.getRelativeItem(1);
         };
 
         this.$scope.resetMap = () => {
@@ -421,11 +334,37 @@ export class MapListingController {
              minZoom: map.getZoom()
         });
 
+        map.on("moveend", () => {
+            this.$scope.visibleItems = 0;
+            this.$timeout(() => {
+                _.forEach(this.$scope.itemValues, (path) => {
+                    if (this.isVisible(path)) {
+                        this.$scope.visibleItems++;
+                    }
+                });
+            });
+            this.$scope.showZoomButton = true;
+        });
+
         return map;
     }
 
+    private getRelativeItem(offset : number) : void {
+        var mod = (index, total) => (index + total) % total;
+
+        var initialIndex = this.pathToIndex(this.$scope.selectedPath);
+        var total = this.$scope.itemValues.length;
+
+        var index = mod(initialIndex + offset, total);
+        while (!this.isVisible(this.indexToPath(index))) {
+            index = mod(index + offset, total);
+        }
+
+        this.$scope.selectItem(this.indexToPath(index));
+    }
+
     private scrollToItem(path : string) : void {
-        var index = this.$scope.itemValues.indexOf(path);
+        var index = this.pathToIndex(path);
         var width = this.$element.find(".map-list-item").width();
 
         if (this.$attrs.orientation === "vertical") {
@@ -435,6 +374,24 @@ export class MapListingController {
             var left = width * index;
             (<any>this.scrollContainer).scrollTo(left, 0, 800);
         }
+    }
+
+    private isVisible(path : string) : boolean {
+        if (this.markers.hasOwnProperty(path)) {
+            var mapBounds = this.map.getBounds();
+            var markerLatLng = this.markers[path].getLatLng();
+            return mapBounds.contains(markerLatLng);
+        } else {
+            return false;
+        }
+    }
+
+    private pathToIndex(path : string) : number {
+        return this.$scope.itemValues.indexOf(path);
+    }
+
+    private indexToPath(index : number) : string {
+        return this.$scope.itemValues[index];
     }
 
     private isUndefinedLatLng(lat : number, lng : number) : boolean {
@@ -451,11 +408,17 @@ export class MapListingController {
             marker.addTo(this.map);
             marker.on("click", () => {
                 this.$timeout(() => {
-                    this.scrollToItem(path);
+                    this.$scope.selectItem(path);
                 });
             });
+            this.markers[path] = marker;
+
+            if (this.isVisible(path)) {
+                this.$scope.visibleItems++;
+            }
 
             return () => {
+                delete this.markers[path];
                 this.map.removeLayer(marker);
             };
         }
