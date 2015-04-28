@@ -195,6 +195,33 @@ export var listItemDirective = (
     };
 };
 
+export var mapListItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapListItem.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope) => {
+            bindPath(adhHttp, adhRate)(scope);
+            scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    scope.selectedState = "";
+                } else if (proposalVersionUrl === scope.path) {
+                    scope.selectedState = "is-selected";
+                } else {
+                    scope.selectedState = "is-not-selected";
+                }
+            }));
+        }
+    };
+};
+
 export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -327,6 +354,8 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", "adhRate", detailDirective])
         .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", "adhRate", "adhTopLevelState", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
+            "adhConfig", "adhHttp", "adhRate", "adhTopLevelState", mapListItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
             "adhConfig",
             "adhHttp",

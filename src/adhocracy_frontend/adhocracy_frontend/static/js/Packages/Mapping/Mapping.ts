@@ -290,7 +290,7 @@ export var mapListingInternal = (
             itemValues: "=items"
         },
         restrict: "E",
-
+        transclude: true,
         templateUrl: (element, attrs) => {
             if (attrs.orientation === "vertical") {
                 return adhConfig.pkg_path + pkgLocation + "/ListingInternal.html";
@@ -474,6 +474,7 @@ export var register = (angular) => {
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
             AdhListing.moduleName,
+            "adhInject",
             "duScroll"
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {

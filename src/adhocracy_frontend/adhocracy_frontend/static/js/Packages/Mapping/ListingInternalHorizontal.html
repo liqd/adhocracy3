@@ -13,16 +13,7 @@
                 <li
                     data-ng-repeat ="(key, item) in items"
                     class="map-list-item map-list-item{{key}}">
-                    <div class="map-list-item-col-left">
-                        <h3 class="map-list-item-title">{{item.value.title}}</h3>
-                        <p class="map-list-item-location map-list-meta-item"><i class="map-list-meta-item-icon icon-pin-detail"></i> {{item.value.locationText}}</p>
-                    </div>
-                    <div class="map-list-item-col-right">
-                        <!-- FIXME: dummy data -->
-                        <p class="map-list-item-comments map-list-meta-item"><i class="map-list-meta-item-icon icon-speechbubble-unfilled"></i> {{ item.value.commentCount }} {{ "TR__COMMENTS" | translate }}</p>
-                        <p class="map-list-item-votes map-list-meta-item"><i class="map-list-meta-item-icon icon-voting"></i> 234 {{ "TR__RATES" | translate }}</p>
-                        <a href="{{item.value.url | adhResourceUrl }}" class="button arrow-button">{{ "TR__MORE" | translate }}</a>
-                    </div>
+                    <adh-inject></adh-inject>
                 </li>
             </ol>
         </div>
