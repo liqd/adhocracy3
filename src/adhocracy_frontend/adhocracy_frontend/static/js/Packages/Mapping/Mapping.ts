@@ -381,7 +381,7 @@ export class MapListingController {
                 index = loopCarousel(index - 1, this.$scope.items.length);
             }
             this.$scope.toggleItem(this.$scope.items[index]);
-            this.scrollToItem(index);
+            this.scrollToItem(<any>index);
         };
 
         this.$scope.getNextItem = (item) => {
@@ -390,7 +390,7 @@ export class MapListingController {
                 index = loopCarousel(index + 1, this.$scope.items.length);
             }
             this.$scope.toggleItem(this.$scope.items[index]);
-            this.scrollToItem(index);
+            this.scrollToItem(<any>index);
         };
 
         this.$scope.resetMap = () => {
@@ -424,15 +424,18 @@ export class MapListingController {
         return map;
     }
 
-    private scrollToItem(key) : void {
-        var element = this.$element.find(".map-list-item" + key);
+    private scrollToItem(path : string) : void {
+        var index = this.$scope.itemValues.indexOf(path);
+        var width = this.$element.find(".map-list-item").width();
+
         if (this.$attrs.orientation === "vertical") {
+            var element = this.$element.find(".map-list-item").eq(index);
             (<any>this.scrollContainer).scrollToElement(element, 10, 300);
         } else {
-            var left = element.width() * key;
+            var left = width * index;
             (<any>this.scrollContainer).scrollTo(left, 0, 800);
         }
-    };
+    }
 
     private isUndefinedLatLng(lat : number, lng : number) : boolean {
         return lat === 0 && lng === 0;
@@ -446,6 +449,11 @@ export class MapListingController {
                 icon: this.itemLeafletIcon
             });
             marker.addTo(this.map);
+            marker.on("click", () => {
+                this.$timeout(() => {
+                    this.scrollToItem(path);
+                });
+            });
 
             return () => {
                 this.map.removeLayer(marker);
