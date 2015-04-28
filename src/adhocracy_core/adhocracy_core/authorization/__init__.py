@@ -102,7 +102,8 @@ def acm_to_acl(acm: dict, registry: Registry) -> [str]:
         for permissions in acm['permissions']:
             permission_name = permissions[0]
             if permission_name not in registry.content.permissions:
-                raise ValueError('Invalid permission: {0}'.format(permission_name))
+                raise ValueError('Invalid permission: {0} not in {1}'
+                                 .format(permission_name, registry.content.permissions))
             action = permissions[idx + 1]
             if action is not None:
                 ace = (action, principal, permission_name)
