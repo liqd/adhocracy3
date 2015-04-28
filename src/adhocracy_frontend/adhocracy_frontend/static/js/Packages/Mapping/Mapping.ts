@@ -356,8 +356,14 @@ export class MapListingController {
         var total = this.$scope.itemValues.length;
 
         var index = mod(initialIndex + offset, total);
+        var counter = 0;
         while (!this.isVisible(this.indexToPath(index))) {
+            if (counter > total) {
+                console.log("Potential infinite loop!");
+                return;
+            }
             index = mod(index + offset, total);
+            counter++;
         }
 
         this.$scope.selectItem(this.indexToPath(index));
