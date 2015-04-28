@@ -5,20 +5,20 @@
     </div>
     <div class="map-list-container">
         <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container">
-            <a class="map-list-navigate map-list-navigate-back" href="" data-ng-click="getPreviousItem(selectedItem);" title="{{ 'TR__PREVIOUS' | translate }}">
+            <a class="map-list-navigate map-list-navigate-back" href="" data-ng-click="getPreviousItem()" title="{{ 'TR__PREVIOUS' | translate }}">
             <i class="icon-chevron-prev"></i></a>
         </div>
         <div class="map-list-scroll-container">
             <ol class="map-list-scroll-container-inner">
                 <li
                     data-ng-repeat="item in items"
-                    class="map-list-item map-list-item{{key}}">
+                    class="map-list-item">
                     <adh-inject></adh-inject>
                 </li>
             </ol>
         </div>
         <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container">
-            <a class="map-list-navigate map-list-navigate-next" href="" data-ng-click="getNextItem(selectedItem);" title="{{ 'TR__NEXT' | translate }}">
+            <a class="map-list-navigate map-list-navigate-next" href="" data-ng-click="getNextItem()" title="{{ 'TR__NEXT' | translate }}">
             <i class="icon-chevron-next"></i></a>
         </div>
     </div>
