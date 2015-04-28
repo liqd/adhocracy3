@@ -272,9 +272,9 @@ export interface IMapListScope<T> extends angular.IScope {
     toggleItem(item : IItem<T>) : void;
     getPreviousItem(item : IItem<T>) : void;
     getNextItem(item : IItem<T>) : void;
-    showZoomButton: boolean;
-    resetMap(): void;
-    visible: number;
+    showZoomButton : boolean;
+    resetMap() : void;
+    visible : number;
 }
 
 export var mapListingInternal = (
