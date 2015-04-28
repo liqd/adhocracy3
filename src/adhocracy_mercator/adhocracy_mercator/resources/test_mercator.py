@@ -1,7 +1,9 @@
 from pytest import fixture
 from pytest import mark
 from webtest import TestResponse
-
+from unittest.mock import Mock
+from pyramid import testing
+from pyramid.security import Allow
 
 # TODO: move _create_proposal to somewhere in backend fixtures as the
 # natural dependency ordering is "frontend depends on backend"
@@ -14,10 +16,10 @@ def test_root_meta():
     from adhocracy_core.resources.root import root_meta
     from adhocracy_core.resources.root import \
         create_initial_content_for_app_root
-    from .mercator import create_initial_content
+    from .mercator import _create_initial_content
     from .mercator import mercator_root_meta
-    assert create_initial_content not in root_meta.after_creation
-    assert create_initial_content in mercator_root_meta.after_creation
+    assert _create_initial_content not in root_meta.after_creation
+    assert _create_initial_content in mercator_root_meta.after_creation
     assert create_initial_content_for_app_root in \
         mercator_root_meta.after_creation
 
@@ -68,6 +70,18 @@ def test_mercator_proposal_version_meta():
     assert meta.iresource == IMercatorProposalVersion
     assert meta.permission_add == 'add_mercator_proposal_version'
 
+
+def test_application_created_subscriber():
+    from adhocracy_mercator.resources.mercator import _application_created_subscriber
+    event = Mock()
+    event.app.registry.content.permissions = ['add_mercator_proposal_version']
+    root = testing.DummyResource(__acl__=[(Allow, 'role:creator', 'view')])
+    event.app.root_factory.return_value = root
+    _application_created_subscriber(event)
+    assert (Allow, 'role:creator', 'add_mercator_proposal_version') in root.__acl__
+    assert (Allow, 'role:creator', 'view') in root.__acl__
+    assert (Allow, 'role:god', 'add_mercator_proposal_version') in root.__acl__
+ 
 
 @fixture
 def integration(config):

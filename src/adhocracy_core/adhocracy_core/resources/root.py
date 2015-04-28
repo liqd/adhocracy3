@@ -29,7 +29,6 @@ root_acm = \
                      ['add_commentversion',            None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
                      ['add_externalresource',          None,              None,             Allow,              None,           None,           None,         Allow],  # noqa
                      ['add_group',                     None,              None,             None,               None,           None,           Allow,        Allow],  # noqa
-                     ['add_mercator_proposal_version', None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
                      ['add_paragraph',                 None,              None,             Allow,              None,           None,           None,         Allow],  # noqa
                      ['add_paragraphversion',          None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
                      ['add_pool',                      None,              None,             None,               None,           None,           Allow,        Allow],  # noqa

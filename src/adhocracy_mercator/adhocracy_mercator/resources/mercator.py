@@ -1,5 +1,9 @@
 """Mercator proposal."""
 from pyramid.registry import Registry
+from pyramid.events import ApplicationCreated
+from pyramid.request import Request
+from pyramid.security import Allow
+from substanced.util import get_acl
 
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
@@ -17,7 +21,10 @@ from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import add_platform
+from adhocracy_core.authorization import acm_to_acl
+from adhocracy_core.utils import set_acl
 import adhocracy_mercator.sheets.mercator
+import transaction
 
 
 class IOrganizationInfoVersion(IItemVersion):
@@ -447,15 +454,41 @@ mercator_proposal_meta = item_meta._replace(
     permission_add='add_proposal',
 )
 
+mercator_acm = \
+    {'principals':                                   ['system.Everyone', 'role:annotator', 'role:contributor', 'role:creator', 'role:manager', 'role:admin', 'role:god'],  # noqa
+     'permissions': [['add_mercator_proposal_version', None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
+                     ]}
 
-def create_initial_content(context: IPool, registry: Registry,
-                           options: dict):
+
+def _create_initial_content(context: IPool, registry: Registry, options: dict):
     """Add mercator specific content."""
     add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
 
 
+def _application_created_subscriber(event):
+    """Called when the Pyramid application is started."""
+    app = event.app
+    root = _get_root(app)
+    _set_permissions(root, app.registry)
+
+
+def _get_root(app):
+    request = Request.blank('/path-is-meaningless-here')
+    request.registry = app.registry
+    root = app.root_factory(request)
+    return root
+
+
+def _set_permissions(root, registry):
+    acl = get_acl(root)
+    mercator_acl = acm_to_acl(mercator_acm, registry)
+    new_acl = mercator_acl + acl
+    set_acl(root, new_acl, registry)
+    transaction.commit()  # otherwise mercator permission get discarded?!
+
+
 mercator_root_meta = root_meta._replace(after_creation=root_meta.after_creation
-                                        + [create_initial_content])
+                                        + [_create_initial_content])
 
 
 def includeme(config):
@@ -485,6 +518,8 @@ def includeme(config):
     add_resource_type_to_registry(finance_version_meta, config)
     add_resource_type_to_registry(experience_meta, config)
     add_resource_type_to_registry(experience_version_meta, config)
+    # add a subscriber
+    config.add_subscriber(_application_created_subscriber, ApplicationCreated)
     # overrides adhocracy root
     config.commit()
     add_resource_type_to_registry(mercator_root_meta, config)
