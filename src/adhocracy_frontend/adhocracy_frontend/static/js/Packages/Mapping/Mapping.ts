@@ -434,15 +434,23 @@ export class MapListingController {
         }
     };
 
-    public registerListItem(lat : number, lng : number) : () => void {
-        var marker = this.leaflet.marker(this.leaflet.latLng(lat, lng), {
-            icon: this.itemLeafletIcon
-        });
-        marker.addTo(this.map);
+    private isUndefinedLatLng(lat : number, lng : number) : boolean {
+        return lat === 0 && lng === 0;
+    }
 
-        return () => {
-            this.map.removeLayer(marker);
-        };
+    public registerListItem(path : string, lat : number, lng : number) : () => void {
+        if (this.isUndefinedLatLng(lat, lng)) {
+            return () => undefined;
+        } else {
+            var marker = this.leaflet.marker(this.leaflet.latLng(lat, lng), {
+                icon: this.itemLeafletIcon
+            });
+            marker.addTo(this.map);
+
+            return () => {
+                this.map.removeLayer(marker);
+            };
+        }
     }
 }
 
