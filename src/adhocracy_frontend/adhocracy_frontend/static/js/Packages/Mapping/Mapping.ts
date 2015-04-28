@@ -274,7 +274,7 @@ export interface IMapListScope<T> extends angular.IScope {
     getNextItem(item : IItem<T>) : void;
     showZoomButton : boolean;
     resetMap() : void;
-    visible : number;
+    visibleItems : number;
 }
 
 export var mapListingInternal = (
@@ -331,7 +331,7 @@ export var mapListingInternal = (
             var itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
 
             scope.items = [];
-            scope.visible = 0;
+            scope.visibleItems = 0;
             _.forEach(scope.itemValues, (url, key) => {
 
                 adhHttp.get(AdhUtil.parentPath(url), {
@@ -357,7 +357,7 @@ export var mapListingInternal = (
 
                         var hide = (value.lat === 0 && value.lat === 0);
                         if (!hide) {
-                            scope.visible++;
+                            scope.visibleItems++;
                         }
 
                         var item = {
@@ -387,12 +387,12 @@ export var mapListingInternal = (
 
             map.on("moveend", () => {
                 var bounds = map.getBounds();
-                scope.visible = 0;
+                scope.visibleItems = 0;
                 $timeout(() => {
                     _.forEach(scope.items, (item) => {
                         if (bounds.contains(item.marker.getLatLng())) {
                             item.hide = false;
-                            scope.visible++;
+                            scope.visibleItems++;
                         } else {
                             item.hide = true;
                         }
