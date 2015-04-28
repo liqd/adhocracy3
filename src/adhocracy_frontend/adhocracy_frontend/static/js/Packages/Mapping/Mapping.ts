@@ -276,6 +276,9 @@ export interface IMapListScope<T> extends angular.IScope {
 
 export class MapListingController {
     private map : L.Map;
+    private scrollContainer;
+    private selectedItemLeafletIcon;
+    private itemLeafletIcon;
 
     constructor(
         private $scope : IMapListScope<any>,
@@ -284,16 +287,7 @@ export class MapListingController {
         private $timeout : angular.ITimeoutService,
         private leaflet : typeof L
     ) {
-        var scrollContainer = this.$element.find(".map-list-scroll-container-inner");
-        var scrollToItem = (key) : void => {
-            var element = this.$element.find(".map-list-item" + key);
-            if (this.$attrs.orientation === "vertical") {
-                (<any>scrollContainer).scrollToElement(element, 10, 300);
-            } else {
-                var left = element.width() * key;
-                (<any>scrollContainer).scrollTo(left, 0, 800);
-            }
-        };
+        this.scrollContainer = this.$element.find(".map-list-scroll-container-inner");
 
         var mapElement = this.$element.find(".map-list-map");
         mapElement.height(this.$scope.height);
@@ -310,8 +304,8 @@ export class MapListingController {
              minZoom: this.map.getZoom()
         });
 
-        var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
-        var itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
+        this.selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
+        this.itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
 
         this.$scope.items = [];
         this.$scope.visibleItems = 0;
@@ -345,7 +339,7 @@ export class MapListingController {
         //
         //             var item = {
         //                 value: value,
-        //                 marker: L.marker(leaflet.latLng(value.lat, value.lng), {icon: itemLeafletIcon}),
+        //                 marker: L.marker(leaflet.latLng(value.lat, value.lng), {icon: this.itemLeafletIcon}),
         //                 hide: hide,
         //                 index: key
         //             };
@@ -354,13 +348,13 @@ export class MapListingController {
         //             item.marker.on("click", (e) => {
         //                 this.$timeout(() => {
         //                     this.$scope.toggleItem(item);
-        //                     scrollToItem(item.index);
+        //                     this.scrollToItem(item.index);
         //                 });
         //             });
         //
         //             if (key === 0) {
         //                 this.$scope.selectedItem = item;
-        //                 <any>this.$scope.selectedItem.marker.setIcon(selectedItemLeafletIcon);
+        //                 <any>this.$scope.selectedItem.marker.setIcon(this.selectedItemLeafletIcon);
         //             }
         //             // this.$scope.items.push(item);
         //
@@ -388,10 +382,10 @@ export class MapListingController {
 
         this.$scope.toggleItem = (item) => {
             if (typeof this.$scope.selectedItem !== "undefined") {
-                this.$scope.selectedItem.marker.setIcon(itemLeafletIcon);
+                this.$scope.selectedItem.marker.setIcon(this.itemLeafletIcon);
             }
             this.$scope.selectedItem = item;
-            item.marker.setIcon(selectedItemLeafletIcon);
+            item.marker.setIcon(this.selectedItemLeafletIcon);
         };
 
         this.$scope.getPreviousItem = (item) => {
@@ -400,7 +394,7 @@ export class MapListingController {
                 index = loopCarousel(index - 1, this.$scope.items.length);
             }
             this.$scope.toggleItem(this.$scope.items[index]);
-            scrollToItem(index);
+            this.scrollToItem(index);
         };
 
         this.$scope.getNextItem = (item) => {
@@ -409,7 +403,7 @@ export class MapListingController {
                 index = loopCarousel(index + 1, this.$scope.items.length);
             }
             this.$scope.toggleItem(this.$scope.items[index]);
-            scrollToItem(index);
+            this.scrollToItem(index);
         };
 
         this.$scope.resetMap = () => {
@@ -424,9 +418,19 @@ export class MapListingController {
         };
     }
 
+    private scrollToItem(key) : void {
+        var element = this.$element.find(".map-list-item" + key);
+        if (this.$attrs.orientation === "vertical") {
+            (<any>this.scrollContainer).scrollToElement(element, 10, 300);
+        } else {
+            var left = element.width() * key;
+            (<any>this.scrollContainer).scrollTo(left, 0, 800);
+        }
+    };
+
     public registerListItem(lat : number, lng : number) : () => void {
         var marker = this.leaflet.marker(this.leaflet.latLng(lat, lng), {
-            icon: (<any>this.leaflet).divIcon(cssItemIcon)
+            icon: this.itemLeafletIcon
         });
         marker.addTo(this.map);
 
