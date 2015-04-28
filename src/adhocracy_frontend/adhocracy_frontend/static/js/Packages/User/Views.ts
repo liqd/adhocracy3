@@ -155,7 +155,10 @@ export var registerDirective = (
             scope.termsUrl = adhConfig.terms_url;
             scope.showError = adhShowError;
 
-            scope.$watch(() => adhUser.loggedIn, function(value) {
+            scope.logOut = () => {
+                adhUser.logOut();
+            };
+
             scope.$watch(() => adhUser.loggedIn, (value) => {
                 scope.loggedIn = value;
             });
@@ -163,9 +166,6 @@ export var registerDirective = (
             scope.$watch(() => adhUser.data, (value) => {
                 if (value) {
                     scope.userName = value.name;
-                    scope.logOut = () => {
-                        adhUser.logOut();
-                    };
                 }
             });
 
