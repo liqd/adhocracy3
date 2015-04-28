@@ -1,5 +1,5 @@
 <div class="login">
-    <form novalidate="novalidate" class="login-form" name="registerForm" data-ng-if="!success" data-ng-submit="register()">
+    <form novalidate="novalidate" class="login-form" name="registerForm" data-ng-if="!success && !loggedIn" data-ng-submit="register()">
         <div class="form-error" ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
@@ -79,12 +79,19 @@
             }"></p>
         </div>
     </form>
-
-    <div data-ng-if="success" class="login-success">
-        <p>{{ "TR__REGISTER_SUCCESS" | translate }}</p>
-        <p>{{ "TR__CALL_FOR_ACTIVATION" | translate:{siteName: siteName} }}</p>
+    <div data-ng-if="!success && loggedIn" class="login-success">
+        <p>{{ "TR__REGISTRATION_ALREADY_LOGGED_IN.text1" | translate }}
+        <a href="" data-ng-click="logOut()">{{ "TR__LOGOUT" | translate }}</a>
+        {{ "TR__REGISTRATION_ALREADY_LOGGED_IN.text2" | translate }}</p>
     </div>
-
+    <div data-ng-if="success && !loggedIn" class="login-success">
+        <p>{{ "TR__REGISTER_SUCCESS" | translate }}</p>
+        <p>{{ "TR__REGISTRATION_CALL_FOR_ACTIVATION" | translate:{siteName: siteName} }}</p>
+    </div>
+    <div data-ng-if="success && loggedIn" class="login-success">
+        <p>{{ "TR__REGISTRATION_THANKS_FOR_REGISTERING" | translate:{siteName: siteName, userName: userName} }}</p>
+        <p>{{ "TR__REGISTRATION_CLOSE_THIS_TAB_AND_PROCEED" | translate:{siteName: siteName} }}</p>
+    </div>
     <a class="login-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
     <div class="login-info">
         {{ "TR__REGISTRATION_SUPPORT" | translate }} <br />

@@ -40,6 +40,8 @@ export interface IScopeRegister {
         password : string;
         passwordRepeat : string;
     };
+    loggedIn : boolean;
+    userName : string;
     siteName : string;
     termsUrl : string;
     errors : string[];
@@ -147,10 +149,25 @@ export var registerDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        link: (scope : IScopeRegister) => {
+        link: (scope) => {
             scope.siteName = adhConfig.site_name;
             scope.termsUrl = adhConfig.terms_url;
             scope.showError = adhShowError;
+
+            scope.$watch(() => adhUser.loggedIn, function(value) {
+                scope.loggedIn = value;
+            });
+
+
+            scope.$watch(() => adhUser.data, function(value) {
+                if(value) {
+                    console.log(adhUser);
+                    scope.userName = value.name;
+                    scope.logOut = () => {
+                        adhUser.logOut();
+                    };
+                }
+            });
 
             scope.input = {
                 username: "",
