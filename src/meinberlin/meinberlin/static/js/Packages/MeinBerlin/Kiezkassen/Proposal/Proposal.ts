@@ -4,6 +4,7 @@ import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
+import AdhMapping = require("../../../Mapping/Mapping");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../../../Rate/Rate");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
@@ -204,11 +205,20 @@ export var mapListItemDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MapListItem.html",
+        require: "^adhMapListingInternal",
         scope: {
             path: "@"
         },
-        link: (scope : IScope) => {
+        link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
             bindPath(adhHttp, adhRate)(scope);
+
+            var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
+                if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
+                    scope.$on("$destroy", mapListing.registerListItem(values[0], values[1]));
+                    unregister();
+                }
+            });
+
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
@@ -342,6 +352,7 @@ export var register = (angular) => {
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
+            AdhMapping.moduleName,
             AdhRate.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName

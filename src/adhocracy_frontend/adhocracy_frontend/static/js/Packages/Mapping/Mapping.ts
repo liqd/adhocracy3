@@ -15,13 +15,8 @@ import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhHttp = require("../Http/Http");  if (AdhHttp) { ; }
 import AdhPermissions = require("../Permissions/Permissions");  if (AdhPermissions) { ; }
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");  if (AdhPreliminaryNames) { ; }
-import AdhUtil = require("../Util/Util");
 
 import AdhMappingUtils = require("./MappingUtils");
-
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 
 var pkgLocation = "/Mapping";
 
@@ -275,6 +270,26 @@ export interface IMapListScope<T> extends angular.IScope {
     showZoomButton : boolean;
     resetMap() : void;
     visibleItems : number;
+
+    map : L.Map;
+}
+
+export class MapListingController {
+    constructor(
+        private $scope : IMapListScope<any>,
+        private leaflet : typeof L
+    ) {}
+
+    public registerListItem(lat : number, lng : number) : () => void {
+        var marker = this.leaflet.marker(this.leaflet.latLng(lat, lng), {
+            icon: (<any>this.leaflet).divIcon(cssItemIcon)
+        });
+        marker.addTo(this.$scope.map);
+
+        return () => {
+            this.$scope.map.removeLayer(marker);
+        };
+    }
 }
 
 export var mapListingInternal = (
@@ -298,7 +313,7 @@ export var mapListingInternal = (
                 return adhConfig.pkg_path + pkgLocation + "/ListingInternalHorizontal.html";
             }
         },
-
+        controller: ["$scope", "leaflet", MapListingController],
         link: (scope : IMapListScope<any>, element, attrs) => {
 
             var scrollContainer = angular.element(".map-list-scroll-container-inner");
@@ -316,6 +331,7 @@ export var mapListingInternal = (
             mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
+            scope.map = map;  // FIXME
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
@@ -332,58 +348,58 @@ export var mapListingInternal = (
 
             scope.items = [];
             scope.visibleItems = 0;
-            _.forEach(scope.itemValues, (url, key) => {
-
-                adhHttp.get(AdhUtil.parentPath(url), {
-                    content_type: RICommentVersion.content_type,
-                    depth: "all",
-                    tag: "LAST",
-                    count: true
-                }).then((pool) => {
-                    adhHttp.get(url).then((resource) => {
-                        // FIXME: This is specific to meinberlin and should not be on adhocracy_core
-                        var mainSheet = resource.data["adhocracy_meinberlin.sheets.kiezkassen.IProposal"];
-                        var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
-                        var poolSheet = pool.data[SIPool.nick];
-
-                        var value = {
-                            url: url,
-                            title: mainSheet.title,
-                            locationText: mainSheet.location_text,
-                            commentCount: poolSheet.count,
-                            lng: pointSheet.x,
-                            lat: pointSheet.y
-                        };
-
-                        var hide = (value.lat === 0 && value.lat === 0);
-                        if (!hide) {
-                            scope.visibleItems++;
-                        }
-
-                        var item = {
-                            value: value,
-                            marker: L.marker(leaflet.latLng(value.lat, value.lng), {icon: itemLeafletIcon}),
-                            hide: hide,
-                            index: key
-                        };
-
-                        item.marker.addTo(map);
-                        item.marker.on("click", (e) => {
-                            $timeout(() => {
-                                scope.toggleItem(item);
-                                scrollToItem(item.index);
-                            });
-                        });
-
-                        if (key === 0) {
-                            scope.selectedItem = item;
-                            <any>scope.selectedItem.marker.setIcon(selectedItemLeafletIcon);
-                        }
-                        scope.items.push(item);
-
-                    });
-                });
-            });
+            // _.forEach(scope.itemValues, (url, key) => {
+            //
+            //     adhHttp.get(AdhUtil.parentPath(url), {
+            //         content_type: RICommentVersion.content_type,
+            //         depth: "all",
+            //         tag: "LAST",
+            //         count: true
+            //     }).then((pool) => {
+            //         adhHttp.get(url).then((resource) => {
+            //             // FIXME: This is specific to meinberlin and should not be on adhocracy_core
+            //             var mainSheet = resource.data["adhocracy_meinberlin.sheets.kiezkassen.IProposal"];
+            //             var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+            //             var poolSheet = pool.data[SIPool.nick];
+            //
+            //             var value = {
+            //                 url: url,
+            //                 title: mainSheet.title,
+            //                 locationText: mainSheet.location_text,
+            //                 commentCount: poolSheet.count,
+            //                 lng: pointSheet.x,
+            //                 lat: pointSheet.y
+            //             };
+            //
+            //             var hide = (value.lat === 0 && value.lat === 0);
+            //             if (!hide) {
+            //                 scope.visibleItems++;
+            //             }
+            //
+            //             var item = {
+            //                 value: value,
+            //                 marker: L.marker(leaflet.latLng(value.lat, value.lng), {icon: itemLeafletIcon}),
+            //                 hide: hide,
+            //                 index: key
+            //             };
+            //
+            //             item.marker.addTo(map);
+            //             item.marker.on("click", (e) => {
+            //                 $timeout(() => {
+            //                     scope.toggleItem(item);
+            //                     scrollToItem(item.index);
+            //                 });
+            //             });
+            //
+            //             if (key === 0) {
+            //                 scope.selectedItem = item;
+            //                 <any>scope.selectedItem.marker.setIcon(selectedItemLeafletIcon);
+            //             }
+            //             // scope.items.push(item);
+            //
+            //         });
+            //     });
+            // });
 
             map.on("moveend", () => {
                 var bounds = map.getBounds();
