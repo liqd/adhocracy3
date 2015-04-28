@@ -254,7 +254,7 @@ export interface IMapListScope extends angular.IScope {
     height : number;
     polygon : L.Polygon;
     rawPolygon : number[][];
-    itemValues : string[];
+    items : string[];
     selectedPath : string;
     selectItem(path : string) : void;
     getPreviousItem() : void;
@@ -337,7 +337,7 @@ export class MapListingController {
         map.on("moveend", () => {
             this.$scope.visibleItems = 0;
             this.$timeout(() => {
-                _.forEach(this.$scope.itemValues, (path) => {
+                _.forEach(this.$scope.items, (path) => {
                     if (this.isVisible(path)) {
                         this.$scope.visibleItems++;
                     }
@@ -353,7 +353,7 @@ export class MapListingController {
         var mod = (index, total) => (index + total) % total;
 
         var initialIndex = this.pathToIndex(this.$scope.selectedPath);
-        var total = this.$scope.itemValues.length;
+        var total = this.$scope.items.length;
 
         var index = mod(initialIndex + offset, total);
         var counter = 0;
@@ -396,11 +396,11 @@ export class MapListingController {
     }
 
     private pathToIndex(path : string) : number {
-        return this.$scope.itemValues.indexOf(path);
+        return this.$scope.items.indexOf(path);
     }
 
     private indexToPath(index : number) : string {
-        return this.$scope.itemValues[index];
+        return this.$scope.items[index];
     }
 
     private isUndefinedLatLng(lat : number, lng : number) : boolean {
@@ -445,7 +445,7 @@ export var mapListingInternal = (
         scope: {
             height: "@",
             rawPolygon: "=polygon",
-            itemValues: "=items"
+            items: "="
         },
         restrict: "E",
         transclude: true,
