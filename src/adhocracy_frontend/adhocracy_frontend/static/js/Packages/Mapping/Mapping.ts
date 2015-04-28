@@ -424,6 +424,9 @@ export class MapListingController {
             }
 
             return () => {
+                if (this.isVisible(path)) {
+                    this.$scope.visibleItems--;
+                }
                 delete this.markers[path];
                 this.map.removeLayer(marker);
             };
