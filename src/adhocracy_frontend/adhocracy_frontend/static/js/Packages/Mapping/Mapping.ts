@@ -370,6 +370,9 @@ export class MapListingController {
     }
 
     private scrollToItem(path : string) : void {
+        // FIXME: this needs to be retriggered when the widget
+        // is resized or the index of an item changes.
+
         var index = this.pathToIndex(path);
         var width = this.$element.find(".map-list-item").width();
 
