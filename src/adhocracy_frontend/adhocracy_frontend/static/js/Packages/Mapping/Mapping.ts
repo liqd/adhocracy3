@@ -277,10 +277,12 @@ export interface IMapListScope<T> extends angular.IScope {
     visible: number;
 }
 
-export var mapListingInternal = (adhConfig : AdhConfig.IService,
-                                 adhHttp : AdhHttp.Service<any>,
-                                 leaflet : typeof L,
-                                 $timeout : angular.ITimeoutService) => {
+export var mapListingInternal = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    leaflet : typeof L,
+    $timeout : angular.ITimeoutService
+) => {
     return {
         scope: {
             height: "@",
@@ -395,7 +397,6 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService,
                             item.hide = true;
                         }
                     });
-
                 });
                 scope.showZoomButton = true;
             });
@@ -432,7 +433,7 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService,
                 map.fitBounds(scope.polygon.getBounds());
 
                 // this is hacky but I could not find how to add
-                // a callbackfunction to fitbounds as this always
+                // a callback function to fitbounds as this always
                 // triggers the moveend event.
                 $timeout(() => {
                     scope.showZoomButton = false;
