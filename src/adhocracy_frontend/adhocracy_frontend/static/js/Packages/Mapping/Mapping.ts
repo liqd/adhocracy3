@@ -289,23 +289,10 @@ export class MapListingController {
     ) {
         this.scrollContainer = this.$element.find(".map-list-scroll-container-inner");
 
-        var mapElement = this.$element.find(".map-list-map");
-        mapElement.height(this.$scope.height);
-
-        this.map = leaflet.map(mapElement[0]);
-        leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(this.map);
-
-        this.$scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), style);
-        this.$scope.polygon.addTo(this.map);
-
-        // limit map to polygon
-        this.map.fitBounds(this.$scope.polygon.getBounds());
-        leaflet.Util.setOptions(this.map, {
-             minZoom: this.map.getZoom()
-        });
-
         this.selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
         this.itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
+
+        this.map = this.createMap();
 
         this.$scope.items = [];
         this.$scope.visibleItems = 0;
@@ -416,6 +403,25 @@ export class MapListingController {
                 this.$scope.showZoomButton = false;
             }, 300);
         };
+    }
+
+    private createMap() {
+        var mapElement = this.$element.find(".map-list-map");
+        mapElement.height(this.$scope.height);
+
+        var map = this.leaflet.map(mapElement[0]);
+        this.leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+
+        this.$scope.polygon = this.leaflet.polygon(this.leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), style);
+        this.$scope.polygon.addTo(map);
+
+        // limit map to polygon
+        map.fitBounds(this.$scope.polygon.getBounds());
+        this.leaflet.Util.setOptions(map, {
+             minZoom: map.getZoom()
+        });
+
+        return map;
     }
 
     private scrollToItem(key) : void {
