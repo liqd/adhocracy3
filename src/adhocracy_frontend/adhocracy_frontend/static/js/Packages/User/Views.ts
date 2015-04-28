@@ -15,7 +15,7 @@ import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/I
 var pkgLocation = "/User";
 
 
-export interface IScopeLogin {
+export interface IScopeLogin extends angular.IScope {
     user : AdhUser.Service;
     loginForm : angular.IFormController;
     credentials : {
@@ -32,7 +32,7 @@ export interface IScopeLogin {
 }
 
 
-export interface IScopeRegister {
+export interface IScopeRegister extends angular.IScope {
     registerForm : angular.IFormController;
     input : {
         username : string;
@@ -51,6 +51,7 @@ export interface IScopeRegister {
     register : () => angular.IPromise<void>;
     cancel : () => void;
     showError;
+    logOut : () => void;
 }
 
 
@@ -149,16 +150,17 @@ export var registerDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        link: (scope) => {
+        link: (scope : IScopeRegister) => {
             scope.siteName = adhConfig.site_name;
             scope.termsUrl = adhConfig.terms_url;
             scope.showError = adhShowError;
 
             scope.$watch(() => adhUser.loggedIn, function(value) {
+            scope.$watch(() => adhUser.loggedIn, (value) => {
                 scope.loggedIn = value;
             });
 
-            scope.$watch(() => adhUser.data, function(value) {
+            scope.$watch(() => adhUser.data, (value) => {
                 if (value) {
                     scope.userName = value.name;
                     scope.logOut = () => {
