@@ -275,6 +275,8 @@ export interface IMapListScope<T> extends angular.IScope {
 }
 
 export class MapListingController {
+    private map : L.Map;
+
     constructor(
         private $scope : IMapListScope<any>,
         private $element,
@@ -296,17 +298,16 @@ export class MapListingController {
         var mapElement = this.$element.find(".map-list-map");
         mapElement.height(this.$scope.height);
 
-        var map = leaflet.map(mapElement[0]);
-        this.$scope.map = map;  // FIXME
-        leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+        this.map = leaflet.map(mapElement[0]);
+        leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(this.map);
 
         this.$scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), style);
-        this.$scope.polygon.addTo(map);
+        this.$scope.polygon.addTo(this.map);
 
         // limit map to polygon
-        map.fitBounds(this.$scope.polygon.getBounds());
-        leaflet.Util.setOptions(map, {
-             minZoom: map.getZoom()
+        this.map.fitBounds(this.$scope.polygon.getBounds());
+        leaflet.Util.setOptions(this.map, {
+             minZoom: this.map.getZoom()
         });
 
         var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
@@ -349,7 +350,7 @@ export class MapListingController {
         //                 index: key
         //             };
         //
-        //             item.marker.addTo(map);
+        //             item.marker.addTo(this.map);
         //             item.marker.on("click", (e) => {
         //                 this.$timeout(() => {
         //                     this.$scope.toggleItem(item);
@@ -367,8 +368,8 @@ export class MapListingController {
         //     });
         // });
 
-        map.on("moveend", () => {
-            var bounds = map.getBounds();
+        this.map.on("moveend", () => {
+            var bounds = this.map.getBounds();
             this.$scope.visibleItems = 0;
             this.$timeout(() => {
                 _.forEach(this.$scope.items, (item) => {
@@ -412,7 +413,7 @@ export class MapListingController {
         };
 
         this.$scope.resetMap = () => {
-            map.fitBounds(this.$scope.polygon.getBounds());
+            this.map.fitBounds(this.$scope.polygon.getBounds());
 
             // this is hacky but I could not find how to add
             // a callback function to fitbounds as this always
@@ -427,10 +428,10 @@ export class MapListingController {
         var marker = this.leaflet.marker(this.leaflet.latLng(lat, lng), {
             icon: (<any>this.leaflet).divIcon(cssItemIcon)
         });
-        marker.addTo(this.$scope.map);
+        marker.addTo(this.map);
 
         return () => {
-            this.$scope.map.removeLayer(marker);
+            this.map.removeLayer(marker);
         };
     }
 }
