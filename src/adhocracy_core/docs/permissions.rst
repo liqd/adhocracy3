@@ -242,14 +242,16 @@ Cannot create process content::
 
     >>> resp_data = testapp.options(pool, headers=admin_header).json
     >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-    ['adhocracy_core.resources.asset.IPoolWithAssets',
+    ['adhocracy_core.interfaces.IPool',
+     'adhocracy_core.resources.asset.IPoolWithAssets',
      'adhocracy_core.resources.pool.IBasicPool']
 
 Can create process structure::
 
     >>> resp_data = testapp.options(pool, headers=admin_header).json
     >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-    ['adhocracy_core.resources.asset.IPoolWithAssets',
+    ['adhocracy_core.interfaces.IPool',
+     'adhocracy_core.resources.asset.IPoolWithAssets',
      'adhocracy_core.resources.pool.IBasicPool']
 
 FIXME Can edit process structure, but we don't have an example for that yet.
