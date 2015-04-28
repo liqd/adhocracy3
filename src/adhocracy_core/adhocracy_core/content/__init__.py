@@ -83,7 +83,7 @@ class ResourceContentRegistry(ContentRegistry):
             resources_addables[iresource] = all_addables
         return resources_addables
 
-    @reify
+    @property
     def permissions(self) -> [str]:
         """Set of all permissions defined in the system."""
         perms = {'hide_resource', 'edit_group', 'do_transition'}  # built-in permissions
