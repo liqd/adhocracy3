@@ -38,8 +38,20 @@ def integration(config):
     config.include('adhocracy_core.resources.pool')
     config.include('adhocracy_core.resources.principal')
     config.include('adhocracy_core.resources.subscriber')
+    config.include('adhocracy_core.resources.comment')
+    config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.item')
+    config.include('adhocracy_core.resources.sample_paragraph')
+    config.include('adhocracy_core.resources.sample_proposal')
+    config.include('adhocracy_core.resources.sample_section')
+    config.include('adhocracy_core.resources.external_resource')
+    config.include('adhocracy_core.rest')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.messaging')
+    # TODO remove the following include once permissions in root_acm
+    # have been splitted for each platform
+    config.include('adhocracy_mercator.resources.mercator')
+    config.include('adhocracy_mercator.sheets.mercator')
 
 
 @mark.usefixtures('integration')
