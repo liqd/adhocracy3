@@ -3,6 +3,7 @@
     "TR__ACTIVATION_ERROR_2": "Please excuse the inconvience and make sure you activate your account within the next 6 days.",
     "TR__ACTIVATION_ERROR_3": "Thanks!",
     "TR__ACTIVATION_ERROR_SUPPORT": "To request a new link, please contact our support team, explicitly stating the email address you registered with, via",
+    "TR__CREATE_PASSWORD_RESET_PROCEED": "Proceed back to [[link:{{siteName}}]].",
     "TR__AUTHOR": "author",
     "TR__BACK_TO_TOP": "back to top",
     "TR__REGISTRATION_THANKS_FOR_REGISTERING": "HI, {{userName}}! Thanks for registering with {{siteName}}.",
