@@ -4,6 +4,7 @@ import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
+import AdhMapping = require("../../../Mapping/Mapping");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../../../Rate/Rate");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
@@ -197,6 +198,42 @@ export var listItemDirective = (
     };
 };
 
+export var mapListItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapListItem.html",
+        require: "^adhMapListingInternal",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
+            bindPath(adhHttp, adhRate)(scope);
+
+            var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
+                if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
+                    scope.$on("$destroy", mapListing.registerListItem(scope.path, values[0], values[1]));
+                    unregister();
+                }
+            });
+
+            scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    scope.selectedState = "";
+                } else if (proposalVersionUrl === scope.path) {
+                    scope.selectedState = "is-selected";
+                } else {
+                    scope.selectedState = "is-not-selected";
+                }
+            }));
+        }
+    };
+};
+
 export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -317,6 +354,7 @@ export var register = (angular) => {
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
+            AdhMapping.moduleName,
             AdhRate.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName
@@ -329,6 +367,8 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", "adhRate", detailDirective])
         .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", "adhRate", "adhTopLevelState", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
+            "adhConfig", "adhHttp", "adhRate", "adhTopLevelState", mapListItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
             "adhConfig",
             "adhHttp",
