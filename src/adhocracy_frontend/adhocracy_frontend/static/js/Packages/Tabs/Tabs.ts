@@ -10,6 +10,7 @@ var pkgLocation = "/Tabs";
 export interface ITabScope extends angular.IScope {
     active : boolean;
     heading : string;
+    classes : string;
     select() : void;
     height : number;
 }
@@ -109,7 +110,8 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tab.html",
         scope: {
             active: "=?",
-            heading: "@"
+            heading: "@",
+            classes: "@"
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
             scope.height = 0;
