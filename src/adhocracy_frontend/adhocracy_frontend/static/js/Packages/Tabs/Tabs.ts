@@ -80,7 +80,7 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tabset.html",
         controller: ["$scope", "$element", TabSetController],
         link: (scope, element, attrs) => {
-            if(attrs.fullWidth) {
+            if (attrs.fullWidth) {
                 scope.$watch(() => scope.tabs.length, (value : number) => {
                     if (value !== 0) {
                         var tabWidth = Math.floor(100 / value);
@@ -88,7 +88,7 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
                     }
                 });
             }
-            if(attrs.paneAbove) {
+            if (attrs.paneAbove) {
                 element.find(".tabset-panes").prependTo(element.find(".tabset"));
             }
         }
