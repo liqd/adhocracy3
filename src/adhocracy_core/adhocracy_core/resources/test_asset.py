@@ -15,10 +15,12 @@ def test_asset_meta():
     from adhocracy_core.sheets.metadata import IMetadata
     from adhocracy_core.sheets.asset import IAssetData
     from adhocracy_core.sheets.asset import IAssetMetadata
+    from adhocracy_core.sheets.title import ITitle
     meta = asset_meta
     assert meta.iresource is IAsset
     assert IMetadata in meta.basic_sheets
     assert IAssetData in meta.basic_sheets
+    assert ITitle in meta.basic_sheets
     assert IAssetMetadata in meta.extended_sheets
     assert meta.use_autonaming
     assert meta.permission_add == 'add_asset'

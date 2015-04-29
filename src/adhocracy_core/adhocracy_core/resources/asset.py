@@ -20,6 +20,7 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import raise_colander_style_error
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
+import adhocracy_core.sheets.title
 
 
 class IAssetDownload(ISimple):
@@ -131,6 +132,7 @@ asset_meta = pool_meta._replace(
     basic_sheets=[
         adhocracy_core.sheets.metadata.IMetadata,
         adhocracy_core.sheets.asset.IAssetData,
+        adhocracy_core.sheets.title.ITitle,
     ],
     extended_sheets=[
         # all subtypes need to provide an IAssetMetadata sheet
