@@ -1,19 +1,22 @@
-/// <reference path="../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAbuse = require("../../Abuse/Abuse");
-import AdhConfig = require("../../Config/Config");
-import AdhHttp = require("../../Http/Http");
-import AdhMovingColumns = require("../../MovingColumns/MovingColumns");
-import AdhProcess = require("../../Process/Process");
-import AdhResourceArea = require("../../ResourceArea/ResourceArea");
-import AdhUser = require("../../User/User");
+import AdhAbuse = require("../../../Abuse/Abuse");
+import AdhConfig = require("../../../Config/Config");
+import AdhHttp = require("../../../Http/Http");
+import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
+import AdhProcess = require("../../../Process/Process");
+import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import AdhUser = require("../../../User/User");
 
-import RICommentVersion = require("../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIKiezkassenProcess = require("../../../Resources_/adhocracy_core/resources/pool/IBasicPool");  // FIXME
-import RIProposalVersion = require("../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIComment = require("../../../Resources_/adhocracy_core/sheets/comment/IComment");
+import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
+import AdhMeinBerlinKiezkassenProposal = require("../Proposal/Proposal");
 
-var pkgLocation = "/MeinBerlin/Workbench";
+import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_core/resources/pool/IBasicPool");  // FIXME
+import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
+import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
+
+var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
 
 export var meinBerlinWorkbenchDirective = (adhConfig : AdhConfig.IService) => {
@@ -91,6 +94,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhAbuse.moduleName,
             AdhHttp.moduleName,
+            AdhMeinBerlinKiezkassenProcess.moduleName,
+            AdhMeinBerlinKiezkassenProposal.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
             AdhResourceArea.moduleName,
