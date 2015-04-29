@@ -78,7 +78,15 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
         scope: {},
         transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tabset.html",
-        controller: ["$scope", "$element", TabSetController]
+        controller: ["$scope", "$element", TabSetController],
+        link: (scope, element, attrs) => {
+            console.log(scope.tabs);
+            scope.$watch(() => scope.tabs.length, (value : number) => {
+                if (value !== 0) {
+                    element.find(".tabset-tabs").attr("tab-total", scope.tabs.length);
+                }
+            });
+        }
     };
 };
 
