@@ -84,14 +84,14 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
                 scope.$watch(() => scope.tabs.length, (value : number) => {
                     if (value !== 0) {
                         var tabWidth = Math.floor(100 / value);
-                        element.find(".tabset-tabs").addClass("full-width")
+                        element.find(".tabset").addClass("full-width")
                             .find(".tab").css("width", tabWidth + "%");
                     }
                 });
             }
             if (attrs.paneAbove) {
                 element.find(".tabset-panes").prependTo(element.find(".tabset"));
-                element.find(".tabset-tabs").addClass("pane-above");
+                element.find(".tabset").addClass("pane-above");
             }
         }
     };

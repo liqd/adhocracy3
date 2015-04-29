@@ -1,0 +1,61 @@
+.tabset {
+    &.full-width {
+        .tab {
+            text-align: center;
+        }
+    }
+
+    &.pane-above {
+        .tab {
+            &.is-active {
+                a {
+                    border-width: 0 1px 1px;
+                    top: -1px;
+                }
+            }
+        }
+    }
+}
+
+.tabset-tabs {
+    margin: 0;
+    padding: 0;
+
+    .tab {
+        @include inline-block;
+        list-style: none;
+
+        a {
+            background: $color-structure-border;
+            color: $color-text-inverted;
+            display: block;
+            margin-right: 1px;
+            padding: 0.5em 1em;
+        }
+
+        &:last-child {
+            a {
+                margin-right: 0;
+            }
+        }
+
+        &.is-active {
+            a {
+                background: $color-background-base-introvert;
+                border: 1px solid $color-structure-border;
+                border-width: 1px 1px 0;
+                color: $color-text-normal;
+                font-weight: bold;
+                position: relative;
+                top: 1px;
+            }
+        }
+    }
+}
+
+.tabset-panes {
+    @include box-sizing(content-box);
+    background: $color-background-base-introvert;
+    border: 1px solid $color-structure-border;
+    padding: 1em;
+}
