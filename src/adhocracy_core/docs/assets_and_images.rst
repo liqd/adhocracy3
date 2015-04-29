@@ -224,10 +224,10 @@ child element::
     >>> resp_data = testapp.get(pic_path + 'thumbnail')
     >>> resp_data.content_type
     'image/jpeg'
-    >>> detail_size = len(resp_data.body)
-    >>> detail_size < 3000
+    >>> thumbnail_size = len(resp_data.body)
+    >>> thumbnail_size > 2000
     True
-    >>> detail_size < original_size
+    >>> thumbnail_size < original_size
     True
 
 
@@ -246,8 +246,9 @@ Lets post a new proposal version that refers to the image::
     ...              'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'title': 'We need more pics!',
     ...                     'description': 'Or maybe just nicer ones?',
-    ...                     'picture': pic_path,
     ...                     'elements': []},
+    ...                  'adhocracy_core.sheets.image.IImageReference': {
+    ...                      'picture': pic_path},
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [prop_v0_path]}},
     ...          'root_versions': [prop_v0_path]}
@@ -324,10 +325,10 @@ changed accordingly::
 
 Predefined scaled+cropped views are automatically updated as well::
 
-    >>> resp_data = testapp.get(pic_path + 'detail')
-    >>> len(resp_data.body) > 10000
+    >>> resp_data = testapp.get(pic_path + 'thumbnail')
+    >>> len(resp_data.body) > 2000
     True
-    >>> len(resp_data.body) == detail_size
+    >>> len(resp_data.body) == thumbnail_size
     False
 
 
