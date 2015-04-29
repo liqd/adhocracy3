@@ -37,6 +37,7 @@ export interface IScope extends angular.IScope {
         detail : string;
         creatorParticipate : boolean;
         locationText : string;
+        address : string;
         creator : string;
         creationDate : string;
         commentCount : number;
@@ -84,8 +85,10 @@ var bindPath = (
                             budget: mainSheet.budget,
                             detail: descriptionSheet.description,
                             creatorParticipate: mainSheet.creator_participate,
+                            address: mainSheet.address,
                             rateCount: ratesPro - ratesContra,
                             locationText: mainSheet.location_text,
+                            adlocationText: mainSheet.location_text,
                             creator: metadataSheet.creator,
                             creationDate: metadataSheet.item_creation_date,
                             commentCount: poolSheet.count,
@@ -111,7 +114,8 @@ var fill = (
         budget: scope.data.budget,
         detail: scope.data.detail,
         creator_participate: scope.data.creatorParticipate,
-        location_text: scope.data.locationText
+        location_text: scope.data.locationText,
+        address: scope.data.address
     });
     proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
         coordinates: [scope.data.lng, scope.data.lat]
