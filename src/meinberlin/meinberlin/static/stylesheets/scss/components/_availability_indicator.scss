@@ -1,7 +1,7 @@
 /*doc
 ---
-title: participation icons
-name: m-icon-participation
+title: availablity indicator
+name: m-availability-indicator
 category: Icons
 ---
 
@@ -10,11 +10,11 @@ phase. If the feature is available, they have the status `is-available`.
 
 ```html_example
 <div style="font-size: 20px">
-    <i class="icon-comment-gap m-icon-participation is-available"></i>
-    <i class="icon-voting-gap m-icon-participation"></i>
+    <i class="icon-comment-gap m-availability-indicator is-available"></i>
+    <i class="icon-voting-gap m-availability-indicator"></i>
 </div>
 */
-.m-icon-participation {
+.m-availability-indicator {
     position: relative;
 
     &:after {
