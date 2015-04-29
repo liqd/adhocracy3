@@ -215,6 +215,7 @@ export var passwordResetDirective = (
         scope: {},
         link: (scope) => {
             scope.showError = adhShowError;
+            scope.success = false;
 
             scope.input = {
                 password: "",
@@ -233,7 +234,7 @@ export var passwordResetDirective = (
                     password: scope.input.password
                 }).then((response) => {
                     adhUser.storeAndEnableToken(response.data.user_token, response.data.user_path);
-                    adhTopLevelState.redirectToCameFrom("/");
+                    scope.success = true;
                 }, AdhHttp.logBackendError)
                 .catch((errors) => bindServerErrors(scope, errors));
             };
