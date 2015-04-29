@@ -71,28 +71,34 @@ var bindServerErrors = (
 };
 
 
-export var activateController = (
+export var activateArea = (
+    adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
     adhDone,
+    $scope,
     $location : angular.ILocationService
-) : void => {
+) : AdhTopLevelState.IAreaInput => {
+    $scope.translationData = {
+        supportEmail: adhConfig.support_email
+    };
+    $scope.success = false;
+    $scope.ready = false;
+
     var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
 
-    var success = () => {
-        // FIXME show success message in UI
-        // FIXME extract cameFrom from activation key (involves BE)
-        adhTopLevelState.redirectToCameFrom("/");
-    };
-
-    var error = () => {
-        $location.url("activation_error");
-    };
-
     adhUser.activate(path)
-        .then(success, error)
-        .then(adhDone);
+        .then(() => {
+            $scope.success = true;
+        })
+        .finally(() => {
+            $scope.ready = true;
+            adhDone();
+        });
+
+    return {
+        templateUrl: "/static/js/templates/Activation.html"
+    };
 };
 
 
@@ -507,22 +513,7 @@ export var register = (angular) => {
                         templateUrl: "/static/js/templates/Register.html"
                     };
                 })
-                .when("activate", ["adhUser", "adhTopLevelState", "adhDone", "$location",
-                    (adhUser, adhTopLevelState, adhDone, $location) : AdhTopLevelState.IAreaInput => {
-                        activateController(adhUser, adhTopLevelState, adhDone, $location);
-                        return {
-                            skip: true
-                        };
-                    }
-                ])
-                .when("activation_error", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.translationData = {
-                        supportEmail: adhConfig.support_email
-                    };
-                    return {
-                        templateUrl: "/static/js/templates/ActivationError.html"
-                    };
-                }]);
+                .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", activateArea]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
