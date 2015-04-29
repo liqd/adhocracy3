@@ -537,7 +537,7 @@ export var register = (angular) => {
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
-        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", passwordResetDirective])
+        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", passwordResetDirective])
         .directive("adhCreatePasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
