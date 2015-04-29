@@ -13,6 +13,7 @@ from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.geo import ILocationReference
+from adhocracy_core.sheets.image import IImageReference
 import adhocracy_meinberlin.sheets.kiezkassen
 
 
@@ -65,6 +66,7 @@ process_meta = process.process_meta._replace(
     extended_sheets=[
         adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
         ILocationReference,
+        IImageReference,
     ],
     permission_add='add_kiezkassen_process',
 )

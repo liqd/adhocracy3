@@ -62,6 +62,7 @@ class TestProcess:
 
     def test_meta(self, meta):
         import adhocracy_core.resources.process
+        import adhocracy_core.sheets.image
         import adhocracy_meinberlin.sheets.kiezkassen
         from adhocracy_core.resources.asset import add_assets_service
         from .kiezkassen import IProcess
@@ -72,6 +73,7 @@ class TestProcess:
         assert meta.extended_sheets == [
             adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
             adhocracy_core.sheets.geo.ILocationReference,
+            adhocracy_core.sheets.image.IImageReference,
         ]
         assert add_assets_service in meta.after_creation
 
