@@ -8,6 +8,7 @@ from adhocracy_core.sheets import workflow
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import Text
 
 
 class IProposal(ISheet):
@@ -25,7 +26,7 @@ class ProposalSchema(colander.MappingSchema):
                             validator=colander.Range(min=0, max=50000))
     creator_participate = Boolean()
     location_text = SingleLine(validator=colander.Length(max=100))
-
+    address = Text()
 
 proposal_meta = sheet_meta._replace(isheet=IProposal,
                                     schema_class=ProposalSchema)
