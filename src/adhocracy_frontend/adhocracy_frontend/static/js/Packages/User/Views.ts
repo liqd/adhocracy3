@@ -52,6 +52,7 @@ export interface IScopeRegister extends angular.IScope {
     cancel : () => void;
     showError;
     logOut : () => void;
+    goBack : () => void;
 }
 
 
@@ -176,9 +177,10 @@ export var registerDirective = (
                 passwordRepeat: ""
             };
 
-            scope.cancel = () => {
+            scope.cancel = scope.goBack = () => {
                  adhTopLevelState.redirectToCameFrom("/");
             };
+
 
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;

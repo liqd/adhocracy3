@@ -7,7 +7,7 @@
     "TR__BACK_TO_TOP": "back to top",
     "TR__REGISTRATION_THANKS_FOR_REGISTERING": "HI, {{userName}}! Thanks for registering with {{siteName}}.",
     "TR__REGISTRATION_CALL_FOR_ACTIVATION": "Once you have clicked on the activation link you can proceed using {{siteName}}.",
-    "TR__REGISTRATION_CLOSE_THIS_TAB_AND_PROCEED": "You can close this tab and proceed on the {{siteName}} website.",
+    "TR__REGISTRATION_PROCEED": "Proceed back to [[link:{{siteName}}]].",
     "TR__CANCEL": "cancel",
     "TR__CLOSE": "close",
     "TR__COMMENTS": "comments",

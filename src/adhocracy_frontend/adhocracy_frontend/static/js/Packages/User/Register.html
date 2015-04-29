@@ -93,7 +93,9 @@
     this will display if you log in as any user -->
     <div data-ng-if="success && loggedIn" class="login-success">
         <p>{{ "TR__REGISTRATION_THANKS_FOR_REGISTERING" | translate:{siteName: siteName, userName: userName} }}</p>
-        <p>{{ "TR__REGISTRATION_CLOSE_THIS_TAB_AND_PROCEED" | translate:{siteName: siteName} }}</p>
+        <p data-adh-html-translate="TR__REGISTRATION_PROCEED" data-translate-values="{siteName: siteName}" data-translate-templates="{
+            link: '&lt;a href=&quot;&quot; data-ng-click=&quot;goBack()&quot;&gt;{{ content }}&lt;/a&gt;'
+        }"></p>
     </div>
 
     <a class="login-cancel" href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
