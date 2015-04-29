@@ -81,9 +81,9 @@
     </form>
 
     <div data-ng-if="!success && loggedIn" class="login-success">
-        <p>{{ "TR__REGISTRATION_ALREADY_LOGGED_IN.text1" | translate }}
-        <a href="" data-ng-click="logOut()">{{ "TR__LOGOUT" | translate }}</a>
-        {{ "TR__REGISTRATION_ALREADY_LOGGED_IN.text2" | translate }}</p>
+        <p data-adh-html-translate="TR__REGISTRATION_ALREADY_LOGGED_IN" data-translate-templates="{
+            link: '&lt;a href=&quot;&quot; data-ng-click=&quot;logOut()&quot;&gt;{{ content }}&lt;/a&gt;'
+        }"></p>
     </div>
     <div data-ng-if="success && !loggedIn" class="login-success">
         <p>{{ "TR__REGISTER_SUCCESS" | translate }}</p>

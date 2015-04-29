@@ -113,10 +113,7 @@
     "TR__REGISTER_SUCCESS": "Thank you for your registration. We sent you an email with an activation link. In case you do not recieve that email, please also check your spam folder.",
     "TR__REGISTRATION_LOGIN_INSTEAD": "I already have an account. Log in [[link:here]].",
     "TR__REGISTRATION_SUPPORT": "Having trouble with the registration?",
-    "TR__REGISTRATION_ALREADY_LOGGED_IN": {
-        "text1": "You are already logged in, you must",
-        "text2": "to re-register."
-    },
+    "TR__REGISTRATION_ALREADY_LOGGED_IN": "You are already logged in, you must [[link:logout]] to re-register.",
     "TR__REPLY": "reply",
     "TR__REPORT": "report",
     "TR__REPORT_ABUSE_STATUS_OK": "The moderators have been notified.",
