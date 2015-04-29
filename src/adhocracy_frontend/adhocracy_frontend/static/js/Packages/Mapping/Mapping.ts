@@ -307,6 +307,7 @@ export class MapListingController {
         };
 
         this.$scope.resetMap = () => {
+            this.map.invalidateSize(false);
             this.map.fitBounds(this.$scope.polygon.getBounds());
 
             // this is hacky but I could not find how to add
