@@ -388,7 +388,7 @@ export class Wrap {
  *         link: '&lt;a href=&quot;#&quot;&gt;{{content}}&lt;/a&gt;'
  *     }"></span>
  */
-export var htmlTranslateDirective = ($translate, adhWrap : Wrap) => {
+export var htmlTranslateDirective = ($compile, $translate, adhWrap : Wrap) => {
     return {
         restrict: "A",
         scope: {
@@ -410,6 +410,7 @@ export var htmlTranslateDirective = ($translate, adhWrap : Wrap) => {
                     var wrapped = adhWrap.decode(adhWrap.wrap(html, templates));
                     // FIXME: do some $sce related magic here
                     element.html(wrapped);
+                    $compile(element.contents())(scope.$parent);
                 });
             };
 
@@ -430,6 +431,6 @@ export var register = (angular) => {
         .module(moduleName, [])
         .filter("adhCountryName", countryName)
         .service("adhWrap", ["$interpolate", Wrap])
-        .directive("adhHtmlTranslate", ["$translate", "adhWrap", htmlTranslateDirective])
+        .directive("adhHtmlTranslate", ["$compile", "$translate", "adhWrap", htmlTranslateDirective])
         .directive("countrySelect", ["$translate", "adhConfig", countrySelect]);
 };
