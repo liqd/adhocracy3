@@ -41,9 +41,13 @@ class WorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
 
     """Data structure the kiezkassen workflow assignment sheet."""
 
-    workflow_name = 'sample'  # FIXME add custom workflow for kiezkassen
+    workflow_name = 'kiezkassen'
 
-    announced = workflow.StateAssignment()
+    draft = workflow.StateAssignment()
+    announce = workflow.StateAssignment()
+    participate = workflow.StateAssignment()
+    frozen = workflow.StateAssignment()
+    result = workflow.StateAssignment()
 
 
 workflow_meta = workflow.workflow_meta._replace(
