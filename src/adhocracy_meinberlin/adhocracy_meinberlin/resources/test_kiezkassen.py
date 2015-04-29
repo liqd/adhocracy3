@@ -63,6 +63,7 @@ class TestProcess:
     def test_meta(self, meta):
         import adhocracy_core.resources.process
         import adhocracy_core.sheets.image
+        import adhocracy_core.sheets.description
         import adhocracy_meinberlin.sheets.kiezkassen
         from adhocracy_core.resources.asset import add_assets_service
         from .kiezkassen import IProcess
@@ -71,6 +72,7 @@ class TestProcess:
         assert meta.is_implicit_addable is True
         assert meta.permission_add == 'add_kiezkassen_process'
         assert meta.extended_sheets == [
+            adhocracy_core.sheets.description.IDescription,
             adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
             adhocracy_core.sheets.geo.ILocationReference,
             adhocracy_core.sheets.image.IImageReference,
