@@ -16,7 +16,6 @@ from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
-from adhocracy_core.resources.geo import add_locations_service
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
 
@@ -46,26 +45,22 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:contributor', 'add_paragraph'),
             (Allow, 'role:contributor', 'add_externalresource'),
             (Allow, 'role:contributor', 'message_to_user'),
-            (Allow, 'role:contributor', 'add_kiezkassen_proposal'),
             # Creator role
             (Allow, 'role:creator', 'add_commentversion'),
             (Allow, 'role:creator', 'add_rateversion'),
             (Allow, 'role:creator', 'add_proposalversion'),
             (Allow, 'role:creator', 'add_sectionversion'),
             (Allow, 'role:creator', 'add_paragraphversion'),
-            # TODO reuse edit instead of custom add_xx_version permission?
             (Allow, 'role:creator', 'edit_some_sheets'),  # put request default
             (Allow, 'role:creator', 'edit_metadata'),
             (Allow, 'role:creator', 'view_userextended'),
             (Allow, 'role:creator', 'edit_userextended'),
             (Allow, 'role:creator', 'add_mercator_proposal_version'),
-            (Allow, 'role:creator', 'add_kiezkassen_proposal_version'),
             # Manager role
             (Allow, 'role:manager', 'view'),
             (Allow, 'role:manager', 'hide_resource'),
             (Allow, 'role:manager', 'edit_some_sheets'),
             (Allow, 'role:manager', 'edit_metadata'),
-
             # Admin role
             (Allow, 'role:admin', 'view'),
             (Allow, 'role:admin', 'view_sensitive'),  # sensitive info that
@@ -74,8 +69,6 @@ root_acl = [(Allow, 'system.Everyone', 'view'),  # get request default,
             (Allow, 'role:admin', 'create_sheet'),
             (Allow, 'role:admin', 'add_group'),
             (Allow, 'role:admin', 'add_pool'),
-            (Allow, 'role:admin', 'add_process'),
-            (Allow, 'role:admin', 'add_kiezkassen_process'),
             (Allow, 'role:admin', 'edit_group'),
             (Allow, 'role:admin', 'edit_some_sheets'),
             (Allow, 'role:admin', 'edit_sheet'),  # edit sheets default
@@ -104,7 +97,6 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
     _add_platform(context, registry)
-    add_locations_service(context, registry, {})
     # TODO: Move mercator platform creation to mercator package
     _add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
 

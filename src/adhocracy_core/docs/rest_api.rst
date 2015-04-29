@@ -267,7 +267,6 @@ to a array of stub views of allowed requests::
 
     >>> data_post_pool = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...                   'data': {'adhocracy_core.sheets.metadata.IMetadata': {},
-    ...                            'adhocracy_core.sheets.title.ITitle': {},
     ...                            'adhocracy_core.sheets.name.IName': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
@@ -326,7 +325,7 @@ Returns resource and child elements meta data and all sheet with data::
     >>> pprint(resp_data["data"])
     {'adhocracy_core.sheets.metadata.IMetadata': ...
      'adhocracy_core.sheets.name.IName': {'name': 'adhocracy'},
-     'adhocracy_core.sheets.pool.IPool': {'elements': [...
+     'adhocracy_core.sheets.pool.IPool': {'elements': [...]}}
 
 POST
 ~~~~
@@ -565,7 +564,7 @@ Fetch the first Proposal version, it is empty ::
 
     >>> resp = testapp.get(pvrs0_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.document.IDocument'])
-    {'description': '', 'elements': [], 'title': ''}
+    {'description': '', 'elements': [], 'picture': '', 'title': ''}
 
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
     {'followed_by': [], 'follows': []}

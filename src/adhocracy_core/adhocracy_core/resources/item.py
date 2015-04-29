@@ -48,8 +48,8 @@ item_meta = pool_meta._replace(
 )
 
 
-item_basic_sheets_without_name = copy(item_meta.basic_sheets)
-item_basic_sheets_without_name.remove(adhocracy_core.sheets.name.IName)
+item_basic_sheets_without_name_sheet = copy(item_meta.basic_sheets)
+item_basic_sheets_without_name_sheet.remove(adhocracy_core.sheets.name.IName)
 
 
 def includeme(config):
