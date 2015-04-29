@@ -11,6 +11,7 @@ def integration(config):
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
     config.include('adhocracy_core.resources.process')
+    config.include('adhocracy_core.resources.asset')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
     config.include('adhocracy_meinberlin.resources.kiezkassen')
 
@@ -62,6 +63,7 @@ class TestProcess:
     def test_meta(self, meta):
         import adhocracy_core.resources.process
         import adhocracy_meinberlin.sheets.kiezkassen
+        from adhocracy_core.resources.asset import add_assets_service
         from .kiezkassen import IProcess
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
@@ -71,6 +73,7 @@ class TestProcess:
             adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
             adhocracy_core.sheets.geo.ILocationReference,
         ]
+        assert add_assets_service in meta.after_creation
 
 
     @mark.usefixtures('integration')

@@ -10,6 +10,7 @@ def integration(config):
     config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_core.sheets.geo')
     config.include('adhocracy_core.resources.process')
+    config.include('adhocracy_core.resources.asset')
 
 
 class TestProcess:
@@ -21,12 +22,16 @@ class TestProcess:
 
     def test_meta(self, meta):
         from .process import IProcess
+        from .asset import add_assets_service
         from adhocracy_core.interfaces import IPool
+        from adhocracy_core import sheets
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(IPool)
         assert meta.is_implicit_addable is False
         assert meta.permission_add == 'add_process'
+        assert sheets.asset.IHasAssetPool in meta.basic_sheets
         assert meta.extended_sheets == []
+        assert add_assets_service in meta.after_creation
 
 
     @mark.usefixtures('integration')
