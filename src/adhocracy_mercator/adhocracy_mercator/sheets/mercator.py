@@ -1,6 +1,5 @@
 """Sheets for Mercator proposals."""
 import colander
-from zope.deprecation import deprecated
 
 from adhocracy_core.interfaces import Dimensions
 from adhocracy_core.interfaces import ISheet
@@ -29,9 +28,6 @@ class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
 class ITitle(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for the proposal title."""
-
-
-deprecated('ITitle', 'moved to adhocracy_core.sheets.title')
 
 
 class IUserInfo(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -104,9 +100,6 @@ class TitleSchema(colander.MappingSchema):
     """Data structure for the proposal title."""
 
     title = SingleLine(validator=colander.Length(min=1, max=100))
-
-
-deprecated('TitleSchema', 'moved to adhocracy_core.sheets.title')
 
 
 title_meta = sheet_meta._replace(isheet=ITitle,

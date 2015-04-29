@@ -86,12 +86,12 @@ Note: this section is mostly backend-specific.
 The generic `adhocracy_core.sheets.asset.IAssetMetadata` sheet doesn't limit
 the MIME type of assets. Since this is rarely desirable, it is considered
 abstract and cannot be instantiated -- only subclasses that provide a *MIME
-Type Validator* can. Check out the `adhocracy_core.sheets.image` module
+Type Validator* can. Check out the `adhocracy_core.sheets.sample_image` module
 for an example of how to do that.
 
 To prevent confusing the frontend, you should also define a subclass of the
 `adhocracy_core.resources.asset.IAsset` resource type that uses the subclassed
-sheet instead of the generic one. See `adhocracy_core.resources.image`
+sheet instead of the generic one. See `adhocracy_core.resources.sample_image`
 for an example.
 
 In the examples that follow, we will use the subclassed example resource type
@@ -99,7 +99,7 @@ and sheet.
 
 The backend can resize and crop images to different target formats. To do
 this, add an `image_sizes` field to the metadata of your subclassed sheet.
-`adhocracy_core.sheets.image` shows how to do that too. For example,
+`adhocracy_core.sheets.sample_image` shows how to do that too. For example,
 if we have::
 
     image_sizes={'thumbnail': Dimensions(width=100, height=50),
@@ -127,7 +127,7 @@ key/value pairs that are sent as a "multipart/form-data" request. Hence, the
 request will have keys similar to the following:
 
 :content_type: the type of the resource that shall be created, e.g.
-        "adhocracy_core.resources.image.IImage"
+    "adhocracy_core.resources.sample_image.ISampleImage"
 :data\:adhocracy_core.sheets.asset.IAssetMetadata\:mime_type: the MIME type of
     the uploaded file, e.g. "image/jpeg"
 :data\:adhocracy_core.sheets.asset.IAssetData\:data: the binary data of the
@@ -158,8 +158,8 @@ Now we can upload a sample picture::
     >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
     ...     'python.jpg', open('docs/_static/python.jpg', 'rb').read())]
     >>> request_body = {
-    ...    'content_type': 'adhocracy_core.resources.image.IImage',
-    ...    'data:adhocracy_core.sheets.image.IImageMetadata:mime_type':
+    ...    'content_type': 'adhocracy_core.resources.sample_image.ISampleImage',
+    ...    'data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type':
     ...        'image/jpeg'}
     >>> resp_data = testapp.post(asset_pool_path, request_body,
     ...             headers=god_header, upload_files=upload_files).json
@@ -168,7 +168,7 @@ In response, the backend sends a JSON document with the resource type and
 path of the new resource (just as with other resource types)::
 
     >>> resp_data["content_type"]
-    'adhocracy_core.resources.image.IImage'
+    'adhocracy_core.resources.sample_image.ISampleImage'
     >>> pic_path = resp_data["path"]
     >>> pic_path
     'http://localhost/adhocracy/ProposalPool/assets/0000000/'
@@ -193,10 +193,10 @@ the asset::
 
     >>> resp_data = testapp.get(pic_path).json
     >>> resp_data['content_type']
-    'adhocracy_core.resources.image.IImage'
+    'adhocracy_core.resources.sample_image.ISampleImage'
     >>> resp_data['data']['adhocracy_core.sheets.metadata.IMetadata']['modification_date']
     '20...'
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.image.IImageMetadata'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.sample_image.ISampleImageMetadata'])
     {'attached_to': [],
      'filename': 'python.jpg',
      'mime_type': 'image/jpeg',
@@ -221,13 +221,13 @@ In case of images, it can retrieve the image in one of the predefined
 cropped sizes by asking for one of the keys defined by the ImageSizeMapper as
 child element::
 
-    >>> resp_data = testapp.get(pic_path + 'thumbnail')
+    >>> resp_data = testapp.get(pic_path + 'detail')
     >>> resp_data.content_type
     'image/jpeg'
-    >>> thumbnail_size = len(resp_data.body)
-    >>> thumbnail_size > 2000
+    >>> detail_size = len(resp_data.body)
+    >>> detail_size > 10000
     True
-    >>> thumbnail_size < original_size
+    >>> detail_size < original_size
     True
 
 
@@ -238,7 +238,7 @@ Sheets can have fields that refer to assets of a specific type. This is done
 in the usual way be setting the type of the field to `Reference` (to refer
 to a single asset) or `UniqueReferences` (to refer to a list of assets) and
 defining a suitable `reftype` (e.g. with `target_isheet =
-IImageMetadata`).
+ISampleImageMetadata`).
 
 Lets post a new proposal version that refers to the image::
 
@@ -246,9 +246,8 @@ Lets post a new proposal version that refers to the image::
     ...              'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'title': 'We need more pics!',
     ...                     'description': 'Or maybe just nicer ones?',
+    ...                     'picture': pic_path,
     ...                     'elements': []},
-    ...                  'adhocracy_core.sheets.image.IImageReference': {
-    ...                      'picture': pic_path},
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [prop_v0_path]}},
     ...          'root_versions': [prop_v0_path]}
@@ -261,7 +260,7 @@ If we re-download the image metadata, we see that it is now attached to the
 proposal version::
 
     >>> resp_data = testapp.get(pic_path).json
-    >>> resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']['attached_to']
+    >>> resp_data['data']['adhocracy_core.sheets.sample_image.ISampleImageMetadata']['attached_to']
     ['http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/']
 
 
@@ -295,8 +294,8 @@ Lets replace the uploaded python with another one::
     >>> upload_files = [('data:adhocracy_core.sheets.asset.IAssetData:data',
     ...     'python2.jpg', open('docs/_static/python2.jpg', 'rb').read())]
     >>> request_body = {
-    ...    'content_type': 'adhocracy_core.resources.image.IImage',
-    ...    'data:adhocracy_core.sheets.image.IImageMetadata:mime_type':
+    ...    'content_type': 'adhocracy_core.resources.sample_image.ISampleImage',
+    ...    'data:adhocracy_core.sheets.sample_image.ISampleImageMetadata:mime_type':
     ...        'image/jpeg'}
     >>> resp_data = testapp.put(pic_path, request_body,
     ...             headers=god_header, upload_files=upload_files).json
@@ -317,7 +316,7 @@ If we download the image metadata again, we see that filename and size have
 changed accordingly::
 
     >>> resp_data = testapp.get(pic_path).json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.image.IImageMetadata'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.sample_image.ISampleImageMetadata'])
     {'attached_to': ['http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/'],
      'filename': 'python2.jpg',
      'mime_type': 'image/jpeg',
@@ -325,10 +324,10 @@ changed accordingly::
 
 Predefined scaled+cropped views are automatically updated as well::
 
-    >>> resp_data = testapp.get(pic_path + 'thumbnail')
-    >>> len(resp_data.body) > 2000
+    >>> resp_data = testapp.get(pic_path + 'detail')
+    >>> len(resp_data.body) > 10000
     True
-    >>> len(resp_data.body) == thumbnail_size
+    >>> len(resp_data.body) == detail_size
     False
 
 

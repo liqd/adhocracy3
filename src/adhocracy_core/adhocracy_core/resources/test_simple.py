@@ -4,15 +4,10 @@ from pytest import mark
 
 
 def test_simple_meta():
-    import adhocracy_core.sheets
     from .simple import simple_meta
     from .simple import ISimple
     meta = simple_meta
     assert meta.iresource is ISimple
-    assert meta.basic_sheets == [adhocracy_core.sheets.name.IName,
-                                 adhocracy_core.sheets.title.ITitle,
-                                 adhocracy_core.sheets.metadata.IMetadata,
-                                 ]
     assert meta.permission_add == 'add_simple'
 
 

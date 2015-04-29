@@ -25,7 +25,6 @@ dotted_name_resolver = DottedNameResolver()
 filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
                                  'count', 'sort', 'reverse', 'limit', 'offset',
                                  'aggregateby', 'aggregateby_elements',
-                                 'only_visible',
                                  ]
 
 
@@ -83,8 +82,7 @@ class FilteringPoolSheet(PoolSheet):
                  'limit': params.get('limit', None),
                  'offset': params.get('offset', 0),
                  'aggregate_filter': params.get('aggregateby', ''),
-                 'aggregate_form': params.get('aggregateby_elements', 'count'),
-                 'only_visible': params.get('only_visible', True),
+                 'aggregate_form': params.get('aggregateby_elements', 'count')
                  }
         result = self._filter_elements(**query)
         appstruct = {}
@@ -133,7 +131,6 @@ class FilteringPoolSheet(PoolSheet):
                          offset: int=0,
                          aggregate_filter: str=None,
                          aggregate_form: str='count',
-                         only_visible: bool=True,
                          ) -> FilterElementsResult:
         system_catalog = find_catalog(self.context, 'system')
         # filter path
@@ -158,9 +155,8 @@ class FilteringPoolSheet(PoolSheet):
                 isheet = dotted_name_resolver.resolve(isheet_name)
                 query &= index.eq(isheet, isheet_field, value)
         # Only show visible elements (not hidden or deleted)
-        if only_visible:
-            visibility_index = adhocracy_catalog['private_visibility']
-            query &= visibility_index.eq('visible')
+        visibility_index = adhocracy_catalog['private_visibility']
+        query &= visibility_index.eq('visible')
         # Execute filter query
         identity = lambda x: x  # pragma: no branch
         resolver = None if resolve_resources else identity
