@@ -80,12 +80,17 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tabset.html",
         controller: ["$scope", "$element", TabSetController],
         link: (scope, element, attrs) => {
-            console.log(scope.tabs);
-            scope.$watch(() => scope.tabs.length, (value : number) => {
-                if (value !== 0) {
-                    element.find(".tabset-tabs").attr("tab-total", scope.tabs.length);
-                }
-            });
+            if(attrs.fullWidth) {
+                scope.$watch(() => scope.tabs.length, (value : number) => {
+                    if (value !== 0) {
+                        var tabWidth = Math.floor(100 / value);
+                        element.find(".tabset-tabs .tab").css("width", tabWidth + "%");
+                    }
+                });
+            }
+            if(attrs.paneAbove) {
+                element.find(".tabset-panes").prependTo(element.find(".tabset"));
+            }
         }
     };
 };
