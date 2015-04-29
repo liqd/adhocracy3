@@ -413,9 +413,11 @@ export var htmlTranslateDirective = ($translate, adhWrap : Wrap) => {
                 });
             };
 
-            scope.$watch(() => attrs.htmlTranslate, update);
-            scope.$watch("translateValues", update);
-            scope.$watch("translateTemplates", update);
+            scope.$watchGroup([
+                () => attrs.htmlTranslate,
+                "translateValues",
+                "translateTemplates"
+            ], update);
         }
     };
 };
