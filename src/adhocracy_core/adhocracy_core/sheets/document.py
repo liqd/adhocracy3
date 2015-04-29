@@ -6,7 +6,7 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets.sample_image import ISampleImageMetadata
+from adhocracy_core.sheets.image import IImageMetadata
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Text
@@ -43,7 +43,7 @@ class DocumentPictureReference(SheetToSheet):
 
     source_isheet = IDocument
     source_isheet_field = 'picture'
-    target_isheet = ISampleImageMetadata
+    target_isheet = IImageMetadata
 
 
 class SectionElementsReference(SheetToSheet):

@@ -130,8 +130,11 @@ asset_meta = pool_meta._replace(
     iresource=IAsset,
     basic_sheets=[
         adhocracy_core.sheets.metadata.IMetadata,
+        adhocracy_core.sheets.asset.IAssetData,
+    ],
+    extended_sheets=[
+        # all subtypes need to provide an IAssetMetadata sheet
         adhocracy_core.sheets.asset.IAssetMetadata,
-        adhocracy_core.sheets.asset.IAssetData
     ],
     use_autonaming=True,
     permission_add='add_asset',
