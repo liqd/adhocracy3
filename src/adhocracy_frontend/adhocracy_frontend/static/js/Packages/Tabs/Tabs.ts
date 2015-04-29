@@ -89,10 +89,6 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
                     }
                 });
             }
-            if (attrs.paneAbove) {
-                element.find(".tabset-panes").prependTo(element.find(".tabset"));
-                element.find(".tabset").addClass("pane-above");
-            }
         }
     };
 };
