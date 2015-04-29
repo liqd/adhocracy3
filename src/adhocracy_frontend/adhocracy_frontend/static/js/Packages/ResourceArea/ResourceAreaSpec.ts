@@ -10,6 +10,7 @@ export var register = () => {
         describe("Service", () => {
             var providerMock;
             var adhHttpMock;
+            var adhEmbedMock;
             var adhConfigMock;
             var $injectorMock;
             var $locationMock;
@@ -19,7 +20,8 @@ export var register = () => {
             beforeEach(() => {
                 providerMock = {
                     defaults: {},
-                    specifics: {}
+                    specifics: {},
+                    templates: {}
                 };
 
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get"]);
@@ -36,10 +38,13 @@ export var register = () => {
                     rest_url: "rest_url"
                 };
 
+                adhEmbedMock = jasmine.createSpyObj("adhEmbed", ["getContext"]);
+                adhEmbedMock.getContext.and.returnValue("");
+
                 adhResourceUrlFilterMock = (path) => path;
 
                 service = new AdhResourceArea.Service(providerMock, <any>q, $injectorMock, $locationMock, adhHttpMock, adhConfigMock,
-                    adhResourceUrlFilterMock);
+                    adhEmbedMock, adhResourceUrlFilterMock);
             });
 
             describe("route", () => {

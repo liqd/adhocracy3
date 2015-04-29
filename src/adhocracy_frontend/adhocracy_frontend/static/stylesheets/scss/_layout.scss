@@ -1,5 +1,9 @@
 .main-header {
     position: relative;
+
+    @media print {
+        display: none;
+    }
 }
 
 .l-header {
@@ -29,7 +33,6 @@
 
 .l-header-center {
     left: 0;
-    position: absolute;
     text-align: center;
     top: 0;
     width: 100%;
@@ -41,28 +44,28 @@
 }
 
 .l-content {
-    position: absolute;
     top: $l-header-height;
     bottom: 0;
     left: 0;
     right: 0;
     overflow: hidden;
+
+    @media print {
+        overflow: visible;
+    }
+}
+
+.l-header-center,
+.l-content {
+    position: absolute;
+
+    @media print {
+        position: static;
+    }
 }
 
 .l-center {
     max-width: 30em;
     margin: 5em auto 10em;
     padding: 0.5em;
-}
-
-
-@media print {
-    .l-header-center,
-    .l-content {
-        position: static;
-    }
-
-    .main-header {
-        display: none;
-    }
 }

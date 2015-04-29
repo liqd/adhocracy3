@@ -1,11 +1,11 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
-2015-4-20: Created.
+2015-4-23: Created.
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Mon Apr 20 11:48:06 2015
+Created by FontForge 20120731 at Thu Apr 23 18:12:06 2015
  By Caroline Clifford,,,
 Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -22,7 +22,7 @@ Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
     bbox="-0.75 -65 515 449"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+F100-F12A"
+    unicode-range="U+F100-F12C"
   />
     <missing-glyph />
     <glyph glyph-name="uniF129" unicode="&#xf129;" horiz-adv-x="279" 
@@ -91,6 +91,9 @@ l222 176c2 2 5 2 7 2c6 0 11 -4 11 -10c0 -3 -2 -7 -4 -9l-229 -181c-2 -1 -5 -2 -7 
     <glyph glyph-name="uniF101" unicode="&#xf101;" horiz-adv-x="402" 
 d="M17 446h1h1h241c5 0 11 -3 14 -6l123 -139c3 -3 5 -8 5 -12v-333c0 -10 -9 -18 -19 -18h-2h-362c-10 0 -19 8 -19 18v472v0c0 9 8 17 17 18zM37 409v-434h328v292h-107c-10 0 -19 9 -19 19v123h-202zM276 381v-76h68zM116 171h181v-43h-181v43zM116 64h181v-43h-181v43z
 " />
+    <glyph glyph-name="uniF12B" unicode="&#xf12b;" horiz-adv-x="507" 
+d="M461 320h-415c-26 0 -46 14 -46 37s20 38 46 38h415c26 0 46 -15 46 -38s-20 -37 -46 -37zM461 149h-415c-26 0 -46 20 -46 43s20 43 46 43h415c26 0 46 -20 46 -43s-20 -43 -46 -43zM461 -11h-415c-26 0 -46 15 -46 38s20 37 46 37h415c26 0 46 -14 46 -37
+s-20 -38 -46 -38z" />
     <glyph glyph-name="uniF125" unicode="&#xf125;" horiz-adv-x="489" 
 d="M279 176h-2c-21 0 -37 6 -48 20c-23 23 -45 73 -43 132c2 39 41 60 91 62h2c50 -2 87 -23 89 -62c2 -59 -16 -109 -39 -132c-16 -13 -33 -20 -50 -20zM274 358c-35 0 -60 -8 -62 -29c-2 -51 16 -94 32 -112c7 -6 16 -12 27 -12h3c12 0 20 4 27 12c16 16 37 61 35 111
 c0 21 -25 30 -62 30zM428 56h-304v16c0 80 78 107 144 107h7c64 0 153 -27 153 -107v-16zM153 85h244c-12 57 -95 62 -119 62h-7c-25 0 -107 -5 -118 -62zM489 -6h-428v455h428v-455zM91 26h366v394h-366v-394zM31 -36h397v-29h-428v423h31v-394z" />
@@ -102,8 +105,8 @@ d="M237 4v44h37v-44h-37zM240 213v88h30v-88l-6 -135h-17zM255 426c-2 0 -9 -4 -15 -
 c-43 0 -61 30 -43 67l214 415c10 18 21 28 34 28z" />
     <glyph glyph-name="uniF119" unicode="&#xf119;" horiz-adv-x="512" 
 d="M47 360h418c9 0 18 -3 25 -7l-234 -202l-234 202c7 4 16 7 25 7zM7 338c78 -72 164 -138 243 -209c4 -3 8 -3 12 0l241 207c1 1 1 2 2 3c4 -7 7 -15 7 -24v-245c0 -25 -21 -46 -47 -46h-418c-26 0 -47 21 -47 46v244c0 9 2 17 7 24z" />
-    <glyph glyph-name="uniF123" unicode="&#xf123;" horiz-adv-x="422" 
-d="M211 446c54 0 103 -33 106 -106s-4 -183 -105 -183s-109 110 -107 183c3 73 64 108 112 107zM211 99c0 0 211 -2 211 -162h-211h-211c0 163 210 162 211 162z" />
+    <glyph glyph-name="uniF12C" unicode="&#xf12c;" horiz-adv-x="512" 
+d="M322 46l-132 -110v400l132 112v-402zM350 448v0l156 -102c4 -2 6 -8 6 -12v-395c0 -3 -3 -4 -5 -3l-157 111v401zM0 444c0 3 3 5 5 3l157 -105v-405l-156 107c-4 2 -6 7 -6 12v388z" />
     <glyph glyph-name="uniF115" unicode="&#xf115;" horiz-adv-x="514" 
 d="M71 192c0 11 2 13 13 13s14 -2 14 -13s-3 -13 -14 -13s-13 2 -13 13zM51 192c0 -21 12 -34 33 -34s34 13 34 34s-13 34 -34 34s-33 -13 -33 -34zM463 216l23 -24l-26 -26l-12 13l-24 -24l-23 24l-24 -24l-23 24l-22 -22l-13 13h-87l-2 -7c-6 -20 -15 -35 -27 -47
 c-20 -22 -44 -32 -74 -32s-55 10 -77 32c-21 21 -32 45 -32 75s11 55 32 77c20 22 44 32 74 32s55 -10 77 -32c12 -13 21 -29 27 -46l3 -6h230zM472 236h-225c-8 19 -16 32 -29 46c-26 26 -57 39 -92 39s-65 -13 -89 -39s-37 -56 -37 -91s12 -65 37 -89
@@ -145,5 +148,7 @@ d="M508 5h-508v374h508v-374zM34 39h441v306h-441v-306zM76 134c-4 0 -9 3 -12 6c-6 
 " />
     <glyph glyph-name="uniF11B" unicode="&#xf11b;" horiz-adv-x="515" 
 d="M0 229v-74h515v74h-515z" />
+    <glyph glyph-name="uniF123" unicode="&#xf123;" horiz-adv-x="422" 
+d="M211 446c54 0 103 -33 106 -106s-4 -183 -105 -183s-109 110 -107 183c3 73 64 108 112 107zM211 99c0 0 211 -2 211 -162h-211h-211c0 163 210 162 211 162z" />
   </font>
 </defs></svg>

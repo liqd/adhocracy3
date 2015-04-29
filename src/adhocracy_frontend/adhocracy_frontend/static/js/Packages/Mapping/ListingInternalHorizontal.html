@@ -1,7 +1,10 @@
 <div class="map-list map-list-horizontal">
     <div class="map-list-map"></div>
+    <div>
+        <a data-ng-show="showZoomButton" data-ng-click="resetMap()" href="">{{ "TR__MAP_RESET" | translate }}</a>
+    </div>
     <div class="map-list-container">
-        <div class="map-list-navigate-container">
+        <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container">
             <a class="map-list-navigate map-list-navigate-back" href="" data-ng-click="getPreviousItem(selectedItem);" title="{{ 'TR__PREVIOUS' | translate }}">
             <i class="icon-chevron-prev"></i></a>
         </div>
@@ -17,13 +20,13 @@
                     <div class="map-list-item-col-right">
                         <!-- FIXME: dummy data -->
                         <p class="map-list-item-comments map-list-meta-item"><i class="map-list-meta-item-icon icon-speechbubble-unfilled"></i> {{ item.value.commentCount }} {{ "TR__COMMENTS" | translate }}</p>
-                        <p class="map-list-item-votes map-list-meta-item"><i class="map-list-meta-item-icon icon-voting"></i> 234 {{ "TR__VOTES" | translate }}</p>
+                        <p class="map-list-item-votes map-list-meta-item"><i class="map-list-meta-item-icon icon-voting"></i> 234 {{ "TR__RATES" | translate }}</p>
                         <a href="{{item.value.url | adhResourceUrl }}" class="button arrow-button">{{ "TR__MORE" | translate }}</a>
                     </div>
                 </li>
             </ol>
         </div>
-        <div class="map-list-navigate-container">
+        <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container">
             <a class="map-list-navigate map-list-navigate-next" href="" data-ng-click="getNextItem(selectedItem);" title="{{ 'TR__NEXT' | translate }}">
             <i class="icon-chevron-next"></i></a>
         </div>

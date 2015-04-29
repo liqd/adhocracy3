@@ -1,7 +1,10 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
-        <i class="icon-user-unfilled moving-column-icon"></i>
+        <div class="moving-column-tab">
+            <i class="icon-user-unfilled moving-column-icon"></i>
+        </div>
         <a
+            class="moving-column-menu-button"
             href=""
             data-ng-click="ctrl.toggleOverlay('messaging')"
             data-ng-if="messageOptions.POST">{{ "TR__MESSAGING" | translate }}</a>
@@ -13,7 +16,6 @@
 
     <adh-recompile-on-change
         data-ng-switch-when="body"
-        data-key="userUrl"
         data-value="{{userUrl}}">
         <adh-user-profile
             data-path="{{userUrl}}">

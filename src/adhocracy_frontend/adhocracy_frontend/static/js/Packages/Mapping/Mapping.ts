@@ -272,9 +272,17 @@ export interface IMapListScope<T> extends angular.IScope {
     toggleItem(item : IItem<T>) : void;
     getPreviousItem(item : IItem<T>) : void;
     getNextItem(item : IItem<T>) : void;
+    showZoomButton : boolean;
+    resetMap() : void;
+    visibleItems : number;
 }
 
-export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+export var mapListingInternal = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    leaflet : typeof L,
+    $timeout : angular.ITimeoutService
+) => {
     return {
         scope: {
             height: "@",
@@ -323,6 +331,7 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
             var itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
 
             scope.items = [];
+            scope.visibleItems = 0;
             _.forEach(scope.itemValues, (url, key) => {
 
                 adhHttp.get(AdhUtil.parentPath(url), {
@@ -347,6 +356,9 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                         };
 
                         var hide = (value.lat === 0 && value.lat === 0);
+                        if (!hide) {
+                            scope.visibleItems++;
+                        }
 
                         var item = {
                             value: value,
@@ -375,15 +387,18 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
 
             map.on("moveend", () => {
                 var bounds = map.getBounds();
+                scope.visibleItems = 0;
                 $timeout(() => {
                     _.forEach(scope.items, (item) => {
                         if (bounds.contains(item.marker.getLatLng())) {
                             item.hide = false;
+                            scope.visibleItems++;
                         } else {
                             item.hide = true;
                         }
                     });
                 });
+                scope.showZoomButton = true;
             });
 
             var loopCarousel = (index, total) => (index + total) % total;
@@ -412,6 +427,17 @@ export var mapListingInternal = (adhConfig : AdhConfig.IService, adhHttp : AdhHt
                 }
                 scope.toggleItem(scope.items[index]);
                 scrollToItem(index);
+            };
+
+            scope.resetMap = () => {
+                map.fitBounds(scope.polygon.getBounds());
+
+                // this is hacky but I could not find how to add
+                // a callback function to fitbounds as this always
+                // triggers the moveend event.
+                $timeout(() => {
+                    scope.showZoomButton = false;
+                }, 300);
             };
         }
     };

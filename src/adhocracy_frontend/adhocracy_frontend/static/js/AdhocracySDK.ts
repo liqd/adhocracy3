@@ -186,35 +186,23 @@
         }
         iframe.data("autoresize", autoresize);
 
-        var url;
-        if (widget === "plain") {
+        if (data.autourl) {
+            if (hasAutourl()) {
+                throw "There's already an embedded element with enabled autourl";
+            }
+            data.initialUrl = getUrlFromHash() || data.initialUrl;
 
-            var initialUrl;
-            if (data.autourl) {
-                if (hasAutourl()) {
-                    throw "There's already an embedded element with enabled autourl";
+            adhocracy.registerMessageHandler("urlchange", (data, source) => {
+                if (getIFrameByWindow(source) === iframe[0]) {
+                    setHashFromUrl(data.url);
                 }
-                initialUrl = getUrlFromHash();
-
-                adhocracy.registerMessageHandler("urlchange", (data, source) => {
-                    if (getIFrameByWindow(source) === iframe[0]) {
-                        setHashFromUrl(data.url);
-                    }
-                });
-            }
-            if (typeof initialUrl === "undefined") {
-                initialUrl = data.initialUrl;
-            }
-            if (typeof initialUrl === "undefined") {
-                initialUrl = "/";
-            }
-            url = origin + initialUrl;
-        } else {
-            url = origin + appUrl + widget;
+            });
         }
+
+        var url = origin + appUrl + widget;
+
         delete data.autourl;
         delete data.autoresize;
-        delete data.initialUrl;
         url = addParamsToUrl(url, data);
         iframe.attr("src", url);
         iframe.addClass("adhocracy-embed");

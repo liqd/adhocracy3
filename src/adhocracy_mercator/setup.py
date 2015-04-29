@@ -44,6 +44,8 @@ setup(name='adhocracy_mercator',
       [console_scripts]
       export_mercator_proposals =\
           adhocracy_mercator.scripts.export_proposals:export_proposals
+      export_mercator_lost_rates =\
+          adhocracy_mercator.scripts.export_lost_rates:export_lost_rates
       export_mercator_users =\
           adhocracy_mercator.scripts.export_users:export_users
       """,

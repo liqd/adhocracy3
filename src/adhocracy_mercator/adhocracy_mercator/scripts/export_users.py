@@ -51,8 +51,8 @@ def export_users():
 
 def _export_users_and_proposals_rates(root: IResource, filename: str,
                                       min_rate=0):
-    proposals = _get_most_rated_proposals(root, min_rate)
-    proposals_titles = _get_titles(proposals)
+    proposals = get_most_rated_proposals(root, min_rate)
+    proposals_titles = get_titles(proposals)
     column_names = ['Username', 'Email', 'Creation date'] + proposals_titles
     with open(filename, 'w', newline='') as result_file:
         wr = csv.writer(result_file, delimiter=';', quotechar='"',
@@ -69,7 +69,8 @@ def _export_users_and_proposals_rates(root: IResource, filename: str,
     print('Users exported to {0}'.format(filename))
 
 
-def _get_titles(resources: [ITitle]) -> [str]:
+def get_titles(resources: [ITitle]) -> [str]:
+    """Return all titles for `resources`."""
     titles = [get_sheet_field(p, ITitle, 'title') for p in resources]
     return titles
 
@@ -79,8 +80,9 @@ def _get_users(root: IResource) -> [IUser]:
     return users.values()
 
 
-def _get_most_rated_proposals(root: IResource,
-                              min_rate: int) -> [IMercatorProposalVersion]:
+def get_most_rated_proposals(root: IResource,
+                             min_rate: int) -> [IMercatorProposalVersion]:
+    """Return child proposals of `root` with rating higher then `min_rate`."""
     pool = get_sheet(root, IPool)
     params = {'depth': 3,
               'content_type': IMercatorProposalVersion,
@@ -113,6 +115,7 @@ def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
         params = {'depth': 3,
                   'content_type': IRate,
                   'tag': 'LAST',
+                  'rate': 1,
                   'elements': 'content',
                   IRate.__identifier__ + ':object': rateable,
                   }
@@ -147,6 +150,7 @@ def _get_rate_date(user: IUser, rateable: IRateable) -> str:
               'tag': 'LAST',
               IRate.__identifier__ + ':subject': user,
               IRate.__identifier__ + ':object': rateable,
+              'rate': 1,
               'elements': 'content',
               'count': True
               }
