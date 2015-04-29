@@ -889,21 +889,6 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         resultType = "number";
         parser = stringToFloat;
         break;
-    case "adhocracy_core.sheets.geo.Point":
-        resultType = "number[]";
-        jsonType = "string[]";
-        parser = "(point) => _.map(point, " + stringToFloat + ")";
-        break;
-    case "adhocracy_core.sheets.geo.Polygon":
-        resultType = "number[][][]";
-        jsonType = "string[][][]";
-        // FIXME: Definitely Typed does not seem to have good definitions for _.map
-        parser = "(polygon : string[][][]) => _.map(polygon, (line : string[][]) " +
-                 "=> _.map(line, (point : string[]) => _.map(point, " + stringToFloat + ")))";
-        break;
-    case "adhocracy_core.sheets.geo.AdministrativeDivisionName":
-        resultType = "string";
-        break;
     case "adhocracy_core.sheets.workflow.StateAssignment":
         resultType = "{start_date : string; description : string;}";
         jsonType = "{start_date : string; description : string;}";
@@ -922,7 +907,12 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
             resultType += "[]";
             jsonType += "[]";
             if (parser) {
-                parser = "(list) => _.map(list, " + parser + ")";
+                throw "not implemented: parsers for list fields.  email mf@zerobuzz.net to fix this.";
+
+                // FIXME: (this can be done.  we need to take the
+                // parser string and construct a string that maps the
+                // parser over a list.  it's just awkward, and we
+                // don't need it yet.)
             }
             break;
         default:

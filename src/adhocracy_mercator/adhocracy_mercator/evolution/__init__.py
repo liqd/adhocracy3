@@ -1,7 +1,6 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
 from substanced.util import find_catalog  # pragma: no cover
-from adhocracy_core.evolution import migrate_new_sheet
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
@@ -61,17 +60,7 @@ def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
                 'remove add_proposal permission')
 
 
-def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
-    """Migrate mercator title sheet to adhocracy_core title sheet."""
-    from adhocracy_core.sheets.title import ITitle
-    from adhocracy_mercator.sheets import mercator
-    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
-    migrate_new_sheet(root, IMercatorProposalVersion, ITitle, mercator.ITitle,
-                      remove_isheet_old=True,
-                      fields_mapping=[('title', 'title')])
-
-
-def evolve4_disable_voting_and_commenting(root):
+def evolve3_disable_voting_and_commenting(root):
     """Disable rate and comment permissions."""
     from adhocracy_core.utils import set_acl
     from substanced.util import get_acl
@@ -100,5 +89,4 @@ def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
     config.add_evolution_step(evolve2_disable_add_proposal_permission)
-    config.add_evolution_step(evolve3_use_adhocracy_core_title_sheet)
-    config.add_evolution_step(evolve4_disable_voting_and_commenting)
+    config.add_evolution_step(evolve3_disable_voting_and_commenting)

@@ -716,7 +716,7 @@ class TestItemRESTView:
 
         wanted = {'path': request.application_url + '/',  'data': {},
                   'content_type': IItem.__identifier__,
-                  'first_version_path': None}
+                  'first_version_path': ''}
         assert inst.get() == wanted
 
     def test_post_valid(self, request, context):
@@ -1341,7 +1341,7 @@ class TestMessageUserView:
         inst = self.make_one(context, request)
         result = inst.options()
         assert 'POST' in result
-        assert result['POST']['request_body'] == {'recipient': None,
+        assert result['POST']['request_body'] == {'recipient': '',
                                                   'text': '',
                                                   'title': ''}
         assert result['POST']['response_body'] == ''

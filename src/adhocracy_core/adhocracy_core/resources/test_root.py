@@ -24,7 +24,6 @@ def integration(config):
     config.include('adhocracy_core.resources.pool')
     config.include('adhocracy_core.resources.principal')
     config.include('adhocracy_core.resources.subscriber')
-    config.include('adhocracy_core.resources.geo')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.messaging')
 
@@ -59,7 +58,6 @@ class TestRoot:
         assert find_catalog(inst, 'system') is not None
         assert find_catalog(inst, 'adhocracy') is not None
         assert find_service(inst, 'principals', 'users') is not None
-        assert find_service(inst, 'locations') is not None
 
     def test_create_root_with_custom_platform_id(self, registry):
         from adhocracy_core.resources.root import IRootPool

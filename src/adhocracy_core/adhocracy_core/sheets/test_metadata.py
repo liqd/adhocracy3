@@ -41,10 +41,10 @@ class TestIMetadataSchema:
         inst = self.make_one()
         result = inst.serialize({})
         assert result['creation_date'] == null
-        assert result['creator'] is None
+        assert result['creator'] == ''
         assert result['item_creation_date'] == null
         assert result['modification_date'] == null
-        assert result['modified_by'] is None
+        assert result['modified_by'] == ''
         assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
