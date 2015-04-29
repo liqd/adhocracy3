@@ -6,8 +6,6 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets.sample_image import ISampleImageMetadata
-from adhocracy_core.schema import Reference
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import SingleLine
@@ -37,15 +35,6 @@ class DocumentElementsReference(SheetToSheet):
     target_isheet = ISection
 
 
-class DocumentPictureReference(SheetToSheet):
-
-    """Document picture reference."""
-
-    source_isheet = IDocument
-    source_isheet_field = 'picture'
-    target_isheet = ISampleImageMetadata
-
-
 class SectionElementsReference(SheetToSheet):
 
     """Section element reference."""
@@ -70,13 +59,11 @@ class DocumentSchema(colander.MappingSchema):
 
     `title`: one line title
     `description`: summary text
-    `picture`: a picture
     `elements`: structural subelements like sections
     """
 
     title = SingleLine()
     description = Text()
-    picture = Reference(reftype=DocumentPictureReference)
     elements = UniqueReferences(reftype=DocumentElementsReference)
 
 

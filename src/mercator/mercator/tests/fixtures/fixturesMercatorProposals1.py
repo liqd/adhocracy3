@@ -768,7 +768,7 @@ def _create_proposal():
                 "body": {
                     "parent": "@pn31",
                     "data": {
-                        "adhocracy_mercator.sheets.mercator.ITitle": {
+                        "adhocracy_core.sheets.title.ITitle": {
                             "title": name
                         },
                         "adhocracy_mercator.sheets.mercator.IHeardFrom": {

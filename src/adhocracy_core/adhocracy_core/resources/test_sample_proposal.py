@@ -10,7 +10,8 @@ def test_proposalversion_meta():
     meta = proposalversion_meta
     assert meta.iresource is IProposalVersion
     assert meta.extended_sheets == [adhocracy_core.sheets.document.IDocument,
-                                    adhocracy_core.sheets.comment.ICommentable
+                                    adhocracy_core.sheets.comment.ICommentable,
+                                    adhocracy_core.sheets.image.IImageReference,
                                     ]
     assert meta.permission_add == 'add_proposalversion'
 

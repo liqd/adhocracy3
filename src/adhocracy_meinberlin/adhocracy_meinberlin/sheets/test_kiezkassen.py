@@ -10,6 +10,7 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.catalog')
+    config.include('adhocracy_meinberlin.workflows.kiezkassen')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
 
 
@@ -47,11 +48,10 @@ class TestProposalSheet:
     def test_get_empty(self, meta, context):
         from decimal import Decimal
         inst = meta.sheet_class(meta, context)
-        wanted = {'title': '',
-                  'detail': '',
-                  'budget': Decimal(0),
+        wanted = {'budget': Decimal(0),
                   'creator_participate': False,
                   'location_text': '',
+                  'address': '',
                   }
         assert inst.get() == wanted
 
@@ -64,10 +64,45 @@ class TestProposalSchema:
         return ProposalSchema()
 
     def test_create(self, inst):
-        assert inst['title'].validator.max == 100
-        assert inst['detail'].validator.max == 500
         assert inst['budget'].validator.max == 50000
         assert inst['budget'].required
         assert inst['location_text'].validator.max == 100
 
 
+class TestWorkflowSheet:
+
+    @fixture
+    def meta(self):
+        from .kiezkassen import workflow_meta
+        return workflow_meta
+
+    def test_meta(self, meta):
+        from . import kiezkassen
+        assert meta.isheet == kiezkassen.IWorkflowAssignment
+        assert meta.schema_class == kiezkassen.WorkflowAssignmentSchema
+
+    def test_create(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+
+    @mark.usefixtures('integration')
+    def test_get_empty(self, meta, context, registry):
+        kiezkassen_workflow = registry.content.get_workflow('kiezkassen')
+        inst = meta.sheet_class(meta, context)
+        wanted =  {'announce': {},
+                   'draft': {},
+                   'frozen': {},
+                   'participate': {},
+                   'result': {},
+                   'workflow': kiezkassen_workflow,
+                   'workflow_state': None}
+        assert inst.get() == wanted
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)

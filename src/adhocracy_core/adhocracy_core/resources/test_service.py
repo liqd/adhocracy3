@@ -3,15 +3,15 @@ from pytest import fixture
 
 
 def test_service_meta():
-    from .service import service_meta
+    from .service import service_meta as meta
     from .service import IBasicService
     import adhocracy_core.sheets
-    meta = service_meta
-    meta.content_name == 'Service'
-    meta.iresource == IBasicService
-    meta.basic_sheet = [adhocracy_core.sheets.pool.IPool,
-                        adhocracy_core.sheets.metadata.IMetadata,
-                        ]
+    assert meta.content_name == 'service'
+    assert meta.iresource == IBasicService
+    assert meta.basic_sheets == [adhocracy_core.sheets.pool.IPool,
+                                 adhocracy_core.sheets.metadata.IMetadata,
+                                 ]
+    assert meta.permission_add == 'add_service'
 
 @fixture
 def integration(config):
@@ -25,13 +25,10 @@ def integration(config):
 @mark.usefixtures('integration')
 class TestService:
 
-    @fixture
-    def context(self, pool):
-        return pool
-
-    def test_create_service(self, context, registry):
+    def test_create_service(self, pool, registry):
         from adhocracy_core.resources.service import IBasicService
         from substanced.interfaces import IService
-        res = registry.content.create(IBasicService.__identifier__, context)
+        res = registry.content.create(IBasicService.__identifier__, pool)
         assert IService.providedBy(res)
         assert res.__is_service__
+        assert pool['service']
