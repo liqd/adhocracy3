@@ -262,6 +262,12 @@ class AnnotationStorageSheet(PropertySheet):
                                   request=request)
         return schema
 
+    def delete_field_values(self, fields: [str]):
+        """Delete value for every field name in `fields`."""
+        for key in fields:
+            if key in self._data:
+                del self._data[key]
+
 
 @implementer(IResourceSheet)
 class AttributeStorageSheet(AnnotationStorageSheet):
@@ -332,6 +338,8 @@ def includeme(config):  # pragma: no cover
     config.include('.comment')
     config.include('.rate')
     config.include('.asset')
-    config.include('.sample_image')
+    config.include('.image')
     config.include('.geo')
     config.include('.workflow')
+    config.include('.title')
+    config.include('.description')

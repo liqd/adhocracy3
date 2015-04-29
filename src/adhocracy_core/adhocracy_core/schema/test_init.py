@@ -433,7 +433,7 @@ class TestResource:
     def test_create(self):
         from adhocracy_core.schema import ResourceObject
         inst = self.make_one()
-        assert inst.default == ''
+        assert inst.default is None
         assert inst.missing == colander.drop
         assert inst.schema_type == ResourceObject
 

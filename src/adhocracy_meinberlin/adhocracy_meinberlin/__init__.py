@@ -14,8 +14,10 @@ def includeme(config):
     config.include('adhocracy_core.resources.sample_section')
     config.include('adhocracy_core.resources.sample_proposal')
     # include custom resource types
+    config.include('adhocracy_meinberlin.workflows')
     config.include('adhocracy_meinberlin.resources.kiezkassen')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
+    config.include('adhocracy_meinberlin.evolution')
 
 
 def main(global_config, **settings):

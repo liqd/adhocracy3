@@ -5,8 +5,8 @@ from pytest import mark
 from pytest import raises
 import colander
 
-from adhocracy_core.sheets.sample_image import ISampleImageMetadata
-from adhocracy_core.resources.sample_image import ISampleImage
+from adhocracy_core.sheets.image import IImageMetadata
+from adhocracy_core.resources.image import IImage
 
 
 def test_asset_meta():
@@ -15,11 +15,13 @@ def test_asset_meta():
     from adhocracy_core.sheets.metadata import IMetadata
     from adhocracy_core.sheets.asset import IAssetData
     from adhocracy_core.sheets.asset import IAssetMetadata
+    from adhocracy_core.sheets.title import ITitle
     meta = asset_meta
     assert meta.iresource is IAsset
     assert IMetadata in meta.basic_sheets
     assert IAssetData in meta.basic_sheets
-    assert IAssetMetadata in meta.basic_sheets
+    assert ITitle in meta.basic_sheets
+    assert IAssetMetadata in meta.extended_sheets
     assert meta.use_autonaming
     assert meta.permission_add == 'add_asset'
 
@@ -51,7 +53,7 @@ def integration(config):
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.resources.asset')
-    config.include('adhocracy_core.resources.sample_image')
+    config.include('adhocracy_core.resources.image')
 
 
 @mark.usefixtures('integration')
@@ -92,8 +94,8 @@ class TestValidateAndCompleteAsset:
     def _make_asset(self, pool, registry,
                     mime_type='image/png',
                     mime_type_in_file='image/png',
-                    resource_type=ISampleImage,
-                    asset_metadata_sheet=ISampleImageMetadata):
+                    resource_type=IImage,
+                    asset_metadata_sheet=IImageMetadata):
         from adhocracy_core.sheets.asset import IAssetData
         mock_file = Mock()
         mock_file.mimetype = mime_type_in_file

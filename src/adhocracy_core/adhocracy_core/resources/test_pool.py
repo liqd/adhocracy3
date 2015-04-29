@@ -13,6 +13,7 @@ def test_pool_meta():
     assert meta.content_class is Pool
     assert meta.is_implicit_addable is False
     assert meta.basic_sheets == [adhocracy_core.sheets.name.IName,
+                                 adhocracy_core.sheets.title.ITitle,
                                  adhocracy_core.sheets.pool.IPool,
                                  adhocracy_core.sheets.metadata.IMetadata,
                                  ]

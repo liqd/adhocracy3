@@ -55,7 +55,7 @@ class AdhocracySchemaNode(colander.SchemaNode):
         If the appstruct is None and None is the default value, serialize
         to None instead of :class:`colander.null`.
         """
-        if appstruct is None and self.default is None:
+        if appstruct in (None, colander.null) and self.default is None:
             return None
         return super().serialize(appstruct)
 
@@ -278,7 +278,7 @@ def string_has_no_newlines_validator(value: str) -> bool:
     return False if '\n' in value or '\r' in value else True  # noqa
 
 
-class SingleLine(colander.SchemaNode):  # noqa
+class SingleLine(AdhocracySchemaNode):  # noqa
 
     """ UTF-8 encoded String without line breaks.
 
@@ -470,7 +470,7 @@ class Resource(AdhocracySchemaNode):
     Example value:  'http://a.org/bluaABC/_123/3'
     """
 
-    default = ''
+    default = None
     missing = colander.drop
     schema_type = ResourceObject
 
