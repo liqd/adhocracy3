@@ -64,6 +64,13 @@
     z-index: 1;
 }
 
+@media print {
+    .styleguide-nav,
+    .styleguide-navigation-toggle {
+        display: none;
+    }
+}
+
 .styleguide-navigation {
     top: 2em;
     overflow-y: auto;

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <title>adhocracy root page</title>
+        <title>Adhocracy</title>
         <meta charset="utf-8">
         % for url in css:
             <link rel="stylesheet" href="${url}"/>
@@ -18,6 +18,7 @@
         <script type="text/javascript">
             require(["Adhocracy", "text!${config}", "text!${meta_api}"], function(Adh, config_string, meta_api_string) {
                 var config = JSON.parse(config_string);
+                document.title = config.site_name;
                 var meta_api = JSON.parse(meta_api_string);
                 $(document).ready(function() {
                     Adh.init(config, meta_api);

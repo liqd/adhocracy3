@@ -16,6 +16,7 @@ from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.schema import ACM
+from adhocracy_core.resources.geo import add_locations_service
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
 
@@ -73,6 +74,7 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_acl_to_app_root(context, registry)
     _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
+    add_locations_service(context, registry, {})
 
 
 def _add_objectmap_to_app_root(root):

@@ -89,6 +89,7 @@ def _get_rate_users(rateable: IRateable) -> set(IUser):
     params = {'depth': 3,
               'content_type': IRate,
               'tag': 'LAST',
+              'rate': 1,
               'elements': 'content',
               IRate.__identifier__ + ':object': rateable,
               }

@@ -27,7 +27,7 @@ frontend unit tests:
 
     A.  Integrated with py.test::
 
-            bin/py.test ./src/adhocracy_frontend/adhocracy_frontend/tests/unit/
+           bin/polytester jsunit
 
     B.  In browser::
 
@@ -48,29 +48,8 @@ frontend unit tests:
                make -C ./parts/static/js/ compile_tests_browser test-no-blanket
                xdg-open http://localhost:6551/static/test-no-blanket.html
 
-    C.  With node.js::
 
-            make -C ./parts/static/js/ compile_tests_node
-            bin/jasmine-node ./parts/static/js/
-
-        .. note::
-
-           Node only works with the commonjs module system;
-           whereas the frontend currently uses requirejs and the amd
-           module system (rationale: requirejs is more powerful with
-           importing module-system-oblivious libraries like angular,
-           underscore, ...).  You know that you have run into this
-           problem if this appears in your browser console::
-
-               Uncaught Error: Module name "Adhocracy/UtilSpec" has not been loaded yet for context: _. Use require([])
-               http://requirejs.org/docs/errors.html#notloaded
-
-           In order for the javascript code to work in the browser, you
-           need to revert to adm::
-
-               make -C ./parts/static/js/ compile_tests_browser
-
-frontend integration tests:
+frontend integration tests (jsint):
 
     Frontend integration tests behave like unit tests in the sense
     that they are driven by jasmine and can access all exports of all
@@ -93,7 +72,7 @@ frontend integration tests:
 
     A.  Integrated with py.test::
 
-            bin/py.test ./tests/integration/
+           bin/polytester jsint
 
     B.  In browser::
 
@@ -109,25 +88,32 @@ frontend integration tests:
            any tricks, because we don't run blanket for test coverage
            reporting.
 
-frontend functional tests::
-
-    bin/py.test ./src/adhocracy_frontend/adhocracy_frontend/tests/functional
-
 protractor acceptance tests::
 
-    bin/protractor etc/protractorConf.js
+     bin/polytester acceptance
 
 run backend functional tests::
 
-    bin/py.test -m"functional" src/adhocracy_core/adhocracy_core/websocket src/adhocracy_core/docs
+    bin/polytester pyfunc
 
 run backend unit tests and show python test code coverage::
 
-    bin/py.test_run_unittests_with_coverage
+    bin/polytester pyunit
+    xdg-open ./htmlcov/index.html
 
-run all tests (without protractor acceptance tests)::
+run all test::
 
-    bin/py.test_run_all
+    bin/polytester
+
+to display console output::
+
+    bin/polytester -v
+
+modify test config:
+
+     tests.ini  (run all tests with polytester)
+     pytest.ini (python/jasmin tests with pytest)
+     etc/protractorConf (acceptantance tests with protractor)
 
 delete database (works best on development systems without valuable data!)::
 

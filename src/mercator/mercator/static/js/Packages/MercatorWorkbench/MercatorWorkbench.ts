@@ -179,11 +179,11 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RICommentVersion.content_type, "", "", {
+                .default(RICommentVersion.content_type, "", "", "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RICommentVersion.content_type, "", "", ["adhHttp", "$q", (
+                .specific(RICommentVersion.content_type, "", "", "", ["adhHttp", "$q", (
                     adhHttp : AdhHttp.Service<any>,
                     $q : angular.IQService
                 ) => (resource : RICommentVersion) => {
@@ -214,17 +214,17 @@ export var register = (angular) => {
                     })
                     .then(() => specifics);
                 }])
-                .default(RIPoolWithAssets.content_type, "", "", {
+                .default(RIPoolWithAssets.content_type, "", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
                     proposalUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIPoolWithAssets.content_type, "create_proposal", "", {
+                .default(RIPoolWithAssets.content_type, "create_proposal", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIPoolWithAssets.content_type, "create_proposal", "", ["adhHttp", "adhUser",
+                .specific(RIPoolWithAssets.content_type, "create_proposal", "", "", ["adhHttp", "adhUser",
                     (adhHttp : AdhHttp.Service<any>, adhUser) => {
                         return (resource : RIPoolWithAssets) => {
                             return adhUser.ready.then(() => {

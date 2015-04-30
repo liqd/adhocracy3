@@ -115,6 +115,7 @@ def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
         params = {'depth': 3,
                   'content_type': IRate,
                   'tag': 'LAST',
+                  'rate': 1,
                   'elements': 'content',
                   IRate.__identifier__ + ':object': rateable,
                   }
@@ -149,6 +150,7 @@ def _get_rate_date(user: IUser, rateable: IRateable) -> str:
               'tag': 'LAST',
               IRate.__identifier__ + ':subject': user,
               IRate.__identifier__ + ':object': rateable,
+              'rate': 1,
               'elements': 'content',
               'count': True
               }

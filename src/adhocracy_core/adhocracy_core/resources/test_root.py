@@ -46,6 +46,7 @@ def integration(config):
     config.include('adhocracy_core.resources.sample_section')
     config.include('adhocracy_core.resources.external_resource')
     config.include('adhocracy_core.rest')
+    config.include('adhocracy_core.resources.geo')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.messaging')
     # TODO remove the following include once permissions in root_acm
@@ -84,6 +85,7 @@ class TestRoot:
         assert find_catalog(inst, 'system') is not None
         assert find_catalog(inst, 'adhocracy') is not None
         assert find_service(inst, 'principals', 'users') is not None
+        assert find_service(inst, 'locations') is not None
 
     def test_create_root_with_custom_platform_id(self, registry):
         from adhocracy_core.resources.root import IRootPool

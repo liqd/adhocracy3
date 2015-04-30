@@ -19,6 +19,7 @@ from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import add_platform
 from adhocracy_core.schema import ACM
+import adhocracy_core.sheets.title
 import adhocracy_mercator.sheets.mercator
 
 
@@ -409,7 +410,7 @@ class IMercatorProposalVersion(IItemVersion):
 mercator_proposal_version_meta = itemversion_meta._replace(
     content_name='MercatorProposalVersion',
     iresource=IMercatorProposalVersion,
-    extended_sheets=[adhocracy_mercator.sheets.mercator.ITitle,
+    extended_sheets=[adhocracy_core.sheets.title.ITitle,
                      adhocracy_mercator.sheets.mercator.IUserInfo,
                      adhocracy_mercator.sheets.mercator.IHeardFrom,
                      adhocracy_mercator.sheets.mercator.IMercatorSubResources,
