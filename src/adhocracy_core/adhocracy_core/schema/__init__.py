@@ -188,6 +188,7 @@ class TimeZoneName(AdhocracySchemaNode):
 ROLE_PRINCIPALS = ['reader',
                    'annotator',
                    'contributor',
+                   'creator',
                    'editor',
                    'manager',
                    'admin',

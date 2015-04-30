@@ -10,6 +10,7 @@ from zope.interface import implementer
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
+from adhocracy_core.schema import ACM
 
 
 CREATOR_ROLEID = 'role:creator'
@@ -101,9 +102,6 @@ def acm_to_acl(acm: dict, registry: Registry) -> [str]:
     for principal in acm['principals']:
         for permissions in acm['permissions']:
             permission_name = permissions[0]
-            if permission_name not in registry.content.permissions:
-                raise ValueError('Invalid permission: {0} not in {1}'
-                                 .format(permission_name, registry.content.permissions))
             action = permissions[idx + 1]
             if action is not None:
                 ace = (action, principal, permission_name)

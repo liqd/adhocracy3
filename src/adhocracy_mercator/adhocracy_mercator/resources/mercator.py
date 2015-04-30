@@ -23,6 +23,7 @@ from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import add_platform
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.utils import set_acl
+from adhocracy_core.schema import ACM
 import adhocracy_mercator.sheets.mercator
 import transaction
 
@@ -454,10 +455,10 @@ mercator_proposal_meta = item_meta._replace(
     permission_add='add_proposal',
 )
 
-mercator_acm = \
-    {'principals':                                   ['system.Everyone', 'role:annotator', 'role:contributor', 'role:creator', 'role:manager', 'role:admin', 'role:god'],  # noqa
-     'permissions': [['add_mercator_proposal_version', None,              None,             None,               Allow,          None,           None,         Allow],  # noqa
-                     ]}
+mercator_acm = ACM().deserialize(
+    {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
+     'permissions': [['add_mercator_proposal_version', None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
+                     ]})
 
 
 def _create_initial_content(context: IPool, registry: Registry, options: dict):

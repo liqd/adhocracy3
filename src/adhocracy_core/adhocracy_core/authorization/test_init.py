@@ -212,12 +212,3 @@ def test_acm_to_acl(mock_registry):
     assert (Deny,  'role:creator', 'edit') not in acl
     assert (Deny,  'role:annotator', 'edit') not in acl
     assert (None,  'role:annotator', 'edit') not in acl
-
-
-def test_acm_to_acl_invalid_permission(mock_registry):
-    from . import acm_to_acl
-    mock_registry.content.permissions = ['view']
-    appstruct = {'principals':             ['Everyone'],
-                 'permissions': [['viewxyz', Allow]]}
-    with raises(ValueError):
-        acm_to_acl(appstruct, mock_registry)

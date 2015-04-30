@@ -1037,7 +1037,8 @@ class TestRole:
 
     def test_create(self, inst):
         assert inst.validator.choices == ['reader', 'annotator', 'contributor',
-                                          'editor', 'manager', 'admin', 'god']
+                                          'creator', 'editor', 'manager',
+                                          'admin', 'god']
         assert inst.schema_type == colander.String
         assert inst.default == 'reader'
 

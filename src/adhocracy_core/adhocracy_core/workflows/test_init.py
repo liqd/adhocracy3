@@ -56,7 +56,7 @@ class TestAddWorkflow:
         """Return example workflow cstruct with required data."""
         cstruct = \
             {'states_order': ['draft', 'announced'],
-             'states': {'draft': {'acm': {'principals':          ['reader'],
+             'states': {'draft': {'acm': {'principals':           ['reader'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []}},
              'transitions': {'to_announced': {'from_state': 'draft',
