@@ -21,6 +21,7 @@ def app(app_settings):
     configurator.include(adhocracy_core.resources.comment)
     configurator.include(adhocracy_core.resources.rate)
     configurator.include(adhocracy_mercator.resources.mercator)
+    #    configurator.include(adhocracy_mercator.resources.subscriber)
     configurator.commit()
     add_create_test_users_subscriber(configurator)
     app = configurator.make_wsgi_app()

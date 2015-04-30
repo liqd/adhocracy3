@@ -15,6 +15,7 @@ def includeme(config):
     config.include('.catalog')
     config.include('.sheets.mercator')
     config.include('.resources.mercator')
+    config.include('.resources.subscriber')
     config.include('.evolution')
 
 
