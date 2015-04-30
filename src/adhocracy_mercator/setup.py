@@ -48,5 +48,7 @@ setup(name='adhocracy_mercator',
           adhocracy_mercator.scripts.export_lost_rates:export_lost_rates
       export_mercator_users =\
           adhocracy_mercator.scripts.export_users:export_users
+      delete_users =\
+          adhocracy_mercator.scripts.delete_users:delete_users
       """,
       )
