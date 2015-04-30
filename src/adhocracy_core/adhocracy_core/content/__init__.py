@@ -86,7 +86,7 @@ class ResourceContentRegistry(ContentRegistry):
     @property
     def permissions(self) -> [str]:
         """Set of all permissions defined in the system."""
-        perms = {'hide_resource', 'edit_group', 'do_transition'}  # built-in permissions
+        perms = self._builtin_permissions
         for resource_meta in self.resources_meta.values():
             perms.update(self._get_resource_permissions(resource_meta))
         for sheet_meta in self.sheets_meta.values():
@@ -95,6 +95,10 @@ class ResourceContentRegistry(ContentRegistry):
             perms.update(self._get_workflow_permissions(workflow_meta))
         perms.update(self._get_views_permissions())
         return perms
+
+    @property
+    def _builtin_permissions(self):
+        return {'hide_resource', 'edit_group', 'do_transition'}
 
     def _get_resource_permissions(self, resource_meta):
         return [p for p in [resource_meta.permission_add,
