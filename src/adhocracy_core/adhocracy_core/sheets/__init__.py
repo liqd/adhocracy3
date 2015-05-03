@@ -274,12 +274,16 @@ class AnnotationStorageSheet(PropertySheet):
                         by 'view' permission.
         :param params: Parameters to update the search query to find reference
                        data.
+
+        Automatically set params are: `only_visible` and `allows` view
+        permission.
         """
+        params['allows'] = (request.effective_principals, 'view')
+        params['only_visible'] = True
         schema = self._get_schema_for_cstruct(request, params)
         appstruct = self.get(params=params)
         cstruct = schema.serialize(appstruct)
         return cstruct
-
 
     def _get_schema_for_cstruct(self, request, params: dict):
         """Return customized schema to serialize cstruct data.

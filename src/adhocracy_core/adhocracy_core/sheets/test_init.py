@@ -283,6 +283,23 @@ class TestResourcePropertySheet:
         cstruct = inst.get_cstruct(request_, params={'name': 'child'})
         assert 'name' in inst.get.call_args[1]['params']
 
+    def test_get_cstruct_filter_by_view_permission(self, sheet_meta, request_,
+                                                   context):
+        inst = self.make_one(sheet_meta, context)
+        inst.get = Mock()
+        inst.get.return_value = {}
+        cstruct = inst.get_cstruct(request_)
+        assert inst.get.call_args[1]['params']['allows'] == \
+            (request_.effective_principals, 'view')
+
+    def test_get_cstruct_filter_by_only_visible(self, sheet_meta, request_,
+                                                context):
+        inst = self.make_one(sheet_meta, context)
+        inst.get = Mock()
+        inst.get.return_value = {}
+        cstruct = inst.get_cstruct(request_)
+        assert inst.get.call_args[1]['params']['only_visible']
+
     def test_delete_field_values_ignore_if_wrong_field(self, sheet_meta,
                                                        request_, context):
         inst = self.make_one(sheet_meta, context)

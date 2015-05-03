@@ -107,7 +107,18 @@ class TestFilteringPoolSheet:
         cstruct = inst.get_cstruct(_request, params={'name': 'child'})
         assert 'name' in inst.get.call_args[1]['params']
 
+    def test_get_cstruct_filter_by_view_permission(self, inst, _request):
+        inst.get = Mock()
+        inst.get.return_value = {'elements': []}
+        cstruct = inst.get_cstruct(_request)
+        assert inst.get.call_args[1]['params']['allows'] == \
+            (_request.effective_principals, 'view')
 
+    def test_get_cstruct_filter_by_only_visible(self, inst, _request):
+        inst.get = Mock()
+        inst.get.return_value = {'elements': []}
+        cstruct = inst.get_cstruct(_request)
+        assert inst.get.call_args[1]['params']['only_visible']
 
     def test_get_cstruct_with_serialization_content(self, inst, _request):
         inst.get = Mock()

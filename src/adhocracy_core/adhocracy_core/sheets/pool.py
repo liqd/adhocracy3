@@ -38,7 +38,6 @@ class FilteringPoolSheet(PoolSheet):
 
     """Pool resource sheet that allows filtering and aggregating elements."""
 
-
     def get(self, params: dict={}) -> dict:
         """Return child references or arbitrary search for descendants.
 
@@ -87,6 +86,8 @@ class FilteringPoolSheet(PoolSheet):
         :param params: Parameters to update the search query to find `elements`
 
         For available  values in `params` read the `get` method docstring.
+        Automatically set params are: `only_visible` and `allows`
+        read permission.
         Additional params are:
 
         serialization_form (str):
@@ -98,6 +99,8 @@ class FilteringPoolSheet(PoolSheet):
         show_frequency (bool):
             add 'aggregateby` field. defaults to False.
         """
+        params['allows'] = (request.effective_principals, 'view')
+        params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
         appstruct = self.get(params=params_query)
         if params.get('serialization_form', False) == 'omit':
