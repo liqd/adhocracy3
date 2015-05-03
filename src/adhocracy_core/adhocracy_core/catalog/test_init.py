@@ -125,6 +125,28 @@ class TestCatalogsServiceAdhocracy:
         assert 'adhocracy' in res
         assert 'system' in res
 
+    def test_reindex_all(self, registry, pool, inst):
+        from hypatia.catalog import Catalog
+        inst['adhocracy'].reindex_resource = Mock()
+        inst['system'].reindex_resource = Mock()
+        child = self._make_resource(registry, parent=pool)
+        inst.reindex_all(child)
+        inst['adhocracy'].reindex_resource.assert_called_with(child)
+        inst['system'].reindex_resource.assert_called_with(child)
+
+    def test_reindex_index(self, registry, pool, inst):
+        inst['adhocracy']['rate'].reindex_resource = Mock()
+        child = self._make_resource(registry, parent=pool)
+        inst.reindex_index(child, 'rate')
+        inst['adhocracy']['rate'].reindex_resource.assert_called_with(child)
+
+    def test_reindex_index_raise_if_wrong_index(self, registry, pool, inst):
+        from hypatia.field import FieldIndex
+        inst['adhocracy']['rate'].reindex_resource = Mock(spec=FieldIndex)
+        child = self._make_resource(registry, parent=pool)
+        with raises(KeyError):
+            inst.reindex_index(child, 'WRONG')
+
     def test_search_default_query(self, registry, pool, inst, query):
         from hypatia.interfaces import IResultSet
         child = self._make_resource(registry, parent=pool)

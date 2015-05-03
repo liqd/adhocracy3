@@ -27,6 +27,22 @@ class ICatalogsService(IServicePool):
 
 class CatalogsServiceAdhocracy(CatalogsService):
 
+    def reindex_all(self, resource: IResource):
+        """Reindex `resource` with all indexes."""
+        for catalog in self.values():
+            catalog.reindex_resource(resource)
+
+    def reindex_index(self, resource: IResource, index_name: str):
+        """Reindex `resource` with index `index_name`.
+
+        :raises KeyError: if `index_name`  index does not exists.
+        """
+        index = self._get_index(index_name)
+        if index is None:
+            msg = 'catalog index {0} does not exist.'.format(index_name)
+            raise KeyError(msg)
+        index.reindex_resource(resource)
+
     def search(self, query: SearchQuery) -> SearchResult:  # flake8: noqa
         """Search indexes in catalogs `adhocracy` and `system`."""
         elements = self._search_elements(query)
