@@ -497,5 +497,7 @@ def create_filename(directory='.', prefix='', suffix='.csv') -> str:
 
 def set_acl(resource: IResource, acl: list, registry=None) -> bool:
     """Set the acl and mark the resource as dirty."""
-    substanced.util.set_acl(resource, acl, registry)
-    resource._p_changed = True
+    changed = substanced.util.set_acl(resource, acl, registry=registry)
+    if changed:
+        resource._p_changed = True
+    return changed

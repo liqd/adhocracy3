@@ -83,6 +83,7 @@ def index_rates(resource, default) -> int:
     """
     rates = get_sheet_field(resource, IRateable, 'rates')
     last_rates = filter_by_tag(rates, 'LAST')
+    # FIXME use catalog query instead
     rate_sum = 0
     for rate in last_rates:
         value = get_sheet_field(rate, IRate, 'rate')

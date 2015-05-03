@@ -1,6 +1,5 @@
 """List, search and filter child resources."""
 from copy import deepcopy
-from pyramid.util import DottedNameResolver
 from pyramid.request import Request
 import colander
 
@@ -13,9 +12,6 @@ from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.utils import remove_keys_from_dict
-
-
-dotted_name_resolver = DottedNameResolver()
 
 
 class PoolSheet(AnnotationStorageSheet):

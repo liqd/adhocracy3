@@ -95,6 +95,8 @@ def autoupdate_versionable_has_new_version(event):
         new_version_sheet.set(appstruct)
 
 
+# FIXME modfiy if acl changed
+
 def _is_in_root_version_subtree(event: ISheetReferenceNewVersion) -> bool:
     if event.root_versions == []:
         return True
