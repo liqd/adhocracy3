@@ -160,13 +160,6 @@ class TestVersionsSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
-    def test_get_not_empty_with_versionable(self, meta, context):
-        from adhocracy_core.sheets.versions import IVersionable
-        versionable = testing.DummyResource(__provides__=IVersionable)
-        context['child'] = versionable
-        inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'elements': [versionable]}
-
 
 def test_includeme_register_version_sheet(config):
     from adhocracy_core.utils import get_sheet

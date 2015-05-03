@@ -14,10 +14,10 @@ class TestTagsSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.tags import ITags
         from adhocracy_core.sheets.tags import TagsSchema
-        from adhocracy_core.sheets.pool import FilteringPoolSheet
+        from adhocracy_core.sheets.pool import PoolSheet
         inst = meta.sheet_class(meta, context)
         assert inst.meta.isheet == ITags
-        assert inst.meta.sheet_class == FilteringPoolSheet
+        assert inst.meta.sheet_class == PoolSheet
         assert inst.meta.schema_class == TagsSchema
         assert inst.meta.editable is False
         assert inst.meta.creatable is False

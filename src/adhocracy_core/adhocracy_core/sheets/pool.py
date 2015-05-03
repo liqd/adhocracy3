@@ -16,22 +16,6 @@ from adhocracy_core.utils import remove_keys_from_dict
 
 class PoolSheet(AnnotationStorageSheet):
 
-    """Generic pool resource sheet."""
-
-    # TODO remove, this class is not used
-
-    def _get_reference_appstruct(self, params):
-        appstruct = {'elements': []}
-        reftype = self._reference_nodes['elements'].reftype
-        target_isheet = reftype.getTaggedValue('target_isheet')
-        for child in self.context.values():
-            if target_isheet.providedBy(child):
-                appstruct['elements'].append(child)
-        return appstruct
-
-
-class FilteringPoolSheet(PoolSheet):
-
     """Pool resource sheet that allows filtering and aggregating elements."""
 
     def get(self, params: dict={}) -> dict:
@@ -163,7 +147,7 @@ class PoolSchema(colander.MappingSchema):
 pool_meta = sheet_meta._replace(
     isheet=IPool,
     schema_class=PoolSchema,
-    sheet_class=FilteringPoolSheet,
+    sheet_class=PoolSheet,
     editable=False,
     creatable=False,
 )

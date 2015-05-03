@@ -8,7 +8,6 @@ from pyramid.decorator import reify
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.threadlocal import get_current_registry
-from substanced.property import PropertySheet
 from substanced.util import find_service
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
@@ -32,12 +31,14 @@ logger = getLogger(__name__)
 
 
 @implementer(IResourceSheet)
-class AnnotationStorageSheet(PropertySheet):
+class BaseResourceSheet:
 
-    """Generic sheet for to get/set resource data as context annotation."""
+    """Basic Resource sheet to get/set resource appstruct data.
 
-    request = None
-    """Pyramid request object, just to fulfill the interface."""
+    Subclasses have to implement the `_data` property to store appstruct data.
+    """
+
+    request = None  # just to follow the interface."""
 
     def __init__(self, meta, context, registry=None):
         self.schema = meta.schema_class()
@@ -113,19 +114,8 @@ class AnnotationStorageSheet(PropertySheet):
 
     @property
     def _data(self):
-        """Return dictionary to store data.
-
-        This might be overridden in subclasses.
-        """
-        sheets_data = getattr(self.context, '_sheets', None)
-        if sheets_data is None:
-            sheets_data = PersistentMapping()
-            setattr(self.context, '_sheets', sheets_data)
-        data = sheets_data.get(self._data_key, None)
-        if data is None:
-            data = PersistentMapping()
-            sheets_data[self._data_key] = data
-        return data
+        """Return dictionary to store data."""
+        raise NotImplementedError
 
     @property
     def _references_query(self) -> SearchQuery:
@@ -301,11 +291,34 @@ class AnnotationStorageSheet(PropertySheet):
             if key in self._data:
                 del self._data[key]
 
+    def after_set(self, changed: bool):
+        """Hook to run after setting data. Not used."""
+        raise NotImplementedError
+
+
+@implementer(IResourceSheet)
+class AnnotationStorageSheet(BaseResourceSheet):
+
+    """Resource Sheet that stores data in dictionary annotation."""
+
+    @property
+    def _data(self):
+        """Return dictionary to store data."""
+        sheets_data = getattr(self.context, '_sheets', None)
+        if sheets_data is None:
+            sheets_data = PersistentMapping()
+            setattr(self.context, '_sheets', sheets_data)
+        data = sheets_data.get(self._data_key, None)
+        if data is None:
+            data = PersistentMapping()
+            sheets_data[self._data_key] = data
+        return data
+
 
 @implementer(IResourceSheet)
 class AttributeStorageSheet(AnnotationStorageSheet):
 
-    """Sheet class that stores data as context attributes."""
+    """Resource Sheet that stores data as context attributes."""
 
     @property
     def _data(self):

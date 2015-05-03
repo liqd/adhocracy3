@@ -23,7 +23,7 @@ def sheet_meta(sheet_meta):
     return meta
 
 
-class TestResourcePropertySheet:
+class TestResourceSheet:
 
     @fixture
     def request_(self):
