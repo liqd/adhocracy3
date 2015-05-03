@@ -5,7 +5,7 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.sheets import AnnotationStorageSheet
+from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
@@ -14,9 +14,11 @@ from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.utils import remove_keys_from_dict
 
 
-class PoolSheet(AnnotationStorageSheet):
+class PoolSheet(AnnotationRessourceSheet):
 
     """Pool resource sheet that allows filtering and aggregating elements."""
+
+    _additional_params = ('serialization_form', 'show_frequency', 'show_count')
 
     def get(self, params: dict={}) -> dict:
         """Return child references or arbitrary search for descendants.
@@ -34,26 +36,30 @@ class PoolSheet(AnnotationStorageSheet):
         """
         return super().get(params)
 
+    def _get_references_query(self, params: dict) -> SearchQuery:
+        reftype = self._fields['reference']['elements'].reftype
+        target_isheet = reftype.getTaggedValue('target_isheet')
+        default_params = {'interfaces': target_isheet,
+                          'root': self.context,
+                          'depth': 1,
+                          'only_visible': False,
+                          'resolve': True,
+                          'allows': (),
+                          }
+        query = search_query._replace(**default_params)
+        if params:
+            query = query._replace(**params)
+        return query
+
     def _get_reference_appstruct(self, query: SearchQuery) -> dict:
-        if self._catalogs is None:  # ease testing
-            return {}
+        if not self._catalogs:
+            return {}  # ease testing
         result = self._catalogs.search(query)
         appstruct = {'elements': result.elements,
                      'count': result.count,
                      'frequency_of': result.frequency_of,
                      'group_by': result.group_by}
         return appstruct
-
-    @property
-    def _references_query(self) -> SearchQuery:
-        query = {'interfaces': self._get_target_isheet('elements'),
-                 'root': self.context,
-                 'depth': 1,
-                 'only_visible': False,
-                 'resolve': True,
-                 'allows': (),
-                 }
-        return search_query._replace(**query)
 
     def get_cstruct(self, request: Request, params: dict={}) -> dict:
         """Return cstruct data.
@@ -67,8 +73,7 @@ class PoolSheet(AnnotationStorageSheet):
 
         For available  values in `params` read the `get` method docstring.
         Automatically set params are: `only_visible` and `allows`
-        read permission.
-        Additional params are:
+        read permission. Additional params are:
 
         serialization_form (str):
             serialization for references resources: `omit` returns an empty
@@ -93,8 +98,6 @@ class PoolSheet(AnnotationStorageSheet):
         schema = self._get_schema_for_cstruct(request, params)
         cstruct = schema.serialize(appstruct)
         return cstruct
-
-    _additional_params = ('serialization_form', 'show_frequency', 'show_count')
 
     def _get_schema_for_cstruct(self, request, params: dict):
         schema = super()._get_schema_for_cstruct(request, params)

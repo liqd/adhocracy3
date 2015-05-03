@@ -8,33 +8,26 @@ import colander
 
 @fixture
 def sheet_meta(sheet_meta):
-    from adhocracy_core.sheets import AnnotationStorageSheet
+    from adhocracy_core.sheets import AnnotationRessourceSheet
     from adhocracy_core.interfaces import ISheet
     class SheetASchema(colander.MappingSchema):
         count = colander.SchemaNode(colander.Int(),
-                                    missing=colander.drop,
-                                    default=0)
+            missing=colander.drop,
+            default=0)
     meta = sheet_meta._replace(isheet=ISheet,
                                schema_class=SheetASchema,
-                               sheet_class=AnnotationStorageSheet,
+                               sheet_class=AnnotationRessourceSheet,
                                readable=True,
                                editable=True,
                                creatable=True)
     return meta
 
 
-class TestResourceSheet:
+class TestBaseResourceSheet:
 
     @fixture
     def request_(self):
         return testing.DummyRequest()
-
-    @fixture
-    def mock_catalogs(self, mock_catalogs, monkeypatch):
-        mock = mock_catalogs()
-        monkeypatch.setattr('adhocracy_core.sheets.find_service',
-                            lambda x, y: mock)
-        return mock
 
     @fixture
     def mock_node_unique_references(self):
@@ -63,112 +56,86 @@ class TestResourceSheet:
         context.__graph__ = mock_graph
         return context
 
-    def make_one(self, sheet_meta, context, registry=None):
-        from adhocracy_core.sheets import AnnotationStorageSheet
-        return AnnotationStorageSheet(sheet_meta, context, registry=registry)
+    @fixture
+    def inst(self, sheet_meta, context, registry):
+        sheet_class = self.get_class()
+        class DummyStorage(sheet_class):
 
-    def test_create_valid(self, sheet_meta, context):
+            @property
+            def _data(self):
+                return context.__dict__
+
+        inst = DummyStorage(sheet_meta, context, registry=registry)
+        return inst
+
+    def get_class(self):
+        from adhocracy_core.sheets import BaseResourceSheet
+        return BaseResourceSheet
+
+    def test_create_valid(self, inst, sheet_meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        inst = self.make_one(sheet_meta, context)
         assert inst.context == context
         assert inst.meta == sheet_meta
-        assert isinstance(inst.schema, sheet_meta.schema_class)
-        assert inst._data_key == sheet_meta.isheet.__identifier__
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
     def test_create_valid_set_registry_if_available(self, sheet_meta, context,
                                                     registry):
-        inst = self.make_one(sheet_meta, context)
+        inst = self.get_class()(sheet_meta, context)
         assert inst.registry is registry
 
     def test_create_valid_set_registry_manually(self, sheet_meta, context):
         registry = testing.DummyResource()
-        inst = self.make_one(sheet_meta, context, registry=registry)
+        inst = self.get_class()(sheet_meta, context, registry=registry)
         assert inst.registry is registry
 
-    def test_get_empty(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_get_empty(self, inst):
         assert inst.get() == {'count': 0}
 
-    def test_get_non_empty(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_get_non_empty(self, inst):
         inst._data['count'] = 11
         assert inst.get() == {'count': 11}
 
-    def test_get_with_custom_query(self, sheet_meta, mock_catalogs, context,
+    def test_get_with_custom_query(self, inst, sheet_catalogs,
                                    mock_node_unique_references):
         from adhocracy_core.interfaces import search_result
-        inst = self.make_one(sheet_meta, context)
         node = mock_node_unique_references
         inst.schema.children.append(node)
-        mock_catalogs.search.return_value = search_result
+        sheet_catalogs.search.return_value = search_result
         appstruct = inst.get({'depth': 100})
-        query = mock_catalogs.search.call_args[0][0]
+        query = sheet_catalogs.search.call_args[0][0]
         assert query.depth == 100
 
-    def test_get_raise_if_query_key_is_no_search_query_key(self, sheet_meta,
-                                                           context):
-        inst = self.make_one(sheet_meta, context)
+    def test_get_raise_if_query_key_is_no_search_query_key(self, inst):
         with raises(ValueError):
             inst.get({'WRONG': 100})
 
-    def test_set_valid(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_set_valid(self, inst):
         assert inst.set({'count': 11}) is True
         assert inst.get() == {'count': 11}
 
-    def test_set_valid_empty(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_set_valid_empty(self, inst):
         assert inst.set({}) is False
         assert inst.get() == {'count': 0}
 
-    def test_set_valid_omit_str(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_set_valid_omit_str(self, inst):
         assert inst.set({'count': 11}, omit='count') is False
 
-    def test_set_valid_omit_tuple(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_set_valid_omit_tuple(self, inst):
         assert inst.set({'count': 11}, omit=('count',)) is False
 
-    def test_set_valid_omit_wrong_key(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_set_valid_omit_wrong_key(self, inst):
         assert inst.set({'count': 11}, omit=('wrongkey',)) is True
 
-    def test_set_valid_omit_readonly(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_set_valid_omit_readonly(self, inst):
         inst.schema['count'].readonly = True
         inst.set({'count': 11})
         assert inst.get() == {'count': 0}
 
-    def test_set_valid_with_sheet_subtype_and_name_conflicts(self, sheet_meta,
-                                                             context):
-        sheet_a_meta = sheet_meta
-
-        class ISheetB(sheet_a_meta.isheet):
-            pass
-
-        class SheetBSchema(sheet_a_meta.schema_class):
-            count = colander.SchemaNode(colander.Int(),
-                                        missing=colander.drop,
-                                        default=0)
-
-        sheet_b_meta = sheet_a_meta._replace(isheet=ISheetB,
-                                             schema_class=SheetBSchema)
-        inst_a = self.make_one(sheet_a_meta, context)
-        inst_b = self.make_one(sheet_b_meta, context)
-
-        inst_a.set({'count': 1})
-        inst_b.set({'count': 2})
-
-        assert inst_a.get() == {'count': 1}
-        assert inst_b.get() == {'count': 2}
-
-    def test_set_valid_references(self, sheet_meta, context, mock_graph,
+    def test_set_valid_references(self, inst, context, mock_graph,
                                   mock_node_unique_references, registry):
         from adhocracy_core.interfaces import ISheet
-        inst = self.make_one(sheet_meta, context)
         node = mock_node_unique_references
         inst.schema.children.append(node)
         inst.context._graph = mock_graph
@@ -179,19 +146,18 @@ class TestResourceSheet:
         mock_graph.set_references_for_isheet.assert_called_with(
             context, ISheet, {'references': [target]}, registry)
 
-    def test_get_valid_back_references(self, sheet_meta, context, mock_catalogs,
+    def test_get_valid_back_references(self, inst, context, sheet_catalogs,
                                        mock_node_unique_references):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import search_result
         from adhocracy_core.interfaces import search_query
         from adhocracy_core.interfaces import Reference
-        inst = self.make_one(sheet_meta, context)
         node = mock_node_unique_references
         node.backref = True
         inst.schema.children.append(node)
         source = testing.DummyResource()
         result = search_result._replace(elements=[source])
-        mock_catalogs.search.return_value = result
+        sheet_catalogs.search.return_value = result
 
         appstruct = inst.get()
 
@@ -199,14 +165,12 @@ class TestResourceSheet:
         query = search_query._replace(references=[reference],
                                       resolve=True,
                                       )
-        mock_catalogs.search.assert_called_with(query)
+        sheet_catalogs.search.assert_called_with(query)
         assert appstruct['references'] == [source]
 
-
-    def test_set_valid_reference(self, sheet_meta, context, mock_graph,
+    def test_set_valid_reference(self, inst, context, mock_graph,
                                  mock_node_single_reference, registry):
         from adhocracy_core.interfaces import ISheet
-        inst = self.make_one(sheet_meta, context)
         node = mock_node_single_reference
         inst.schema.children.append(node)
         target = testing.DummyResource()
@@ -215,18 +179,17 @@ class TestResourceSheet:
         graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
         assert graph_set_args == (context, ISheet, {'reference': target}, registry)
 
-    def test_get_valid_reference(self, sheet_meta, context, mock_catalogs,
+    def test_get_valid_reference(self, inst, context, sheet_catalogs,
                                  mock_node_single_reference):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import search_result
         from adhocracy_core.interfaces import search_query
         from adhocracy_core.interfaces import Reference
-        inst = self.make_one(sheet_meta, context)
         node = mock_node_single_reference
         inst.schema.children.append(node)
         target = testing.DummyResource()
         result = search_result._replace(elements=[target])
-        mock_catalogs.search.return_value = result
+        sheet_catalogs.search.return_value = result
 
         appstruct = inst.get()
 
@@ -234,34 +197,30 @@ class TestResourceSheet:
         query = search_query._replace(references=[reference],
                                       resolve=True,
                                       )
-        mock_catalogs.search.assert_called_with(query)
+        sheet_catalogs.search.assert_called_with(query)
         assert appstruct['reference'] == target
 
-    def test_get_valid_back_reference(self, sheet_meta, context, mock_catalogs,
-                                     mock_node_single_reference):
+    def test_get_valid_back_reference(self, inst, context, sheet_catalogs,
+                                      mock_node_single_reference):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import search_result
-        from adhocracy_core.interfaces import search_query
         from adhocracy_core.interfaces import Reference
-        inst = self.make_one(sheet_meta, context)
         node = mock_node_single_reference
         node.backref = True
         inst.schema.children.append(node)
         source = testing.DummyResource()
         result = search_result._replace(elements=[source])
-        mock_catalogs.search.return_value = result
-
+        sheet_catalogs.search.return_value = result
         appstruct = inst.get()
 
         reference = Reference(None, ISheet, '', context)
-        assert mock_catalogs.search.call_args[0][0].references == [reference]
+        assert sheet_catalogs.search.call_args[0][0].references == [reference]
         assert appstruct['reference'] == source
 
-    def test_notify_resource_sheet_modified(self, sheet_meta, context, config):
+    def test_notify_resource_sheet_modified(self, inst, context, config):
         from adhocracy_core.interfaces import IResourceSheetModified
         from adhocracy_core.testing import create_event_listener
         events = create_event_listener(config, IResourceSheetModified)
-        inst = self.make_one(sheet_meta, context)
 
         inst.set({'count': 2})
 
@@ -271,47 +230,103 @@ class TestResourceSheet:
         assert events[0].old_appstruct == {'count': 0}
         assert events[0].new_appstruct == {'count': 2}
 
-    def test_get_cstruct(self, sheet_meta, request_, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_get_cstruct(self, inst, request_):
         inst.set({'count': 2})
         assert inst.get_cstruct(request_) == {'count': '2'}
 
-    def test_get_cstruct_with_params(self, sheet_meta, request_, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_get_cstruct_with_params(self, inst, request_):
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
         cstruct = inst.get_cstruct(request_, params={'name': 'child'})
         assert 'name' in inst.get.call_args[1]['params']
 
-    def test_get_cstruct_filter_by_view_permission(self, sheet_meta, request_,
-                                                   context):
-        inst = self.make_one(sheet_meta, context)
+    def test_get_cstruct_filter_by_view_permission(self, inst, request_):
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.get_cstruct(request_)
         assert inst.get.call_args[1]['params']['allows'] == \
-            (request_.effective_principals, 'view')
+               (request_.effective_principals, 'view')
 
-    def test_get_cstruct_filter_by_only_visible(self, sheet_meta, request_,
-                                                context):
-        inst = self.make_one(sheet_meta, context)
+    def test_get_cstruct_filter_by_only_visible(self, inst, request_):
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.get_cstruct(request_)
         assert inst.get.call_args[1]['params']['only_visible']
 
-    def test_delete_field_values_ignore_if_wrong_field(self, sheet_meta,
-                                                       request_, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_delete_field_values_ignore_if_wrong_field(self, inst):
         inst._data['count'] = 2
         inst.delete_field_values(['count'])
         assert 'count' not in inst._data
 
-    def test_delete_field_values(self, sheet_meta, request_, context):
-        inst = self.make_one(sheet_meta, context)
+    def test_delete_field_values(self, inst):
         inst._data['count'] = 2
         inst.delete_field_values(['wrong'])
         assert 'count' in inst._data
+
+
+class TestAnnotationRessourceSheet:
+
+    @fixture
+    def sheet_meta(self, sheet_meta):
+        from . import AnnotationRessourceSheet
+        return sheet_meta._replace(sheet_class=AnnotationRessourceSheet)
+
+    @fixture
+    def inst(self, sheet_meta, context):
+        from . import AnnotationRessourceSheet
+        return AnnotationRessourceSheet(sheet_meta, context)
+
+    def test_create(self, inst, context, sheet_meta):
+        from . import BaseResourceSheet
+        from adhocracy_core.interfaces import IResourceSheet
+        from zope.interface.verify import verifyObject
+        assert isinstance(inst, BaseResourceSheet)
+        assert inst.context == context
+        assert inst.meta == sheet_meta
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+
+    def test_set_valid_with_other_sheet_name_conflicts(self, inst, sheet_meta,
+                                                       context):
+        from adhocracy_core.interfaces import ISheet
+
+        class ISheetB(ISheet):
+            pass
+
+        class SheetBSchema(sheet_meta.schema_class):
+            count = colander.SchemaNode(colander.Int(),
+                missing=colander.drop,
+                default=0)
+
+        sheet_b_meta = sheet_meta._replace(isheet=ISheetB,
+                                           schema_class=SheetBSchema)
+        inst_b = sheet_meta.sheet_class(sheet_b_meta, context)
+
+        inst.set({'count': 1})
+        inst_b.set({'count': 2})
+
+        assert inst.get() == {'count': 1}
+        assert inst_b.get() == {'count': 2}
+
+    def test_set_valid_with_subtype_and_name_conflicts(self, inst,  sheet_meta,
+                                                       context):
+        class ISheetB(sheet_meta.isheet):
+            pass
+
+        class SheetBSchema(sheet_meta.schema_class):
+            count = colander.SchemaNode(colander.Int(),
+                missing=colander.drop,
+                default=0)
+
+        sheet_b_meta = sheet_meta._replace(isheet=ISheetB,
+                                             schema_class=SheetBSchema)
+        inst_b = sheet_meta.sheet_class(sheet_b_meta, context)
+
+        inst.set({'count': 1})
+        inst_b.set({'count': 2})
+
+        assert inst.get() == {'count': 1}
+        assert inst_b.get() == {'count': 2}
 
 
 class TestAddSheetToRegistry:
@@ -366,8 +381,8 @@ class TestAddSheetToRegistry:
     def test_register_non_valid_schema_subclass_has_changed_field_type(self, sheet_meta, registry):
         class SheetABSchema(sheet_meta.schema_class):
             count = colander.SchemaNode(colander.String(),
-                                        missing=colander.drop,
-                                        default='D')
+                missing=colander.drop,
+                default='D')
         class ISheetAB(sheet_meta.isheet):
             pass
         meta_b = sheet_meta._replace(isheet=ISheetAB,

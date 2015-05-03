@@ -12,9 +12,9 @@ class TestDocumentSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.document import IDocument
         from adhocracy_core.sheets.document import DocumentSchema
-        from adhocracy_core.sheets import AnnotationStorageSheet
+        from adhocracy_core.sheets import AnnotationRessourceSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationStorageSheet)
+        assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == IDocument
         assert inst.meta.schema_class == DocumentSchema
 
@@ -43,9 +43,9 @@ class TestParagraphSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.document import IParagraph
         from adhocracy_core.sheets.document import ParagraphSchema
-        from adhocracy_core.sheets import AnnotationStorageSheet
+        from adhocracy_core.sheets import AnnotationRessourceSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationStorageSheet)
+        assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == IParagraph
         assert inst.meta.schema_class == ParagraphSchema
 
@@ -74,9 +74,9 @@ class TestSectionSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.document import ISection
         from adhocracy_core.sheets.document import SectionSchema
-        from adhocracy_core.sheets import AnnotationStorageSheet
+        from adhocracy_core.sheets import AnnotationRessourceSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationStorageSheet)
+        assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == ISection
         assert inst.meta.schema_class == SectionSchema
 

@@ -1,7 +1,7 @@
 """Data structures/validation, set/get for an isolated set of resource data."""
 
 from logging import getLogger
-from collections import Iterable
+from collections import defaultdict
 
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
@@ -10,7 +10,6 @@ from pyramid.request import Request
 from pyramid.threadlocal import get_current_registry
 from substanced.util import find_service
 from zope.interface import implementer
-from zope.interface.interfaces import IInterface
 import colander
 
 from adhocracy_core.events import ResourceSheetModified
@@ -26,8 +25,6 @@ from adhocracy_core.utils import normalize_to_tuple
 from adhocracy_core.utils import find_graph
 
 logger = getLogger(__name__)
-
-# TODO refactor PropertySheet
 
 
 @implementer(IResourceSheet)
@@ -47,7 +44,6 @@ class BaseResourceSheet:
         """Resource to adapt."""
         self.meta = meta
         """SheetMetadata"""
-        self._data_key = self.meta.isheet.__identifier__
         if registry is None:
             registry = get_current_registry(context)
         self.registry = registry
@@ -55,52 +51,20 @@ class BaseResourceSheet:
            :func:`pyramid.threadlocal.get_current_registry` is used get it.
         """
 
-    def get(self, params: dict={}) -> dict:
-        """Return appstruct data.
-
-        :param params: Parameters to update the search query to find
-            references data (possible items are described in
-            :class:`adhocracy_core.interfaces.SearchQuery`).
-            The default search query is set in the `_references_query`
-            property.
-        """
-        query = self._references_query
-        if params:
-            query = query._replace(**params)
-        appstruct = self._default_appstruct
-        appstruct.update(self._get_data_appstruct())
-        appstruct.update(self._get_reference_appstruct(query))
-        appstruct.update(self._get_back_reference_appstruct(query))
-        return appstruct
-
-    @property
-    def _default_appstruct(self) -> dict:
-        """Return schema default values."""
-        schema = self._get_schema_for_default_values()
-        items = [(n.name, n.default) for n in schema]
-        return dict(items)
-
-    def _get_schema_for_default_values(self) -> colander.SchemaNode:
-        """Return customized schema to get default values.
-
-        This might be overridden in subclasses.
-        """
-        schema = self.schema.bind(context=self.context,
-                                  registry=self.registry)
-        return schema
-
-    def _get_data_appstruct(self) -> iter:
-        """Return non references data.
-
-        This might be overridden in subclasses.
-        """
-        for key in self._data_keys:
-            if key in self._data:
-                yield (key, self._data[key])
-
     @reify
-    def _data_keys(self) -> list:
-        return [n.name for n in self.schema if not hasattr(n, 'reftype')]
+    def _fields(self) -> dict:
+        fields = defaultdict(dict)
+        for node in self.schema.children:
+            field = node.name
+            if not hasattr(node, 'reftype'):
+                fields['data'][field] = node
+            elif not node.backref:
+                fields['reference'][field] = node
+            else:
+                fields['back_reference'][field] = node
+            if getattr(node, 'readonly', False):
+                fields['readonly'][field] = node
+        return fields
 
     @property
     def _graph(self):
@@ -117,82 +81,76 @@ class BaseResourceSheet:
         """Return dictionary to store data."""
         raise NotImplementedError
 
-    @property
-    def _references_query(self) -> SearchQuery:
-        query = {'only_visible': False,
-                 'resolve': True,
-                 'allows': (),
-                 'references': [],
-                 }
-        return search_query._replace(**query)
+    def get(self, params: dict={}) -> dict:
+        """Return appstruct data.
+
+        :param params: Parameters to update the search query to find
+            references data (possible items are described in
+            :class:`adhocracy_core.interfaces.SearchQuery`).
+            The default search query is set in the `_references_query`
+            property.
+        """
+        appstruct = self._get_default_appstruct()
+        appstruct.update(self._get_data_appstruct())
+        query = self._get_references_query(params)
+        appstruct.update(self._get_reference_appstruct(query))
+        appstruct.update(self._get_back_reference_appstruct(query))
+        return appstruct
+
+    def _get_default_appstruct(self) -> dict:
+        schema = self.schema.bind(context=self.context,
+                                  registry=self.registry)
+        items = [(n.name, n.default) for n in schema]
+        return dict(items)
+
+    def _get_data_appstruct(self) -> iter:
+        """Might be overridden in subclasses."""
+        for key in self._fields['data']:
+            if key in self._data:
+                yield (key, self._data[key])
+
+    def _get_references_query(self, params: dict) -> SearchQuery:
+        """Might be overridden in subclasses."""
+        default_params = {'only_visible': False,
+                          'resolve': True,
+                          'allows': (),
+                          'references': [],
+                          }
+        query = search_query._replace(**default_params)
+        if params:
+            query = query._replace(**params)
+        return query
 
     def _get_reference_appstruct(self, query: SearchQuery) -> iter:
-        """Return reference data.
-
-        This might be overridden in subclasses.
-        """
-        for key, node in self._reference_nodes.items():
-            node_references = self._get_references(key, query)
-            if len(node_references) == 0:
-                continue
-            if isinstance(node, schema.Reference):
-                yield(key, list(node_references)[0])
-            else:
-                yield(key, node_references)
-
-    def _get_references(self, field, query) -> Iterable:
-        if self._catalogs is None:
-            return []  # ease testing
-        reference = Reference(self.context, self.meta.isheet, field, None)
-        query_field = query._replace(references=[reference])
-        result = self._catalogs.search(query_field)
-        return result.elements
-
-    @reify
-    def _reference_nodes(self) -> dict:
-        nodes = {}
-        for node in self.schema:
-            if hasattr(node, 'reftype') and not node.backref:
-                nodes[node.name] = node
-        return nodes
-
-    def _get_target_isheet(self, reference_node) -> IInterface:
-        reftype = self._reference_nodes[reference_node].reftype
-        target_isheet = reftype.getTaggedValue('target_isheet')
-        return target_isheet
+        """Might be overridden in subclasses."""
+        fields = self._fields['reference'].items()
+        get_ref = lambda node: Reference(self.context, self.meta.isheet,
+                                         node.name, None)
+        return self._yield_references(self._catalogs, fields, query, get_ref)
 
     def _get_back_reference_appstruct(self, query: SearchQuery) -> dict:
-        for key, node in self._back_reference_nodes.items():
-            node_backrefs = self._get_backrefs(key, query)
-            if not isinstance(node_backrefs, Iterable):  # ease testing
+        fields = self._fields['back_reference'].items()
+
+        def get_ref(node):
+            isheet = node.reftype.getTaggedValue('source_isheet')
+            isheet_field = node.reftype.getTaggedValue('source_isheet_field')
+            return Reference(None, isheet, isheet_field, self.context)
+
+        return self._yield_references(self._catalogs, fields, query, get_ref)
+
+    def _yield_references(self, catalogs, fields, query, create_ref) -> iter:
+        if not catalogs:
+            return iter([])  # ease testing
+        for field, node in fields:
+            reference = create_ref(node)
+            query_field = query._replace(references=[reference])
+            elements = self._catalogs.search(query_field).elements
+            if len(elements) == 0:
                 continue
             if isinstance(node, schema.Reference):
-                yield(key, node_backrefs[0])
+                yield(field, elements[0])
             else:
-                yield(key, node_backrefs)
-
-    def _get_backrefs(self, field, query: SearchQuery) -> Iterable:
-        """Return back reference data.
-
-        This might be overridden in subclasses.
-        """
-        if self._catalogs is None:
-            return []  # ease testing
-        reftype = self._back_reference_nodes[field].reftype
-        isheet = reftype.getTaggedValue('source_isheet')
-        isheet_field = reftype.getTaggedValue('source_isheet_field')
-        reference = Reference(None, isheet, isheet_field, self.context)
-        query_field = query._replace(references=[reference])
-        result = self._catalogs.search(query_field)
-        return result.elements
-
-    @reify
-    def _back_reference_nodes(self) -> dict:
-        nodes = {}
-        for node in self.schema:
-            if hasattr(node, 'reftype') and node.backref:
-                nodes[node.name] = node
-        return nodes
+                yield(field, elements)
 
     def set(self,
             appstruct: dict,
@@ -207,52 +165,39 @@ class BaseResourceSheet:
             appstruct = self._omit_readonly_keys(appstruct)
         self._store_data(appstruct)
         self._store_references(appstruct, self.registry)
-        # TODO: only store struct if values have changed
-        self._notify_resource_sheet_modified(send_event,
-                                             self.registry,
-                                             appstruct_old,
-                                             appstruct,
-                                             request)
+        if send_event:
+            event = ResourceSheetModified(self.context,
+                                          self.meta.isheet,
+                                          self.registry,
+                                          appstruct_old,
+                                          appstruct,
+                                          request)
+            self.registry.notify(event)
         return bool(appstruct)
+        # TODO: only store struct if values have changed
 
     def _omit_readonly_keys(self, appstruct: dict):
-        omit_keys = tuple(self._readonly_keys)
+        omit_keys = tuple(self._fields['readonly'])
         return remove_keys_from_dict(appstruct, keys_to_remove=omit_keys)
 
     def _omit_omit_keys(self, appstruct: dict, omit):
         omit_keys = normalize_to_tuple(omit)
         return remove_keys_from_dict(appstruct, keys_to_remove=omit_keys)
 
-    @reify
-    def _readonly_keys(self):
-        return [n.name for n in self.schema if getattr(n, 'readonly', False)]
-
     def _store_data(self, appstruct):
-        for key in self._data_keys:
+        """Might be overridden in subclasses."""
+        for key in self._fields['data']:
             if key in appstruct:
                 self._data[key] = appstruct[key]
 
     def _store_references(self, appstruct, registry):
-        if self._graph:
-            self._graph.set_references_for_isheet(self.context,
-                                                  self.meta.isheet,
-                                                  appstruct,
-                                                  registry)
-
-    def _notify_resource_sheet_modified(self,
-                                        send_event,
-                                        registry,
-                                        old,
-                                        new,
-                                        request: Request):
-        if send_event:
-            event = ResourceSheetModified(self.context,
-                                          self.meta.isheet,
-                                          registry,
-                                          old,
-                                          new,
-                                          request)
-            registry.notify(event)
+        """Might be overridden in subclasses."""
+        if not self._graph:
+            return  # ease testing
+        self._graph.set_references_for_isheet(self.context,
+                                              self.meta.isheet,
+                                              appstruct,
+                                              registry)
 
     def get_cstruct(self, request: Request, params: dict={}):
         """Return cstruct data.
@@ -276,10 +221,7 @@ class BaseResourceSheet:
         return cstruct
 
     def _get_schema_for_cstruct(self, request, params: dict):
-        """Return customized schema to serialize cstruct data.
-
-        This might be overridden in subclasses.
-        """
+        """Might be overridden in subclasses."""
         schema = self.schema.bind(context=self.context,
                                   registry=self.registry,
                                   request=request)
@@ -297,9 +239,13 @@ class BaseResourceSheet:
 
 
 @implementer(IResourceSheet)
-class AnnotationStorageSheet(BaseResourceSheet):
+class AnnotationRessourceSheet(BaseResourceSheet):
 
     """Resource Sheet that stores data in dictionary annotation."""
+
+    def __init__(self, meta, context, registry=None):
+        super().__init__(meta, context, registry)
+        self._data_key = self.meta.isheet.__identifier__
 
     @property
     def _data(self):
@@ -316,7 +262,7 @@ class AnnotationStorageSheet(BaseResourceSheet):
 
 
 @implementer(IResourceSheet)
-class AttributeStorageSheet(AnnotationStorageSheet):
+class AttributeResourceSheet(BaseResourceSheet):
 
     """Resource Sheet that stores data as context attributes."""
 
@@ -326,7 +272,7 @@ class AttributeStorageSheet(AnnotationStorageSheet):
 
 
 sheet_meta = SheetMetadata(isheet=ISheet,
-                           sheet_class=AnnotationStorageSheet,
+                           sheet_class=AnnotationRessourceSheet,
                            schema_class=colander.MappingSchema,
                            permission_view='view',
                            permission_edit='edit_sheet',
