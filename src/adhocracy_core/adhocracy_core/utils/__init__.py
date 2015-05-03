@@ -323,7 +323,7 @@ def get_last_version(resource: IItemVersion,
     last_tag = item['LAST']
     last_versions = get_sheet_field(last_tag, ITag, 'elements',
                                     registry=registry)
-    last_version = last_versions[0]
+    last_version = [x for x in last_versions][0]
     return last_version
 
 

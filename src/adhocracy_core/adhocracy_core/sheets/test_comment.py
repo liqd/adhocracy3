@@ -42,16 +42,16 @@ class TestCommentableSheet:
         data = inst.get()
         assert list(data['comments']) == []
 
-    def test_get_with_comments(self, meta, context, mock_graph):
+    def test_get_with_comments(self, meta, context, sheet_catalogs,
+                               search_result):
         comment = testing.DummyResource()
         inst = meta.sheet_class(meta, context)
-        mock_graph.get_back_references_for_isheet.return_value = {'refers_to': [comment]}
-        mock_graph.get_references_for_isheet.return_value = {}
+        sheet_catalogs.search.return_value =\
+            search_result._replace(elements=[comment])
         data = inst.get()
         assert list(data['comments']) == [comment]
 
-    def test_set_with_comments(self, meta, context, mock_graph):
-        mock_graph.get_references_for_isheet.return_value = {}
+    def test_set_with_comments(self, meta, context, sheet_catalogs):
         inst = meta.sheet_class(meta, context)
         inst.set({'comments': []})
         assert not 'comments' in inst._data

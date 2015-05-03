@@ -134,7 +134,8 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         """ Get ``appstruct`` dictionary data.
 
         :param params: optional parameters that can modify the appearance
-        of the returned dictionary, e.g. query parameters in a GET request
+        of the returned dictionary. Valid keys/values are defined in
+        :class:`SearchQuery`.
         """
 
     def get_cstruct(request, params: dict={}):

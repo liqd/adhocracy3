@@ -247,7 +247,7 @@ class PasswordAuthenticationSheet(AnnotationStorageSheet):
         password_encoded = self.context.pwd_manager.encode(password)
         self.context.password = password_encoded
 
-    def _get_data_appstruct(self, params: dict={}):
+    def _get_data_appstruct(self):
         password_encoded = getattr(self.context, 'password', '')
         return {'password': password_encoded}
 

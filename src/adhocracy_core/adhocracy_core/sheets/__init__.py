@@ -1,6 +1,5 @@
 """Data structures/validation, set/get for an isolated set of resource data."""
 
-from itertools import chain
 from logging import getLogger
 from collections import Iterable
 
@@ -10,21 +9,26 @@ from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.threadlocal import get_current_registry
 from substanced.property import PropertySheet
+from substanced.util import find_service
 from zope.interface import implementer
+from zope.interface.interfaces import IInterface
 import colander
 
-from adhocracy_core.utils import find_graph
-from adhocracy_core.utils import is_hidden
-from adhocracy_core.utils import is_deleted
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetMetadata
-from adhocracy_core.schema import Reference
+from adhocracy_core.interfaces import Reference
+from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import search_query
+from adhocracy_core import schema
 from adhocracy_core.utils import remove_keys_from_dict
 from adhocracy_core.utils import normalize_to_tuple
+from adhocracy_core.utils import find_graph
 
 logger = getLogger(__name__)
+
+# TODO refactor PropertySheet
 
 
 @implementer(IResourceSheet)
@@ -51,11 +55,21 @@ class AnnotationStorageSheet(PropertySheet):
         """
 
     def get(self, params: dict={}) -> dict:
-        """Return appstruct."""
+        """Return appstruct data.
+
+        :param params: Parameters to update the search query to find
+            references data (possible items are described in
+            :class:`adhocracy_core.interfaces.SearchQuery`).
+            The default search query is set in the `_references_query`
+            property.
+        """
+        query = self._references_query
+        if params:
+            query = query._replace(**params)
         appstruct = self._default_appstruct
-        appstruct.update(self._get_data_appstruct(params))
-        appstruct.update(self._get_reference_appstruct(params))
-        appstruct.update(self._get_back_reference_appstruct(params))
+        appstruct.update(self._get_data_appstruct())
+        appstruct.update(self._get_reference_appstruct(query))
+        appstruct.update(self._get_back_reference_appstruct(query))
         return appstruct
 
     @property
@@ -74,7 +88,7 @@ class AnnotationStorageSheet(PropertySheet):
                                   registry=self.registry)
         return schema
 
-    def _get_data_appstruct(self, params: dict={}) -> iter:
+    def _get_data_appstruct(self) -> iter:
         """Return non references data.
 
         This might be overridden in subclasses.
@@ -89,7 +103,13 @@ class AnnotationStorageSheet(PropertySheet):
 
     @property
     def _graph(self):
-        return find_graph(self.context)
+        graph = find_graph(self.context)
+        return graph
+
+    @property
+    def _catalogs(self):
+        catalogs = find_service(self.context, 'catalogs')
+        return catalogs
 
     @property
     def _data(self):
@@ -107,26 +127,36 @@ class AnnotationStorageSheet(PropertySheet):
             sheets_data[self._data_key] = data
         return data
 
-    def _get_reference_appstruct(self, params: dict={}) -> iter:
+    @property
+    def _references_query(self) -> SearchQuery:
+        query = {'only_visible': False,
+                 'resolve': True,
+                 'allows': (),
+                 'references': [],
+                 }
+        return search_query._replace(**query)
+
+    def _get_reference_appstruct(self, query: SearchQuery) -> iter:
         """Return reference data.
 
         This might be overridden in subclasses.
         """
-        references = self._get_references()
         for key, node in self._reference_nodes.items():
-            node_references = references.get(key, None)
-            if not node_references:
+            node_references = self._get_references(key, query)
+            if len(node_references) == 0:
                 continue
-            if isinstance(node, Reference):
-                yield(key, node_references[0])
+            if isinstance(node, schema.Reference):
+                yield(key, list(node_references)[0])
             else:
                 yield(key, node_references)
 
-    def _get_references(self) -> dict:
-        if not self._graph:
-            return {}
-        return self._graph.get_references_for_isheet(self.context,
-                                                     self.meta.isheet)
+    def _get_references(self, field, query) -> Iterable:
+        if self._catalogs is None:
+            return []  # ease testing
+        reference = Reference(self.context, self.meta.isheet, field, None)
+        query_field = query._replace(references=[reference])
+        result = self._catalogs.search(query_field)
+        return result.elements
 
     @reify
     def _reference_nodes(self) -> dict:
@@ -136,39 +166,35 @@ class AnnotationStorageSheet(PropertySheet):
                 nodes[node.name] = node
         return nodes
 
-    def _get_back_reference_appstruct(self, params: dict={}) -> dict:
+    def _get_target_isheet(self, reference_node) -> IInterface:
+        reftype = self._reference_nodes[reference_node].reftype
+        target_isheet = reftype.getTaggedValue('target_isheet')
+        return target_isheet
+
+    def _get_back_reference_appstruct(self, query: SearchQuery) -> dict:
         for key, node in self._back_reference_nodes.items():
-            node_backrefs = self._get_backrefs(node)
+            node_backrefs = self._get_backrefs(key, query)
             if not isinstance(node_backrefs, Iterable):  # ease testing
                 continue
-            visible_node_backrefs = []
-            for resource in node_backrefs:
-                if is_deleted(resource):
-                    continue
-                if is_hidden(resource):
-                    continue
-                visible_node_backrefs.append(resource)
-            if isinstance(node, Reference):
-                yield(key, visible_node_backrefs[0])
+            if isinstance(node, schema.Reference):
+                yield(key, node_backrefs[0])
             else:
-                yield(key, visible_node_backrefs)
+                yield(key, node_backrefs)
 
-    def _get_backrefs(self, node: Reference) -> Iterable:
-        """Return backreference data.
+    def _get_backrefs(self, field, query: SearchQuery) -> Iterable:
+        """Return back reference data.
 
         This might be overridden in subclasses.
         """
-        if not self._graph:
-            return {}
-        isheet = node.reftype.getTaggedValue('source_isheet')
-        backrefs = self._graph.get_back_references_for_isheet(self.context,
-                                                              isheet)
-        field = node.reftype.getTaggedValue('source_isheet_field')
-        if field:
-            return backrefs.get(field, None)
-        else:
-            # return all backrefs regardless of field name
-            return list(chain(*backrefs.values()))
+        if self._catalogs is None:
+            return []  # ease testing
+        reftype = self._back_reference_nodes[field].reftype
+        isheet = reftype.getTaggedValue('source_isheet')
+        isheet_field = reftype.getTaggedValue('source_isheet_field')
+        reference = Reference(None, isheet, isheet_field, self.context)
+        query_field = query._replace(references=[reference])
+        result = self._catalogs.search(query_field)
+        return result.elements
 
     @reify
     def _back_reference_nodes(self) -> dict:
@@ -241,16 +267,19 @@ class AnnotationStorageSheet(PropertySheet):
     def get_cstruct(self, request: Request, params: dict={}):
         """Return cstruct data.
 
-        Bind `request` and `context` (self.context) to colander schema
+        Bind `request` and `self.context` to colander schema
         (self.schema). Get sheet appstruct data and serialize.
 
-        :param params: optional parameters that can modify the appearance
-        of the returned dictionary, e.g. query parameters in a GET request
+        :param request: Bind to schema and get principals to filter elements
+                        by 'view' permission.
+        :param params: Parameters to update the search query to find reference
+                       data.
         """
         schema = self._get_schema_for_cstruct(request, params)
         appstruct = self.get(params=params)
         cstruct = schema.serialize(appstruct)
         return cstruct
+
 
     def _get_schema_for_cstruct(self, request, params: dict):
         """Return customized schema to serialize cstruct data.

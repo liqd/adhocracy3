@@ -340,6 +340,18 @@ def query() -> SearchQuery:
 
 
 @fixture
+def sheet_catalogs(monkeypatch, search_result) -> Mock:
+    """Mock _catalogs property for sheets."""
+    from adhocracy_core.interfaces import search_result
+    from adhocracy_core.catalog import CatalogsServiceAdhocracy
+    from adhocracy_core import sheets
+    mock = Mock(spec=CatalogsServiceAdhocracy)
+    mock.search.return_value = search_result
+    monkeypatch.setattr(sheets, 'find_service', lambda x, y: mock)
+    return mock
+
+
+@fixture
 def mock_objectmap() -> Mock:
     """Mock :class:`substanced.objectmap.ObjectMap`."""
     from substanced.objectmap import ObjectMap

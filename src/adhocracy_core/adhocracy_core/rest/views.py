@@ -6,7 +6,6 @@ from datetime import timezone
 from logging import getLogger
 import json
 
-from colander import drop
 from colander import Invalid
 from colander import MappingSchema
 from colander import SchemaNode
@@ -59,6 +58,7 @@ from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
@@ -204,24 +204,11 @@ def _validate_list_schema(schema: SequenceSchema, cstruct: list,
 def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
                           request: Request, location='body'):
     validated = {}
-    nodes_with_cstruct = [n for n in schema if n.name in cstruct]
-    nodes_without_cstruct = [n for n in schema if n.name not in cstruct]
-
-    for node in nodes_without_cstruct:
-        appstruct = node.deserialize()
-        if appstruct is not drop:
-            validated[node.name] = appstruct
-    for node in nodes_with_cstruct:
-        node_cstruct = cstruct[node.name]
-        try:
-            validated[node.name] = node.deserialize(node_cstruct)
-        except Invalid as err:
-            _add_colander_invalid_error_to_request(err, request, location)
-    if getattr(schema.typ, 'unknown', None) == 'preserve':
-        # Schema asks us to preserve other cstruct values
-        for name, value in cstruct.items():
-            if name not in validated:
-                validated[name] = value
+    try:
+        validated = schema.deserialize(cstruct)
+    except Invalid as err:
+        for child in err.children:
+            _add_colander_invalid_error_to_request(child, request, location)
     request.validated.update(validated)
 
 
@@ -462,7 +449,10 @@ class ResourceRESTView(RESTView):
         data_cstruct = {}
         for sheet in sheets_view:
             key = sheet.meta.isheet.__identifier__
-            cstruct = sheet.get_cstruct(self.request, params=queryparams)
+            if sheet.meta.isheet is IPoolSheet:
+                cstruct = sheet.get_cstruct(self.request, params=queryparams)
+            else:
+                cstruct = sheet.get_cstruct(self.request)
             data_cstruct[key] = cstruct
         return data_cstruct
 

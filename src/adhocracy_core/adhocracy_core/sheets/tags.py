@@ -8,7 +8,7 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.versions import IVersionable
-from adhocracy_core.sheets.pool import PoolSheet
+from adhocracy_core.sheets.pool import FilteringPoolSheet
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.utils import find_graph
 
@@ -71,7 +71,7 @@ class TagsSchema(colander.MappingSchema):
 
 tags_meta = sheet_meta._replace(isheet=ITags,
                                 schema_class=TagsSchema,
-                                sheet_class=PoolSheet,
+                                sheet_class=FilteringPoolSheet,
                                 editable=False,
                                 creatable=False,
                                 )

@@ -27,7 +27,14 @@ class TestResourcePropertySheet:
 
     @fixture
     def request_(self):
-        return testing.DummyResource()
+        return testing.DummyRequest()
+
+    @fixture
+    def mock_catalogs(self, mock_catalogs, monkeypatch):
+        mock = mock_catalogs()
+        monkeypatch.setattr('adhocracy_core.sheets.find_service',
+                            lambda x, y: mock)
+        return mock
 
     @fixture
     def mock_node_unique_references(self):
@@ -89,6 +96,23 @@ class TestResourcePropertySheet:
         inst = self.make_one(sheet_meta, context)
         inst._data['count'] = 11
         assert inst.get() == {'count': 11}
+
+    def test_get_with_custom_query(self, sheet_meta, mock_catalogs, context,
+                                   mock_node_unique_references):
+        from adhocracy_core.interfaces import search_result
+        inst = self.make_one(sheet_meta, context)
+        node = mock_node_unique_references
+        inst.schema.children.append(node)
+        mock_catalogs.search.return_value = search_result
+        appstruct = inst.get({'depth': 100})
+        query = mock_catalogs.search.call_args[0][0]
+        assert query.depth == 100
+
+    def test_get_raise_if_query_key_is_no_search_query_key(self, sheet_meta,
+                                                           context):
+        inst = self.make_one(sheet_meta, context)
+        with raises(ValueError):
+            inst.get({'WRONG': 100})
 
     def test_set_valid(self, sheet_meta, context):
         inst = self.make_one(sheet_meta, context)
@@ -155,51 +179,29 @@ class TestResourcePropertySheet:
         mock_graph.set_references_for_isheet.assert_called_with(
             context, ISheet, {'references': [target]}, registry)
 
-    def test_get_valid_back_references(self, sheet_meta, context, mock_graph,
+    def test_get_valid_back_references(self, sheet_meta, context, mock_catalogs,
                                        mock_node_unique_references):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import search_result
+        from adhocracy_core.interfaces import search_query
+        from adhocracy_core.interfaces import Reference
         inst = self.make_one(sheet_meta, context)
         node = mock_node_unique_references
         node.backref = True
         inst.schema.children.append(node)
         source = testing.DummyResource()
-        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
-        inst.context._graph = mock_graph
+        result = search_result._replace(elements=[source])
+        mock_catalogs.search.return_value = result
 
         appstruct = inst.get()
 
+        reference = Reference(None, ISheet, '', context)
+        query = search_query._replace(references=[reference],
+                                      resolve=True,
+                                      )
+        mock_catalogs.search.assert_called_with(query)
         assert appstruct['references'] == [source]
 
-    def test_get_valid_back_references_hidden(self, sheet_meta, context,
-                                              mock_graph,
-                                              mock_node_unique_references):
-        inst = self.make_one(sheet_meta, context)
-        node = mock_node_unique_references
-        node.backref = True
-        inst.schema.children.append(node)
-        source = testing.DummyResource()
-        source.hidden = True
-        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
-        inst.context._graph = mock_graph
-
-        appstruct = inst.get()
-
-        assert appstruct['references'] == []
-
-    def test_get_valid_back_references_deleted(self, sheet_meta, context,
-                                              mock_graph,
-                                              mock_node_unique_references):
-        inst = self.make_one(sheet_meta, context)
-        node = mock_node_unique_references
-        node.backref = True
-        inst.schema.children.append(node)
-        source = testing.DummyResource()
-        source.deleted = True
-        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
-        inst.context._graph = mock_graph
-
-        appstruct = inst.get()
-
-        assert appstruct['references'] == []
 
     def test_set_valid_reference(self, sheet_meta, context, mock_graph,
                                  mock_node_single_reference, registry):
@@ -213,29 +215,47 @@ class TestResourcePropertySheet:
         graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
         assert graph_set_args == (context, ISheet, {'reference': target}, registry)
 
-    def test_get_valid_reference(self, sheet_meta, context, mock_graph,
+    def test_get_valid_reference(self, sheet_meta, context, mock_catalogs,
                                  mock_node_single_reference):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import search_result
+        from adhocracy_core.interfaces import search_query
+        from adhocracy_core.interfaces import Reference
         inst = self.make_one(sheet_meta, context)
         node = mock_node_single_reference
         inst.schema.children.append(node)
         target = testing.DummyResource()
-        mock_graph.get_references_for_isheet.return_value = {'reference':
-                                                             [target]}
+        result = search_result._replace(elements=[target])
+        mock_catalogs.search.return_value = result
+
         appstruct = inst.get()
+
+        reference = Reference(context, ISheet, 'reference', None)
+        query = search_query._replace(references=[reference],
+                                      resolve=True,
+                                      )
+        mock_catalogs.search.assert_called_with(query)
         assert appstruct['reference'] == target
 
-    def test_get_valid_back_reference(self, sheet_meta, context, mock_graph,
+    def test_get_valid_back_reference(self, sheet_meta, context, mock_catalogs,
                                      mock_node_single_reference):
         from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import search_result
+        from adhocracy_core.interfaces import search_query
+        from adhocracy_core.interfaces import Reference
         inst = self.make_one(sheet_meta, context)
         node = mock_node_single_reference
         node.backref = True
         inst.schema.children.append(node)
         source = testing.DummyResource()
-        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
+        result = search_result._replace(elements=[source])
+        mock_catalogs.search.return_value = result
+
         appstruct = inst.get()
+
+        reference = Reference(None, ISheet, '', context)
+        assert mock_catalogs.search.call_args[0][0].references == [reference]
         assert appstruct['reference'] == source
-        mock_graph.get_back_references_for_isheet.assert_called_with(context, ISheet)
 
     def test_notify_resource_sheet_modified(self, sheet_meta, context, config):
         from adhocracy_core.interfaces import IResourceSheetModified
@@ -255,6 +275,13 @@ class TestResourcePropertySheet:
         inst = self.make_one(sheet_meta, context)
         inst.set({'count': 2})
         assert inst.get_cstruct(request_) == {'count': '2'}
+
+    def test_get_cstruct_with_params(self, sheet_meta, request_, context):
+        inst = self.make_one(sheet_meta, context)
+        inst.get = Mock()
+        inst.get.return_value = {'elements': []}
+        cstruct = inst.get_cstruct(request_, params={'name': 'child'})
+        assert 'name' in inst.get.call_args[1]['params']
 
     def test_delete_field_values_ignore_if_wrong_field(self, sheet_meta,
                                                        request_, context):

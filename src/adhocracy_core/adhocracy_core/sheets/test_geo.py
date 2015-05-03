@@ -170,12 +170,9 @@ class TestLocationReferenceSheet:
     def test_create(self, meta, context):
         assert meta.sheet_class(meta, context)
 
-    def test_get_empty(self, meta, context, mock_graph):
-        mock_graph.get_references_for_isheet.return_value = {}
-        context.__graph__ = mock_graph
+    def test_get_empty(self, meta, context, sheet_catalogs):
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'location': None}
-        assert mock_graph.get_references_for_isheet.called
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):

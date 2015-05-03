@@ -13,8 +13,8 @@ from adhocracy_core.sheets.rate import IRateable
 
 @fixture
 def integration(config):
-    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.content')
+    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets.rate')
 
 
