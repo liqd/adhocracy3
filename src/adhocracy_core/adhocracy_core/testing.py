@@ -24,6 +24,8 @@ import colander
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
+from adhocracy_core.interfaces import SearchResult
+from adhocracy_core.interfaces import SearchQuery
 
 
 #####################################
@@ -159,13 +161,16 @@ def pool_graph(config):
     from adhocracy_core.resources.pool import Pool
     from adhocracy_core.resources.root import _add_graph
     from adhocracy_core.resources.root import _add_objectmap_to_app_root
+    from adhocracy_core.sheets.pool import IPool
+    from zope.interface import directlyProvides
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.graph')
-    context = Pool()
-    _add_objectmap_to_app_root(context)
-    _add_graph(context, config.registry)
-    return context
+    pool = Pool()
+    directlyProvides(pool, IPool)
+    _add_objectmap_to_app_root(pool)
+    _add_graph(pool, config.registry)
+    return pool
 
 
 @fixture
@@ -310,6 +315,28 @@ def mock_graph() -> Mock:
     from adhocracy_core.graph import Graph
     mock = Mock(spec=Graph)
     return mock
+
+
+@fixture
+def mock_catalogs() -> Mock:
+    """Mock :class:`adhocracy_core.catalogs.ICatalaogsService`."""
+    from adhocracy_core.catalog import CatalogsService
+    mock = Mock(spec=CatalogsService)
+    return mock
+
+
+@fixture
+def search_result() -> SearchResult:
+    """Return search result."""
+    from adhocracy_core.interfaces import search_result
+    return search_result
+
+
+@fixture
+def query() -> SearchQuery:
+    """Return search query."""
+    from adhocracy_core.interfaces import search_query
+    return search_query
 
 
 @fixture

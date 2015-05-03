@@ -292,6 +292,96 @@ class TestGraphGetReferences:
         assert len(list(result)) == 1
 
 
+class TestGraphGetSourceIds:
+
+    def call_fut(self, objectmap, target, **kwargs):
+        from adhocracy_core.graph import Graph
+        graph = Graph(objectmap.root)
+        return Graph.get_source_ids(graph, target, **kwargs)
+
+    def test_no_target_references(self, context, objectmap):
+        target = create_dummy_resources(parent=context)
+        result = self.call_fut(objectmap, target)
+        assert list(result) == []
+
+    def test_with_target_references(self, context, objectmap):
+        from adhocracy_core.interfaces import SheetReference
+        source, target = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(source, target, SheetReference)
+        result = self.call_fut(objectmap, target)
+        assert list(result) == [source.__oid__]
+
+    def test_filter_by_isheet(self, context, objectmap):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import SheetToSheet
+        class IASheet(ISheet):
+            pass
+        class ASheetToSheet(SheetToSheet):
+            source_isheet = IASheet
+        source, target = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(source, target, SheetToSheet)
+        objectmap.connect(source, target, ASheetToSheet)
+        result = self.call_fut(objectmap, target, isheet=IASheet)
+        assert list(result) == [source.__oid__]
+
+    def test_filter_by_isheet_field(self, context, objectmap):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import SheetToSheet
+        class ASheetToSheet(SheetToSheet):
+            source_isheet = ISheet
+            source_isheet_field = 'a'
+        source, target = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(source, target, SheetToSheet)
+        objectmap.connect(source, target, ASheetToSheet)
+        result = self.call_fut(objectmap, target, isheet_field='a')
+        assert list(result) == [source.__oid__]
+
+
+class TestGraphGetTargetIds:
+
+    def call_fut(self, objectmap, target, **kwargs):
+        from adhocracy_core.graph import Graph
+        graph = Graph(objectmap.root)
+        return Graph.get_target_ids(graph, target, **kwargs)
+
+    def test_no_source_references(self, context, objectmap):
+        source = create_dummy_resources(parent=context)
+        result = self.call_fut(objectmap, source)
+        assert list(result) == []
+
+    def test_with_source_references(self, context, objectmap):
+        from adhocracy_core.interfaces import SheetReference
+        source, target = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(source, target, SheetReference)
+        result = self.call_fut(objectmap, source)
+        assert list(result) == [target.__oid__]
+
+    def test_filter_by_isheet(self, context, objectmap):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import SheetToSheet
+        class IASheet(ISheet):
+            pass
+        class ASheetToSheet(SheetToSheet):
+            source_isheet = IASheet
+        source, target = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(source, target, SheetToSheet)
+        objectmap.connect(source, target, ASheetToSheet)
+        result = self.call_fut(objectmap, source, isheet=IASheet)
+        assert list(result) == [target.__oid__]
+
+    def test_filter_by_isheet_field(self, context, objectmap):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import SheetToSheet
+        class ASheetToSheet(SheetToSheet):
+            source_isheet = ISheet
+            source_isheet_field = 'a'
+        source, target = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(source, target, SheetToSheet)
+        objectmap.connect(source, target, ASheetToSheet)
+        result = self.call_fut(objectmap, source, isheet_field='a')
+        assert list(result) == [target.__oid__]
+
+
 class TestGraphGetBackReferences:
 
     def call_fut(self, objectmap, resource, **kwargs):

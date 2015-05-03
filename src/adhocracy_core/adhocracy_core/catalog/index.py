@@ -5,12 +5,12 @@ from persistent import Persistent
 from substanced.catalog.indexes import SDIndex
 from substanced.content import content
 from substanced.util import find_objectmap
-from substanced.util import get_oid
 from zope.interface import implementer
 import BTrees
 import hypatia.query
 
 from adhocracy_core.utils import find_graph
+from adhocracy_core.interfaces import Reference
 
 
 @content('Reference Index',
@@ -19,7 +19,7 @@ from adhocracy_core.utils import find_graph
 @implementer(IIndex)
 class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
 
-    """Uses the graph query isheet references."""
+    """Use :func:`adhocracy_core.graph.Graph.get_source_ids` to query refs."""
 
     family = BTrees.family64
     __parent__ = None
@@ -64,32 +64,29 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
         """Read interface."""
         return self._not_indexed
 
-    def eq(self, isheet, isheet_field, target) -> hypatia.query.Eq:
+    def eq(self, reference: Reference) -> hypatia.query.Eq:
         """Eq operator to concatenate queries.."""
-        query = {'isheet': isheet,
-                 'isheet_field': isheet_field,
-                 'target': target,
-                 }
+        query = {'reference': reference}
         return hypatia.query.Eq(self, query)
 
     def apply(self, query: dict) -> BTrees.family64.IF.TreeSet:
-        """Apply query parameters and return search result."""
-        query_args = [query['isheet'],
-                      query['isheet_field'],
-                      query['target'],
-                      ]
-        return self._search(*query_args)
+        """Apply query parameters·{reference: Reference} and return result."""
+        reference = query['reference']
+        return self._search(reference)
 
     applyEq = apply
     """Read apply docsting."""
 
-    def _search(self, isheet, isheet_field, target=None):
-        graph = find_graph(self.__parent__)
-        # TODO? unneeded objectid -> object -> objectid transformation
-        backreferences = graph.get_back_references(target, base_isheet=isheet)
-        result = self.family.IF.TreeSet()
-        for source, isheet, field, target in backreferences:
-            if field == isheet_field:
-                docid = get_oid(source)
-                result.add(docid)
+    def _search(self, reference: Reference) -> BTrees.LFBTree.TreeSet:
+        graph = find_graph(self)
+        source, isheet, isheet_field, target = reference
+        if source is None and target is None:
+            raise ValueError('You have to add a source or target resource')
+        elif source is not None and target is not None:
+            raise ValueError('Either source or target has to be None')
+        if source is None:
+            doc_ids = graph.get_source_ids(target, isheet, isheet_field)
+        else:
+            doc_ids = graph.get_target_ids(source, isheet, isheet_field)
+        result = self.family.IF.TreeSet(doc_ids)
         return result

@@ -1,4 +1,5 @@
 """Test custom catalog index."""
+from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
@@ -91,90 +92,86 @@ class TestReference:
          inst = self.make_one()
          assert list(inst.not_indexed()) == []
 
-    def test_search_reference_exists(self, context, catalog):
-         from adhocracy_core.utils import find_graph
-         from adhocracy_core.interfaces import SheetToSheet
+    def test_search_raise_if_source_and_target_is_none(self):
+         from adhocracy_core.interfaces import Reference
          from adhocracy_core.interfaces import ISheet
          inst = self.make_one()
-         catalog['index'] = inst
-         graph = find_graph(context)
-         target = testing.DummyResource()
-         context.add('target', target)
-         graph.set_references(context, [target], SheetToSheet)
+         reference = Reference(None, ISheet, '', None)
+         with raises(ValueError):
+            inst._search(reference)
 
-         result = inst._search(ISheet, '', target)
-
-         assert list(result) == [context.__oid__]
-
-    def test_search_reference_exits_wrong_field_name(self, context, catalog):
-         from adhocracy_core.utils import find_graph
-         from adhocracy_core.interfaces import SheetToSheet
+    def test_search_raise_if_source_and_target_is_not_none(self):
+         from adhocracy_core.interfaces import Reference
          from adhocracy_core.interfaces import ISheet
          inst = self.make_one()
-         catalog['index'] = inst
-         graph = find_graph(context)
-         target = testing.DummyResource()
-         context.add('target', target)
-         graph.set_references(context, [target], SheetToSheet)
+         reference = Reference(object(), ISheet, '', object())
+         with raises(ValueError):
+            inst._search(reference)
 
-         result = inst._search(ISheet, 'WRONG_FIELD', target)
-
-         assert list(result) == []
-
-    def test_search_reference_nonexists(self, context, catalog):
-         from adhocracy_core.interfaces import ISheet
-         inst = self.make_one()
-         catalog['index'] = inst
-         target = testing.DummyResource()
-         context.add('target', target)
-
-         result = inst._search(ISheet, '', target)
-
-         assert list(result) == []
-
-    def test_apply_with_valid_query(self, context, catalog):
+    def test_search_sources(self, mock_graph):
         from adhocracy_core.interfaces import ISheet
-        inst = self.make_one()
-        catalog['index'] = inst
+        from adhocracy_core.interfaces import Reference
         target = testing.DummyResource()
-        context.add('target', target)
-        query = {'isheet': ISheet,
-                 'isheet_field': '',
-                 'target': target,
-                 }
+        mock_graph.get_source_ids.return_value = {1}
+        inst = self.make_one()
+        inst.__graph__ = mock_graph
+        reference = Reference(None, ISheet, '', target)
+        result = inst._search(reference)
+        mock_graph.get_source_ids.assert_called_with(target, ISheet, '')
+        assert list(result) == [1]
 
+    def test_search_targets(self, mock_graph):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import Reference
+        source = testing.DummyResource()
+        mock_graph.get_target_ids.return_value = {1}
+        inst = self.make_one()
+        inst.__graph__ = mock_graph
+        reference = Reference(source, ISheet, '', None)
+        result = inst._search(reference)
+        mock_graph.get_target_ids.assert_called_with(source, ISheet, '')
+        assert list(result) == [1]
+
+    def test_apply_with_valid_query(self, mock_graph):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import Reference
+        mock_graph.get_source_ids.return_value = {1}
+        inst = self.make_one()
+        inst.__graph__ = mock_graph
+        target = testing.DummyResource()
+        reference = Reference(None, ISheet, '', target)
+        query = {'reference': reference}
         result = inst.apply(query)
-
-        assert list(result) == []
+        assert list(result) == [1]
 
     def test_apply_with_invalid_query(self):
         inst = self.make_one()
         query = {'WRONG': ''}
-        # TODO better error message explaining what could be wrong
         with raises(KeyError):
             inst.apply(query)
 
-    def test_apply_intersect_reference_not_exists(self, context):
+    def test_apply_intersect_reference_not_exists(self):
         # actually we test the default implementation in hypatia.util
         import BTrees
         from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.graph import Graph
+        graph = Mock(spec=Graph)
+        graph.get_source_ids.return_value = set()
         inst = self.make_one()
+        inst.__graph__ = graph
         target = testing.DummyResource()
-        context.add('target', inst)
-        query = {'isheet': ISheet,
-                 'isheet_field': '',
-                 'target': target,
-                 }
+        reference = Reference(None, ISheet, '', target)
+        query = {'reference': reference}
         other_result = BTrees.family64.IF.Set([1])
         result = inst.apply_intersect(query, other_result)
         assert list(result) == []
 
     def test_eq(self):
         from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import Reference
         inst = self.make_one()
-        wanted = {'isheet': ISheet,
-                  'isheet_field': '',
-                  'target': None,
-                 }
-        result = inst.eq(ISheet, '', None)
-        assert result._value == wanted
+        target = testing.DummyResource()
+        reference = Reference(None, ISheet, '', target)
+        result = inst.eq(reference)
+        assert result._value == {'reference': reference}
