@@ -16,13 +16,26 @@ export interface ITabScope extends angular.IScope {
 
 export interface ITabsetScope extends angular.IScope {
     tabs : ITabScope[];
+    fullWidth? : boolean;
 }
 
 export class TabSetController {
     private unregister : Function;
 
-    constructor(private $scope : ITabsetScope, private $element) {
+    constructor(private $scope : ITabsetScope, private $element, private $timeout : angular.ITimeoutService) {
         this.$scope.tabs = [];
+    }
+
+    private updateTabWidth() {
+        if (this.$scope.fullWidth) {
+            var value = this.$scope.tabs.length;
+            if (value !== 0) {
+                var tabWidth = Math.floor(100 / value);
+                this.$timeout(() => {
+                    this.$element.find(".tab").css("width", tabWidth + "%");
+                });
+            }
+        }
     }
 
     public select(selectedTab? : ITabScope) {
@@ -57,6 +70,8 @@ export class TabSetController {
         } else if (tab.active) {
             this.select(tab);
         }
+
+        this.updateTabWidth();
     }
 
     public removeTab(tab : ITabScope) {
@@ -69,16 +84,20 @@ export class TabSetController {
             this.select(this.$scope.tabs[newActiveIndex]);
         }
         this.$scope.tabs.splice(index, 1);
+
+        this.updateTabWidth();
     }
 }
 
 export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
-        scope: {},
+        scope: {
+            fullWidth: "=?"
+        },
         transclude: true,
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tabset.html",
-        controller: ["$scope", "$element", TabSetController]
+        controller: ["$scope", "$element", "$timeout", TabSetController]
     };
 };
 
@@ -94,7 +113,7 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
             scope.height = 0;
-            scope.$watch(() => element.find(".tab-pane").height(), (value : number) => {
+            scope.$watch(() => element.find(".tab-pane").outerHeight(), (value : number) => {
                 if (value !== 0) {
                     scope.height = value;
                 }
