@@ -1,6 +1,6 @@
 <div class="login">
-    <form novalidate="novalidate" class="login-form" name="registerForm" data-ng-if="!success" data-ng-submit="register()">
-        <div class="form-error" ng-repeat="error in errors track by $index">
+    <form novalidate="novalidate" class="login-form" name="registerForm" data-ng-if="!success && !loggedIn" data-ng-submit="register()">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | translate }}</p>
         </div>
 
@@ -80,12 +80,26 @@
         </div>
     </form>
 
-    <div data-ng-if="success" class="login-success">
+    <div data-ng-if="!success && loggedIn" class="login-success">
+        <p data-adh-html-translate="TR__REGISTRATION_ALREADY_LOGGED_IN" data-translate-templates="{
+            link: '&lt;a href=&quot;&quot; data-ng-click=&quot;logOut()&quot;&gt;{{ content }}&lt;/a&gt;'
+        }"></p>
+    </div>
+    <div data-ng-if="success && !loggedIn" class="login-success">
         <p>{{ "TR__REGISTER_SUCCESS" | translate }}</p>
-        <p>{{ "TR__CALL_FOR_ACTIVATION" | translate:{siteName: siteName} }}</p>
+        <p>{{ "TR__REGISTRATION_CALL_FOR_ACTIVATION" | translate:{siteName: siteName} }}</p>
+        <!-- FIXME: Show option in case the user is not automatically logged in (e.g. 3rd party cookies blocked. -->
+    </div>
+    <!-- FIXME: Technically this should only display if you logged in as the user you just registered as, but
+    this will display if you log in as any user -->
+    <div data-ng-if="success && loggedIn" class="login-success">
+        <p>{{ "TR__REGISTRATION_THANKS_FOR_REGISTERING" | translate:{siteName: siteName, userName: userName} }}</p>
+        <p data-adh-html-translate="TR__REGISTRATION_PROCEED" data-translate-values="{siteName: siteName}" data-translate-templates="{
+            link: '&lt;a href=&quot;&quot; data-ng-click=&quot;goBack()&quot;&gt;{{ content }}&lt;/a&gt;'
+        }"></p>
     </div>
 
-    <a class="login-cancel" href="" ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+    <a class="login-cancel" href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
     <div class="login-info">
         {{ "TR__REGISTRATION_SUPPORT" | translate }} <br />
         <a data-ng-href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>
