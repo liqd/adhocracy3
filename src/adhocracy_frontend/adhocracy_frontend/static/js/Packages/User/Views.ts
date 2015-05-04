@@ -83,6 +83,7 @@ export var activateArea = (
     };
     $scope.success = false;
     $scope.ready = false;
+    $scope.siteName = adhConfig.site_name;
 
     var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
@@ -216,6 +217,7 @@ export var passwordResetDirective = (
         link: (scope) => {
             scope.showError = adhShowError;
             scope.success = false;
+            scope.siteName = adhConfig.site_name;
 
             scope.input = {
                 password: "",
