@@ -154,12 +154,13 @@ export class Service implements AdhTopLevelState.IAreaInput {
     }
 
     /**
-     * Promise the content type of next ancestor process.
+     * Promise the next ancestor process.
      *
-     * If the passed path is a process itself, its own content type is returned.
-     * Promise "" if none could be found.
+     * If the passed path is a process, it is returned itself.
+     *
+     * If `fail` is false, it promises undefined instead of failing.
      */
-    private getProcessType(resourceUrl : string) : angular.IPromise<string> {
+    private getProcess(resourceUrl : string, fail = true) : angular.IPromise<ResourcesBase.Resource> {
         var paths = [];
 
         var path = resourceUrl.substr(this.adhConfig.rest_url.length);
@@ -178,10 +179,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
             // for resources that are directly below an organisation.
             for (var i = 1; i < resources.length; i++) {
                 if (resources[i].content_type === RIOrganisation.content_type) {
-                    return resources[i - 1].content_type;
+                    return resources[i - 1];
                 }
             }
-            return "";
+            if (fail) {
+                throw "no process found";
+            }
         });
     }
 
@@ -262,12 +265,15 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return self.$q.all([
             self.adhHttp.get(resourceUrl),
-            self.getProcessType(resourceUrl),
+            self.getProcess(resourceUrl, false),
             self.conditionallyRedirectVersionToLast(resourceUrl)
         ]).then((values : any[]) => {
             var resource : ResourcesBase.Resource = values[0];
-            var processType : string = values[1];
+            var process : ResourcesBase.Resource = values[1];
             var hasRedirected : boolean = values[2];
+
+            var processType = process ? process.content_type : "";
+            var processUrl = process ? process.path : "/";
 
             if (hasRedirected) {
                 return;
@@ -279,6 +285,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 var meta : Dict = {
                     embedContext: embedContext,
                     processType: processType,
+                    processUrl: processUrl,
                     platformUrl: self.adhConfig.rest_url + "/" + segs[1],
                     contentType: resource.content_type,
                     resourceUrl: resourceUrl,

@@ -40,12 +40,6 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", [
-                    () => (resource : RIKiezkassenProcess) => {
-                        return {
-                            processUrl: resource.path
-                        };
-                    }])
                 .default(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
@@ -60,9 +54,7 @@ export var register = (angular) => {
                                 if (!options.POST) {
                                     throw 401;
                                 } else {
-                                    return {
-                                        processUrl: resource.path
-                                    };
+                                    return {};
                                 }
                             });
                         });
@@ -74,8 +66,7 @@ export var register = (angular) => {
                 .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", [
                     () => (resource : RIProposalVersion) => {
                         return {
-                            proposalUrl: resource.path,
-                            processUrl: "/organisation/kiezkasse"  // FIXME
+                            proposalUrl: resource.path
                         };
                     }])
                 .default(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "kiezkassen", {
@@ -86,8 +77,7 @@ export var register = (angular) => {
                     () => (resource : RIProposalVersion) => {
                         return {
                             commentableUrl: resource.path,
-                            proposalUrl: resource.path,
-                            processUrl: "/organisation/kiezkasse"  // FIXME
+                            proposalUrl: resource.path
                         };
                     }])
                 .default(RICommentVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
@@ -111,8 +101,7 @@ export var register = (angular) => {
                         return getCommentableUrl(resource).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
-                                proposalUrl: commentable.path,
-                                processUrl: "/organisation/kiezkasse"  // FIXME
+                                proposalUrl: commentable.path
                             };
                         });
                     };
