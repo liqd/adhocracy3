@@ -4,21 +4,6 @@
             text-align: center;
         }
     }
-
-    &.pane-above {
-        .tab {
-            a {
-                top: 0;
-            }
-
-            &.is-active {
-                a {
-                    border-width: 0 1px 1px;
-                    top: -1px;
-                }
-            }
-        }
-    }
 }
 
 .tabset-tabs {
