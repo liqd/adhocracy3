@@ -44,9 +44,12 @@
 }
 
 .tabset-panes {
-    @include box-sizing(content-box);
     @include single-transition(height, 0.5s);
     background: $color-background-base-introvert;
     border: 1px solid $color-structure-border;
+    overflow: hidden;
+}
+
+.tab-pane {
     padding: 1em;
 }
