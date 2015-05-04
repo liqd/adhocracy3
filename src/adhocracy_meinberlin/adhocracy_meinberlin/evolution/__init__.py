@@ -1,7 +1,10 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
+from pyramid.threadlocal import get_current_registry
 from adhocracy_core.evolution import migrate_new_sheet
+from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
+from adhocracy_meinberlin.resources.kiezkassen import IProcess
 import adhocracy_core.sheets
 import adhocracy_meinberlin.sheets
 
@@ -34,7 +37,27 @@ def use_adhocracy_core_description_sheet(root):  # pragma: no cover
                       fields_mapping=[('description', 'detail')])
 
 
+def add_sample_organisation(root):
+    """Add sample organisation and kiezkassen process."""
+    registry = get_current_registry(root)
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'organisation'},
+                  adhocracy_core.sheets.title.ITitle.__identifier__:
+                  {'title': 'Sample Organisation'}}
+    registry.content.create(IOrganisation.__identifier__,
+                            parent=root,
+                            appstructs=appstructs)
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'kiezkasse'},
+                  adhocracy_core.sheets.title.ITitle.__identifier__:
+                  {'title': 'Sample Kiezkassen process'}}
+    registry.content.create(IProcess.__identifier__,
+                            parent=root['organisation'],
+                            appstructs=appstructs)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(use_adhocracy_core_title_sheet)
     config.add_evolution_step(use_adhocracy_core_description_sheet)
+    config.add_evolution_step(add_sample_organisation)

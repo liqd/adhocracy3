@@ -2,6 +2,7 @@
 
 from pyramid.registry import Registry
 from substanced.file import File
+from zope.deprecation import deprecated
 
 from adhocracy_core.interfaces import Dimensions
 from adhocracy_core.interfaces import IPool
@@ -159,6 +160,9 @@ assets_service_meta = service_meta._replace(
 class IPoolWithAssets(IPool):
 
     """A pool with an auto-created asset service pool."""
+
+
+deprecated('IPoolWithAssets', 'BBB use process instead')
 
 
 def add_assets_service(context: IPool, registry: Registry, options: dict):

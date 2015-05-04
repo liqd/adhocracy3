@@ -114,6 +114,7 @@ def includeme(config):
     config.include('.sheets')
     config.include('.resources.asset')
     config.include('.resources.pool')
+    config.include('.resources.organisation')
     config.include('.resources.root')
     config.include('.resources.tag')
     config.include('.resources.comment')
