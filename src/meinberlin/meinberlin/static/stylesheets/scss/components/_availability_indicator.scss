@@ -1,0 +1,35 @@
+/*doc
+---
+title: availablity indicator
+name: m-availability-indicator
+category: Icons
+---
+
+These icons inform you about which kinds of participation are available in a
+phase. If the feature is available, they have the status `is-available`.
+
+```html_example
+<div style="font-size: 20px">
+    <i class="icon-comment-gap m-availability-indicator is-available"></i>
+    <i class="icon-voting-gap m-availability-indicator"></i>
+</div>
+*/
+.m-availability-indicator {
+    position: relative;
+
+    &:after {
+        @include border-radius(50%);
+        content: "";
+        position: absolute;
+        bottom: 0.15em;
+        right: -0.05em;
+        display: block;
+        width: 0;
+        height: 0;
+        border: 0.15em solid;
+    }
+
+    &.is-available:after {
+        border-color: $color-function-valid;
+    }
+}
