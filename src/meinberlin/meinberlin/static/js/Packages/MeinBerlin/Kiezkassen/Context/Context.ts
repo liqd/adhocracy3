@@ -7,7 +7,7 @@ import AdhUser = require("../../../User/User");
 import AdhMeinBerlinWorkbench = require("../../Workbench/Workbench");
 
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_core/resources/pool/IBasicPool");  // FIXME
+import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
 
