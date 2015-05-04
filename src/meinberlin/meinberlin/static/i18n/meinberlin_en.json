@@ -1,4 +1,6 @@
 {
+    "TR__BY": "by",
+    "TR__CREATE_PROPOSAL": "create proposal",
     "TR__MEINBERLIN_BUDGET": "Budget",
     "TR__MEINBERLIN_DETAIL": "Detail",
     "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET": "Please enter the budget",
@@ -10,5 +12,9 @@
     "TR__MEINBERLIN_LOCATION": "Geo location point",
     "TR__MEINBERLIN_LOCATION_TEXT": "Address",
     "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL": "MeinBerlin Simple Proposal",
-    "TR__MEINBERLIN_TITLE": "Title"
+    "TR__MEINBERLIN_TITLE": "Title",
+    "TR__ON": "on",
+    "TR__PROPOSAL": "proposal",
+    "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
+    "TR__PROPOSAL_LIST": "list"
 }
