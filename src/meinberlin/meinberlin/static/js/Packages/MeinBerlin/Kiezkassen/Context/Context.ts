@@ -36,20 +36,20 @@ export var register = (angular) => {
                 ) => {
                     return $templateRequest(adhConfig.pkg_path + pkgLocation + "/template.html");
                 }])
-                .default(RIKiezkassenProcess.content_type, "", "", "kiezkassen", {
+                .default(RIKiezkassenProcess.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "", "", "kiezkassen", [() => (resource : RIKiezkassenProcess) => {
+                .specific(RIKiezkassenProcess.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", [() => (resource : RIKiezkassenProcess) => {
                     return {
                         processUrl: resource.path
                     };
                 }])
-                .default(RIKiezkassenProcess.content_type, "create_proposal", "", "kiezkassen", {
+                .default(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "create_proposal", "", "kiezkassen", ["adhHttp", "adhUser", (
+                .specific(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", ["adhHttp", "adhUser", (
                     adhHttp : AdhHttp.Service<any>,
                     adhUser : AdhUser.Service
                 ) => (resource : RIKiezkassenProcess) => {
@@ -65,32 +65,32 @@ export var register = (angular) => {
                         });
                     });
                 }])
-                .default(RIProposalVersion.content_type, "", "", "kiezkassen", {
+                .default(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion.content_type, "", "", "kiezkassen", [() => (resource : RIProposalVersion) => {
+                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", [() => (resource : RIProposalVersion) => {
                     return {
                         proposalUrl: resource.path,
                         processUrl: "/adhocracy"  // FIXME
                     };
                 }])
-                .default(RIProposalVersion.content_type, "comments", "", "kiezkassen", {
+                .default(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "comments", "", "kiezkassen", [() => (resource : RIProposalVersion) => {
+                .specific(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "kiezkassen", [() => (resource : RIProposalVersion) => {
                     return {
                         commentableUrl: resource.path,
                         proposalUrl: resource.path,
                         processUrl: "/adhocracy"  // FIXME
                     };
                 }])
-                .default(RICommentVersion.content_type, "", "", "kiezkassen", {
+                .default(RICommentVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "", "", "kiezkassen", ["adhHttp", "$q", (
+                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", ["adhHttp", "$q", (
                     adhHttp : AdhHttp.Service<any>,
                     $q : angular.IQService
                 ) => {
