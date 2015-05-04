@@ -142,7 +142,7 @@ export var register = (angular) => {
                     () => (resource : RIProposalVersion) => {
                         return {
                             proposalUrl: resource.path,
-                            processUrl: "/adhocracy"  // FIXME
+                            processUrl: "/organisation/kiezkasse"  // FIXME
                         };
                     }])
                 .default(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "", {
@@ -154,7 +154,7 @@ export var register = (angular) => {
                         return {
                             commentableUrl: resource.path,
                             proposalUrl: resource.path,
-                            processUrl: "/adhocracy"  // FIXME
+                            processUrl: "/organisation/kiezkasse"  // FIXME
                         };
                     }])
                 .default(RICommentVersion.content_type, "", RIKiezkassenProcess.content_type, "", {
@@ -179,7 +179,7 @@ export var register = (angular) => {
                             return {
                                 commentableUrl: commentable.path,
                                 proposalUrl: commentable.path,
-                                processUrl: "/adhocracy"  // FIXME
+                                processUrl: "/organisation/kiezkasse"  // FIXME
                             };
                         });
                     };
