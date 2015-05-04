@@ -12,7 +12,7 @@
 
     <div class="mein-berlin-kiezkassen-detail-listing">
         <adh-listing
-            data-path="/"
+            data-path="{{path}}"
             data-ng-show="!showMap"
             data-no-create-form="true"
             data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
@@ -24,7 +24,7 @@
 
         <adh-wait condition="showMap">
             <adh-map-listing
-                data-path="/"
+                data-path="{{path}}"
                 data-ng-show="showMap"
                 data-polygon="polygon"
                 data-no-create-form="true"

@@ -12,7 +12,7 @@ import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
 import AdhMeinBerlinKiezkassenProposal = require("../Proposal/Proposal");
 
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_core/resources/pool/IBasicPool");  // FIXME
+import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
 
@@ -101,64 +101,57 @@ export var register = (angular) => {
             AdhResourceArea.moduleName,
             AdhUser.moduleName
         ])
-        // FIXME: the following should be specific to kiezkassen process
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIKiezkassenProcess.content_type, "", "", "", {
+                .default(RIKiezkassenProcess.content_type, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "", "", "", [() => (resource : RIKiezkassenProcess) => {
-                    return {
-                        processUrl: resource.path
-                    };
-                }])
-                .default(RIKiezkassenProcess.content_type, "create_proposal", "", "", {
+                .default(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "create_proposal", "", "", ["adhHttp", "adhUser", (
-                    adhHttp : AdhHttp.Service<any>,
-                    adhUser : AdhUser.Service
-                ) => (resource : RIKiezkassenProcess) => {
-                    return adhUser.ready.then(() => {
-                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
-                                throw 401;
-                            } else {
-                                return {
-                                    processUrl: resource.path
-                                };
-                            }
+                .specific(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "", [
+                    "adhHttp", "adhUser", (
+                        adhHttp : AdhHttp.Service<any>,
+                        adhUser : AdhUser.Service
+                    ) => (resource : RIKiezkassenProcess) => {
+                        return adhUser.ready.then(() => {
+                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                                if (!options.POST) {
+                                    throw 401;
+                                } else {
+                                    return {};
+                                }
+                            });
                         });
-                    });
-                }])
-                .default(RIProposalVersion.content_type, "", "", "", {
+                    }])
+                .default(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion.content_type, "", "", "", [() => (resource : RIProposalVersion) => {
-                    return {
-                        proposalUrl: resource.path,
-                        processUrl: "/adhocracy"  // FIXME
-                    };
-                }])
-                .default(RIProposalVersion.content_type, "comments", "", "", {
+                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", [
+                    () => (resource : RIProposalVersion) => {
+                        return {
+                            proposalUrl: resource.path
+                        };
+                    }])
+                .default(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "comments", "", "", [() => (resource : RIProposalVersion) => {
-                    return {
-                        commentableUrl: resource.path,
-                        proposalUrl: resource.path,
-                        processUrl: "/adhocracy"  // FIXME
-                    };
-                }])
-                .default(RICommentVersion.content_type, "", "", "", {
+                .specific(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "", [
+                    () => (resource : RIProposalVersion) => {
+                        return {
+                            commentableUrl: resource.path,
+                            proposalUrl: resource.path
+                        };
+                    }])
+                .default(RICommentVersion.content_type, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "", "", "", ["adhHttp", "$q", (
+                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", ["adhHttp", "$q", (
                     adhHttp : AdhHttp.Service<any>,
                     $q : angular.IQService
                 ) => {
@@ -175,15 +168,14 @@ export var register = (angular) => {
                         return getCommentableUrl(resource).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
-                                proposalUrl: commentable.path,
-                                processUrl: "/adhocracy"  // FIXME
+                                proposalUrl: commentable.path
                             };
                         });
                     };
                 }]);
         }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[""] = ["$q", ($q : angular.IQService) => {
+            adhProcessProvider.templateFactories[RIKiezkassenProcess.content_type] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-mein-berlin-workbench></adh-mein-berlin-workbench>");
             }];
         }])

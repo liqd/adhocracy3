@@ -242,6 +242,7 @@ export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
     adhSubmitIfValid,
     adhResourceUrlFilter,
@@ -262,9 +263,11 @@ export var createDirective = (
             scope.data.lat = undefined;
             scope.data.lng = undefined;
 
+            var processUrl = adhTopLevelState.get("processUrl");
+
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url)
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, processUrl)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(result[1].path));
                         });
@@ -377,6 +380,7 @@ export var register = (angular) => {
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
+            "adhTopLevelState",
             "adhShowError",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
