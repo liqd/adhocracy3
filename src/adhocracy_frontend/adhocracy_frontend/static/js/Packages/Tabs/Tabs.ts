@@ -84,7 +84,7 @@ export var tabsetDirective = (adhConfig : AdhConfig.IService) => {
                 scope.$watch(() => scope.tabs.length, (value : number) => {
                     if (value !== 0) {
                         var tabWidth = Math.floor(100 / value);
-                        element.find(".tabset").addClass("full-width")
+                        element.find(".tabset").addClass("m-full-width")
                             .find(".tab").css("width", tabWidth + "%");
                     }
                 });
