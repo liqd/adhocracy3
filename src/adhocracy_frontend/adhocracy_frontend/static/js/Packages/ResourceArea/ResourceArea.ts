@@ -2,14 +2,15 @@ import _ = require("lodash");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
+
+import RIOrganisation = require("../../Resources_/adhocracy_core/resources/organisation/IOrganisation");
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/ResourceArea";
 
@@ -153,14 +154,35 @@ export class Service implements AdhTopLevelState.IAreaInput {
     }
 
     /**
-     * Promise the process type of next ancestor process.
+     * Promise the content type of next ancestor process.
      *
+     * If the passed path is a process itself, its own content type is returned.
      * Promise "" if none could be found.
-     *
-     * FIXME: don't really know how to do this yet
      */
     private getProcessType(resourceUrl : string) : angular.IPromise<string> {
-        return this.$q.when("");
+        var paths = [];
+
+        var path = resourceUrl.substr(this.adhConfig.rest_url.length);
+        while (path !== AdhUtil.parentPath(path)) {
+            paths.push(path);
+            path = AdhUtil.parentPath(path);
+        }
+
+        return this.adhHttp.withTransaction((transaction) => {
+            var requests = _.map(paths, (path) => transaction.get(path));
+            return transaction.commit().then((responses) => {
+                return _.map(requests, (request) => responses[request.index]);
+            });
+        }).then((resources) => {
+            // FIXME: a process can not be identified directly. Instead, we look
+            // for resources that are directly below an organisation.
+            for (var i = 1; i < resources.length; i++) {
+                if (resources[i].content_type === RIOrganisation.content_type) {
+                    return resources[i - 1].content_type;
+                }
+            }
+            return "";
+        });
     }
 
     private conditionallyRedirectVersionToLast(resourceUrl : string) : angular.IPromise<boolean> {
