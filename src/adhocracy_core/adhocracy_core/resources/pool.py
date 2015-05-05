@@ -22,7 +22,7 @@ class IBasicPool(IPool):
     """Basic Pool."""
 
 
-deprecated('IBasicPool', 'BBB use organisation or pool instead')
+deprecated('IBasicPool', 'Backward compatible code, use organisation or pool')
 
 
 @implementer(IPool, IFolder)

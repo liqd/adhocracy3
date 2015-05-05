@@ -162,7 +162,7 @@ class IPoolWithAssets(IPool):
     """A pool with an auto-created asset service pool."""
 
 
-deprecated('IPoolWithAssets', 'BBB use process instead')
+deprecated('IPoolWithAssets', 'Backward compatible code, use process instead')
 
 
 def add_assets_service(context: IPool, registry: Registry, options: dict):
