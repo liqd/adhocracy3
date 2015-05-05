@@ -224,7 +224,9 @@ export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
 
-            scope.map = leaflet.map(mapElement[0]);
+            scope.map = leaflet.map(mapElement[0], {
+                scrollWheelZoom: false
+            });
             leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
             scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon), style);
             scope.polygon.addTo(scope.map);
