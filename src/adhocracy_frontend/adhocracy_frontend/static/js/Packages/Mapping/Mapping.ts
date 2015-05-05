@@ -318,6 +318,10 @@ export class MapListingController {
                 this.$scope.showZoomButton = false;
             }, 300);
         };
+
+        this.$scope.$watch("items", () => {
+            this.scrollToItem(this.$scope.selectedPath, false);
+        });
     }
 
     private createMap() {
@@ -439,6 +443,7 @@ export class MapListingController {
                 }
                 delete this.markers[path];
                 this.map.removeLayer(marker);
+                this.scrollToItem(this.$scope.selectedPath, false);
             };
         }
     }
