@@ -79,6 +79,7 @@ def integration(config):
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.rest')
     config.include('adhocracy_core.authentication')
+    config.include('adhocracy_core.resources.geo')
     config.include('adhocracy_core.resources.tag')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
