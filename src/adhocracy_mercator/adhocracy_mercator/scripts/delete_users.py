@@ -97,6 +97,7 @@ def _get_rates_from_user(pool: IPool, user: IUser) -> [IRateVersion]:
     params = {'depth': 6,
               'content_type': IRate,
               'elements': 'content',
+              'tag': 'LAST',
               IRate.__identifier__ + ':subject': user,
               }
     rates = pool.get(params)['elements']
