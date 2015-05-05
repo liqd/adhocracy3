@@ -117,6 +117,12 @@ var fill = (
         location_text: scope.data.locationText,
         address: scope.data.address
     });
+    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
+    });
+    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+        description: scope.data.detail
+    });
     proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
         coordinates: [scope.data.lng, scope.data.lat]
     });
