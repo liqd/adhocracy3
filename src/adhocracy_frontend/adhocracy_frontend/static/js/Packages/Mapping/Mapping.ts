@@ -370,7 +370,7 @@ export class MapListingController {
         this.$scope.selectItem(this.indexToPath(index));
     }
 
-    private scrollToItem(path : string) : void {
+    private scrollToItem(path : string, animate = true) : void {
         // FIXME: this needs to be retriggered when the widget
         // is resized or the index of an item changes.
 
@@ -379,10 +379,10 @@ export class MapListingController {
 
         if (this.$attrs.orientation === "vertical") {
             var element = this.$element.find(".map-list-item").eq(index);
-            (<any>this.scrollContainer).scrollToElement(element, 10, 300);
+            (<any>this.scrollContainer).scrollToElement(element, 10, animate ? 300 : 0);
         } else {
             var left = width * (index + 1);
-            (<any>this.scrollContainer).scrollTo(left, 0, 800);
+            (<any>this.scrollContainer).scrollTo(left, 0, animate ? 800 : 0);
         }
     }
 
