@@ -381,7 +381,7 @@ export class MapListingController {
             var element = this.$element.find(".map-list-item").eq(index);
             (<any>this.scrollContainer).scrollToElement(element, 10, 300);
         } else {
-            var left = width * index;
+            var left = width * (index + 1);
             (<any>this.scrollContainer).scrollTo(left, 0, 800);
         }
     }
