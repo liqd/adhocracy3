@@ -288,13 +288,14 @@ export class MapListingController {
         this.$scope.visibleItems = 0;
 
         this.$scope.selectItem = (path : string) => {
-            if (this.isVisible(path)) {
-                if (this.markers.hasOwnProperty(this.$scope.selectedPath)) {
-                    this.markers[this.$scope.selectedPath].setIcon(this.itemLeafletIcon);
-                }
-                this.$scope.selectedPath = path;
-                this.markers[this.$scope.selectedPath].setIcon(this.selectedItemLeafletIcon);
-                this.scrollToItem(path);
+            if (this.markers.hasOwnProperty(this.$scope.selectedPath)) {
+                this.markers[this.$scope.selectedPath].setIcon(this.itemLeafletIcon);
+            }
+
+            this.$scope.selectedPath = path;
+            this.scrollToItem(path);
+            if (path) {
+                this.markers[path].setIcon(this.selectedItemLeafletIcon);
             }
         };
 
@@ -374,7 +375,7 @@ export class MapListingController {
         // FIXME: this needs to be retriggered when the widget
         // is resized or the index of an item changes.
 
-        var index = this.pathToIndex(path);
+        var index = path ? this.pathToIndex(path) : -1;
         var width = this.$element.find(".map-list-item").width();
 
         if (this.$attrs.orientation === "vertical") {
