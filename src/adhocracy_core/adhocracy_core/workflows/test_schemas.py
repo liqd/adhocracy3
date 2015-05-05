@@ -15,7 +15,8 @@ class TestState:
         assert inst.deserialize({}) == {'title': '',
                                         'description': '',
                                         'display_only_to_roles': [],
-                                        'acl': []}
+                                        'acm': {'principals': [],
+                                                'permissions': []}}
 
 
 class TestTransition:

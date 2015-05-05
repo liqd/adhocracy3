@@ -188,6 +188,7 @@ class TimeZoneName(AdhocracySchemaNode):
 ROLE_PRINCIPALS = ['reader',
                    'annotator',
                    'contributor',
+                   'creator',
                    'editor',
                    'manager',
                    'admin',
@@ -873,27 +874,65 @@ class ACEPrincipal(colander.SchemaNode):
     schema_type = ACEPrincipalType
 
 
-class ACE(colander.TupleSchema):
+class ACMCell(colander.SchemaNode):
 
-    """Pyramid :term:`ace` tuple."""
+    """ACM Cell."""
 
-    action = SingleLine(missing=colander.required,
-                        validator=colander.OneOf([security.Allow,
-                                                  security.Deny,
-                                                  ]),
-                        )
-    principal = ACEPrincipal(missing=colander.required)
-    permissions = SingleLineList(missing=colander.required)
+    schema_type = colander.String
+    missing = None
 
 
-class ACL(colander.SequenceSchema):
+class ACMRow(colander.SequenceSchema):
 
-    """Pyramid :term:`acl`, a list of :term:`ace`s."""
+    """ACM Row."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:  # pragma: no branch
-            self.default = []
-            self.missing = []
+    item = ACMCell()
 
-    ace = ACE()
+    @colander.deferred
+    def validator(node, kw):
+        registry = kw.get('registry')
+
+        def validate_permission_name(node, value):
+            permission_name = value[0]
+            if permission_name not in registry.content.permissions():
+                msg = 'No such permission: {0}'.format(permission_name)
+                raise colander.Invalid(node, msg, value=permission_name)
+
+        def validate_actions_names(node, value):
+            for action in value[1:]:
+                if action not in [security.Allow, security.Deny, None]:
+                    msg = 'Invalid action: {0}'.format(action)
+                    raise colander.Invalid(node, msg, value=action)
+
+        return colander.All(validate_permission_name,
+                            validate_actions_names)
+
+
+class ACMPrincipals(colander.SequenceSchema):
+
+    """ACM Principals."""
+
+    principal = ACEPrincipal()
+    default = []
+    missing = []
+
+
+class ACMPermissions(colander.SequenceSchema):
+
+    """ACM Permissions."""
+
+    row = ACMRow()
+    default = []
+    missing = []
+
+
+class ACM(colander.MappingSchema):
+
+    """Access Control Matrix."""
+
+    principals = ACMPrincipals()
+    permissions = ACMPermissions()
+    default = {'principals': [],
+               'permissions': []}
+    missing = {'principals': [],
+               'permissions': []}

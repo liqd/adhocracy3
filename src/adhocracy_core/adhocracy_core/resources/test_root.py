@@ -1,7 +1,7 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
-
+from unittest.mock import Mock
 
 def test_root_meta():
     from .root import root_meta
@@ -11,6 +11,20 @@ def test_root_meta():
     assert meta.iresource is IRootPool
     assert create_initial_content_for_app_root in meta.after_creation
 
+
+def test_add_platform_no_platform_id():
+    from .root import add_platform
+    registry = Mock()
+    context = testing.DummyResource()
+    add_platform(context, registry)
+    assert registry.settings.get.called is True
+
+def test_add_platform():
+    from .root import add_platform
+    registry = Mock()
+    context = testing.DummyResource()
+    add_platform(context, registry, 'meinberlin')
+    assert registry.settings.get.called is False
 
 @fixture
 def integration(config):
@@ -24,9 +38,21 @@ def integration(config):
     config.include('adhocracy_core.resources.pool')
     config.include('adhocracy_core.resources.principal')
     config.include('adhocracy_core.resources.subscriber')
+    config.include('adhocracy_core.resources.comment')
+    config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.item')
+    config.include('adhocracy_core.resources.sample_paragraph')
+    config.include('adhocracy_core.resources.sample_proposal')
+    config.include('adhocracy_core.resources.sample_section')
+    config.include('adhocracy_core.resources.external_resource')
+    config.include('adhocracy_core.rest')
     config.include('adhocracy_core.resources.geo')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.messaging')
+    # TODO remove the following include once permissions in root_acm
+    # have been splitted for each platform
+    config.include('adhocracy_mercator.resources.mercator')
+    config.include('adhocracy_mercator.sheets.mercator')
 
 
 @mark.usefixtures('integration')
@@ -71,7 +97,6 @@ class TestRoot:
     def test_create_root_with_acl(self, registry):
         from adhocracy_core.resources.root import IRootPool
         from substanced.util import get_acl
-        from pyramid.security import ALL_PERMISSIONS
         from pyramid.security import Allow
         inst = registry.content.create(IRootPool.__identifier__)
         acl = get_acl(inst)
@@ -79,7 +104,8 @@ class TestRoot:
         assert (Allow, 'system.Everyone', 'add_user') in acl
         assert (Allow, 'system.Everyone', 'create_sheet_password') in acl
         assert (Allow, 'system.Everyone', 'create_sheet_userbasic') in acl
-        assert (Allow, 'role:god', ALL_PERMISSIONS) in acl
+        assert (Allow, 'role:god', 'view_userextended') in acl
+        assert (Allow, 'role:god', 'message_to_user') in acl
 
     def test_create_root_with_initial_god_user(self, registry, request_):
         from substanced.interfaces import IUserLocator

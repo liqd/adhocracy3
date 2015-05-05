@@ -3,11 +3,24 @@ from pytest import mark
 from webtest import TestResponse
 
 
+
 # TODO: move _create_proposal to somewhere in backend fixtures as the
 # natural dependency ordering is "frontend depends on backend"
 from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
 from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch
 from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
+
+
+def test_root_meta():
+    from adhocracy_core.resources.root import root_meta
+    from adhocracy_core.resources.root import \
+        create_initial_content_for_app_root
+    from .mercator import _create_initial_content
+    from .mercator import mercator_root_meta
+    assert _create_initial_content not in root_meta.after_creation
+    assert _create_initial_content in mercator_root_meta.after_creation
+    assert create_initial_content_for_app_root in \
+        mercator_root_meta.after_creation
 
 
 def test_mercator_proposal_meta():
@@ -55,7 +68,7 @@ def test_mercator_proposal_version_meta():
     meta = mercator_proposal_version_meta
     assert meta.iresource == IMercatorProposalVersion
     assert meta.permission_add == 'add_mercator_proposal_version'
-
+ 
 
 @fixture
 def integration(config):
@@ -63,11 +76,23 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.graph')
+    config.include('adhocracy_core.rest')
+    config.include('adhocracy_core.authentication')
     config.include('adhocracy_core.resources.tag')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.principal')
+    config.include('adhocracy_core.resources.pool')
+    config.include('adhocracy_core.resources.asset')
+    config.include('adhocracy_core.resources.item')
+    config.include('adhocracy_core.resources.sample_paragraph')
+    config.include('adhocracy_core.resources.sample_proposal')
+    config.include('adhocracy_core.resources.sample_section')
+    config.include('adhocracy_core.resources.external_resource')
     config.include('adhocracy_mercator.sheets.mercator')
     config.include('adhocracy_mercator.resources.mercator')
+    config.include('adhocracy_mercator.resources.subscriber')
 
 
 @mark.usefixtures('integration')
@@ -97,6 +122,17 @@ class TestIncludemeIntegration:
                                       )
         assert IMercatorProposalVersion.providedBy(res)
 
+    def test_create_mercator_root_with_initial_content(self, registry):
+        from adhocracy_core.resources.root import IRootPool
+        from adhocracy_core.resources.asset import IPoolWithAssets
+        inst = registry.content.create(IRootPool.__identifier__)
+        assert IRootPool.providedBy(inst)
+        assert IPoolWithAssets.providedBy(inst['mercator'])
+
+@fixture(scope='class')
+def app_anonymous(app_anonymous):
+    app_anonymous.base_path = '/mercator'
+    return app_anonymous
 
 @fixture(scope='class')
 def app_contributor(app_contributor):
