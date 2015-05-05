@@ -256,7 +256,7 @@ export interface IMapListScope extends angular.IScope {
     rawPolygon : number[][];
     items : string[];
     selectedPath : string;
-    selectItem(path : string) : void;
+    selectItem(path : string, animate? : boolean) : void;
     getPreviousItem() : void;
     getNextItem() : void;
     showZoomButton : boolean;
@@ -287,13 +287,13 @@ export class MapListingController {
 
         this.$scope.visibleItems = 0;
 
-        this.$scope.selectItem = (path : string) => {
+        this.$scope.selectItem = (path : string, animate = true) => {
             if (this.markers.hasOwnProperty(this.$scope.selectedPath)) {
                 this.markers[this.$scope.selectedPath].setIcon(this.itemLeafletIcon);
             }
 
             this.$scope.selectedPath = path;
-            this.scrollToItem(path);
+            this.scrollToItem(path, animate);
             if (path) {
                 this.markers[path].setIcon(this.selectedItemLeafletIcon);
             }
@@ -350,6 +350,9 @@ export class MapListingController {
                         this.$scope.getNextItem();
                     }
                 });
+                if (!this.$scope.selectedPath && this.$scope.visibleItems > 0) {
+                    this.$scope.getNextItem();
+                }
             });
             this.$scope.showZoomButton = true;
         });
@@ -432,6 +435,10 @@ export class MapListingController {
 
             if (this.isVisible(path)) {
                 this.$scope.visibleItems++;
+
+                if (!this.$scope.selectedPath) {
+                    this.$scope.selectItem(path, false);
+                }
             }
 
             return () => {
