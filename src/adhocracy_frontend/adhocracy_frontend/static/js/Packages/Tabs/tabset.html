@@ -4,7 +4,7 @@
             class="tab {{tab.classes}}"
             data-ng-repeat="tab in tabs"
             data-ng-class="{'is-active': tab.active}">
-            <a href="" data-ng-click="tab.select()">{{tab.heading}}</a>
+            <a class="tab-button" href="" data-ng-click="tab.select();">{{tab.heading}}</a>
         </li>
     </ul>
     <div class="tabset-panes">
