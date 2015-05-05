@@ -446,7 +446,8 @@ export var mapListingInternal = (
         scope: {
             height: "@",
             rawPolygon: "=polygon",
-            items: "="
+            items: "=",
+            emptyText: "@"
         },
         restrict: "E",
         transclude: true,
