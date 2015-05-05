@@ -342,6 +342,8 @@ export class MapListingController {
                 _.forEach(this.$scope.items, (path) => {
                     if (this.isVisible(path)) {
                         this.$scope.visibleItems++;
+                    } else if (path === this.$scope.selectedPath) {
+                        this.$scope.getNextItem();
                     }
                 });
             });
@@ -361,7 +363,7 @@ export class MapListingController {
         var counter = 0;
         while (!this.isVisible(this.indexToPath(index))) {
             if (counter > total) {
-                console.log("Potential infinite loop!");
+                this.$scope.selectItem(null);
                 return;
             }
             index = mod(index + offset, total);
@@ -431,6 +433,9 @@ export class MapListingController {
             return () => {
                 if (this.isVisible(path)) {
                     this.$scope.visibleItems--;
+                }
+                if (path === this.$scope.selectedPath) {
+                    this.$scope.getNextItem();
                 }
                 delete this.markers[path];
                 this.map.removeLayer(marker);
