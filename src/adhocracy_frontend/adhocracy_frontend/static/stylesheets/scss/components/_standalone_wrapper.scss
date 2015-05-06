@@ -1,3 +1,19 @@
+/*doc
+---
+title: Standalone Wrapper
+name: standalone-wrapper
+category: layout
+---
+
+A wrapper for pages that are not embedded in the application such as pages that are opened
+when you follow an Adhocracy link from your email. Could contain branding.
+
+```html_example
+<div class="standalone-wrapper">
+    You have activated your account, well done!
+</div>
+```
+*/
 .standalone-wrapper,
 .standalone-wrapper .standalone-wrapper-title,
 .standalone-wrapper label,
