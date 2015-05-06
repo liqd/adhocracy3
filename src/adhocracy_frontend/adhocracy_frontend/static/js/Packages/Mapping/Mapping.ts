@@ -258,7 +258,7 @@ export interface IMapListScope extends angular.IScope {
     rawPolygon : number[][];
     items : string[];
     selectedPath : string;
-    selectItem(path : string) : void;
+    selectItem(path : string, animate? : boolean) : void;
     getPreviousItem() : void;
     getNextItem() : void;
     showZoomButton : boolean;
@@ -289,14 +289,15 @@ export class MapListingController {
 
         this.$scope.visibleItems = 0;
 
-        this.$scope.selectItem = (path : string) => {
-            if (this.isVisible(path)) {
-                if (this.markers.hasOwnProperty(this.$scope.selectedPath)) {
-                    this.markers[this.$scope.selectedPath].setIcon(this.itemLeafletIcon);
-                }
-                this.$scope.selectedPath = path;
-                this.markers[this.$scope.selectedPath].setIcon(this.selectedItemLeafletIcon);
-                this.scrollToItem(path);
+        this.$scope.selectItem = (path : string, animate = true) => {
+            if (this.markers.hasOwnProperty(this.$scope.selectedPath)) {
+                this.markers[this.$scope.selectedPath].setIcon(this.itemLeafletIcon);
+            }
+
+            this.$scope.selectedPath = path;
+            this.scrollToItem(path, animate);
+            if (path) {
+                this.markers[path].setIcon(this.selectedItemLeafletIcon);
             }
         };
 
@@ -319,6 +320,10 @@ export class MapListingController {
                 this.$scope.showZoomButton = false;
             }, 300);
         };
+
+        this.$scope.$watch("items", () => {
+            this.scrollToItem(this.$scope.selectedPath, false);
+        });
     }
 
     private createMap() {
@@ -343,8 +348,13 @@ export class MapListingController {
                 _.forEach(this.$scope.items, (path) => {
                     if (this.isVisible(path)) {
                         this.$scope.visibleItems++;
+                    } else if (path === this.$scope.selectedPath) {
+                        this.$scope.getNextItem();
                     }
                 });
+                if (!this.$scope.selectedPath && this.$scope.visibleItems > 0) {
+                    this.$scope.getNextItem();
+                }
             });
             this.$scope.showZoomButton = true;
         });
@@ -362,7 +372,7 @@ export class MapListingController {
         var counter = 0;
         while (!this.isVisible(this.indexToPath(index))) {
             if (counter > total) {
-                console.log("Potential infinite loop!");
+                this.$scope.selectItem(null);
                 return;
             }
             index = mod(index + offset, total);
@@ -372,19 +382,19 @@ export class MapListingController {
         this.$scope.selectItem(this.indexToPath(index));
     }
 
-    private scrollToItem(path : string) : void {
+    private scrollToItem(path : string, animate = true) : void {
         // FIXME: this needs to be retriggered when the widget
         // is resized or the index of an item changes.
 
-        var index = this.pathToIndex(path);
+        var index = path ? this.pathToIndex(path) : -1;
         var width = this.$element.find(".map-list-item").width();
 
         if (this.$attrs.orientation === "vertical") {
             var element = this.$element.find(".map-list-item").eq(index);
-            (<any>this.scrollContainer).scrollToElement(element, 10, 300);
+            (<any>this.scrollContainer).scrollToElement(element, 10, animate ? 300 : 0);
         } else {
-            var left = width * index;
-            (<any>this.scrollContainer).scrollTo(left, 0, 800);
+            var left = width * (index + 1);
+            (<any>this.scrollContainer).scrollTo(left, 0, animate ? 800 : 0);
         }
     }
 
@@ -427,14 +437,22 @@ export class MapListingController {
 
             if (this.isVisible(path)) {
                 this.$scope.visibleItems++;
+
+                if (!this.$scope.selectedPath) {
+                    this.$scope.selectItem(path, false);
+                }
             }
 
             return () => {
                 if (this.isVisible(path)) {
                     this.$scope.visibleItems--;
                 }
+                if (path === this.$scope.selectedPath) {
+                    this.$scope.getNextItem();
+                }
                 delete this.markers[path];
                 this.map.removeLayer(marker);
+                this.scrollToItem(this.$scope.selectedPath, false);
             };
         }
     }
@@ -448,7 +466,8 @@ export var mapListingInternal = (
         scope: {
             height: "@",
             rawPolygon: "=polygon",
-            items: "="
+            items: "=",
+            emptyText: "@"
         },
         restrict: "E",
         transclude: true,

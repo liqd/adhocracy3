@@ -10,6 +10,12 @@
         </div>
         <div class="map-list-scroll-container">
             <ol class="map-list-scroll-container-inner">
+                <li class="map-list-item m-empty" data-ng-if="items.length === 0">
+                    {{emptyText}}
+                </li>
+                <li class="map-list-item m-empty" data-ng-if="items.length !== 0">
+                    {{ "TR__MAP_NO_ITEMS_IN_VIEW" | translate }}
+                </li>
                 <li
                     data-ng-repeat="item in items"
                     class="map-list-item">
