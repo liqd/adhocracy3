@@ -82,10 +82,6 @@ That is not supported by all targeted browsers however.
     }
 }
 
-.l-header {
-    line-height: $l-header-height;
-}
-
 .l-header-wrapper {
     @include clearfix;
     margin: 0 auto;
