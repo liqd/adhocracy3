@@ -46,8 +46,11 @@ a description::
 
 a local ACM (see doc:`glossary`) that is set when entering this state::
 
-    >>> state['acm']
-    {'permissions': [['view', 'Deny']], 'principals': ['reader']}
+    >>> state['acm']['principals']
+    ['reader']
+    >>> state['acm']['permissions']
+    [['view', 'Deny']]
+
 
 a hint for the frontend if displaying this state in listing should be restricted::
 

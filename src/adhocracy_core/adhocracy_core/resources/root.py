@@ -56,6 +56,7 @@ root_acm = ACM().deserialize(
                      ['view',                          Allow,      Allow,       Allow,         None,      Allow,     Allow,   Allow],  # noqa
                      ['view_sensitive',                None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['view_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
+                     ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      ]})
 
 
