@@ -623,12 +623,12 @@ def add_test_users(root, registry):
                    registry)
 
 
-def add_create_test_users_subscriber(config):
+def add_create_test_users_subscriber(configurator):
     """Register a subscriber to create test users."""
-    config.add_subscriber(lambda event:
-                          add_test_users(event.object, event.registry),
-                          IResourceCreatedAndAdded,
-                          object_iface=IRootPool)
+    configurator.add_subscriber(lambda event:
+                                add_test_users(event.object, event.registry),
+                                IResourceCreatedAndAdded,
+                                object_iface=IRootPool)
 
 
 @fixture(scope='class')
@@ -650,7 +650,7 @@ def _make_app(app_config):
     configurator.include(adhocracy_core.resources.sample_section)
     configurator.include(adhocracy_core.resources.comment)
     configurator.include(adhocracy_core.resources.rate)
-    add_create_test_users_subscriber(config)
+    add_create_test_users_subscriber(configurator)
 
     app = configurator.make_wsgi_app()
     return app
