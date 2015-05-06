@@ -23,6 +23,7 @@ from adhocracy_core.utils import get_sheet_field
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from pyramid.request import Request
 from pyramid.registry import Registry
+from substanced.util import find_catalog
 
 
 def delete_users():
@@ -53,20 +54,42 @@ def _delete_users_and_votes(filename: str, root: IResource, registry: Registry):
     print('Getting users from the database...')
     users = _get_users(root, registry, users_emails)
     pool = get_sheet(root, IPool)
+    modified_proposals = set()
+    index = 1
     for user in users:
         user_name = user.__name__
-        _delete_proposals_rates(pool, user)
+        user_email = user.email
+        currently_modified = _delete_proposals_rates(pool, user)
+        modified_proposals.update(currently_modified)
         _delete_user(user)
-        print('User {} and its votes deleted.'.format(user_name))
+        if index % 100 == 0:
+            print('Creating savepoint...')
+            transaction.savepoint()
+        index = index + 1
+        print('User {} ({}) and its votes deleted.'.format(user_name, user_email))
+    print('Reindexing...')
+    _reindex_proposals(root, modified_proposals)
+    print('Committing changes...')
     transaction.commit()
     print('Users deleted successfully.')
 
 
-def _delete_proposals_rates(pool: IPool, user: IUser):
+def _reindex_proposals(pool: IPool, proposals: [IMercatorProposalVersion]):
+    adhocracy = find_catalog(pool, 'adhocracy')
+    rates = adhocracy['rates']
+    for proposal in proposals:
+        rates.reindex_resource(proposal)
+
+
+def _delete_proposals_rates(pool: IPool, user: IUser) -> [IMercatorProposalVersion]:
+    """Return the list of modified proposals."""
     rates = _get_rates_from_user(pool, user)
     proposals_rates = _select_proposal_rates(rates)
+    modified = [get_sheet_field(proposal_rate, IRate, 'object')
+                for proposal_rate in proposals_rates]
     for proposal_rate in proposals_rates:
         proposal_rate.__parent__.remove(proposal_rate.__name__)
+    return modified
 
 
 def _delete_user(user: IUser):
