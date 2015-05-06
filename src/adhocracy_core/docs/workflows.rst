@@ -44,10 +44,10 @@ a description::
     >>> state['description']
     'This phase is for internal review.'
 
-a local ACL (see doc:`authorization`) that is set when entering this state::
+a local ACM (see doc:`glossary`) that is set when entering this state::
 
-    >>> state['acl']
-    [['Deny', 'reader', ['view']]]
+    >>> state['acm']
+    {'permissions': [['view', 'Deny']], 'principals': ['reader']}
 
 a hint for the frontend if displaying this state in listing should be restricted::
 
@@ -67,7 +67,7 @@ execute arbitrary tasks::
      >>> pprint(transition)
      {'callback': None,
       'from_state': 'draft',
-      'permission': 'do_transitions',
+      'permission': 'do_transition',
       'to_state': 'announced'}
 
 
