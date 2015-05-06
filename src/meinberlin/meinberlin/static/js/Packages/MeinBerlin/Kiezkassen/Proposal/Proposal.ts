@@ -46,6 +46,7 @@ export interface IScope extends angular.IScope {
         polygon: number[][];
     };
     selectedState? : string;
+    resource: RIProposalVersion;
 }
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
@@ -67,6 +68,9 @@ var bindPath = (
                 count: true
             }).then((pool) => {
                 adhHttp.get(value).then((resource : RIProposalVersion) => {
+
+                    scope.resource = resource;
+
                     var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
                     var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
                     var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
@@ -159,7 +163,7 @@ var postEdit = (
     oldVersion : RIProposalVersion
 ) => {
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
-    proposalVersion.parent = oldVersion.parent;
+    proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
     });
@@ -283,6 +287,37 @@ export var createDirective = (
     };
 };
 
+export var editDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError,
+    adhSubmitIfValid,
+    adhResourceUrlFilter,
+    $location : angular.ILocationService,
+    adhRate : AdhRate.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope, element) => {
+            bindPath(adhHttp, adhRate)(scope);
+            scope.submit = () => {
+                return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
+                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
+                        .then((result) => {
+                            $location.url(adhResourceUrlFilter(result[0].path));
+                    });
+                });
+            };
+        }
+    };
+};
+
 export var meinBerlinProposalFormController = ($scope, $element, $window) => {
     console.log($scope);
 };
@@ -305,6 +340,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list-item");
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-create");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-edit");
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list");
         }])
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", "adhRate", detailDirective])
@@ -321,6 +357,18 @@ export var register = (angular) => {
             "adhResourceUrlFilter",
             "$location",
             createDirective
+        ])
+        .directive("adhMeinBerlinKiezkassenProposalEdit", [
+            "adhConfig",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            "$location",
+            "adhRate",
+            editDirective
         ])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
 };
