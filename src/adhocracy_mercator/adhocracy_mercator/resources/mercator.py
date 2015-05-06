@@ -1,6 +1,7 @@
 """Mercator proposal."""
 from pyramid.registry import Registry
 from pyramid.security import Allow
+from pyramid.security import Deny
 
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
@@ -458,7 +459,12 @@ def _create_initial_content(context: IPool, registry: Registry, options: dict):
 
 mercator_acm = ACM().deserialize(
     {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
-     'permissions': [['add_mercator_proposal_version', None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
+     'permissions': [['add_proposal',                  None,       None,        Deny,          Deny,      None,      None,    Allow],  # noqa
+                     ['add_mercator_proposal_version', None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
+                     ['add_comment',                   None,       Deny,        None,          None,      None,      None,    Allow],  # noqa
+                     ['add_commentversion',            None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
+                     ['add_rate',                      None,       Deny,        None,          None,      None,      None,    Allow],  # noqa
+                     ['add_rateversion',               None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
                      ]})
 
 

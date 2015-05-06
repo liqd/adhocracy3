@@ -182,16 +182,19 @@ class TestMercatorProposalPermissionsAnonymous:
 @mark.functional
 class TestMercatorProposalPermissionsContributor:
 
+    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_can_create_proposal_item(self, app_contributor):
         resp = _post_proposal_item(app_contributor, path='/', name='proposal1')
         assert resp.status_code == 200
 
+    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_can_create_proposal_version(self, app_contributor):
         from adhocracy_mercator.resources import mercator
         possible_types = mercator.mercator_proposal_meta.element_types
         postable_types = app_contributor.get_postable_types('/proposal1')
         assert set(postable_types) == set(possible_types)
 
+    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_can_create_and_update_proposal_per_batch(self, app_contributor):
         """Create full proposal then do batch request that first
          creates a new subresource Version (IOrganisationInfo) and then
@@ -210,6 +213,7 @@ class TestMercatorProposalPermissionsContributor:
         postable_types = app_contributor.get_postable_types('/proposal_other')
         assert postable_types == []
 
+    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_non_god_creator_is_set(self, app_contributor):
         """Regression test issue #362"""
         from adhocracy_core.sheets.metadata import IMetadata
