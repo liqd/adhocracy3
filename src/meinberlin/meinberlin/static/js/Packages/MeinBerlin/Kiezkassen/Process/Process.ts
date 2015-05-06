@@ -15,22 +15,6 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            scope.currentTab = 0;
-            scope.tabs = [{
-                heading: "Tab1",
-                content: "foo1"
-            }, {
-                heading: "Tab2",
-                content: "foo2"
-            }];
-            scope.tabs2 = [{
-                heading: "Tab2_1",
-                content: "foo2_1",
-                classes: "class1"
-            }, {
-                heading: "Tab2_2",
-                content: "foo2_2"
-            }];
             scope.$watch(() => column.$scope.shared.isShowMap, function(value) {
                 scope.showMap = (typeof value === "undefined") ? true : value;
             });
