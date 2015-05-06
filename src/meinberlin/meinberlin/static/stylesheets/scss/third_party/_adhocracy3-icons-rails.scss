@@ -23,46 +23,22 @@
 [data-icon]:before { content: attr(data-icon); }
 
 [data-icon]:before,
-.icon-add:before,
-.icon-attention:before,
-.icon-back-to-top:before,
-.icon-ban-circle:before,
 .icon-budget:before,
-.icon-calendar:before,
 .icon-chevron-next:before,
 .icon-chevron-prev:before,
 .icon-comment-gap:before,
 .icon-document:before,
-.icon-documents:before,
 .icon-group:before,
-.icon-key:before,
-.icon-list:before,
 .icon-list-column:before,
-.icon-list-filled:before,
 .icon-location:before,
-.icon-mail:before,
-.icon-mail-filled:before,
 .icon-map-filled:before,
-.icon-map-pin:before,
 .icon-map-pin-add:before,
-.icon-meinberlin-logo:before,
-.icon-minus:before,
-.icon-pig:before,
 .icon-pin-detail:before,
-.icon-pointy-rectangle-left:before,
-.icon-pointy-rectangle-right:before,
 .icon-process:before,
 .icon-project:before,
 .icon-reply:before,
 .icon-search:before,
-.icon-speechbubble:before,
-.icon-speechbubble-document:before,
-.icon-speechbubble-unfilled:before,
 .icon-speechbubbles:before,
-.icon-tick:before,
-.icon-user:before,
-.icon-user-unfilled:before,
-.icon-users:before,
 .icon-vote-down:before,
 .icon-vote-up:before,
 .icon-voting:before,
@@ -82,46 +58,22 @@
   font-smoothing: antialiased;
 }
 
-.icon-add:before { content: "\f10f"; }
-.icon-attention:before { content: "\f110"; }
-.icon-back-to-top:before { content: "\f111"; }
-.icon-ban-circle:before { content: "\f112"; }
 .icon-budget:before { content: "\f100"; }
-.icon-calendar:before { content: "\f113"; }
 .icon-chevron-next:before { content: "\f129"; }
 .icon-chevron-prev:before { content: "\f12a"; }
 .icon-comment-gap:before { content: "\f12f"; }
 .icon-document:before { content: "\f101"; }
-.icon-documents:before { content: "\f114"; }
 .icon-group:before { content: "\f102"; }
-.icon-key:before { content: "\f115"; }
-.icon-list:before { content: "\f116"; }
 .icon-list-column:before { content: "\f12b"; }
-.icon-list-filled:before { content: "\f117"; }
 .icon-location:before { content: "\f10e"; }
-.icon-mail:before { content: "\f118"; }
-.icon-mail-filled:before { content: "\f119"; }
 .icon-map-filled:before { content: "\f12c"; }
-.icon-map-pin:before { content: "\f11a"; }
 .icon-map-pin-add:before { content: "\f103"; }
-.icon-meinberlin-logo:before { content: "\f12e"; }
-.icon-minus:before { content: "\f11b"; }
-.icon-pig:before { content: "\f11c"; }
 .icon-pin-detail:before { content: "\f104"; }
-.icon-pointy-rectangle-left:before { content: "\f11d"; }
-.icon-pointy-rectangle-right:before { content: "\f11e"; }
 .icon-process:before { content: "\f105"; }
 .icon-project:before { content: "\f106"; }
 .icon-reply:before { content: "\f107"; }
 .icon-search:before { content: "\f108"; }
-.icon-speechbubble:before { content: "\f11f"; }
-.icon-speechbubble-document:before { content: "\f120"; }
-.icon-speechbubble-unfilled:before { content: "\f121"; }
 .icon-speechbubbles:before { content: "\f109"; }
-.icon-tick:before { content: "\f122"; }
-.icon-user:before { content: "\f123"; }
-.icon-user-unfilled:before { content: "\f124"; }
-.icon-users:before { content: "\f125"; }
 .icon-vote-down:before { content: "\f10a"; }
 .icon-vote-up:before { content: "\f10b"; }
 .icon-voting:before { content: "\f10c"; }
