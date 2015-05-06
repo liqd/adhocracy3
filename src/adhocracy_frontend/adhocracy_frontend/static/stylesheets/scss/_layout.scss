@@ -76,6 +76,7 @@ That is not supported by all targeted browsers however.
 
 .main-header {
     position: relative;
+    line-height: 2.8571em;
 
     @media print {
         display: none;
