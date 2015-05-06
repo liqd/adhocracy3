@@ -5,7 +5,7 @@ from substanced.util import get_acl
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.utils import set_acl
 from adhocracy_mercator.resources.mercator import mercator_acm
-# import transaction
+import transaction
 
 
 def _application_created_subscriber(event):
@@ -27,7 +27,7 @@ def _set_permissions(root, registry):
     mercator_acl = acm_to_acl(mercator_acm, registry)
     new_acl = mercator_acl + acl
     set_acl(root, new_acl, registry)
-    #    transaction.commit()  # otherwise mercator permission get discarded?!
+    transaction.commit()  # otherwise mercator permission get discarded?!
 
 
 def includeme(config):
