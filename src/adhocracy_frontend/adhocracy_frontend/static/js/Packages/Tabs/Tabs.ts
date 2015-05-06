@@ -26,6 +26,7 @@ export class TabSetController {
 
     constructor(private $scope : ITabsetScope, private $element, private $timeout : angular.ITimeoutService) {
         this.$scope.tabs = [];
+        this.$element.find(".tabset-panes").css("height", 0);
     }
 
     private updateTabWidth() {
