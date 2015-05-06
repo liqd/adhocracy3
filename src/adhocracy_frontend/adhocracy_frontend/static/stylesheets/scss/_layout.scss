@@ -108,23 +108,20 @@ That is not supported by all targeted browsers however.
 }
 
 .l-header-center {
+    position: absolute;
     left: 0;
     text-align: center;
     top: 0;
     width: 100%;
     z-index: 0;
-}
-
-.l-header-right {
-    float: right;
-}
-
-.l-header-center {
-    position: absolute;
 
     @media print {
         position: static;
     }
+}
+
+.l-header-right {
+    float: right;
 }
 
 .l-center {
