@@ -4,7 +4,7 @@
         <a data-ng-show="showZoomButton" data-ng-click="resetMap()" href="">{{ "TR__MAP_RESET" | translate }}</a>
     </div>
     <div class="map-list-container">
-        <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container">
+        <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container map-list-navigate-container-prev">
             <a class="map-list-navigate map-list-navigate-back" href="" data-ng-click="getPreviousItem()" title="{{ 'TR__PREVIOUS' | translate }}">
             <i class="icon-chevron-prev"></i></a>
         </div>
@@ -17,7 +17,7 @@
                 </li>
             </ol>
         </div>
-        <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container">
+        <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container map-list-navigate-container-next">
             <a class="map-list-navigate map-list-navigate-next" href="" data-ng-click="getNextItem()" title="{{ 'TR__NEXT' | translate }}">
             <i class="icon-chevron-next"></i></a>
         </div>

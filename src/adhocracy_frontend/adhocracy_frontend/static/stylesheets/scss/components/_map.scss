@@ -54,8 +54,7 @@
 .map-list {
 
     .map-list-container {
-        display: table;
-        width: 100%;
+        position: relative;
     }
 
     .map-list-navigate {
@@ -67,21 +66,28 @@
         }
     }
 
-    .map-list-navigate-container,
-    .map-list-scroll-container {
-        display: table-cell;
-        vertical-align: middle;
+    .map-list-navigate-container {
+        position: absolute;
+        top: 50%;
+        margin-top: -$font-size-normal;
     }
 
-    .map-list-navigate-next {
-        float: right;
+    .map-list-navigate-container-prev {
+        left: 0;
+    }
+
+    .map-list-navigate-container-next {
+        right: 0;
+    }
+
+    .map-list-scroll-container {
+        padding: 0 auto;
     }
 
     .map-list-scroll-container-inner {
         overflow: hidden;
         margin: (20px / $font-size-normal * 1em) 0 0;
         vertical-align: top;
-        //FIXME: remove this when we are in moving columns
         white-space: nowrap;
     }
 
