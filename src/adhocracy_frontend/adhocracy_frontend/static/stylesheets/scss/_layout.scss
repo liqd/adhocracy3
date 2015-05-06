@@ -119,20 +119,7 @@ That is not supported by all targeted browsers however.
     float: right;
 }
 
-.l-content {
-    top: $l-header-height;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    overflow: hidden;
-
-    @media print {
-        overflow: visible;
-    }
-}
-
-.l-header-center,
-.l-content {
+.l-header-center {
     position: absolute;
 
     @media print {
