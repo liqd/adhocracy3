@@ -23,11 +23,11 @@ from adhocracy_core.utils import get_sheet
 from pyramid.traversal import resource_path
 
 from adhocracy_core.resources.comment import ICommentVersion
+from adhocracy_core.sheets.title import ITitle
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IFinance
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
 from adhocracy_mercator.sheets.mercator import IOrganizationInfo
-from adhocracy_mercator.sheets.mercator import ITitle
 from adhocracy_mercator.sheets.mercator import IUserInfo
 from adhocracy_mercator.sheets.mercator import ILocation
 from adhocracy_mercator.sheets.mercator import IIntroduction
@@ -70,11 +70,11 @@ def export_proposals():
     registry = env['registry']
     pool = get_sheet(root, IPool)
     params = {'depth': 3,
-              'content_type': IMercatorProposalVersion,
-              'sort': 'rates',
+              'interfaces': IMercatorProposalVersion,
+              'sort_by': 'rates',
               'reverse': True,
-              'tag': 'LAST',
-              'elements': 'content',
+              'arbitrary_indexes': {'tag': 'LAST'},
+              'resolve': True,
               }
     results = pool.get(params)
     proposals = results['elements']
@@ -165,11 +165,10 @@ def export_proposals():
         result.append(rates)
 
         # Comments
-        query = {'content_type': ICommentVersion,
+        query = {'interfaces': ICommentVersion,
                  'depth': 'all',
-                 'tag': 'LAST',
-                 'count': 'true',
-                 'elements': 'omit'}
+                 'arbitrary_indexes': {'tag': 'LAST'},
+                 'resolve': False}
         proposal_item = proposal.__parent__
         proposal_sheet = get_sheet(proposal_item, IPool)
         query_result = proposal_sheet.get(query)
