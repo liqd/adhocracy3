@@ -140,3 +140,19 @@ category: meinberlin
         color: $color-text-highlight-normal;
     }
 }
+
+.meinberlin-kiezkassen-proposal-map-list-item-detail-link {
+    display: block;
+    padding: 10px / $font-size-normal * 1em;
+
+    *:not(a) {
+        color: $color-text-normal;
+        text-decoration: none;
+    }
+
+    &:hover, &:focus {
+        @include box-shadow($color-text-highlight-normal 1px 0 0 1px, $color-text-highlight-normal -1px 0 0 0,
+            $color-text-highlight-normal -4px 0 0 0 inset, $color-text-highlight-normal 0 1px 0 0 inset);
+        @include clearfix;
+    }
+}

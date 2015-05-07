@@ -127,7 +127,6 @@
     }
 
     .map-list-meta-item-icon {
-        @extend .button;
         font-size: $font-size-normal;
         margin-right: 8px / $font-size-normal * 1em;
     }
