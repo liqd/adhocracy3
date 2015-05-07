@@ -130,12 +130,13 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         :param omit_readonly: do not store readonly ``appstruct`` data.
         """
 
-    def get(params: dict={}) -> dict:
+    def get(params: dict={}, add_back_references=True) -> dict:
         """ Get ``appstruct`` dictionary data.
 
         :param params: optional parameters that can modify the appearance
         of the returned dictionary. Valid keys/values are defined in
         :class:`SearchQuery`.
+        :param add_backrefs: allow to omit back references
         """
 
     def get_cstruct(request, params: dict={}):

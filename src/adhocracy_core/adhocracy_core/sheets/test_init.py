@@ -38,6 +38,8 @@ class TestBaseResourceSheet:
         mock.name = 'references'
         mock.backref = False
         mock.reftype = SheetReference
+        mock.default = []
+        mock.clone.return_value = mock
         return mock
 
     @fixture
@@ -49,6 +51,8 @@ class TestBaseResourceSheet:
         mock.name = 'reference'
         mock.backref = False
         mock.reftype = SheetReference
+        mock.default = []
+        mock.clone.return_value = mock
         return mock
 
     @fixture
@@ -168,6 +172,20 @@ class TestBaseResourceSheet:
         sheet_catalogs.search.assert_called_with(query)
         assert appstruct['references'] == [source]
 
+    def test_get_omit_valid_back_references(self, inst, context, sheet_catalogs,
+                                            mock_node_unique_references):
+        from adhocracy_core.interfaces import search_result
+        node = mock_node_unique_references
+        node.backref = True
+        inst.schema.children.append(node)
+        source = testing.DummyResource()
+        result = search_result._replace(elements=[source])
+        sheet_catalogs.search.return_value = result
+        appstruct = inst.get(add_back_references=False)
+
+        assert not sheet_catalogs.search.called
+        assert appstruct['references'] == []
+
     def test_set_valid_reference(self, inst, context, mock_graph,
                                  mock_node_single_reference, registry):
         from adhocracy_core.interfaces import ISheet
@@ -221,7 +239,6 @@ class TestBaseResourceSheet:
         from adhocracy_core.interfaces import IResourceSheetModified
         from adhocracy_core.testing import create_event_listener
         events = create_event_listener(config, IResourceSheetModified)
-
         inst.set({'count': 2})
 
         assert IResourceSheetModified.providedBy(events[0])

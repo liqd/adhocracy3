@@ -81,7 +81,7 @@ class BaseResourceSheet:
         """Return dictionary to store data."""
         raise NotImplementedError
 
-    def get(self, params: dict={}) -> dict:
+    def get(self, params: dict={}, add_back_references=True) -> dict:
         """Return appstruct data.
 
         :param params: Parameters to update the search query to find
@@ -89,12 +89,14 @@ class BaseResourceSheet:
             :class:`adhocracy_core.interfaces.SearchQuery`).
             The default search query is set in the `_references_query`
             property.
+        :param add_back_references: allow to omit back references
         """
         appstruct = self._get_default_appstruct()
         appstruct.update(self._get_data_appstruct())
         query = self._get_references_query(params)
         appstruct.update(self._get_reference_appstruct(query))
-        appstruct.update(self._get_back_reference_appstruct(query))
+        if add_back_references:
+            appstruct.update(self._get_back_reference_appstruct(query))
         return appstruct
 
     def _get_default_appstruct(self) -> dict:
@@ -159,7 +161,7 @@ class BaseResourceSheet:
             request: Request=None,
             omit_readonly: bool=True) -> bool:
         """Store appstruct."""
-        appstruct_old = self.get()
+        appstruct_old = self.get(add_back_references=False)
         appstruct = self._omit_omit_keys(appstruct, omit)
         if omit_readonly:
             appstruct = self._omit_readonly_keys(appstruct)
