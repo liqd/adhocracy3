@@ -1,27 +1,34 @@
 .moving-column {
     &.is-collapse {
-        background: $color-structure-normal;
+        background: $color-background-base-introvert;
         border: 0;
 
         .moving-column-expand {
             color: $color-text-introvert;
-
-            &:hover, &:focus, &:active {
-                color: $color-text-highlight-normal;
-            }
 
             .moving-column-icon {
                 margin-right: 0;
             }
         }
 
+        .moving-column-tab {
+            background: $color-structure-normal;
+            display: block;
+            float: none;
+            padding: 0;
+            margin: 0;
+
+            &:hover, &:focus, &:active {
+                color: $color-text-highlight-normal;
+            }
+        }
     }
 }
 
 .moving-column-body {
     background: $color-background-base-introvert;
     border: 0;
-    padding: (12px / $font-size-normal * 1em) (15px / $font-size-normal * 1em);
+    padding: 0 (5px / $font-size-normal * 1em);
 }
 
 .moving-column-icon {
@@ -29,6 +36,7 @@
 }
 
 .moving-column-menu {
+    background: $color-background-base-introvert;
     padding: 0;
 }
 
@@ -39,18 +47,26 @@
     float: left;
     font-size: $font-size-small;
     font-weight: $font-weight-extrovert;
-    margin-right: 15px / $font-size-small * 1em;
-    padding: 0 (15px / $font-size-small * 1em);
+    margin: 0 (30px / $font-size-small * 1em) 0 (5px / $font-size-small * 1em);
     text-transform: uppercase;
     vertical-align: baseline;
 }
 
 .moving-column-menu-switch {
     float: right;
+    margin-right: (5px / $font-size-small * 1em);
 
     .moving-column-menu-switch-item {
+        background: $color-structure-normal;
+        border-right: 1px solid $color-background-base;
         color: $color-text-introvert;
-        margin-right: 15px / $font-size-normal * 1em;
+        display: block;
+        float: left;
+        padding: 0 (8px / $font-size-normal * 1em);
+
+        &:last-child {
+            border: 0;
+        }
 
         &:hover, &:active, &.is-active {
             color: $color-brand-two-normal;
