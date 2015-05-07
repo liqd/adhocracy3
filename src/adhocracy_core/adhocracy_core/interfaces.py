@@ -610,7 +610,7 @@ class SearchQuery(namedtuple('Query', ['interfaces',
 
     resolve (bool):
         return `elements` list of resources or lazy iterator set
-    sort (str):
+    sort_by (str):
         index name to sort result. Available indexes are defined in
         :class:`adhocracy_core.catalog.adhocracy` and
         :class:`substanced.catalog.system`
