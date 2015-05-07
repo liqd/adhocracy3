@@ -24,6 +24,7 @@ from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from pyramid.request import Request
 from pyramid.registry import Registry
 from substanced.util import find_catalog
+from adhocracy_core.catalog import ICatalogsService
 
 
 def delete_users():
@@ -118,10 +119,10 @@ def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
 
 def _get_rates_from_user(pool: IPool, user: IUser) -> [IRateVersion]:
     params = {'depth': 6,
-              'content_type': IRate,
-              'elements': 'content',
-              'tag': 'LAST',
-              IRate.__identifier__ + ':subject': user,
+              'interfaces': IRate,
+              'resolve': True,
+              'arbitrary_indexes': {'tag': 'LAST'},
+              'references': [(None, IRate, 'subject', user)],
               }
     rates = pool.get(params)['elements']
     return rates
