@@ -59,6 +59,27 @@ export var register = (angular) => {
                             });
                         });
                     }])
+                .default(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "kiezkassen", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide"
+                })
+                .specific(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "kiezkassen", [
+                    "adhHttp", "adhUser", (
+                        adhHttp : AdhHttp.Service<any>,
+                        adhUser : AdhUser.Service
+                    ) => (resource : RIProposalVersion) => {
+                        return adhUser.ready.then(() => {
+                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                                if (!options.PUT) {
+                                    throw 401;
+                                } else {
+                                    return {
+                                        proposalUrl: resource.path
+                                    };
+                                }
+                            });
+                        });
+                    }])
                 .default(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
