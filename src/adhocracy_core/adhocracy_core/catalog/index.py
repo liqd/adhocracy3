@@ -92,24 +92,21 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
         elif source is not None and target is not None:
             raise ValueError('Either source or target has to be None')
         if source is None:
-            doc_ids = self._get_source_ids(target, isheet, isheet_field)
+            oids = self._ressource_ids(target, isheet, isheet_field, 'sources')
         else:
-            doc_ids = self._get_target_ids(source, isheet, isheet_field)
-        result = self.family.IF.TreeSet(doc_ids)
+            oids = self._ressource_ids(source, isheet, isheet_field, 'targets')
+        result = self.family.IF.TreeSet(oids)
         return result
 
-    def _get_source_ids(self, target, isheet=ISheet, isheet_field='') -> set:
-        """Get OIDs from references with `target`."""
+    def _ressource_ids(self, resource, isheet=ISheet, isheet_field='',
+                       orientation='') -> set:
+        """Get OIDs from references with `orientation` targets or sources."""
+        if orientation == 'sources':
+            get_resources_ids = self._objectmap.sourceids
+        else:
+            get_resources_ids = self._objectmap.targetids
         for isheet, field, reftype in self._graph.get_reftypes(isheet):
             if isheet_field and field != isheet_field:
                 continue
-            for source_id in self._objectmap.sourceids(target, reftype):
-                yield source_id
-
-    def _get_target_ids(self, source, isheet=ISheet, isheet_field='') -> set:
-        """Get OIDs from references with `source`."""
-        for isheet, field, reftype in self._graph.get_reftypes(isheet):
-            if isheet_field and field is not isheet_field:
-                continue
-            for target_id in self._objectmap.targetids(source, reftype):
-                yield target_id
+            for oid in get_resources_ids(resource, reftype):
+                yield oid
