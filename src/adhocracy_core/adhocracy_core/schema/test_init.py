@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import Mock
+from pytest import mark
 
 from pyramid import testing
 import colander
@@ -10,6 +11,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.testing import register_sheet
 
+from pyramid.security import Allow
 
 ############
 #  helper  #
@@ -1035,7 +1037,8 @@ class TestRole:
 
     def test_create(self, inst):
         assert inst.validator.choices == ['reader', 'annotator', 'contributor',
-                                          'editor', 'manager', 'admin', 'god']
+                                          'creator', 'editor', 'manager',
+                                          'admin', 'god']
         assert inst.schema_type == colander.String
         assert inst.default == 'reader'
 
@@ -1203,26 +1206,70 @@ class TestACEPrincipal:
         inst.schema_type = ACEPrincipalType
 
 
-class TestACE:
+@fixture
+def mock_registry():
+    registry = Mock()
+    return registry
+
+
+class TestACMRow:
 
     @fixture
     def inst(self):
-        from . import ACE
-        return ACE()
+        from . import ACMRow
+        return ACMRow()
 
-    def test_create(self, inst):
-        assert inst['action'].validator.choices == ['Allow', 'Deny']
-        assert inst['action'].required
-        assert inst['principal'].required
-        assert inst['permissions'].required
+    def test_deserialize(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry) \
+        .deserialize(['edit', 'Allow']) == ['edit', Allow]
+
+    def test_deserialize_invalid_permission_name(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        with raises(colander.Invalid):
+            inst.bind(registry=mock_registry).deserialize(['modify', 'Allow'])
+
+    def test_deserialize_invalid_action_name(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        with raises(colander.Invalid):
+            inst.bind(registry=mock_registry).deserialize(['edit', 'Agree'])
 
 
-class TestACL:
+class TestACM:
 
     @fixture
     def inst(self):
-        from . import ACL
-        return ACL()
+        from . import ACM
+        return ACM()
 
-    def serialize_empty(self, inst):
-        assert inst.serialize() == []
+    def test_serialize_empty(self, inst):
+       assert inst.serialize() == {'principals': [],
+                                   'permissions': []}
+
+    def test_serialize(self, inst):
+        appstruct = {'principals': ['system.Everyone'],
+                     'permissions': [['edit', Allow]]}
+        assert inst.serialize(appstruct) == {'principals': ['Everyone'],
+                                             'permissions': [['edit', 'Allow']]}
+
+    def test_deserialize(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry).deserialize(
+            {'principals': ['Everyone'],
+             'permissions': [['edit', 'Allow']]}) == \
+            {'principals': ['system.Everyone'],
+             'permissions': [['edit', Allow]]}
+
+    def test_deserialize_empty(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry).deserialize({}) \
+            == {'principals': [],
+                'permissions': []}
+
+    def test_deserialize_noaction(self, inst, mock_registry):
+        mock_registry.content.permissions.return_value = ['edit']
+        assert inst.bind(registry=mock_registry).deserialize(
+            {'principals': ['Everyone'],
+             'permissions': [['edit', '']]}) == \
+            {'principals': ['system.Everyone'],
+             'permissions': [['edit', None]]}

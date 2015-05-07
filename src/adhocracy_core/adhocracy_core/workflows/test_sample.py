@@ -7,6 +7,7 @@ from pytest import mark
 def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
+    config.include('adhocracy_core.rest')
     config.include('adhocracy_core.workflows.sample')
 
 
@@ -24,7 +25,7 @@ def test_initate_and_transition_to_announce(registry, context):
     assert workflow.state_of(context) is None
     workflow.initialize(context)
     assert workflow.state_of(context) is 'draft'
-    assert get_acl(context) == [('Deny', 'role:reader', ['view'])]
+    assert get_acl(context) == [('Deny', 'role:reader', 'view')]
     request = testing.DummyRequest()  # bypass permission check
     workflow.transition_to_state(context, request, 'announced')
     assert workflow.state_of(context) is 'announced'

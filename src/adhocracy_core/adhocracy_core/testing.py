@@ -25,7 +25,8 @@ import colander
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
-
+from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.resources.root import IRootPool
 
 #####################################
 # Integration/Function test helper  #
@@ -569,7 +570,7 @@ def add_user(root, login: str=None, password: str=None, email: str=None,
     return user
 
 
-def add_test_users(root, registry, options):
+def add_test_users(root, registry):
     """Add test user and dummy authentication token for every role."""
     add_user_token(root,
                    god_header['X-User-Path'],
@@ -622,14 +623,12 @@ def add_test_users(root, registry, options):
                    registry)
 
 
-def includeme_root_with_test_users(config):
-    """Override IRootPool to create initial test users."""
-    from adhocracy_core.resources import add_resource_type_to_registry
-    from adhocracy_core.resources.root import root_meta
-    config.commit()
-    after_creation = root_meta.after_creation + [add_test_users]
-    root_meta = root_meta._replace(after_creation=after_creation)
-    add_resource_type_to_registry(root_meta, config)
+def add_create_test_users_subscriber(configurator):
+    """Register a subscriber to create test users."""
+    configurator.add_subscriber(lambda event:
+                                add_test_users(event.object, event.registry),
+                                IResourceCreatedAndAdded,
+                                object_iface=IRootPool)
 
 
 @fixture(scope='class')
@@ -651,6 +650,8 @@ def _make_app(app_config):
     configurator.include(adhocracy_core.resources.sample_section)
     configurator.include(adhocracy_core.resources.comment)
     configurator.include(adhocracy_core.resources.rate)
+    add_create_test_users_subscriber(configurator)
+
     app = configurator.make_wsgi_app()
     return app
 

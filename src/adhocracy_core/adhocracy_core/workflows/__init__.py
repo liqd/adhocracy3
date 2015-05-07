@@ -11,6 +11,7 @@ from zope.interface import implementer
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
+from adhocracy_core.authorization import acm_to_acl
 
 
 @implementer(IAdhocracyWorkflow)
@@ -40,7 +41,7 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
     error_msg = 'Cannot create workflow {0}: {1}'
     try:
         appstruct = _validate_workflow_cstruct(cstruct)
-        workflow = _create_workflow(appstruct, name)
+        workflow = _create_workflow(registry, appstruct, name)
     except Invalid as error:
         msg = error_msg.format(name, str(error.asdict()))
         raise ConfigurationError(msg)
@@ -57,11 +58,12 @@ def _validate_workflow_cstruct(cstruct: dict) -> dict:
     return appstruct
 
 
-def _create_workflow(appstruct: dict, name: str) -> ACLWorkflow:
+def _create_workflow(registry: Registry, appstruct: dict, name: str) -> ACLWorkflow:
     initial_state = appstruct['states_order'][0]
     workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
     for name, data in appstruct['states'].items():
-        workflow.add_state(name, callback=None, acl=data['acl'])
+        acl = acm_to_acl(data['acm'], registry)
+        workflow.add_state(name, callback=None, acl=acl)
     for name, data in appstruct['transitions'].items():
         workflow.add_transition(name, **data)
     workflow.check()

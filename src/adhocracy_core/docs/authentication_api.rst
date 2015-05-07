@@ -410,7 +410,7 @@ new password to the reset password end point::
     >>> resp_data = testapp.post_json('/password_reset', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
-     'user_path': 'http://localhost/principals/users/0000008/',
+     'user_path': 'http://localhost/principals/users/0000015/',
      'user_token':...
 
 If the user is not activated yet::

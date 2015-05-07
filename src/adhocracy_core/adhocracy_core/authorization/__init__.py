@@ -10,6 +10,7 @@ from zope.interface import implementer
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
+from adhocracy_core.schema import ACM
 
 
 CREATOR_ROLEID = 'role:creator'
@@ -87,3 +88,23 @@ def get_local_roles_all(resource) -> dict:
                                            roles)
             local_roles_all[principal].update(roles_without_creator)
     return local_roles_all
+
+
+def acm_to_acl(acm: dict, registry: Registry) -> [str]:
+    """Convert an Access Control Matrix into a pyramid ACL.
+
+    To avoid generating too many ACE, action which are None will not
+    generate an ACE.
+
+    """
+    acl = []
+    idx = 0
+    for principal in acm['principals']:
+        for permissions in acm['permissions']:
+            permission_name = permissions[0]
+            action = permissions[idx + 1]
+            if action is not None:
+                ace = (action, principal, permission_name)
+                acl.append(ace)
+        idx = idx + 1
+    return acl

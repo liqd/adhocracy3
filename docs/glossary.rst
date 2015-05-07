@@ -6,6 +6,14 @@ Glossary
 .. glossary::
    :sorted:
 
+   ACM
+      An Access Control Matrix defines the rights of a list of
+      principals. An ACM crosses principals with permissions. At the
+      intersection of a principal and a permission there is an action.
+      The action can be either :data:`pyramid.security.Allow`,
+      :data:`pyramid.security.Deny` or :const:`None`. None is a default value and
+      does not grant any right.
+
    post_pool
       A normal or :term:`service` :class:`adhocracy_core.interfaces.IPool` that
       serves as the common place to post resources of a special type for a
