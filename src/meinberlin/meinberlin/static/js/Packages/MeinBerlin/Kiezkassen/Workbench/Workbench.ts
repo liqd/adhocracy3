@@ -167,18 +167,10 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 })
                 .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (resource : RIProposalVersion) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                return {
-                                    proposalUrl: resource.path,
-                                    editable: options.PUT
-                                };
-                            });
-                        });
+                    () => (resource : RIProposalVersion) => {
+                        return {
+                            proposalUrl: resource.path
+                        };
                     }])
                 .default(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "", {
                     space: "content",

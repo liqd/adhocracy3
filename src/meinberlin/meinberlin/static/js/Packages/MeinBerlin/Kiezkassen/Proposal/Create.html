@@ -4,8 +4,8 @@
     class="mein-berlin-proposal-form"
     name="meinBerlinProposalForm">
 
-    <h2 data-ng-show="create" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL" | translate }}</h2>
-    <h2 data-ng-show="!create" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL_EDIT" | translate }}</h2>
+    <h2 data-ng-if="create" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL" | translate }}</h2>
+    <h2 data-ng-if="!create" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL_EDIT" | translate }}</h2>
 
     <div class="form-error" data-ng-repeat="error in errors track by $index">
         <p>{{ error | adhFormatError | translate }}</p>
