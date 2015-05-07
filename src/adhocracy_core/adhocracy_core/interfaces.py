@@ -597,7 +597,7 @@ class SearchQuery(namedtuple('Query', ['interfaces',
         (reference).
     root (IResource):
        root resource to start searching  in descendants
-    dept (int):
+    depth (int):
        path depth to search descendants
     only_visible (bool):
         filter hidden and deleted resources
