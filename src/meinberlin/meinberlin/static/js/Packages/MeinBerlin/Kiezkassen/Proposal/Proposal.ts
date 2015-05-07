@@ -264,7 +264,7 @@ export var createDirective = (
         link: (scope, element) => {
             scope.errors = [];
             scope.data = {};
-            scope.edit = true;
+            scope.create = true;
             scope.showError = adhShowError;
 
             // FIXME: These values have to come from somewhere
@@ -308,7 +308,7 @@ export var editDirective = (
         link: (scope, element) => {
             scope.errors = [];
             scope.showError = adhShowError;
-            scope.edit = false;
+            scope.create = false;
             bindPath(adhHttp, adhRate)(scope);
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {

@@ -4,8 +4,8 @@
     class="mein-berlin-proposal-form"
     name="meinBerlinProposalForm">
 
-    <h2 data-ng-show="edit" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL" | translate }}</h2>
-    <h2 data-ng-show="!edit" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL_EDIT" | translate }}</h2>
+    <h2 data-ng-show="create" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL" | translate }}</h2>
+    <h2 data-ng-show="!create" class="mein-berlin-proposal-form-heading">1. {{ "TR__MEINBERLIN_MEIN_BERLIN_SIMPLE_PROPOSAL_EDIT" | translate }}</h2>
 
     <div class="form-error" data-ng-repeat="error in errors track by $index">
         <p>{{ error | adhFormatError | translate }}</p>
@@ -105,7 +105,9 @@
             value="{{ 'TR__PUBLISH' | translate }}"
             class="m-call-to-action form-footer-button-cta" />
 
-        <a href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
+        <a data-ng-show="create" href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
+        {{ "TR__CANCEL" | translate }}</a>
+        <a data-ng-show="!create" href="{{ path | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
         {{ "TR__CANCEL" | translate }}</a>
     </footer>
 </form>
