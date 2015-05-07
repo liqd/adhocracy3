@@ -20,7 +20,7 @@ class PoolSheet(AnnotationRessourceSheet):
 
     _additional_params = ('serialization_form', 'show_frequency', 'show_count')
 
-    def get(self, params: dict={}) -> dict:
+    def get(self, params: dict={}, add_back_references=True) -> dict:
         """Return child references or arbitrary search for descendants.
 
         :param params: Parameters to update the search query to find `elements`
