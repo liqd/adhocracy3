@@ -16,14 +16,6 @@
         }
 
     }
-
-    &.is-first-visible-child {
-        @include border-top-left-radius(10px / $font-size-small * 1em);
-    }
-
-    &.is-last-visible-child {
-        @include border-top-right-radius(10px / $font-size-small * 1em);
-    }
 }
 
 .moving-column-body {
