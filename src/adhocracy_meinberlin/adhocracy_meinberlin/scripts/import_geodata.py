@@ -162,9 +162,9 @@ def _slugify(value: str) -> str:
 def _download_geodata(filename: str, url: str, layer: str):
     call = 'ogr2ogr -s_srs EPSG:25833'\
            ' -t_srs WGS84 -f'\
-           ' geoJSON %s%s WFS:"%s" %s' % (
-               filename, '?TYPENAMES=GML2' if GDAL_LEGACY else '',
-               url, layer)
+           ' geoJSON %s WFS:"%s%s" %s' % (
+               filename, url, '?TYPENAMES=GML2' if GDAL_LEGACY else '',
+               layer)
     try:
         os.remove(filename)
     except:
