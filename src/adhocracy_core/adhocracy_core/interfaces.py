@@ -135,7 +135,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
         :param params: optional parameters that can modify the appearance
         of the returned dictionary. Valid keys/values are defined in
-        :class:`SearchQuery`.
+        :class:`adhocracy_core.interfaces.SearchQuery`.
         :param add_backrefs: allow to omit back references
         """
 

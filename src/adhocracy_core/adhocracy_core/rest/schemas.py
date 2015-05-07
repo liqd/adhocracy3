@@ -457,7 +457,7 @@ class GETPoolRequestSchema(colander.Schema):
         for key, value in appstruct.items():
             if key in fields + SearchQuery._fields:
                 continue
-            if (':') in key:
+            if ':' in key:
                 if 'references' not in search_query:  # pragma: no branch
                     search_query['references'] = []
                 isheet_name, isheet_field = key.split(':')
