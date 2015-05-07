@@ -70,23 +70,31 @@
         position: absolute;
         top: 50%;
         margin-top: -$font-size-normal;
+        width: 30px / $font-size-normal * 1em;
+
+        p {
+            line-height: 1em;
+        }
     }
 
     .map-list-navigate-container-prev {
-        left: 0;
+        left: 10px / $font-size-normal * 1em;
+        text-align: left;
     }
 
     .map-list-navigate-container-next {
-        right: 0;
+        right: 10px / $font-size-normal * 1em;
+        text-align: right;
     }
 
     .map-list-scroll-container {
-        padding: 0 auto;
+        padding: 0 (40px / $font-size-normal * 1em);
     }
 
     .map-list-scroll-container-inner {
         overflow: hidden;
-        margin: (20px / $font-size-normal * 1em) 0 0;
+        margin: (15px / $font-size-normal * 1em) 0 0;
+        padding: 0;
         vertical-align: top;
         white-space: nowrap;
     }
@@ -105,13 +113,13 @@
         @include span(4 of 12 last);
 
         .map-list-meta-item {
-            margin-bottom: 20px / $font-size-small * 1em;
+            margin-bottom: 15px / $font-size-small * 1em;
         }
     }
 
     .map-list-item-title {
         font-size: $font-size-normal;
-        margin: 0 0 (20px / $font-size-normal * 1em);
+        margin: 0 0 (15px / $font-size-normal * 1em);
     }
 
     .map-list-meta-item {
