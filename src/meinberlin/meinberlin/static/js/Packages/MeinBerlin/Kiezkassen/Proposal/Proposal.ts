@@ -305,6 +305,8 @@ export var editDirective = (
             path: "@"
         },
         link: (scope, element) => {
+            scope.errors = [];
+            scope.showError = adhShowError;
             bindPath(adhHttp, adhRate)(scope);
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
