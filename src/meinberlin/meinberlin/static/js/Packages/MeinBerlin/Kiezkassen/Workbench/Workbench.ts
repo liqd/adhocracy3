@@ -8,6 +8,7 @@ import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhUser = require("../../../User/User");
 import AdhUtil = require("../../../Util/Util");
+import AdhPermissions = require("../../../Permissions/Permissions");
 
 import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
 import AdhMeinBerlinKiezkassenProposal = require("../Proposal/Proposal");
@@ -43,7 +44,8 @@ export var commentColumnDirective = (
 
 export var kiezkassenProposalDetailColumnDirective = (
     bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -51,6 +53,7 @@ export var kiezkassenProposalDetailColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, ["processUrl", "proposalUrl"]);
+            adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
         }
     };
 };
@@ -218,7 +221,7 @@ export var register = (angular) => {
         .directive("adhMeinBerlinWorkbench", ["adhConfig", meinBerlinWorkbenchDirective])
         .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalDetailColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalDetailColumnDirective])
+            "adhBindVariablesAndClear", "adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreateColumn", [
             "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalCreateColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalEditColumn", [
