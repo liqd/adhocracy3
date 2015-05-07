@@ -68,6 +68,20 @@ export var kiezkassenProposalCreateColumnDirective = (
     };
 };
 
+export var kiezkassenProposalEditColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenProposalEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            bindVariablesAndClear(scope, column, ["processUrl", "proposalUrl"]);
+        }
+    };
+};
+
 export var kiezkassenDetailColumnDirective = (
     bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
@@ -125,6 +139,16 @@ export var register = (angular) => {
                                 }
                             });
                         });
+                    }])
+                .default(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide"
+                })
+                .specific(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "", [
+                    () => (resource : RIProposalVersion) => {
+                        return {
+                            proposalUrl: resource.path
+                        };
                     }])
                 .default(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
@@ -185,6 +209,8 @@ export var register = (angular) => {
             "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalDetailColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreateColumn", [
             "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalCreateColumnDirective])
+        .directive("adhMeinBerlinKiezkassenProposalEditColumn", [
+            "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalEditColumnDirective])
         .directive("adhMeinBerlinKiezkassenDetailColumn", [
             "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailColumnDirective]);
 };
