@@ -37,8 +37,7 @@ def migrate_new_sheet(context: IPool,
     """
     registry = get_current_registry(context)
     pool = get_sheet(context, IPool, registry=registry)
-    query = {'content_type': iresource,
-             'sheet': isheet_old,
+    query = {'interfaces': (isheet_old, iresource),
              'depth': 'all',
              'only_visible': False,
              }
