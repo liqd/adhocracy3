@@ -3,61 +3,65 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
-    color: $color-text-normal;
-
-    &:focus:not(:disabled):not(.ng-disabled),
-    &:hover:not(:disabled):not(.ng-disabled) {
-        background: transparent;
+    &, &.m-call-to-action {
         color: $color-text-normal;
-        text-decoration: underline;
-    }
-
-    &:active:not(:disabled):not(.ng-disabled) {
-        color: $color-shadow;
-    }
-
-    &.m-call-to-action {
-        @include border-radius(1em);
-        font-weight: $font-weight-extrovert;
-
-        &:hover:not(:disabled):not(.ng-disabled),
-        &:focus:not(:disabled):not(.ng-disabled) {
-            background: $color-brand-two-introvert;
-            text-decoration: none;
-        }
-
-        &:active:not(:disabled):not(.ng-disabled) {
-            background: $color-brand-two-extrovert;
-        }
-    }
-
-    &.m-call-to-action-secondary {
-        color: $color-text-introvert;
-
-        &:hover:not(:disabled):not(.ng-disabled),
-        &:focus:not(:disabled):not(.ng-disabled) {
-            background: transparent;
-            text-decoration: underline;
-        }
-    }
-
-    &.arrow-button {
-        background: $color-text-inverted;
-        color: $color-text-highlight-normal;
-        min-width: 100px;
-        outline: 1px solid $color-text-highlight-normal;
-        font-weight: $font-weight-extrovert;
-        text-align: center;
-
-        &:after {
-            content: ">";
-        }
+        min-width: 1px;
+        padding: 0 (30px / $font-size-normal * 1em);
 
         &:focus:not(:disabled):not(.ng-disabled),
         &:hover:not(:disabled):not(.ng-disabled) {
-            background: $color-text-highlight-normal;
-            color: $color-text-inverted;
-            text-decoration: none;
+            background: transparent;
+            color: $color-text-normal;
+            text-decoration: underline;
+        }
+
+        &:active:not(:disabled):not(.ng-disabled) {
+            color: $color-shadow;
+        }
+
+        &.m-call-to-action {
+            @include border-radius(1em);
+            font-weight: $font-weight-extrovert;
+
+            &:hover:not(:disabled):not(.ng-disabled),
+            &:focus:not(:disabled):not(.ng-disabled) {
+                background: $color-brand-two-introvert;
+                text-decoration: none;
+            }
+
+            &:active:not(:disabled):not(.ng-disabled) {
+                background: $color-brand-two-extrovert;
+            }
+        }
+
+        &.m-call-to-action-secondary {
+            color: $color-text-introvert;
+
+            &:hover:not(:disabled):not(.ng-disabled),
+            &:focus:not(:disabled):not(.ng-disabled) {
+                background: transparent;
+                text-decoration: underline;
+            }
+        }
+
+        &.arrow-button {
+            background: $color-text-inverted;
+            color: $color-text-highlight-normal;
+            min-width: 100px;
+            outline: 1px solid $color-text-highlight-normal;
+            font-weight: $font-weight-extrovert;
+            text-align: center;
+
+            &:after {
+                content: ">";
+            }
+
+            &:focus:not(:disabled):not(.ng-disabled),
+            &:hover:not(:disabled):not(.ng-disabled) {
+                background: $color-text-highlight-normal;
+                color: $color-text-inverted;
+                text-decoration: none;
+            }
         }
     }
 }
