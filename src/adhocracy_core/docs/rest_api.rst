@@ -565,7 +565,7 @@ Fetch the first Proposal version, it is empty ::
 
     >>> resp = testapp.get(pvrs0_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.document.IDocument'])
-    {'description': '', 'elements': [], 'picture': None, 'title': ''}
+    {'description': '', 'elements': [], 'title': ''}
 
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
     {'followed_by': [], 'follows': []}

@@ -5,10 +5,10 @@
     <!-- FIXME: rm inline CSS -->
     <ol class="cols-2 map-list-scroll-container listing-elements" style="height: {{height}}px; overflow-y: scroll;">
         <li
-            data-ng-repeat="(key, item) in items"
+            data-ng-repeat="item in items"
             data-ng-hide="item.hide"
-            class="map-list-item{{key}}"
-            data-ng-class="{'is-selected': selectedItem == item}">
+            class="map-list-item"
+            data-ng-class="{'is-selected': selectedPath == item}">
             <a data-ng-click="toggleItem(item)" href="" style="display: block; padding: 1em;">{{ item.value.title }}</a>
         </li>
     </ol>

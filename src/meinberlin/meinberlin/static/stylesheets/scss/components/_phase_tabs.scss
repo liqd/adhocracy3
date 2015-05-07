@@ -1,0 +1,51 @@
+.tab.m-phase {
+    overflow: visible;
+    position: relative;
+
+    &, .tab-button, &.is-active .tab-button {
+        border: 0;
+        line-height: 1;
+        margin-right: 0;
+        top: 0;
+    }
+
+    &.is-active {
+        &:after {
+            border-left-color: $color-background-base-introvert;
+        }
+
+        &:before {
+            display: none;
+        }
+    }
+
+    &.is-current-phase {
+        @include single-box-shadow(0, 2px, 0, 0, $color-function-valid);
+    }
+
+    &:after, &:before {
+        border-top: 1em solid transparent;
+        border-left: 0.5em solid $color-structure-border;
+        border-bottom: 1em solid transparent;
+        content: "";
+        height: 0;
+        position: absolute;
+        right: -0.5em;
+        top: 0;
+        width: 0;
+        z-index: 2;
+    }
+
+    &:before {
+        border-left-color: $color-text-inverted;
+        right: -0.6em;
+        margin-left: 1px;
+        z-index: 1;
+    }
+
+    &:last-child {
+        &:after, &:before {
+            content: none;
+        }
+    }
+}

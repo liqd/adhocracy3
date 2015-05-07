@@ -114,21 +114,22 @@ def includeme(config):
     config.include('.sheets')
     config.include('.resources.asset')
     config.include('.resources.pool')
+    config.include('.resources.organisation')
     config.include('.resources.root')
     config.include('.resources.tag')
     config.include('.resources.comment')
     config.include('.resources.external_resource')
     config.include('.resources.principal')
     config.include('.resources.rate')
+    config.include('.resources.image')
     config.include('.resources.subscriber')
-    config.include('.resources.sample_image')
     config.include('.resources.geo')
     config.include('.workflows')
     config.include('.websockets')
     config.include('.rest')
     if settings.get('adhocracy.add_test_users', False):
-        from adhocracy_core.testing import includeme_root_with_test_users
-        config.include(includeme_root_with_test_users)
+        from adhocracy_core.testing import add_create_test_users_subscriber
+        add_create_test_users_subscriber(config)
 
 
 def main(global_config, **settings):

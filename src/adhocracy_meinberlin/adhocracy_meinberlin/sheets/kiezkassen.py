@@ -8,6 +8,7 @@ from adhocracy_core.sheets import workflow
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import Text
 
 
 class IProposal(ISheet):
@@ -25,7 +26,7 @@ class ProposalSchema(colander.MappingSchema):
                             validator=colander.Range(min=0, max=50000))
     creator_participate = Boolean()
     location_text = SingleLine(validator=colander.Length(max=100))
-
+    address = Text()
 
 proposal_meta = sheet_meta._replace(isheet=IProposal,
                                     schema_class=ProposalSchema)
@@ -40,9 +41,13 @@ class WorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
 
     """Data structure the kiezkassen workflow assignment sheet."""
 
-    workflow_name = 'sample'  # FIXME add custom workflow for kiezkassen
+    workflow_name = 'kiezkassen'
 
-    announced = workflow.StateAssignment()
+    draft = workflow.StateAssignment()
+    announce = workflow.StateAssignment()
+    participate = workflow.StateAssignment()
+    frozen = workflow.StateAssignment()
+    result = workflow.StateAssignment()
 
 
 workflow_meta = workflow.workflow_meta._replace(

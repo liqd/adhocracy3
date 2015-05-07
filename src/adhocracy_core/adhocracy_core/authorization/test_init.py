@@ -1,7 +1,9 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
-
+from pyramid.security import Allow
+from pyramid.security import Deny
+from unittest.mock import Mock
 
 class TestRuleACLAuthorizaitonPolicy:
 
@@ -187,3 +189,26 @@ def test_get_local_roles_all_parents_with_creator_role(context):
     context['child'] = context.clone(__local_roles__={'principal': {'role:editor'}})
     child = context['child']
     assert get_local_roles_all(child) == {'principal': {'role:editor'}}
+
+@fixture
+def mock_registry():
+    registry = Mock()
+    return registry
+
+def test_acm_to_acl(mock_registry):
+    mock_registry.content.permissions = ['view', 'edit']
+    from . import acm_to_acl
+    appstruct = {'principals':           ['Everyone', 'role:creator', 'role:annotator'],
+                 'permissions': [['view',  Allow,      Allow,          Allow],
+                                 ['edit',  Deny,       Allow,          None]]}
+    acl = acm_to_acl(appstruct, mock_registry)
+    assert (Allow, 'Everyone', 'view') in acl
+    assert (Deny,  'Everyone', 'view') not in acl
+    assert (Deny,  'Everyone', 'edit') in acl
+    assert (Allow, 'Everyone', 'edit') not in acl
+    assert (Allow, 'role:creator', 'view') in acl
+    assert (Deny,  'role:creator', 'view') not in acl
+    assert (Allow, 'role:creator', 'edit') in acl
+    assert (Deny,  'role:creator', 'edit') not in acl
+    assert (Deny,  'role:annotator', 'edit') not in acl
+    assert (None,  'role:annotator', 'edit') not in acl

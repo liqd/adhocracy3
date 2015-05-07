@@ -15,7 +15,7 @@ import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/I
 var pkgLocation = "/User";
 
 
-export interface IScopeLogin {
+export interface IScopeLogin extends angular.IScope {
     user : AdhUser.Service;
     loginForm : angular.IFormController;
     credentials : {
@@ -32,7 +32,7 @@ export interface IScopeLogin {
 }
 
 
-export interface IScopeRegister {
+export interface IScopeRegister extends angular.IScope {
     registerForm : angular.IFormController;
     input : {
         username : string;
@@ -40,6 +40,8 @@ export interface IScopeRegister {
         password : string;
         passwordRepeat : string;
     };
+    loggedIn : boolean;
+    userName : string;
     siteName : string;
     termsUrl : string;
     errors : string[];
@@ -49,6 +51,8 @@ export interface IScopeRegister {
     register : () => angular.IPromise<void>;
     cancel : () => void;
     showError;
+    logOut : () => void;
+    goBack : () => void;
 }
 
 
@@ -67,28 +71,35 @@ var bindServerErrors = (
 };
 
 
-export var activateController = (
+export var activateArea = (
+    adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
     adhDone,
+    $scope,
     $location : angular.ILocationService
-) : void => {
+) : AdhTopLevelState.IAreaInput => {
+    $scope.translationData = {
+        supportEmail: adhConfig.support_email
+    };
+    $scope.success = false;
+    $scope.ready = false;
+    $scope.siteName = adhConfig.site_name;
+
     var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
 
-    var success = () => {
-        // FIXME show success message in UI
-        // FIXME extract cameFrom from activation key (involves BE)
-        adhTopLevelState.redirectToCameFrom("/");
-    };
-
-    var error = () => {
-        $location.url("activation_error");
-    };
-
     adhUser.activate(path)
-        .then(success, error)
-        .then(adhDone);
+        .then(() => {
+            $scope.success = true;
+        })
+        .finally(() => {
+            $scope.ready = true;
+            adhDone();
+        });
+
+    return {
+        templateUrl: "/static/js/templates/Activation.html"
+    };
 };
 
 
@@ -152,6 +163,20 @@ export var registerDirective = (
             scope.termsUrl = adhConfig.terms_url;
             scope.showError = adhShowError;
 
+            scope.logOut = () => {
+                adhUser.logOut();
+            };
+
+            scope.$watch(() => adhUser.loggedIn, (value) => {
+                scope.loggedIn = value;
+            });
+
+            scope.$watch(() => adhUser.data, (value) => {
+                if (value) {
+                    scope.userName = value.name;
+                }
+            });
+
             scope.input = {
                 username: "",
                 email: "",
@@ -159,9 +184,10 @@ export var registerDirective = (
                 passwordRepeat: ""
             };
 
-            scope.cancel = () => {
+            scope.cancel = scope.goBack = () => {
                  adhTopLevelState.redirectToCameFrom("/");
             };
+
 
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
@@ -190,6 +216,8 @@ export var passwordResetDirective = (
         scope: {},
         link: (scope) => {
             scope.showError = adhShowError;
+            scope.success = false;
+            scope.siteName = adhConfig.site_name;
 
             scope.input = {
                 password: "",
@@ -208,7 +236,7 @@ export var passwordResetDirective = (
                     password: scope.input.password
                 }).then((response) => {
                     adhUser.storeAndEnableToken(response.data.user_token, response.data.user_path);
-                    adhTopLevelState.redirectToCameFrom("/");
+                    scope.success = true;
                 }, AdhHttp.logBackendError)
                 .catch((errors) => bindServerErrors(scope, errors));
             };
@@ -219,6 +247,7 @@ export var passwordResetDirective = (
 export var createPasswordResetDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError
 ) => {
@@ -229,12 +258,17 @@ export var createPasswordResetDirective = (
         link: (scope) => {
             scope.success = false;
             scope.showError = adhShowError;
+            scope.siteName = adhConfig.site_name;
+
+            scope.$watch(() => adhUser.loggedIn, (value) => {
+                scope.loggedIn = value;
+            });
 
             scope.input = {
                 email: ""
             };
 
-            scope.cancel = () => {
+            scope.goBack = scope.cancel = () => {
                  adhTopLevelState.redirectToCameFrom("/");
             };
 
@@ -269,7 +303,7 @@ export var indicatorDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var metaDirective = (adhConfig : AdhConfig.IService) => {
+export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
@@ -282,7 +316,7 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
-                        $scope.isAnonymous = false;
+                        $scope.noLink = !adhResourceArea.has(RIUser.content_type);
                     });
             } else {
                 $translate("TR__GUEST").then((translated) => {
@@ -290,7 +324,7 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
                         name: translated
                     };
                 });
-                $scope.isAnonymous = true;
+                $scope.noLink = true;
             }
         }]
     };
@@ -488,35 +522,20 @@ export var register = (angular) => {
                         templateUrl: "/static/js/templates/Register.html"
                     };
                 })
-                .when("activate", ["adhUser", "adhTopLevelState", "adhDone", "$location",
-                    (adhUser, adhTopLevelState, adhDone, $location) : AdhTopLevelState.IAreaInput => {
-                        activateController(adhUser, adhTopLevelState, adhDone, $location);
-                        return {
-                            skip: true
-                        };
-                    }
-                ])
-                .when("activation_error", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.translationData = {
-                        supportEmail: adhConfig.support_email
-                    };
-                    return {
-                        templateUrl: "/static/js/templates/ActivationError.html"
-                    };
-                }]);
+                .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", activateArea]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIUser.content_type, "", "", {
+                .default(RIUser.content_type, "", "", "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIUser.content_type, "", "", () => (resource : RIUser) => {
+                .specific(RIUser.content_type, "", "", "", () => (resource : RIUser) => {
                     return {
                         userUrl: resource.path
                     };
                 })
-                .default(RIUsersService.content_type, "", "", {
+                .default(RIUsersService.content_type, "", "", "", {
                     space: "user",
                     movingColumns: "is-show-hide-hide",
                     userUrl: "",  // not used by default, but should be overridable
@@ -527,11 +546,12 @@ export var register = (angular) => {
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
-        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", passwordResetDirective])
-        .directive("adhCreatePasswordReset", ["adhConfig", "adhHttp", "adhTopLevelState", createPasswordResetDirective])
+        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", passwordResetDirective])
+        .directive("adhCreatePasswordReset", [
+            "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
-        .directive("adhUserMeta", ["adhConfig", metaDirective])
+        .directive("adhUserMeta", ["adhConfig", "adhResourceArea", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
         .directive("adhUserDetailColumn", ["adhBindVariablesAndClear", "adhPermissions", "adhConfig", userDetailColumnDirective])
         .directive("adhUserListingColumn", ["adhBindVariablesAndClear", "adhConfig", userListingColumnDirective]);

@@ -3,6 +3,7 @@ from substanced.folder import Folder
 from substanced.util import find_service
 from substanced.interfaces import IFolder
 from zope.interface import implementer
+from zope.deprecation import deprecated
 
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.pool
@@ -19,6 +20,9 @@ from adhocracy_core.utils import now
 class IBasicPool(IPool):
 
     """Basic Pool."""
+
+
+deprecated('IBasicPool', 'Backward compatible code, use organisation or pool')
 
 
 @implementer(IPool, IFolder)
@@ -80,6 +84,7 @@ class Pool(Base, Folder):
         """Return  the :term:`service` for the given context."""
         return find_service(self, service_name, *sub_service_names)
 
+
 pool_meta = resource_meta._replace(
     iresource=IPool,
     content_class=Pool,
@@ -94,6 +99,7 @@ pool_meta = resource_meta._replace(
     extended_sheets=[],
     element_types=[IPool],
 )
+
 
 basicpool_meta = pool_meta._replace(
     iresource=IBasicPool,

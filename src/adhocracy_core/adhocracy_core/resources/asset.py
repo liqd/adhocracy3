@@ -2,6 +2,7 @@
 
 from pyramid.registry import Registry
 from substanced.file import File
+from zope.deprecation import deprecated
 
 from adhocracy_core.interfaces import Dimensions
 from adhocracy_core.interfaces import IPool
@@ -20,6 +21,7 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import raise_colander_style_error
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
+import adhocracy_core.sheets.title
 
 
 class IAssetDownload(ISimple):
@@ -130,8 +132,12 @@ asset_meta = pool_meta._replace(
     iresource=IAsset,
     basic_sheets=[
         adhocracy_core.sheets.metadata.IMetadata,
+        adhocracy_core.sheets.asset.IAssetData,
+        adhocracy_core.sheets.title.ITitle,
+    ],
+    extended_sheets=[
+        # all subtypes need to provide an IAssetMetadata sheet
         adhocracy_core.sheets.asset.IAssetMetadata,
-        adhocracy_core.sheets.asset.IAssetData
     ],
     use_autonaming=True,
     permission_add='add_asset',
@@ -154,6 +160,9 @@ assets_service_meta = service_meta._replace(
 class IPoolWithAssets(IPool):
 
     """A pool with an auto-created asset service pool."""
+
+
+deprecated('IPoolWithAssets', 'Backward compatible code, use process instead')
 
 
 def add_assets_service(context: IPool, registry: Registry, options: dict):

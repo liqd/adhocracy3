@@ -8,6 +8,21 @@ category: Type
 
 body {
     @include text(running);
+
+    @media print {
+        // scss-lint:disable ImportantRule
+        padding: 0 1.5em !important;
+    }
+}
+
+@media print {
+    * {
+        // scss-lint:disable ImportantRule, ColorVariable
+        background-color: #fff !important;
+        border-color: #000 !important;
+        color: #000 !important;
+        // scss-lint:enable ImportantRule, ColorVariable
+    }
 }
 
 /*doc
@@ -50,6 +65,10 @@ p {
     hyphens: auto;
     line-height: 1.15;
     margin: 0 0 1em;
+
+    @media print {
+        text-align: justify;
+    }
 }
 
 /*doc
@@ -172,16 +191,20 @@ category: Type
 */
 
 .inline-box {
-    @include inline-block;
-    color: $color-text-highlight-introvert;
-    border: 1px solid $color-text-highlight-introvert;
-    font-size: $font-size-small;
-    padding: 0 1em;
+    @media screen {
+        @include inline-block;
+        color: $color-text-highlight-introvert;
+        border: 1px solid $color-text-highlight-introvert;
+        font-size: $font-size-small;
+        padding: 0 1em;
+    }
 }
 
 .inline-boxes {
-    margin: 0;
-    padding: 0;
+    @media screen {
+        margin: 0;
+        padding: 0;
+    }
 
     li {
         @extend .inline-box;
@@ -462,14 +485,3 @@ parent: inline
 <time datetime="2013-04-18T13:50:47+02:00">18. April 2013 13:50</time>
 ```
 */
-
-
-@media print {
-    // scss-lint:disable ImportantRule, ColorVariable
-
-    * {
-        background: white !important;
-        color: black !important;
-        border-color: black !important;
-    }
-}

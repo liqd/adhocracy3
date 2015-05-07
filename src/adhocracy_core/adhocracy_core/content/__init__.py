@@ -83,6 +83,43 @@ class ResourceContentRegistry(ContentRegistry):
             resources_addables[iresource] = all_addables
         return resources_addables
 
+    @property
+    def permissions(self) -> [str]:
+        """Set of all permissions defined in the system."""
+        perms = self._builtin_permissions
+        for resource_meta in self.resources_meta.values():
+            perms.update(self._get_resource_permissions(resource_meta))
+        for sheet_meta in self.sheets_meta.values():
+            perms.update(self._get_sheet_permissions(sheet_meta, perms))
+        for workflow_meta in self.workflows_meta.values():
+            perms.update(self._get_workflow_permissions(workflow_meta))
+        perms.update(self._get_views_permissions())
+        return perms
+
+    @property
+    def _builtin_permissions(self):
+        return {'hide_resource', 'edit_group', 'do_transition'}
+
+    def _get_resource_permissions(self, resource_meta):
+        return [p for p in [resource_meta.permission_add,
+                            resource_meta.permission_view]
+                if p != '']
+
+    def _get_sheet_permissions(self, sheet_meta, perms):
+        return [p for p in [sheet_meta.permission_view,
+                            sheet_meta.permission_edit,
+                            sheet_meta.permission_create]
+                if p != '']
+
+    def _get_views_permissions(self):
+        permissions = self.registry.introspector.get_category('permissions')
+        if permissions is None:
+            return []
+        return [v['introspectable'].title for v in permissions]
+
+    def _get_workflow_permissions(self, workflow_meta):
+        return [t['permission'] for t in workflow_meta['transitions'].values()]
+
     def get_sheet(self, context: object, isheet: IInterface) -> ISheet:
         """Get sheet for `context` and set the 'context' attribute.
 

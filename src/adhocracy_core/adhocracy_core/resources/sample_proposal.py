@@ -13,6 +13,7 @@ from adhocracy_core.resources.rate import add_ratesservice
 import adhocracy_core.sheets.document
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.workflow
+import adhocracy_core.sheets.image
 
 
 class IProposalVersion(IItemVersion):
@@ -27,7 +28,8 @@ proposalversion_meta = itemversion_meta._replace(
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
     extended_sheets=[adhocracy_core.sheets.document.IDocument,
-                     adhocracy_core.sheets.comment.ICommentable
+                     adhocracy_core.sheets.comment.ICommentable,
+                     adhocracy_core.sheets.image.IImageReference,
                      ],
     permission_add='add_proposalversion',
 )

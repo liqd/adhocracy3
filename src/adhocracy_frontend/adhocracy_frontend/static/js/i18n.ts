@@ -42,6 +42,7 @@ translateMe = [
     "TR__OPTIONAL",
     "TR__OTHER",
     "TR__PLEASE_SPECIFY",
+    "TR__PRINT",
     "TR__PUBLISH",
     "TR__RATES",
     "TR__SHARE",

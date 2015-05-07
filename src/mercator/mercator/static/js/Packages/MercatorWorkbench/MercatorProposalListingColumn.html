@@ -3,7 +3,8 @@
         <i class="icon-list-filled moving-column-icon"></i>
         <a href=""
             data-ng-click="ctrl.toggleSidebar()"
-            data-ng-class="{'is-active': _showSidebar}">{{ "TR__FILTERS" | translate }}</a>
+            data-ng-class="{'is-active': _showSidebar}"
+            class="moving-column-menu-button">{{ "TR__FILTERS" | translate }}</a>
         <div class="moving-column-menu-sorts">
             <span class="moving-column-menu-sort-label">{{ "TR__SORT_BY" | translate }}</span>
             <a href=""
@@ -17,7 +18,7 @@
         </div>
     </div>
 
-    <a data-ng-switch-when="collapsed" data-ng-href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">
+    <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">
         <i class="icon-list-filled moving-column-icon"></i>
     </a>
 

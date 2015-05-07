@@ -13,6 +13,7 @@ omit =
     src/adhocracy/adhocracy/scaffolds/__init__
     src/adhocracy_*/adhocracy_*/__init__.py
     src/adhocracy_*/setup.py
+    src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/import_geodata.py
 source =
     src/adhocracy_core
     src/adhocracy_mercator

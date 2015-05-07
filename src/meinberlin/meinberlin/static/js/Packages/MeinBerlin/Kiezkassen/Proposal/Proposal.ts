@@ -4,9 +4,11 @@ import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
+import AdhMapping = require("../../../Mapping/Mapping");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../../../Rate/Rate");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
@@ -29,14 +31,13 @@ export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
-    toggleMap() : void;
-    mapIsOpen : boolean;
     data : {
         title : string;
         budget : number;
         detail : string;
         creatorParticipate : boolean;
         locationText : string;
+        address : string;
         creator : string;
         creationDate : string;
         commentCount : number;
@@ -44,6 +45,7 @@ export interface IScope extends angular.IScope {
         lat : number;
         polygon: number[][];
     };
+    selectedState? : string;
 }
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
@@ -83,8 +85,10 @@ var bindPath = (
                             budget: mainSheet.budget,
                             detail: descriptionSheet.description,
                             creatorParticipate: mainSheet.creator_participate,
+                            address: mainSheet.address,
                             rateCount: ratesPro - ratesContra,
                             locationText: mainSheet.location_text,
+                            adlocationText: mainSheet.location_text,
                             creator: metadataSheet.creator,
                             creationDate: metadataSheet.item_creation_date,
                             commentCount: poolSheet.count,
@@ -110,7 +114,14 @@ var fill = (
         budget: scope.data.budget,
         detail: scope.data.detail,
         creator_participate: scope.data.creatorParticipate,
-        location_text: scope.data.locationText
+        location_text: scope.data.locationText,
+        address: scope.data.address
+    });
+    proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
+    });
+    proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
+        description: scope.data.detail
     });
     proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
         coordinates: [scope.data.lng, scope.data.lat]
@@ -170,7 +181,12 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
     };
 };
 
-export var listItemDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, adhRate : AdhRate.Service) => {
+export var listItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
@@ -179,6 +195,51 @@ export var listItemDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHtt
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhRate)(scope);
+            scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    scope.selectedState = "";
+                } else if (proposalVersionUrl === scope.path) {
+                    scope.selectedState = "is-selected";
+                } else {
+                    scope.selectedState = "is-not-selected";
+                }
+            }));
+        }
+    };
+};
+
+export var mapListItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapListItem.html",
+        require: "^adhMapListingInternal",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
+            bindPath(adhHttp, adhRate)(scope);
+
+            var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
+                if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
+                    scope.$on("$destroy", mapListing.registerListItem(scope.path, values[0], values[1]));
+                    unregister();
+                }
+            });
+
+            scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
+                if (!proposalVersionUrl) {
+                    scope.selectedState = "";
+                } else if (proposalVersionUrl === scope.path) {
+                    scope.selectedState = "is-selected";
+                } else {
+                    scope.selectedState = "is-not-selected";
+                }
+            }));
         }
     };
 };
@@ -187,6 +248,7 @@ export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
     adhSubmitIfValid,
     adhResourceUrlFilter,
@@ -207,9 +269,11 @@ export var createDirective = (
             scope.data.lat = undefined;
             scope.data.lng = undefined;
 
+            var processUrl = adhTopLevelState.get("processUrl");
+
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, adhConfig.rest_url)
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, processUrl)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(result[1].path));
                         });
@@ -303,8 +367,10 @@ export var register = (angular) => {
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
+            AdhMapping.moduleName,
             AdhRate.moduleName,
-            AdhResourceArea.moduleName
+            AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
@@ -313,11 +379,14 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list");
         }])
         .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", "adhRate", detailDirective])
-        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", "adhRate", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", "adhRate", "adhTopLevelState", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
+            "adhConfig", "adhHttp", "adhRate", "adhTopLevelState", mapListItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
+            "adhTopLevelState",
             "adhShowError",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",

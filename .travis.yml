@@ -7,8 +7,7 @@ install:
   - "python bootstrap.py --setuptools-version=12.0.4"
   - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout 2>/dev/null"
 script:
-  - "./bin/py.test_run_unittests_with_coverage"
-  - "./bin/py.test_run_all"
+  - "./bin/polytester -v pyunit,pyfunc,jsunit,jsint"
   - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/protractor etc/protractorConfSauce.js"
 notifications:
   email: false

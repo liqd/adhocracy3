@@ -9,7 +9,7 @@ from colander import drop
 from colander import required
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
-from adhocracy_core.schema import ACL
+from adhocracy_core.schema import ACM
 from adhocracy_core.schema import Roles
 
 
@@ -71,7 +71,7 @@ class StateMeta(MappingSchema):
 
     title = SingleLine(missing='')
     description = Text(missing='')
-    acl = ACL()
+    acm = ACM()
     display_only_to_roles = Roles(missing=[])
     """Hint for the fronted, this is not security related."""
 

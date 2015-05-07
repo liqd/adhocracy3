@@ -25,6 +25,7 @@
 @import "components/forms_theme";
 @import "components/button";
 @import "components/button_theme";
+@import "components/availability_indicator";
 @import "components/login";
 @import "components/map";
 @import "components/navbar";
@@ -47,9 +48,14 @@
 @import "components/rate";
 @import "components/rate_theme";
 @import "components/facets";
+@import "components/tabs";
+@import "components/phase_tabs";
+@import "components/kiezkassen_context";
 @import "components/unsupported_browser";
 @import "components/busy";
 @import "components/error_pages";
+@import "components/standalone_wrapper";
+@import "components/standalone_wrapper_theme";
 
 @import "third_party/social_share";
 
@@ -57,5 +63,7 @@
 @import "debug/placeholder";
 
 @import "overwrite";
+
+@import "print";
 
 @import "../lib/leaflet/dist/leaflet.css";

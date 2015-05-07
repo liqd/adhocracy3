@@ -1,0 +1,55 @@
+.tabset {
+    &.m-full-width {
+        .tab {
+            text-align: center;
+        }
+    }
+}
+
+.tabset-tabs {
+    margin: 0;
+    padding: 0;
+
+    .tab {
+        @include inline-block;
+        list-style: none;
+
+        .tab-button {
+            background: $color-structure-border;
+            color: $color-text-inverted;
+            display: block;
+            margin-right: 1px;
+            padding: 0.5em 1em;
+            position: relative;
+            top: 1px;
+        }
+
+        &:last-child {
+            .tab-button {
+                margin-right: 0;
+            }
+        }
+
+        &.is-active {
+            .tab-button {
+                background: $color-background-base-introvert;
+                border: 1px solid $color-structure-border;
+                border-width: 1px 1px 0;
+                color: $color-text-normal;
+                font-weight: bold;
+                top: 1px;
+            }
+        }
+    }
+}
+
+.tabset-panes {
+    @include single-transition(height, 0.5s);
+    background: $color-background-base-introvert;
+    border: 1px solid $color-structure-border;
+    overflow: hidden;
+}
+
+.tab-pane {
+    padding: 1em;
+}
