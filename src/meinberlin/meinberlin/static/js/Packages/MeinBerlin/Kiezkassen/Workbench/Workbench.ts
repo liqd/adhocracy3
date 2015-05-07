@@ -7,6 +7,7 @@ import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhUser = require("../../../User/User");
+import AdhUtil = require("../../../Util/Util");
 
 import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
 import AdhMeinBerlinKiezkassenProposal = require("../Proposal/Proposal");
@@ -150,8 +151,8 @@ export var register = (angular) => {
                         adhUser : AdhUser.Service
                     ) => (resource : RIProposalVersion) => {
                         return adhUser.ready.then(() => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.PUT) {
+                            return adhHttp.options(AdhUtil.parentPath(resource.path)).then((options : AdhHttp.IOptions) => {
+                                if (!options.POST) {
                                     throw 401;
                                 } else {
                                     return {

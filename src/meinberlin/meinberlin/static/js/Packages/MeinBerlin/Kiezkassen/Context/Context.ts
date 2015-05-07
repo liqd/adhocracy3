@@ -3,6 +3,7 @@ import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhUser = require("../../../User/User");
+import AdhUtil = require("../../../Util/Util");
 
 import AdhMeinBerlinWorkbench = require("../../Workbench/Workbench");
 
@@ -69,8 +70,8 @@ export var register = (angular) => {
                         adhUser : AdhUser.Service
                     ) => (resource : RIProposalVersion) => {
                         return adhUser.ready.then(() => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.PUT) {
+                            return adhHttp.options(AdhUtil.parentPath(resource.path)).then((options : AdhHttp.IOptions) => {
+                                if (!options.POST) {
                                     throw 401;
                                 } else {
                                     return {
