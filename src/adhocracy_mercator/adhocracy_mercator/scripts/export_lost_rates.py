@@ -87,11 +87,11 @@ def _get_old_versions(version: IVersionable) -> [IVersionable]:
 
 def _get_rate_users(rateable: IRateable) -> set(IUser):
     params = {'depth': 3,
-              'content_type': IRate,
-              'tag': 'LAST',
-              'rate': 1,
-              'elements': 'content',
-              IRate.__identifier__ + ':object': rateable,
+              'interfaces': IRate,
+              'arbitrary_indexes': {'tag': 'LAST',
+                                    'rate': 1},
+              'resolve': 'True',
+              'references': [(None, IRate, 'object', rateable)]
               }
     pool = get_sheet(rateable.__parent__, IPool)
     rates = pool.get(params)['elements']

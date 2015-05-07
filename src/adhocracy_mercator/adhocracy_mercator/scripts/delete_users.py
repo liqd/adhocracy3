@@ -24,7 +24,6 @@ from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from pyramid.request import Request
 from pyramid.registry import Registry
 from substanced.util import find_catalog
-from adhocracy_core.catalog import ICatalogsService
 
 
 def delete_users():
