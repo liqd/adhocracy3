@@ -234,13 +234,56 @@ class TestCatalogsServiceAdhocracy:
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         referenced = pool
-        referencing = self._make_resource(registry, parent=pool,
-                                          iresource=ITag)
+        referencing = self._make_resource(registry, parent=pool, iresource=ITag)
         sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [pool]})
+        sheet.set({'elements': [referenced]})
         reference = Reference(None, sheets.tags.ITag, 'elements', referenced)
         result = inst.search(query._replace(references=[reference]))
         assert list(result.elements) == [referencing]
+
+    def test_search_with_references_include_isheet_subtypes(
+            self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core import sheets
+        from adhocracy_core.utils import get_sheet
+        referenced = pool
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=ITag)
+        sheet = get_sheet(referencing, sheets.tags.ITag)
+        sheet.set({'elements': [referenced]})
+        reference = Reference(None, ISheet, 'elements', referenced)
+        result = inst.search(query._replace(references=[reference]))
+        assert list(result.elements) == [referencing]
+
+    def test_search_with_references_ignore_field_name_if_empty(
+            self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core import sheets
+        from adhocracy_core.utils import get_sheet
+        referenced = pool
+        referencing = self._make_resource(registry, parent=pool,
+                                          iresource=ITag)
+        sheet = get_sheet(referencing, sheets.tags.ITag)
+        sheet.set({'elements': [referenced]})
+        reference = Reference(None, sheets.tags.ITag, '', referenced)
+        result = inst.search(query._replace(references=[reference]))
+        assert list(result.elements) == [referencing]
+
+    def test_search_with_back_references(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import ITag
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core import sheets
+        from adhocracy_core.utils import get_sheet
+        referenced = self._make_resource(registry, parent=pool)
+        referencing = self._make_resource(registry, parent=pool, iresource=ITag)
+        sheet = get_sheet(referencing, sheets.tags.ITag)
+        sheet.set({'elements': [referenced]})
+        reference = Reference(referencing, sheets.tags.ITag, 'elements', None)
+        result = inst.search(query._replace(references=[reference]))
+        assert list(result.elements) == [referenced]
 
     def test_search_with_sort_by(self, registry, pool, inst, query):
         child = self._make_resource(registry, parent=pool)

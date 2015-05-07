@@ -142,22 +142,6 @@ class Graph(Persistent):
             for source in ObjectMap.sources(self._objectmap, target, reftype):
                 yield Reference(source, isheet, field, target)
 
-    def get_source_ids(self, target, isheet=ISheet, isheet_field='') -> set:
-        """Get docids from references with `target`."""
-        for isheet, field, reftype in self.get_reftypes(isheet):
-            if isheet_field and field != isheet_field:
-                continue
-            for source_id in self._objectmap.sourceids(target, reftype):
-                yield source_id
-
-    def get_target_ids(self, source, isheet=ISheet, isheet_field='') -> set:
-        """Get docids from references with `source`."""
-        for isheet, field, reftype in self.get_reftypes(isheet):
-            if isheet_field and field is not isheet_field:
-                continue
-            for target_id in self._objectmap.targetids(source, reftype):
-                yield target_id
-
     def get_back_reference_sources(self,
                                    resource,
                                    reftype=SheetReference) -> Iterable:

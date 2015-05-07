@@ -108,35 +108,44 @@ class TestReference:
          with raises(ValueError):
             inst._search(reference)
 
-    def test_search_sources(self, mock_graph):
+    def test_search_sources(self, mock_graph, mock_objectmap):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import SheetToSheet
         target = testing.DummyResource()
-        mock_graph.get_source_ids.return_value = {1}
         inst = self.make_one()
         inst.__graph__ = mock_graph
+        mock_graph.get_reftypes.return_value = [(ISheet, '', SheetToSheet)]
+        mock_objectmap.sourceids.return_value = set([1])
+        inst._objectmap = mock_objectmap
         reference = Reference(None, ISheet, '', target)
         result = inst._search(reference)
-        mock_graph.get_source_ids.assert_called_with(target, ISheet, '')
+        mock_objectmap.sourceids.assert_called_with(target, SheetToSheet)
         assert list(result) == [1]
 
-    def test_search_targets(self, mock_graph):
+    def test_search_targets(self, mock_graph, mock_objectmap):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import SheetToSheet
         source = testing.DummyResource()
-        mock_graph.get_target_ids.return_value = {1}
         inst = self.make_one()
         inst.__graph__ = mock_graph
+        mock_graph.get_reftypes.return_value = [(ISheet, '', SheetToSheet)]
+        mock_objectmap.targetids.return_value = set([1])
+        inst._objectmap = mock_objectmap
         reference = Reference(source, ISheet, '', None)
         result = inst._search(reference)
-        mock_graph.get_target_ids.assert_called_with(source, ISheet, '')
+        mock_objectmap.targetids.assert_called_with(source, SheetToSheet)
         assert list(result) == [1]
 
-    def test_apply_with_valid_query(self, mock_graph):
+    def test_apply_with_valid_query(self, mock_graph, mock_objectmap):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import Reference
-        mock_graph.get_source_ids.return_value = {1}
+        from adhocracy_core.interfaces import SheetToSheet
+        mock_objectmap.sourceids.return_value = set([1])
         inst = self.make_one()
+        inst._objectmap = mock_objectmap
+        mock_graph.get_reftypes.return_value = [(ISheet, '', SheetToSheet)]
         inst.__graph__ = mock_graph
         target = testing.DummyResource()
         reference = Reference(None, ISheet, '', target)
@@ -150,16 +159,15 @@ class TestReference:
         with raises(KeyError):
             inst.apply(query)
 
-    def test_apply_intersect_reference_not_exists(self):
+    def test_apply_intersect_reference_not_exists(self, mock_objectmap):
         # actually we test the default implementation in hypatia.util
         import BTrees
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import Reference
-        from adhocracy_core.graph import Graph
-        graph = Mock(spec=Graph)
-        graph.get_source_ids.return_value = set()
+        from adhocracy_core.graph import ObjectMap
+        mock_objectmap.sourceids.return_value = set()
         inst = self.make_one()
-        inst.__graph__ = graph
+        inst._mock_objectmap = mock_objectmap
         target = testing.DummyResource()
         reference = Reference(None, ISheet, '', target)
         query = {'reference': reference}
