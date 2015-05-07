@@ -6,6 +6,13 @@
         .moving-column-expand {
             color: $color-text-introvert;
 
+            &:hover, &:focus, &:active,
+            &:hover .moving-column-tab, &:focus .moving-column-tab,
+            &:active .moving-column-tab {
+                color: $color-text-highlight-normal;
+
+            }
+
             .moving-column-icon {
                 margin-right: 0;
             }
@@ -17,10 +24,6 @@
             float: none;
             padding: 0;
             margin: 0;
-
-            &:hover, &:focus, &:active {
-                color: $color-text-highlight-normal;
-            }
         }
     }
 }
