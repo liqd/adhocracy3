@@ -227,7 +227,7 @@ export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) 
             scope.map = leaflet.map(mapElement[0], {
                 scrollWheelZoom: false
             });
-            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
+            leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
             scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon), style);
             scope.polygon.addTo(scope.map);
 
@@ -331,7 +331,7 @@ export class MapListingController {
         mapElement.height(this.$scope.height);
 
         var map = this.leaflet.map(mapElement[0]);
-        this.leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+        this.leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
         this.$scope.polygon = this.leaflet.polygon(this.leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), style);
         this.$scope.polygon.addTo(map);
