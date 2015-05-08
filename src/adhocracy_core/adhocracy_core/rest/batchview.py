@@ -182,6 +182,12 @@ class BatchView(RESTView):
         # properly setup subrequest in case script_name env is set,
         # see https://github.com/Pylons/pyramid/issues/1434
         request.script_name = self.request.script_name
+
+        if not request.path_info.startswith(request.script_name):
+            raise Exception('Batch subrequest path (%s) does not start with '
+                            'script name (%s)' % (request.path_info,
+                                                  request.script_name))
+
         request.path_info = request.path_info[len(self.request.script_name):]
 
         return request
