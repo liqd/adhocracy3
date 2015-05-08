@@ -99,7 +99,7 @@ export var mapInput = (
             mapElement.height(scope.height);
 
             var map = leaflet.map(mapElement[0]);
-            leaflet.tileLayer("http://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
+            leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
             scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
             scope.polygon.addTo(map);
