@@ -6,6 +6,7 @@ import textwrap
 import inspect
 
 from pyramid.paster import bootstrap
+from pyramid.traversal import find_resource
 
 import transaction
 
@@ -13,7 +14,6 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.geo import IMultiPolygon
-from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.title import ITitle
 
@@ -64,20 +64,13 @@ def _fetch_district_by_name(root, district):
     sys.exit()
 
 
-def _fetch_organisation_by_name(root, organisation):
-    pool = get_sheet(root, IPool)
-    params = {'depth': 3,
-              'content_type': IOrganisation,
-              'elements': 'content',
-              }
-    results = pool.get(params)
-    organisations = results['elements']
-    for org in organisations:
-        if get_sheet_field(org, IName, 'name') == organisation:
-            return org
-
-    print('could not find organisation %s' % (organisation))
-    sys.exit()
+def _fetch_organisation_by_name(root, organisation_path):
+    organisation = find_resource(root, organisation_path)
+    if organisation is None:
+        print('could not find organisation %s' % (organisation))
+        sys.exit()
+    else:
+        return organisation
 
 
 def _create_process(root, registry, organisation, district):
