@@ -6,7 +6,7 @@ import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUser = require("../../../User/User");
 import AdhUtil = require("../../../Util/Util");
 
-import AdhMeinBerlinWorkbench = require("../../Workbench/Workbench");
+import AdhMeinBerlinWorkbench = require("../Workbench/Workbench");
 
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
