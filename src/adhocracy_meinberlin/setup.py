@@ -46,5 +46,7 @@ setup(name='adhocracy_meinberlin',
           adhocracy_meinberlin.scripts.import_geodata:import_bezirksregions
       import_bezirke =\
           adhocracy_meinberlin.scripts.import_geodata:import_bezirke
+      create_process_for_region =\
+          adhocracy_meinberlin.scripts.create_process_for_region:create_process_for_region
       """,
       )
