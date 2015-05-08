@@ -22,13 +22,13 @@ from adhocracy_core.sheets.geo import ILocationReference
 
 
 def create_process_for_region():
-    """Import Berlin districts to adhocracy meinBerlin.
+    """Create sample Kiezkassen process for a given region and organisation.
 
     usage::
 
-      bin/import_bezirke etc/development.ini <regionname> <organisationname>
+      bin/create_process_for_region <config> <regionname> <organisationname>
     """
-    usage = 'usage: %prog config_file'
+    usage = 'usage: %prog config_file region organisation'
     parser = optparse.OptionParser(
         usage=usage,
         description=textwrap.dedent(inspect.getdoc(create_process_for_region))
