@@ -170,7 +170,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         }
 
         return this.adhHttp.withTransaction((transaction) => {
-            var requests = _.map(paths, (path) => transaction.get(path));
+            var requests = _.map(paths, (path) => transaction.get(this.adhConfig.rest_url + path));
             return transaction.commit().then((responses) => {
                 return _.map(requests, (request) => responses[request.index]);
             });
