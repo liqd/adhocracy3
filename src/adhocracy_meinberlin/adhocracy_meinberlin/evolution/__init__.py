@@ -4,6 +4,7 @@ from pyramid.threadlocal import get_current_registry
 from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
+from adhocracy_meinberlin.resources.kiezkassen import IProcess
 import adhocracy_core.sheets
 import adhocracy_meinberlin.sheets
 
@@ -45,6 +46,13 @@ def add_sample_organisation(root):
                   {'title': 'Sample Organisation'}}
     registry.content.create(IOrganisation.__identifier__,
                             parent=root,
+                            appstructs=appstructs)
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'kiezkasse'},
+                  adhocracy_core.sheets.title.ITitle.__identifier__:
+                  {'title': 'Sample Kiezkassen process'}}
+    registry.content.create(IProcess.__identifier__,
+                            parent=root['organisation'],
                             appstructs=appstructs)
 
 
