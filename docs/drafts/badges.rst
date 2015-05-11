@@ -4,7 +4,7 @@ Badges
 This is a summary of the "badge concept" user story. The concepts are
 not yet implemented in Adhocracy 3.
 
-Adhocracy 2 knows a variety of badges and similar entities The aim is
+Adhocracy 2 knows a variety of badges and similar entities. The aim is
 to streamline these entities into more consistent or possibly independent
 concepts in Adhocracy 3. Some aspects shall not be implemented in A3.
 
@@ -109,7 +109,7 @@ Requirements for badges in A3
 
 (this is incomplete)
 
--   Allow to define which which badges can be assigned to a certain
+-   Allow to define which badges can be assigned to a certain
     resource with which rules (see features above).
 
 -   It must be possible to freely define multiple available badge groups.
