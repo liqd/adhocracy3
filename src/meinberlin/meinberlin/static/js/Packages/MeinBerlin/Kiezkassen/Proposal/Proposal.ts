@@ -220,7 +220,7 @@ export var mapListItemDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MapListItem.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         require: "^adhMapListingInternal",
         scope: {
             path: "@"
