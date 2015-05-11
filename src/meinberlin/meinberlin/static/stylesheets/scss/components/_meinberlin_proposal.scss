@@ -109,36 +109,9 @@ category: meinberlin
 </a>
 ```
 */
-.mein-berlin-kiezkassen-proposal-list-item {
-    @include container;
-    border: 1px solid $color-structure-border;
-    color: $color-text-introvert;
-    display: block;
-    margin-bottom: 0.5em;
-    padding: 1em;
-
-    h1 {
-        @include span(first 2 of 3);
-        color: $color-text-normal;
-        margin: 0;
-        padding-right: 1.5em;
-    }
-
-    .mein-berlin-kiezkassen-proposal-list-item-meta {
-        @include span(last 1 of 3);
-        border-left: 1px solid $color-text-introvert;
-        padding-left: 1.5em;
-    }
-
-    &:hover, &:focus {
-        border-color: $color-text-highlight-normal;
-        color: $color-text-introvert;
-    }
-
-    &:active, &.is-selected {
-        border-color: $color-text-highlight-normal;
-        color: $color-text-highlight-normal;
-    }
+.meinberlin-kiezkassen-proposal-map-list-item,
+.meinberlin-kiezkassen-proposal-map-list-item-detail-link {
+    @include clearfix;
 }
 
 .meinberlin-kiezkassen-proposal-map-list-item-detail-link {
@@ -151,8 +124,19 @@ category: meinberlin
     }
 
     &:hover, &:focus {
-        @include box-shadow($color-text-highlight-normal 1px 0 0 1px, $color-text-highlight-normal -1px 0 0 0,
-            $color-text-highlight-normal -4px 0 0 0 inset, $color-text-highlight-normal 0 1px 0 0 inset);
         @include clearfix;
+        background: $color-structure-normal;
     }
+}
+
+.meinberlin-kiezkassen-proposal-map-list-item {
+    &.is-selected {
+        .meinberlin-kiezkassen-proposal-map-list-item-detail-link {
+            background: $color-structure-normal;
+        }
+    }
+}
+
+.meinberlin-kiezkassen-proposal-map-list-item-vertical {
+    border-bottom: 1px solid $color-background-base-introvert;
 }
