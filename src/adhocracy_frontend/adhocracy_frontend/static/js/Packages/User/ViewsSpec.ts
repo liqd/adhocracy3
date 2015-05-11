@@ -112,7 +112,9 @@ export var register = () => {
                 var scopeMock;
 
                 beforeEach(() => {
-                    scopeMock = {};
+                    scopeMock = {
+                        $watch: () => undefined
+                    };
                     directive.link(scopeMock);
                 });
 
