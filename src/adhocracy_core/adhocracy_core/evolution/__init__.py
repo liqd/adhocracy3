@@ -15,6 +15,8 @@ from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.catalog import ICatalogsService
+
 
 logger = logging.getLogger(__name__)
 
@@ -94,9 +96,33 @@ def add_kiezkassen_permissions(root):
     logger.info('Finished evolve step:' + add_kiezkassen_permissions.__doc__)
 
 
+def upgrade_catalogs(root):
+    """Upgrade catalogs."""
+    logger.info('Running evolve step:' + upgrade_catalogs.__doc__)
+
+    registry = get_current_registry()
+    old_catalogs = root['catalogs']
+
+    old_catalogs.move('system', root, 'old_system_catalog')
+    old_catalogs.move('adhocracy', root, 'old_adhocracy_catalog')
+
+    del root['catalogs']
+
+    registry.content.create(ICatalogsService.__identifier__, parent=root)
+
+    catalogs = root['catalogs']
+    del catalogs['system']
+    del catalogs['adhocracy']
+    root.move('old_system_catalog', catalogs, 'system')
+    root.move('old_adhocracy_catalog', catalogs, 'adhocracy')
+
+    logger.info('Finished evolve step:' + upgrade_catalogs.__doc__)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
     config.scan('substanced.evolution.subscribers')
+    config.add_evolution_step(upgrade_catalogs)
     config.add_evolution_step(evolve1_add_title_sheet_to_pools)
     config.add_evolution_step(add_kiezkassen_permissions)
