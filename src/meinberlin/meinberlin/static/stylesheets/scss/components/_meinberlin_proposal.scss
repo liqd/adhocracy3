@@ -117,12 +117,9 @@ category: meinberlin
 </div>
 ```
 */
-.meinberlin-kiezkassen-proposal-list-item,
-.meinberlin-kiezkassen-proposal-list-item-detail-link {
-    @include clearfix;
-}
 
-.meinberlin-kiezkassen-proposal-list-item-detail-link {
+.meinberlin-kiezkassen-proposal-list-item {
+    @include clearfix;
     display: block;
     padding: 10px / $font-size-normal * 1em;
 
@@ -135,9 +132,7 @@ category: meinberlin
         @include clearfix;
         background: $color-structure-normal;
     }
-}
 
-.meinberlin-kiezkassen-proposal-list-item {
     &.is-selected {
         .meinberlin-kiezkassen-proposal-list-item-detail-link {
             background: $color-structure-normal;
