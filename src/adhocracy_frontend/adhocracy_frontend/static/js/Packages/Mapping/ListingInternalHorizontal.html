@@ -1,7 +1,7 @@
 <div class="map-list map-list-horizontal">
-    <div class="map-list-map"></div>
-    <div>
-        <a data-ng-show="showZoomButton" data-ng-click="resetMap()" href="">{{ "TR__MAP_RESET" | translate }}</a>
+    <div class="map-list-map-container">
+        <div class="map-list-map"></div>
+        <a class="map-list map-list-zoom" data-ng-show="showZoomButton" data-ng-click="resetMap()" href="">{{ "TR__MAP_RESET" | translate }}</a>
     </div>
     <div class="map-list-container">
         <div data-ng-show="visibleItems >= 2" class="map-list-navigate-container map-list-navigate-container-prev">
