@@ -146,10 +146,6 @@ category: meinberlin
 
 .meinberlin-kiezkassen-proposal-list-item-col-right {
     @include span(4 of 12 last);
-
-    .meinberlin-kiezkassen-proposal-list-meta-item {
-        margin-bottom: 15px / $font-size-small * 1em;
-    }
 }
 
 .meinberlin-kiezkassen-proposal-list-item-title {
@@ -158,6 +154,7 @@ category: meinberlin
 }
 
 .meinberlin-kiezkassen-proposal-list-meta-item {
+    margin-bottom: 15px / $font-size-small * 1em;
     font-size: $font-size-small;
 }
 
