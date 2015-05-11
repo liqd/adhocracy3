@@ -2,27 +2,31 @@
     <div class="l-rows">
         <div class="l-row">
             <div class="l-cell">
-                <h1 class="mercator-print-header" data-aria-hidden="true"><img src="/static/icons/png/favicon.png" alt=""/> {{ "TR__ADVOCATE_EUROPE" | translate }}</h1>
+                <div class="l-cell-inner">
+                    <h1 class="mercator-print-header" data-aria-hidden="true"><img src="/static/icons/png/favicon.png" alt=""/> {{ "TR__ADVOCATE_EUROPE" | translate }}</h1>
 
-                <header class="l-header main-header">
-                    <div class="l-header-wrapper">
-                        <div class="l-header-left">
-                            <adh-mercator-proposal-add-button></adh-mercator-proposal-add-button>
+                    <header class="l-header main-header">
+                        <div class="l-header-wrapper">
+                            <div class="l-header-left">
+                                <adh-mercator-proposal-add-button></adh-mercator-proposal-add-button>
+                            </div>
+                            <div class="l-header-center">
+                                <adh-space-switch></adh-space-switch>
+                            </div>
+                            <div class="l-header-right">
+                                <adh-user-indicator></adh-user-indicator>
+                            </div>
                         </div>
-                        <div class="l-header-center">
-                            <adh-space-switch></adh-space-switch>
-                        </div>
-                        <div class="l-header-right">
-                            <adh-user-indicator></adh-user-indicator>
-                        </div>
-                    </div>
-                    <adh-http-busy></adh-http-busy>
-                </header>
+                        <adh-http-busy></adh-http-busy>
+                    </header>
+                </div>
             </div>
         </div>
 
         <div class="l-row">
-            <div class="l-cell" data-ng-transclude=""></div>
+            <div class="l-cell">
+                <div class="l-cell-inner" data-ng-transclude=""></div>
+            </div>
         </div>
     </div>
 </div>
