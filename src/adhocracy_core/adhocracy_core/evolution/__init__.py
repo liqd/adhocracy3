@@ -116,6 +116,9 @@ def upgrade_catalogs(root):
     root.move('old_system_catalog', catalogs, 'system')
     root.move('old_adhocracy_catalog', catalogs, 'adhocracy')
 
+    catalogs.reindex_all(catalogs['system'])
+    catalogs.reindex_all(catalogs['adhocracy'])
+
     logger.info('Finished evolve step:' + upgrade_catalogs.__doc__)
 
 
