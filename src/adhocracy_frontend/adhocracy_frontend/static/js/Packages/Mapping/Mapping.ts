@@ -278,6 +278,7 @@ export class MapListingController {
         private $element,
         private $attrs,
         private $timeout : angular.ITimeoutService,
+        private $window,
         private leaflet : typeof L
     ) {
         this.scrollContainer = this.$element.find(".map-list-scroll-container-inner");
@@ -323,6 +324,25 @@ export class MapListingController {
 
         this.$scope.$watch("items", () => {
             this.scrollToItem(this.$scope.selectedPath, false);
+        });
+
+        var mcs = $element.parents(".moving-columns");
+        this.$scope.$watch(() => {
+            return mcs.find(".moving-column.is-show, .moving-column.is-collapse").length;
+        }, (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                // fixme: moving column load time hard coded
+                this.$timeout(() => {
+                    this.scrollToItem(this.$scope.selectedPath, true);
+                }, 550);
+            }
+        });
+        this.$scope.$watch(() => {
+            return angular.element($window).width();
+        }, (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                this.scrollToItem(this.$scope.selectedPath, false);
+            }
         });
     }
 
@@ -478,7 +498,7 @@ export var mapListingInternal = (
                 return adhConfig.pkg_path + pkgLocation + "/ListingInternalHorizontal.html";
             }
         },
-        controller: ["$scope", "$element", "$attrs", "$timeout", "leaflet", MapListingController]
+        controller: ["$scope", "$element", "$attrs", "$timeout", "$window", "leaflet", MapListingController]
     };
 };
 
