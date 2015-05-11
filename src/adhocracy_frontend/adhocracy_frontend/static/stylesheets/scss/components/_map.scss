@@ -93,8 +93,14 @@
 
     .map-list-item {
         @include inline-block;
-        vertical-align: baseline;
+        vertical-align: middle;
         width: 100%;
+
+        &.m-empty {
+            color: $color-text-highlight-introvert;
+            font-weight: bold;
+            text-align: center;
+        }
     }
 
     .map-list-item-col-left {
