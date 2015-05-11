@@ -22,7 +22,7 @@ Allowed targets
     What can be badged?
 
 
-Locality
+Scope
     Do badges exist globally or locally only?
 
 Exclusivity
