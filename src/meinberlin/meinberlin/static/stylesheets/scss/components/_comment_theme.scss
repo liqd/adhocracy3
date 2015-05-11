@@ -1,13 +1,14 @@
-.comment-main {
-    background: $color-background-base;
-    padding: 1em;
-    margin-bottom: 1em;
+.comment-create-form {
+    background: $color-background-base-introvert;
+    margin: 0;
+    padding: 0;
 
-    .comment-children & {
-        border-left: 1px solid $color-text-highlight-normal;
+    .comment-create-form-text {
+        margin: 0;
+        min-height: 70px / $font-size-normal * 1em;
     }
 }
 
-.comment-children {
-    border: 0;
+.comment-header-link:not(i) {
+    @include hide-text();
 }
