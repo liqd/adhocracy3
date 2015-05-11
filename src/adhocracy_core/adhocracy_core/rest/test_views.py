@@ -857,7 +857,18 @@ class TestMetaApiView:
         inst = self.make_one(request, context)
         resp = inst.get()
         assert IResource.__identifier__ in resp['resources']
-        assert resp['resources'][IResource.__identifier__] == {'sheets': []}
+        assert resp['resources'][IResource.__identifier__]['sheets'] == []
+        assert resp['resources'][IResource.__identifier__]['super_types'] == []
+
+    def test_get_resources_with_super_types(self, request, context, resource_meta):
+        class IResourceBX(IResourceX):
+            pass
+        resource_meta._replace(iresource=IResourceBX)
+        request.registry.content.resources_meta[IResourceBX] = resource_meta
+        inst = self.make_one(request, context)
+        resp = inst.get()
+        assert resp['resources'][IResourceBX.__identifier__]['super_types'] ==\
+            [IResourceX.__identifier__]
 
     def test_get_resources_with_sheets_meta(self, request, context, resource_meta):
         resource_meta = resource_meta._replace(basic_sheets=[ISheet],
@@ -898,6 +909,16 @@ class TestMetaApiView:
         assert ISheet.__identifier__ in response['sheets']
         assert 'fields' in response['sheets'][ISheet.__identifier__]
         assert response['sheets'][ISheet.__identifier__]['fields'] == []
+        assert response['sheets'][ISheet.__identifier__]['super_types'] == []
+
+    def test_get_sheets_with_super_types(self, request, context, sheet_meta):
+        class ISheetBX(ISheetB):
+            pass
+        sheet_meta = sheet_meta._replace(isheet=ISheetBX)
+        request.registry.content.sheets_meta[ISheetBX] = sheet_meta
+        inst = self.make_one(request, context)
+        response = inst.get()['sheets'][ISheetBX.__identifier__]
+        assert response['super_types'] == [ISheetB.__identifier__]
 
     def test_get_sheets_with_field(self, request, context, sheet_meta):
         class SchemaF(colander.MappingSchema):
