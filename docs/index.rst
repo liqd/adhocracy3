@@ -17,6 +17,7 @@ Contents
    coding_guides/index
    api/index
    translation
+   drafts/index
    attic/index
    CHANGES
    glossary
