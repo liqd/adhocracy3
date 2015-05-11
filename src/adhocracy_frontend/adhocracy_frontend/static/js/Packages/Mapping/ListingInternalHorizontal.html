@@ -14,7 +14,7 @@
                     {{emptyText}}
                 </li>
                 <li class="map-list-item m-empty" data-ng-if="items.length !== 0">
-                    {{ "TR__MAP_NO_ITEMS_IN_VIEW" | translate }}
+                    <a data-ng-click="resetMap()" href="">{{ "TR__MAP_NO_ITEMS_IN_VIEW" | translate }}</a>
                 </li>
                 <li
                     data-ng-repeat="item in items"
