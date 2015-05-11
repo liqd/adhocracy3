@@ -88,7 +88,7 @@ category: meinberlin
 ---
 
 ```html_example
-<div class="meinberlin-kiezkassen-proposal-map-list-item meinberlin-kiezkassen-proposal-map-list-item-vertical">
+<div class="meinberlin-kiezkassen-proposal-map-list-item">
     <a class="meinberlin-kiezkassen-proposal-map-list-item-detail-link" href="">
         <div class="map-list-item-col-left">
             <h3 class="map-list-item-title">The title of my proposal</h3>
@@ -102,7 +102,7 @@ category: meinberlin
     </a>
 </div>
 
-<div class="meinberlin-kiezkassen-proposal-map-list-item meinberlin-kiezkassen-proposal-map-list-item-vertical is-selected">
+<div class="meinberlin-kiezkassen-proposal-map-list-item is-selected">
     <a class="meinberlin-kiezkassen-proposal-map-list-item-detail-link" href="">
         <div class="map-list-item-col-left">
             <h3 class="map-list-item-title">The title of my proposal</h3>
@@ -143,8 +143,4 @@ category: meinberlin
             background: $color-structure-normal;
         }
     }
-}
-
-.meinberlin-kiezkassen-proposal-map-list-item-vertical {
-    border-bottom: 1px solid $color-background-base-introvert;
 }
