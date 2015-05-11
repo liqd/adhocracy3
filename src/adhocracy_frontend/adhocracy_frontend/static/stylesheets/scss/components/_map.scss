@@ -102,29 +102,3 @@
     vertical-align: baseline;
     width: 100%;
 }
-
-.map-list-item-col-left {
-    @include span(8 of 12 first);
-}
-
-.map-list-item-col-right {
-    @include span(4 of 12 last);
-
-    .map-list-meta-item {
-        margin-bottom: 15px / $font-size-small * 1em;
-    }
-}
-
-.map-list-item-title {
-    font-size: $font-size-normal;
-    margin: 0 0 (15px / $font-size-normal * 1em);
-}
-
-.map-list-meta-item {
-    font-size: $font-size-small;
-}
-
-.map-list-meta-item-icon {
-    font-size: $font-size-normal;
-    margin-right: 8px / $font-size-normal * 1em;
-}

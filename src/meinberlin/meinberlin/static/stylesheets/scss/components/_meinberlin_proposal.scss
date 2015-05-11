@@ -117,12 +117,12 @@ category: meinberlin
 </div>
 ```
 */
-.meinberlin-kiezkassen-proposal-map-list-item,
-.meinberlin-kiezkassen-proposal-map-list-item-detail-link {
+.meinberlin-kiezkassen-proposal-list-item,
+.meinberlin-kiezkassen-proposal-list-item-detail-link {
     @include clearfix;
 }
 
-.meinberlin-kiezkassen-proposal-map-list-item-detail-link {
+.meinberlin-kiezkassen-proposal-list-item-detail-link {
     display: block;
     padding: 10px / $font-size-normal * 1em;
 
@@ -137,10 +137,36 @@ category: meinberlin
     }
 }
 
-.meinberlin-kiezkassen-proposal-map-list-item {
+.meinberlin-kiezkassen-proposal-list-item {
     &.is-selected {
-        .meinberlin-kiezkassen-proposal-map-list-item-detail-link {
+        .meinberlin-kiezkassen-proposal-list-item-detail-link {
             background: $color-structure-normal;
         }
     }
+}
+
+.meinberlin-kiezkassen-proposal-list-item-col-left {
+    @include span(8 of 12 first);
+}
+
+.meinberlin-kiezkassen-proposal-list-item-col-right {
+    @include span(4 of 12 last);
+
+    .meinberlin-kiezkassen-proposal-list-meta-item {
+        margin-bottom: 15px / $font-size-small * 1em;
+    }
+}
+
+.meinberlin-kiezkassen-proposal-list-item-title {
+    font-size: $font-size-normal;
+    margin: 0 0 (15px / $font-size-normal * 1em);
+}
+
+.meinberlin-kiezkassen-proposal-list-meta-item {
+    font-size: $font-size-small;
+}
+
+.meinberlin-kiezkassen-proposal-list-meta-item-icon {
+    font-size: $font-size-normal;
+    margin-right: 8px / $font-size-normal * 1em;
 }
