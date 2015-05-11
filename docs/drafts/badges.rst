@@ -117,7 +117,7 @@ Requirements for badges in A3
 -   Allow to define badges globally and locally. It should be possible
     to restrict and extend the available badges locally.
 
--   NTH: Badges can be connected through a common taxonoy, i.e. if a
+-   NTH: Badges can be connected through a common taxonomy, i.e. if a
     local process wants to call a badge `Umweltpolitik` it can be
     connected to a global badge `Umwelt`.
 
