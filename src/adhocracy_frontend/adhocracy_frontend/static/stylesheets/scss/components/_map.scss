@@ -1,16 +1,4 @@
 .map-wrapper {
-    .map-info {
-        background: $color-text-normal;
-        color: $color-text-inverted;
-        font-size: $font-size-small;
-        padding: 0.5em;
-
-        &.ng-invalid {
-            background: $color-function-invalid;
-            font-weight: $font-weight-extrovert;
-        }
-    }
-
     .map-buttons {
         @include clearfix;
         margin: 2px 0 -7px;
@@ -37,6 +25,23 @@
     }
 }
 
+.map-info {
+    background: $color-text-normal;
+    color: $color-text-inverted;
+    font-size: $font-size-small;
+    padding: 0.5em;
+    width: 100%;
+
+    &:hover {
+        color: $color-text-inverted;
+    }
+
+    &.ng-invalid {
+        background: $color-function-invalid;
+        font-weight: $font-weight-extrovert;
+    }
+}
+
 .leaflet-marker-icon {
     -webkit-text-stroke: 1px $color-text-inverted;
     color: $color-brand-two-normal;
@@ -51,8 +56,15 @@
     }
 }
 
-.map-list-container {
+.map-list-container,
+.map-list-map-container {
     position: relative;
+}
+
+.map-list-zoom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
 }
 
 .map-list-navigate {
@@ -99,6 +111,11 @@
 
 .map-list-item {
     @include inline-block;
-    vertical-align: baseline;
+    vertical-align: middle;
     width: 100%;
+
+    &.m-empty {
+        font-weight: bold;
+        text-align: center;
+    }
 }
