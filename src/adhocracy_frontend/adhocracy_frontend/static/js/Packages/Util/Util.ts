@@ -16,18 +16,18 @@ export function deepPluck(base, keys : string[]) : any {
 
 
 /**
- * Remove last hierarchy level from path (uris or directory paths). If given
- * url has a trailing slash, the returned url will also have a trailing slash.
+ * Remove last hierarchy level from path. If given path has a trailing slash,
+ * the returned path will also have a trailing slash.
  */
-export function parentPath(url : string) : string {
+export function parentPath(path : string) : string {
     "use strict";
 
     var result;
 
-    if (url[url.length - 1] === "/") {
-        result = url.substring(0, url.lastIndexOf("/", url.length - 2) + 1);
+    if (path[path.length - 1] === "/") {
+        result = path.substring(0, path.lastIndexOf("/", path.length - 2) + 1);
     } else {
-        result = url.substring(0, url.lastIndexOf("/"));
+        result = path.substring(0, path.lastIndexOf("/"));
     }
 
     if (result === "") {
