@@ -328,7 +328,7 @@ export class MapListingController {
         var mcs = $element.parents(".moving-columns");
         this.$scope.$watch(() => {
             return mcs.find(".moving-column.is-show, .moving-column.is-collapse").length;
-        }, (newValue, oldValue) => {
+        }, () => {
             // FIXME: moving column load time hard coded
             this.$timeout(() => {
                 this.scrollToItem(this.$scope.selectedPath, true);
@@ -336,7 +336,7 @@ export class MapListingController {
         });
         this.$scope.$watch(() => {
             return this.map.getBounds().getSouthWest().lng;
-        }, (newValue, oldValue) => {
+        }, () => {
             this.scrollToItem(this.$scope.selectedPath, false);
         });
     }
