@@ -29,9 +29,8 @@
 }
 
 .moving-column-body {
-    background: $color-background-base-introvert;
-    border: 0;
-    padding: 0 (5px / $font-size-normal * 1em);
+    background-color: $color-background-base;
+    border-color: $color-background-base-introvert;
 }
 
 .moving-column-icon {
