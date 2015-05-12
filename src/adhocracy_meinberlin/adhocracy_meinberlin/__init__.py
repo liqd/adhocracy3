@@ -8,6 +8,7 @@ def includeme(config):
     """Setup adhocracy extension."""
     # include adhocracy_core
     config.include('adhocracy_core')
+    config.include('adhocracy_core.resources.geo')
     # include sample packages
     # TODO: fix tests and remove
     config.include('adhocracy_core.resources.sample_paragraph')
@@ -16,6 +17,7 @@ def includeme(config):
     # include custom resource types
     config.include('adhocracy_meinberlin.workflows')
     config.include('adhocracy_meinberlin.resources.kiezkassen')
+    config.include('adhocracy_meinberlin.resources.root')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
     config.include('adhocracy_meinberlin.evolution')
 
