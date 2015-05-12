@@ -1,6 +1,7 @@
 import AdhConfig = require("..././../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
 
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
@@ -9,7 +10,11 @@ import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/ge
 var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 
 
-export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
+export var detailDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
@@ -31,11 +36,9 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
                             scope.polygon =  polygon;
                         });
                     });
-                    adhHttp.options(value).then((options : AdhHttp.IOptions) => {
-                        scope.options = options;
-                    });
                 }
             });
+            adhPermissions.bindScope(scope, () => scope.path);
         }
     };
 };
@@ -48,7 +51,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName,
             AdhMovingColumns.moduleName,
+            AdhPermissions.moduleName,
             AdhTabs.moduleName
         ])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", detailDirective]);
+        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective]);
 };
