@@ -5,7 +5,7 @@
     .rate-pro,
     .rate-contra {
         float: left;
-        line-height: 25px / $font-size-small * 1em;
+        line-height: 24px / $font-size-small * 1em;
     }
 
     .rate-difference {
@@ -22,9 +22,8 @@
     .rate-contra {
         @include inline-block;
         background: $color-background-base-introvert;
-        border: 1px solid $color-background-base-introvert;
         color: $color-text-normal;
-        min-width: 25px / $font-size-small * 1em;
+        min-width: 24px / $font-size-small * 1em;
         text-align: center;
 
         &:active,
