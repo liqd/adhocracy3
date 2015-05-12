@@ -112,7 +112,9 @@ export var register = () => {
                 var scopeMock;
 
                 beforeEach(() => {
-                    scopeMock = {};
+                    scopeMock = {
+                        $watch: () => undefined
+                    };
                     directive.link(scopeMock);
                 });
 
@@ -171,6 +173,7 @@ export var register = () => {
         describe("indicatorDirective", () => {
             var directive;
             var adhConfigMock;
+            var adhResourceAreaMock;
 
             beforeEach(() => {
                 adhConfigMock = {
@@ -179,7 +182,9 @@ export var register = () => {
                     ws_url: "mock",
                     embedded: true
                 };
-                directive = AdhUserViews.indicatorDirective(adhConfigMock);
+                adhResourceAreaMock = jasmine.createSpyObj("adhResourceArea", ["has"]);
+                adhResourceAreaMock.has.and.returnValue(false);
+                directive = AdhUserViews.indicatorDirective(adhConfigMock, adhResourceAreaMock);
             });
 
             describe("controller", () => {

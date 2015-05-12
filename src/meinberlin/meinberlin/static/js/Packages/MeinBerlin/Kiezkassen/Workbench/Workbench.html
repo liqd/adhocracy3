@@ -4,7 +4,8 @@
     </adh-moving-column>
     <adh-moving-column>
         <adh-mein-berlin-kiezkassen-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mein-berlin-kiezkassen-proposal-create-column>
-        <adh-mein-berlin-kiezkassen-proposal-detail-column data-ng-if="view !== 'create_proposal'"></adh-mein-berlin-kiezkassen-proposal-detail-column>
+        <adh-mein-berlin-kiezkassen-proposal-edit-column data-ng-if="view === 'edit'"></adh-mein-berlin-kiezkassen-proposal-edit-column>
+        <adh-mein-berlin-kiezkassen-proposal-detail-column data-ng-if="view !== 'create_proposal' && view !== 'edit'"></adh-mein-berlin-kiezkassen-proposal-detail-column>
     </adh-moving-column>
     <adh-moving-column>
         <adh-comment-column></adh-comment-column>

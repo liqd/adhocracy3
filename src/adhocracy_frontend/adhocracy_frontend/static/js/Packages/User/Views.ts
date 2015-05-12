@@ -287,13 +287,14 @@ export var createPasswordResetDirective = (
 };
 
 
-export var indicatorDirective = (adhConfig : AdhConfig.IService) => {
+export var indicatorDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
         scope: {},
         controller: ["adhUser", "$scope", (adhUser : AdhUser.Service, $scope) => {
             $scope.user = adhUser;
+            $scope.noLink = !adhResourceArea.has(RIUser.content_type);
 
             $scope.logOut = () => {
                 adhUser.logOut();
@@ -550,7 +551,7 @@ export var register = (angular) => {
         .directive("adhCreatePasswordReset", [
             "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
-        .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
+        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
         .directive("adhUserDetailColumn", ["adhBindVariablesAndClear", "adhPermissions", "adhConfig", userDetailColumnDirective])

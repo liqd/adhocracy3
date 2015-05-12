@@ -1,16 +1,4 @@
 .map-wrapper {
-    .map-info {
-        background: $color-text-normal;
-        color: $color-text-inverted;
-        font-size: $font-size-small;
-        padding: 0.5em;
-
-        &.ng-invalid {
-            background: $color-function-invalid;
-            font-weight: $font-weight-extrovert;
-        }
-    }
-
     .map-buttons {
         @include clearfix;
         margin: 2px 0 -7px;
@@ -37,6 +25,23 @@
     }
 }
 
+.map-info {
+    background: $color-text-normal;
+    color: $color-text-inverted;
+    font-size: $font-size-small;
+    padding: 0.5em;
+    width: 100%;
+
+    &:hover {
+        color: $color-text-inverted;
+    }
+
+    &.ng-invalid {
+        background: $color-function-invalid;
+        font-weight: $font-weight-extrovert;
+    }
+}
+
 .leaflet-marker-icon {
     -webkit-text-stroke: 1px $color-text-inverted;
     color: $color-brand-two-normal;
@@ -51,76 +56,66 @@
     }
 }
 
-.map-list {
+.map-list-container,
+.map-list-map-container {
+    position: relative;
+}
 
-    .map-list-container {
-        position: relative;
+.map-list-zoom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+}
+
+.map-list-navigate {
+    font-weight: bold;
+    font-size: $font-size-normal;
+
+    &:hover, &:focus {
+        text-decoration: none;
     }
+}
 
-    .map-list-navigate {
+.map-list-navigate-container {
+    position: absolute;
+    top: 50%;
+    margin-top: -$font-size-normal;
+    width: 30px / $font-size-normal * 1em;
+
+    p {
+        line-height: 1em;
+    }
+}
+
+.map-list-navigate-container-prev {
+    left: 10px / $font-size-normal * 1em;
+    text-align: left;
+}
+
+.map-list-navigate-container-next {
+    right: 10px / $font-size-normal * 1em;
+    text-align: right;
+}
+
+.map-list-scroll-container {
+    padding: 0 (40px / $font-size-normal * 1em);
+}
+
+.map-list-scroll-container-inner {
+    overflow: hidden;
+    margin: (15px / $font-size-normal * 1em) 0 0;
+    padding: 0;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.map-list-item {
+    @include inline-block;
+    vertical-align: middle;
+    width: 100%;
+
+    &.m-empty {
         font-weight: bold;
-        font-size: $font-size-normal;
-
-        &:hover, &:focus {
-            text-decoration: none;
-        }
-    }
-
-    .map-list-navigate-container {
-        position: absolute;
-        top: 50%;
-        margin-top: -$font-size-normal;
-    }
-
-    .map-list-navigate-container-prev {
-        left: 0;
-    }
-
-    .map-list-navigate-container-next {
-        right: 0;
-    }
-
-    .map-list-scroll-container {
-        padding: 0 auto;
-    }
-
-    .map-list-scroll-container-inner {
-        overflow: hidden;
-        margin: (20px / $font-size-normal * 1em) 0 0;
-        vertical-align: top;
-        white-space: nowrap;
-    }
-
-    .map-list-item {
-        @include inline-block;
-        vertical-align: baseline;
-        width: 100%;
-    }
-
-    .map-list-item-col-left {
-        @include span(8 of 12 first);
-    }
-
-    .map-list-item-col-right {
-        @include span(4 of 12 last);
-
-        .map-list-meta-item {
-            margin-bottom: 20px / $font-size-small * 1em;
-        }
-    }
-
-    .map-list-item-title {
-        font-size: $font-size-normal;
-        margin: 0 0 (20px / $font-size-normal * 1em);
-    }
-
-    .map-list-meta-item {
-        font-size: $font-size-small;
-    }
-
-    .map-list-meta-item-icon {
-        @extend .button;
-        font-size: $font-size-normal;
-        margin-right: 8px / $font-size-normal * 1em;
+        text-align: center;
     }
 }

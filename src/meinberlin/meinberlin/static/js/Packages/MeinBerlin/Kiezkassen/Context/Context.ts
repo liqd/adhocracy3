@@ -4,8 +4,9 @@ import AdhHttp = require("../../../Http/Http");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUser = require("../../../User/User");
+import AdhUtil = require("../../../Util/Util");
 
-import AdhMeinBerlinWorkbench = require("../../Workbench/Workbench");
+import AdhMeinBerlinWorkbench = require("../Workbench/Workbench");
 
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
@@ -70,6 +71,27 @@ export var register = (angular) => {
                                     throw 401;
                                 } else {
                                     return {};
+                                }
+                            });
+                        });
+                    }])
+                .default(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "kiezkassen", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide"
+                })
+                .specific(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "kiezkassen", [
+                    "adhHttp", "adhUser", (
+                        adhHttp : AdhHttp.Service<any>,
+                        adhUser : AdhUser.Service
+                    ) => (resource : RIProposalVersion) => {
+                        return adhUser.ready.then(() => {
+                            return adhHttp.options(AdhUtil.parentPath(resource.path)).then((options : AdhHttp.IOptions) => {
+                                if (!options.POST) {
+                                    throw 401;
+                                } else {
+                                    return {
+                                        proposalUrl: resource.path
+                                    };
                                 }
                             });
                         });

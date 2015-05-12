@@ -8,10 +8,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-requires = ['adhocracy_sample',
+requires = ['adhocracy_core',
             ]
 
-test_requires = ['adhocracy_sample[test]',
+test_requires = ['adhocracy_core[test]',
                  ]
 
 debug_requires = ['adhocracy_core[debug]',
@@ -46,5 +46,7 @@ setup(name='adhocracy_meinberlin',
           adhocracy_meinberlin.scripts.import_geodata:import_bezirksregions
       import_bezirke =\
           adhocracy_meinberlin.scripts.import_geodata:import_bezirke
+      create_process_for_region =\
+          adhocracy_meinberlin.scripts.create_process_for_region:create_process_for_region
       """,
       )

@@ -2,15 +2,18 @@
     <div class="l-rows">
         <div class="l-row">
             <div class="l-cell">
-                <header class="l-header main-header">
-                    <adh-space-switch></adh-space-switch>
-                    <adh-user-indicator></adh-user-indicator>
-                </header>
+                <div class="l-cell-inner">
+                    <header class="l-header main-header">
+                        <adh-space-switch></adh-space-switch>
+                        <adh-user-indicator></adh-user-indicator>
+                    </header>
+                </div>
             </div>
         </div>
 
         <div class="l-row">
-            <div class="l-cell" data-ng-transclude="">
+            <div class="l-cell">
+                <div class="l-cell-inner" data-ng-transclude=""></div>
             </div>
         </div>
     </div>

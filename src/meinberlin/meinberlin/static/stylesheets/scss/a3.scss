@@ -27,6 +27,7 @@
 @import "components/button_theme";
 @import "components/availability_indicator";
 @import "components/login";
+@import "components/login_theme";
 @import "components/map";
 @import "components/navbar";
 @import "components/meinberlin_proposal";
@@ -65,5 +66,3 @@
 @import "overwrite";
 
 @import "print";
-
-@import "../lib/leaflet/dist/leaflet.css";

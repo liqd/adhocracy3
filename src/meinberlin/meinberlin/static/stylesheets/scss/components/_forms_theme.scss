@@ -1,5 +1,4 @@
 form {
-    background-color: $color-background-base-introvert;
     padding: 1em;
 }
 
@@ -12,6 +11,7 @@ input[type="time"],
 input[type="number"],
 select,
 textarea {
+    background: $color-background-base-introvert;
     border: 0;
     margin-bottom: 16px / $font-size-normal * 1em;
 

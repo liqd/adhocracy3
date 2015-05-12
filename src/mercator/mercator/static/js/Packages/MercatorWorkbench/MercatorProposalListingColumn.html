@@ -19,7 +19,9 @@
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ platformUrl | adhResourceUrl:undefined:{proposalUrl: proposalUrl, movingColumns: 'is-show-show-hide'} }}">
-        <i class="icon-list-filled moving-column-icon"></i>
+        <div class="moving-column-tab">
+            <i class="icon-list-filled moving-column-icon"></i>
+        </div>
     </a>
 
     <adh-facets

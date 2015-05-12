@@ -32,15 +32,19 @@ That is not supported by all targeted browsers however.
     <div class="l-rows-wrapper">
         <div class="l-rows">
             <div class="l-row">
-                <div class="l-cell" style="background: red">
-                    huhu
+                <div class="l-cell">
+                    <div class="l-cell-inner" style="background: red">
+                        huhu
+                    </div>
                 </div>
             </div>
 
             <div class="l-row">
                 <div class="l-cell">
-                    <div style="overflow-y: auto; background: green; position: absolute; top: 0; bottom: 0; left: 0; right: 0;">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia consectetur. Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut gravida lorem. Ut turpis felis, pulvinar a semper sed, adipiscing id dolor. Pellentesque auctor nisi id magna consequat sagittis. Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar at malesuada arcu rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris vitae nisi at sem facilisis semper ac in est.
+                    <div class="l-cell-inner">
+                        <div style="overflow-y: auto; background: green; position: absolute; top: 0; bottom: 0; left: 0; right: 0;">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia consectetur. Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut gravida lorem. Ut turpis felis, pulvinar a semper sed, adipiscing id dolor. Pellentesque auctor nisi id magna consequat sagittis. Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar at malesuada arcu rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris vitae nisi at sem facilisis semper ac in est.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -54,6 +58,7 @@ That is not supported by all targeted browsers however.
         @include stretch;
     }
 
+
     .l-rows {
         display: table;
         width: 100%;
@@ -64,12 +69,17 @@ That is not supported by all targeted browsers however.
         display: table-row;
 
         &:last-child {
-            height: 100%;
+            &, .l-cell, .l-cell-inner {
+                height: 100%;
+            }
         }
     }
 
     .l-cell {
         display: table-cell;
+    }
+
+    .l-cell-inner {
         position: relative;
     }
 }

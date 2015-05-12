@@ -24,11 +24,12 @@ export var register = () => {
                     templates: {}
                 };
 
-                adhHttpMock = jasmine.createSpyObj("adhHttp", ["get"]);
+                adhHttpMock = jasmine.createSpyObj("adhHttp", ["get", "withTransaction"]);
                 adhHttpMock.get.and.returnValue(q.when({
                     content_type: "content_type",
                     data: {}
                 }));
+                adhHttpMock.withTransaction.and.returnValue(q.when([]));
 
                 $injectorMock = jasmine.createSpyObj("$injector", ["invoke"]);
 
