@@ -1,13 +1,74 @@
-.comment-main {
-    background: $color-background-base;
-    padding: 1em;
-    margin-bottom: 1em;
-
-    .comment-children & {
-        border-left: 1px solid $color-text-highlight-normal;
+.comment-listing {
+    .listing-element {
+        border: 0;
     }
 }
 
+.comment-create-form,
+.comment-children-edit-form {
+    background: $color-background-base-introvert;
+    margin: 0;
+    padding: 0;
+
+    .comment-create-form-text,
+    .comment-edit-form-text {
+        margin: 0;
+        min-height: 70px / $font-size-normal * 1em;
+    }
+
+    .form-footer-button {
+        font-size: $font-size-small;
+        line-height: 24px / $font-size-small * 1em;
+        padding: 0;
+        text-transform: capitalize;
+    }
+}
+
+.comment-header .comment-header-links {
+    margin-right: 1px;
+    padding: 0;
+
+    .comment-header-link {
+        @include icon-button;
+        margin: 0 -1px 0 0;
+
+        &:after {
+            display: none;
+        }
+    }
+}
+
+.comment {
+    padding: 0 (10px / $font-size-normal * 1em);
+}
+
+.comment-content,
+.comment-create-form-text,
+.comment-edit-form-text {
+    font-size: $font-size-small;
+    line-height: $line-height-plus;
+}
+
 .comment-children {
-    border: 0;
+    border-color: $color-text-highlight-normal;
+}
+
+.comment-children-create-form,
+.comment-children-edit-form {
+    margin-bottom: 20px / $font-size-normal * 1em;
+
+    .comment-create-form, & {
+        background: transparent;
+
+        .comment-create-form-text,
+        .comment-edit-form-text {
+            background: $color-background-base-introvert;
+            border-left: 1px solid $color-text-highlight-normal;
+        }
+    }
+}
+
+.comment-main {
+    margin-bottom: 24px / $font-size-normal * 1em;
+    padding-bottom: 0;
 }
