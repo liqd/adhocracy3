@@ -252,12 +252,11 @@ parent: comment
 ---
 
 ```html_example
-<div class="comment-children-create-form">
+<form class="comment-create-form">
     <textarea class="comment-create-form-text"></textarea>
     <footer class="form-footer">
         <input class="comment-create-form-button-submit m-call-to-action form-footer-button-cta" type="submit" value="Submit">
-        <a href="" class="button form-footer-button">CANCEL</a>
     </footer>
-</div>
+</form>
 ```
 */
