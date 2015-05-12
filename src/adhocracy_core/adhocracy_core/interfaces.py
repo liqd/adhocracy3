@@ -589,8 +589,8 @@ class SearchQuery(namedtuple('Query', ['interfaces',
     indexes ({str:object}):
         Mapping index name to wanted index value. Available indexes are defined
         in :class:`adhocracy_core.catalog.adhocracy`
-    references [Reference]:
-        Reference with (source, isheet, isheet_field, target).
+    references (Reference):
+        References with (source, isheet, isheet_field, target).
         If `source` is None search for resources referencing target
         (back references).
         If `target` is None search for resources referenced by source
@@ -630,7 +630,7 @@ class SearchQuery(namedtuple('Query', ['interfaces',
 
 search_query = SearchQuery(interfaces=(),
                            indexes={},
-                           references={},
+                           references=(),
                            root=None,
                            depth=0,
                            only_visible=False,
