@@ -83,15 +83,16 @@ def index_rates(resource, default) -> int:
     Only the LAST version of each rate is counted.
     """
     catalogs = find_service(resource, 'catalogs')
-    query = search_query._replace(interfaces=IRateable,
-                                  depth=1,
-                                  root=resource,
-                                  group_by='rate',
-                                  arbitrary_indexes={'tag': 'LAST'})
+    query = search_query._replace(interfaces=IRate,
+                                  frequency_of='rate',
+                                  arbitrary_indexes={'tag': 'LAST'},
+                                  references=[(None, IRate, 'object', resource)
+                                              ],
+                                  )
     result = catalogs.search(query)
     rate_sum = 0
-    for rate, rateables in result['group_by'].items():
-        rate_sum += rate * len(rateables)
+    for value, count in result['frequency_of'].items():
+        rate_sum += value * count
     return rate_sum
 
 
