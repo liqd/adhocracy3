@@ -31,11 +31,10 @@
     .comment-header-link {
         @include icon-button;
         margin: 0 -1px 0 0;
-    }
 
-    .comment-header-link-text {
-        @include squish-text;
-        position: absolute;
+        &:after {
+            display: none;
+        }
     }
 }
 

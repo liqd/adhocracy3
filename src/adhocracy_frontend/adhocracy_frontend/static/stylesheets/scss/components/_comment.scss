@@ -226,6 +226,12 @@ parent: comment
         }
     }
 
+    .comment-header-link {
+        &:after {
+            content: attr(title);
+        }
+    }
+
     .comment-header-column1,
     .comment-header-column2 {
         @include text-align(right);
