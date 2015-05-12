@@ -136,6 +136,13 @@ class TestIndexRate:
         return mock_sheet
 
     @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import adhocracy
+        monkeypatch.setattr(adhocracy, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    @fixture
     def mock_rateable_sheet(self, mock_sheet):
         from copy import deepcopy
         from adhocracy_core.sheets.rate import IRateable
@@ -150,35 +157,18 @@ class TestIndexRate:
         mock_rate_sheet.get.return_value = {'rate': 1}
         assert index_rate(context['rateable'], None) == 1
 
-    def _inject_mock_graph(self, monkeypatch, tag: str):
-        from adhocracy_core.sheets import tags
-        mock_graph = Mock()
-        return_value = [testing.DummyResource(__name__=tag)]
-        mock_graph.get_back_reference_sources.return_value = return_value
-        mock_find_graph = Mock(return_value=mock_graph)
-        monkeypatch.setattr(tags, 'find_graph', mock_find_graph)
-
-    def test_index_rates_with_last_tag(self, item, monkeypatch):
-        import substanced.util
-        mock_find_service = Mock()
-        dummy_rateable = testing.DummyResource()
-        mock_catalogs = Mock()
-        mock_catalogs.search.return_value = {'group_by': {1: [dummy_rateable]}}
-        mock_find_service.return_value = mock_catalogs
-        monkeypatch.setattr(substanced.util, 'find_service', mock_find_service)
+    def test_index_rates_with_last_tag(self, item, mock_catalogs):
         from .adhocracy import index_rates
+        dummy_rateable = testing.DummyResource()
+        mock_catalogs.search.return_value = {'group_by': {1: [dummy_rateable]}}
         item['rates']['rate'] = testing.DummyResource()
         item['rateable'] = dummy_rateable
         assert index_rates(item['rateable'], None) == 1
 
-    def test_index_rates_with_another_tag(self, item, monkeypatch, registry):
+    def test_index_rates_with_another_tag(self, item, mock_catalogs):
         import substanced.util
-        mock_find_service = Mock()
         dummy_rateable = testing.DummyResource()
-        mock_catalogs = Mock()
         mock_catalogs.search.return_value = {'group_by': {}}
-        mock_find_service.return_value = mock_catalogs
-        monkeypatch.setattr(substanced.util, 'find_service', mock_find_service)
         item['rates']['rate'] = testing.DummyResource()
         from .adhocracy import index_rates
         item['rateable'] = dummy_rateable

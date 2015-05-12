@@ -320,10 +320,11 @@ def mock_graph() -> Mock:
 
 
 @fixture
-def mock_catalogs() -> Mock:
-    """Mock :class:`adhocracy_core.catalogs.ICatalaogsService`."""
-    from adhocracy_core.catalog import CatalogsService
-    mock = Mock(spec=CatalogsService)
+def mock_catalogs(search_result) -> Mock:
+    """Mock :class:`adhocracy_core.catalogs.ICatalalogsService`."""
+    from adhocracy_core.catalog import CatalogsServiceAdhocracy
+    mock = Mock(spec=CatalogsServiceAdhocracy)
+    mock.search.return_value = search_result
     return mock
 
 
@@ -344,7 +345,6 @@ def query() -> SearchQuery:
 @fixture
 def sheet_catalogs(monkeypatch, search_result) -> Mock:
     """Mock _catalogs property for sheets."""
-    from adhocracy_core.interfaces import search_result
     from adhocracy_core.catalog import CatalogsServiceAdhocracy
     from adhocracy_core import sheets
     mock = Mock(spec=CatalogsServiceAdhocracy)
