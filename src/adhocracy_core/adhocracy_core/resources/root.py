@@ -57,6 +57,9 @@ root_acm = ACM().deserialize(
                      ['view_sensitive',                None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['view_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
                      ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
+                     # FIXME, move to meinberlin module
+                     ['add_kiezkassen_proposal_version',  None,       None,        None,          None,      None,      None,    Allow],  # noqa
+                     ['add_kiezkassen_process',           None,       None,        None,          None,      None,      None,    Allow]  # noqa
                      ]})
 
 
