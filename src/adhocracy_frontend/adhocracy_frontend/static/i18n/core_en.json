@@ -118,7 +118,7 @@
     "TR__REGISTRATION_LOGIN_INSTEAD": "I already have an account. Log in [[link:here]].",
     "TR__REGISTRATION_PROCEED": "Proceed back to [[link:{{siteName}}]].",
     "TR__REGISTRATION_SUPPORT": "Having trouble with the registration?",
-    "TR__REGISTRATION_THANKS_FOR_REGISTERING": "HI, {{userName}}! Thanks for registering with {{siteName}}.",
+    "TR__REGISTRATION_THANKS_FOR_REGISTERING": "Hi, {{userName}}! Thanks for registering with {{siteName}}.",
     "TR__REPLY": "reply",
     "TR__REPORT": "report",
     "TR__REPORT_ABUSE_STATUS_OK": "The moderators have been notified.",
