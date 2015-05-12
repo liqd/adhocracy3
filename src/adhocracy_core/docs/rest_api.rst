@@ -1413,9 +1413,9 @@ If *reverse* is set to ``True`` the sorting will be reversed::
 You can also specifiy a *limit* and an *offset* for pagination::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'sort': 'name', 'limit': 1, 'offset': 1}).json
+    ...     params={'sort': 'name', 'limit': 1, 'offset': 0}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/adhocracy/Proposals/kommunismus/LAST/']
+    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/']
 
 The *count* is not affected by *limit*::
 

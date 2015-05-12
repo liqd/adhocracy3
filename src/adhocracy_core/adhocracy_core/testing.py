@@ -25,6 +25,8 @@ import colander
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
+from adhocracy_core.interfaces import SearchResult
+from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import IRootPool
 
@@ -161,13 +163,16 @@ def pool_graph(config):
     from adhocracy_core.resources.pool import Pool
     from adhocracy_core.resources.root import _add_graph
     from adhocracy_core.resources.root import _add_objectmap_to_app_root
+    from adhocracy_core.sheets.pool import IPool
+    from zope.interface import directlyProvides
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.graph')
-    context = Pool()
-    _add_objectmap_to_app_root(context)
-    _add_graph(context, config.registry)
-    return context
+    pool = Pool()
+    directlyProvides(pool, IPool)
+    _add_objectmap_to_app_root(pool)
+    _add_graph(pool, config.registry)
+    return pool
 
 
 @fixture
@@ -311,6 +316,40 @@ def mock_graph() -> Mock:
     """Mock :class:`adhocracy_core.graph.Graph`."""
     from adhocracy_core.graph import Graph
     mock = Mock(spec=Graph)
+    return mock
+
+
+@fixture
+def mock_catalogs(search_result) -> Mock:
+    """Mock :class:`adhocracy_core.catalogs.ICatalalogsService`."""
+    from adhocracy_core.catalog import CatalogsServiceAdhocracy
+    mock = Mock(spec=CatalogsServiceAdhocracy)
+    mock.search.return_value = search_result
+    return mock
+
+
+@fixture
+def search_result() -> SearchResult:
+    """Return search result."""
+    from adhocracy_core.interfaces import search_result
+    return search_result
+
+
+@fixture
+def query() -> SearchQuery:
+    """Return search query."""
+    from adhocracy_core.interfaces import search_query
+    return search_query
+
+
+@fixture
+def sheet_catalogs(monkeypatch, search_result) -> Mock:
+    """Mock _catalogs property for sheets."""
+    from adhocracy_core.catalog import CatalogsServiceAdhocracy
+    from adhocracy_core import sheets
+    mock = Mock(spec=CatalogsServiceAdhocracy)
+    mock.search.return_value = search_result
+    monkeypatch.setattr(sheets, 'find_service', lambda x, y: mock)
     return mock
 
 

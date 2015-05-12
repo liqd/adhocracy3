@@ -2,15 +2,17 @@
 from hypatia.interfaces import IIndex
 from hypatia.util import BaseIndexMixin
 from persistent import Persistent
+from pyramid.decorator import reify
 from substanced.catalog.indexes import SDIndex
 from substanced.content import content
 from substanced.util import find_objectmap
-from substanced.util import get_oid
 from zope.interface import implementer
 import BTrees
 import hypatia.query
 
 from adhocracy_core.utils import find_graph
+from adhocracy_core.interfaces import Reference
+from adhocracy_core.interfaces import ISheet
 
 
 @content('Reference Index',
@@ -19,7 +21,7 @@ from adhocracy_core.utils import find_graph
 @implementer(IIndex)
 class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
 
-    """Uses the graph query isheet references."""
+    """Use :func:`adhocracy_core.graph.Graph.get_source_ids` to query refs."""
 
     family = BTrees.family64
     __parent__ = None
@@ -28,10 +30,17 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
     def __init__(self, discriminator=None):
         self._not_indexed = self.family.IF.TreeSet()
 
+    @reify
+    def _graph(self):
+        return find_graph(self)
+
+    @reify
+    def _objectmap(self):
+        return find_objectmap(self)
+
     def document_repr(self, docid: int, default=None) -> str:
         """Read interface."""
-        objectmap = find_objectmap(self.__parent__)
-        path = objectmap.path_for(docid)
+        path = self._objectmap.path_for(docid)
         if path is None:
             return default
         return path
@@ -54,8 +63,7 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
 
     def docids(self):
         """Read interface."""
-        graph = find_graph(self.__parent__)
-        return graph._objectmap.referencemap.refmap.items()
+        return self._objectmap.referencemap.refmap.items()
 
     indexed = docids
     """Read docids docstring."""
@@ -64,32 +72,41 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
         """Read interface."""
         return self._not_indexed
 
-    def eq(self, isheet, isheet_field, target) -> hypatia.query.Eq:
+    def eq(self, reference: Reference) -> hypatia.query.Eq:
         """Eq operator to concatenate queries.."""
-        query = {'isheet': isheet,
-                 'isheet_field': isheet_field,
-                 'target': target,
-                 }
+        query = {'reference': reference}
         return hypatia.query.Eq(self, query)
 
     def apply(self, query: dict) -> BTrees.family64.IF.TreeSet:
-        """Apply query parameters and return search result."""
-        query_args = [query['isheet'],
-                      query['isheet_field'],
-                      query['target'],
-                      ]
-        return self._search(*query_args)
+        """Apply query parameters·{reference: Reference} and return result."""
+        reference = query['reference']
+        return self._search(reference)
 
     applyEq = apply
     """Read apply docsting."""
 
-    def _search(self, isheet, isheet_field, target=None):
-        graph = find_graph(self.__parent__)
-        # TODO? unneeded objectid -> object -> objectid transformation
-        backreferences = graph.get_back_references(target, base_isheet=isheet)
-        result = self.family.IF.TreeSet()
-        for source, isheet, field, target in backreferences:
-            if field == isheet_field:
-                docid = get_oid(source)
-                result.add(docid)
+    def _search(self, reference: Reference) -> BTrees.LFBTree.TreeSet:
+        source, isheet, isheet_field, target = reference
+        if source is None and target is None:
+            raise ValueError('You have to add a source or target resource')
+        elif source is not None and target is not None:
+            raise ValueError('Either source or target has to be None')
+        if source is None:
+            oids = self._resource_ids(target, isheet, isheet_field, 'sources')
+        else:
+            oids = self._resource_ids(source, isheet, isheet_field, 'targets')
+        result = self.family.IF.TreeSet(oids)
         return result
+
+    def _resource_ids(self, resource, isheet=ISheet, isheet_field='',
+                      orientation='') -> set:
+        """Get OIDs from references with `orientation` targets or sources."""
+        if orientation == 'sources':
+            get_resources_ids = self._objectmap.sourceids
+        else:
+            get_resources_ids = self._objectmap.targetids
+        for isheet, field, reftype in self._graph.get_reftypes(isheet):
+            if isheet_field and field != isheet_field:
+                continue
+            for oid in get_resources_ids(resource, reftype):
+                yield oid

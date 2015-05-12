@@ -17,6 +17,7 @@ from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.schema import ACM
 from adhocracy_core.resources.geo import add_locations_service
+from adhocracy_core.catalog import ICatalogsService
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.name
 
@@ -92,10 +93,7 @@ def _add_graph(context, registry):
 
 
 def _add_catalog_service(context, registry):
-    catalogs = registry.content.create('Catalogs')
-    context.add_service('catalogs', catalogs, registry=registry)
-    catalogs.add_catalog('system')
-    catalogs.add_catalog('adhocracy')
+    registry.content.create(ICatalogsService.__identifier__, parent=context)
 
 
 def _add_principals_service(context, registry):

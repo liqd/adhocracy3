@@ -18,7 +18,7 @@ from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
-from adhocracy_core.sheets import AnnotationStorageSheet
+from adhocracy_core.sheets import AnnotationRessourceSheet
 from adhocracy_core.interfaces import IResourceSheet
 
 
@@ -167,7 +167,7 @@ class IWorkflowAssignment(ISheet):
 
 
 @implementer(IResourceSheet)
-class WorkflowAssignmentSheet(AnnotationStorageSheet):
+class WorkflowAssignmentSheet(AnnotationRessourceSheet):
 
     """Sheet class for workflow assignment sheets.
 

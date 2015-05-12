@@ -3,7 +3,7 @@
 Read :mod:`substanced.catalog.subscribers` for default reindex subscribers.
 """
 
-from substanced.util import find_catalog
+from substanced.util import find_service
 
 from adhocracy_core.utils import get_visibility_change
 from adhocracy_core.interfaces import VisibilityChange
@@ -18,16 +18,14 @@ from adhocracy_core.utils import list_resource_with_descendants
 
 def reindex_tag(event):
     """Reindex tag index if a tag backreference is modified."""
-    # TODO: als long as we cannot reindex a single index this function
-    # does the same like reindex_rate: reindex all indexes
-    adhocracy_catalog = find_catalog(event.object, 'adhocracy')
-    adhocracy_catalog.reindex_resource(event.object)
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'tag')
 
 
 def reindex_rate(event):
     """Reindex the rates index if a rate backreference is modified."""
-    adhocracy_catalog = find_catalog(event.object, 'adhocracy')
-    adhocracy_catalog.reindex_resource(event.object)
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'rates')
 
 
 def reindex_visibility(event):
@@ -38,12 +36,12 @@ def reindex_visibility(event):
 
 
 def _reindex_resource_and_descendants(resource: IResource):
-    adhocracy_catalog = find_catalog(resource, 'adhocracy')
-    if adhocracy_catalog is None:
+    catalogs = find_service(resource, 'catalogs')
+    if catalogs is None:
         return  # ease testing
     resource_and_descendants = list_resource_with_descendants(resource)
     for res in resource_and_descendants:
-        adhocracy_catalog.reindex_resource(res)
+        catalogs.reindex_index(res, 'private_visibility')
 
 
 def includeme(config):
@@ -57,3 +55,5 @@ def includeme(config):
     config.add_subscriber(reindex_rate,
                           ISheetBackReferenceModified,
                           event_isheet=IRateable)
+    # add subscriber to updated allowed index
+    config.scan('substanced.objectmap.subscribers')

@@ -136,6 +136,13 @@ class TestIndexRate:
         return mock_sheet
 
     @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import adhocracy
+        monkeypatch.setattr(adhocracy, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    @fixture
     def mock_rateable_sheet(self, mock_sheet):
         from copy import deepcopy
         from adhocracy_core.sheets.rate import IRateable
@@ -150,38 +157,23 @@ class TestIndexRate:
         mock_rate_sheet.get.return_value = {'rate': 1}
         assert index_rate(context['rateable'], None) == 1
 
-    def _inject_mock_graph(self, monkeypatch, tag: str):
-        from adhocracy_core.sheets import tags
-        mock_graph = Mock()
-        return_value = [testing.DummyResource(__name__=tag)]
-        mock_graph.get_back_reference_sources.return_value = return_value
-        mock_find_graph = Mock(return_value=mock_graph)
-        monkeypatch.setattr(tags, 'find_graph', mock_find_graph)
-
-    def test_index_rates_with_last_tag(self, item, monkeypatch,
-                                       mock_rate_sheet, mock_rateable_sheet,
-                                       registry):
+    def test_index_rates_with_last_tag(self, item, mock_catalogs, search_result):
         from .adhocracy import index_rates
-        self._inject_mock_graph(monkeypatch, 'LAST')
+        dummy_rateable = testing.DummyResource()
+        search_result = search_result._replace(frequency_of={1: 5})
+        mock_catalogs.search.return_value = search_result
         item['rates']['rate'] = testing.DummyResource()
-        mock_rate_sheet.get.return_value = {'rate': 1}
-        item['rateable'] = testing.DummyResource()
-        mock_rateable_sheet.get.return_value = {'rates': [item['rates']['rate']]}
-        registry.content.get_sheet.side_effect = [mock_rateable_sheet,
-                                                  mock_rate_sheet]
-        assert index_rates(item['rateable'], None) == 1
+        item['rateable'] = dummy_rateable
+        assert index_rates(item['rateable'], None) == 5
 
-    def test_index_rates_with_another_tag(self, item, monkeypatch,
-                                          mock_rate_sheet, mock_rateable_sheet,
-                                          registry):
-        from .adhocracy import index_rates
-        self._inject_mock_graph(monkeypatch, 'FIRST')
+    def test_index_rates_with_another_tag(self, item, mock_catalogs,
+                                          search_result):
+        dummy_rateable = testing.DummyResource()
+        search_result = search_result._replace(frequency_of={})
+        mock_catalogs.search.return_value = search_result
         item['rates']['rate'] = testing.DummyResource()
-        mock_rate_sheet.get.return_value = {'rate': 1}
-        item['rateable'] = testing.DummyResource()
-        mock_rateable_sheet.get.return_value = {'rates': [item['rates']['rate']]}
-        registry.content.get_sheet.side_effect = [mock_rateable_sheet,
-                                                  mock_rate_sheet]
+        from .adhocracy import index_rates
+        item['rateable'] = dummy_rateable
         assert index_rates(item['rateable'], None) == 0
 
 

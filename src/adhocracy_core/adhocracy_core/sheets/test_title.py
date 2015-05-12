@@ -12,9 +12,9 @@ class TestTitleSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.title import ITitle
         from adhocracy_core.sheets.title import TitleSchema
-        from adhocracy_core.sheets import AnnotationStorageSheet
+        from adhocracy_core.sheets import AnnotationRessourceSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationStorageSheet)
+        assert isinstance(inst, AnnotationRessourceSheet)
         assert inst.meta.isheet == ITitle
         assert inst.meta.schema_class == TitleSchema
         assert inst.meta.editable is True
