@@ -327,19 +327,13 @@ export class MapListingController {
             this.scrollToItem(this.$scope.selectedPath, false);
         });
 
-        var mcs = $element.parents(".moving-columns");
-        this.$scope.$watch(() => {
-            return mcs.find(".moving-column.is-show, .moving-column.is-collapse").length;
-        }, () => {
+        this.$scope.$watch(() => $element.find(".map-list").width(), () => {
+            this.scrollToItem(this.$scope.selectedPath, false);
+
             // FIXME: moving column load time hard coded
             this.$timeout(() => {
                 this.scrollToItem(this.$scope.selectedPath, true);
-            }, 550);
-        });
-        this.$scope.$watch(() => {
-            return this.map.getBounds().getSouthWest().lng;
-        }, () => {
-            this.scrollToItem(this.$scope.selectedPath, false);
+            }, 500);
         });
     }
 
