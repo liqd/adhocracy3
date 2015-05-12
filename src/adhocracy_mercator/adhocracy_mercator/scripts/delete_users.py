@@ -120,7 +120,7 @@ def _get_rates_from_user(pool: IPool, user: IUser) -> [IRateVersion]:
     params = {'depth': 6,
               'interfaces': IRate,
               'resolve': True,
-              'arbitrary_indexes': {'tag': 'LAST'},
+              'indexes': {'tag': 'LAST'},
               'references': [(None, IRate, 'subject', user)],
               }
     rates = pool.get(params)['elements']

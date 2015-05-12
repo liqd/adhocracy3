@@ -87,7 +87,7 @@ def get_most_rated_proposals(root: IResource,
     params = {'depth': 3,
               'interfaces': IMercatorProposalVersion,
               'reverse': True,
-              'arbitrary_indexes': {'tag': 'LAST'},
+              'indexes': {'tag': 'LAST'},
               'group_by': 'rates',
               'resolve': True,
               }
@@ -112,7 +112,7 @@ def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
     for rateable in rateables:
         params = {'depth': 3,
                   'interfaces': IRate,
-                  'arbitrary_indexes': {'tag': 'LAST', 'rate': 1},
+                  'indexes': {'tag': 'LAST', 'rate': 1},
                   'resolve': True,
                   'references': [(None, IRate, 'object', rateable)]
                   }
@@ -144,7 +144,7 @@ def _get_rate_date(user: IUser, rateable: IRateable) -> str:
     pool = get_sheet(rateable.__parent__, IPool)
     params = {'depth': 3,
               'interfaces': IRate,
-              'arbitrary_indexes': {'tag': 'LAST', 'rate': 1},
+              'indexes': {'tag': 'LAST', 'rate': 1},
               'references': [(None, IRate, 'subject', user),
                              (None, IRate, 'object', rateable)],
               'resolve': True

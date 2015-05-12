@@ -564,7 +564,7 @@ search_result = SearchResult(elements=[],
 
 
 class SearchQuery(namedtuple('Query', ['interfaces',
-                                       'arbitrary_indexes',
+                                       'indexes',
                                        'references',
                                        'root',
                                        'depth',
@@ -586,7 +586,7 @@ class SearchQuery(namedtuple('Query', ['interfaces',
 
     interfaces (IInterface or (IInterface)):
         Resource type (iresource) or sheet (isheet) interfaces
-    arbitrary_indexes ({str:object}):
+    indexes ({str:object}):
         Mapping index name to wanted index value. Available indexes are defined
         in :class:`adhocracy_core.catalog.adhocracy`
     references [Reference]:
@@ -629,7 +629,7 @@ class SearchQuery(namedtuple('Query', ['interfaces',
 
 
 search_query = SearchQuery(interfaces=(),
-                           arbitrary_indexes={},
+                           indexes={},
                            references={},
                            root=None,
                            depth=0,

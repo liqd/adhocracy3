@@ -88,8 +88,8 @@ def _get_old_versions(version: IVersionable) -> [IVersionable]:
 def _get_rate_users(rateable: IRateable) -> set(IUser):
     params = {'depth': 3,
               'interfaces': IRate,
-              'arbitrary_indexes': {'tag': 'LAST',
-                                    'rate': 1},
+              'indexes': {'tag': 'LAST',
+                          'rate': 1},
               'resolve': 'True',
               'references': [(None, IRate, 'object', rateable)]
               }

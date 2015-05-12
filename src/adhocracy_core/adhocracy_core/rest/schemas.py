@@ -466,9 +466,9 @@ class GETPoolRequestSchema(colander.Schema):
                 reference = ReferenceTuple(None, isheet, isheet_field, target)
                 search_query['references'].append(reference)
             else:
-                if 'arbitrary_indexes' not in search_query:
-                    search_query['arbitrary_indexes'] = {}
-                search_query['arbitrary_indexes'][key] = value
+                if 'indexes' not in search_query:
+                    search_query['indexes'] = {}
+                search_query['indexes'][key] = value
         return search_query
 
 

@@ -85,7 +85,7 @@ def index_rates(resource, default) -> int:
     catalogs = find_service(resource, 'catalogs')
     query = search_query._replace(interfaces=IRate,
                                   frequency_of='rate',
-                                  arbitrary_indexes={'tag': 'LAST'},
+                                  indexes={'tag': 'LAST'},
                                   references=[(None, IRate, 'object', resource)
                                               ],
                                   )

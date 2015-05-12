@@ -72,8 +72,8 @@ class CatalogsServiceAdhocracy(CatalogsService):
             index_query &= path_index.eq(query.root,
                                          depth=depth,
                                          include_origin=False)
-        if query.arbitrary_indexes:
-            for name, value in query.arbitrary_indexes.items():
+        if query.indexes:
+            for name, value in query.indexes.items():
                 index = self._get_index(name)
                 index_query &= index.eq(value)
         if query.references:

@@ -599,7 +599,7 @@ class TestGETPoolRequestSchema():
                    ISheet.__identifier__ + ':x': '/',
                    }
         target = context
-        wanted = {'arbitrary_indexes': {'index1': 1, 'index2': 1},
+        wanted = {'indexes': {'index1': 1, 'index2': 1},
                   'depth': 100,
                   'frequency_of': 'index1',
                   'interfaces': (IName, IResource),

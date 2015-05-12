@@ -73,7 +73,7 @@ def export_proposals():
               'interfaces': IMercatorProposalVersion,
               'sort_by': 'rates',
               'reverse': True,
-              'arbitrary_indexes': {'tag': 'LAST'},
+              'indexes': {'tag': 'LAST'},
               'resolve': True,
               }
     results = pool.get(params)
@@ -167,7 +167,7 @@ def export_proposals():
         # Comments
         query = {'interfaces': ICommentVersion,
                  'depth': 'all',
-                 'arbitrary_indexes': {'tag': 'LAST'},
+                 'indexes': {'tag': 'LAST'},
                  'resolve': False}
         proposal_item = proposal.__parent__
         proposal_sheet = get_sheet(proposal_item, IPool)

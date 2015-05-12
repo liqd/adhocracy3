@@ -221,11 +221,11 @@ class TestCatalogsServiceAdhocracy:
         result = inst.search(query._replace(only_visible=False))
         assert list(result.elements) == [child]
 
-    def test_search_with_arbitrary_indexes(self, registry, pool, inst, query):
+    def test_search_with_indexes(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
         item = self._make_resource(registry, parent=pool, iresource=IItem)
         first = item['VERSION_0000000']
-        result = inst.search(query._replace(arbitrary_indexes={'tag': 'FIRST'}))
+        result = inst.search(query._replace(indexes={'tag': 'FIRST'}))
         assert list(result.elements) == [first]
 
     def test_search_with_references(self, registry, pool, inst, query):
