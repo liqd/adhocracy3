@@ -101,11 +101,23 @@ in addition we can add custom metadata for specific workflow states::
 Workflow transition to states
 -----------------------------
 
-We can also modify the state if the workflow has a suitable transition::
+We can also modify the state if the workflow has a suitable transition.
+First we check the available next states::
 
     >>> resp_data = app_god.options('/proposals/proposal_item').json
     >>> resp_data['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.ISample']
     {'workflow_state': ['announced']}
+
+Then we can put the wanted next state:
+
+     >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'workflow_state': 'announced'}}}
+     >>> resp = app_god.put('/proposals/proposal_item', data)
+     >>> resp.status_code
+     200
+
+    >>> resp_data = app_god.get('/proposals/proposal_item').json
+    >>> resp_data['data']['adhocracy_core.sheets.workflow.ISample']['workflow_state']
+    'announced'
 
 NOTE: The available next states depend on the workflow transitions and user permissions.
 NOTE: To make this work every state may have only one transition to another state.

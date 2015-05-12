@@ -6,8 +6,10 @@ from colander import SchemaType
 from colander import deferred
 from colander import null
 from colander import OneOf
+from colander import drop
 from pyramid.testing import DummyRequest
 from pyramid.interfaces import IRequest
+from pyramid.threadlocal import get_current_request
 from substanced.workflow import IWorkflow
 from zope.interface import implementer
 
@@ -37,7 +39,7 @@ class WorkflowType(SchemaType):
 
     def deserialize(self, node, value) -> IWorkflow:
         """Serialize name to :class:`substanced.workflow.IWorkflow'."""
-        if value == '':
+        if value in ('', null):
             return None
         registry = node.bindings['registry']
         try:
@@ -125,6 +127,8 @@ class StateAssignment(MappingSchema):
 
     """Resource specific data for a workflow state."""
 
+    missing = drop
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'default' not in kwargs:  # pragma: no branch
@@ -208,7 +212,7 @@ class WorkflowAssignmentSheet(AnnotationStorageSheet):
     def _set_state(self, name: str):
         """Do transition to state `name`, don`t check user permissions."""
         workflow = self.get()['workflow']
-        request = DummyRequest()  # bypass permission check
+        request = get_current_request() or DummyRequest()  # ease testing
         workflow.transition_to_state(self.context, request, to_state=name)
 
 

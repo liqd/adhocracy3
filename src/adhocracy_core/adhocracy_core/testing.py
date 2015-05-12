@@ -768,6 +768,13 @@ class AppUser:
                                   expect_errors=True)
         return resp
 
+    def put(self, path: str, cstruct: dict={}) -> TestResponse:
+        """Put request to modify a resource."""
+        url = self.rest_url + self.base_path + path
+        resp = self.app.put_json(url, cstruct, headers=self.header,
+                                 expect_errors=True)
+        return resp
+
     def post(self, path: str, cstruct: dict={}) -> TestResponse:
         """Post request to create a new resource."""
         url = self.rest_url + self.base_path + path
