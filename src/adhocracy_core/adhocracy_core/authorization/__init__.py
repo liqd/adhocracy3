@@ -6,11 +6,12 @@ from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import lineage
 from pyramid.registry import Registry
 from zope.interface import implementer
+from substanced.util import get_acl
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
-from adhocracy_core.schema import ACM
+from adhocracy_core.utils import set_acl
 
 
 CREATOR_ROLEID = 'role:creator'
@@ -108,3 +109,14 @@ def acm_to_acl(acm: dict, registry: Registry) -> [str]:
                 acl.append(ace)
         idx = idx + 1
     return acl
+
+
+def add_acm(resource: IResource, acm: dict, registry: Registry):
+    """Add permissions defined by an ACM to a resource.
+
+    New permissions are generated from the ACM and put in front of the
+    ACL list.
+    """
+    old_acl = get_acl(resource)
+    new_acl = acm_to_acl(acm, registry) + old_acl
+    set_acl(resource, new_acl, registry)

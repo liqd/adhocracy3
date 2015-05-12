@@ -1,6 +1,7 @@
 """Root resource type."""
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
+from pyramid.security import Allow
 from substanced.util import find_service
 from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.interfaces import IPool
@@ -8,6 +9,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.geo import IMultiPolygon
 from adhocracy_core.resources.root import add_platform
 from adhocracy_core.resources.root import root_meta
+from adhocracy_core.schema import ACM
 from .kiezkassen import IProcess
 import adhocracy_core.sheets
 
@@ -39,6 +41,11 @@ def create_initial_content_for_meinberlin(context: IPool, registry: Registry,
                             parent=context['organisation'],
                             appstructs=appstructs)
 
+meinberlin_acm = ACM().deserialize(
+    {'principals':                                      ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
+     'permissions': [['add_kiezkassen_proposal_version',  None,       None,        None,          None,      None,      None,    Allow],  # noqa
+                     ['add_kiezkassen_process',           None,       None,        None,          None,      None,      None,    Allow]   # noqa
+                     ]})
 
 meinberlin_root_meta = root_meta._replace(
     after_creation=root_meta.after_creation +

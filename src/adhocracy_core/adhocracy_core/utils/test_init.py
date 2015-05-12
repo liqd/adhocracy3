@@ -4,6 +4,7 @@ from pyramid import testing
 from pytest import raises
 from pytest import mark
 from pytest import fixture
+from unittest.mock import Mock
 
 
 def test_find_graph_graph_exists():
@@ -565,3 +566,13 @@ def test_set_acl_set_resource_dirty():
     resource = testing.DummyResource()
     set_acl(resource, [(Deny, 'role:creator', 'add_commentversion')])
     assert resource._p_changed is True
+
+
+def test_get_root(app, registry):
+    from adhocracy_core.resources.root import IRootPool
+    from adhocracy_core.utils import get_root
+    fake_root = testing.DummyResource()
+    app.root_factory = Mock()
+    app.root_factory.return_value = fake_root
+    root = get_root(app)
+    assert root == fake_root
