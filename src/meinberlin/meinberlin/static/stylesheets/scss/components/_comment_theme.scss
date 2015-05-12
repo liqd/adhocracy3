@@ -73,8 +73,3 @@
     margin-bottom: 24px / $font-size-normal * 1em;
     padding-bottom: 0;
 }
-
-.rate .rate-difference {
-    @include icon-button;
-    margin-right: -2px;
-}
