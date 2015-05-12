@@ -76,7 +76,6 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
                     "müssen bis Mitte Dezember realisiert und abgerechnet werden",
                 processType: "Kiezkasse",
                 startDate: "2015-05-20",
-                endDate: "2015-06-01",
                 votingAvailable: false,
                 commentAvailable: false
             }];
