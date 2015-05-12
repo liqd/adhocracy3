@@ -18,6 +18,7 @@ def includeme(config):
     config.include('adhocracy_meinberlin.workflows')
     config.include('adhocracy_meinberlin.resources.kiezkassen')
     config.include('adhocracy_meinberlin.resources.root')
+    config.include('adhocracy_meinberlin.resources.subscriber')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
     config.include('adhocracy_meinberlin.evolution')
 

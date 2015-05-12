@@ -272,6 +272,7 @@ export class MapListingController {
     private selectedItemLeafletIcon;
     private itemLeafletIcon;
     private markers : {[path : string]: L.Marker};
+    private scrollToItem;
 
     constructor(
         private $scope : IMapListScope,
@@ -284,6 +285,7 @@ export class MapListingController {
         this.selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
         this.itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
         this.markers = {};
+        this.scrollToItem = _.throttle((path, animate) => this._scrollToItem(path, animate), 10);
 
         this.map = this.createMap();
 
@@ -323,6 +325,15 @@ export class MapListingController {
 
         this.$scope.$watch("items", () => {
             this.scrollToItem(this.$scope.selectedPath, false);
+        });
+
+        this.$scope.$watch(() => $element.find(".map-list").width(), () => {
+            this.scrollToItem(this.$scope.selectedPath, false);
+
+            // FIXME: moving column load time hard coded
+            this.$timeout(() => {
+                this.scrollToItem(this.$scope.selectedPath, true);
+            }, 500);
         });
     }
 
@@ -382,7 +393,7 @@ export class MapListingController {
         this.$scope.selectItem(this.indexToPath(index));
     }
 
-    private scrollToItem(path : string, animate = true) : void {
+    private _scrollToItem(path : string, animate = true) : void {
         // FIXME: this needs to be retriggered when the widget
         // is resized or the index of an item changes.
 

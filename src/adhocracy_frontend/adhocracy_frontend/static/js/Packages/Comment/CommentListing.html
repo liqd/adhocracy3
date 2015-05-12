@@ -1,30 +1,32 @@
-<adh-comment-listing-partial
-    data-path="{{path}}"
-    data-empty-text="{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}"
-    data-frontend-order-predicate="frontendOrderPredicate"
-    data-frontend-order-reverse="frontendOrderReverse">
-    <div data-ng-switch="transclusionId">
-        <adh-resource-wrapper
-            data-on-submit="onCreate()"
-            data-clear-on-submit=""
-            data-ng-switch-when="create-form-id">
-            <adh-comment-create
-                data-path="{{createPath}}"
-                data-refers-to="{{path}}"
-                data-pool-path="{{poolPath}}"
-                data-hide-cancel="true"
-                data-mode="edit">
-            </adh-comment-create>
-        </adh-resource-wrapper>
-        <adh-resource-wrapper
-            data-ng-switch-when="element-id">
-            <adh-comment-resource
-                data-path="{{element}}"
-                data-mode="display"
-                data-frontend-order-predicate="frontendOrderPredicate"
-                data-frontend-order-reverse="frontendOrderReverse"
-                data-update-listing="update">
-            </adh-comment-resource>
-        </adh-resource-wrapper>
-    </div>
-</adh-comment-listing-partial>
+<div class="comment-listing">
+    <adh-comment-listing-partial
+        data-path="{{path}}"
+        data-empty-text="{{ 'TR__COMMENT_EMPTY_TEXT' | translate }}"
+        data-frontend-order-predicate="frontendOrderPredicate"
+        data-frontend-order-reverse="frontendOrderReverse">
+        <div data-ng-switch="transclusionId">
+            <adh-resource-wrapper
+                data-on-submit="onCreate()"
+                data-clear-on-submit=""
+                data-ng-switch-when="create-form-id">
+                <adh-comment-create
+                    data-path="{{createPath}}"
+                    data-refers-to="{{path}}"
+                    data-pool-path="{{poolPath}}"
+                    data-hide-cancel="true"
+                    data-mode="edit">
+                </adh-comment-create>
+            </adh-resource-wrapper>
+            <adh-resource-wrapper
+                data-ng-switch-when="element-id">
+                <adh-comment-resource
+                    data-path="{{element}}"
+                    data-mode="display"
+                    data-frontend-order-predicate="frontendOrderPredicate"
+                    data-frontend-order-reverse="frontendOrderReverse"
+                    data-update-listing="update">
+                </adh-comment-resource>
+            </adh-resource-wrapper>
+        </div>
+    </adh-comment-listing-partial>
+</div>
