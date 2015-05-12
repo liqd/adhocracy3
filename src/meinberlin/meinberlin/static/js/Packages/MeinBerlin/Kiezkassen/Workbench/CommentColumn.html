@@ -9,13 +9,15 @@
         </div>
     </div>
 
-    <adh-comment-listing
-        data-ng-if="commentableUrl"
-        data-path="{{commentableUrl}}"
-        data-frontend-order-predicate="frontendOrderPredicate"
-        data-frontend-order-reverse="frontendOrderReverse"
-        data-ng-switch-when="body">
-    </adh-comment-listing>
+    <div class="comment-listing">
+        <adh-comment-listing
+            data-ng-if="commentableUrl"
+            data-path="{{commentableUrl}}"
+            data-frontend-order-predicate="frontendOrderPredicate"
+            data-frontend-order-reverse="frontendOrderReverse"
+            data-ng-switch-when="body">
+        </adh-comment-listing>
+    </div>
 
     <adh-report-abuse
         data-ng-switch-when="overlays"
