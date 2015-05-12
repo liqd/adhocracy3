@@ -157,18 +157,20 @@ class TestIndexRate:
         mock_rate_sheet.get.return_value = {'rate': 1}
         assert index_rate(context['rateable'], None) == 1
 
-    def test_index_rates_with_last_tag(self, item, mock_catalogs):
+    def test_index_rates_with_last_tag(self, item, mock_catalogs, search_result):
         from .adhocracy import index_rates
         dummy_rateable = testing.DummyResource()
-        mock_catalogs.search.return_value = {'frequency_of': {1: 5}}
+        search_result = search_result._replace(frequency_of={1: 5})
+        mock_catalogs.search.return_value = search_result
         item['rates']['rate'] = testing.DummyResource()
         item['rateable'] = dummy_rateable
         assert index_rates(item['rateable'], None) == 5
 
-    def test_index_rates_with_another_tag(self, item, mock_catalogs):
-        import substanced.util
+    def test_index_rates_with_another_tag(self, item, mock_catalogs,
+                                          search_result):
         dummy_rateable = testing.DummyResource()
-        mock_catalogs.search.return_value = {'frequency_of': {}}
+        search_result = search_result._replace(frequency_of={})
+        mock_catalogs.search.return_value = search_result
         item['rates']['rate'] = testing.DummyResource()
         from .adhocracy import index_rates
         item['rateable'] = dummy_rateable

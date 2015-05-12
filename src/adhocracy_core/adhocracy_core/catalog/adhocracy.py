@@ -91,7 +91,7 @@ def index_rates(resource, default) -> int:
                                   )
     result = catalogs.search(query)
     rate_sum = 0
-    for value, count in result['frequency_of'].items():
+    for value, count in result.frequency_of.items():
         rate_sum += value * count
     return rate_sum
 
