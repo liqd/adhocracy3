@@ -308,12 +308,12 @@ export var editDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
+    adhRate : AdhRate.Service,
+    adhResourceUrlFilter,
     adhShowError,
     adhSubmitIfValid,
-    adhResourceUrlFilter,
-    $location : angular.ILocationService,
-    adhRate : AdhRate.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
@@ -382,12 +382,12 @@ export var register = (angular) => {
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
-            "adhTopLevelState",
+            "adhRate",
+            "adhResourceUrlFilter",
             "adhShowError",
             "adhSubmitIfValid",
-            "adhResourceUrlFilter",
+            "adhTopLevelState",
             "$location",
-            "adhRate",
             editDirective
         ])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
