@@ -134,8 +134,8 @@ class CatalogsServiceAdhocracy(CatalogsService):
                        query: SearchQuery) -> IResultSet:
         sort_index = self._get_index(query.sort_by)
         if sort_index is not None:
-            # TODO: We should assert the IIndexSort interfaces here, but
-            # hypation.field.FieldIndex is missing this interfaces.
+            # TODO: We should assert the IIndexSort interface here, but
+            # hypatia.field.FieldIndex is missing this interface.
             assert 'sort' in sort_index.__dir__()
             elements = elements.sort(sort_index,
                                      reverse=query.reverse,

@@ -92,14 +92,14 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
         elif source is not None and target is not None:
             raise ValueError('Either source or target has to be None')
         if source is None:
-            oids = self._ressource_ids(target, isheet, isheet_field, 'sources')
+            oids = self._resource_ids(target, isheet, isheet_field, 'sources')
         else:
-            oids = self._ressource_ids(source, isheet, isheet_field, 'targets')
+            oids = self._resource_ids(source, isheet, isheet_field, 'targets')
         result = self.family.IF.TreeSet(oids)
         return result
 
-    def _ressource_ids(self, resource, isheet=ISheet, isheet_field='',
-                       orientation='') -> set:
+    def _resource_ids(self, resource, isheet=ISheet, isheet_field='',
+                      orientation='') -> set:
         """Get OIDs from references with `orientation` targets or sources."""
         if orientation == 'sources':
             get_resources_ids = self._objectmap.sourceids
