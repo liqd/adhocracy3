@@ -9,7 +9,7 @@ import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/ge
 var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 
 
-export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>) => {
+export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, $rootScope) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
@@ -38,6 +38,59 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
                     });
                 }
             });
+
+            // FIXME: this is not the right place for this information. It is displayed in the context header.
+            $rootScope.phases = [{
+                title: "Informationsphase",
+                description: "Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.",
+                processType: "Kiezkasse",
+                startDate: "2015-01-01",
+                endDate: "2015-02-02",
+                votingAvailable: false,
+                commentAvailable: false
+            }, {
+                title: "Ideensammlungsphase",
+                description: "Alle Interessierten werden aufgerufen Vorschläge für Projekte in der Bezirksregion zu machen. " +
+                    "Die Angabe der Kosten soll bitte die Mehrwertsteuer enthalten. Vorschläge können aber auch noch offline " +
+                    "in der den. Alle Vorschläge (offline und online) werden dann bei der Bürgerversammlung beschlossen.",
+                processType: "Kiezkasse",
+                startDate: "2015-02-02",
+                endDate: "2015-05-10",
+                votingAvailable: true,
+                commentAvailable: true
+            }, {
+                title: "Bürgerversammlung",
+                description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder bewertet " +
+                    "werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge " +
+                    "werden dann vor Ort die Art und Weise der Abstimmung bestimmt die Bürgerversammlung selbst. Offline " +
+                    "Vorschläge werden online",
+                processType: "Kiezkasse",
+                startDate: "2015-05-10",
+                endDate: "2015-05-20",
+                votingAvailable: true,
+                commentAvailable: false
+            }, {
+                title: "Ergebnisse",
+                description: "Nach der Prüfung vom zuständigen Fachamt des Bezirksamtes werden die Vorschläge, die realisiert " +
+                    "werden und ggf. diejenigen, die nicht realisierbar sind, online markiert und angezeigt. Die Projekte " +
+                    "müssen bis Mitte Dezember realisiert und abgerechnet werden",
+                processType: "Kiezkasse",
+                startDate: "2015-05-20",
+                endDate: "2015-06-01",
+                votingAvailable: false,
+                commentAvailable: false
+            }];
+        }
+    };
+};
+
+
+export var phaseDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Phase.html",
+        scope: {
+            phase: "="
         }
     };
 };
@@ -52,5 +105,6 @@ export var register = (angular) => {
             AdhMovingColumns.moduleName,
             AdhTabs.moduleName
         ])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", detailDirective]);
+        .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
+        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "$rootScope", detailDirective]);
 };
