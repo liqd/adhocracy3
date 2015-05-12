@@ -18,18 +18,16 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            scope.$watch(() => column.$scope.shared.isShowMap, function(value) {
-                scope.showMap = (typeof value === "undefined") ? true : value;
+            scope.$watch(() => column.$scope.shared.isShowMap, (value : boolean) => {
+                scope.showMap = value;
             });
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        // FIXME: set individual fields on scope, not simply dump whole resource
-                        scope.resource = resource;
+                        var locationUrl = resource.data[SILocationReference.nick].location;
 
-                        var locationUrl = resource.data[SILocationReference.nick]["location"];
                         adhHttp.get(locationUrl).then((location) => {
-                            var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
+                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
                             scope.polygon =  polygon;
                         });
                     });
