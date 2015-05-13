@@ -15,6 +15,13 @@
             </adh-mein-berlin-kiezkassen-proposal-list-item>
         </adh-listing>
 
+        <div
+            class="map-info"
+            data-ng-if="shared.isShowMap"
+            data-adh-html-translate="TR__MAP_INCOMPLETE"
+            data-translate-templates="{
+                link: '&lt;a href=&quot;&quot; data-ng-click=&quot;showMap(false)&quot;&gt;{{ content }}&lt;/a&gt;'
+        }"></div>
         <adh-wait condition="shared.isShowMap">
             <adh-map-listing
                 data-path="{{path}}"
