@@ -1,0 +1,20 @@
+.user-indicator {
+    &, .user-indicator-logout,
+    .user-indicator-login,
+    .user-indicator-register {
+        letter-spacing: 0;
+        font-size: $font-size-small;
+    }
+
+    .user-indicator-logout,
+    .user-indicator-login,
+    .user-indicator-register {
+        color: $color-text-normal;
+        font-variant: normal;
+
+        &:hover, &:focus {
+            color: $color-brand-one-introvert;
+            text-decoration: underline;
+        }
+    }
+}
