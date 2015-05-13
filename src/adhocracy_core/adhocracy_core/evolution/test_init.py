@@ -91,9 +91,7 @@ class TestMigrateNewSheet:
         from adhocracy_core.interfaces import IResource
         pool_sheet.get.return_value = {'elements': []}
         self.call_fut(context, IResource, ISheet, ISheetB)
-        pool_sheet.get.assert_called_with({'sheet': ISheetB,
-                                           'content_type': IResource,
-                                           'depth': 'all',
+        pool_sheet.get.assert_called_with({'interfaces': (ISheetB, IResource),
                                            'only_visible': False,
                                            })
 

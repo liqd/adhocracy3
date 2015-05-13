@@ -94,11 +94,16 @@
             vertical-align: middle;
 
             &:first-child {
-                margin: 0;
+                margin-left: 0;
+            }
+
+            &.phase-header-tab-pane-meta-icon-date {
+                margin-left: 40px / $font-size-normal * 1em;
             }
         }
 
-        .is-participation {
+        .is-participation-allowed,
+        .is-commenting-allowed {
             color: $color-function-valid;
             font-style: italic;
         }

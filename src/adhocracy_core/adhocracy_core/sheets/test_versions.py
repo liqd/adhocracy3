@@ -160,13 +160,6 @@ class TestVersionsSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
-    def test_get_not_empty_with_versionable(self, meta, context):
-        from adhocracy_core.sheets.versions import IVersionable
-        versionable = testing.DummyResource(__provides__=IVersionable)
-        context['child'] = versionable
-        inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'elements': [versionable]}
-
 
 def test_includeme_register_version_sheet(config):
     from adhocracy_core.utils import get_sheet
@@ -184,11 +177,6 @@ class TestVersionableSheet:
         from adhocracy_core.sheets.versions import versionable_meta
         return versionable_meta
 
-    @fixture
-    def context(self, context, mock_graph):
-        context.__graph__ = mock_graph
-        return context
-
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
@@ -200,27 +188,11 @@ class TestVersionableSheet:
         assert inst.meta.isheet == IVersionable
         assert inst.meta.schema_class == VersionableSchema
 
-    def test_get_empty(self, meta, context, mock_graph):
+    def test_get_empty(self, meta, context, sheet_catalogs):
         inst = meta.sheet_class(meta, context)
-        mock_graph.get_back_references_for_isheet.return_value = {}
-        mock_graph.get_references_for_isheet.return_value = {}
         data = inst.get()
         assert list(data['follows']) == []
         assert list(data['followed_by']) == []
-
-    def test_get_with_followed_by(self, meta, context, mock_graph):
-        successor = testing.DummyResource()
-        inst = meta.sheet_class(meta, context)
-        mock_graph.get_back_references_for_isheet.return_value = {'follows': iter([successor])}
-        data = inst.get()
-        assert list(data['followed_by']) == [successor]
-
-    def test_get_with_follows(self, meta, context, mock_graph):
-        precessor = testing.DummyResource()
-        inst = meta.sheet_class(meta, context)
-        mock_graph.get_references_for_isheet.return_value = {'follows': iter([precessor])}
-        data = inst.get()
-        assert list(data['follows']) == [precessor]
 
     def test_set_with_followed_by(self, meta, context):
         inst = meta.sheet_class(meta, context)

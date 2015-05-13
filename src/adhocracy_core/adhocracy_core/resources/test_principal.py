@@ -105,8 +105,8 @@ def integration(config):
     config.include('pyramid_mailer.testing')
     config.include('pyramid_mako')
     config.include('adhocracy_core.events')
-    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.content')
+    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.changelog')
     config.include('adhocracy_core.messaging')
     config.include('adhocracy_core.sheets.metadata')
@@ -117,9 +117,9 @@ def integration(config):
 
 
 @fixture
-def principals(pool_graph, registry):
+def principals(pool_graph_catalog, registry):
     from adhocracy_core.resources.principal import IPrincipalsService
-    context = pool_graph
+    context = pool_graph_catalog
     inst = registry.content.create(IPrincipalsService.__identifier__,
                                    parent=context)
     return inst

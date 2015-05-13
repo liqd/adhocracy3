@@ -575,7 +575,8 @@ class TestPoolRESTView:
         wanted['content_type'] = IResource.__identifier__
         assert wanted == response
 
-    def test_get_valid_pool_sheet_with_query_params(self, request, context, mock_sheet):
+    def test_get_valid_pool_sheet_with_query_params(self, request, context,
+                                                    mock_sheet):
         from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
         mock_sheet.get_cstruct.return_value = {}
@@ -857,7 +858,18 @@ class TestMetaApiView:
         inst = self.make_one(request, context)
         resp = inst.get()
         assert IResource.__identifier__ in resp['resources']
-        assert resp['resources'][IResource.__identifier__] == {'sheets': []}
+        assert resp['resources'][IResource.__identifier__]['sheets'] == []
+        assert resp['resources'][IResource.__identifier__]['super_types'] == []
+
+    def test_get_resources_with_super_types(self, request, context, resource_meta):
+        class IResourceBX(IResourceX):
+            pass
+        resource_meta._replace(iresource=IResourceBX)
+        request.registry.content.resources_meta[IResourceBX] = resource_meta
+        inst = self.make_one(request, context)
+        resp = inst.get()
+        assert resp['resources'][IResourceBX.__identifier__]['super_types'] ==\
+            [IResourceX.__identifier__]
 
     def test_get_resources_with_sheets_meta(self, request, context, resource_meta):
         resource_meta = resource_meta._replace(basic_sheets=[ISheet],
@@ -898,6 +910,16 @@ class TestMetaApiView:
         assert ISheet.__identifier__ in response['sheets']
         assert 'fields' in response['sheets'][ISheet.__identifier__]
         assert response['sheets'][ISheet.__identifier__]['fields'] == []
+        assert response['sheets'][ISheet.__identifier__]['super_types'] == []
+
+    def test_get_sheets_with_super_types(self, request, context, sheet_meta):
+        class ISheetBX(ISheetB):
+            pass
+        sheet_meta = sheet_meta._replace(isheet=ISheetBX)
+        request.registry.content.sheets_meta[ISheetBX] = sheet_meta
+        inst = self.make_one(request, context)
+        response = inst.get()['sheets'][ISheetBX.__identifier__]
+        assert response['super_types'] == [ISheetB.__identifier__]
 
     def test_get_sheets_with_field(self, request, context, sheet_meta):
         class SchemaF(colander.MappingSchema):
@@ -1213,7 +1235,7 @@ class TestLoginEmailView:
 class TestValidateActivationPathUnitTest:
 
     @fixture
-    def request(self, cornice_request, registry):
+    def _request(self, cornice_request, registry):
         cornice_request.registry = registry
         cornice_request.validated['path'] = '/foo'
         return cornice_request
@@ -1221,8 +1243,8 @@ class TestValidateActivationPathUnitTest:
     @fixture
     def user_with_metadata(self, config):
         from adhocracy_core.sheets.metadata import IMetadata
-        config.include('adhocracy_core.catalog')
         config.include('adhocracy_core.content')
+        config.include('adhocracy_core.catalog')
         config.include('adhocracy_core.changelog')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
@@ -1230,25 +1252,25 @@ class TestValidateActivationPathUnitTest:
         user.activate = Mock()
         return user
 
-    def call_fut(self, context, request):
+    def call_fut(self, context, _request):
         from adhocracy_core.rest.views import validate_activation_path
-        return validate_activation_path(context, request)
+        return validate_activation_path(context, _request)
 
-    def test_valid(self, request, user_with_metadata, context,
+    def test_valid(self, _request, user_with_metadata, context,
                    mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = \
             user_with_metadata
-        self.call_fut(context, request)
-        assert request.validated['user'] == user_with_metadata
+        self.call_fut(context, _request)
+        assert _request.validated['user'] == user_with_metadata
         assert user_with_metadata.activate.called
 
-    def test_not_found(self, request, context, mock_user_locator):
+    def test_not_found(self, _request, context, mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = None
-        self.call_fut(context, request)
-        assert 'Unknown or expired activation path' == request.errors[0][
+        self.call_fut(context, _request)
+        assert 'Unknown or expired activation path' == _request.errors[0][
             'description']
 
-    def test_found_but_expired(self, request, user_with_metadata, context,
+    def test_found_but_expired(self, _request, user_with_metadata, context,
                                mock_user_locator):
         from datetime import datetime
         from datetime import timezone
@@ -1261,8 +1283,8 @@ class TestValidateActivationPathUnitTest:
         appstruct['creation_date'] = datetime(
             year=2010, month=1, day=1, tzinfo=timezone.utc)
         metadata.set(appstruct, omit_readonly=False)
-        self.call_fut(context, request)
-        assert 'Unknown or expired activation path' == request.errors[0][
+        self.call_fut(context, _request)
+        assert 'Unknown or expired activation path' == _request.errors[0][
             'description']
 
 

@@ -117,11 +117,16 @@ of the sheets implemented by the resource::
     >>> sorted(basicpool_desc['sheets'])
     ['adhocracy_core.sheets.metadata.IMetadata', 'adhocracy_core.sheets.name.IName', 'adhocracy_core.sheets.pool.IPool'...]
 
+In addition we get the listing of resource super types (excluding IResource)::
+
+    >>> section_desc = resp_data['resources']['adhocracy_core.resources.sample_section.ISection']
+    >>> sorted(section_desc['super_types'])
+    ['adhocracy_core.interfaces.IItem', 'adhocracy_core.interfaces.IPool']
+
 If the resource is an item, it will also have a "item_type" key whose value
 is the type of versions managed by this item (e.g. a Section will manage
 SectionVersions as main element type)::
 
-    >>> section_desc = resp_data['resources']['adhocracy_core.resources.sample_section.ISection']
     >>> section_desc['item_type']
     'adhocracy_core.resources.sample_section.ISectionVersion'
 
@@ -226,6 +231,13 @@ IVersionable's:
 ...     'readable': True,
 ...     'targetsheet': 'adhocracy_core.sheets.versions.IVersionable',
 ...     'valuetype': 'adhocracy_core.schema.AbsolutePath'}
+
+
+In addition we get the listing of sheet super types (excluding ISheet)::
+
+    >>> pprint(resp_data['sheets']['adhocracy_core.sheets.comment.IComment']['super_types'])
+    ['adhocracy_core.interfaces.ISheetReferenceAutoUpdateMarker']
+
 
 OPTIONS
 ~~~~~~~
@@ -1413,9 +1425,9 @@ If *reverse* is set to ``True`` the sorting will be reversed::
 You can also specifiy a *limit* and an *offset* for pagination::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'sort': 'name', 'limit': 1, 'offset': 1}).json
+    ...     params={'sort': 'name', 'limit': 1, 'offset': 0}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/adhocracy/Proposals/kommunismus/LAST/']
+    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/']
 
 The *count* is not affected by *limit*::
 

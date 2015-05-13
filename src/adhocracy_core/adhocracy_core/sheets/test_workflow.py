@@ -221,7 +221,7 @@ class TestWorkflowAssignmentSheet:
         mock_workflow.type = 'sample'
         registry.content.get_workflow.return_value = mock_workflow
         inst = meta.sheet_class(meta, context, registry=registry)
-        request = testing.DummyResource(registry=registry)
+        request = testing.DummyRequest(registry=registry)
         assert inst.get_cstruct(request) == {'workflow': 'sample',
                                              'workflow_state': None}
 
@@ -290,7 +290,7 @@ class TestSampleWorkflowAssignmentSheet:
         mock_workflow.type = 'sample'
         registry.content.get_workflow.return_value = mock_workflow
         inst = meta.sheet_class(meta, context, registry=registry)
-        request = testing.DummyResource(registry=registry)
+        request = testing.DummyRequest(registry=registry)
         assert inst.get_cstruct(request)['announced'] ==\
             {'description': 'Soon you can participate',
              'start_date': '2015-02-14T00:00:00+00:00'}

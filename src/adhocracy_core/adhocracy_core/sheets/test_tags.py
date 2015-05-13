@@ -26,19 +26,6 @@ class TestTagsSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
-    def test_get_not_empty_with_target_isheet(self, meta, context):
-        from adhocracy_core.sheets.tags import ITag
-        child = testing.DummyResource(__provides__=ITag)
-        context['child1'] = child
-        inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'elements': [child]}
-
-    def test_get_not_empty_without_target_isheet(self, meta, context):
-        child = testing.DummyResource()
-        context['child1'] = child
-        inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'elements': []}
-
 
 def test_includeme_register_tags_sheet(config):
     from adhocracy_core.sheets.tags import ITags

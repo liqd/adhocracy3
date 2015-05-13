@@ -75,8 +75,8 @@ class TestMultiPolygonSheet:
     def test_meta(self, meta):
         from adhocracy_core.sheets.geo import IMultiPolygon
         from adhocracy_core.sheets.geo import MultiPolygonSchema
-        from adhocracy_core.sheets import AnnotationStorageSheet
-        assert meta.sheet_class == AnnotationStorageSheet
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        assert meta.sheet_class == AnnotationRessourceSheet
         assert meta.isheet == IMultiPolygon
         assert meta.schema_class == MultiPolygonSchema
         assert meta.editable is False
@@ -128,8 +128,8 @@ class TestPointSheet:
     def test_meta(self, meta):
         from adhocracy_core.sheets.geo import IPoint
         from adhocracy_core.sheets.geo import PointSchema
-        from adhocracy_core.sheets import AnnotationStorageSheet
-        assert meta.sheet_class == AnnotationStorageSheet
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        assert meta.sheet_class == AnnotationRessourceSheet
         assert meta.isheet == IPoint
         assert meta.schema_class == PointSchema
         assert meta.editable is True
@@ -160,8 +160,8 @@ class TestLocationReferenceSheet:
     def test_meta(self, meta):
         from adhocracy_core.sheets.geo import ILocationReference
         from adhocracy_core.sheets.geo import LocationReferenceSchema
-        from adhocracy_core.sheets import AnnotationStorageSheet
-        assert meta.sheet_class == AnnotationStorageSheet
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        assert meta.sheet_class == AnnotationRessourceSheet
         assert meta.isheet == ILocationReference
         assert meta.schema_class == LocationReferenceSchema
         assert meta.editable is True
@@ -170,12 +170,9 @@ class TestLocationReferenceSheet:
     def test_create(self, meta, context):
         assert meta.sheet_class(meta, context)
 
-    def test_get_empty(self, meta, context, mock_graph):
-        mock_graph.get_references_for_isheet.return_value = {}
-        context.__graph__ = mock_graph
+    def test_get_empty(self, meta, context, sheet_catalogs):
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'location': None}
-        assert mock_graph.get_references_for_isheet.called
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):

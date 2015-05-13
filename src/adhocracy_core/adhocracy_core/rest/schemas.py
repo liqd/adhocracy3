@@ -10,6 +10,8 @@ import colander
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import Reference as ReferenceTuple
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Email
@@ -401,12 +403,73 @@ class GETPoolRequestSchema(colander.Schema):
                       missing=colander.drop,
                       validator=deferred_validate_sort)
     reverse = SchemaNode(colander.Boolean(), missing=colander.drop)
-    # FIXME: validate limit, offset to be multiple of 10, 20, 50, 100, 200, 500
+    # TODO: validate limit, offset to be multiple of 10, 20, 50, 100, 200, 500
     limit = SchemaNode(colander.Int(), missing=colander.drop)
     offset = SchemaNode(colander.Int(), missing=colander.drop)
     aggregateby = SchemaNode(colander.String(),
                              missing=colander.drop,
                              validator=deferred_validate_aggregateby)
+
+    def deserialize(self, cstruct=colander.null):  # flake8: noqa
+        """ Deserialize the :term:`cstruct` into an :term:`appstruct`.
+
+        Adapt key/values to :class:`adhocracy_core.interfaces.SearchQuery`. for
+        BBB.
+        TODO: CHANGE API according to internal SearchQuery api.
+             refactor to follow coding guideline better.
+        """
+        appstruct = super().deserialize(cstruct)
+        search_query = {}
+        if appstruct:
+            search_query['root'] = self.bindings['context']
+        if 'depth' in appstruct:
+            depth_bbb = appstruct['depth']
+            depth = None
+            if depth_bbb != 'all':
+                depth = int(depth_bbb)
+            search_query['depth'] = depth
+        if 'elements' in appstruct:
+            elements = appstruct.get('elements')
+            search_query['serialization_form'] = elements
+            if elements == 'omit':
+                search_query['resolve'] = False
+        interfaces = ()
+        if 'sheet' in appstruct:
+            interfaces += (appstruct['sheet'],)
+        if 'content_type' in appstruct:
+            interfaces += (appstruct['content_type'],)
+        if interfaces:
+            search_query['interfaces'] = interfaces
+        if 'aggregateby' in appstruct:
+            search_query['frequency_of'] = appstruct['aggregateby']
+            search_query['show_frequency'] = True
+        if 'sort' in appstruct:
+            search_query['sort_by'] = appstruct['sort']
+        if 'limit' in appstruct:
+            search_query['limit'] = appstruct['limit']
+        if 'offset' in appstruct:
+            search_query['offset'] = appstruct['offset']
+        if 'reverse' in appstruct:
+            search_query['reverse'] = appstruct['reverse']
+        if 'count' in appstruct:
+            search_query['show_count'] = appstruct['count']
+        fields = tuple([x.name for x in GETPoolRequestSchema().children])
+        for key, value in appstruct.items():
+            if key in fields + SearchQuery._fields:
+                continue
+            if ':' in key:
+                if 'references' not in search_query:  # pragma: no branch
+                    search_query['references'] = []
+                isheet_name, isheet_field = key.split(':')
+                isheet = resolver.resolve(isheet_name)
+                target = appstruct[key]
+                reference = ReferenceTuple(None, isheet, isheet_field, target)
+                search_query['references'].append(reference)
+            else:
+                if 'indexes' not in search_query:
+                    search_query['indexes'] = {}
+                search_query['indexes'][key] = value
+        return search_query
 
 
 def add_get_pool_request_extra_fields(cstruct: dict,

@@ -8,7 +8,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.sheets import AttributeStorageSheet
+from adhocracy_core.sheets import AttributeResourceSheet
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
@@ -92,7 +92,7 @@ class MetadataSchema(colander.MappingSchema):
 metadata_meta = sheet_meta._replace(
     isheet=IMetadata,
     schema_class=MetadataSchema,
-    sheet_class=AttributeStorageSheet,
+    sheet_class=AttributeResourceSheet,
     editable=True,
     creatable=True,
     readable=True,
