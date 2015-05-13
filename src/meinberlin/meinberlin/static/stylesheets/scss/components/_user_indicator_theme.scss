@@ -17,4 +17,8 @@
             text-decoration: underline;
         }
     }
+
+    .user-indicator-login-icon {
+        @include inline-block;
+    }
 }
