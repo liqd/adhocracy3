@@ -555,7 +555,7 @@ def test_set_acl_set_changes_acl():
     from pyramid.security import Allow
     resource = testing.DummyResource()
     resource.__acl__ = []
-    acl = [(Allow, 'role:creator', 'add_commentversion')]
+    acl = [(Allow, 'role:creator', 'edit_comment')]
     set_acl(resource, acl)
     assert resource.__acl__ == acl
 
@@ -564,7 +564,7 @@ def test_set_acl_set_resource_dirty():
     from . import set_acl
     from pyramid.security import Deny
     resource = testing.DummyResource()
-    set_acl(resource, [(Deny, 'role:creator', 'add_commentversion')])
+    set_acl(resource, [(Deny, 'role:creator', 'edit_comment')])
     assert resource._p_changed is True
 
 

@@ -43,7 +43,7 @@ def create_initial_content_for_meinberlin(context: IPool, registry: Registry,
 
 meinberlin_acm = ACM().deserialize(
     {'principals':                                      ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
-     'permissions': [['add_kiezkassen_proposal_version',  None,       None,        None,          None,      None,      None,    Allow],  # noqa
+     'permissions': [['edit_kiezkassen_proposal',         None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      ['add_kiezkassen_process',           None,       None,        None,          None,      None,      None,    Allow]   # noqa
                      ]})
 

@@ -87,7 +87,7 @@ def add_kiezkassen_permissions(root):
     registry = get_current_registry()
     acl = get_acl(root)
     new_acl = [(Allow, 'role:contributor', 'add_kiezkassen_proposal'),
-               (Allow, 'role:creator', 'add_kiezkassen_proposal_version'),
+               (Allow, 'role:creator', 'edit_kiezkassen_proposal'),
                (Allow, 'role:admin', 'add_kiezkassen_process'),
                (Allow, 'role:admin', 'add_process')]
     updated_acl = acl + new_acl

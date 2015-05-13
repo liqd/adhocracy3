@@ -10,10 +10,10 @@ def test_application_created_subscriber(monkeypatch):
     event = Mock()
     # avoid substanced querying the real registry when the commit occurs
     monkeypatch.setattr(transaction, 'commit', lambda: None)
-    event.app.registry.content.permissions = ['add_mercator_proposal_version']
+    event.app.registry.content.permissions = ['edit_mercator_proposal']
     root = testing.DummyResource(__acl__=[(Allow, 'role:creator', 'view')])
     event.app.root_factory.return_value = root
     _application_created_subscriber(event)
-    assert (Deny, 'role:creator', 'add_mercator_proposal_version') in root.__acl__
+    assert (Deny, 'role:creator', 'edit_mercator_proposal') in root.__acl__
     assert (Allow, 'role:creator', 'view') in root.__acl__
-    assert (Allow, 'role:god', 'add_mercator_proposal_version') in root.__acl__
+    assert (Allow, 'role:god', 'edit_mercator_proposal') in root.__acl__

@@ -28,24 +28,23 @@ root_acm = ACM().deserialize(
     {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
      'permissions': [['add_asset',                     None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
                      ['add_comment',                   None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
-                     ['add_commentversion',            None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
+                     ['edit_comment',                  None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['add_externalresource',          None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
                      ['add_group',                     None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['add_paragraph',                 None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['add_paragraphversion',          None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
+                     ['edit_paragraph',                None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['add_pool',                      None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['add_proposal',                  None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['add_proposalversion',           None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
+                     ['edit_proposal',                 None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['add_rate',                      None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
-                     ['add_rateversion',               None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
+                     ['edit_rate',                     None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['add_resource',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
                      ['add_section',                   None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['add_sectionversion',            None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
+                     ['edit_section',                  None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['add_user',                      Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
                      ['create_sheet',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
                      ['create_sheet_password',         Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
                      ['create_sheet_userbasic',        Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
-                     ['edit_group',                    None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['edit_metadata',                 None,       None,        None,          Allow,     Allow,     None,    Allow],  # noqa
                      ['edit_sheet',                    None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['edit_some_sheets',              None,       None,        None,          Allow,     Allow,     Allow,   Allow],  # noqa
@@ -58,7 +57,7 @@ root_acm = ACM().deserialize(
                      ['view_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
                      ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      # FIXME, move to meinberlin module
-                     ['add_kiezkassen_proposal_version',  None,       None,        None,          None,      None,      None,    Allow],  # noqa
+                     ['edit_kiezkassen_proposal',  None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      ['add_kiezkassen_process',           None,       None,        None,          None,      None,      None,    Allow]  # noqa
                      ]})
 

@@ -22,7 +22,7 @@ sectionversion_meta = itemversion_meta._replace(
                   ],
     extended_sheets=[adhocracy_core.sheets.document.ISection,
                      ],
-    permission_add='add_sectionversion',
+    permission_add='edit_section',
 )
 
 

@@ -22,7 +22,7 @@ paragraphversion_meta = itemversion_meta._replace(
                   ],
     extended_sheets=[adhocracy_core.sheets.document.IParagraph,
                      ],
-    permission_add='add_paragraphversion',
+    permission_add='edit_paragraph',
 )
 
 

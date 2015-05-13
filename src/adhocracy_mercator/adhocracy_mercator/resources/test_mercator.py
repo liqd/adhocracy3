@@ -67,7 +67,7 @@ def test_mercator_proposal_version_meta():
     from .mercator import IMercatorProposalVersion
     meta = mercator_proposal_version_meta
     assert meta.iresource == IMercatorProposalVersion
-    assert meta.permission_add == 'add_mercator_proposal_version'
+    assert meta.permission_add == 'edit_mercator_proposal'
  
 
 @fixture

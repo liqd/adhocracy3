@@ -45,7 +45,7 @@ def test_kiezkassenversion_meta():
                                     ICommentable,
                                     IRateable,
                                     ]
-    assert meta.permission_add == 'add_kiezkassen_proposal_version'
+    assert meta.permission_add == 'edit_kiezkassen_proposal'
 
 @mark.usefixtures('integration')
 def test_kiezkassenversion_create(registry):

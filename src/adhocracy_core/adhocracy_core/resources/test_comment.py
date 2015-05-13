@@ -23,7 +23,7 @@ def test_commentversion_meta():
     assert meta.extended_sheets == [adhocracy_core.sheets.comment.IComment,
                                     adhocracy_core.sheets.comment.ICommentable,
                                     adhocracy_core.sheets.rate.IRateable]
-    assert meta.permission_add == 'add_commentversion'
+    assert meta.permission_add == 'edit_comment'
 
 
 def test_commentservice_meta():

@@ -22,7 +22,7 @@ class IRateVersion(IItemVersion):
 rateversion_meta = itemversion_meta._replace(
     iresource=IRateVersion,
     extended_sheets=[IRate],
-    permission_add='add_rateversion',
+    permission_add='edit_rate',
 )
 
 

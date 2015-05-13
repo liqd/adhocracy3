@@ -31,7 +31,7 @@ proposal_version_meta = itemversion_meta._replace(
                      IPoint,
                      ICommentable,
                      IRateable],
-    permission_add='add_kiezkassen_proposal_version',
+    permission_add='edit_kiezkassen_proposal',
 )
 
 

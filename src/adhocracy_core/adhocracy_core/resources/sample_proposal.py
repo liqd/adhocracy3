@@ -31,7 +31,7 @@ proposalversion_meta = itemversion_meta._replace(
                      adhocracy_core.sheets.comment.ICommentable,
                      adhocracy_core.sheets.image.IImageReference,
                      ],
-    permission_add='add_proposalversion',
+    permission_add='edit_proposal',
 )
 
 

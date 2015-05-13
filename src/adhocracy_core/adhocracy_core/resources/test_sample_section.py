@@ -8,7 +8,7 @@ def test_sectionversion_meta():
     from .sample_section import ISectionVersion
     meta = sectionversion_meta
     assert meta.iresource is ISectionVersion
-    assert meta.permission_add == 'add_sectionversion'
+    assert meta.permission_add == 'edit_section'
 
 
 def test_section_meta():

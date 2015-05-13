@@ -13,7 +13,7 @@ def test_proposalversion_meta():
                                     adhocracy_core.sheets.comment.ICommentable,
                                     adhocracy_core.sheets.image.IImageReference,
                                     ]
-    assert meta.permission_add == 'add_proposalversion'
+    assert meta.permission_add == 'edit_proposal'
 
 
 def test_proposal_meta():

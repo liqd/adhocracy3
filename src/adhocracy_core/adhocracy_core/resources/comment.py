@@ -25,7 +25,7 @@ commentversion_meta = itemversion_meta._replace(
     extended_sheets=[adhocracy_core.sheets.comment.IComment,
                      adhocracy_core.sheets.comment.ICommentable,
                      adhocracy_core.sheets.rate.IRateable],
-    permission_add='add_commentversion',
+    permission_add='edit_comment',
 )
 
 

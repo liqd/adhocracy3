@@ -8,7 +8,7 @@ def test_paragraphversion_meta():
     from .sample_paragraph import IParagraphVersion
     meta = paragraphversion_meta
     assert meta.iresource is IParagraphVersion
-    assert meta.permission_add == 'add_paragraphversion'
+    assert meta.permission_add == 'edit_paragraph'
 
 
 def test_paragraph_meta():
