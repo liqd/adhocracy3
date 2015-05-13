@@ -122,7 +122,7 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
             var paneElement = element.find(".tab-pane");
             scope.height = 0;
             scope.$watch(() => paneElement.outerHeight(), (value : number) => {
-                if (paneElement.height() !== 0) {
+                if (value !== 0 && paneElement.height() !== 0) {
                     scope.height = value;
                 }
             });
