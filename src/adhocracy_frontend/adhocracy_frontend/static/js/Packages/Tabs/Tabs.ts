@@ -66,7 +66,7 @@ export class TabSetController {
     public addTab(tab : ITabScope) {
         this.$scope.tabs.push(tab);
 
-        // we can"t run the select function on the first tab
+        // we can't run the select function on the first tab
         // since that would select it twice
         if (this.$scope.tabs.length === 1) {
             if (!this.$scope.closedByDefault) {
