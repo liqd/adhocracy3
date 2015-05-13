@@ -5,6 +5,7 @@
 
 translateMe = [
     "TR__BACK_TO_TOP",
+    "TR__COMMENTS",
     "TR__COMMENTS_TOTAL",
     "TR__CREATION_DATE",
     "TR__ERROR_INVALID_DATE",
