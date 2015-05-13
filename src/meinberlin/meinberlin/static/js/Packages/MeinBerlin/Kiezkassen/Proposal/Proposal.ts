@@ -139,9 +139,11 @@ var fill = (
     proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
         description: scope.data.detail
     });
-    proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
-        coordinates: [scope.data.lng, scope.data.lat]
-    });
+    if (scope.data.lng && scope.data.lat) {
+        proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+            coordinates: [scope.data.lng, scope.data.lat]
+        });
+    }
 };
 
 var postCreate = (
