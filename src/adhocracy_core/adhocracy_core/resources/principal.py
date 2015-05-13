@@ -69,7 +69,7 @@ principals_meta = service_meta._replace(
     after_creation=[create_initial_content_for_principals] +
     service_meta.after_creation,
     element_types=[],  # we don't want the frontend to post resources here
-    permission_add='add_service',
+    permission_create='create_service',
 )
 
 
@@ -198,7 +198,7 @@ user_meta = pool_meta._replace(
                      adhocracy_core.sheets.rate.ICanRate],
     element_types=[],  # we don't want the frontend to post resources here
     use_autonaming=True,
-    permission_add='add_user',
+    permission_create='create_user',
 )
 
 
@@ -211,7 +211,7 @@ users_meta = service_meta._replace(
     iresource=IUsersService,
     content_name='users',
     element_types=[IUser],
-    permission_add='add_service',
+    permission_create='create_service',
 )
 
 
@@ -236,7 +236,7 @@ group_meta = pool_meta._replace(
     extended_sheets=[adhocracy_core.sheets.principal.IGroup,
                      ],
     element_types=[],  # we don't want the frontend to post resources here
-    permission_add='add_group',
+    permission_create='create_group',
 )
 
 
@@ -249,7 +249,7 @@ groups_meta = service_meta._replace(
     iresource=IGroupsService,
     content_name='groups',
     element_types=[IGroup],
-    permission_add='add_service',
+    permission_create='create_service',
 )
 
 
@@ -275,7 +275,7 @@ class PasswordReset(Base):
 passwordreset_meta = resource_meta._replace(
     iresource=IPasswordReset,
     content_class=PasswordReset,
-    permission_add='add_password_reset',
+    permission_create='create_password_reset',
     permission_view='manage_password_reset',
     basic_sheets=[adhocracy_core.sheets.metadata.IMetadata],
     use_autonaming_random=True,
@@ -291,7 +291,7 @@ passwordresets_meta = service_meta._replace(
     iresource=IPasswordResetsService,
     content_name='resets',
     element_types=[IPasswordReset],
-    permission_add='add_service',
+    permission_create='create_service',
     permission_view='manage_password_reset',
 )
 

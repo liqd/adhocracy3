@@ -44,7 +44,7 @@ item_meta = pool_meta._replace(
                    ],
     after_creation=[create_initial_content_for_item],
     item_type=IItemVersion,
-    permission_add='add_resource',
+    permission_create='create_resource',
 )
 
 

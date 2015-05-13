@@ -403,9 +403,9 @@ class ResourceRESTView(RESTView):
             del cstruct['GET']
 
         is_users = IUsersService.providedBy(context) \
-            and request.has_permission('add_user', self.context)
+            and request.has_permission('create_user', self.context)
         # TODO move the is_user specific part the UsersRestView
-        if request.has_permission('add_resource', self.context) or is_users:
+        if request.has_permission('create_resources', self.context) or is_users:
             addables = registry.get_resources_meta_addable(context, request)
             if addables:
                 for resource_meta in addables:
@@ -543,7 +543,7 @@ class PoolRESTView(SimpleRESTView):
                 return child
 
     @view_config(request_method='POST',
-                 permission='add_resource',
+                 permission='create_resources',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -591,7 +591,7 @@ class ItemRESTView(PoolRESTView):
         return cstruct
 
     @view_config(request_method='POST',
-                 permission='add_resource',
+                 permission='create_resources',
                  content_type='application/json')
     def post(self):
         """Create new resource and get response data.
@@ -644,7 +644,7 @@ class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
 
     @view_config(request_method='POST',
-                 permission='add_user',
+                 permission='create_user',
                  content_type='application/json')
     def post(self):
         return super().post()
@@ -659,7 +659,7 @@ class AssetsServiceRESTView(PoolRESTView):
     """View allowing multipart requests for asset upload."""
 
     @view_config(request_method='POST',
-                 permission='add_asset',
+                 permission='create_asset',
                  content_type='multipart/form-data')
     def post(self):
         return super().post()
@@ -674,7 +674,7 @@ class AssetRESTView(SimpleRESTView):
     """View for assets, allows PUTting new versions via multipart."""
 
     @view_config(request_method='PUT',
-                 permission='add_asset',
+                 permission='create_asset',
                  content_type='multipart/form-data')
     def put(self) -> dict:
         result = super().put()

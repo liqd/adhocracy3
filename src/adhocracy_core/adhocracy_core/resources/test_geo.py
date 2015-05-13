@@ -25,7 +25,7 @@ class TestMultiPolygon:
         from .geo import IMultiPolygon
         assert meta.iresource is IMultiPolygon
         assert IMultiPolygon.isOrExtends(ISimple)
-        assert meta.permission_add == 'add_multipolygon'
+        assert meta.permission_create == 'create_multipolygon'
         assert meta.extended_sheets == [adhocracy_core.sheets.geo.IMultiPolygon,
                                         ]
 
@@ -53,7 +53,7 @@ class TestService:
         assert meta.iresource is ILocationsService
         assert ILocationsService.isOrExtends(IServicePool)
         assert meta.content_name == 'locations'
-        assert meta.permission_add == 'add_service'
+        assert meta.permission_create == 'create_service'
         assert meta.element_types == [IMultiPolygon]
 
     @mark.usefixtures('integration')

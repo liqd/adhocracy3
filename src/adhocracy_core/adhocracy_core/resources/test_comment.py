@@ -11,7 +11,7 @@ def test_comment_meta():
     assert meta.item_type == ICommentVersion
     assert meta.element_types == [ICommentVersion]
     assert meta.use_autonaming
-    assert meta.permission_add == 'add_comment'
+    assert meta.permission_create == 'create_comment'
 
 
 def test_commentversion_meta():
@@ -23,7 +23,7 @@ def test_commentversion_meta():
     assert meta.extended_sheets == [adhocracy_core.sheets.comment.IComment,
                                     adhocracy_core.sheets.comment.ICommentable,
                                     adhocracy_core.sheets.rate.IRateable]
-    assert meta.permission_add == 'edit_comment'
+    assert meta.permission_create == 'edit_comment'
 
 
 def test_commentservice_meta():

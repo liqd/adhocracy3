@@ -13,7 +13,7 @@ def test_simple_meta():
                                  adhocracy_core.sheets.title.ITitle,
                                  adhocracy_core.sheets.metadata.IMetadata,
                                  ]
-    assert meta.permission_add == 'add_simple'
+    assert meta.permission_create == 'create_simple'
 
 
 @fixture

@@ -16,7 +16,7 @@ process_meta = pool_meta._replace(
     basic_sheets=pool_meta.basic_sheets + [sheets.asset.IHasAssetPool],
     # Every process should have a workflow assignment sheet, for example
     # extended_sheets=[adhocracy_core.sheets.workflow.sample]
-    permission_add='add_process',
+    permission_create='create_process',
     after_creation=[add_assets_service],
 )
 

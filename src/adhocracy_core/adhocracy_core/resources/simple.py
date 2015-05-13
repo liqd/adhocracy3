@@ -10,7 +10,7 @@ from adhocracy_core.resources.base import Base
 simple_meta = resource_meta._replace(
     iresource=ISimple,
     content_class=Base,
-    permission_add='add_simple',
+    permission_create='create_simple',
     permission_view='view',
     is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.name.IName,

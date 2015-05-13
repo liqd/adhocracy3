@@ -30,7 +30,7 @@ from adhocracy_core.utils import get_modification_date
 resource_meta = ResourceMetadata(content_name='',
                                  iresource=None,
                                  content_class=None,
-                                 permission_add='',
+                                 permission_create='',
                                  permission_view='',
                                  is_implicit_addable=False,
                                  basic_sheets=[],

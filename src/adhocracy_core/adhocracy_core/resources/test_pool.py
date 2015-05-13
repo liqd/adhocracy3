@@ -19,7 +19,7 @@ def test_pool_meta():
                                  ]
     assert meta.element_types == [IPool]
     assert meta.is_implicit_addable is False
-    assert meta.permission_add == 'add_pool'
+    assert meta.permission_create == 'create_pool'
 
 
 def test_poolbasic_meta():

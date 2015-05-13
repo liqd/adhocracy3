@@ -11,7 +11,7 @@ import adhocracy_core.sheets.metadata
 tag_meta = resource_meta._replace(
     iresource=ITag,
     content_class=Base,
-    permission_add='add_tag',
+    permission_create='create_tag',
     permission_view='view',
     is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.name.IName,

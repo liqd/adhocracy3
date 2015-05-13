@@ -28,7 +28,7 @@ class TestProcess:
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(IPool)
         assert meta.is_implicit_addable is False
-        assert meta.permission_add == 'add_process'
+        assert meta.permission_create == 'create_process'
         assert sheets.asset.IHasAssetPool in meta.basic_sheets
         assert meta.extended_sheets == []
         assert add_assets_service in meta.after_creation

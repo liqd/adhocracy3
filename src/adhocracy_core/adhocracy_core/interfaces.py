@@ -57,11 +57,11 @@ class SheetMetadata(namedtuple('SheetMetadata',
         :class:`colander.MappingSchema` to define the sheet data structure.
         Subtype must preserve the super type data structure.
     permission_view:
-        Permission to view or index this data.
-        Subtype should override.
+        Permission to view or search for this data.
     permission_edit:
         Permission to edit this data.
-        Subtype should override.
+    permission_create:
+        Permission to create a new resource with this sheet data.
     readable:
         The sheet data is readable
     editable:
@@ -155,7 +155,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                   ['content_name',
                                    'iresource',
                                    'content_class',
-                                   'permission_add',
+                                   'permission_create',
                                    'permission_view',
                                    'is_implicit_addable',
                                    'basic_sheets',
@@ -181,10 +181,10 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
         subtypes have to override
     content_class:
         Class to create content objects
-    permission_add:
-        Permission to add this resource to the object hierarchy.
+    permission_create:
+        Permission to create and add this resource to the object hierarchy.
     permission_view:
-        Permission to view resource data and view in listings
+        Permission to view resource sheet data
     is_implicit_addable:
         Make this type addable if supertype is addable.
     basic_sheets:

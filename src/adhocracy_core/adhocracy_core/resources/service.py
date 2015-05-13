@@ -24,7 +24,7 @@ service_meta = pool_meta._replace(
     basic_sheets=[adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
-    permission_add='add_service'
+    permission_create='create_service'
 )
 
 

@@ -23,7 +23,7 @@ def test_asset_meta():
     assert ITitle in meta.basic_sheets
     assert IAssetMetadata in meta.extended_sheets
     assert meta.use_autonaming
-    assert meta.permission_add == 'add_asset'
+    assert meta.permission_create == 'create_asset'
 
 
 def test_assets_service_meta():

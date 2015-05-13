@@ -31,7 +31,7 @@ proposalversion_meta = itemversion_meta._replace(
                      adhocracy_core.sheets.comment.ICommentable,
                      adhocracy_core.sheets.image.IImageReference,
                      ],
-    permission_add='edit_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -54,7 +54,7 @@ proposal_meta = item_meta._replace(
         add_ratesservice,
     ],
     item_type=IProposalVersion,
-    permission_add='add_proposal',
+    permission_create='create_proposal',
     is_implicit_addable=True,
 )
 

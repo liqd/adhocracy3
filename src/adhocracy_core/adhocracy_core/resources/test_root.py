@@ -101,7 +101,7 @@ class TestRoot:
         inst = registry.content.create(IRootPool.__identifier__)
         acl = get_acl(inst)
         assert (Allow, 'system.Everyone', 'view') in acl
-        assert (Allow, 'system.Everyone', 'add_user') in acl
+        assert (Allow, 'system.Everyone', 'create_user') in acl
         assert (Allow, 'system.Everyone', 'create_sheet_password') in acl
         assert (Allow, 'system.Everyone', 'create_sheet_userbasic') in acl
         assert (Allow, 'role:god', 'view_userextended') in acl

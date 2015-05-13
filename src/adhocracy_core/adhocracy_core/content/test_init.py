@@ -189,14 +189,14 @@ class TestResourceContentRegistry:
         config.testing_securitypolicy(userid='hank', permissive=False)
         assert inst.get_resources_meta_addable(context, request_) == []
 
-    def test_permissions_resource_permission_add_defined(
+    def test_permissions_resource_permission_create_defined(
             self, inst, resource_meta, mock_registry):
         simple_meta = resource_meta._replace(
             iresource=ISimple,
-            permission_add='add_simple')
+            permission_create='create_simple')
         inst.registry = mock_registry
         inst.resources_meta[ISimple] = simple_meta
-        assert 'add_simple' in inst.permissions
+        assert 'create_simple' in inst.permissions
 
     def test_permissions_resource_permission_view_defined(
             self, inst, resource_meta, mock_registry):

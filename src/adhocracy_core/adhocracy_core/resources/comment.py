@@ -25,7 +25,7 @@ commentversion_meta = itemversion_meta._replace(
     extended_sheets=[adhocracy_core.sheets.comment.IComment,
                      adhocracy_core.sheets.comment.ICommentable,
                      adhocracy_core.sheets.rate.IRateable],
-    permission_add='edit_comment',
+    permission_create='edit_comment',
 )
 
 
@@ -42,7 +42,7 @@ comment_meta = item_meta._replace(
     item_type=ICommentVersion,
     use_autonaming=True,
     autonaming_prefix='comment_',
-    permission_add='add_comment',
+    permission_create='create_comment',
 )
 
 
