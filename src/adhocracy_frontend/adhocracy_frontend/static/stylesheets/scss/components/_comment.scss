@@ -93,53 +93,32 @@ parent: comment
     <div class="comment-header">
         <div class="comment-header-column1">
             <span class="comment-header-creator">
-                <a href="#">god</a>
+                <a href="">god</a>
             </span>
             <span class="comment-header-date">
-                12/03/15
-            </span>
-            <span class="comment-header-edited">
-                Edited 2 days ago
+                25 minutes ago
             </span>
         </div>
         <div class="comment-header-column2">
             <span class="comment-header-links">
-                <a href="#"><i class="icon-reply"></i> Reply</a>
-                <a href="#">Bearbeiten</a>
-                <a href="#"><i class="icon-ban-circle"></i> Report</a>
+                <a href="" class="comment-header-link" title="Reply">
+                    <i class="comment-header-icon icon-reply"></i>
+                </a>
+                <a href="" class="comment-header-link ng-scope" title="Edit">
+                    <i class="comment-header-icon icon-pencil"></i>
+                </a>
+                <a href="" class="comment-header-link ng-scope" title="Report">
+                    <i class="comment-header-icon icon-ban-circle"></i>
+                </a>
+                <a href="" class="comment-header-link ng-scope" title="Delete">
+                    <i class="comment-header-icon icon-x"></i>
+                </a>
             </span>
             <div class="rate">
-                <span class="rate-difference">0</span>
-                <a href="" class="rate-pro"><i class="icon-vote-up" title="Vote up"></i></a>
-                <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
-            </div>
-        </div>
-    </div>
-    <div class="comment-content">
-        Nunc nulla. Vivamus quis mi. Fusce vulputate eleifend sapien. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus. Donec vitae orci sed dolor rutrum auctor.
-    </div>
-</div>
-
-<div class="comment-main">
-    <div class="comment-header">
-        <div class="comment-header-column1">
-            <span class="comment-header-creator">
-                <a href="#">god</a>
-            </span>
-            <span class="comment-header-date">
-                12/03/15
-            </span>
-        </div>
-        <div class="comment-header-column2">
-            <span class="comment-header-links">
-                <a href="#"><i class="icon-reply"></i> Reply</a>
-                <a href="#">Bearbeiten</a>
-                <a href="#"><i class="icon-ban-circle"></i> Report</a>
-            </span>
-            <div class="rate">
-                <span class="rate-difference">0</span>
-                <a href="" class="rate-pro"><i class="icon-vote-up" title="Vote up"></i></a>
-                <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+                <span class="rate-difference is-positive">+1</span>
+                    <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+                    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+                </span>
             </div>
         </div>
     </div>
@@ -226,6 +205,12 @@ parent: comment
         }
     }
 
+    .comment-header-link {
+        &:after {
+            content: attr(title);
+        }
+    }
+
     .comment-header-column1,
     .comment-header-column2 {
         @include text-align(right);
@@ -267,12 +252,11 @@ parent: comment
 ---
 
 ```html_example
-<div class="comment-children-create-form">
+<form class="comment-create-form">
     <textarea class="comment-create-form-text"></textarea>
     <footer class="form-footer">
         <input class="comment-create-form-button-submit m-call-to-action form-footer-button-cta" type="submit" value="Submit">
-        <a href="" class="button form-footer-button">CANCEL</a>
     </footer>
-</div>
+</form>
 ```
 */

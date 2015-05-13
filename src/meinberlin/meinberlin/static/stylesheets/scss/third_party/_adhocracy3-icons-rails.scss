@@ -47,6 +47,7 @@
 .icon-map-pin-add:before,
 .icon-meinberlin-logo:before,
 .icon-minus:before,
+.icon-pencil:before,
 .icon-pig:before,
 .icon-pin-detail:before,
 .icon-pointy-rectangle-left:before,
@@ -55,6 +56,7 @@
 .icon-project:before,
 .icon-reply:before,
 .icon-search:before,
+.icon-share:before,
 .icon-speechbubble:before,
 .icon-speechbubble-document:before,
 .icon-speechbubble-unfilled:before,
@@ -106,22 +108,24 @@
 .icon-map-pin-add:before { content: "\f103"; }
 .icon-meinberlin-logo:before { content: "\f13d"; }
 .icon-minus:before { content: "\f13e"; }
+.icon-pencil:before { content: "\f14b"; }
 .icon-pig:before { content: "\f13f"; }
 .icon-pin-detail:before { content: "\f104"; }
 .icon-pointy-rectangle-left:before { content: "\f140"; }
 .icon-pointy-rectangle-right:before { content: "\f141"; }
 .icon-process:before { content: "\f105"; }
 .icon-project:before { content: "\f106"; }
-.icon-reply:before { content: "\f107"; }
+.icon-reply:before { content: "\f142"; }
 .icon-search:before { content: "\f108"; }
-.icon-speechbubble:before { content: "\f142"; }
-.icon-speechbubble-document:before { content: "\f143"; }
-.icon-speechbubble-unfilled:before { content: "\f144"; }
+.icon-share:before { content: "\f143"; }
+.icon-speechbubble:before { content: "\f144"; }
+.icon-speechbubble-document:before { content: "\f145"; }
+.icon-speechbubble-unfilled:before { content: "\f146"; }
 .icon-speechbubbles:before { content: "\f109"; }
-.icon-tick:before { content: "\f145"; }
-.icon-user:before { content: "\f146"; }
-.icon-user-unfilled:before { content: "\f147"; }
-.icon-users:before { content: "\f148"; }
+.icon-tick:before { content: "\f147"; }
+.icon-user:before { content: "\f148"; }
+.icon-user-unfilled:before { content: "\f149"; }
+.icon-users:before { content: "\f14a"; }
 .icon-vote-down:before { content: "\f10a"; }
 .icon-vote-up:before { content: "\f10b"; }
 .icon-voting:before { content: "\f10c"; }

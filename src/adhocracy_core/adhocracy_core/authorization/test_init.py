@@ -4,6 +4,10 @@ from pytest import raises
 from pyramid.security import Allow
 from pyramid.security import Deny
 from unittest.mock import Mock
+from adhocracy_core.schema import ACM
+from adhocracy_core.utils import set_acl
+from substanced.util import get_acl
+
 
 class TestRuleACLAuthorizaitonPolicy:
 
@@ -212,3 +216,17 @@ def test_acm_to_acl(mock_registry):
     assert (Deny,  'role:creator', 'edit') not in acl
     assert (Deny,  'role:annotator', 'edit') not in acl
     assert (None,  'role:annotator', 'edit') not in acl
+
+
+def test_add_acm(mock_registry):
+    from . import add_acm
+    mock_registry.content.permissions = ['view']
+    acm = ACM().deserialize(
+        {'principals':           ['creator'],
+         'permissions': [['view',  Allow        ]]})
+    resource = testing.DummyResource()
+    set_acl(resource, [(Deny, 'role:creator','view')])
+    add_acm(resource, acm, mock_registry)
+    acl = get_acl(resource)
+    assert (Allow, 'role:creator', 'view') in acl[:-1]
+    assert (Deny, 'role:creator', 'view') == acl[-1]

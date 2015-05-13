@@ -70,6 +70,14 @@ class TestAddChangelogModified:
         self.call_fut(event)
         assert changelog['/parent/child'].modified is True
 
+    def test_set_modified_changelog_with_missing_registry(
+            self, event, changelog, registry):
+        """Get threadlocal registry for ACLModified events."""
+        delattr(event, 'registry')
+        registry.changelog = changelog
+        self.call_fut(event)
+        assert changelog['/parent/child'].modified is True
+
     def test_dont_set_changed_descendants_for_context(self, event, changelog):
         self.call_fut(event)
         assert changelog['/parent/child'].changed_descendants is False

@@ -130,11 +130,13 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         :param omit_readonly: do not store readonly ``appstruct`` data.
         """
 
-    def get(params: dict={}) -> dict:
+    def get(params: dict={}, add_back_references=True) -> dict:
         """ Get ``appstruct`` dictionary data.
 
         :param params: optional parameters that can modify the appearance
-        of the returned dictionary, e.g. query parameters in a GET request
+        of the returned dictionary. Valid keys/values are defined in
+        :class:`adhocracy_core.interfaces.SearchQuery`.
+        :param add_backrefs: allow to omit back references
         """
 
     def get_cstruct(request, params: dict={}):
@@ -549,6 +551,100 @@ class AuditlogAction(Enum):
     revealed = 'revealed'
 
 
+SearchResult = namedtuple('SearchResult', ['elements',
+                                           'count',
+                                           'frequency_of',
+                                           'group_by'])
+
+
+search_result = SearchResult(elements=[],
+                             count=0,
+                             frequency_of={},
+                             group_by={})
+
+
+class SearchQuery(namedtuple('Query', ['interfaces',
+                                       'indexes',
+                                       'references',
+                                       'root',
+                                       'depth',
+                                       'only_visible',
+                                       'allows',
+                                       'resolve',
+                                       'sort_by',
+                                       'reverse',
+                                       'limit',
+                                       'offset',
+                                       'frequency_of',
+                                       'group_by',
+                                       ])):
+
+    """Query parameters to search resources.
+
+    Search resources:
+    -----------------
+
+    interfaces (IInterface or (IInterface)):
+        Resource type (iresource) or sheet (isheet) interfaces
+    indexes ({str:object}):
+        Mapping index name to wanted index value. Available indexes are defined
+        in :class:`adhocracy_core.catalog.adhocracy`
+    references (Reference):
+        References with (source, isheet, isheet_field, target).
+        If `source` is None search for resources referencing target
+        (back references).
+        If `target` is None search for resources referenced by source
+        (reference).
+    root (IResource):
+       root resource to start searching  in descendants
+    depth (int):
+       path depth to search descendants
+    only_visible (bool):
+        filter hidden and deleted resources
+    allows ([str], str):
+        filter resources that don't allow the :term:`principal`s  the given
+        permission ([principal], permission).
+
+    Present search result
+    ----------------------
+
+    resolve (bool):
+        return `elements` list of resources or lazy iterator set
+    sort_by (str):
+        index name to sort result. Available indexes are defined in
+        :class:`adhocracy_core.catalog.adhocracy` and
+        :class:`substanced.catalog.system`
+    reverse (bool):
+        reverse sort
+    limit (int):
+        max number of resources in search result
+    offset (int):
+        starting position of resources in search result (only works together
+        with `limit`)
+    frequency_of (str):
+        index name to count frequency of indexed values.
+    group_by (str):
+        index name to group result resources by indexed value.
+    """
+
+
+search_query = SearchQuery(interfaces=(),
+                           indexes={},
+                           references=(),
+                           root=None,
+                           depth=0,
+                           only_visible=False,
+                           allows=(),
+                           resolve=False,
+                           sort_by='',
+                           reverse=False,
+                           limit=0,
+                           offset=0,
+                           frequency_of='',
+                           group_by='',
+                           )
+
+
 class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
     """Adapter responsible for returning a user or get info about it."""
@@ -605,7 +701,20 @@ class IRateValidator(Interface):  # pragma: no cover
 
 class Reference(namedtuple('Reference', 'source isheet field target')):
 
-    """Fields: source isheet field target."""
+    """Reference between two resources.
+
+    Fields:
+    -------
+
+    source (IResource):
+        Referencing resource
+    isheet (IInterface):
+        Resource sheet of source with referencing field
+    field (str):
+        Referencing field
+    target (IResource):
+        Referenced resource
+    """
 
 
 class HTTPCacheMode(Enum):

@@ -558,44 +558,90 @@ class TestGETPoolRequestSchema():
         return pool
 
     @fixture
+    def result(self):
+        from adhocracy_core.interfaces import search_result
+        return search_result
+
+    @fixture
     def inst(self):
         from adhocracy_core.rest.schemas import GETPoolRequestSchema
         return GETPoolRequestSchema()
 
-    def test_deserialize_empty(self, inst):
+    def test_deserialize_empty(self, inst, context):
+        inst = inst.bind(context=context)
         assert inst.deserialize({}) == {}
 
     def test_deserialize_valid(self, inst, context):
         from adhocracy_core.sheets.name import IName
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.schema import Resource
+        from adhocracy_core.schema import Integer
         from hypatia.interfaces import IIndexSort
         catalog = context['catalogs']['adhocracy']
         catalog['index1'] = testing.DummyResource(unique_values=lambda x: x,
                                                   __provides__=IIndexSort)
+        catalog['index2'] = testing.DummyResource(unique_values=lambda x: x,
+                                                  __provides__=IIndexSort)
+        cstruct = {'aggregateby': 'index1',
+                   'content_type': 'adhocracy_core.interfaces.IResource',
+                   'count': 'true',
+                   'depth': '100',
+                   'elements': 'content',
+                   'index1': 1,
+                   'index2': 1,
+                   'limit': 2,
+                   'offset': 1,
+                   'reverse': 'True',
+                   'sheet': 'adhocracy_core.sheets.name.IName',
+                   'sort': 'index1',
+                   ISheet.__identifier__ + ':x': '/',
+                   }
+        target = context
+        wanted = {'indexes': {'index1': 1, 'index2': 1},
+                  'depth': 100,
+                  'frequency_of': 'index1',
+                  'interfaces': (IName, IResource),
+                  'limit': 2,
+                  'offset': 1,
+                  'references': [Reference(None, ISheet, 'x', target)],
+                  'reverse': True,
+                  'root': context,
+                  'serialization_form': 'content',
+                  'show_count': True,
+                  'show_frequency': True,
+                  'sort_by': 'index1',
+                  }
         inst = inst.bind(context=context)
-        data = {'content_type': 'adhocracy_core.sheets.name.IName',
-                'sheet': 'adhocracy_core.sheets.name.IName',
-                'depth': '100',
-                'elements': 'content',
-                'count': 'true',
-                'sort': 'index1',
-                'aggregateby': 'index1',
-                }
-        expected = {'content_type': IName,
-                    'sheet': IName,
-                    'depth': '100',
-                    'elements': 'content',
-                    'count': True,
-                    'sort': 'index1',
-                    'aggregateby': 'index1',
-                    }
-        assert inst.deserialize(data) == expected
+        node = Resource(name=ISheet.__identifier__ + ':x').bind(**inst.bindings)
+        inst.add(node)
+        node = Integer(name='index1').bind(**inst.bindings)
+        inst.add(node)
+        node = Integer(name='index2').bind(**inst.bindings)
+        inst.add(node)
+        assert inst.deserialize(cstruct) == wanted
+
+    def test_deserialize_valid_elements_path(self, inst, context):
+        inst = inst.bind(context=context)
+        cstruct = {'elements': 'paths'}
+        assert inst.deserialize(cstruct)['serialization_form'] == 'paths'
+
+    def test_deserialize_valid_elements_omit(self, inst, context):
+        inst = inst.bind(context=context)
+        cstruct = {'elements': 'omit'}
+        appstruct = inst.deserialize(cstruct)
+        assert appstruct['serialization_form'] ==  'omit'
+        assert appstruct['resolve'] is False
 
     def test_deserialize_valid_aggregateby_system_index(self, inst, context):
         catalog = context['catalogs']['system']
         catalog['index1'] = testing.DummyResource(unique_values=lambda x: x)
         inst = inst.bind(context=context)
         data = {'aggregateby': 'index1'}
-        assert inst.deserialize(data)['aggregateby'] == 'index1'
+        appstruct = inst.deserialize(data)
+        assert appstruct['frequency_of'] == 'index1'
+        assert appstruct['show_frequency']
 
     def test_deserialize_aggregateby_invalid_wrong_index_name(self, inst, context):
         inst = inst.bind(context=context)
@@ -617,9 +663,10 @@ class TestGETPoolRequestSchema():
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_depth_all(self, inst):
+    def test_deserialize_depth_all(self, inst, context):
         data = {'depth': 'all'}
-        assert inst.deserialize(data) == {'depth': 'all'}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['depth'] is None
 
     @mark.parametrize('value', ['-7', '1.5', 'fall', 'alle'])
     def test_deserialize_depth_invalid(self, inst, value):
@@ -627,13 +674,15 @@ class TestGETPoolRequestSchema():
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_count_explicit_false(self, inst):
+    def test_deserialize_count_explicit_false(self, inst, context):
         data = {'count': 'false'}
-        assert inst.deserialize(data) == {'count': False}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['show_count'] is False
 
-    def test_deserialize_extra_values_are_preserved(self, inst):
+    def test_deserialize_extra_values_are_preserved(self, inst, context):
         data = {'extra1': 'blah',
                 'another_extra': 'blub'}
+        inst = inst.bind(context=context)
         assert inst.typ.unknown == 'raise'
         with raises(colander.Invalid):
             inst.deserialize(data)
@@ -644,7 +693,7 @@ class TestGETPoolRequestSchema():
         catalog['index1'] = testing.DummyResource(__provides__=IIndexSort)
         inst = inst.bind(context=context)
         data = {'sort': 'index1'}
-        assert inst.deserialize(data)['sort'] == 'index1'
+        assert inst.deserialize(data)['sort_by'] == 'index1'
 
     def test_deserialize_sort_valid_adhocarcy_index(self, inst, context):
         from hypatia.interfaces import IIndexSort
@@ -652,7 +701,7 @@ class TestGETPoolRequestSchema():
         catalog['index1'] = testing.DummyResource(__provides__=IIndexSort)
         inst = inst.bind(context=context)
         data = {'sort': 'index1'}
-        assert inst.deserialize(data)['sort'] == 'index1'
+        assert inst.deserialize(data)['sort_by'] == 'index1'
 
     def test_deserialize_sort_valid_but_index_is_missing_IIndexSortable(self, inst, context):
         # workaround bug: hypation.field.FieldIndex is missing IIndexSortable
@@ -660,7 +709,7 @@ class TestGETPoolRequestSchema():
         catalog['index1'] = testing.DummyResource(sort=lambda x: x)
         inst = inst.bind(context=context)
         data = {'sort': 'index1'}
-        assert inst.deserialize(data)['sort'] == 'index1'
+        assert inst.deserialize(data)['sort_by'] == 'index1'
 
     def test_deserialize_sort_invalid_non_sortable_index(self, inst, context):
         catalog = context['catalogs']['adhocracy']

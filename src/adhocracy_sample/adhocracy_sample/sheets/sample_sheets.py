@@ -3,10 +3,10 @@ import colander
 
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets.name import name_meta
-from adhocracy_core.sheets import AnnotationStorageSheet
+from adhocracy_core.sheets import AnnotationRessourceSheet
 
 
-class DummyNameSheet(AnnotationStorageSheet):
+class DummyNameSheet(AnnotationRessourceSheet):
 
     """Dummy sheet class without persistent data store."""
 

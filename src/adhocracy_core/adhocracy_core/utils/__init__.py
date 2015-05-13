@@ -323,7 +323,7 @@ def get_last_version(resource: IItemVersion,
     last_tag = item['LAST']
     last_versions = get_sheet_field(last_tag, ITag, 'elements',
                                     registry=registry)
-    last_version = last_versions[0]
+    last_version = [x for x in last_versions][0]
     return last_version
 
 
@@ -499,3 +499,11 @@ def set_acl(resource: IResource, acl: list, registry=None) -> bool:
     """Set the acl and mark the resource as dirty."""
     substanced.util.set_acl(resource, acl, registry)
     resource._p_changed = True
+
+
+def get_root(app):
+    """Return the root of the application."""
+    request = Request.blank('/path-is-meaningless-here')
+    request.registry = app.registry
+    root = app.root_factory(request)
+    return root

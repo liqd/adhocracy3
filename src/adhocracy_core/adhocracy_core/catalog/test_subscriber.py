@@ -12,7 +12,7 @@ def catalog():
     catalog = testing.DummyResource(__provides__=(IFolder, IService))
     catalog['adhocracy'] = testing.DummyResource(__provides__=(IFolder,
                                                                IService))
-    catalog['adhocracy'].reindex_resource = Mock()
+    catalog.reindex_index = Mock()
     return catalog
 
 
@@ -30,13 +30,13 @@ def event(context):
 def test_reindex_tagged_with_removed_and_added_elements(event, catalog):
     from .subscriber import reindex_tag
     reindex_tag(event)
-    assert catalog['adhocracy'].reindex_resource.call_count == 1
+    catalog.reindex_index.assert_called_with(event.object, 'tag')
 
 
 def test_reindex_rate_index(event, catalog):
     from .subscriber import reindex_rate
     reindex_rate(event)
-    assert catalog['adhocracy'].reindex_resource.call_count == 1
+    catalog.reindex_index.assert_called_with(event.object, 'rates')
 
 
 @fixture
@@ -122,14 +122,15 @@ class TestReindexResourceAndDescendants:
         self.call_fut(context)
         assert catalog['system']['path'].eq.call_args == \
                call(resource_path(context), include_origin=True)
-        mock_reindex = catalog['adhocracy'].reindex_resource
-        assert call(child) in mock_reindex.call_args_list
+        mock_reindex = catalog.reindex_index
+        assert call(child, 'private_visibility') in mock_reindex.call_args_list
         assert mock_reindex.call_count == 2
 
 
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.catalog')
 
 

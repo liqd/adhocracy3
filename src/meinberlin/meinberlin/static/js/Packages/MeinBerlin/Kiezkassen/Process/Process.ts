@@ -1,6 +1,7 @@
 import AdhConfig = require("..././../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
 
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
@@ -9,7 +10,12 @@ import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/ge
 var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 
 
-export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, $rootScope) => {
+export var detailDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    $rootScope
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
@@ -18,26 +24,22 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
         },
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            scope.$watch(() => column.$scope.shared.isShowMap, function(value) {
-                scope.showMap = (typeof value === "undefined") ? true : value;
+            scope.$watch(() => column.$scope.shared.isShowMap, (value : boolean) => {
+                scope.showMap = value;
             });
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        // FIXME: set individual fields on scope, not simply dump whole resource
-                        scope.resource = resource;
+                        var locationUrl = resource.data[SILocationReference.nick].location;
 
-                        var locationUrl = resource.data[SILocationReference.nick]["location"];
                         adhHttp.get(locationUrl).then((location) => {
-                            var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
+                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
                             scope.polygon =  polygon;
                         });
                     });
-                    adhHttp.options(value).then((options : AdhHttp.IOptions) => {
-                        scope.options = options;
-                    });
                 }
             });
+            adhPermissions.bindScope(scope, () => scope.path);
 
             // FIXME: this is not the right place for this information. It is displayed in the context header.
             $rootScope.phases = [{
@@ -102,8 +104,9 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName,
             AdhMovingColumns.moduleName,
+            AdhPermissions.moduleName,
             AdhTabs.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "$rootScope", detailDirective]);
+        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", "$rooScope", detailDirective]);
 };

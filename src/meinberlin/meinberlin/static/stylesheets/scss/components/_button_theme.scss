@@ -1,3 +1,16 @@
+@mixin icon-button($base-font-size: $font-size-small) {
+    @include inline-block;
+    background: $color-background-base-introvert;
+    color: $color-text-introvert;
+    line-height: 24px / $base-font-size * 1em;
+    min-width: 24px / $base-font-size * 1em;
+    padding: 0 (8px / $base-font-size * 1em);
+
+    &:hover, &:focus {
+        color: $color-text-highlight-normal;
+    }
+}
+
 button,
 .button,
 input[type="reset"],
@@ -72,6 +85,8 @@ input[type="button"] {
     input[type="reset"],
     input[type="submit"],
     input[type="button"] {
-        @include border-radius(0);
+        &, &.m-call-to-action {
+            @include border-radius(0);
+        }
     }
 }

@@ -5,6 +5,7 @@ import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
 import AdhMapping = require("../../../Mapping/Mapping");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../../../Rate/Rate");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
@@ -56,6 +57,7 @@ export interface IScope extends angular.IScope {
 // should be resolved at some point.
 var bindPath = (
     adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => (
@@ -115,10 +117,8 @@ var bindPath = (
                     });
                 });
             });
-            adhHttp.options(value).then((options : AdhHttp.IOptions) => {
-                scope.options = options;
-            });
         }
+        adhPermissions.bindScope(scope, () => scope[pathKey]);
     });
 };
 
@@ -184,8 +184,13 @@ var postEdit = (
     return adhHttp.deepPost([proposalVersion]);
 };
 
-export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service) => {
+export var detailDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
@@ -193,7 +198,7 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhRate, adhTopLevelState)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState)(scope);
         }
     };
 };
@@ -201,6 +206,7 @@ export var detailDirective = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.
 export var listItemDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -211,7 +217,7 @@ export var listItemDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhRate, adhTopLevelState)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState)(scope);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
@@ -228,6 +234,7 @@ export var listItemDirective = (
 export var mapListItemDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
@@ -239,7 +246,7 @@ export var mapListItemDirective = (
             path: "@"
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
-            bindPath(adhHttp, adhRate, adhTopLevelState)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState)(scope);
 
             var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
                 if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
@@ -307,13 +314,14 @@ export var createDirective = (
 export var editDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
+    adhRate : AdhRate.Service,
+    adhResourceUrlFilter,
     adhShowError,
     adhSubmitIfValid,
-    adhResourceUrlFilter,
-    $location : angular.ILocationService,
-    adhRate : AdhRate.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
@@ -325,7 +333,7 @@ export var editDirective = (
             scope.errors = [];
             scope.showError = adhShowError;
             scope.create = false;
-            bindPath(adhHttp, adhRate, adhTopLevelState)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState)(scope);
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
@@ -352,6 +360,7 @@ export var register = (angular) => {
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhMapping.moduleName,
+            AdhPermissions.moduleName,
             AdhRate.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName
@@ -363,10 +372,12 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-edit");
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list");
         }])
-        .directive("adhMeinBerlinKiezkassenProposalDetail", ["adhConfig", "adhHttp", "adhRate", "adhTopLevelState", detailDirective])
-        .directive("adhMeinBerlinKiezkassenProposalListItem", ["adhConfig", "adhHttp", "adhRate", "adhTopLevelState", listItemDirective])
+        .directive("adhMeinBerlinKiezkassenProposalDetail", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
+        .directive("adhMeinBerlinKiezkassenProposalListItem", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
-            "adhConfig", "adhHttp", "adhRate", "adhTopLevelState", mapListItemDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", mapListItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
             "adhConfig",
             "adhHttp",
@@ -381,13 +392,14 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenProposalEdit", [
             "adhConfig",
             "adhHttp",
+            "adhPermissions",
             "adhPreliminaryNames",
-            "adhTopLevelState",
+            "adhRate",
+            "adhResourceUrlFilter",
             "adhShowError",
             "adhSubmitIfValid",
-            "adhResourceUrlFilter",
+            "adhTopLevelState",
             "$location",
-            "adhRate",
             editDirective
         ])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);

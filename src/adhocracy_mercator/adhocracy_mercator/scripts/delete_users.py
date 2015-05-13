@@ -48,7 +48,8 @@ def delete_users():
     env['closer']()
 
 
-def _delete_users_and_votes(filename: str, root: IResource, registry: Registry):
+def _delete_users_and_votes(filename: str, root: IResource,
+                            registry: Registry):
     print('Reading emails from file...')
     users_emails = _get_emails(filename)
     print('Getting users from the database...')
@@ -66,7 +67,8 @@ def _delete_users_and_votes(filename: str, root: IResource, registry: Registry):
             print('Creating savepoint...')
             transaction.savepoint()
         index = index + 1
-        print('User {} ({}) and its votes deleted.'.format(user_name, user_email))
+        print('User {} ({}) and its votes deleted.'.format(user_name,
+                                                           user_email))
     print('Reindexing...')
     _reindex_proposals(root, modified_proposals)
     print('Committing changes...')
@@ -81,7 +83,8 @@ def _reindex_proposals(pool: IPool, proposals: [IMercatorProposalVersion]):
         rates.reindex_resource(proposal)
 
 
-def _delete_proposals_rates(pool: IPool, user: IUser) -> [IMercatorProposalVersion]:
+def _delete_proposals_rates(pool: IPool,
+                            user: IUser) -> [IMercatorProposalVersion]:
     """Return the list of modified proposals."""
     rates = _get_rates_from_user(pool, user)
     proposals_rates = _select_proposal_rates(rates)
@@ -118,15 +121,19 @@ def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
 
 def _get_rates_from_user(pool: IPool, user: IUser) -> [IRateVersion]:
     params = {'depth': 6,
-              'content_type': IRate,
-              'elements': 'content',
-              'tag': 'LAST',
-              IRate.__identifier__ + ':subject': user,
+              'interfaces': IRate,
+              'resolve': True,
+              'indexes': {'tag': 'LAST'},
+              'references': [(None, IRate, 'subject', user)],
               }
     rates = pool.get(params)['elements']
     return rates
 
 
 def _select_proposal_rates(rates: [IRateVersion]) -> [IRateVersion]:
-    return [rate for rate in rates
-            if IMercatorProposalVersion.providedBy(get_sheet_field(rate, IRate, 'object'))]
+    rates = []
+    for rate in rates:
+        rated = get_sheet_field(rate, IRate, 'object')
+        if IMercatorProposalVersion.providedBy(rated):
+            rates.append(rate)
+    return rate
