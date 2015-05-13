@@ -6,7 +6,7 @@
     <div class="mein-berlin-kiezkassen-detail-listing">
         <adh-listing
             data-path="{{path}}"
-            data-ng-show="!showMap"
+            data-ng-show="!shared.isShowMap"
             data-no-create-form="true"
             data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
             data-params="{tag: 'LAST'}"
@@ -15,10 +15,10 @@
             </adh-mein-berlin-kiezkassen-proposal-list-item>
         </adh-listing>
 
-        <adh-wait condition="showMap">
+        <adh-wait condition="shared.isShowMap">
             <adh-map-listing
                 data-path="{{path}}"
-                data-ng-show="showMap"
+                data-ng-show="shared.isShowMap"
                 data-polygon="polygon"
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
