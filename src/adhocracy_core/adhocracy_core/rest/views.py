@@ -21,12 +21,15 @@ from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
+from zope.interface.interfaces import IInterface
+from zope.interface import Interface
 
 from adhocracy_core.caching import set_cache_header
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ISimple
+from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
@@ -734,6 +737,9 @@ class MetaApiView(RESTView):
         for iresource, resource_meta in resources_meta.items():
             prop_map = {}
 
+            # super types
+            prop_map['super_types'] = _get_base_ifaces(iresource,
+                                                       root_iface=IResource)
             # List of sheets
             sheets = []
             sheets.extend(resource_meta.basic_sheets)
@@ -828,9 +834,10 @@ class MetaApiView(RESTView):
 
                 fields.append(fielddesc)
 
-            # For now, each sheet definition only contains a 'fields' attribute
-            # listing the defined fields
-            sheet_map[to_dotted_name(isheet)] = {'fields': fields}
+            super_types = _get_base_ifaces(isheet, root_iface=ISheet)
+
+            sheet_map[to_dotted_name(isheet)] = {'fields': fields,
+                                                 'super_types': super_types}
 
         return sheet_map
 
@@ -860,6 +867,19 @@ class MetaApiView(RESTView):
                   'workflows': workflows_map,
                   }
         return struct
+
+
+def _get_base_ifaces(iface: IInterface, root_iface=Interface) -> [str]:
+    bases = []
+    current_bases = iface.getBases()
+    while current_bases:
+        old_bases = deepcopy(current_bases)
+        current_bases = ()
+        for base in old_bases:
+            if base.extends(root_iface):
+                bases.append(base.__identifier__)
+            current_bases += base.getBases()
+    return bases
 
 
 def _add_no_such_user_or_wrong_password_error(request: Request):
