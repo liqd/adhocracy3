@@ -108,5 +108,5 @@ export var register = (angular) => {
             AdhTabs.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", "$rooScope", detailDirective]);
+        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", "$rootScope", detailDirective]);
 };
