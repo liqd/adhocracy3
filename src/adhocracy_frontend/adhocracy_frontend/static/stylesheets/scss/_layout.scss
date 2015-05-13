@@ -58,29 +58,50 @@ That is not supported by all targeted browsers however.
         @include stretch;
     }
 
-
     .l-rows {
-        display: table;
         width: 100%;
         height: 100%;
     }
 
-    .l-row {
-        display: table-row;
+    .modernizr-no-flexbox {
+        .l-rows {
+            display: table;
+        }
 
-        &:last-child {
-            &, .l-cell, .l-cell-inner {
-                height: 100%;
+        .l-row {
+            display: table-row;
+
+            &:last-child {
+                &, .l-cell, .l-cell-inner {
+                    height: 100%;
+                }
             }
+        }
+
+        .l-cell {
+            display: table-cell;
+        }
+
+        .l-cell-inner {
+            position: relative;
         }
     }
 
-    .l-cell {
-        display: table-cell;
-    }
+    .modernizr-flexbox {
+        .l-rows {
+            @include flexbox((
+                display: flex,
+                flex-direction: column
+            ));
+        }
 
-    .l-cell-inner {
-        position: relative;
+        .l-row {
+            position: relative;
+
+            &:last-child {
+                @include flex-grow(1);
+            }
+        }
     }
 }
 
