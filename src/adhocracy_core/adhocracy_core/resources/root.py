@@ -42,7 +42,7 @@ root_acm = ACM().deserialize(
                      ['edit_proposal',                 None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['create_rate',                   None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
                      ['edit_rate',                     None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
-                     ['create_resources',              None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
+                     ['create_some_resources',         None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
                      ['create_section',                None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
                      ['edit_section',                  None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['create_user',                   Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
