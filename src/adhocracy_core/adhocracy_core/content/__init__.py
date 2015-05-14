@@ -98,7 +98,7 @@ class ResourceContentRegistry(ContentRegistry):
 
     @property
     def _builtin_permissions(self):
-        return {'hide_resource', 'edit_group', 'do_transition'}
+        return {'hide', 'edit_group', 'do_transition'}
 
     def _get_resource_permissions(self, resource_meta):
         return [p for p in [resource_meta.permission_create,

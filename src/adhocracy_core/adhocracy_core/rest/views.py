@@ -431,7 +431,7 @@ class ResourceRESTView(RESTView):
             return
         # everybody who can PUT metadata can delete the resource
         permission_info = {'deleted': [True, False]}
-        if self.request.has_permission('hide_resource', self.context):
+        if self.request.has_permission('hide', self.context):
             permission_info['hidden'] = [True, False]
         cstruct[IMetadata.__identifier__] = permission_info
 

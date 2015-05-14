@@ -35,7 +35,7 @@ root_acm = ACM().deserialize(
                      ['create',                        None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
                      ['edit',                          None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
                      ['edit_some',                     None,       Allow,       Allow,         Allow,     Allow,     Allow,   Allow],  # noqa
-                     ['hide_resource',                 None,       None,        None,          None,      Allow,     None,    Allow],  # noqa
+                     ['hide',                          None,       None,        None,          None,      Allow,     None,    Allow],  # noqa
                      ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      ['message_to_user',               None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
                      # specific resources
