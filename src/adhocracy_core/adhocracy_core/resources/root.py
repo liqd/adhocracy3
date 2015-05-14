@@ -30,7 +30,16 @@ import adhocracy_core.sheets.name
 # do_post       ['add_resource',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
 root_acm = ACM().deserialize(
     {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
-     'permissions': [['create_asset',                  None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
+     'permissions': [  # general
+                     ['view',                          Allow,      Allow,       Allow,         None,      Allow,     Allow,   Allow],  # noqa
+                     ['create',                        None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
+                     ['edit',                          None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
+                     ['edit_some_resources',           None,       Allow,       Allow,         Allow,     Allow,     Allow,   Allow],  # noqa
+                     ['hide_resource',                 None,       None,        None,          None,      Allow,     None,    Allow],  # noqa
+                     ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
+                     ['message_to_user',               None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
+                     # specific resources
+                     ['create_asset',                  None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
                      ['create_comment',                None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
                      ['edit_comment',                  None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['create_externalresource',       None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
@@ -45,23 +54,19 @@ root_acm = ACM().deserialize(
                      ['create_section',                None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
                      ['edit_section',                  None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
                      ['create_user',                   Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
-                     ['create',                        None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
+                     ['create_asset',                  None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
+                     # specific resource sheets
                      ['create_sheet_password',         Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
                      ['create_sheet_userbasic',        Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
                      ['edit_metadata',                 None,       None,        None,          Allow,     Allow,     None,    Allow],  # noqa
-                     ['edit',                          None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
-                     ['edit_some_resources',           None,       Allow,       Allow,         Allow,     Allow,     Allow,   Allow],  # noqa
                      ['edit_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
-                     ['hide_resource',                 None,       None,        None,          None,      Allow,     None,    Allow],  # noqa
-                     ['manage_principals',             None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['message_to_user',               None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['view',                          Allow,      Allow,       Allow,         None,      Allow,     Allow,   Allow],  # noqa
-                     ['view_sensitive',                None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['view_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
-                     ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
-                     # FIXME, move to meinberlin module
+                     ['manage_principals',             None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
+                     # FIXME move to meinberlin package
                      ['edit_kiezkassen_proposal',      None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      ['create_kiezkassen_process',     None,       None,        None,          None,      None,      None,    Allow]  # noqa
+                     # FIXME move to mercator package
+                     ['view_sensitive',                None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ]})
 
 
