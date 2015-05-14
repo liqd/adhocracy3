@@ -31,6 +31,7 @@ root_acm = ACM().deserialize(
                      ['create',                        None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
                      ['edit',                          None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
                      ['edit_some',                     None,       Allow,       Allow,         Allow,     Allow,     Allow,   Allow],  # noqa
+                     ['delete',                        None,       None,        None,          Allow,     Allow,     None,    Allow],  # noqa
                      ['hide',                          None,       None,        None,          None,      Allow,     None,    Allow],  # noqa
                      ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      ['message_to_user',               None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
@@ -54,7 +55,6 @@ root_acm = ACM().deserialize(
                      # specific resource sheets
                      ['create_sheet_password',         Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
                      ['create_sheet_userbasic',        Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
-                     ['edit_metadata',                 None,       None,        None,          Allow,     Allow,     None,    Allow],  # noqa
                      ['edit_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
                      ['view_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
                      ['manage_principals',             None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
