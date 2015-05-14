@@ -59,7 +59,7 @@ def test_mercator_proposal_meta():
     assert meta.item_type == IMercatorProposalVersion
     assert add_ratesservice in meta.after_creation
     assert add_commentsservice in meta.after_creation
-    assert meta.permission_create == 'create_proposal'
+    assert meta.permission_create == 'create_mercator_proposal'
 
 
 def test_mercator_proposal_version_meta():

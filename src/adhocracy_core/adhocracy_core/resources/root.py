@@ -65,8 +65,6 @@ root_acm = ACM().deserialize(
                      # FIXME move to meinberlin package
                      ['edit_kiezkassen_proposal',      None,       None,        None,          None,      None,      None,    Allow],  # noqa
                      ['create_kiezkassen_process',     None,       None,        None,          None,      None,      None,    Allow],  # noqa
-                     # FIXME move to mercator package
-                     ['view_sensitive',                None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ]})
 
 
