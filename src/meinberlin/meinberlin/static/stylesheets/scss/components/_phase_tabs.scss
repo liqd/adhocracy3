@@ -1,118 +1,117 @@
-.phase-header {
-    margin-bottom: 20px / $font-size-small * 1em;
-    overflow-y: hidden;
-    padding-top: 2px;
+.tab.m-phase {
     position: relative;
 
-    .tabset-tabs {
-        background-color: $color-background-base-introvert;
-        border-top: 2px solid $color-background-base;
-    }
+    $height: 24px;
+    $height-large: 28px;
+    $arrow-width: 5px;
+    $padding: 2px;
+    $highlight-width: 2px;
+    $arrow-width-large: floor($arrow-width * $height-large / $height);
 
-    .tab {
-        font-size: $font-size-small;
-        margin-right: 0;
-        position: relative;
+    height: $height;
+    line-height: $height - 2 * $highlight-width;
+    margin: ($height-large - $height) / 2 0;
+    padding-right: $padding;
 
-        .tab-button, &.is-active .tab-button {
-            background: transparent;
-            border-bottom: 2px solid $color-background-base;
-            color: $color-text-highlight-introvert;
-            font-weight: $font-weight-extrovert;
-            padding: 0;
-
-            &:after {
-                background: url("/static/images/chevron.png") no-repeat right center;
-                bottom: 50%;
-                content: " ";
-                height: 77px;
-                margin-bottom: -38px;
-                position: absolute;
-                right: -7px;
-                width: 16px;
-            }
-        }
-
-        &, .tab-button, &.is-active .tab-button {
-            line-height: 2em;
-            top: 0;
-        }
-
-        &.is-active {
-            margin-bottom: -2px;
-
-            .tab-button {
-                border: 0;
-                border-top: 2px solid $color-background-base-introvert;
-                line-height: 28px / $font-size-small * 1em;
-                top: -2px;
-            }
-        }
-
-        &.is-current-phase {
-            .tab-button {
-                @include single-box-shadow(0, -2px, 0, 0, $color-function-valid, inset);
-            }
-        }
-
-        &:last-child .tab-button:after {
-            display: none;
-        }
-    }
-
-    .tabset-panes {
+    .tab-button,
+    &.is-active .tab-button {
+        background: $color-background-base-introvert;
+        color: $color-text-highlight-introvert;
+        top: 0;
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
         border: 0;
-        position: relative;
-        z-index: 10;
+        border-top: $highlight-width solid $color-background-base-introvert;
+        border-bottom: $highlight-width solid $color-background-base-introvert;
     }
 
-    .tab-pane {
-        padding: 10px / $font-size-small * 1em;
+    &:after, &:before {
+        border-top: $height / 2 solid transparent;
+        border-left: $arrow-width solid $color-background-base-introvert;
+        border-bottom: $height / 2 solid transparent;
+        content: "";
+        height: 0;
+        position: absolute;
+        top: 0;
+        width: 0;
+        z-index: 1;
     }
 
-    .tab-pane, .phase-header-tab-pane-header span {
-        font-size: $font-size-small;
+    &:before {
+        border-left-color: $color-text-inverted;
+        left: 0;
     }
 
-    .phase-header-tab-pane-header {
-        color: $color-text-normal;
-        line-height: $line-height-plus;
-        margin: 0 0 (13px / $font-size-normal * 1em);
-        font-size: $font-size-normal;
+    &:after {
+        right: $padding - $arrow-width;
+        z-index: 2;
+    }
 
-        span {
-            display: block;
-            font-weight: $font-weight-normal;
+    &:first-child:before,
+    &:last-child:after {
+        content: none;
+    }
+
+    &:last-child {
+        padding-right: 0;
+    }
+
+    &.is-active {
+        height: $height-large;
+        line-height: $height-large - 2 * $highlight-width;
+        left: $arrow-width - $arrow-width-large;
+        margin: 0;
+
+        &:after, &:before {
+            border-top-width: $height-large / 2;
+            border-left-width: $arrow-width-large;
+            border-bottom-width: $height-large / 2;
+        }
+
+        &:after {
+            right: $padding - $arrow-width-large;
         }
     }
 
-    .phase-header-tab-pane-meta {
-        margin-top: 28px / $font-size-normal * 1em;
-
-        [class^="icon"] {
-            font-size: $font-size-normal;
-            margin: 0 (7px / $font-size-normal * 1em) (15px / $font-size-normal * 1em);
-            vertical-align: middle;
-
-            &:first-child {
-                margin-left: 0;
-            }
-
-            &.phase-header-tab-pane-meta-icon-date {
-                margin-left: 40px / $font-size-normal * 1em;
-            }
-        }
-
-        .is-not-participation-allowed,
-        .is-not-commenting-allowed,
-        .is-participation-allowed,
-        .is-commenting-allowed {
-            font-style: italic;
-        }
-
-        .is-participation-allowed,
-        .is-commenting-allowed {
-            color: $color-function-valid;
+    &.is-current-phase {
+        .tab-button {
+            border-bottom-color: $color-function-valid;
         }
     }
+}
+
+
+.phase {
+    font-size: $font-size-small;
+    color: $color-text-normal;
+    background: $color-background-base-introvert;
+    padding: 10px / $font-size-small * 1em;
+
+    [class^="icon"] {
+        font-size: 130%;
+        margin-right: 0.5em;
+    }
+}
+
+.phase-title {
+    margin: 0;
+    font-size: $font-size-normal;
+}
+
+.phase-process-type {
+    margin-bottom: 0.8em;
+}
+
+.phase-description {
+    margin-bottom: 1.5em;
+}
+
+.phase-availability {
+    margin-right: 3em;
+}
+
+.phase-availability-summary {
+    font-style: italic;
+    color: $color-function-valid;
 }
