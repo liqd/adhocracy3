@@ -405,7 +405,7 @@ class ResourceRESTView(RESTView):
         is_users = IUsersService.providedBy(context) \
             and request.has_permission('create_user', self.context)
         # TODO move the is_user specific part the UsersRestView
-        if request.has_permission('create_some_resources', self.context) or is_users:
+        if request.has_permission('create', self.context) or is_users:
             addables = registry.get_resources_meta_addable(context, request)
             if addables:
                 for resource_meta in addables:
@@ -543,7 +543,7 @@ class PoolRESTView(SimpleRESTView):
                 return child
 
     @view_config(request_method='POST',
-                 permission='create_some_resources',
+                 permission='create',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -591,7 +591,7 @@ class ItemRESTView(PoolRESTView):
         return cstruct
 
     @view_config(request_method='POST',
-                 permission='create_some_resources',
+                 permission='create',
                  content_type='application/json')
     def post(self):
         """Create new resource and get response data.

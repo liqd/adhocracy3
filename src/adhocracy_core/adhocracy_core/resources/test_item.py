@@ -31,6 +31,7 @@ def test_item_meta():
     ]
     assert create_initial_content_for_item in meta.after_creation
     assert meta.item_type == IItemVersion
+    assert meta.permission_create == 'create_item'
 
 
 def test_item_without_name_sheet_meta():
