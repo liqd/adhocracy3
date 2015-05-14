@@ -21,7 +21,7 @@ def test_proposal_meta():
     from .kiezkassen import IProposalVersion
     assert proposal_meta.element_types == [IProposalVersion]
     assert proposal_meta.item_type == IProposalVersion
-    # TODO assert proposal_meta.permission_create == 'create_kiezkassen_proposal'
+    assert proposal_meta.permission_create == 'create_kiezkassen_proposal'
 
 
 @mark.usefixtures('integration')
@@ -78,6 +78,7 @@ class TestProcess:
             adhocracy_core.sheets.image.IImageReference,
         ]
         assert add_assets_service in meta.after_creation
+        assert meta.permission_create == 'create_kiezkassen_process'
 
 
     @mark.usefixtures('integration')

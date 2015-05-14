@@ -50,6 +50,7 @@ proposal_meta = item_meta._replace(
     ],
     item_type=IProposalVersion,
     is_implicit_addable=True,
+    permission_create='create_kiezkassen_proposal',
 )
 
 
