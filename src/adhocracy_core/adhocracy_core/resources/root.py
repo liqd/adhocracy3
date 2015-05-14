@@ -39,7 +39,7 @@ root_acm = ACM().deserialize(
                      ['create_asset',                  None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
                      ['create_comment',                None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
                      ['edit_comment',                  None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
-                     ['create_externalresource',       None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
+                     ['create_external',               None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
                      ['create_group',                  None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
                      ['create_paragraph',              None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
                      ['edit_paragraph',                None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
