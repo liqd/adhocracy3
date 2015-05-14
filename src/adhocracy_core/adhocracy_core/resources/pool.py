@@ -90,6 +90,7 @@ pool_meta = resource_meta._replace(
     content_class=Pool,
     permission_create='create_pool',
     permission_view='view',
+    permission_edit='edit',
     is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.name.IName,
                   adhocracy_core.sheets.title.ITitle,

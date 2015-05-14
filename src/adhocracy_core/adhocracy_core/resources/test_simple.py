@@ -14,6 +14,7 @@ def test_simple_meta():
                                  adhocracy_core.sheets.metadata.IMetadata,
                                  ]
     assert meta.permission_create == 'create_simple'
+    assert meta.permission_edit == 'edit'
 
 
 @fixture

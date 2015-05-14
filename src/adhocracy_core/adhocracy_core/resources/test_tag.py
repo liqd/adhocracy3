@@ -14,6 +14,7 @@ def test_tag_meta():
                                adhocracy_core.sheets.tags.ITag,
                                ]
     assert meta.permission_create == 'create_tag'
+    assert meta.permission_edit == 'edit'
 
 
 @fixture

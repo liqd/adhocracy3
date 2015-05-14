@@ -379,7 +379,7 @@ class ResourceRESTView(RESTView):
         empty = {}  # tiny performance tweak
         cstruct = deepcopy(options_resource_response_data_dict)
 
-        if request.has_permission('edit_some_sheets', context):
+        if request.has_permission('edit_some_resources', context):
             edits = self.registry.get_sheets_edit(context, request)
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
             if put_sheets:
@@ -478,7 +478,7 @@ class SimpleRESTView(ResourceRESTView):
     validation_PUT = (PUTResourceRequestSchema, [])
 
     @view_config(request_method='PUT',
-                 permission='edit_sheet',
+                 permission='edit_some_resources',
                  content_type='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
@@ -560,7 +560,7 @@ class PoolRESTView(SimpleRESTView):
         return self.build_post_response(resource)
 
     @view_config(request_method='PUT',
-                 permission='edit_some_sheets',
+                 permission='edit_some_resources',
                  content_type='application/json')
     def put(self) -> dict:
         return super().put()

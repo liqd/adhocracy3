@@ -24,6 +24,10 @@ import adhocracy_core.sheets.name
 # Access Control Matrix. Permissions are mapped to a role.
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
+# do get        ['view',                          Allow,      Allow,       Allow,         None,      Allow,     Allow,   Allow],  # noqa
+# put requests  ['edit_some_sheets',              None,       None,        None,          Allow,     Allow,     Allow,   Allow],  # noqa
+# aka add_re    ['create_sheet',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
+# do_post       ['add_resource',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
 root_acm = ACM().deserialize(
     {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
      'permissions': [['create_asset',                  None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
@@ -46,8 +50,8 @@ root_acm = ACM().deserialize(
                      ['create_sheet_password',         Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
                      ['create_sheet_userbasic',        Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
                      ['edit_metadata',                 None,       None,        None,          Allow,     Allow,     None,    Allow],  # noqa
-                     ['edit_sheet',                    None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['edit_some_sheets',              None,       None,        None,          Allow,     Allow,     Allow,   Allow],  # noqa
+                     ['edit',                          None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
+                     ['edit_some_resources',           None,       Allow,       Allow,         Allow,     Allow,     Allow,   Allow],  # noqa
                      ['edit_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
                      ['hide_resource',                 None,       None,        None,          None,      Allow,     None,    Allow],  # noqa
                      ['manage_principals',             None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
