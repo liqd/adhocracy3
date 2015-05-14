@@ -24,10 +24,6 @@ import adhocracy_core.sheets.name
 # Access Control Matrix. Permissions are mapped to a role.
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
-# do get        ['view',                          Allow,      Allow,       Allow,         None,      Allow,     Allow,   Allow],  # noqa
-# put requests  ['edit_some_sheets',              None,       None,        None,          Allow,     Allow,     Allow,   Allow],  # noqa
-# aka add_re    ['create',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
-# do_post       ['add_resource',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
 root_acm = ACM().deserialize(
     {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
      'permissions': [  # general
