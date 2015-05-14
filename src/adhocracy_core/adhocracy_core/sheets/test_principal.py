@@ -331,8 +331,8 @@ class TestPermissionsSheet:
         assert isinstance(inst, PermissionsAttributeStorageSheet)
         assert inst.meta.isheet == IPermissions
         assert inst.meta.schema_class == PermissionsSchema
-        assert inst.meta.permission_create == 'manage_principals'
-        assert inst.meta.permission_edit == 'manage_principals'
+        assert inst.meta.permission_create == 'edit_sheet_permissions'
+        assert inst.meta.permission_edit == 'edit_sheet_permissions'
         assert inst.meta.permission_view == 'view_userextended'
 
     def test_get_empty(self, meta, context):

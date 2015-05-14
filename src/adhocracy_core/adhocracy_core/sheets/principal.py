@@ -205,8 +205,8 @@ permissions_meta = sheet_meta._replace(
     isheet=IPermissions,
     schema_class=PermissionsSchema,
     permission_view='view_userextended',
-    permission_create='manage_principals',
-    permission_edit='manage_principals',
+    permission_create='edit_sheet_permissions',
+    permission_edit='edit_sheet_permissions',
     sheet_class=PermissionsAttributeStorageSheet,
 )
 
