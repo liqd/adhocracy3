@@ -9,6 +9,7 @@ var pkgLocation = "/Tabs";
 
 export interface ITabScope extends angular.IScope {
     active : boolean;
+    highlighted : boolean;
     heading : string;
     classes : string;
     select() : void;
@@ -115,6 +116,7 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tab.html",
         scope: {
             active: "=?",
+            highlighted: "=?",
             heading: "@",
             classes: "@"
         },

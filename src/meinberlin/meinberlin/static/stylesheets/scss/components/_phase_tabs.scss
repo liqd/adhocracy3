@@ -14,7 +14,7 @@ category: Widgets
         ><li class="tab m-phase is-active" style="width: 25%;">
             <a class="tab-button" href="#">Ideensammlungsphase</a>
         </li
-        ><li class="tab m-phase is-current-phase" style="width: 25%;">
+        ><li class="tab m-phase is-highlighted" style="width: 25%;">
             <a class="tab-button" href="#">Bürgerversammlung</a>
         </li
         ><li class="tab m-phase" style="width: 25%;">
@@ -105,7 +105,7 @@ category: Widgets
         }
     }
 
-    &.is-current-phase {
+    &.is-highlighted {
         .tab-button {
             border-bottom-color: $color-function-valid;
         }

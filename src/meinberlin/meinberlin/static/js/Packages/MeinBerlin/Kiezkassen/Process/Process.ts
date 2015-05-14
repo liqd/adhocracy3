@@ -52,6 +52,8 @@ export var phaseHeaderDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
         scope: {},
         link: (scope) => {
+            scope.currentPhase = "Informationsphase";
+
             scope.phases = [{
                 title: "Informationsphase",
                 description: "Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.",
