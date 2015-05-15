@@ -11,19 +11,19 @@ import argparse
 import inspect
 import transaction
 from pyramid.paster import bootstrap
-
-from adhocracy_core.interfaces import IResource
-from substanced.interfaces import IUserLocator
-from adhocracy_core.resources.principal import IUser
-from adhocracy_core.resources.rate import IRateVersion
-from adhocracy_core.sheets.pool import IPool
-from adhocracy_core.sheets.rate import IRate
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from pyramid.request import Request
 from pyramid.registry import Registry
-from substanced.util import find_catalog
+from substanced.util import find_service
+
+from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import search_query
+from substanced.interfaces import IUserLocator
+from adhocracy_core.catalog import ICatalogsService
+from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.rate import IRate
+from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_mercator.scripts.export_users import get_most_rated_proposals
 
 
 def delete_users():
@@ -48,55 +48,48 @@ def delete_users():
     env['closer']()
 
 
-def _delete_users_and_votes(filename: str, root: IResource,
+def _delete_users_and_votes(filename: str, root: IPool,
                             registry: Registry):
     print('Reading emails from file...')
     users_emails = _get_emails(filename)
     print('Getting users from the database...')
     users = _get_users(root, registry, users_emails)
-    pool = get_sheet(root, IPool)
-    modified_proposals = set()
+    catalogs = find_service(root, 'catalogs')
     index = 1
     for user in users:
-        user_name = user.__name__
-        user_email = user.email
-        currently_modified = _delete_proposals_rates(pool, user)
-        modified_proposals.update(currently_modified)
-        _delete_user(user)
+        print('Deleting user {} ({}) and its rates'.format(user.__name__,
+                                                           user.email))
+        _delete_rate_items(catalogs, user)
+        _delete(user)
         if index % 100 == 0:
             print('Creating savepoint...')
             transaction.savepoint()
         index = index + 1
-        print('User {} ({}) and its votes deleted.'.format(user_name,
-                                                           user_email))
     print('Reindexing...')
-    _reindex_proposals(root, modified_proposals)
+    _reindex_proposals(catalogs, root)
     print('Committing changes...')
     transaction.commit()
     print('Users deleted successfully.')
 
 
-def _reindex_proposals(pool: IPool, proposals: [IMercatorProposalVersion]):
-    adhocracy = find_catalog(pool, 'adhocracy')
-    rates = adhocracy['rates']
+def _reindex_proposals(catalogs: ICatalogsService, root: IPool):
+    proposals = get_most_rated_proposals(root, min_rate=0)
     for proposal in proposals:
-        rates.reindex_resource(proposal)
+        catalogs.reindex_index(proposal, 'rates')
 
 
-def _delete_proposals_rates(pool: IPool,
-                            user: IUser) -> [IMercatorProposalVersion]:
-    """Return the list of modified proposals."""
-    rates = _get_rates_from_user(pool, user)
-    proposals_rates = _select_proposal_rates(rates)
-    modified = [get_sheet_field(proposal_rate, IRate, 'object')
-                for proposal_rate in proposals_rates]
-    for proposal_rate in proposals_rates:
-        proposal_rate.__parent__.remove(proposal_rate.__name__)
-    return modified
+def _delete_rate_items(catalogs: ICatalogsService, user: IUser):
+    query = search_query._replace(
+        interfaces=IRate,
+        references=[(None, IMetadata, 'creator', user)],
+    )
+    user_rates = catalogs.search(query).elements
+    for rate in user_rates:
+        _delete(rate)
 
 
-def _delete_user(user: IUser):
-    user.__parent__.remove(user.__name__)
+def _delete(resource: IResource):
+    resource.__parent__.remove(resource.__name__)
 
 
 def _get_users(root: IResource, registry: Registry, emails: [str]) -> [IUser]:
@@ -117,23 +110,3 @@ def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
     request = Request.blank('/dummy')
     locator = registry.getMultiAdapter((context, request), IUserLocator)
     return locator
-
-
-def _get_rates_from_user(pool: IPool, user: IUser) -> [IRateVersion]:
-    params = {'depth': 6,
-              'interfaces': IRate,
-              'resolve': True,
-              'indexes': {'tag': 'LAST'},
-              'references': [(None, IRate, 'subject', user)],
-              }
-    rates = pool.get(params)['elements']
-    return rates
-
-
-def _select_proposal_rates(rates: [IRateVersion]) -> [IRateVersion]:
-    rates = []
-    for rate in rates:
-        rated = get_sheet_field(rate, IRate, 'object')
-        if IMercatorProposalVersion.providedBy(rated):
-            rates.append(rate)
-    return rate
