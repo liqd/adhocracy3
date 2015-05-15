@@ -10,9 +10,10 @@ from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import IRateValidator
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.interfaces import Reference
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import Integer
-from adhocracy_core.schema import Reference
+from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import PostPoolMappingSchema
@@ -102,8 +103,8 @@ class RateSchema(colander.MappingSchema):
 
     """Rate sheet data structure."""
 
-    subject = Reference(reftype=RateSubjectReference)
-    object = Reference(reftype=RateObjectReference)
+    subject = ReferenceSchema(reftype=RateSubjectReference)
+    object = ReferenceSchema(reftype=RateObjectReference)
     rate = Integer()
 
     def validator(self, node, value):
@@ -139,8 +140,10 @@ class RateSchema(colander.MappingSchema):
         # If they occur elsewhere, an error is thrown.
         adhocracy_catalog = find_catalog(request.context, 'adhocracy')
         index = adhocracy_catalog['reference']
-        query = index.eq(IRate, 'subject', value['subject'])
-        query &= index.eq(IRate, 'object', value['object'])
+        reference_subject = Reference(None, IRate, 'subject', value['subject'])
+        query = index.eq(reference_subject)
+        reference_object = Reference(None, IRate, 'object', value['object'])
+        query &= index.eq(reference_object)
         system_catalog = find_catalog(request.context, 'system')
         path_index = system_catalog['path']
         query &= path_index.noteq(resource_path(request.context), depth=None)

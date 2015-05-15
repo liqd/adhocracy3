@@ -91,6 +91,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         context['user'] = user
         self.config = testing.setUp()
         self.request = testing.DummyRequest(root=context,
+
                                             registry=self.config.registry)
         self.user_url = self.request.application_url + '/user/'
         self.userid = '/user'
@@ -137,6 +138,12 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
     def test_authenticated_userid_without_tokenmanger(self):
         get_tokenmanager=lambda x: None
         inst = self.make_one('', get_tokenmanager=get_tokenmanager)
+        assert inst.authenticated_userid(self.request) is None
+
+    def test_authenticated_userid_without_root(self):
+        get_tokenmanager=lambda x: Mock()
+        inst = self.make_one('', get_tokenmanager=get_tokenmanager)
+        self.request.root = None
         assert inst.authenticated_userid(self.request) is None
 
     def test_authenticated_userid_with_tokenmanger_valid_token(self):

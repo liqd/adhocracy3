@@ -119,9 +119,10 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
             classes: "@"
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
+            var paneElement = element.find(".tab-pane");
             scope.height = 0;
-            scope.$watch(() => element.find(".tab-pane").outerHeight(), (value : number) => {
-                if (value !== 0) {
+            scope.$watch(() => paneElement.outerHeight(), (value : number) => {
+                if (paneElement.height() !== 0) {
                     scope.height = value;
                 }
             });

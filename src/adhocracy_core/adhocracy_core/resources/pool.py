@@ -111,3 +111,4 @@ basicpool_meta = pool_meta._replace(
 def includeme(config):
     """Add resource type to registry."""
     add_resource_type_to_registry(basicpool_meta, config)
+    add_resource_type_to_registry(pool_meta, config)

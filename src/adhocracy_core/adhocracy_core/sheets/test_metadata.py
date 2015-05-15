@@ -83,23 +83,23 @@ class TestMetadataSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.sheets.metadata import MetadataSchema
-        from . import AttributeStorageSheet
+        from . import AttributeResourceSheet
         inst = meta.sheet_class(meta, context)
         assert inst.meta.isheet == IMetadata
         assert inst.meta.schema_class == MetadataSchema
         assert inst.meta.editable is True
         assert inst.meta.creatable is True
         assert inst.meta.readable is True
-        assert inst.meta.sheet_class is AttributeStorageSheet
+        assert inst.meta.sheet_class is AttributeResourceSheet
 
 
 
 @fixture
 def integration(config):
+    config.include('adhocracy_core.content')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.content')
     config.include('adhocracy_core.sheets.metadata')
 
 
@@ -114,37 +114,31 @@ def test_includeme_register_metadata_sheet(config):
 class TestVisibility:
 
     @fixture
-    def resource_with_metadata(self, integration):
-        from adhocracy_core.interfaces import IResource
-        from adhocracy_core.sheets.metadata import IMetadata
-        return testing.DummyResource(__provides__=[IResource, IMetadata])
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        return view_blocked_by_metadata(*args)
 
     def test_view_blocked_by_metadata_no_imetadata(self, registry):
         from adhocracy_core.interfaces import IResource
-        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
         resource = testing.DummyResource(__provides__=IResource)
-        assert view_blocked_by_metadata(resource, registry, 'hidden') ==\
-               {'reason': 'hidden'}
+        result = self.call_fut(resource, registry, 'hidden')
+        assert result == {'reason':  'hidden'}
 
-    def test_view_blocked_by_metadata_with_imetadata(
-            self, pool_graph, resource_with_metadata, registry):
+    def test_view_blocked_by_metadata_with_imetadata(self, registry, mock_sheet):
         from datetime import datetime
-        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import IMetadata
-        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-        from adhocracy_core.utils import get_sheet
-        pool_graph['res'] = resource_with_metadata
-        metadata = get_sheet(resource_with_metadata, IMetadata,
-                             registry=registry)
-        appstruct = metadata.get()
-        user = testing.DummyRequest(__provides__=IUser)
-        pool_graph['user'] = user
+        from adhocracy_core.resources.principal import IUser
+        resource = testing.DummyResource(__provides__=[IResource, IMetadata],
+                                         hidden=True)
+        user = testing.DummyResource(__provides__=IUser)
         now = datetime.now()
-        appstruct['modified_by'] = user
-        appstruct['modification_date'] = now
-        metadata.set(appstruct, omit_readonly=False, send_event=False)
-        resource_with_metadata.hidden = True
-        result = view_blocked_by_metadata(resource_with_metadata, registry,
-                                          'hidden')
+        mock_sheet.get.return_value = {'modified_by': user,
+                                       'modification_date': now}
+        registry.content.get_sheet.return_value = mock_sheet
+        result = self.call_fut(resource, registry, 'hidden')
         assert result['modified_by'] == user
         assert result['modification_date'] == now

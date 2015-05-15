@@ -9,8 +9,8 @@ from substanced.interfaces import IUserLocator
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
-from adhocracy_core.sheets import AnnotationStorageSheet
-from adhocracy_core.sheets import AttributeStorageSheet
+from adhocracy_core.sheets import AnnotationRessourceSheet
+from adhocracy_core.sheets import AttributeResourceSheet
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import SingleLine
@@ -61,7 +61,7 @@ class GroupSchema(colander.MappingSchema):
 group_meta = sheet_meta._replace(
     isheet=IGroup,
     schema_class=GroupSchema,
-    sheet_class=AttributeStorageSheet,
+    sheet_class=AttributeResourceSheet,
 )
 
 
@@ -128,7 +128,7 @@ class UserBasicSchema(colander.MappingSchema):
 userbasic_meta = sheet_meta._replace(
     isheet=IUserBasic,
     schema_class=UserBasicSchema,
-    sheet_class=AttributeStorageSheet,
+    sheet_class=AttributeResourceSheet,
     permission_create='create_sheet_userbasic',
 )
 
@@ -150,7 +150,7 @@ class UserExtendedSchema(colander.MappingSchema):
 userextended_meta = sheet_meta._replace(
     isheet=IUserExtended,
     schema_class=UserExtendedSchema,
-    sheet_class=AttributeStorageSheet,
+    sheet_class=AttributeResourceSheet,
     permission_create='create_sheet_userbasic',
     permission_view='view_userextended',
     permission_edit='edit_userextended',
@@ -189,7 +189,7 @@ class PermissionsSchema(colander.MappingSchema):
                                   default=deferred_roles_and_group_roles)
 
 
-class PermissionsAttributeStorageSheet(AttributeStorageSheet):
+class PermissionsAttributeResourceSheet(AttributeResourceSheet):
 
     """Store the groups field references also as object attribute."""
 
@@ -207,7 +207,7 @@ permissions_meta = sheet_meta._replace(
     permission_view='view_userextended',
     permission_create='edit_sheet_permissions',
     permission_edit='edit_sheet_permissions',
-    sheet_class=PermissionsAttributeStorageSheet,
+    sheet_class=PermissionsAttributeResourceSheet,
 )
 
 
@@ -226,7 +226,7 @@ class PasswordAuthenticationSchema(colander.MappingSchema):
     password = Password(missing=colander.required)
 
 
-class PasswordAuthenticationSheet(AnnotationStorageSheet):
+class PasswordAuthenticationSheet(AnnotationRessourceSheet):
 
     """Sheet for password based user authentication.
 
@@ -247,7 +247,7 @@ class PasswordAuthenticationSheet(AnnotationStorageSheet):
         password_encoded = self.context.pwd_manager.encode(password)
         self.context.password = password_encoded
 
-    def _get_data_appstruct(self, params: dict={}):
+    def _get_data_appstruct(self):
         password_encoded = getattr(self.context, 'password', '')
         return {'password': password_encoded}
 

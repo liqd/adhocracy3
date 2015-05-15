@@ -21,7 +21,7 @@ from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import create_filename
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
-from adhocracy_mercator.sheets.mercator import ITitle
+from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.pool import IPool
 
 
@@ -85,17 +85,15 @@ def get_most_rated_proposals(root: IResource,
     """Return child proposals of `root` with rating higher then `min_rate`."""
     pool = get_sheet(root, IPool)
     params = {'depth': 3,
-              'content_type': IMercatorProposalVersion,
-              'sort': 'rates',
+              'interfaces': IMercatorProposalVersion,
               'reverse': True,
-              'tag': 'LAST',
-              'aggregateby': 'rates',
-              'aggregateby_elements': 'content',
-              'elements': 'content',
+              'indexes': {'tag': 'LAST'},
+              'group_by': 'rates',
+              'resolve': True,
               }
     results = pool.get(params)
     proposals = results['elements']
-    aggregates = results['aggregateby']['rates']
+    aggregates = results['group_by']
     # remove proposals with rate < min_rate.
     # TODO extend query parameters to allow comparators, like
     # 'rate': '>=3'
@@ -113,11 +111,10 @@ def _map_rating_users(rateables: [IRateable]) -> [(IRateable, set(IUser))]:
     rateables_users_map = []
     for rateable in rateables:
         params = {'depth': 3,
-                  'content_type': IRate,
-                  'tag': 'LAST',
-                  'rate': 1,
-                  'elements': 'content',
-                  IRate.__identifier__ + ':object': rateable,
+                  'interfaces': IRate,
+                  'indexes': {'tag': 'LAST', 'rate': 1},
+                  'resolve': True,
+                  'references': [(None, IRate, 'object', rateable)]
                   }
         pool = get_sheet(rateable.__parent__, IPool)
         rates = pool.get(params)['elements']
@@ -146,13 +143,11 @@ def _append_rate_dates(user: IUser, rateables: [(IRateable, set(IUser))],
 def _get_rate_date(user: IUser, rateable: IRateable) -> str:
     pool = get_sheet(rateable.__parent__, IPool)
     params = {'depth': 3,
-              'content_type': IRate,
-              'tag': 'LAST',
-              IRate.__identifier__ + ':subject': user,
-              IRate.__identifier__ + ':object': rateable,
-              'rate': 1,
-              'elements': 'content',
-              'count': True
+              'interfaces': IRate,
+              'indexes': {'tag': 'LAST', 'rate': 1},
+              'references': [(None, IRate, 'subject', user),
+                             (None, IRate, 'object', rateable)],
+              'resolve': True
               }
     result = pool.get(params)
     rate = result['elements'][0]

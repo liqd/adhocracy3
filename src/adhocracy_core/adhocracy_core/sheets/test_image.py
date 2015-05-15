@@ -59,8 +59,8 @@ class TestImageReference:
     def test_meta(self, meta):
       from .image import IImageReference
       from .image import ImageReferenceSchema
-      from adhocracy_core.sheets import AnnotationStorageSheet
-      assert meta.sheet_class == AnnotationStorageSheet
+      from adhocracy_core.sheets import AnnotationRessourceSheet
+      assert meta.sheet_class == AnnotationRessourceSheet
       assert meta.isheet == IImageReference
       assert meta.schema_class == ImageReferenceSchema
       assert meta.editable is True

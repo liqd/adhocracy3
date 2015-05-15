@@ -2,6 +2,8 @@
 from pyramid.location import lineage
 from pyramid.registry import Registry
 from pyramid.traversal import find_interface, resource_path
+from pyramid.threadlocal import get_current_registry
+from substanced.event import ACLModified
 
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResource
@@ -29,8 +31,11 @@ def add_changelog_created(event):
 
 def add_changelog_modified_and_descendants(event):
     """Add modified message to the transaction_changelog."""
-    _add_changelog(event.registry, event.object, key='modified', value=True)
-    _add_changed_descendants_to_all_parents(event.registry, event.object)
+    registry = getattr(event, 'registry', None)
+    if registry is None:   # TODO ACLModified events have no registry
+        registry = get_current_registry(event.object)
+    _add_changelog(registry, event.object, key='modified', value=True)
+    _add_changed_descendants_to_all_parents(registry, event.object)
 
 
 def _add_changed_descendants_to_all_parents(registry, resource):
@@ -125,6 +130,8 @@ def includeme(config):
                           IResourceCreatedAndAdded)
     config.add_subscriber(add_changelog_modified_and_descendants,
                           IResourceSheetModified)
+    config.add_subscriber(add_changelog_modified_and_descendants,
+                          ACLModified)
     config.add_subscriber(add_changelog_backrefs,
                           ISheetBackReferenceModified)
     config.add_subscriber(add_changelog_followed,

@@ -2,17 +2,18 @@
 from pyramid.traversal import resource_path
 from substanced import catalog
 from substanced.catalog import IndexFactory
+from substanced.util import find_service
 from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
-from adhocracy_core.sheets.tags import filter_by_tag
 from adhocracy_core.sheets.tags import TagElementsReference
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import find_graph
+from adhocracy_core.interfaces import search_query
 
 
 class Reference(IndexFactory):
@@ -81,12 +82,17 @@ def index_rates(resource, default) -> int:
 
     Only the LAST version of each rate is counted.
     """
-    rates = get_sheet_field(resource, IRateable, 'rates')
-    last_rates = filter_by_tag(rates, 'LAST')
+    catalogs = find_service(resource, 'catalogs')
+    query = search_query._replace(interfaces=IRate,
+                                  frequency_of='rate',
+                                  indexes={'tag': 'LAST'},
+                                  references=[(None, IRate, 'object', resource)
+                                              ],
+                                  )
+    result = catalogs.search(query)
     rate_sum = 0
-    for rate in last_rates:
-        value = get_sheet_field(rate, IRate, 'rate')
-        rate_sum += value
+    for value, count in result.frequency_of.items():
+        rate_sum += value * count
     return rate_sum
 
 

@@ -1,51 +1,118 @@
-.tab.m-phase {
-    overflow: visible;
+.phase-header {
+    margin-bottom: 20px / $font-size-small * 1em;
+    overflow-y: hidden;
+    padding-top: 2px;
     position: relative;
 
-    &, .tab-button, &.is-active .tab-button {
-        border: 0;
-        line-height: 1;
-        margin-right: 0;
-        top: 0;
+    .tabset-tabs {
+        background-color: $color-background-base-introvert;
+        border-top: 2px solid $color-background-base;
     }
 
-    &.is-active {
-        &:after {
-            border-left-color: $color-background-base-introvert;
+    .tab {
+        font-size: $font-size-small;
+        margin-right: 0;
+        position: relative;
+
+        .tab-button, &.is-active .tab-button {
+            background: transparent;
+            border-bottom: 2px solid $color-background-base;
+            color: $color-text-highlight-introvert;
+            font-weight: $font-weight-extrovert;
+            padding: 0;
+
+            &:after {
+                background: url("/static/images/chevron.png") no-repeat right center;
+                bottom: 50%;
+                content: " ";
+                height: 77px;
+                margin-bottom: -38px;
+                position: absolute;
+                right: -7px;
+                width: 16px;
+            }
         }
 
-        &:before {
+        &, .tab-button, &.is-active .tab-button {
+            line-height: 2em;
+            top: 0;
+        }
+
+        &.is-active {
+            margin-bottom: -2px;
+
+            .tab-button {
+                border: 0;
+                border-top: 2px solid $color-background-base-introvert;
+                line-height: 28px / $font-size-small * 1em;
+                top: -2px;
+            }
+        }
+
+        &.is-current-phase {
+            .tab-button {
+                @include single-box-shadow(0, -2px, 0, 0, $color-function-valid, inset);
+            }
+        }
+
+        &:last-child .tab-button:after {
             display: none;
         }
     }
 
-    &.is-current-phase {
-        @include single-box-shadow(0, 2px, 0, 0, $color-function-valid);
+    .tabset-panes {
+        border: 0;
+        position: relative;
+        z-index: 10;
     }
 
-    &:after, &:before {
-        border-top: 1em solid transparent;
-        border-left: 0.5em solid $color-structure-border;
-        border-bottom: 1em solid transparent;
-        content: "";
-        height: 0;
-        position: absolute;
-        right: -0.5em;
-        top: 0;
-        width: 0;
-        z-index: 2;
+    .tab-pane {
+        padding: 10px / $font-size-small * 1em;
     }
 
-    &:before {
-        border-left-color: $color-text-inverted;
-        right: -0.6em;
-        margin-left: 1px;
-        z-index: 1;
+    .tab-pane, .phase-header-tab-pane-header span {
+        font-size: $font-size-small;
     }
 
-    &:last-child {
-        &:after, &:before {
-            content: none;
+    .phase-header-tab-pane-header {
+        color: $color-text-normal;
+        line-height: $line-height-plus;
+        margin: 0 0 (13px / $font-size-normal * 1em);
+        font-size: $font-size-normal;
+
+        span {
+            display: block;
+            font-weight: $font-weight-normal;
+        }
+    }
+
+    .phase-header-tab-pane-meta {
+        margin-top: 28px / $font-size-normal * 1em;
+
+        [class^="icon"] {
+            font-size: $font-size-normal;
+            margin: 0 (7px / $font-size-normal * 1em) (15px / $font-size-normal * 1em);
+            vertical-align: middle;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &.phase-header-tab-pane-meta-icon-date {
+                margin-left: 40px / $font-size-normal * 1em;
+            }
+        }
+
+        .is-not-participation-allowed,
+        .is-not-commenting-allowed,
+        .is-participation-allowed,
+        .is-commenting-allowed {
+            font-style: italic;
+        }
+
+        .is-participation-allowed,
+        .is-commenting-allowed {
+            color: $color-function-valid;
         }
     }
 }

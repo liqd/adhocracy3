@@ -92,30 +92,16 @@ class TestIAssetMetadata:
                               'mime_type': '',
                               'size': 0}
 
-    def test_get_with_backreference(self, meta, context, mock_graph):
-        context.__graph__ = mock_graph
+    def test_get_with_backreference(self, meta, context, sheet_catalogs,
+                                    search_result):
         inst = meta.sheet_class(meta, context)
         attacher = testing.DummyResource()
-        mock_graph.get_back_references_for_isheet.return_value = {
-            'picture': [attacher]}
+        sheet_catalogs.search.return_value =\
+            search_result._replace(elements=[attacher])
         assert inst.get() == {'attached_to': [attacher],
                               'filename': '',
                               'mime_type': '',
                               'size': 0}
-
-    def test_get_with_multiple_backreferences(self, meta, context, mock_graph):
-        context.__graph__ = mock_graph
-        inst = meta.sheet_class(meta, context)
-        pic_attacher1 = testing.DummyResource()
-        pic_attacher2 = testing.DummyResource()
-        img_attacher = testing.DummyResource()
-        mock_graph.get_back_references_for_isheet.return_value = {
-            'picture': [pic_attacher1, pic_attacher2],
-            'image': [img_attacher]}
-        appstruct = inst.get()
-        assert set(appstruct['attached_to']) == {pic_attacher1,
-                                                 pic_attacher2,
-                                                 img_attacher}
 
     def test_set_and_get(self, meta, context):
         inst = meta.sheet_class(meta, context)

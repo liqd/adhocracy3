@@ -3,12 +3,10 @@
         {{ title }}
     </div>
 
-    <a href="{{path | adhResourceUrl:'create_proposal'}}">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
-
     <div class="mein-berlin-kiezkassen-detail-listing">
         <adh-listing
             data-path="{{path}}"
-            data-ng-show="!showMap"
+            data-ng-show="!shared.isShowMap"
             data-no-create-form="true"
             data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
             data-params="{tag: 'LAST'}"
@@ -17,10 +15,17 @@
             </adh-mein-berlin-kiezkassen-proposal-list-item>
         </adh-listing>
 
-        <adh-wait condition="showMap">
+        <div
+            class="map-info"
+            data-ng-if="shared.isShowMap"
+            data-adh-html-translate="TR__MAP_INCOMPLETE"
+            data-translate-templates="{
+                link: '&lt;a href=&quot;&quot; data-ng-click=&quot;showMap(false)&quot;&gt;{{ content }}&lt;/a&gt;'
+        }"></div>
+        <adh-wait condition="shared.isShowMap">
             <adh-map-listing
                 data-path="{{path}}"
-                data-ng-show="showMap"
+                data-ng-show="shared.isShowMap"
                 data-polygon="polygon"
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
