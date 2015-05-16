@@ -8,7 +8,7 @@ def test_sectionversion_meta():
     from .sample_section import ISectionVersion
     meta = sectionversion_meta
     assert meta.iresource is ISectionVersion
-    assert meta.permission_create == 'edit_section'
+    assert meta.permission_create == 'edit_proposal'
 
 
 def test_section_meta():
@@ -20,7 +20,7 @@ def test_section_meta():
     assert meta.iresource is ISection
     assert meta.element_types == [ITag, ISectionVersion]
     assert meta.item_type == ISectionVersion
-    assert meta.permission_create == 'create_section'
+    assert meta.permission_create == 'edit_proposal'
 
 
 @fixture

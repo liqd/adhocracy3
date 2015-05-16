@@ -458,14 +458,14 @@ def _create_initial_content(context: IPool, registry: Registry, options: dict):
 
 
 mercator_acm = ACM().deserialize(
-    {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
-     'permissions': [['create_mercator_proposal',      None,       None,        Deny,          Deny,      None,      None,    Allow],  # noqa
-                     ['edit_mercator_proposal',        None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
-                     ['view_sheet_heardfrom',          None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['create_comment',                None,       Deny,        None,          None,      None,      None,    Allow],  # noqa
-                     ['edit_comment',                  None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
-                     ['create_rate',                   None,       Deny,        None,          None,      None,      None,    Allow],  # noqa
-                     ['edit_rate',                     None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
+    {'principals':                                   ['Everyone', 'Anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin', 'god'],  # noqa
+     'permissions': [['create_mercator_proposal',      Deny,       None,        None,          None,          None,      None,        None,   None],  # noqa
+                     ['edit_mercator_proposal',        None,       None,        None,          None,          Deny,      None,        Allow,  Allow],  # noqa
+                     ['view_sheet_heardfrom',          None,       None,        None,          None,          Allow,     Allow,       Allow,  Allow],  # noqa
+                     ['create_comment',                Deny,       None,        None,          None,          None,      None,        None,   None],  # noqa
+                     ['edit_comment',                  Deny,       None,        None,          None,          None,      None,        None,   None],  # noqa
+                     ['create_rate',                   Deny,       None,        None,          None,          None,      None,        None,   None],  # noqa
+                     ['edit_rate',                     Deny,       None,        None,          None,          None,      None,        None,   None],  # noqa
                      ]})
 
 

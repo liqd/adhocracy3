@@ -45,44 +45,34 @@ god_password = 'password'
 """The password for the god user, default value."""
 god_email = 'sysadmin@test.de'
 """The email for the god user, default value."""
-reader_header = {'X-User-Path': '/principals/users/0000001',
-                 'X-User-Token': 'SECRET_READER'}
-"""The authentication headers for the `reader`, used by functional fixtures.
+
+participant_header = {'X-User-Path': '/principals/users/0000001',
+                      'X-User-Token': 'SECRET_PARTICIPANT'}
+"""The authentication headers for the `participant`, used by funct. fixtures.
 This assumes the user exists with path == 'X-User-Path'.
 """
-reader_login = 'reader'
-reader_password = 'password'
-reader_roles = ['reader']
-annotator_header = {'X-User-Path': '/principals/users/0000002',
-                    'X-User-Token': 'SECRET_ANNOTATOR'}
-annotator_login = 'annotator'
-annotator_password = 'password'
-annotator_roles = ['annotator']
-contributor_header = {'X-User-Path': '/principals/users/0000003',
-                      'X-User-Token': 'SECRET_CONTRIBUTOR'}
-contributor_login = 'contributor'
-contributor_password = 'password'
-contributor_roles = ['contributor']
-editor_header = {'X-User-Path': '/principals/users/0000004',
-                 'X-User-Token': 'SECRET_EDITOR'}
-editor_login = 'editor'
-editor_password = 'password'
-editor_roles = ['editor']
-reviewer_header = {'X-User-Path': '/principals/users/0000005',
-                   'X-User-Token': 'SECRET_REVIEWER'}
-reviewer_login = 'reviewer'
-reviewer_password = 'password'
-reviewer_roles = ['reviewer']
-manager_header = {'X-User-Path': '/principals/users/0000006',
-                  'X-User-Token': 'SECRET_EDITOR'}
-manager_login = 'manager'
-manager_password = 'password'
-manager_roles = ['manager']
-admin_header = {'X-User-Path': '/principals/users/0000007',
+participant_login = 'participant'
+participant_password = 'password'
+
+moderator_header = {'X-User-Path': '/principals/users/0000002',
+                    'X-User-Token': 'SECRET_MODERATOR'}
+moderator_login = 'moderator'
+moderator_password = 'password'
+
+initiator_header = {'X-User-Path': '/principals/users/0000003',
+                    'X-User-Token': 'SECRET_INITIATOR'}
+initiator_login = 'initiator'
+initiator_password = 'password'
+
+admin_header = {'X-User-Path': '/principals/users/0000004',
                 'X-User-Token': 'SECRET_ADMIN'}
 admin_login = 'admin'
 admin_password = 'password'
-admin_roles = ['admin']
+
+participant2_header = {'X-User-Path': '/principals/users/0000005',
+                       'X-User-Token': 'SECRET_PARTICIPANT2'}
+participant2_login = 'participant2'
+participant2_password = 'password'
 
 broken_header = {'X-User-Path': '/principals/users/0000001',
                  'X-User-Token': ''}
@@ -615,44 +605,26 @@ def add_test_users(root, registry):
                    god_header['X-User-Path'],
                    god_header['X-User-Token'],
                    registry)
-    add_user(root, login=reader_login, password=reader_password,
-             email='reader@example.org', roles=['reader'], registry=registry)
-    add_user_token(root,
-                   reader_header['X-User-Path'],
-                   reader_header['X-User-Token'],
-                   registry)
-    add_user(root, login=annotator_login, password=annotator_password,
-             email='annotator@example.org', roles=['annotator'],
+    add_user(root, login=participant_login, password=participant_password,
+             email='participant@example.org', roles=['participant'],
              registry=registry)
     add_user_token(root,
-                   annotator_header['X-User-Path'],
-                   annotator_header['X-User-Token'],
+                   participant_header['X-User-Path'],
+                   participant_header['X-User-Token'],
                    registry)
-    add_user(root, login=contributor_login, password=contributor_password,
-             email='contributor@example.org', roles=['contributor'],
+    add_user(root, login=moderator_login, password=moderator_password,
+             email='moderator@example.org', roles=['moderator'],
              registry=registry)
     add_user_token(root,
-                   contributor_header['X-User-Path'],
-                   contributor_header['X-User-Token'],
+                   moderator_header['X-User-Path'],
+                   moderator_header['X-User-Token'],
                    registry)
-    add_user(root, login=editor_login, password=editor_password,
-             email='editor@example.org', roles=['editor'], registry=registry)
-    add_user_token(root,
-                   editor_header['X-User-Path'],
-                   editor_header['X-User-Token'],
-                   registry)
-    add_user(root, login=reviewer_login, password=reviewer_password,
-             email='reviewer@example.org', roles=['reviewer'],
+    add_user(root, login=initiator_login, password=initiator_password,
+             email='initiator@example.org', roles=['initiator'],
              registry=registry)
     add_user_token(root,
-                   reviewer_header['X-User-Path'],
-                   reviewer_header['X-User-Token'],
-                   registry)
-    add_user(root, login=manager_login, password=manager_password,
-             email='manager@example.org', roles=['manager'], registry=registry)
-    add_user_token(root,
-                   manager_header['X-User-Path'],
-                   manager_header['X-User-Token'],
+                   initiator_header['X-User-Path'],
+                   initiator_header['X-User-Token'],
                    registry)
     add_user(root, login=admin_login, password=admin_password,
              email='admin@example.org', roles=['admin'], registry=registry)
@@ -660,6 +632,13 @@ def add_test_users(root, registry):
                    admin_header['X-User-Path'],
                    admin_header['X-User-Token'],
                    registry)
+    add_user_token(root,
+                   participant2_header['X-User-Path'],
+                   participant2_header['X-User-Token'],
+                   registry)
+    add_user(root, login=participant2_login, password=participant2_password,
+             email='participant2@example.org', roles=['participant'],
+             registry=registry)
 
 
 def add_create_test_users_subscriber(configurator):
@@ -801,7 +780,7 @@ class AppUser:
                       iresource: IInterface,
                       cstruct: dict) -> TestResponse:
         """Build and post request to create a new resource."""
-        url = self.rest_url + self.base_path + path
+        url = self._build_url(path)
         props = self._build_post_body(iresource, cstruct)
         resp = self.app.post_json(url, props, headers=self.header,
                                   expect_errors=True)
@@ -809,14 +788,14 @@ class AppUser:
 
     def put(self, path: str, cstruct: dict={}) -> TestResponse:
         """Put request to modify a resource."""
-        url = self.rest_url + self.base_path + path
+        url = self._build_url(path)
         resp = self.app.put_json(url, cstruct, headers=self.header,
                                  expect_errors=True)
         return resp
 
     def post(self, path: str, cstruct: dict={}) -> TestResponse:
         """Post request to create a new resource."""
-        url = self.rest_url + self.base_path + path
+        url = self._build_url(path)
         resp = self.app.post_json(url, cstruct, headers=self.header,
                                   expect_errors=True)
         return resp
@@ -825,21 +804,29 @@ class AppUser:
         return {'content_type': iresource.__identifier__,
                 'data': cstruct}
 
+    def _build_url(self, path: str) -> str:
+        if path.startswith('http'):
+            return path
+        return self.rest_url + self.base_path + path
+
     def batch(self, subrequests: list):
         """Build and post batch request to the backend rest server."""
         resp = self.app.post_json(batch_url, subrequests, headers=self.header,
                                   expect_errors=True)
         return resp
 
-    def get(self, path: str) -> TestResponse:
+    def get(self, path: str, params={}) -> TestResponse:
         """Send get request to the backend rest server."""
-        url = self.rest_url + self.base_path + path
-        resp = self.app.get(url, headers=self.header, expect_errors=True)
+        url = self._build_url(path)
+        resp = self.app.get(url,
+                            headers=self.header,
+                            params=params,
+                            expect_errors=True)
         return resp
 
     def options(self, path: str) -> TestResponse:
         """Send options request to the backend rest server."""
-        url = self.rest_url + self.base_path + path
+        url = self._build_url(path)
         resp = self.app.options(url, headers=self.header, expect_errors=True)
         return resp
 
@@ -856,44 +843,38 @@ class AppUser:
 
 @fixture(scope='class')
 def app_anonymous(app) -> TestApp:
-    """Return backend test app wrapper with reader authentication."""
+    """Return backend test app wrapper with participant authentication."""
     return AppUser(app, base_path='/adhocracy')
 
 
 @fixture(scope='class')
 def app_broken_token(app) -> TestApp:
-    """Return backend test app wrapper with reader authentication."""
+    """Return backend test app wrapper with participant authentication."""
     return AppUser(app, base_path='/adhocracy', header=broken_header)
 
 
 @fixture(scope='class')
-def app_reader(app) -> TestApp:
-    """Return backend test app wrapper with reader authentication."""
-    return AppUser(app, base_path='/adhocracy', header=reader_header)
+def app_participant(app) -> TestApp:
+    """Return backend test app wrapper with participant authentication."""
+    return AppUser(app, base_path='/adhocracy', header=participant_header)
 
 
 @fixture(scope='class')
-def app_annotator(app):
-    """Return backend test app wrapper with annotator authentication."""
-    return AppUser(app, base_path='/adhocracy', header=annotator_header)
+def app_participant2(app) -> TestApp:
+    """Return backend test app wrapper with participant authentication."""
+    return AppUser(app, base_path='/adhocracy', header=participant2_header)
 
 
 @fixture(scope='class')
-def app_contributor(app):
-    """Return backend test app wrapper with contributor authentication."""
-    return AppUser(app, base_path='/adhocracy', header=contributor_header)
+def app_moderator(app):
+    """Return backend test app wrapper with moderator authentication."""
+    return AppUser(app, base_path='/adhocracy', header=moderator_header)
 
 
 @fixture(scope='class')
-def app_editor(app):
-    """Return backend test app wrapper with editor authentication."""
-    return AppUser(app, base_path='/adhocracy', header=editor_header)
-
-
-@fixture(scope='class')
-def app_manager(app):
-    """Return backend test app wrapper with manager authentication."""
-    return AppUser(app, base_path='/adhocracy', header=manager_header)
+def app_initiator(app):
+    """Return backend test app wrapper with initiator authentication."""
+    return AppUser(app, base_path='/adhocracy', header=initiator_header)
 
 
 @fixture(scope='class')

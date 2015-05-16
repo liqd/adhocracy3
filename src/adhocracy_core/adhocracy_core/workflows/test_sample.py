@@ -25,7 +25,7 @@ def test_initate_and_transition_to_announce(registry, context):
     assert workflow.state_of(context) is None
     workflow.initialize(context)
     assert workflow.state_of(context) is 'draft'
-    assert get_acl(context) == [('Deny', 'role:reader', 'view')]
+    assert ('Deny', 'role:participant', 'view') in get_acl(context)
     request = testing.DummyRequest()  # bypass permission check
     workflow.transition_to_state(context, request, 'announced')
     assert workflow.state_of(context) is 'announced'

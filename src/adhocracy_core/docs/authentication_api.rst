@@ -9,27 +9,27 @@ Prerequisites
 
 Some imports to work with rest api calls::
 
+    >>> from copy import copy
     >>> from pprint import pprint
-    >>> from adhocracy_core.testing import admin_header, contributor_header, god_header
+    >>> from adhocracy_core.testing import broken_header
 
-Start Adhocracy testapp::
+Start adhocracy app and log in some users::
 
-    >>> from webtest import TestApp
-    >>> app = getfixture('app')
-    >>> testapp = TestApp(app)
-    >>> rest_url = 'http://localhost'
-
+    >>> anonymous = getfixture('app_anonymous')
+    >>> participant = getfixture('app_participant')
+    >>> moderator = getfixture('app_moderator')
+    >>> admin = getfixture('app_admin')
 
 Test that the relevant resources and sheets exist:
 
-    >>> resp_data = testapp.get("/meta_api/").json
-    >>> 'adhocracy_core.sheets.versions.IVersions' in resp_data['sheets']
+    >>> resp = anonymous.get("http://localhost/meta_api/").json
+    >>> 'adhocracy_core.sheets.versions.IVersions' in resp['sheets']
     True
-    >>> 'adhocracy_core.sheets.principal.IUserBasic' in resp_data['sheets']
+    >>> 'adhocracy_core.sheets.principal.IUserBasic' in resp['sheets']
     True
-    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['sheets']
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp['sheets']
     True
-    >>> 'adhocracy_core.sheets.principal.IPasswordAuthentication' in resp_data['sheets']
+    >>> 'adhocracy_core.sheets.principal.IPasswordAuthentication' in resp['sheets']
     True
 
 User Creation (Registration)
@@ -39,7 +39,7 @@ A new user is registered by creating a user object under the
 ``/principals/users`` pool. On success, the response contains the
 path of the new user::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
+    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy_core.sheets.principal.IUserBasic': {
     ...                  'name': 'Anna Müller'},
@@ -47,10 +47,10 @@ path of the new user::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop).json
-    >>> resp_data["content_type"]
+    >>> resp = anonymous.post("http://localhost/principals/users", data).json
+    >>> resp["content_type"]
     'adhocracy_core.resources.principal.IUser'
-    >>> user_path = resp_data["path"]
+    >>> user_path = resp["path"]
     >>> user_path
     '.../principals/users/00...
 
@@ -71,7 +71,7 @@ to be used (see "Account Activation" below).
 On failure, the backend responds with status code 400 and an error message.
 E.g. when we try to register a user with an empty password::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
+    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy_core.sheets.principal.IUserBasic': {
     ...                  'name': 'Other User'},
@@ -79,9 +79,10 @@ E.g. when we try to register a user with an empty password::
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': ''}}}
-    >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop,
-    ...                               status=400).json
-    >>> pprint(resp_data)
+    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp.status_code
+    400
+    >>> pprint(resp.json)
     {'errors': [{'description': 'Required',
                  'location': 'body',
                  'name': 'data.adhocracy_core.sheets.principal.IPasswordAuthentication.password'}],
@@ -103,7 +104,7 @@ conditions can occur:
 For example, if we try to register a user whose email address is already
 registered::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
+    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy_core.sheets.principal.IUserBasic': {
     ...                  'name': 'New user with old email'},
@@ -111,9 +112,10 @@ registered::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop,
-    ...                               status=400).json
-    >>> pprint(resp_data)
+    >>> resp = anonymous.post('http://localhost/principals/users', data)
+    >>> resp.status_code
+    400
+    >>> pprint(resp.json)
     {'errors': [{'description': 'The user login email is not unique',
                  'location': 'body',
                  'name': 'data.adhocracy_core.sheets.principal.IUserExtended.email'}],
@@ -149,8 +151,10 @@ Before they have confirmed their email address, new users are invisible
 (hidden). They won't show up in user listings, and retrieving information
 about them manually leads to a *410 Gone* response (see :doc:`deletion`)::
 
-    >>> resp_data = testapp.get(user_path, status=410).json
-    >>> resp_data['reason']
+    >>> resp = anonymous.get(user_path)
+    >>> resp.status_code
+    410
+    >>> resp.json['reason']
     'hidden'
 
 On user registration, the backend sends a mail with an activation link
@@ -163,9 +167,9 @@ must post a JSON request containing the path to the
 ``activate_account`` endpoint of the backend::
 
     >>> newest_activation_path = getfixture('newest_activation_path')
-    >>> prop = {'path': newest_activation_path}
-    >>> resp_data = testapp.post_json('/activate_account', prop).json
-    >>> pprint(resp_data)
+    >>> data = {'path': newest_activation_path}
+    >>> resp = anonymous.post('http://localhost/activate_account', data).json
+    >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
      'user_token': '...'}
@@ -175,10 +179,11 @@ The backend responds with either response code 200 and 'status':
 successful login request (see next section).  This means that the user
 account has been activated and the user is now logged in. ::
 
-    >>> prop = {'path': '/activate/blahblah'}
-    >>> resp_data = testapp.post_json('/activate_account', prop,
-    ...                               status=400).json
-    >>> pprint(resp_data)
+    >>> data = {'path': '/activate/blahblah'}
+    >>> resp = anonymous.post('http://localhost/activate_account', data)
+    >>> resp.status_code
+    400
+    >>> pprint(resp.json)
     {'errors': [{'description': 'Unknown or expired activation path',
                  'location': 'body',
                  'name': 'path'}],
@@ -206,14 +211,14 @@ yet!)
 Since the user account has been activated, the public part of the user
 information is now visible to everybody::
 
-    >>> resp_data = testapp.get(user_path).json
-    >>> resp_data['data']['adhocracy_core.sheets.principal.IUserBasic']['name']
+    >>> resp = anonymous.get(user_path).json
+    >>> resp['data']['adhocracy_core.sheets.principal.IUserBasic']['name']
     'Anna Müller'
 
 Like every resource, the user has a metadata sheet with creation information.
 In the case of users, the creator is the user themselves::
 
-    >>> resp_metadata = resp_data['data']['adhocracy_core.sheets.metadata.IMetadata']
+    >>> resp_metadata = resp['data']['adhocracy_core.sheets.metadata.IMetadata']
     >>> resp_metadata['creator']
     '.../principals/users/00...
     >>> resp_metadata['creator'] == user_path
@@ -226,26 +231,30 @@ User Login
 To log-in an existing and activated user via password, the frontend posts a
 JSON request to the URL ``login_username`` with a user name and password::
 
-    >>> prop = {'name': 'Anna Müller',
+    >>> data = {'name': 'Anna Müller',
     ...         'password': 'EckVocUbs3'}
-    >>> resp_data = testapp.post_json('/login_username', prop).json
-    >>> pprint(resp_data)
+    >>> resp = anonymous.post('http://localhost/login_username', data).json
+    >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
      'user_token': '...'}
-    >>> user_path = resp_data['user_path']
-    >>> user_token_via_username = resp_data['user_token']
+    >>> user_path = resp['user_path']
+    >>> user_token_via_username = resp['user_token']
+    >>> headers = {'X-User-Path': user_path,
+    ...            'X-User-Token': user_token_via_username}
+    >>> user = copy(anonymous)
+    >>> user.header = headers
 
 Or to ``login_email``, specifying the user's email address instead of name::
 
-    >>> prop = {'email': 'anna@example.org',
+    >>> data = {'email': 'anna@example.org',
     ...        'password': 'EckVocUbs3'}
-    >>> resp_data = testapp.post_json('/login_email', prop).json
-    >>> pprint(resp_data)
+    >>> resp = anonymous.post('http://localhost/login_email', data).json
+    >>> pprint(resp)
     {'status': 'success',
      'user_path': '.../principals/users/...',
      'user_token': '...'}
-    >>> user_token_via_email = resp_data['user_token']
+    >>> user_token_via_email = resp['user_token']
 
 On success, the backend sends back the path to the object
 representing the logged-in user and a token that must be used to authorize
@@ -255,10 +264,12 @@ An error is returned if the specified user name or email doesn't exist or if
 the wrong password is specified. For security reasons, the same error message
 (referring to the password) is given in all these cases::
 
-    >>> prop = {'name': 'No such user',
+    >>> data = {'name': 'No such user',
     ...         'password': 'EckVocUbs3'}
-    >>> resp_data = testapp.post_json('/login_username', prop, status=400).json
-    >>> pprint(resp_data)
+    >>> resp = anonymous.post('http://localhost/login_username', data)
+    >>> resp.status_code
+    400
+    >>> pprint(resp.json)
     {'errors': [{'description': "User doesn't exist or password is wrong",
                  'location': 'body',
                  'name': 'password'}],
@@ -282,35 +293,37 @@ respectively. The backend validates the token. If it's valid and not
 expired, the requested action is performed in the name and with the rights
 of the logged-in user.
 
-Without authentication we may not post anything::    
+Without authentication we may not post anything::
 
-    >>> resp_data = testapp.options(rest_url + "/adhocracy").json
-    >>> 'POST' not in resp_data
+    >>> resp = anonymous.options("/").json
+    >>> 'POST' not in resp
     True
 
 With authentication instead we may::
 
-    >>> resp_data = testapp.options(rest_url + "/adhocracy", headers=god_header).json
-    >>> pprint(resp_data['POST']['request_body'])
+    >>> resp = admin.options("/").json
+    >>> pprint(resp['POST']['request_body'])
     [...'adhocracy_core.resources.pool.IBasicPool',...]
 
 If the token is not valid or expired the backend responds with an error status
 that identifies the "X-User-Token" header as source of the problem::
 
-    >>> broken_header = {'X-User-Path': god_header['X-User-Path'],
-    ...                  'X-User-Token': 'lalala'}
-    >>> resp_data = testapp.get('/meta_api/', headers=broken_header,
-    ...                         status=400).json
-    >>> sorted(resp_data.keys())
+    >>> broken = copy(anonymous)
+    >>> broken.header = broken_header
+    >>> resp = broken.get('http://localhost/meta_api/')
+    >>> resp.status_code
+    400
+    >>> sorted(resp.json.keys())
     ['errors', 'status']
-    >>> resp_data['status']
+    >>> resp.json['status']
     'error'
-    >>> resp_data['errors'][0]['location']
+    >>> resp.json['errors'][0]['location']
     'header'
-    >>> resp_data['errors'][0]['name']
+    >>> resp.json['errors'][0]['name']
     'X-User-Token'
-    >>> resp_data['errors'][0]['description']
+    >>> resp.json['errors'][0]['description']
     'Invalid user token'
+    >>> anonymous.header = {}
 
 Tokens will usually expire after some time. (In the current implementation,
 they expire by default after 30 days, but configurations may change this.)
@@ -321,39 +334,39 @@ the user must log in again.
 Viewing Users
 -------------
 
-Without proper authorization, only very limited information on each user is
+Without dataer authorization, only very limited information on each user is
 visible::
 
-    >>> resp_data = testapp.get (user_path).json
-    >>> resp_data['data']['adhocracy_core.sheets.principal.IUserBasic']
+    >>> resp = anonymous.get(user_path).json
+    >>> resp['data']['adhocracy_core.sheets.principal.IUserBasic']
     {'name': 'Anna Müller'}
-    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['data']
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp['data']
     False
-    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     False
 
 Only admins and the user herself can view extended information such as her
 email address::
 
-    >>> resp_data = testapp.get (user_path, headers=admin_header).json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.principal.IUserExtended'])
+    >>> resp = admin.get (user_path).json
+    >>> pprint(resp['data']['adhocracy_core.sheets.principal.IUserExtended'])
     {'email': 'anna@example.org', 'tzname': 'UTC'}
-    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     True
     >>> headers = {'X-User-Path': user_path,
     ...            'X-User-Token': user_token_via_username}
-    >>> resp_data = testapp.get (user_path, headers=headers).json
-    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['data']
+    >>> resp = user.get(user_path).json
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp['data']
     True
-    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     True
 
 Other users, even if logged in, cannot::
 
-    >>> resp_data = testapp.get (user_path, headers=contributor_header).json
-    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp_data['data']
+    >>> resp = participant.get(user_path).json
+    >>> 'adhocracy_core.sheets.principal.IUserExtended' in resp['data']
     False
-    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp_data['data']
+    >>> 'adhocracy_core.sheets.principal.IPermissions' in resp['data']
     False
 
 
@@ -378,12 +391,14 @@ the user to be logged in from different devices at the same time. ::
     True
     >>> headers = {'X-User-Path': user_path,
     ...            'X-User-Token': user_token_via_username }
-    >>> resp_data = testapp.get('/meta_api/', headers=headers).json
-    >>> 'resources' in resp_data.keys()
+    >>> user_reloggedin = copy(anonymous)
+    >>> user.header = headers
+    >>> resp = user_reloggedin.get('http://localhost/meta_api/').json
+    >>> 'resources' in resp.keys()
     True
     >>> headers['X-User-Token'] = user_token_via_email
-    >>> resp_data = testapp.get('/meta_api/', headers=headers).json
-    >>> 'resources' in resp_data.keys()
+    >>> resp = user_reloggedin.get('http://localhost/meta_api/').json
+    >>> 'resources' in resp.keys()
     True
 
 User Password reset
@@ -391,8 +406,8 @@ User Password reset
 
 The frontend sends an email to the create password reset end point
 
-    >>> prop = {'email': 'anna@example.org'}
-    >>> resp = testapp.post_json(rest_url + "/create_password_reset", prop)
+    >>> data = {'email': 'anna@example.org'}
+    >>> resp = anonymous.post("http://localhost/create_password_reset", data)
     >>> resp.status_code
     200
 
@@ -405,17 +420,17 @@ If the user clicks on this link, the frontend has to send a post request with th
 new password to the reset password end point::
 
     >>> newest_reset_path = getfixture('newest_reset_path')()
-    >>> prop = {'path': newest_reset_path,
+    >>> data = {'path': newest_reset_path,
     ...         'password': 'new_password'}
-    >>> resp_data = testapp.post_json('/password_reset', prop).json
-    >>> pprint(resp_data)
+    >>> resp = anonymous.post('http://localhost/password_reset', data).json
+    >>> pprint(resp)
     {'status': 'success',
-     'user_path': 'http://localhost/principals/users/0000015/',
+     'user_path': 'http://localhost/principals/users/0000011/',
      'user_token':...
 
 If the user is not activated yet::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
+    >>> data = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy_core.sheets.principal.IUserBasic': {
     ...                  'name': 'Gerd Müller'},
@@ -423,27 +438,29 @@ If the user is not activated yet::
     ...                  'email': 'gerd@example.org'},
     ...              'adhocracy_core.sheets.principal.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop).json
-    >>> user_path = resp_data["path"]
+    >>> resp = anonymous.post("http://localhost/principals/users", data).json
+    >>> user_path = resp["path"]
 
-    >>> resp_data = testapp.get(user_path, status=410).json
-    >>> resp_data['reason']
+    >>> resp = anonymous.get(user_path).json
+    >>> resp['reason']
     'hidden'
 
-but does a successfull password reset::
+but does a successful password reset::
 
-    >>> prop = {'email': 'gerd@example.org'}
-    >>> resp = testapp.post_json(rest_url + "/create_password_reset", prop)
+    >>> data = {'email': 'gerd@example.org'}
+    >>> resp = anonymous.post("http://localhost/create_password_reset", data)
     >>> resp.status_code
     200
 
     >>> newest_reset_path = getfixture('newest_reset_path')()
-    >>> prop = {'path': newest_reset_path,
+    >>> data = {'path': newest_reset_path,
     ...         'password': 'new_password'}
-    >>> resp_data = testapp.post_json('/password_reset', prop).json
+    >>> resp = anonymous.post("http://localhost/password_reset", data)
+    >>> resp.status_code
+    200
 
 he is activated ::
 
-    >>> resp_data = testapp.get(user_path, status=200).json
-    >>> resp_data['path'] == user_path
+    >>> resp = anonymous.get(user_path).json
+    >>> resp['path'] == user_path
     True

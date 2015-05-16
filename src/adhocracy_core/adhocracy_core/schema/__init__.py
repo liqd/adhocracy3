@@ -185,18 +185,17 @@ class TimeZoneName(AdhocracySchemaNode):
     missing = colander.drop
     validator = colander.OneOf(_ZONES)
 
-ROLE_PRINCIPALS = ['reader',
-                   'annotator',
-                   'contributor',
+ROLE_PRINCIPALS = ['participant',
+                   'moderator',
                    'creator',
-                   'editor',
-                   'manager',
+                   'initiator',
                    'admin',
                    'god',
                    ]
 
 SYSTEM_PRINCIPALS = ['Everyone',
                      'Authenticated',
+                     'Anonymous'
                      ]
 
 
@@ -208,7 +207,7 @@ class Role(AdhocracySchemaNode):
     """
 
     schema_type = colander.String
-    default = 'reader'
+    default = 'creator'
     missing = colander.drop
     validator = colander.OneOf(ROLE_PRINCIPALS)
 
@@ -217,7 +216,7 @@ class Roles(colander.SequenceSchema):
 
     """List of Permssion :term:`role` names.
 
-    Example value: ['reader', 'editor']
+    Example value: ['initiator']
     """
 
     # TODO support the 'readonly' keyword, inherit AdhocracySchemaNode

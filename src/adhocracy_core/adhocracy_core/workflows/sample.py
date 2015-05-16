@@ -6,9 +6,9 @@ sample_meta = {
     'states': {
         'draft': {'title': 'Draft',
                   'description': 'This phase is for internal review.',
-                  'acm': {'principals': ['reader'],
+                  'acm': {'principals': ['participant'],
                           'permissions': [['view', 'Deny']]},
-                  'display_only_to_roles': ['manager']
+                  'display_only_to_roles': ['admin']
                   },
         'announced': {'title': 'Announced',
                       'description': '',

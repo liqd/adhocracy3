@@ -4,11 +4,14 @@ Workflows
 Preliminaries
 -------------
 
-For testing, we need to import some stuff and start the Adhocracy testapp::
+Some imports to work with rest api calls::
 
     >>> from pprint import pprint
     >>> from adhocracy_core.resources.pool import IBasicPool
     >>> from adhocracy_core.resources.sample_proposal import IProposal
+
+Start adhocracy app and log in some users::
+
     >>> app_god = getfixture('app_god')
     >>> app_god.base_path = '/adhocracy'
 
@@ -30,8 +33,8 @@ State transitions can have a callable to execute arbitrary tasks.
 
 The MetaAPI gives us the states and transitions metadata for each workflow::
 
-    >>> resp_data = app_god.get('/../meta_api').json
-    >>> workflow = resp_data['workflows']['sample']
+    >>> resp = app_god.get('http://localhost/meta_api').json
+    >>> workflow = resp['workflows']['sample']
 
 State metadata contains a human readable title::
 
@@ -47,7 +50,7 @@ a description::
 a local ACM (see doc:`glossary`) that is set when entering this state::
 
     >>> state['acm']['principals']
-    ['reader']
+    ['participant']
     >>> state['acm']['permissions']
     [['view', 'Deny']]
 
@@ -55,7 +58,7 @@ a local ACM (see doc:`glossary`) that is set when entering this state::
 a hint for the frontend if displaying this state in listing should be restricted::
 
     >>> state['display_only_to_roles']
-    ['manager']
+    ['admin']
 
 The order these states should be listet is also set, in addition this
 defines the initial workflow state (the first in the list)::
@@ -79,8 +82,8 @@ Workflow Assignment
 
 Resources have a WorkflowAssignment sheet to assign the wanted workflow::
 
-    >>> resp_data = app_god.get('/proposals/proposal_item').json
-    >>> workflow_data = resp_data['data']['adhocracy_core.sheets.workflow.ISample']
+    >>> resp = app_god.get('/proposals/proposal_item').json
+    >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
     >>> workflow_data['workflow']
     'sample'
 
@@ -104,8 +107,8 @@ Workflow transition to states
 We can also modify the state if the workflow has a suitable transition.
 First we check the available next states::
 
-    >>> resp_data = app_god.options('/proposals/proposal_item').json
-    >>> resp_data['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.ISample']
+    >>> resp = app_god.options('/proposals/proposal_item').json
+    >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.ISample']
     {'workflow_state': ['announced']}
 
 Then we can put the wanted next state:
@@ -115,8 +118,8 @@ Then we can put the wanted next state:
      >>> resp.status_code
      200
 
-    >>> resp_data = app_god.get('/proposals/proposal_item').json
-    >>> resp_data['data']['adhocracy_core.sheets.workflow.ISample']['workflow_state']
+    >>> resp = app_god.get('/proposals/proposal_item').json
+    >>> resp['data']['adhocracy_core.sheets.workflow.ISample']['workflow_state']
     'announced'
 
 NOTE: The available next states depend on the workflow transitions and user permissions.

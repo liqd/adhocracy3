@@ -15,5 +15,4 @@ def test_application_created_subscriber(monkeypatch):
     event.app.root_factory.return_value = root
     _application_created_subscriber(event)
     assert (Deny, 'role:creator', 'edit_mercator_proposal') in root.__acl__
-    assert (Allow, 'role:creator', 'view') in root.__acl__
     assert (Allow, 'role:god', 'edit_mercator_proposal') in root.__acl__

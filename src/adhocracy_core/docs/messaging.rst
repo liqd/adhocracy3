@@ -11,12 +11,12 @@ Some imports to work with rest api calls::
 
     >>> from adhocracy_core import testing
 
-Start Adhocracy testapp::
+Start Adhocracy testapp ::
 
-    >>> from webtest import TestApp
-    >>> app = getfixture('app')
-    >>> testapp = TestApp(app)
-    >>> rest_url = 'http://localhost'
+    >>> anonymous = getfixture('app_anonymous')
+    >>> participant = getfixture('app_participant')
+    >>> moderator = getfixture('app_moderator')
+    >>> admin = getfixture('app_admin')
 
 Message to a User
 -----------------
@@ -24,27 +24,26 @@ Message to a User
 The end point '/message_user' can be used to send messages from a user to
 another user or a group of users::
 
-    >>> a = {'recipient': 'http://localhost/principals/users/0000000',
-    ...      'title': 'Important notice regarding your Adhocracy account',
-    ...      'text': '''Everything is fine.
+    >>> data = {'recipient': 'http://localhost/principals/users/0000000',
+    ...         'title': 'Important notice regarding your Adhocracy account',
+    ...         'text': '''Everything is fine.
     ... Thank you for your attention and have a nice day.'''}
-    >>> resp_data = testapp.post_json(rest_url + "/message_user", a,
-    ...                              headers=testing.contributor_header)
-    >>> resp_data.status_code
+    >>> resp = participant.post('http://localhost/message_user', data)
+    >>> resp.status_code
     200
-    >>> resp_data.text
+    >>> resp.text
     '""'
 
 The fields are all required and have the following semantics:
 
 :recipient: the name of a user (`.../principals/users/...`)
 :title: the title (subject) of the message. An installation dependent prefix or
-    suffix may be added to the subject (e.g. "Adhocracy Notification: ...").
+            suffix may be added to the subject (e.g. "Adhocracy Notification: ...").
 :text: the plain-text body of the message. An installation dependent prefix
-    and/or suffix may be added to the text.
+            and/or suffix may be added to the text.
 
-The backend checks that the user has sufficient permissions to send the
-message -- only users with the *message_to_user* permission (typically granted
+        The backend checks that the user has sufficient permissions to send the
+        message -- only users with the *message_to_user* permission (typically granted
 to the contributor role) may do so. If this is the case, it sends the message
 per e-mail to the specified user, or to every user in the specified group.
 
@@ -55,12 +54,13 @@ message is sent back.
 If a user doesn't have the necessary permissions (e.g. because they are not
 logged in), the backend responds with 403 Forbidden::
 
-    >>> a = {'recipient': 'http://localhost/principals/users/0000000',
-    ...      'title': 'Important notice regarding your Adhocracy account',
-    ...      'text': '''Everything is fine.
+    >>> data= {'recipient': 'http://localhost/principals/users/0000000',
+    ...        'title': 'Important notice regarding your Adhocracy account',
+    ...        'text': '''Everything is fine.
     ... Thanks you for your attention and have a nice day.'''}
-    >>> resp_data = testapp.post_json(rest_url + "/message_user", a,
-    ...                               status=403)
+    >>> resp = anonymous.post('http://localhost/message_user', data)
+    >>> resp.status_code
+    403
 
 
 Message to a Group of User
@@ -80,18 +80,17 @@ Messages to All
 
 FIXME The following is not implemented yet. Also, it will probably be
 implemented via an internal messaging system rather then by sending mails to
-everyone.
+anonymous.
 
 The end point '/message_all' can be used to send messages from a user to
 *everybody*::
 
-    >> a = {'title': 'Call for participation',
-    ...      'text': 'With great power comes great responsibility!'}
-    >> resp_data = testapp.post_json(rest_url + "/message_all", a,
-    ...                              headers=testing.admin_header)
-    >> resp_data.status_code
+    >> data = {'title': 'Call for participation',
+    ...        'text': 'With great power comes great responsibility!'}
+    >> resp = moderator.post('http://localhost/message_all', data)
+    >> resp.status_code
     200
-    >> resp_data.text
+    >> resp.text
     '""'
 
 The fields are both required and have the same semantics as above.
@@ -104,9 +103,8 @@ function should really be used with care!
 
 The backend responds with an empty string or an error message, as above.
 
-FIXME Add test case with insufficient permissions::
-
-    >> a = {'title': 'Call for participation',
-    ...      'text': 'With great power comes great responsibility!'}
-    >> resp_data = testapp.post_json(rest_url + "/message_all", a,
-    ...                headers=testing.manager_header, status=403)
+    ...>>> data = {'title': 'Call for participation',
+    ......        'text': 'With great power comes great responsibility!'}
+    ...>>> resp = moderator.post("./../message_all", data)
+    ...>>> resp.text
+    ...403

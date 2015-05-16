@@ -114,7 +114,7 @@ class TestCatalogsServiceAdhocracy:
         from . import CatalogsServiceAdhocracy
         assert meta.iresource is ICatalogsService
         assert meta.content_name == 'catalogs'
-        assert meta.permission_add == 'add_service'
+        assert meta.permission_create == 'create_service'
         assert meta.content_class == CatalogsServiceAdhocracy
         assert issubclass(CatalogsServiceAdhocracy, CatalogsService)
 
