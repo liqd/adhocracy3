@@ -117,7 +117,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         };
     }
 
-    public options(path : string) : angular.IPromise<IOptions> {
+    public options(path : string, importOptions : boolean = true) : angular.IPromise<IOptions> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-options preliminary path: " + path;
         }
@@ -125,7 +125,13 @@ export class Service<Content extends ResourcesBase.Resource> {
 
         return this.adhCache.memoize(path, "OPTIONS",
             () => this.$http({method: "OPTIONS", url: path})
-                .then(this.importOptions, AdhError.logBackendError));
+        ).then((response) => {
+            if (importOptions) {
+                return this.importOptions(response);
+            } else {
+                return response;
+            }
+        }, AdhError.logBackendError);
     }
 
     public getRaw(path : string, params?) : angular.IHttpPromise<any> {
