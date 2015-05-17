@@ -104,7 +104,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         }
     }
 
-    private importOptions(raw : { data : any }) : IOptions {
+    private importOptions(raw : angular.IHttpPromiseCallbackArg<any>) : IOptions {
         var metadata = AdhUtil.deepPluck(raw.data, ["PUT", "request_body", "data", SIMetadata.nick]);
         return {
             OPTIONS: !!raw.data.OPTIONS,
