@@ -66,27 +66,39 @@ class TestFilteringPoolSheet:
         assert inst.meta.editable is False
         assert inst.meta.creatable is False
 
-    def test_get_empty(self, inst,  sheet_catalogs):
-        from adhocracy_core.interfaces import ISheet
+    def test_get_no_children(self, inst,  sheet_catalogs):
         appstruct = inst.get()
-        query = sheet_catalogs.search.call_args[0][0]
-        assert query.root is inst.context
-        assert query.depth == 1
-        assert query.interfaces == ISheet  # default elements target isheet
+        assert sheet_catalogs.search.called is False
         assert appstruct == {'elements': [],
                              'frequency_of': {},
                              'group_by': {},
                              'count': 0,
                              }
 
-    def test_get_search_results(self, inst, sheet_catalogs, search_result):
+    def test_get_with_children(self, inst, context,  sheet_catalogs):
+        from adhocracy_core.interfaces import ISheet
+        with_target_isheet = testing.DummyResource(__provides__=ISheet)
+        context['child1'] = with_target_isheet
+        without_target_isheet = testing.DummyResource()
+        context['child2'] = without_target_isheet
+        appstruct = inst.get()
+        assert appstruct['elements'] == [with_target_isheet]
+        assert appstruct['count'] == 1
+
+    def test_get_custom_search(self, inst, sheet_catalogs, search_result):
+        from adhocracy_core.interfaces import ISheet
         child = testing.DummyResource()
         sheet_catalogs.search.return_value = search_result._replace(
             elements=[child],
             count=1,
             frequency_of={'y': 1},
             group_by={'y': [child]})
-        appstruct = inst.get()
+        appstruct = inst.get({'indexes': {'tag': 'LAST'}})
+        query = sheet_catalogs.search.call_args[0][0]
+        assert query.root is inst.context
+        assert query.depth == 1
+        assert query.interfaces == ISheet  # default elements target isheet
+        assert query.indexes == {'tag': 'LAST'}
         assert appstruct == {'elements': [child],
                              'frequency_of': {'y': 1},
                              'group_by': {'y': [child]},
@@ -161,8 +173,10 @@ class TestFilteringPoolSheet:
 class TestIntegrationPoolSheet:
 
     @fixture
-    def pool(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def pool(self, pool_graph_catalog, registry):
+        pool = self._make_resource(registry, parent=pool_graph_catalog,
+                                   name='child')
+        return pool
 
     def _make_resource(self, registry, parent=None, name='',
                        content_type=IBasicPool):
@@ -179,7 +193,7 @@ class TestIntegrationPoolSheet:
         from adhocracy_core.utils import get_sheet
         return get_sheet(pool, IPool)
 
-    def test_get_empty(self, registry,  pool):
+    def test_get_empty(self, pool):
         inst = self._get_pool_sheet(pool)
         assert inst.get() == {'elements': [],
                               'frequency_of': {},
@@ -187,20 +201,15 @@ class TestIntegrationPoolSheet:
                               'count': 0,
                               }
 
-    def test_get_not_empty_with_target_isheet(self, registry, pool):
-        from adhocracy_core.interfaces import ISheet
-        child = self._make_resource(registry, parent=pool)
-        inst = self._get_pool_sheet(pool)
-        assert inst.get()['elements'] == [child]
-
-    def test_get_not_empty_without_target_isheet(self, registry, pool):
-        from adhocracy_core.interfaces import ISheet
-        from zope.interface.declarations import noLongerProvides
-        inst = self._get_pool_sheet(pool)
+    def test_get_custom_search_empty(self, registry, pool):
         child = self._make_resource(registry, parent=pool, name='child')
-        noLongerProvides(child, ISheet)
-        pool['catalogs'].reindex_index(child, 'interfaces')
-        assert inst.get()['elements'] == []
+        inst = self._get_pool_sheet(pool)
+        assert inst.get({'indexes': {'name':'WRONG'}})['elements'] == []
+
+    def test_get_custom_search_not_empty(self, registry, pool):
+        child = self._make_resource(registry, parent=pool, name='child')
+        inst = self._get_pool_sheet(pool)
+        assert inst.get({'indexes': {'name':'child'}})['elements'] == [child]
 
 
 @mark.usefixtures('integration')
