@@ -10,11 +10,9 @@
     .user-indicator-logout,
     .user-indicator-login,
     .user-indicator-register {
-        color: $color-text-normal;
         font-variant: normal;
 
         &:hover, &:focus {
-            color: $color-brand-one-introvert;
             text-decoration: underline;
         }
     }
