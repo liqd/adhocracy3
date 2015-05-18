@@ -5,12 +5,20 @@ name: standalone-wrapper
 category: layout
 ---
 
-A wrapper for pages that are not embedded in the application such as pages that are opened
-when you follow an Adhocracy link from your email. Could contain branding.
+A wrapper for pages that are not embedded in the application such as pages that
+are opened when you follow an Adhocracy link from your email. Could contain
+branding.
 
 ```html_example
 <div class="standalone-wrapper">
-    You have activated your account, well done!
+    <h1 class="standalone-wrapper-title">Some title</h1>
+
+    <label>
+        <span class="label-text">write something</span>
+        <input type="text" />
+    </label>
+
+    <p>You have activated your account, well done!</p>
 </div>
 ```
 */
