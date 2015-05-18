@@ -9,7 +9,7 @@ from zope.interface import noLongerProvides
 from substanced.evolution import add_evolution_step
 from substanced.util import get_acl
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import set_acl
+from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle

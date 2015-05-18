@@ -15,6 +15,7 @@ from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.authorization import acm_to_acl
+from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.schema import ACM
 from adhocracy_core.resources.geo import add_locations_service
 from adhocracy_core.catalog import ICatalogsService
@@ -26,38 +27,38 @@ import adhocracy_core.sheets.name
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
 root_acm = ACM().deserialize(
-    {'principals':                                   ['everyone', 'anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin', 'god'],  # noqa
+    {'principals':                                   ['everyone', 'anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
      'permissions': [  # general
-                     ['view',                          Allow,      None,        None,          None,         None,      None,        None,    None],  # noqa
-                     ['create',                        None,       None,        Allow,         Allow,        None,      Allow,       Allow,   Allow],  # noqa
-                     ['edit',                          None,       None,        None,          None,         Allow,     None,        Allow,   Allow],  # noqa
-                     ['edit_some',                     None,       None,        Allow,         Allow,        Allow,     Allow,       Allow,   Allow],  # noqa
-                     ['delete',                        None,       None,        None,          Allow,        Allow,     None,        Allow,   Allow],  # noqa
-                     ['hide',                          None,       None,        None,          Allow,        None,      Allow,       Allow,   Allow],  # noqa
-                     ['do_transition',                 None,       None,        None,          None,         None,      Allow,       Allow,   Allow],  # noqa
-                     ['message_to_user',               None,       None,        Allow,         Allow,        None,      Allow,       Allow,   Allow],  # noqa
+                     ['view',                          Allow,      None,        None,          None,         None,      None,        None],  # noqa
+                     ['create',                        None,       None,        Allow,         Allow,        None,      Allow,       Allow],  # noqa
+                     ['edit',                          None,       None,        None,          None,         Allow,     None,        Allow],  # noqa
+                     ['edit_some',                     None,       None,        Allow,         Allow,        Allow,     Allow,       Allow],  # noqa
+                     ['delete',                        None,       None,        None,          Allow,        Allow,     None,        Allow],  # noqa
+                     ['hide',                          None,       None,        None,          Allow,        None,      Allow,       Allow],  # noqa
+                     ['do_transition',                 None,       None,        None,          None,         None,      Allow,       Allow],  # noqa
+                     ['message_to_user',               None,       None,        Allow,         Allow,        None,      Allow,       Allow],  # noqa
                      # structure resources
-                     ['create_pool',                   None,       None,        None,          None,         None,      None,        Allow,   Allow],  # noqa
-                     ['create_organisation',           None,       None,        None,          None,         None,      None,        Allow,   Allow],  # noqa
-                     ['create_process',                None,       None,        None,          None,         None,      Allow,       Allow,   Allow],  # noqa
+                     ['create_pool',                   None,       None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_organisation',           None,       None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_process',                None,       None,        None,          None,         None,      Allow,       Allow],  # noqa
                      # simple content resources
-                     ['create_asset',                  None,       None,        Allow,         None,         None,      None,        None,    Allow],  # noqa
-                     ['create_external',               None,       None,        Allow,         None,         None,      None,        None,    Allow],  # noqa
+                     ['create_asset',                  None,       None,        Allow,         None,         None,      None,        None],  # noqa
+                     ['create_external',               None,       None,        Allow,         None,         None,      None,        None],  # noqa
                      # versioned content resources
-                     ['create_proposal',               None,       None,        Allow,         None,         None,      None,        None,    Allow],  # noqa
-                     ['edit_proposal',                 None,       None,        None,          None,         Allow,     None,        None,    Allow],  # noqa
-                     ['create_comment',                None,       None,        Allow,         Allow,        None,      None,        None,    Allow],  # noqa
-                     ['edit_comment',                  None,       None,        None,          None,         Allow,     None,        None,    Allow],  # noqa
-                     ['create_rate',                   None,       None,        Allow,         None,         None,      None,        None,    Allow],  # noqa
-                     ['edit_rate',                     None,       None,        None,          None,         Allow,     None,        None,    Allow],  # noqa
+                     ['create_proposal',               None,       None,        Allow,         None,         None,      None,        None],  # noqa
+                     ['edit_proposal',                 None,       None,        None,          None,         Allow,     None,        None],  # noqa
+                     ['create_comment',                None,       None,        Allow,         Allow,        None,      None,        None],  # noqa
+                     ['edit_comment',                  None,       None,        None,          None,         Allow,     None,        None],  # noqa
+                     ['create_rate',                   None,       None,        Allow,         None,         None,      None,        None],  # noqa
+                     ['edit_rate',                     None,       None,        None,          None,         Allow,     None,        None],  # noqa
                      # user, groups, permissions
-                     ['create_user',                   None,      Allow,        None,          None,         None,      None,        Allow,   Allow],  # noqa
-                     ['create_sheet_password',         None,      Allow,        None,          None,         None,      None,        Allow,   Allow],  # noqa
-                     ['create_sheet_userbasic',        None,      Allow,        None,          None,         None,      None,        Allow,   Allow],  # noqa
-                     ['edit_userextended',             None,       None,        None,          None,         Allow,     None,        Allow,   Allow],  # noqa
-                     ['view_userextended',             None,       None,        None,          None,         Allow,     None,        Allow,   Allow],  # noqa
-                     ['edit_sheet_permissions',        None,       None,        None,          None,         None,      None,        Allow,   Allow],  # noqa
-                     ['create_group',                  None,       None,        None,          None,         None,      None,        Allow,   Allow],  # noqa
+                     ['create_user',                   None,      Allow,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_sheet_password',         None,      Allow,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_sheet_userbasic',        None,      Allow,        None,          None,         None,      None,        Allow],  # noqa
+                     ['edit_userextended',             None,       None,        None,          None,         Allow,     None,        Allow],  # noqa
+                     ['view_userextended',             None,       None,        None,          None,         Allow,     None,        Allow],  # noqa
+                     ['edit_sheet_permissions',        None,       None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_group',                  None,       None,        None,          None,         None,      None,        Allow],  # noqa
                      ]})
 
 # fixme: remove edit_xx_permission
@@ -104,6 +105,7 @@ def _add_principals_service(context, registry):
 def _add_acl_to_app_root(context, registry):
     acl = acm_to_acl(root_acm, registry)
     set_acl(context, acl, registry=registry)
+    set_god_all_permissions(context, registry)
 
 
 def add_platform(context, registry, platform_id=None,

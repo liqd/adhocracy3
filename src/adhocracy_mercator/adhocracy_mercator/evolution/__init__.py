@@ -42,7 +42,7 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
 
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     """Disable add_proposal permissions."""
-    from adhocracy_core.utils import set_acl
+    from adhocracy_core.authorization import set_acl
     from substanced.util import get_acl
     from pyramid.threadlocal import get_current_registry
     from pyramid.security import Deny
@@ -73,7 +73,7 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
 
 def evolve4_disable_voting_and_commenting(root):
     """Disable rate and comment permissions."""
-    from adhocracy_core.utils import set_acl
+    from adhocracy_core.authorization import set_acl
     from substanced.util import get_acl
     from pyramid.threadlocal import get_current_registry
     from pyramid.security import Deny
