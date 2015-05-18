@@ -10,6 +10,7 @@ from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.interfaces import search_query
+from adhocracy_core.interfaces import search_result
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.utils import remove_keys_from_dict
 
@@ -54,11 +55,20 @@ class PoolSheet(AnnotationRessourceSheet):
     def _get_reference_appstruct(self, query: SearchQuery) -> dict:
         if not self._catalogs:
             return {}  # ease testing
-        result = self._catalogs.search(query)
+        default_query = self._get_references_query({})
+        if query == default_query:  # performance tweak
+            target_isheet = query.interfaces
+            children = self.context.values()
+            elements = [x for x in children if target_isheet.providedBy(x)]
+            result = search_result._replace(elements=elements,
+                                            count=len(elements))
+        else:
+            result = self._catalogs.search(query)
         appstruct = {'elements': result.elements,
                      'count': result.count,
                      'frequency_of': result.frequency_of,
-                     'group_by': result.group_by}
+                     'group_by': result.group_by,
+                     }
         return appstruct
 
     def get_cstruct(self, request: Request, params: dict={}) -> dict:
