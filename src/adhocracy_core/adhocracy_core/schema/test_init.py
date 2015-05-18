@@ -1175,7 +1175,7 @@ class TestACLPrincipalType:
         assert inst.serialize(node, colander.null) == colander.null
 
     def test_serialize_system_user(self, node, inst):
-        assert inst.serialize(node, 'system.User') == 'User'
+        assert inst.serialize(node, 'system.User') == 'user'
 
     def test_serialize_role(self, node, inst):
         assert inst.serialize(node, 'role:moderator') == 'moderator'

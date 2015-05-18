@@ -100,7 +100,7 @@ class TestRoot:
         from pyramid.security import Allow
         inst = registry.content.create(IRootPool.__identifier__)
         acl = get_acl(inst)
-        assert (Allow, 'system.Everyone', 'view') in acl
+        assert (Allow, 'system.Anonymous', 'view') in acl
         assert (Allow, 'system.Anonymous', 'create_user') in acl
         assert (Allow, 'system.Anonymous', 'create_sheet_password') in acl
         assert (Allow, 'system.Anonymous', 'create_sheet_userbasic') in acl
