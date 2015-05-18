@@ -458,7 +458,7 @@ def _create_initial_content(context: IPool, registry: Registry, options: dict):
 
 
 mercator_acm = ACM().deserialize(
-    {'principals':                                   ['Everyone', 'Anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin', 'god'],  # noqa
+    {'principals':                                   ['everyone', 'anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin', 'god'],  # noqa
      'permissions': [['create_mercator_proposal',      Deny,       None,        None,          None,          None,      None,        None,   None],  # noqa
                      ['edit_mercator_proposal',        None,       None,        None,          None,          Deny,      None,        Allow,  Allow],  # noqa
                      ['view_sheet_heardfrom',          None,       None,        None,          None,          Allow,     Allow,       Allow,  Allow],  # noqa

@@ -26,7 +26,7 @@ import adhocracy_core.sheets.name
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
 root_acm = ACM().deserialize(
-    {'principals':                                   ['Everyone', 'Anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin', 'god'],  # noqa
+    {'principals':                                   ['everyone', 'anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin', 'god'],  # noqa
      'permissions': [  # general
                      ['view',                          Allow,      None,        None,          None,         None,      None,        None,    None],  # noqa
                      ['create',                        None,       None,        Allow,         Allow,        None,      Allow,       Allow,   Allow],  # noqa
