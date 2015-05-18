@@ -6,4 +6,6 @@
 
 .error-page-title {
     color: $color-text-normal;
+    font-size: $font-size-large;
+    margin: (40px / $font-size-large * 1em) 0 0;
 }
