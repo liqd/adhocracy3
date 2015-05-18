@@ -6,33 +6,7 @@
                     <div class="l-header-wrapper">
                         <adh-kiezkassen-context-header></adh-kiezkassen-context-header>
                     </div>
-                    <div class="phase-header">
-                        <tabset
-                            data-full-width="true"
-                            data-closed-by-default="true">
-                            <tab data-ng-repeat="phase in phases" data-heading="{{phase.title}}" data-classes="m-phase">
-                                <h2 class="phase-header-tab-pane-header">{{phase.title}} <span>Kiezkasse</span></h2>
-                                {{phase.description}}
-                                <div class="phase-header-tab-pane-meta">
-                                    <i class="icon-comment-gap m-availability-indicator" data-ng-class="{ 'is-available': commentAvailable }"></i>
-                                         <span
-                                            class="is-commenting-allowed"
-                                            data-ng-if="commentAvailable">{{ "TR__COMMENTING_ALOWED" | translate }}</span>
-                                        <span
-                                            data-ng-if="!commentAvailable"
-                                            class="is-not-commenting-allowed">{{ "TR__COMMENTING_NOT_ALOWED" | translate }}</span>
-                                    <i class="icon-voting-gap m-availability-indicator" data-ng-class="{ 'is-available': votingAvailable }"></i>
-                                        <span
-                                            class="is-participation-allowed"
-                                            data-ng-if="votingAvailable">{{ "TR__PARTICIPATION_ALOWED" | translate }}</span>
-                                        <span
-                                            class="is-not-participation-allowed"
-                                            data-ng-if="!votingAvailable">{{ "TR__PARTICIPATION_NOT_ALOWED" | translate }}</span>
-                                    <i class="icon-calendar phase-header-tab-pane-meta-icon-date"></i> {{phase.startDate}} <span data-ng-if="phase.endDate">/ {{phase.endDate}}</span>
-                                </div>
-                            </tab>
-                        </tabset>
-                    </div>
+                    <adh-mein-berlin-kiezkassen-phase-header></adh-mein-berlin-kiezkassen-phase-header>
                 </div>
             </div>
         </div>

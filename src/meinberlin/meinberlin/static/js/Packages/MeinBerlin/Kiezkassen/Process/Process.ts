@@ -21,8 +21,7 @@ var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    $rootScope
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -49,9 +48,20 @@ export var detailDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => scope.path);
+        }
+    };
+};
 
-            // FIXME: this is not the right place for this information. It is displayed in the context header.
-            $rootScope.phases = [{
+
+export var phaseHeaderDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
+        scope: {},
+        link: (scope) => {
+            // FIXME: dummy content
+            scope.currentPhase = "Informationsphase";
+            scope.phases = [{
                 title: "Informationsphase",
                 description: "Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.",
                 processType: "Kiezkasse",
@@ -163,6 +173,7 @@ export var register = (angular) => {
             AdhTabs.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", "$rootScope", detailDirective])
+        .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", phaseHeaderDirective])
+        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", editDirective]);
 };

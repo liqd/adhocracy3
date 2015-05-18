@@ -3,7 +3,10 @@
         <li
             class="tab {{tab.classes}}"
             data-ng-repeat="tab in tabs"
-            data-ng-class="{'is-active': tab.active}">
+            data-ng-class="{
+                'is-active': tab.active,
+                'is-highlighted': tab.highlighted
+            }">
             <a class="tab-button" href="" data-ng-click="tab.select();">{{tab.heading}}</a>
         </li>
     </ul>
