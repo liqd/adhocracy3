@@ -4,13 +4,11 @@
     class="mein-berlin-proposal-form"
     name="meinBerlinProposalForm">
 
-    <h2 data-ng-if="create" class="mein-berlin-proposal-form-heading">{{ "TR__MEINBERLIN_MEIN_BERLIN_BPLAENE_SIMPLE_PROPOSAL" | translate }}</h2>
+    <h2 class="mein-berlin-proposal-form-heading">{{ "TR__MEINBERLIN_MEIN_BERLIN_BPLAENE_SIMPLE_PROPOSAL" | translate }}</h2>
 
     <div class="form-error" data-ng-repeat="error in errors track by $index">
         <p>{{ error | adhFormatError | translate }}</p>
     </div>
-
-    <!-- BASIC INFORMATION -->
 
     <!-- Name -->
     <label>
@@ -68,7 +66,10 @@
             maxlength="100"
             required="required" />
         <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.email, 'required')">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_email" | translate }}
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_EMAIL" | translate }}
+        </span>
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.email, 'email')">
+            {{ "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING" | translate }}
         </span>
     </label>
 

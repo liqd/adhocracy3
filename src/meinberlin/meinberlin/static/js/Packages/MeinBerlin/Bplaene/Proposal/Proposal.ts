@@ -27,11 +27,13 @@ export var createDirective = (
         link: (scope, element) => {
             scope.errors = [];
             scope.data = {};
-            scope.create = true;
             scope.showError = adhShowError;
 
-            scope.data.lat = undefined;
-            scope.data.lng = undefined;
+            scope.submit = () => {
+                return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
+                    console.log("success");
+                });
+            };
         }
     };
 };
