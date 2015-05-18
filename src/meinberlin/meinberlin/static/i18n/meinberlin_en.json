@@ -1,6 +1,12 @@
 {
+    "TR__AVAILABLE_COMMENT": "Commenting allowed",
+    "TR__AVAILABLE_NONE": "No participation allowed",
+    "TR__AVAILABLE_PARTICIPATION": "Participation allowed",
+    "TR__AVAILABLE_VOTING": "Rating allowed",
     "TR__BY": "by",
     "TR__CREATE_PROPOSAL": "create proposal",
+    "TR__CURRENT_STATE": "current state",
+    "TR__END_DATE": "end date",
     "TR__MAP_INCOMPLETE": "Only geolocated proposals are displayed on the map. [[link:Switch to full list.]]",
     "TR__MEINBERLIN_BUDGET": "Budget",
     "TR__MEINBERLIN_DETAIL": "Detail",
@@ -18,5 +24,7 @@
     "TR__ON": "on",
     "TR__PROPOSAL": "proposal",
     "TR__PROPOSAL_EMPTY_TEXT": "No proposals yet.",
-    "TR__PROPOSAL_LIST": "list"
+    "TR__PROPOSAL_LIST": "list",
+    "TR__START_DATE": "start date",
+    "TR__WORKFLOW_STATE": "Workflow state"
 }
