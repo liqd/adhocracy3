@@ -1,3 +1,11 @@
+/*doc
+---
+title: map
+name: map
+category: Widgets
+---
+*/
+
 .map-wrapper {
     .map-buttons {
         @include clearfix;
@@ -25,6 +33,27 @@
     }
 }
 
+/*doc
+---
+title: map info
+name: map-info
+parent: map
+---
+
+Map info is used to show action-related information in the context of a map.
+It is different from `map-info-persistant` in that it should only be used for
+information that is related to a user action and that is not shown all the
+time.
+
+```html_example
+<div class="map-info">
+    Some information with a <a href="#">link</a>.
+</div>
+<div class="map-info ng-invalid">
+    Some error with a <a href="#">link</a>.
+</div>
+```
+*/
 .map-info {
     background: $color-text-normal;
     color: $color-text-inverted;
@@ -40,6 +69,29 @@
         background: $color-function-invalid;
         font-weight: $font-weight-extrovert;
     }
+}
+
+/*doc
+---
+title: persistant map info
+name: map-info-persistant
+parent: map
+---
+
+Persistant map info is used to show general information in the context of a
+map.  It is different from `map-info` in that it should be show all the time
+rather than in response to user action.
+
+```html_example
+<div class="map-info-persistent">
+    Some information with a <a href="#">link</a>.
+</div>
+```
+*/
+.map-info-persistent {
+    background: $color-background-base-introvert;
+    font-size: $font-size-small;
+    padding: 0.5em;
 }
 
 .leaflet-marker-icon {
