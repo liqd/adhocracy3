@@ -180,7 +180,7 @@ def _download_geodata(filename: str, url: str, layer: str):
 def _fetch_all_districs(root: IResource) -> dict:
     pool = get_sheet(root, IPool)
     params = {'depth': 3,
-              'interfaces': IMultiPolygon
+              'interfaces': IMultiPolygon,
               }
     results = pool.get(params)
     bezirke = results['elements']
