@@ -204,7 +204,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         templateUrl: adhConfig.pkg_path + pkgLocation + template,
         scope: {
             refersTo: "@",
-            disabled: "@"
+            disabled: "="
         },
         link: (scope : IRateScope) : void => {
             var myRateResource : RIRateVersion;
