@@ -202,14 +202,14 @@ def mock_registry():
 def test_acm_to_acl(mock_registry):
     mock_registry.content.permissions = ['view', 'edit']
     from . import acm_to_acl
-    appstruct = {'principals':           ['Everyone', 'role:creator', 'role:annotator'],
+    appstruct = {'principals':           ['everyone', 'role:creator', 'role:annotator'],
                  'permissions': [['view',  Allow,      Allow,          Allow],
                                  ['edit',  Deny,       Allow,          None]]}
     acl = acm_to_acl(appstruct, mock_registry)
-    assert (Allow, 'Everyone', 'view') in acl
-    assert (Deny,  'Everyone', 'view') not in acl
-    assert (Deny,  'Everyone', 'edit') in acl
-    assert (Allow, 'Everyone', 'edit') not in acl
+    assert (Allow, 'everyone', 'view') in acl
+    assert (Deny,  'everyone', 'view') not in acl
+    assert (Deny,  'everyone', 'edit') in acl
+    assert (Allow, 'everyone', 'edit') not in acl
     assert (Allow, 'role:creator', 'view') in acl
     assert (Deny,  'role:creator', 'view') not in acl
     assert (Allow, 'role:creator', 'edit') in acl

@@ -1191,10 +1191,10 @@ class TestACLPrincipalType:
         assert inst.deserialize(node, 'moderator') == 'role:moderator'
 
     def test_deserialize_system_user_everyone(self, node, inst):
-        assert inst.deserialize(node, 'Everyone') == 'system.Everyone'
+        assert inst.deserialize(node, 'everyone') == 'system.Everyone'
 
     def test_deserialize_system_user_anonymous(self, node, inst):
-        assert inst.deserialize(node, 'Anonymous') == 'system.Anonymous'
+        assert inst.deserialize(node, 'anonymous') == 'system.Anonymous'
 
     def test_deserialize_raise_if_raise_else(self, node, inst):
         with raises(colander.Invalid):
@@ -1256,13 +1256,13 @@ class TestACM:
     def test_serialize(self, inst):
         appstruct = {'principals': ['system.Everyone'],
                      'permissions': [['edit', Allow]]}
-        assert inst.serialize(appstruct) == {'principals': ['Everyone'],
+        assert inst.serialize(appstruct) == {'principals': ['everyone'],
                                              'permissions': [['edit', 'Allow']]}
 
     def test_deserialize(self, inst, mock_registry):
         mock_registry.content.permissions.return_value = ['edit']
         assert inst.bind(registry=mock_registry).deserialize(
-            {'principals': ['Everyone'],
+            {'principals': ['everyone'],
              'permissions': [['edit', 'Allow']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', Allow]]}
@@ -1276,7 +1276,7 @@ class TestACM:
     def test_deserialize_noaction(self, inst, mock_registry):
         mock_registry.content.permissions.return_value = ['edit']
         assert inst.bind(registry=mock_registry).deserialize(
-            {'principals': ['Everyone'],
+            {'principals': ['everyone'],
              'permissions': [['edit', '']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', None]]}
