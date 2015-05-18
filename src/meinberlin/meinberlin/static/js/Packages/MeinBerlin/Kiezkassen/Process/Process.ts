@@ -186,7 +186,8 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
-            AdhTabs.moduleName
+            AdhTabs.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
