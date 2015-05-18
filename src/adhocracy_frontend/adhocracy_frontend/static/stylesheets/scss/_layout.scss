@@ -20,7 +20,7 @@ category: layout
 ---
 
 This deeply nested structure allows to have multiple rows where the last one
-stetches to the end of the screen (i.e. a non-static positioned container).
+stretches to the end of the screen (i.e. a non-static positioned container).
 
 The first version is implemented with `display: flex`, the second with
 `display: table`. Both are needed in order to support a wide range of browsers.
