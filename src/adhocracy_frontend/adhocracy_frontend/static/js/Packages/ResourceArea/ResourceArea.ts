@@ -23,7 +23,10 @@ export interface Dict {
 export class Provider implements angular.IServiceProvider {
     public $get;
     public defaults : {[key : string]: Dict};
-    public specifics : {[key : string]: (resource) => any};  // values return either Dict or angular.IPromise<Dict>
+    public specifics : {[key : string]: {
+        factory : (resource) => any;  // values return either Dict or angular.IPromise<Dict>
+        type? : string;
+    }};
     public templates : {[embedContext : string]: any};
 
     constructor() {
@@ -42,12 +45,57 @@ export class Provider implements angular.IServiceProvider {
         return this;
     }
 
-    public specific(resourceType : string, view : string, processType : string, embedContext : string, factory : Function) : Provider;
-    public specific(resourceType : string, view : string, processType : string, embedContext : string, factory : any[]) : Provider;
-    public specific(resourceType, view, processType, embedContext, factory) {
+    public specific(
+        resourceType : string,
+        view : string,
+        processType : string,
+        embedContext : string,
+        factory : any,
+        type? : string
+    ) : Provider {
         var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
-        this.specifics[key] = factory;
+        this.specifics[key] = {
+            factory: factory,
+            type: type
+        };
         return this;
+    }
+
+    /**
+     * Shortcut to call `default()` for both an itemType and a versionType.
+     */
+    public defaultVersionable(
+        itemType : string,
+        versionType : string,
+        view : string,
+        processType : string,
+        embedContext : string,
+        defaults : Dict
+    ): Provider {
+        return this
+            .default(itemType, view, processType, embedContext, defaults)
+            .default(versionType, view, processType, embedContext, defaults);
+    }
+
+    /**
+     * Shortcut to call `specific()` for both an itemType and a versionType.
+     *
+     * The callback will not only receive a single resource. Instead it will
+     * receive an item, a version, and whether the current route points to the
+     * item or the version.  If the route points to an item, newest version will
+     * be used.
+     */
+    public specificVersionable(
+        itemType : string,
+        versionType : string,
+        view : string,
+        processType : string,
+        embedContext : string,
+        factory : any
+    ) : Provider {
+        return this
+            .specific(itemType, view, processType, embedContext, factory, "item")
+            .specific(versionType, view, processType, embedContext, factory, "version");
     }
 
     public template(embedContext : string, templateFn : any) : Provider {
@@ -141,9 +189,23 @@ export class Service implements AdhTopLevelState.IAreaInput {
         var specifics;
 
         if (this.provider.specifics.hasOwnProperty(key)) {
-            var factory = this.provider.specifics[key];
+            var factory = this.provider.specifics[key].factory;
+            var type = this.provider.specifics[key].type;
             var fn = this.$injector.invoke(factory);
-            specifics = fn(resource);
+
+            if (type === "version") {
+                specifics = this.adhHttp.get(AdhUtil.parentPath(resource.path)).then((item) => {
+                    return fn(item, resource, false);
+                });
+            } else if (type === "item") {
+                specifics = this.adhHttp.getNewestVersionPathNoFork(resource.path).then((versionPath) => {
+                    return this.adhHttp.get(versionPath).then((version) => {
+                        return fn(resource, version, true);
+                    });
+                });
+            } else {
+                specifics = fn(resource);
+            }
         } else {
             specifics = {};
         }
