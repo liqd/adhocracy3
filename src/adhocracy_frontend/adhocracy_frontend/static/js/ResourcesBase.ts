@@ -19,6 +19,13 @@ export class Sheet {
 }
 
 
+export interface IResourceClass {
+    /* tslint:disable:variable-name */
+    content_type : string;
+    /* tslint:enable:variable-name */
+}
+
+
 export class Resource {
     public data : Object;
 

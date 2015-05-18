@@ -52,15 +52,15 @@ export var register = (angular) => {
                 ) => {
                     return $templateRequest(adhConfig.pkg_path + pkgLocation + "/template.html");
                 }])
-                .default(RIKiezkassenProcess.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
+                .default(RIKiezkassenProcess, "", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .default(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", {
+                .default(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", [
+                .specific(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", [
                     "adhHttp", "adhUser", (
                         adhHttp : AdhHttp.Service<any>,
                         adhUser : AdhUser.Service
@@ -75,11 +75,11 @@ export var register = (angular) => {
                             });
                         });
                     }])
-                .default(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "kiezkassen", {
+                .default(RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "kiezkassen", [
+                .specific(RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "kiezkassen", [
                     "adhHttp", "adhUser", (
                         adhHttp : AdhHttp.Service<any>,
                         adhUser : AdhUser.Service
@@ -96,32 +96,32 @@ export var register = (angular) => {
                             });
                         });
                     }])
-                .default(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
+                .default(RIProposalVersion, "", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", [
+                .specific(RIProposalVersion, "", RIKiezkassenProcess.content_type, "kiezkassen", [
                     () => (resource : RIProposalVersion) => {
                         return {
                             proposalUrl: resource.path
                         };
                     }])
-                .default(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "kiezkassen", {
+                .default(RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "kiezkassen", [
+                .specific(RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "kiezkassen", [
                     () => (resource : RIProposalVersion) => {
                         return {
                             commentableUrl: resource.path,
                             proposalUrl: resource.path
                         };
                     }])
-                .default(RICommentVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", {
+                .default(RICommentVersion, "", RIKiezkassenProcess.content_type, "kiezkassen", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "kiezkassen", ["adhHttp", "$q", (
+                .specific(RIProposalVersion, "", RIKiezkassenProcess.content_type, "kiezkassen", ["adhHttp", "$q", (
                     adhHttp : AdhHttp.Service<any>,
                     $q : angular.IQService
                 ) => {

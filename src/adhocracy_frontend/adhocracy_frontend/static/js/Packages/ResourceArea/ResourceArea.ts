@@ -39,21 +39,27 @@ export class Provider implements angular.IServiceProvider {
         self, $q, $injector, $location, adhHttp, adhConfig, adhEmbed, adhResourceUrlFilter)];
     }
 
-    public default(resourceType : string, view : string, processType : string, embedContext : string, defaults : Dict) : Provider {
-        var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
+    public default(
+        resourceType : ResourcesBase.IResourceClass,
+        view : string,
+        processType : string,
+        embedContext : string,
+        defaults : Dict
+    ) : Provider {
+        var key : string = resourceType.content_type + "@" + view + "@" + processType + "@" + embedContext;
         this.defaults[key] = defaults;
         return this;
     }
 
     public specific(
-        resourceType : string,
+        resourceType : ResourcesBase.IResourceClass,
         view : string,
         processType : string,
         embedContext : string,
         factory : any,
         type? : string
     ) : Provider {
-        var key : string = resourceType + "@" + view + "@" + processType + "@" + embedContext;
+        var key : string = resourceType.content_type + "@" + view + "@" + processType + "@" + embedContext;
         this.specifics[key] = {
             factory: factory,
             type: type
@@ -65,8 +71,8 @@ export class Provider implements angular.IServiceProvider {
      * Shortcut to call `default()` for both an itemType and a versionType.
      */
     public defaultVersionable(
-        itemType : string,
-        versionType : string,
+        itemType : ResourcesBase.IResourceClass,
+        versionType : ResourcesBase.IResourceClass,
         view : string,
         processType : string,
         embedContext : string,
@@ -86,8 +92,8 @@ export class Provider implements angular.IServiceProvider {
      * be used.
      */
     public specificVersionable(
-        itemType : string,
-        versionType : string,
+        itemType : ResourcesBase.IResourceClass,
+        versionType : ResourcesBase.IResourceClass,
         view : string,
         processType : string,
         embedContext : string,
