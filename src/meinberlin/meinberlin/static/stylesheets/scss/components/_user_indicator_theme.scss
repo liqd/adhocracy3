@@ -1,0 +1,23 @@
+.user-indicator {
+    &,
+    .user-indicator-logout,
+    .user-indicator-login,
+    .user-indicator-register {
+        letter-spacing: 0;
+        font-size: $font-size-small;
+    }
+
+    .user-indicator-logout,
+    .user-indicator-login,
+    .user-indicator-register {
+        font-variant: normal;
+
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
+    }
+
+    .user-indicator-login-icon {
+        @include inline-block;
+    }
+}
