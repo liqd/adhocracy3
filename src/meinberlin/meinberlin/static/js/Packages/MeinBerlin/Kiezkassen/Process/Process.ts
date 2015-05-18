@@ -67,6 +67,13 @@ export var phaseHeaderDirective = (
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
                 scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                scope.phases[0].startDate = resource.data[SIKiezkassenWorkflow.nick].announce.start_date;
+                scope.phases[0].endDate = resource.data[SIKiezkassenWorkflow.nick].participate.start_date;
+                scope.phases[1].startDate = resource.data[SIKiezkassenWorkflow.nick].participate.start_date;
+                scope.phases[1].endDate = resource.data[SIKiezkassenWorkflow.nick].frozen.start_date;
+                scope.phases[2].startDate = resource.data[SIKiezkassenWorkflow.nick].frozen.start_date;
+                scope.phases[2].endDate = resource.data[SIKiezkassenWorkflow.nick].result.start_date;
+                scope.phases[3].startDate = resource.data[SIKiezkassenWorkflow.nick].result.start_date;
             });
 
             // FIXME: dummy content
@@ -75,8 +82,6 @@ export var phaseHeaderDirective = (
                 title: "Informationsphase",
                 description: "Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.",
                 processType: "Kiezkasse",
-                startDate: "2015-01-01",
-                endDate: "2015-02-02",
                 votingAvailable: false,
                 commentAvailable: false
             }, {
@@ -86,8 +91,6 @@ export var phaseHeaderDirective = (
                     "Die Angabe der Kosten soll bitte die Mehrwertsteuer enthalten. Vorschläge können aber auch noch offline " +
                     "in der den. Alle Vorschläge (offline und online) werden dann bei der Bürgerversammlung beschlossen.",
                 processType: "Kiezkasse",
-                startDate: "2015-02-02",
-                endDate: "2015-05-10",
                 votingAvailable: true,
                 commentAvailable: true
             }, {
@@ -98,8 +101,6 @@ export var phaseHeaderDirective = (
                     "werden dann vor Ort die Art und Weise der Abstimmung bestimmt die Bürgerversammlung selbst. Offline " +
                     "Vorschläge werden online",
                 processType: "Kiezkasse",
-                startDate: "2015-05-10",
-                endDate: "2015-05-20",
                 votingAvailable: true,
                 commentAvailable: false
             }, {
@@ -109,7 +110,6 @@ export var phaseHeaderDirective = (
                     "werden und ggf. diejenigen, die nicht realisierbar sind, online markiert und angezeigt. Die Projekte " +
                     "müssen bis Mitte Dezember realisiert und abgerechnet werden",
                 processType: "Kiezkasse",
-                startDate: "2015-05-20",
                 votingAvailable: false,
                 commentAvailable: false
             }];
