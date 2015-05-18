@@ -6,7 +6,7 @@
     "TR__ERROR_MAX_EURO_50000": "Nicht mehr als 50.000€ erlaubt",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_FINANCE_GRANTED": "Bitte auswählen",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_COUNTRY": "Bitte Land der Organisation eingeben",
-    "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION": "Bitte gib das Datum Deiner Registrierung ein",
+    "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_DATE_OF_FORESEEN_REGISTRATION": "Bitte gib das Datum der Registrierung ein",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_ORGANIZATION_NAME": "Bitte Namen der Organisation eingeben",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_REQUESTED_FUNDING": "Bitte beantragte Förderung eingeben",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_TEASER": "Bitte einen Teaser eingeben",
