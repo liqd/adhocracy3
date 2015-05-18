@@ -21,8 +21,7 @@ var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    $rootScope
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -175,6 +174,6 @@ export var register = (angular) => {
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", phaseHeaderDirective])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", "$rootScope", detailDirective])
+        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", editDirective]);
 };
