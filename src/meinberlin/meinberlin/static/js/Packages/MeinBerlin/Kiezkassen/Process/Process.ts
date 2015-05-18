@@ -39,6 +39,9 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
+                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                        scope.announceDescription = resource.data[SIKiezkassenWorkflow.nick].announce.description;
+
                         var locationUrl = resource.data[SILocationReference.nick].location;
 
                         adhHttp.get(locationUrl).then((location) => {
