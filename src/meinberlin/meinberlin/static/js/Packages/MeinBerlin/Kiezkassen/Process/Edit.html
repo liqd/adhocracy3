@@ -1,0 +1,50 @@
+<form
+    novalidate="novalidate"
+    data-ng-submit="submit()"
+    class="mein-berlin-proposal-form"
+    name="kiezkassenProcessForm">
+
+    <h2>Edit Kiezkassen proposal</h2>
+
+    <div class="form-error" data-ng-repeat="error in errors track by $index">
+        <p>{{ error | adhFormatError | translate }}</p>
+    </div>
+
+    <!-- Title -->
+    <label>
+        <span class="label-text">{{ "TR__MEINBERLIN_TITLE" | translate }}</span>
+        <input
+            type="text"
+            data-ng-model="data.title"
+            name="title"
+            minlength="3"
+            maxlength="100"
+            required="required" />
+        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.title, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_TITLE" | translate }}
+        </span>
+    </label>
+
+    <!-- Workflow state -->
+    <label>
+        <span class="label-text">{{ "TR__WORKFLOW_STATE" | translate }}</span>
+        <select ng-model="data.workflowState" ng-options="item for item in data.availableWorkflowStates">
+            <option value="">{{ data.currentWorkflowState }} ({{ "TR__CURRENT_STATE" | translate }})</option>
+
+        </select>
+    </label>
+
+    <!-- DATA SUBMIT -->
+    <footer class="form-footer mein-berlin-proposal-form-footer">
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__PUBLISH' | translate }}"
+            class="m-call-to-action form-footer-button-cta" />
+
+        <a data-ng-show="create" href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
+        {{ "TR__CANCEL" | translate }}</a>
+        <a data-ng-show="!create" href="{{ path | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
+        {{ "TR__CANCEL" | translate }}</a>
+    </footer>
+</form>

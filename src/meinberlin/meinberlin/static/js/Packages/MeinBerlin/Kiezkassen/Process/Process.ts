@@ -1,11 +1,19 @@
+/// <reference path="../../../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+
+import _ = require("lodash");
+
 import AdhConfig = require("..././../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
+import AdhUtil = require("../../../Util/Util");
 
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
+import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
+
+import SIKiezkassenWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 
@@ -109,6 +117,52 @@ export var phaseDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var editDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhSubmitIfValid
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Edit.html",
+        scope: {
+            path: "@"
+        },
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            var process;
+            scope.data = {};
+            adhHttp.get(scope.path).then((resource) => {
+                process = resource;
+                scope.data.title = process.data[SITitle.nick].title;
+                scope.data.currentWorkflowState = process.data[SIKiezkassenWorkflow.nick].workflow_state;
+            });
+            adhHttp.options(scope.path, false).then((raw) => {
+                // extract available transitions
+                scope.data.availableWorkflowStates = AdhUtil.deepPluck(raw, [
+                    "data", "PUT", "request_body", "data", SIKiezkassenWorkflow.nick, "workflow_state"]);
+            });
+            scope.submit = () => {
+                return adhSubmitIfValid(scope, element, scope.kiezkassenProcessForm, () => {
+                    process.data[SITitle.nick].title = scope.data.title;
+                    process.data["adhocracy_core.sheets.name.IName"] = undefined;
+                    process.data["adhocracy_core.sheets.image.IImageReference"] = undefined;
+                    if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
+                        process.data[SIKiezkassenWorkflow.nick] = {
+                            workflow_state: scope.data.workflowState
+                        };
+                    } else {
+                        process.data[SIKiezkassenWorkflow.nick] = undefined;
+                    }
+
+                    return adhHttp.put(process.path, process);
+                });
+            };
+        }
+    };
+};
+
+
 export var moduleName = "adhMeinBerlinKiezkassenProcess";
 
 export var register = (angular) => {
@@ -121,5 +175,6 @@ export var register = (angular) => {
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", phaseHeaderDirective])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", "$rootScope", detailDirective]);
+        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", "$rootScope", detailDirective])
+        .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", editDirective]);
 };

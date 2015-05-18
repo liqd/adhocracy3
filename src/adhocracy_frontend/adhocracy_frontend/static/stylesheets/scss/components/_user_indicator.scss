@@ -36,5 +36,9 @@ It is usually used in the header bar.
             color: $color-text-normal;
         }
     }
+
+    .user-indicator-login-icon {
+        display: none;
+    }
 }
 
