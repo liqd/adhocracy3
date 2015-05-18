@@ -101,16 +101,14 @@ category: Widgets
 
 Rate up or down with counter
 
-The button has the is-rate-button-active state.
-rate-difference has the is-positive state. Can be is-negative.
+The button has the `is-rate-button-active` state.
+rate-difference has the `is-positive` state. Can be `is-negative`.
 
 ```html_example
 <div class="rate">
-    <span class="rate-difference is-positive">
-        1
-    </span>
-    <a href="" class="rate-pro is-rate-button-active" data-ng-click="cast(1)"><i class="icon-vote-up" title="Vote up"></i></a>
-    <a href="" class="rate-contra" data-ng-click="cast(-1)"><i class="icon-vote-down" title="Vote down"></i></a>
+    <span class="rate-difference is-positive">1</span>
+    <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
 </div>
 ```
 */
