@@ -104,11 +104,20 @@ Rate up or down with counter
 The button has the `is-rate-button-active` state.
 rate-difference has the `is-positive` state. Can be `is-negative`.
 
+The whole widget may be disabled, in which case itself and both buttons have
+the `is-disabled` state.
+
 ```html_example
 <div class="rate">
     <span class="rate-difference is-positive">1</span>
     <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
     <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+</div>
+
+<div class="rate is-disabled">
+    <span class="rate-difference is-positive">1</span>
+    <a href="" class="rate-pro is-rate-button-active is-disabled"><i class="icon-vote-up" title="Vote up"></i></a>
+    <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
 </div>
 ```
 */
