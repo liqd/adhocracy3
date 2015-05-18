@@ -3,7 +3,9 @@ export interface ISheetMetaApi {
     readable : string[];
     editable : string[];
     creatable : string[];
+    /* tslint:disable:variable-name */
     create_mandatory : string[];
+    /* tslint:enable:variable-name */
 
     // computed information
     references : string[];
@@ -28,7 +30,7 @@ export class Resource {
     public root_versions : string[];
     /* tslint:enable:variable-name */
 
-    constructor(public content_type: string) {
+    constructor(public content_type : string) {
         this.data = {};
     }
 
