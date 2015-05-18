@@ -20,10 +20,9 @@
             <span data-ng-if="phase.startDate" title="{{ 'TR__START_DATE' | translate }}">
                 <adh-time data-datetime="phase.startDate" format="L"></adh-time>
             </span>
-            <span data-ng-if="phase.endDate"> /
-                <span title="{{ 'TR__END_DATE' | translate }}">
-                    <adh-time data-datetime="phase.endDate" format="L"></adh-time>
-                </span>
+            <span data-ng-if="phase.startDate && phase.endDate"> / </span>
+            <span data-ng-if="phase.endDate" title="{{ 'TR__END_DATE' | translate }}">
+                <adh-time data-datetime="phase.endDate" format="L"></adh-time>
             </span>
         </span>
     </div>
