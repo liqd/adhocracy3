@@ -29,7 +29,7 @@ import adhocracy_core.sheets.name
 root_acm = ACM().deserialize(
     {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
      'permissions': [  # general
-                     ['view',                          None,        None,          None,         None,      None,        None],  # noqa
+                     ['view',                          Allow,       Allow,         Allow,        Allow,     Allow,       Allow],  # noqa
                      ['create',                        None,        Allow,         Allow,        None,      Allow,       Allow],  # noqa
                      ['edit',                          None,        None,          None,         Allow,     None,        Allow],  # noqa
                      ['edit_some',                     None,        Allow,         Allow,        Allow,     Allow,       Allow],  # noqa
