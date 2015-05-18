@@ -13,8 +13,10 @@ import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
 import AdhMeinBerlinKiezkassenProposal = require("../Proposal/Proposal");
 
+import RIComment = require("../../../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
+import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
 
@@ -176,53 +178,53 @@ export var register = (angular) => {
                             });
                         });
                     }])
-                .default(RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", [
+                .specificVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", [
                     "adhHttp", "adhUser", (
                         adhHttp : AdhHttp.Service<any>,
                         adhUser : AdhUser.Service
-                    ) => (resource : RIProposalVersion) => {
+                    ) => (item : RIProposal, version : RIProposalVersion) => {
                         return adhUser.ready.then(() => {
-                            return adhHttp.options(AdhUtil.parentPath(resource.path)).then((options : AdhHttp.IOptions) => {
+                            return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                                 if (!options.POST) {
                                     throw 401;
                                 } else {
                                     return {
-                                        proposalUrl: resource.path
+                                        proposalUrl: version.path
                                     };
                                 }
                             });
                         });
                     }])
-                .default(RIProposalVersion, "", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIProposal, RIProposalVersion, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion, "", RIKiezkassenProcess.content_type, "", [
-                    () => (resource : RIProposalVersion) => {
+                .specificVersionable(RIProposal, RIProposalVersion, "", RIKiezkassenProcess.content_type, "", [
+                    () => (item : RIProposal, version : RIProposalVersion) => {
                         return {
-                            proposalUrl: resource.path
+                            proposalUrl: version.path
                         };
                     }])
-                .default(RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIProposal, RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "", [
-                    () => (resource : RIProposalVersion) => {
+                .specificVersionable(RIProposal, RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "", [
+                    () => (item : RIProposal, version : RIProposalVersion) => {
                         return {
-                            commentableUrl: resource.path,
-                            proposalUrl: resource.path
+                            commentableUrl: version.path,
+                            proposalUrl: version.path
                         };
                     }])
-                .default(RICommentVersion, "", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIComment, RICommentVersion, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion, "", RIKiezkassenProcess.content_type, "", ["adhHttp", "$q", (
+                .specificVersionable(RIComment, RICommentVersion, "", RIKiezkassenProcess.content_type, "", ["adhHttp", "$q", (
                     adhHttp : AdhHttp.Service<any>,
                     $q : angular.IQService
                 ) => {
@@ -235,8 +237,8 @@ export var register = (angular) => {
                         }
                     };
 
-                    return (resource : RICommentVersion) => {
-                        return getCommentableUrl(resource).then((commentable) => {
+                    return (item : RIComment, version : RICommentVersion) => {
+                        return getCommentableUrl(version).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
                                 proposalUrl: commentable.path
