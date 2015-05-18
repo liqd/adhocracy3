@@ -7,6 +7,7 @@ import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
@@ -53,15 +54,24 @@ export var detailDirective = (
 };
 
 
-export var phaseHeaderDirective = (adhConfig : AdhConfig.IService) => {
+export var phaseHeaderDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
         scope: {},
         link: (scope) => {
+            var processUrl = adhTopLevelState.get("processUrl");
+            adhHttp.get(processUrl).then((resource) => {
+                scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+            });
+
             // FIXME: dummy content
-            scope.currentPhase = "Informationsphase";
             scope.phases = [{
+                name: "announce",
                 title: "Informationsphase",
                 description: "Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.",
                 processType: "Kiezkasse",
@@ -70,6 +80,7 @@ export var phaseHeaderDirective = (adhConfig : AdhConfig.IService) => {
                 votingAvailable: false,
                 commentAvailable: false
             }, {
+                name: "participate",
                 title: "Ideensammlungsphase",
                 description: "Alle Interessierten werden aufgerufen Vorschläge für Projekte in der Bezirksregion zu machen. " +
                     "Die Angabe der Kosten soll bitte die Mehrwertsteuer enthalten. Vorschläge können aber auch noch offline " +
@@ -80,6 +91,7 @@ export var phaseHeaderDirective = (adhConfig : AdhConfig.IService) => {
                 votingAvailable: true,
                 commentAvailable: true
             }, {
+                name: "frozen",
                 title: "Bürgerversammlung",
                 description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder bewertet " +
                     "werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge " +
@@ -91,6 +103,7 @@ export var phaseHeaderDirective = (adhConfig : AdhConfig.IService) => {
                 votingAvailable: true,
                 commentAvailable: false
             }, {
+                name: "result",
                 title: "Ergebnisse",
                 description: "Nach der Prüfung vom zuständigen Fachamt des Bezirksamtes werden die Vorschläge, die realisiert " +
                     "werden und ggf. diejenigen, die nicht realisierbar sind, online markiert und angezeigt. Die Projekte " +
@@ -173,7 +186,7 @@ export var register = (angular) => {
             AdhTabs.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
-        .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", phaseHeaderDirective])
+        .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", editDirective]);
 };
