@@ -41,6 +41,7 @@ def migrate_new_sheet(context: IPool,
     pool = get_sheet(context, IPool, registry=registry)
     query = {'interfaces': (isheet_old, iresource),
              'only_visible': False,
+             'depth': 0
              }
     resources = pool.get(query)['elements']
     count = len(resources)
