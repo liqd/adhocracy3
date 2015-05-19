@@ -69,9 +69,9 @@ export interface IMapInputScope extends angular.IScope {
     zoom? : number;
     text : string;
     error : boolean;
-    mapClicked : boolean;
-    saveCoordinates() : void;
+    dirty : boolean;
     resetCoordinates() : void;
+    clearCoordinates() : void;
 }
 
 export var mapInput = (
@@ -92,8 +92,10 @@ export var mapInput = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Input.html",
         link: (scope : IMapInputScope, element) => {
 
-            var tmpLng : number = _.clone(scope.lng);
-            var tmpLat : number = _.clone(scope.lat);
+            var oldLng : number = _.clone(scope.lng);
+            var oldLat : number = _.clone(scope.lat);
+
+            scope.dirty = false;
 
             var mapElement = element.find(".map");
             mapElement.height(scope.height);
@@ -129,13 +131,15 @@ export var mapInput = (
                         var pointInPolygon = AdhMappingUtils.pointInPolygon(result, scope.polygon);
 
                         if (pointInPolygon) {
-                            scope.mapClicked = true;
+                            scope.dirty = true;
                             $timeout(() => {
-                                tmpLat = result.lat;
-                                tmpLng = result.lng;
+                                oldLat = scope.lat;
+                                oldLng = scope.lng;
+                                scope.lat = result.lat;
+                                scope.lng = result.lng;
                             });
                         } else {
-                            marker.setLatLng(leaflet.latLng(tmpLat, tmpLng));
+                            marker.setLatLng(leaflet.latLng(scope.lat, scope.lng));
                             marker.dragging.disable();
                             $timeout(() => {
                                 scope.text = "TR__MAP_MARKER_ERROR";
@@ -165,13 +169,15 @@ export var mapInput = (
                     createMarker(event.latlng);
                 } else {
                     marker.setLatLng(event.latlng);
+                    scope.dirty = true;
                 }
                 marker.dragging.enable();
                 $timeout(() => {
-                    tmpLat = event.latlng.lat;
-                    tmpLng = event.latlng.lng;
+                    oldLat = scope.lat;
+                    oldLng = scope.lng;
+                    scope.lat = event.latlng.lat;
+                    scope.lng = event.latlng.lng;
                     scope.text = "TR__MAP_EXPLAIN_DRAG";
-                    scope.mapClicked = true;
                 });
             });
 
@@ -182,24 +188,23 @@ export var mapInput = (
                 map.zoomIn();
             });
 
-            scope.saveCoordinates = () => {
-                scope.lng = tmpLng;
-                scope.lat = tmpLat;
-                scope.mapClicked = false;
-                scope.text = "TR__MAP_MARKER_SAVED";
+            scope.resetCoordinates = () => {
+                scope.lng = oldLng;
+                scope.lat = oldLat;
+                marker.setLatLng(leaflet.latLng(scope.lat, scope.lng));
+                scope.dirty = false;
+                scope.text = "TR__MAP_EXPLAIN_RESET";
                 $timeout(() => {
                     scope.text = "TR__MAP_EXPLAIN_DRAG";
                 }, 2000);
             };
 
-            scope.resetCoordinates = () => {
-                tmpLng = undefined;
-                tmpLat = undefined;
+            scope.clearCoordinates = () => {
                 scope.lng = undefined;
                 scope.lat = undefined;
                 map.removeLayer(marker);
                 marker = undefined;
-                scope.mapClicked = false;
+                scope.dirty = false;
                 scope.text = "TR__MAP_EXPLAIN_CLICK";
             };
 
