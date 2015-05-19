@@ -5,7 +5,7 @@ from adhocracy_core.authorization import add_acm
 from adhocracy_core.authorization import clean_acl
 from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.resources.root import root_acm
-from adhocracy_mercator.resources.mercator import mercator_acm
+from adhocracy_mercator.resources.root import mercator_acm
 import transaction
 
 

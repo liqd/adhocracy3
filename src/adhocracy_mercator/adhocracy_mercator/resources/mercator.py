@@ -1,14 +1,10 @@
 """Mercator proposal."""
-from pyramid.registry import Registry
-from pyramid.security import Allow
-
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
-from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.asset import asset_meta
 from adhocracy_core.resources.asset import IAsset
-from adhocracy_core.resources.asset import IPoolWithAssets
+
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.comment import add_commentsservice
@@ -16,9 +12,7 @@ from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.comment import ICommentable
-from adhocracy_core.resources.root import root_meta
-from adhocracy_core.resources.root import add_platform
-from adhocracy_core.schema import ACM
+
 import adhocracy_core.sheets.title
 import adhocracy_mercator.sheets.mercator
 
@@ -451,23 +445,6 @@ mercator_proposal_meta = item_meta._replace(
 )
 
 
-def _create_initial_content(context: IPool, registry: Registry, options: dict):
-    """Add mercator specific content."""
-    add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
-
-
-mercator_acm = ACM().deserialize(
-    {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
-     'permissions': [['create_mercator_proposal',      None,        None,          None,          None,      None,        Allow],  # noqa
-                     ['edit_mercator_proposal',        None,        None,          None,          None,      None,        Allow],  # noqa
-                     ['view_sheet_heardfrom',          None,        None,          None,          Allow,     Allow,       Allow],  # noqa
-                     ]})
-
-
-mercator_root_meta = root_meta._replace(after_creation=root_meta.after_creation
-                                        + [_create_initial_content])
-
-
 def includeme(config):
     """Add resource type to content."""
     add_resource_type_to_registry(mercator_proposal_meta, config)
@@ -495,6 +472,3 @@ def includeme(config):
     add_resource_type_to_registry(finance_version_meta, config)
     add_resource_type_to_registry(experience_meta, config)
     add_resource_type_to_registry(experience_version_meta, config)
-    # overrides adhocracy root
-    config.commit()
-    add_resource_type_to_registry(mercator_root_meta, config)
