@@ -1,6 +1,7 @@
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUser = require("../../../User/User");
@@ -17,12 +18,17 @@ import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment
 var pkgLocation = "/MeinBerlin/Kiezkassen/Context";
 
 
-export var headerDirective = (adhConfig : AdhConfig.IService, adhTopLevelState : AdhTopLevelState.Service) => {
+export var headerDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
         }
     };
 
@@ -37,11 +43,12 @@ export var register = (angular) => {
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhMeinBerlinWorkbench.moduleName,
+            AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
-        .directive("adhKiezkassenContextHeader", ["adhConfig", "adhTopLevelState", headerDirective])
+        .directive("adhKiezkassenContextHeader", ["adhConfig", "adhPermissions", "adhTopLevelState", headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("kiezkassen");
         }])
