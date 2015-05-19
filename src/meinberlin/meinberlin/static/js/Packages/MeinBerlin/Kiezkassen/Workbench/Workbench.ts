@@ -104,6 +104,19 @@ export var kiezkassenDetailColumnDirective = (
     };
 };
 
+export var kiezkassenEditColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            bindVariablesAndClear(scope, column, ["processUrl"]);
+        }
+    };
+};
 
 export var moduleName = "adhMeinBerlinWorkbench";
 
@@ -125,6 +138,25 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
+                .default(RIKiezkassenProcess.content_type, "edit_process", RIKiezkassenProcess.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-show-hide-hide"
+                })
+                .specific(RIKiezkassenProcess.content_type, "edit_process", RIKiezkassenProcess.content_type, "", [
+                    "adhHttp", "adhUser", (
+                        adhHttp : AdhHttp.Service<any>,
+                        adhUser : AdhUser.Service
+                    ) => (resource : RIKiezkassenProcess) => {
+                        return adhUser.ready.then(() => {
+                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                                if (!options.PUT) {
+                                    throw 401;
+                                } else {
+                                    return {};
+                                }
+                            });
+                        });
+                    }])
                 .default(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
@@ -227,5 +259,7 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenProposalEditColumn", [
             "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalEditColumnDirective])
         .directive("adhMeinBerlinKiezkassenDetailColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailColumnDirective]);
+            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailColumnDirective])
+        .directive("adhMeinBerlinKiezkassenEditColumn", [
+            "adhBindVariablesAndClear", "adhConfig", kiezkassenEditColumnDirective]);
 };

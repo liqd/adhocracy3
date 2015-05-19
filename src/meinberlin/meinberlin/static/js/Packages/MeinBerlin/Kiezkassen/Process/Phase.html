@@ -7,10 +7,12 @@
             <i class="icon-comment-gap m-availability-indicator" data-ng-class="{'is-available': phase.commentAvailable}"></i>
             <i class="icon-voting-gap m-availability-indicator" data-ng-class="{'is-available': phase.votingAvailable}"></i>
 
-            <span data-ng-if="phase.commentAvailable && phase.votingAvailable">{{ "TR__AVAILABLE_PARTICIPATION" | translate}}</span>
-            <span data-ng-if="phase.commentAvailable && !phase.votingAvailable">{{ "TR__AVAILABLE_COMMENT" | translate}}</span>
-            <span data-ng-if="!phase.commentAvailable && phase.votingAvailable">{{ "TR__AVAILABLE_VOTING" | translate}}</span>
-            <span data-ng-if="!phase.commentAvailable && !phase.votingAvailable">{{ "TR__AVAILABLE_NONE" | translate}}</span>
+            <span class="phase-availability-summary">
+                <span data-ng-if="phase.commentAvailable && phase.votingAvailable">{{ "TR__AVAILABLE_PARTICIPATION" | translate}}</span>
+                <span data-ng-if="phase.commentAvailable && !phase.votingAvailable">{{ "TR__AVAILABLE_COMMENT" | translate}}</span>
+                <span data-ng-if="!phase.commentAvailable && phase.votingAvailable">{{ "TR__AVAILABLE_VOTING" | translate}}</span>
+                <span data-ng-if="!phase.commentAvailable && !phase.votingAvailable">{{ "TR__AVAILABLE_NONE" | translate}}</span>
+            </span>
         </span>
 
         <span class="phase-date">

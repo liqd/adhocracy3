@@ -37,6 +37,7 @@
 @import "components/listing";
 @import "components/listing_theme";
 @import "components/user_indicator";
+@import "components/user_indicator_theme";
 @import "components/annotated_section";
 @import "components/commentable_section";
 @import "components/chapter";
@@ -50,11 +51,12 @@
 @import "components/comment_theme";
 @import "components/facets";
 @import "components/tabs";
-@import "components/phase_tabs";
+@import "components/phase";
 @import "components/kiezkassen_context";
 @import "components/unsupported_browser";
 @import "components/busy";
 @import "components/error_pages";
+@import "components/error_pages_theme";
 @import "components/standalone_wrapper";
 @import "components/standalone_wrapper_theme";
 

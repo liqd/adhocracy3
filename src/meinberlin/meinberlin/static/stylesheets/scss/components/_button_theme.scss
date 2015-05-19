@@ -39,11 +39,13 @@ input[type="button"] {
             &:hover:not(:disabled):not(.ng-disabled),
             &:focus:not(:disabled):not(.ng-disabled) {
                 background: $color-brand-two-introvert;
+                color: $color-text-inverted;
                 text-decoration: none;
             }
 
             &:active:not(:disabled):not(.ng-disabled) {
                 background: $color-brand-two-extrovert;
+                color: $color-text-inverted;
             }
         }
 

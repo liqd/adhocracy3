@@ -1,0 +1,181 @@
+/*doc
+---
+title: phase header
+name: phase-header
+category: Widgets
+---
+
+```html_example
+<div class="phase-header">
+    <ul class="tabset-tabs">
+        <li class="tab m-phase" style="width: 25%;">
+            <a class="tab-button" href="#">Informationsphase</a>
+        </li
+        ><li class="tab m-phase is-active" style="width: 25%;">
+            <a class="tab-button" href="#">Ideensammlungsphase</a>
+        </li
+        ><li class="tab m-phase is-highlighted" style="width: 25%;">
+            <a class="tab-button" href="#">Bürgerversammlung</a>
+        </li
+        ><li class="tab m-phase" style="width: 25%;">
+            <a class="tab-button" href="#">Ergebnisse</a>
+        </li>
+    </ul>
+    <div class="tabset-panes">
+        <div class="tab-pane m-phase placeholder">
+            pane
+        </div>
+    </div>
+</div>
+```
+*/
+.tab.m-phase {
+    position: relative;
+
+    $height: 24px;
+    $height-large: 28px;
+    $arrow-width: 5px;
+    $padding: 2px;
+    $highlight-width: 2px;
+    $arrow-width-large: floor($arrow-width * $height-large / $height);
+
+    height: $height;
+    line-height: $height - 2 * $highlight-width;
+    margin: ($height-large - $height) / 2 0;
+    padding-right: $padding;
+
+    .tab-button,
+    &.is-active .tab-button {
+        background: $color-background-base-introvert;
+        color: $color-text-highlight-introvert;
+        top: 0;
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        border: 0;
+        border-top: $highlight-width solid $color-background-base-introvert;
+        border-bottom: $highlight-width solid $color-background-base-introvert;
+    }
+
+    &:after, &:before {
+        border-top: $height / 2 solid transparent;
+        border-left: $arrow-width solid $color-background-base-introvert;
+        border-bottom: $height / 2 solid transparent;
+        content: "";
+        height: 0;
+        position: absolute;
+        top: 0;
+        width: 0;
+        z-index: 1;
+    }
+
+    &:before {
+        border-left-color: $color-text-inverted;
+        left: 0;
+    }
+
+    &:after {
+        right: $padding - $arrow-width;
+        z-index: 2;
+    }
+
+    &:first-child:before,
+    &:last-child:after {
+        content: none;
+    }
+
+    &:last-child {
+        padding-right: 0;
+    }
+
+    &.is-active {
+        height: $height-large;
+        line-height: $height-large - 2 * $highlight-width;
+        left: $arrow-width - $arrow-width-large;
+        margin: 0;
+
+        &:after, &:before {
+            border-top-width: $height-large / 2;
+            border-left-width: $arrow-width-large;
+            border-bottom-width: $height-large / 2;
+        }
+
+        &:after {
+            right: $padding - $arrow-width-large;
+        }
+    }
+
+    &.is-highlighted {
+        .tab-button {
+            border-bottom-color: $color-function-valid;
+        }
+    }
+}
+
+
+/*doc
+---
+title: phase
+name: phase
+parent: phase-header
+---
+
+```html_example
+<div class="phase">
+    <h3 class="phase-title">Informationsphase</h3>
+    <div class="phase-process-type">Kiezkasse</div>
+    <p class="phase-description">Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.</p>
+    <div class="phase-meta">
+        <span class="phase-availability">
+            <i class="icon-comment-gap m-availability-indicator"></i>
+            <i class="icon-voting-gap m-availability-indicator is-available"></i>
+
+            <span class="phase-availability-summary">Voting available</span>
+        </span>
+
+        <span class="phase-date">
+            <i class="icon-calendar"></i>
+            <span title="start date">
+                <time datetime="2015-01-01T00:00:00+01:00">01/01/2015</time>
+            </span> /
+            <span title="end date">
+                <time datetime="2015-02-02T00:00:00+01:00">02/02/2015</time>
+            </span>
+        </span>
+    </div>
+</div>
+```
+*/
+.phase {
+    font-size: $font-size-small;
+    color: $color-text-normal;
+    background: $color-background-base-introvert;
+    padding: 10px / $font-size-small * 1em;
+
+    [class^="icon"] {
+        font-size: 130%;
+        margin-right: 0.5em;
+    }
+}
+
+.phase-title {
+    margin: 0;
+    font-size: $font-size-normal;
+}
+
+.phase-process-type {
+    margin-bottom: 0.8em;
+}
+
+.phase-description {
+    margin-bottom: 1.5em;
+}
+
+.phase-availability {
+    margin-right: 3em;
+}
+
+.phase-availability-summary {
+    font-style: italic;
+    color: $color-function-valid;
+}
