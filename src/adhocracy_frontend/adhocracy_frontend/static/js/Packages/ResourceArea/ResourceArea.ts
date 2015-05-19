@@ -442,5 +442,6 @@ export var register = (angular) => {
         }])
         .provider("adhResourceArea", Provider)
         .directive("adhResourceArea", ["adhResourceArea", "$compile", directive])
+        .filter("adhParentPath", () => AdhUtil.parentPath)
         .filter("adhResourceUrl", ["adhConfig", resourceUrl]);
 };

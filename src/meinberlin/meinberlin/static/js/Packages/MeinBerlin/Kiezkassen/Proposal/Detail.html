@@ -24,7 +24,7 @@
     </header>
 
     <section class="mein-berlin-kiezkassen-proposal-detail-body">
-        <a href="{{ path | adhResourceUrl:'comments' }}" class="disguised-link mein-berlin-kiezkassen-proposal-detail-body-comments">
+        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link mein-berlin-kiezkassen-proposal-detail-body-comments">
             <i class="icon-speechbubble-unfilled"></i> {{ data.commentCount }}
         </a>
         <p>{{data.detail}}</p>
@@ -35,7 +35,7 @@
                     <i class="icon-pin-detail"></i> {{data.locationText}}
                 </li>
                 <li class="mein-berlin-kiezkassen-proposal-detail-meta-item">
-                    <a href="{{ path | adhResourceUrl:'comments' }}" class="disguised-link">
+                    <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link">
                         <i class="icon-speechbubble-unfilled"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
                     </a>
                 </li>
