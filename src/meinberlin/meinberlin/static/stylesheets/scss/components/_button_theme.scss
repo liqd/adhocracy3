@@ -16,6 +16,12 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
+    text-transform: none;
+
+    &:first-letter {
+        text-transform: capitalize;
+    }
+
     &, &.m-call-to-action {
         color: $color-text-normal;
         min-width: 1px;
