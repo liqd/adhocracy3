@@ -21,12 +21,12 @@ export class Service {
         var pathFn = typeof path === "string" ? () => path : path;
         var pathString : string;
 
-        scope[key] = AdhHttp.emptyOptions;
+        scope[key] = _.assign({}, AdhHttp.emptyOptions, {"loggedIn": self.adhUser.loggedIn});
 
         var update = () => {
             if (pathString) {
                 return self.adhHttp.options(pathString).then((options : AdhHttp.IOptions) => {
-                    scope[key] = options;
+                    scope[key] = _.assign({}, options, {"loggedIn": self.adhUser.loggedIn});
                 });
             }
         };
