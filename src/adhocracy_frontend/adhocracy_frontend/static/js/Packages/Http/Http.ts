@@ -120,6 +120,11 @@ export class Service<Content extends ResourcesBase.Resource> {
         }
     }
 
+    private parseConfig(config : IHttpConfig) {
+        var headers = {};
+        return headers;
+    }
+
     private importOptions(raw : angular.IHttpPromiseCallbackArg<any>) : IOptions {
         var metadata = AdhUtil.deepPluck(raw.data, ["PUT", "request_body", "data", SIMetadata.nick]);
         return {
@@ -138,9 +143,10 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-options preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
 
         return this.adhCache.memoize(path, "OPTIONS",
-            () => this.$http({method: "OPTIONS", url: path})
+            () => this.$http({method: "OPTIONS", url: path, headers: headers})
         ).then((response) => {
             if (typeof config.importOptions === "undefined" || config.importOptions) {
                 return this.importOptions(response);
@@ -155,8 +161,12 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-get preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
 
-        return this.$http.get(path, { params : params });
+        return this.$http.get(path, {
+            params : params,
+            headers : headers
+        });
     }
 
     /**
@@ -195,9 +205,12 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-put preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
         this.adhCache.invalidate(path);
-        return this.$http
-            .put(path, obj);
+
+        return this.$http.put(path, obj, {
+            headers: headers
+        });
     }
 
     public put(path : string, obj : Content, config : IHttpPutConfig = {}) : angular.IPromise<Content> {
@@ -231,18 +244,20 @@ export class Service<Content extends ResourcesBase.Resource> {
             throw "attempt to http-post preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
 
         if (typeof FormData !== "undefined" && FormData.prototype.isPrototypeOf(obj)) {
             return _self.$http({
                 method: "POST",
                 url: path,
                 data: obj,
-                headers: {"Content-Type": undefined},
+                headers: _.assign({"Content-Type": undefined}, headers),
                 transformRequest: undefined
             });
         } else {
-            return _self.$http
-                .post(path, obj);
+            return _self.$http.post(path, obj, {
+                headers: headers
+            });
         }
     }
 
