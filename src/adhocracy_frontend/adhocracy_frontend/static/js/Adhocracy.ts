@@ -20,6 +20,7 @@ import modernizr = require("modernizr");
 import moment = require("moment");
 import webshim = require("polyfiller");
 import leaflet = require("leaflet");
+import markdownit = require("markdownit");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
 import AdhConfig = require("./Packages/Config/Config");
@@ -35,6 +36,7 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 import AdhMapping = require("./Packages/Mapping/Mapping");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
@@ -91,7 +93,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhProposal.moduleName,
         AdhSticky.moduleName,
         AdhTracking.moduleName,
-        AdhUserViews.moduleName
+        AdhUserViews.moduleName,
+        AdhMarkdown.moduleName
     ];
 
     if (config.cachebust) {
@@ -148,6 +151,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
     app.value("leaflet", leaflet);
+    app.value("markdownit", markdownit);
 
     // register our modules
     app.value("adhConfig", config);
@@ -165,6 +169,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
     AdhMapping.register(angular);
+    AdhMarkdwon.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
