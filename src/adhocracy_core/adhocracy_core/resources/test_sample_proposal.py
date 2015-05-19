@@ -13,7 +13,7 @@ def test_proposalversion_meta():
                                     adhocracy_core.sheets.comment.ICommentable,
                                     adhocracy_core.sheets.image.IImageReference,
                                     ]
-    assert meta.permission_add == 'add_proposalversion'
+    assert meta.permission_create == 'edit_proposal'
 
 
 def test_proposal_meta():
@@ -35,7 +35,7 @@ def test_proposal_meta():
                                   ]
     assert meta.extended_sheets == [ISample]
     assert meta.item_type == IProposalVersion
-    assert meta.permission_add == 'add_proposal'
+    assert meta.permission_create == 'create_proposal'
     assert add_commentsservice in meta.after_creation
     assert add_ratesservice in meta.after_creation
 

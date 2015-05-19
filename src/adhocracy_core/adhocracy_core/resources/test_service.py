@@ -11,7 +11,7 @@ def test_service_meta():
     assert meta.basic_sheets == [adhocracy_core.sheets.pool.IPool,
                                  adhocracy_core.sheets.metadata.IMetadata,
                                  ]
-    assert meta.permission_add == 'add_service'
+    assert meta.permission_create == 'create_service'
 
 @fixture
 def integration(config):

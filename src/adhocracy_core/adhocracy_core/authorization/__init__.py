@@ -1,5 +1,7 @@
 """Authorization with roles/local roles mapped to adhocracy principals."""
 from collections import defaultdict
+from pyramid.security import ALL_PERMISSIONS
+from pyramid.security import Allow
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import ACLPermitsResult
 from pyramid.threadlocal import get_current_registry
@@ -7,11 +9,11 @@ from pyramid.traversal import lineage
 from pyramid.registry import Registry
 from zope.interface import implementer
 from substanced.util import get_acl
+import substanced.util
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
-from adhocracy_core.utils import set_acl
 
 
 CREATOR_ROLEID = 'role:creator'
@@ -120,3 +122,21 @@ def add_acm(resource: IResource, acm: dict, registry: Registry):
     old_acl = get_acl(resource)
     new_acl = acm_to_acl(acm, registry) + old_acl
     set_acl(resource, new_acl, registry)
+
+
+def set_acl(resource: IResource, acl: list, registry=None) -> bool:
+    """Set the acl and mark the resource as dirty."""
+    substanced.util.set_acl(resource, acl, registry)
+    resource._p_changed = True
+
+
+def set_god_all_permissions(resource: IResource, registry=None) -> bool:
+    """Set the god's permissions on the resource."""
+    old_acl = get_acl(resource)
+    new_acl = [(Allow, 'role:god', ALL_PERMISSIONS)] + old_acl
+    set_acl(resource, new_acl, registry)
+
+
+def clean_acl(resource: IResource, registry=None) -> bool:
+    """Remove all ACL on the resource."""
+    set_acl(resource, [], registry)

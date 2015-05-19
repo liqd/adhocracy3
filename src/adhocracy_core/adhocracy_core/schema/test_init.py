@@ -1036,14 +1036,18 @@ class TestRole:
         return Role()
 
     def test_create(self, inst):
-        assert inst.validator.choices == ['reader', 'annotator', 'contributor',
-                                          'creator', 'editor', 'manager',
-                                          'admin', 'god']
+        assert inst.validator.choices ==['participant',
+                                         'moderator',
+                                         'creator',
+                                         'initiator',
+                                         'admin',
+                                         'god',
+                                         ]
         assert inst.schema_type == colander.String
-        assert inst.default == 'reader'
+        assert inst.default == 'creator'
 
     def test_deserialize_valid(self, inst):
-        assert inst.deserialize('reader') == 'reader'
+        assert inst.deserialize('moderator') == 'moderator'
 
     def test_deserialize_notvalid(self, inst):
         with raises(colander.Invalid):
@@ -1070,10 +1074,10 @@ class TestRoles:
         assert inst.deserialize() == colander.drop
 
     def test_deserialize_with_role(self, inst):
-        assert inst.deserialize(['reader']) == ['reader']
+        assert inst.deserialize(['moderator']) == ['moderator']
 
     def test_deserialize_with_duplicates(self, inst):
-        assert inst.deserialize(['reader', 'reader']) == ['reader']
+        assert inst.deserialize(['moderator', 'moderator']) == ['moderator']
 
     def test_deserialize_empty_list(self, inst):
         assert inst.deserialize([]) == []
@@ -1086,7 +1090,7 @@ class TestRoles:
         assert inst.serialize() == []
 
     def test_serialize_with_role(self, inst):
-        assert inst.serialize(['reader']) == ['reader']
+        assert inst.serialize(['moderator']) == ['moderator']
 
 
 class TestFileStoreType:
@@ -1171,10 +1175,10 @@ class TestACLPrincipalType:
         assert inst.serialize(node, colander.null) == colander.null
 
     def test_serialize_system_user(self, node, inst):
-        assert inst.serialize(node, 'system.User') == 'User'
+        assert inst.serialize(node, 'system.User') == 'user'
 
     def test_serialize_role(self, node, inst):
-        assert inst.serialize(node, 'role:reader') == 'reader'
+        assert inst.serialize(node, 'role:moderator') == 'moderator'
 
     def test_serialize_str_without_prefix(self, node, inst):
         with raises(ValueError):
@@ -1184,10 +1188,13 @@ class TestACLPrincipalType:
         assert inst.deserialize(node, '') == ''
 
     def test_deserialize_role(self, node, inst):
-        assert inst.deserialize(node, 'reader') == 'role:reader'
+        assert inst.deserialize(node, 'moderator') == 'role:moderator'
 
-    def test_deserialize_system_user(self, node, inst):
-        assert inst.deserialize(node, 'Everyone') == 'system.Everyone'
+    def test_deserialize_system_user_everyone(self, node, inst):
+        assert inst.deserialize(node, 'everyone') == 'system.Everyone'
+
+    def test_deserialize_system_user_anonymous(self, node, inst):
+        assert inst.deserialize(node, 'anonymous') == 'system.Anonymous'
 
     def test_deserialize_raise_if_raise_else(self, node, inst):
         with raises(colander.Invalid):
@@ -1249,13 +1256,13 @@ class TestACM:
     def test_serialize(self, inst):
         appstruct = {'principals': ['system.Everyone'],
                      'permissions': [['edit', Allow]]}
-        assert inst.serialize(appstruct) == {'principals': ['Everyone'],
+        assert inst.serialize(appstruct) == {'principals': ['everyone'],
                                              'permissions': [['edit', 'Allow']]}
 
     def test_deserialize(self, inst, mock_registry):
         mock_registry.content.permissions.return_value = ['edit']
         assert inst.bind(registry=mock_registry).deserialize(
-            {'principals': ['Everyone'],
+            {'principals': ['everyone'],
              'permissions': [['edit', 'Allow']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', Allow]]}
@@ -1269,7 +1276,7 @@ class TestACM:
     def test_deserialize_noaction(self, inst, mock_registry):
         mock_registry.content.permissions.return_value = ['edit']
         assert inst.bind(registry=mock_registry).deserialize(
-            {'principals': ['Everyone'],
+            {'principals': ['everyone'],
              'permissions': [['edit', '']]}) == \
             {'principals': ['system.Everyone'],
              'permissions': [['edit', None]]}

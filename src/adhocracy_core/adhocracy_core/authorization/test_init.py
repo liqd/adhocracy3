@@ -3,9 +3,10 @@ from pytest import fixture
 from pytest import raises
 from pyramid.security import Allow
 from pyramid.security import Deny
+from pyramid.security import ALL_PERMISSIONS
 from unittest.mock import Mock
 from adhocracy_core.schema import ACM
-from adhocracy_core.utils import set_acl
+from adhocracy_core.authorization import set_acl
 from substanced.util import get_acl
 
 
@@ -202,14 +203,14 @@ def mock_registry():
 def test_acm_to_acl(mock_registry):
     mock_registry.content.permissions = ['view', 'edit']
     from . import acm_to_acl
-    appstruct = {'principals':           ['Everyone', 'role:creator', 'role:annotator'],
+    appstruct = {'principals':           ['everyone', 'role:creator', 'role:annotator'],
                  'permissions': [['view',  Allow,      Allow,          Allow],
                                  ['edit',  Deny,       Allow,          None]]}
     acl = acm_to_acl(appstruct, mock_registry)
-    assert (Allow, 'Everyone', 'view') in acl
-    assert (Deny,  'Everyone', 'view') not in acl
-    assert (Deny,  'Everyone', 'edit') in acl
-    assert (Allow, 'Everyone', 'edit') not in acl
+    assert (Allow, 'everyone', 'view') in acl
+    assert (Deny,  'everyone', 'view') not in acl
+    assert (Deny,  'everyone', 'edit') in acl
+    assert (Allow, 'everyone', 'edit') not in acl
     assert (Allow, 'role:creator', 'view') in acl
     assert (Deny,  'role:creator', 'view') not in acl
     assert (Allow, 'role:creator', 'edit') in acl
@@ -230,3 +231,33 @@ def test_add_acm(mock_registry):
     acl = get_acl(resource)
     assert (Allow, 'role:creator', 'view') in acl[:-1]
     assert (Deny, 'role:creator', 'view') == acl[-1]
+
+
+def test_set_acl_set_changes_acl():
+    from . import set_acl
+    from pyramid.security import Allow
+    resource = testing.DummyResource()
+    resource.__acl__ = []
+    acl = [(Allow, 'role:creator', 'edit_comment')]
+    set_acl(resource, acl)
+    assert resource.__acl__ == acl
+
+
+def test_set_acl_set_resource_dirty():
+    from . import set_acl
+    from pyramid.security import Deny
+    resource = testing.DummyResource()
+    set_acl(resource, [(Deny, 'role:creator', 'edit_comment')])
+    assert resource._p_changed is True
+
+def test_clean_acl():
+    from . import clean_acl
+    resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
+    clean_acl(resource)
+    assert resource.__acl__ == []
+
+def test_set_god_all_permissions():
+    from . import set_god_all_permissions
+    resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
+    set_god_all_permissions(resource)
+    assert resource.__acl__[0] == (Allow, 'role:god', ALL_PERMISSIONS)

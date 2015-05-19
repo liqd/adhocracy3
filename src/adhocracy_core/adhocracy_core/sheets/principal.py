@@ -129,7 +129,7 @@ userbasic_meta = sheet_meta._replace(
     isheet=IUserBasic,
     schema_class=UserBasicSchema,
     sheet_class=AttributeResourceSheet,
-    permission_create='create_sheet_userbasic',
+    permission_create='create_user',
 )
 
 
@@ -151,7 +151,7 @@ userextended_meta = sheet_meta._replace(
     isheet=IUserExtended,
     schema_class=UserExtendedSchema,
     sheet_class=AttributeResourceSheet,
-    permission_create='create_sheet_userbasic',
+    permission_create='create_user',
     permission_view='view_userextended',
     permission_edit='edit_userextended',
 )
@@ -205,8 +205,8 @@ permissions_meta = sheet_meta._replace(
     isheet=IPermissions,
     schema_class=PermissionsSchema,
     permission_view='view_userextended',
-    permission_create='manage_principals',
-    permission_edit='manage_principals',
+    permission_create='edit_sheet_permissions',
+    permission_edit='edit_sheet_permissions',
     sheet_class=PermissionsAttributeResourceSheet,
 )
 
@@ -271,7 +271,7 @@ password_meta = sheet_meta._replace(
     readable=False,
     creatable=True,
     editable=True,
-    permission_create='create_sheet_password',
+    permission_create='create_user',
 )
 
 

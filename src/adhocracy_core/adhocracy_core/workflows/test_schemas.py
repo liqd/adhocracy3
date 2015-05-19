@@ -39,7 +39,7 @@ class TestTransition:
         result = inst.deserialize(required_cstruct)
         assert result['from_state'] == 'test'
         assert result['to_state'] == 'test'
-        assert result['permission'] == ''
+        assert result['permission'] == 'do_transition'
         assert result['callback'] is None
 
     def test_deserialize_callback(self, inst, required_cstruct):
@@ -53,7 +53,7 @@ class TestTransition:
         result = inst.serialize(required_cstruct)
         assert result['from_state'] == 'test'
         assert result['to_state'] == 'test'
-        assert result['permission'] == ''
+        assert result['permission'] == 'do_transition'
         assert result['callback'] is None
 
     def test_serialize_callback(self, inst, required_cstruct):

@@ -114,7 +114,7 @@ class TestCatalogsServiceAdhocracy:
         from . import CatalogsServiceAdhocracy
         assert meta.iresource is ICatalogsService
         assert meta.content_name == 'catalogs'
-        assert meta.permission_add == 'add_service'
+        assert meta.permission_create == 'create_service'
         assert meta.content_class == CatalogsServiceAdhocracy
         assert issubclass(CatalogsServiceAdhocracy, CatalogsService)
 
@@ -348,7 +348,7 @@ class TestCatalogsServiceAdhocracy:
 
     def test_search_with_allows_no_permission(self, registry, pool, inst, query):
         from pyramid.authorization import Deny
-        from adhocracy_core.utils import set_acl
+        from adhocracy_core.authorization import set_acl
         child = self._make_resource(registry, parent=pool)
         set_acl(pool, [(Deny, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)
@@ -358,7 +358,7 @@ class TestCatalogsServiceAdhocracy:
     def test_search_with_allows_has_permission(self, registry, pool, inst,
                                                query):
         from pyramid.authorization import Allow
-        from adhocracy_core.utils import set_acl
+        from adhocracy_core.authorization import set_acl
         child = self._make_resource(registry, parent=pool)
         set_acl(pool, [(Allow, 'principal', 'view')], registry=registry)
         inst['system']['allowed'].reindex_resource(child)

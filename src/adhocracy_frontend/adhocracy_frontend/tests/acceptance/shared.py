@@ -8,8 +8,8 @@ from splinter.driver.webdriver import WebDriverElement
 
 from adhocracy_core.testing import god_login
 from adhocracy_core.testing import god_password
-from adhocracy_core.testing import annotator_password
-from adhocracy_core.testing import annotator_login
+from adhocracy_core.testing import participant_password
+from adhocracy_core.testing import participant_login
 from selenium.common.exceptions import NoSuchElementException
 
 
@@ -70,9 +70,9 @@ def login_god(browser, **kwargs):
     login(browser, god_login, god_password, **kwargs)
 
 
-def login_annotator(browser, **kwargs):
-    """Login annotator user."""
-    login(browser, annotator_login, annotator_password, **kwargs)
+def login_participant(browser, **kwargs):
+    """Login participant user."""
+    login(browser, participant_login, participant_password, **kwargs)
 
 
 def logout(browser):

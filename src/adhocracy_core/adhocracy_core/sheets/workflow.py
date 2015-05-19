@@ -135,7 +135,7 @@ class StateAssignment(MappingSchema):
             self.default = {}
 
     description = Text(missing='',
-                       default='Soon you can participate')
+                       default='Start participating!')
     start_date = DateTime(missing=None,
                           default=datetime(2015, 2, 14))
 
@@ -220,6 +220,7 @@ workflow_meta = sheet_meta._replace(
     isheet=IWorkflowAssignment,
     schema_class=WorkflowAssignmentSchema,
     sheet_class=WorkflowAssignmentSheet,
+    permission_edit='do_transition'
 )
 
 
@@ -234,7 +235,7 @@ class SampleWorkflowAssignmentSchema(WorkflowAssignmentSchema):
 
     workflow_name = 'sample'
 
-    announced = StateAssignment()
+    participate = StateAssignment()
     """Optional data related to a workflow state.
 
     The field name has to match an existing state name.

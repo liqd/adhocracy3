@@ -55,7 +55,7 @@ class ResourceContentRegistry(ContentRegistry):
         addables = self.resources_meta_addable[iresource]
         addables_allowed = []
         for resource_meta in addables:
-            permission = resource_meta.permission_add
+            permission = resource_meta.permission_create
             if request.has_permission(permission, context):
                 addables_allowed.append(resource_meta)
         return addables_allowed
@@ -98,10 +98,10 @@ class ResourceContentRegistry(ContentRegistry):
 
     @property
     def _builtin_permissions(self):
-        return {'hide_resource', 'edit_group', 'do_transition'}
+        return {'hide', 'edit_group', 'do_transition'}
 
     def _get_resource_permissions(self, resource_meta):
-        return [p for p in [resource_meta.permission_add,
+        return [p for p in [resource_meta.permission_create,
                             resource_meta.permission_view]
                 if p != '']
 

@@ -140,7 +140,7 @@ asset_meta = pool_meta._replace(
         adhocracy_core.sheets.asset.IAssetMetadata,
     ],
     use_autonaming=True,
-    permission_add='add_asset',
+    permission_create='create_asset',
     after_creation=[validate_and_complete_asset],
 )
 

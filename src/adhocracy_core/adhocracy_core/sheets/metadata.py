@@ -52,7 +52,7 @@ def deferred_validate_hidden(node, kw):
         return
 
     def check_hide_permisison(node, cstruct):
-        if not request.has_permission('hide_resource', context):
+        if not request.has_permission('hide', context):
             raise colander.Invalid(node, 'Changing this field is not allowed')
     return check_hide_permisison
 
@@ -96,7 +96,7 @@ metadata_meta = sheet_meta._replace(
     editable=True,
     creatable=True,
     readable=True,
-    permission_edit='edit_metadata',
+    permission_edit='delete',
 )
 
 

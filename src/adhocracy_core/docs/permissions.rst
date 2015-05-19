@@ -9,272 +9,278 @@ Basic functional tests for roles and default permission settings.
 Prerequisites
 ~~~~~~~~~~~~~
 
+
 Some imports to work with rest api calls::
 
     >>> from pprint import pprint
-    >>> from adhocracy_core.testing import reader_header
-    >>> from adhocracy_core.testing import annotator_header
-    >>> from adhocracy_core.testing import contributor_header
-    >>> from adhocracy_core.testing import editor_header
-    >>> from adhocracy_core.testing import reviewer_header
-    >>> from adhocracy_core.testing import manager_header
-    >>> from adhocracy_core.testing import admin_header
-    >>> from adhocracy_core.testing import god_header
     >>> from adhocracy_core.resources.sample_proposal import IProposal
     >>> from adhocracy_core.resources.sample_proposal import IProposalVersion
 
-Start Adhocracy testapp::
+Start adhocracy app and log in some users::
 
-    >>> from webtest import TestApp
-    >>> app = getfixture('app')
-    >>> testapp = TestApp(app)
-    >>> rest_url = 'http://localhost'
-    >>> platform = rest_url + '/adhocracy'
-    >>> users = rest_url + '/principals/users/'
-    >>> groups = rest_url + '/principals/groups/'
+    >>> anonymous = getfixture('app_anonymous')
+    >>> participant = getfixture('app_participant')
+    >>> participant2 = getfixture('app_participant2')
+    >>> moderator = getfixture('app_moderator')
+    >>> initiator = getfixture('app_initiator')
+    >>> admin = getfixture('app_admin')
+    >>> god = getfixture('app_god')
 
 Create participation process structure by god (sysadmin)
 (like :class:`adhocracy_core.interfaces.IPool` subtypes) ::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
-    >>> resp = testapp.post_json(platform, prop, headers=god_header).json
-    >>> pool = resp['path']
+    >>> prop = {'content_type': 'adhocracy_core.resources.organisation.IOrganisation',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'organisation'}}}
+    >>> resp = god.post('/', prop).json
+    >>> prop = {'content_type': 'adhocracy_core.resources.process.IProcess',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'process'}}}
+    >>> resp = god.post('/organisation', prop)
 
-Create participation process content by contributor
-(like :class:`adhocracy_core.interfaces.IItem` subtypes) ::
+Create participation process content by participant::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kommunismus'}}}
-    >>> resp = testapp.post_json(pool, prop, headers=contributor_header).json
-    >>> contributor_proposal = resp['path']
-    >>> contributor_proposal_comments = resp['path'] + 'comments'
-    >>> contributor_proposal_rates = resp['path'] + 'rates'
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'prop'}}}
+    >>> resp = participant.post('/organisation/process', prop).json
+    >>> participant_proposal = resp['path']
+    >>> participant_proposal_comments = resp['path'] + 'comments'
+    >>> participant_proposal_rates = resp['path'] + 'rates'
 
 
-Create annotations by annotator
-(like :class:`adhocracy_core.interfaces.IItem` subtypes) ::
+Create content annotations by participant::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'com'}}}
-    >>> resp = testapp.post_json(contributor_proposal_comments, prop, headers=annotator_header).json
-    >>> annotator_comment = resp['path']
+    >>> resp = participant.post('/organisation/process/prop/comments', prop).json
+    >>> participant_comment = resp['path']
 
     >>> prop = {'content_type': 'adhocracy_core.resources.rate.IRate', 'data': {}}
-    >>> resp = testapp.post_json(contributor_proposal_rates, prop, headers=annotator_header).json
-    >>> annotator_rate = resp['path']
+    >>> resp = participant.post('/organisation/process/prop/rates', prop).json
+    >>> participant_rate = resp['path']
 
 
-Reader
-~~~~~~
-
-Can read resources and normal sheets::
-
-    >>> resp_data = testapp.options(pool, headers=reader_header).json
-    >>> pprint(resp_data['GET']['response_body']['data'])
-    {...'adhocracy_core.sheets.metadata.IMetadata': {}...}
-
-
-Cannot create annotations for participation process content::
-
-    >>> resp_data = testapp.options(contributor_proposal_comments, headers=reader_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot edit annotations for participation process content::
-
-    >>> resp_data = testapp.options(annotator_comment, headers=reader_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot create process content::
-
-    >>> resp_data = testapp.options(pool, headers=reader_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot edit process content::
-
-    >>> resp_data = testapp.options(contributor_proposal, headers=reader_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot create process structure::
-
-    >>> resp_data = testapp.options(pool, headers=reader_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot edit process structure::
-
-    >>> resp_data = testapp.options(pool, headers=reader_header).json
-    >>> 'PUT' not in resp_data
-    True
-
-
-Annotator
+Everyone
 ~~~~~~~~~
 
 Can read resources and normal sheets::
 
-    >>> resp_data = testapp.options(pool, headers=annotator_header).json
-    >>> pprint(resp_data['GET']['response_body']['data'])
+    >>> resp = anonymous.options('/organisation').json
+    >>> pprint(resp['GET']['response_body']['data'])
     {...'adhocracy_core.sheets.metadata.IMetadata': {}...}
 
 
-Can create annotations ::
+Cannot create comments annotations for participation process content::
 
-   >>> resp_data = testapp.options(contributor_proposal_comments, headers=annotator_header).json
-   >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+    >>> 'POST' in anonymous.options('/organisation/process/prop/comments').json
+    False
+
+Cannot create rate annotations for participation process content::
+
+    >>> 'POST' in anonymous.options('/organisation/process/prop/rates').json
+    False
+
+Cannot edit annotations for participation process content::
+
+    >>> 'POST' in anonymous.options(participant_comment).json
+    False
+
+Cannot create process content::
+
+    >>> 'POST' in anonymous.options('/organisation/process').json
+    False
+
+Cannot edit process content::
+
+    >>> 'POST' in anonymous.options(participant_proposal).json
+    False
+
+Cannot create process structure::
+
+    >>> 'POST' in anonymous.options('/organisation/process').json
+    False
+
+Cannot edit process structure::
+
+    >>> 'PUT' in anonymous.options('/organisation/process').json
+    False
+
+
+Participant
+~~~~~~~~~~~~
+
+Can read resources and normal sheets::
+
+    >>> resp = participant.options('/organisation').json
+    >>> pprint(resp['GET']['response_body']['data'])
+    {...'adhocracy_core.sheets.metadata.IMetadata': {}...}
+
+Can create comments annotations for participation process content::
+
+   >>> resp = participant.options('/organisation/process/prop/comments').json
+   >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.comment.IComment']
 
-   >>> resp_data = testapp.options(contributor_proposal_rates, headers=annotator_header).json
-   >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+Can create rate annotations for participation process content::
+
+   >>> resp = participant.options('/organisation/process/prop/rates').json
+   >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.rate.IRate']
 
 Can edit his own annotations::
 
-    >>> resp_data = testapp.options(annotator_comment, headers=annotator_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+    >>> resp = participant.options(participant_comment).json
+    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.resources.comment.ICommentVersion']
 
-Cannot create process content::
+Cannot edit annotations::
 
-    >>> resp_data = testapp.options(pool, headers=annotator_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot edit process content::
-
-    >>> resp_data = testapp.options(contributor_proposal, headers=annotator_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot create process structure::
-
-    >>> resp_data = testapp.options(pool, headers=annotator_header).json
-    >>> 'POST' not in resp_data
-    True
-
-Cannot edit process structure::
-
-    >>> resp_data = testapp.options(pool, headers=annotator_header).json
-    >>> 'PUT' not in resp_data
-    True
-
-Contributor
-~~~~~~~~~~~
-
-Can read resources and normal sheets::
-
-    >>> resp_data = testapp.options(pool, headers=contributor_header).json
-    >>> pprint(resp_data['GET']['response_body']['data'])
-    {...'adhocracy_core.sheets.metadata.IMetadata': {}...}
-
-
-Cannot create annotations ::
-
-   >>> resp_data = testapp.options(contributor_proposal, headers=contributor_header).json
-   >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-   ['adhocracy_core.resources.sample_paragraph.IParagraph',
-    'adhocracy_core.resources.sample_proposal.IProposalVersion',
-    'adhocracy_core.resources.sample_section.ISection']
-
+    >>> 'POST' in participant2.options(participant_comment).json
+    False
 
 Can create process content::
 
-    >>> resp_data = testapp.options(pool, headers=contributor_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+    >>> resp = participant.options('/organisation/process').json
+    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.resources.external_resource.IExternalResource',
      'adhocracy_core.resources.sample_proposal.IProposal']
 
 Can edit his own process content::
 
-    >>> resp_data = testapp.options(contributor_proposal, headers=contributor_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+    >>> resp = participant.options('/organisation/process/prop').json
+    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.resources.sample_paragraph.IParagraph',
      'adhocracy_core.resources.sample_proposal.IProposalVersion',
      'adhocracy_core.resources.sample_section.ISection']
 
+
+Cannot edit process content::
+    >>> 'POST' in participant2.options('/organisation/process/prop').json
+    False
+
 Cannot create process structure::
 
-    >>> resp_data = testapp.options(pool, headers=contributor_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-    ['adhocracy_core.resources.external_resource.IExternalResource',
-     'adhocracy_core.resources.sample_proposal.IProposal']
+    >>> 'POST' in participant.options('/organisation').json
+    False
 
 Cannot edit process structure::
 
-    >>> resp_data = testapp.options(pool, headers=contributor_header).json
-    >>> 'PUT' not in resp_data
-    True
+    >>> 'PUT' in participant.options('/organisation').json
+    False
 
-Reviewer
-~~~~~~~~
+Moderator
+~~~~~~~~~~
 
-Manager
-~~~~~~~
+Can create comments annotations for participation process content::
 
-FIXME Can delete and hide resources::
+   >>> resp = moderator.options('/organisation/process/prop/comments').json
+   >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
+   ['adhocracy_core.resources.comment.IComment']
 
-    >>> resp_data = testapp.options(pool, headers=manager_header).json
-    >>> sorted(resp_data['PUT']['request_body']['data']
+Cannot create rate annotations for participation process content::
+
+    >>> 'POST' in moderator.options('/organisation/process/prop/rates').json
+    False
+
+Cannot edit annotations for participation process content::
+
+    >>> 'POST' in moderator.options(participant_comment).json
+    False
+
+Cannot create process content::
+
+    >>> 'POST' in moderator.options('/organisation/process').json
+    False
+
+Cannot edit process content::
+
+    >>> 'POST' in moderator.options(participant_proposal).json
+    False
+
+Can hide and delete process content
+    >>> resp = moderator.options('/organisation/process/prop').json
+    >>> sorted(resp['PUT']['request_body']['data']
     ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
     ['deleted', 'hidden']
+
+Can hide and delete process structure
+    >>> resp = moderator.options('/organisation').json
+    >>> sorted(resp['PUT']['request_body']['data']
+    ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
+    ['deleted', 'hidden']
+
+
+Initiator
+~~~~~~~~~
+
+Cannot create process structure organisation::
+
+   >>> 'POST' in initiator.options('/').json
+   False
+
+Cannot edit process structure organisation::
+
+   >>> 'PUT' in initiator.options('/organisation').json
+   False
+
+Can create process structure process::
+
+   >>> resp = initiator.options('/organisation').json
+   >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
+   ['adhocracy_core.resources.process.IProcess']
+
 
 Admin
 ~~~~~
 
-Can read resources and normal sheets::
+Cannot create rate annotations for participation process content::
 
-    >>> resp_data = testapp.options(pool, headers=admin_header).json
-    >>> pprint(resp_data['GET']['response_body']['data'])
-    {...'adhocracy_core.sheets.metadata.IMetadata': {}...}
+    >>> 'POST' in admin.options('/organisation/process/prop/rates').json
+    False
 
+Cannot edit annotations for participation process content::
 
-Cannot create annotations ::
-
-   >>> resp_data = testapp.options(contributor_proposal, headers=admin_header).json
-   >>> 'POST' not in resp_data
-   True
-
-Cannot create process content::
-
-    >>> resp_data = testapp.options(pool, headers=admin_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-    ['adhocracy_core.interfaces.IPool',
-     'adhocracy_core.resources.asset.IPoolWithAssets',
-     'adhocracy_core.resources.pool.IBasicPool']
+    >>> 'POST' in admin.options(participant_comment).json
+    False
 
 Can create process structure::
 
-    >>> resp_data = testapp.options(pool, headers=admin_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+    >>> resp = admin.options('/').json
+    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.interfaces.IPool',
      'adhocracy_core.resources.asset.IPoolWithAssets',
-     'adhocracy_core.resources.pool.IBasicPool']
+     'adhocracy_core.resources.external_resource.IExternalResource',
+     'adhocracy_core.resources.organisation.IOrganisation',
+     'adhocracy_core.resources.pool.IBasicPool',
+     'adhocracy_core.resources.sample_proposal.IProposal']
 
-FIXME Can edit process structure, but we don't have an example for that yet.
+    >>> resp = admin.options('/organisation').json
+    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
+    ['adhocracy_core.resources.process.IProcess']
+
+Cannot edit process structure::
+
+   >>> 'PUT' in admin.options('/organisation').json
+   True
+
+   >>> 'PUT' in admin.options('/organisation/process').json
+   True
 
 Can create groups::
 
-   >>> resp_data = testapp.options(groups, headers=admin_header).json
-   >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+   >>> resp = admin.options('http://localhost/principals/groups').json
+   >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.principal.IGroup']
-
 
 Can create users::
 
-   >>> resp_data = testapp.options(users, headers=admin_header).json
-   >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+   >>> resp = admin.options('http://localhost/principals/users').json
+   >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.principal.IUser']
-
 
 Can assign users to groups, and roles to users::
 
-   >>> god = users + '0000000'
-   >>> resp_data = testapp.options(god, headers=admin_header).json
-   >>> pprint(sorted([s for s in resp_data['PUT']['request_body']['data']]))
+   >>> god_user = 'http://localhost/principals/users/0000000'
+   >>> resp = admin.options(god_user).json
+   >>> pprint(sorted([s for s in resp['PUT']['request_body']['data']]))
    [...'adhocracy_core.sheets.principal.IPasswordAuthentication',
     'adhocracy_core.sheets.principal.IPermissions',
     'adhocracy_core.sheets.principal.IUserBasic',

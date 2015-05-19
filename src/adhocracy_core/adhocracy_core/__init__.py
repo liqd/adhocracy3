@@ -124,6 +124,7 @@ def includeme(config):
     config.include('.resources.image')
     config.include('.resources.subscriber')
     config.include('.resources.geo')
+    config.include('.resources.process')
     config.include('.workflows')
     config.include('.websockets')
     config.include('.rest')

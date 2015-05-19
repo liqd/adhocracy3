@@ -56,7 +56,7 @@ class TestAddWorkflow:
         """Return example workflow cstruct with required data."""
         cstruct = \
             {'states_order': ['draft', 'announced'],
-             'states': {'draft': {'acm': {'principals':           ['reader'],
+             'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []}},
              'transitions': {'to_announced': {'from_state': 'draft',
@@ -92,7 +92,7 @@ class TestAddWorkflow:
         states = sorted(workflow.get_states(None, None),
                         key=lambda x: x['name'])
         assert states[0]['initial'] is False
-        assert workflow._states['draft'].acl == [('Deny', 'role:reader', 'view')]
+        assert workflow._states['draft'].acl == [('Deny', 'role:moderator', 'view')]
         assert states[1]['initial'] is True
 
 

@@ -15,6 +15,7 @@ from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.authorization import acm_to_acl
+from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.schema import ACM
 from adhocracy_core.resources.geo import add_locations_service
 from adhocracy_core.catalog import ICatalogsService
@@ -26,42 +27,39 @@ import adhocracy_core.sheets.name
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
 root_acm = ACM().deserialize(
-    {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
-     'permissions': [['add_asset',                     None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
-                     ['add_comment',                   None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
-                     ['add_commentversion',            None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
-                     ['add_externalresource',          None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['add_group',                     None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['add_paragraph',                 None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['add_paragraphversion',          None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
-                     ['add_pool',                      None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['add_proposal',                  None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['add_proposalversion',           None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
-                     ['add_rate',                      None,       Allow,       None,          None,      None,      None,    Allow],  # noqa
-                     ['add_rateversion',               None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
-                     ['add_resource',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
-                     ['add_section',                   None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['add_sectionversion',            None,       None,        None,          Allow,     None,      None,    Allow],  # noqa
-                     ['add_user',                      Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
-                     ['create_sheet',                  None,       Allow,       Allow,         None,      None,      Allow,   Allow],  # noqa
-                     ['create_sheet_password',         Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
-                     ['create_sheet_userbasic',        Allow,      None,        None,          None,      None,      None,    Allow],  # noqa
-                     ['edit_group',                    None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['edit_metadata',                 None,       None,        None,          Allow,     Allow,     None,    Allow],  # noqa
-                     ['edit_sheet',                    None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['edit_some_sheets',              None,       None,        None,          Allow,     Allow,     Allow,   Allow],  # noqa
-                     ['edit_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
-                     ['hide_resource',                 None,       None,        None,          None,      Allow,     None,    Allow],  # noqa
-                     ['manage_principals',             None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['message_to_user',               None,       None,        Allow,         None,      None,      None,    Allow],  # noqa
-                     ['view',                          Allow,      Allow,       Allow,         None,      Allow,     Allow,   Allow],  # noqa
-                     ['view_sensitive',                None,       None,        None,          None,      None,      Allow,   Allow],  # noqa
-                     ['view_userextended',             None,       None,        None,          Allow,     None,      Allow,   Allow],  # noqa
-                     ['do_transition',                 None,       None,        None,          None,      None,      None,    Allow],  # noqa
-                     # FIXME, move to meinberlin module
-                     ['add_kiezkassen_proposal_version',  None,       None,        None,          None,      None,      None,    Allow],  # noqa
-                     ['add_kiezkassen_process',           None,       None,        None,          None,      None,      None,    Allow]  # noqa
+    {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
+     'permissions': [  # general
+                     ['view',                          Allow,       Allow,         Allow,        Allow,     Allow,       Allow],  # noqa
+                     ['create',                        None,        Allow,         Allow,        None,      Allow,       Allow],  # noqa
+                     ['edit',                          None,        None,          None,         Allow,     None,        Allow],  # noqa
+                     ['edit_some',                     None,        Allow,         Allow,        Allow,     Allow,       Allow],  # noqa
+                     ['delete',                        None,        None,          Allow,        Allow,     None,        Allow],  # noqa
+                     ['hide',                          None,        None,          Allow,        None,      Allow,       Allow],  # noqa
+                     ['do_transition',                 None,        None,          None,         None,      Allow,       Allow],  # noqa
+                     ['message_to_user',               None,        Allow,         Allow,        None,      Allow,       Allow],  # noqa
+                     # structure resources
+                     ['create_pool',                   None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_organisation',           None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_process',                None,        None,          None,         None,      Allow,       Allow],  # noqa
+                     # simple content resources
+                     ['create_asset',                  None,        Allow,         None,         None,      None,        Allow],  # noqa
+                     ['create_external',               None,        Allow,         None,         None,      None,        Allow],  # noqa
+                     # versioned content resources
+                     ['create_proposal',               None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_comment',                None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['edit_comment',                  None,        None,          None,         None,      None,        None],  # noqa
+                     ['create_rate',                   None,        None,          None,         None,      None,        None],  # noqa
+                     ['edit_rate',                     None,        None,          None,         None,      None,        None],  # noqa
+                     # user, groups, permissions
+                     ['create_user',                   Allow,       None,          None,         None,      None,        Allow],  # noqa
+                     ['edit_userextended',             None,        None,          None,         Allow,     None,        Allow],  # noqa
+                     ['view_userextended',             None,        None,          None,         Allow,     None,        Allow],  # noqa
+                     ['edit_sheet_permissions',        None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_group',                  None,        None,          None,         None,      None,        Allow],  # noqa
                      ]})
+
+# fixme: remove edit_xx_permission
 
 
 class IRootPool(IPool, IRoot):
@@ -105,6 +103,7 @@ def _add_principals_service(context, registry):
 def _add_acl_to_app_root(context, registry):
     acl = acm_to_acl(root_acm, registry)
     set_acl(context, acl, registry=registry)
+    set_god_all_permissions(context, registry)
 
 
 def add_platform(context, registry, platform_id=None,
@@ -130,9 +129,7 @@ def _add_default_group(context, registry):
     # the 'app' fixture in adhocracy_core.testing does not work with
     # setting a default group. So we allow to disable here.
     group_name = 'authenticated'
-    group_roles = ['reader', 'annotator', 'contributor']
-    # TODO these rules only makes sense for mercator
-    #      groups should be created with an evolve script
+    group_roles = ['participant']
     groups = find_service(context, 'principals', 'groups')
     appstructs = {adhocracy_core.sheets.principal.IGroup.__identifier__:
                   {'roles': group_roles},
