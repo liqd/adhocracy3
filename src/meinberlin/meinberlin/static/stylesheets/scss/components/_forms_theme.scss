@@ -21,6 +21,10 @@ textarea {
     }
 }
 
+.label-text, .form-row {
+    font-size: $font-size-small;
+}
+
 .input-error {
     position: relative;
     top: -(16px / $font-size-small * 1em);
