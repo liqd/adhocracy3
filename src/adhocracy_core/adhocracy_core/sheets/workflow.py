@@ -220,6 +220,7 @@ workflow_meta = sheet_meta._replace(
     isheet=IWorkflowAssignment,
     schema_class=WorkflowAssignmentSchema,
     sheet_class=WorkflowAssignmentSheet,
+    permission_edit='do_transition'
 )
 
 

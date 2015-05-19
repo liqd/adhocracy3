@@ -194,6 +194,7 @@ class TestWorkflowAssignmentSheet:
         assert inst.meta.schema_class == WorkflowAssignmentSchema
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
+        assert meta.permission_edit == 'do_transition'
 
     def test_create_raise_if_wrong_isheet(self, meta, context):
         from adhocracy_core.interfaces import ISheet
