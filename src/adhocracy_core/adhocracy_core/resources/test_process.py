@@ -30,7 +30,7 @@ class TestProcess:
         assert meta.is_implicit_addable is False
         assert meta.permission_create == 'create_process'
         assert sheets.asset.IHasAssetPool in meta.basic_sheets
-        assert meta.extended_sheets == []
+        assert meta.extended_sheets == [sheets.workflow.ISample]
         assert add_assets_service in meta.after_creation
 
 

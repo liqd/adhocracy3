@@ -16,4 +16,4 @@ def test_application_created_subscriber(monkeypatch):
     root = testing.DummyResource(__acl__=[(Allow, 'role:creator', 'view')])
     event.app.root_factory.return_value = root
     _application_created_subscriber(event)
-    assert (Allow, 'role:participant', 'create_kiezkassen_proposal') in root.__acl__
+    assert (Allow, 'role:admin', 'create_kiezkassen_proposal') in root.__acl__

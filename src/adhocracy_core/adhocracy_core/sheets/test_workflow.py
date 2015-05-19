@@ -284,15 +284,15 @@ class TestSampleWorkflowAssignmentSheet:
         mock_workflow.state_of.return_value = None
         registry.content.get_workflow.return_value = mock_workflow
         inst = meta.sheet_class(meta, context, registry)
-        assert inst.get()['announced'] == {}
+        assert inst.get()['participate'] == {}
 
     def test_get_cstruct_empty(self, meta, context, registry, mock_workflow):
         mock_workflow.type = 'sample'
         registry.content.get_workflow.return_value = mock_workflow
         inst = meta.sheet_class(meta, context, registry=registry)
         request = testing.DummyRequest(registry=registry)
-        assert inst.get_cstruct(request)['announced'] ==\
-            {'description': 'Soon you can participate',
+        assert inst.get_cstruct(request)['participate'] ==\
+            {'description': 'Start participating!',
              'start_date': '2015-02-14T00:00:00+00:00'}
 
 @fixture

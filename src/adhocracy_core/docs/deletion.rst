@@ -133,18 +133,21 @@ Start adhocracy app and log in some users::
 
 Lets create some content::
 
-    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    >>> data = {'content_type': 'adhocracy_core.resources.organisation.IOrganisation',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name':  'pool2'}}}
     >>> resp = admin.post("/", data)
-    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
     >>> resp = admin.post("/pool2", data)
-    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    >>> data = {'content_type': 'adhocracy_core.resources.organisation.IOrganisation',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'pool1'}}}
     >>> resp = admin.post("/", data)
+    >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
+    >>> resp = admin.post("/pool1", data)
     >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}}
-    >>> resp = participant.post("/pool1", data)
+    >>> resp = participant.post("/pool1/child", data)
     >>> proposal_item = resp.json['path']
     >>> proposal_item_first_version = resp.json['first_version_path']
 
@@ -192,15 +195,15 @@ Lets check whether we have the permission to delete or hide resources.
 The person who has created a resource (creator role) has the right to delete
 it::
 
-    >>> resp = anonymous.get("/pool1/proposal_item").json
+    >>> resp = anonymous.get("/pool1/child/proposal_item").json
 
-    >>> resp = participant.options("/pool1/proposal_item").json
+    >>> resp = participant.options("/pool1/child/proposal_item").json
     >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata']
     {'deleted': [True, False]}
 
 But they cannot hide it -- that special right is reserved to managers::
 
-    >>> resp = moderator.options("/pool1/proposal_item").json
+    >>> resp = moderator.options("/pool1/child/proposal_item").json
     >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
     {'deleted': [True, False], 'hidden': [True, False]}
 
@@ -267,7 +270,7 @@ that there actually is a listed version::
 
     >>> resp = anonymous.get(paragraph_item_first_version)
     >>> resp.json['data']['adhocracy_core.sheets.document.IParagraph']['elements_backrefs']
-    ['http://localhost/adhocracy/pool1/proposal_item/section_item/VERSION_0000001/']
+    ['http://localhost/adhocracy/pool1/child/proposal_item/section_item/VERSION_0000001/']
 
 Now we hide the item::
 

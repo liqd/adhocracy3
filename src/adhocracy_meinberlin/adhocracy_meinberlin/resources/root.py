@@ -43,9 +43,9 @@ def create_initial_content_for_meinberlin(context: IPool, registry: Registry,
 
 meinberlin_acm = ACM().deserialize(
     {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
-     'permissions': [['edit_kiezkassen_proposal',      None,        None,          None,         Allow,     None,        Allow],  # noqa
-                     ['create_kiezkassen_proposal',    None,        Allow,         None,         None,      None,        None],  # noqa
-                     ['create_kiezkassen_process',     None,        None,          None,         None,      None,        Allow],  # noqa
+     'permissions': [['edit_kiezkassen_proposal',      None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_kiezkassen_proposal',    None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_kiezkassen_process',     None,        None,          None,         None,      Allow,       Allow],  # noqa
                      ]})
 
 meinberlin_root_meta = root_meta._replace(

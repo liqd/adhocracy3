@@ -38,43 +38,42 @@ The MetaAPI gives us the states and transitions metadata for each workflow::
 
 State metadata contains a human readable title::
 
-    >>> state = workflow['states']['draft']
+    >>> state = workflow['states']['participate']
     >>> state['title']
-    'Draft'
+    'Participate'
 
 a description::
 
     >>> state['description']
-    'This phase is for internal review.'
+    'This phase is...
 
 a local ACM (see doc:`glossary`) that is set when entering this state::
 
     >>> state['acm']['principals']
-    ['participant']
+    ['participant', ...
     >>> state['acm']['permissions']
-    [['view', 'Deny']]
-
+    [['create_proposal',...
 
 a hint for the frontend if displaying this state in listing should be restricted::
 
     >>> state['display_only_to_roles']
-    ['admin']
+    []
 
 The order these states should be listet is also set, in addition this
 defines the initial workflow state (the first in the list)::
 
     >>> workflow['states_order']
-    ['draft', 'announced']
+    ['participate', 'frozen']
 
 Transition metadata determines the possible state flow and can provide a callable to
 execute arbitrary tasks::
 
-     >>> transition = workflow['transitions']['to_announced']
+     >>> transition = workflow['transitions']['to_frozen']
      >>> pprint(transition)
      {'callback': None,
-      'from_state': 'draft',
+      'from_state': 'participate',
       'permission': 'do_transition',
-      'to_state': 'announced'}
+      'to_state': 'frozen'}
 
 
 Workflow Assignment
@@ -90,15 +89,15 @@ Resources have a WorkflowAssignment sheet to assign the wanted workflow::
 and get the current state::
 
     >>> workflow_data['workflow_state']
-    'draft'
+    'participate'
 
 
 in addition we can add custom metadata for specific workflow states::
 
-    >>> workflow_data['announced']['start_date']
+    >>> workflow_data['participate']['start_date']
     '2015-02-14...
-    >>> workflow_data['announced']['description']
-    'Soon you can participate...
+    >>> workflow_data['participate']['description']
+    'Start...
 
 
 Workflow transition to states
@@ -109,18 +108,18 @@ First we check the available next states::
 
     >>> resp = app_god.options('/proposals/proposal_item').json
     >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.ISample']
-    {'workflow_state': ['announced']}
+    {'workflow_state': ['frozen']}
 
 Then we can put the wanted next state:
 
-     >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'workflow_state': 'announced'}}}
+     >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'workflow_state': 'frozen'}}}
      >>> resp = app_god.put('/proposals/proposal_item', data)
      >>> resp.status_code
      200
 
     >>> resp = app_god.get('/proposals/proposal_item').json
     >>> resp['data']['adhocracy_core.sheets.workflow.ISample']['workflow_state']
-    'announced'
+    'frozen'
 
 NOTE: The available next states depend on the workflow transitions and user permissions.
 NOTE: To make this work every state may have only one transition to another state.

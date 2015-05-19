@@ -42,15 +42,15 @@ root_acm = ACM().deserialize(
                      ['create_organisation',           None,        None,          None,         None,      None,        Allow],  # noqa
                      ['create_process',                None,        None,          None,         None,      Allow,       Allow],  # noqa
                      # simple content resources
-                     ['create_asset',                  None,        Allow,         None,         None,      None,        None],  # noqa
-                     ['create_external',               None,        Allow,         None,         None,      None,        None],  # noqa
+                     ['create_asset',                  None,        Allow,         None,         None,      None,        Allow],  # noqa
+                     ['create_external',               None,        Allow,         None,         None,      None,        Allow],  # noqa
                      # versioned content resources
-                     ['create_proposal',               None,        Allow,         None,         None,      None,        None],  # noqa
-                     ['edit_proposal',                 None,        None,          None,         Allow,     None,        None],  # noqa
-                     ['create_comment',                None,        Allow,         Allow,        None,      None,        None],  # noqa
-                     ['edit_comment',                  None,        None,          None,         Allow,     None,        None],  # noqa
-                     ['create_rate',                   None,        Allow,         None,         None,      None,        None],  # noqa
-                     ['edit_rate',                     None,        None,          None,         Allow,     None,        None],  # noqa
+                     ['create_proposal',               None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_comment',                None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['edit_comment',                  None,        None,          None,         None,      None,        None],  # noqa
+                     ['create_rate',                   None,        None,          None,         None,      None,        None],  # noqa
+                     ['edit_rate',                     None,        None,          None,         None,      None,        None],  # noqa
                      # user, groups, permissions
                      ['create_user',                   Allow,       None,          None,         None,      None,        Allow],  # noqa
                      ['edit_userextended',             None,        None,          None,         Allow,     None,        Allow],  # noqa

@@ -247,8 +247,10 @@ Can create process structure::
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.interfaces.IPool',
      'adhocracy_core.resources.asset.IPoolWithAssets',
+     'adhocracy_core.resources.external_resource.IExternalResource',
      'adhocracy_core.resources.organisation.IOrganisation',
-     'adhocracy_core.resources.pool.IBasicPool']
+     'adhocracy_core.resources.pool.IBasicPool',
+     'adhocracy_core.resources.sample_proposal.IProposal']
 
     >>> resp = admin.options('/organisation').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))

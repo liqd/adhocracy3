@@ -207,7 +207,6 @@ class TestMercatorProposalPermissionsParticipant:
         assert app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
         assert "VERSION_0000002" in  app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_cannot_create_other_users_proposal_version(self, app_participant,
                                                         app_god):
         _post_proposal_item(app_god, path='/', name='proposal_other')
@@ -222,7 +221,6 @@ class TestMercatorProposalPermissionsParticipant:
         creator = resp.json['data'][IMetadata.__identifier__]['creator']
         assert '0000003' in creator
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_god_can_create_proposal_item(self, app_god):
         """Regression test issue #362"""
         resp = _post_proposal_item(app_god, path='/', name='god1')
