@@ -47,7 +47,7 @@ def test_mercator_proposal_meta():
     assert meta.item_type == IMercatorProposalVersion
     assert add_ratesservice in meta.after_creation
     assert add_commentsservice in meta.after_creation
-    assert meta.permission_create == 'create_mercator_proposal'
+    assert meta.permission_create == 'create_proposal'
 
 
 def test_mercator_proposal_version_meta():
@@ -55,7 +55,7 @@ def test_mercator_proposal_version_meta():
     from .mercator import IMercatorProposalVersion
     meta = mercator_proposal_version_meta
     assert meta.iresource == IMercatorProposalVersion
-    assert meta.permission_create == 'edit_mercator_proposal'
+    assert meta.permission_create == 'edit_proposal'
  
 
 @fixture

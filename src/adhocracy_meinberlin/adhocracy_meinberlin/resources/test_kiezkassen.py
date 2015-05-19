@@ -21,7 +21,7 @@ def test_proposal_meta():
     from .kiezkassen import IProposalVersion
     assert proposal_meta.element_types == [IProposalVersion]
     assert proposal_meta.item_type == IProposalVersion
-    assert proposal_meta.permission_create == 'create_kiezkassen_proposal'
+    assert proposal_meta.permission_create == 'create_proposal'
 
 
 @mark.usefixtures('integration')
@@ -45,7 +45,7 @@ def test_kiezkassenversion_meta():
                                     ICommentable,
                                     IRateable,
                                     ]
-    assert meta.permission_create == 'edit_kiezkassen_proposal'
+    assert meta.permission_create == 'edit_proposal'
 
 @mark.usefixtures('integration')
 def test_kiezkassenversion_create(registry):
@@ -70,7 +70,7 @@ class TestProcess:
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
         assert meta.is_implicit_addable is True
-        assert meta.permission_create == 'create_kiezkassen_process'
+        assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == [
             adhocracy_core.sheets.description.IDescription,
             adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
@@ -78,7 +78,7 @@ class TestProcess:
             adhocracy_core.sheets.image.IImageReference,
         ]
         assert add_assets_service in meta.after_creation
-        assert meta.permission_create == 'create_kiezkassen_process'
+        assert meta.permission_create == 'create_process'
 
 
     @mark.usefixtures('integration')

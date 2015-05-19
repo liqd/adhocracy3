@@ -28,7 +28,7 @@ organization_info_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IOrganizationInfo,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -46,7 +46,7 @@ organization_info_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IOrganizationInfoVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -77,7 +77,7 @@ introduction_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IIntroduction,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -95,7 +95,7 @@ introduction_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IIntroductionVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -110,7 +110,7 @@ description_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IDescription,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -128,7 +128,7 @@ description_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IDescriptionVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -143,7 +143,7 @@ location_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.ILocation,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -161,7 +161,7 @@ location_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=ILocationVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -176,7 +176,7 @@ story_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IStory,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -194,7 +194,7 @@ story_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IStoryVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -209,7 +209,7 @@ outcome_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IOutcome,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -227,7 +227,7 @@ outcome_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IOutcomeVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -242,7 +242,7 @@ steps_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.ISteps,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -260,7 +260,7 @@ steps_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IStepsVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -275,7 +275,7 @@ value_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IValue,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -293,7 +293,7 @@ value_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IValueVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -308,7 +308,7 @@ partners_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IPartners,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -326,7 +326,7 @@ partners_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IPartnersVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -341,7 +341,7 @@ finance_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IFinance,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -359,7 +359,7 @@ finance_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IFinanceVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -374,7 +374,7 @@ experience_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IExperience,
         ICommentable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -392,7 +392,7 @@ experience_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IExperienceVersion,
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -410,7 +410,7 @@ mercator_proposal_version_meta = itemversion_meta._replace(
                      adhocracy_mercator.sheets.mercator.IMercatorSubResources,
                      ICommentable,
                      ILikeable],
-    permission_create='edit_mercator_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -441,7 +441,7 @@ mercator_proposal_meta = item_meta._replace(
     ],
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
-    permission_create='create_mercator_proposal',
+    permission_create='create_proposal',
 )
 
 
