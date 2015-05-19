@@ -4,11 +4,11 @@ from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.asset import asset_meta
 from adhocracy_core.resources.asset import IAsset
-
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
+from adhocracy_core.resources import process
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.comment import ICommentable
@@ -445,6 +445,20 @@ mercator_proposal_meta = item_meta._replace(
 )
 
 
+class IProcess(process.IProcess):
+
+    """Mercator participation process."""
+
+
+process_meta = process.process_meta._replace(
+    iresource=IProcess,
+    element_types=[IMercatorProposal,
+                   ],
+    is_implicit_addable=True,
+)
+
+
+
 def includeme(config):
     """Add resource type to content."""
     add_resource_type_to_registry(mercator_proposal_meta, config)
@@ -472,3 +486,4 @@ def includeme(config):
     add_resource_type_to_registry(finance_version_meta, config)
     add_resource_type_to_registry(experience_meta, config)
     add_resource_type_to_registry(experience_version_meta, config)
+    add_resource_type_to_registry(process_meta, config)

@@ -4,15 +4,21 @@ from pyramid.security import Allow
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.resources.organisation import IOrganisation
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import add_platform
 from adhocracy_core.schema import ACM
+from adhocracy_core import sheets
 
 
 def _create_initial_content(context: IPool, registry: Registry, options: dict):
     """Add mercator specific content."""
-    add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
+    add_platform(context, registry, 'mercator', resource_type=IOrganisation)
+    appstructs = {sheets.name.IName.__identifier__: {'name': 'advocate'}}
+    registry.content.create(IProcess.__identifier__,
+                            parent=context['mercator'],
+                            appstructs=appstructs)
 
 
 mercator_acm = ACM().deserialize(
