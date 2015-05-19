@@ -19,14 +19,31 @@ import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberli
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
+import SIKiezkassenWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
 
-export var meinBerlinWorkbenchDirective = (adhConfig : AdhConfig.IService) => {
+export var meinBerlinWorkbenchDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            bindVariablesAndClear(scope, column, ["processUrl"]);
+
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    adhHttp.get(processUrl).then((resource) => {
+                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                    });
+                }
+            });
+        }
+
     };
 };
 
@@ -104,6 +121,15 @@ export var kiezkassenDetailColumnDirective = (
             };
         }
     };
+};
+
+export var kiezkassenDetailAnnounceColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService
+) => {
+    var directive = kiezkassenDetailColumnDirective(bindVariablesAndClear, adhConfig);
+    directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/KiezkassenDetailAnnounceColumn.html";
+    return directive;
 };
 
 export var kiezkassenEditColumnDirective = (
@@ -252,7 +278,7 @@ export var register = (angular) => {
                 return $q.when("<adh-mein-berlin-workbench></adh-mein-berlin-workbench>");
             }];
         }])
-        .directive("adhMeinBerlinWorkbench", ["adhConfig", meinBerlinWorkbenchDirective])
+        .directive("adhMeinBerlinWorkbench", ["adhBindVariablesAndClear", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
         .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalDetailColumn", [
             "adhBindVariablesAndClear", "adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
@@ -262,6 +288,8 @@ export var register = (angular) => {
             "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalEditColumnDirective])
         .directive("adhMeinBerlinKiezkassenDetailColumn", [
             "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailColumnDirective])
+        .directive("adhMeinBerlinKiezkassenDetailAnnounceColumn", [
+            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailAnnounceColumnDirective])
         .directive("adhMeinBerlinKiezkassenEditColumn", [
             "adhBindVariablesAndClear", "adhConfig", kiezkassenEditColumnDirective]);
 };

@@ -7,6 +7,7 @@ import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
@@ -53,50 +54,86 @@ export var detailDirective = (
 };
 
 
-export var phaseHeaderDirective = (adhConfig : AdhConfig.IService) => {
+export var detailAnnounceDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DetailAnnounce.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.$watch("path", (value : string) => {
+                if (value) {
+                    adhHttp.get(value).then((resource) => {
+                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                        scope.announceDescription = resource.data[SIKiezkassenWorkflow.nick].announce.description;
+                    });
+                }
+            });
+        }
+    };
+};
+
+
+export var phaseHeaderDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
         scope: {},
         link: (scope) => {
+            var processUrl = adhTopLevelState.get("processUrl");
+            adhHttp.get(processUrl).then((resource) => {
+                scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                scope.phases[0].startDate = resource.data[SIKiezkassenWorkflow.nick].announce.start_date;
+                scope.phases[0].endDate = resource.data[SIKiezkassenWorkflow.nick].participate.start_date;
+                scope.phases[1].startDate = resource.data[SIKiezkassenWorkflow.nick].participate.start_date;
+                scope.phases[1].endDate = resource.data[SIKiezkassenWorkflow.nick].frozen.start_date;
+                scope.phases[2].startDate = resource.data[SIKiezkassenWorkflow.nick].frozen.start_date;
+                scope.phases[2].endDate = resource.data[SIKiezkassenWorkflow.nick].result.start_date;
+                scope.phases[3].startDate = resource.data[SIKiezkassenWorkflow.nick].result.start_date;
+            });
+
             // FIXME: dummy content
-            scope.currentPhase = "Informationsphase";
             scope.phases = [{
+                name: "announce",
                 title: "Informationsphase",
                 description: "Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.",
                 processType: "Kiezkasse",
-                startDate: "2015-01-01",
-                endDate: "2015-02-02",
                 votingAvailable: false,
                 commentAvailable: false
             }, {
+                name: "participate",
                 title: "Ideensammlungsphase",
                 description: "Alle Interessierten werden aufgerufen Vorschläge für Projekte in der Bezirksregion zu machen. " +
                     "Die Angabe der Kosten soll bitte die Mehrwertsteuer enthalten. Vorschläge können aber auch noch offline " +
                     "in der den. Alle Vorschläge (offline und online) werden dann bei der Bürgerversammlung beschlossen.",
                 processType: "Kiezkasse",
-                startDate: "2015-02-02",
-                endDate: "2015-05-10",
                 votingAvailable: true,
                 commentAvailable: true
             }, {
+                name: "frozen",
                 title: "Bürgerversammlung",
                 description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder bewertet " +
                     "werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge " +
                     "werden dann vor Ort die Art und Weise der Abstimmung bestimmt die Bürgerversammlung selbst. Offline " +
                     "Vorschläge werden online",
                 processType: "Kiezkasse",
-                startDate: "2015-05-10",
-                endDate: "2015-05-20",
                 votingAvailable: true,
                 commentAvailable: false
             }, {
+                name: "result",
                 title: "Ergebnisse",
                 description: "Nach der Prüfung vom zuständigen Fachamt des Bezirksamtes werden die Vorschläge, die realisiert " +
                     "werden und ggf. diejenigen, die nicht realisierbar sind, online markiert und angezeigt. Die Projekte " +
                     "müssen bis Mitte Dezember realisiert und abgerechnet werden",
                 processType: "Kiezkasse",
-                startDate: "2015-05-20",
                 votingAvailable: false,
                 commentAvailable: false
             }];
@@ -170,10 +207,12 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
-            AdhTabs.moduleName
+            AdhTabs.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
-        .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", phaseHeaderDirective])
+        .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
+        .directive("adhMeinBerlinKiezkassenDetailAnnounce", ["adhConfig", "adhHttp", detailAnnounceDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", editDirective]);
 };
