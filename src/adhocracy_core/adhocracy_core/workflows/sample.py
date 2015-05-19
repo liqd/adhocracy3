@@ -6,21 +6,21 @@ sample_meta = {
     'states': {
         'participate': {'title': 'Participate',
                   'description': 'This phase is to participate.',
-                  'acm': {'principals':           ['participant', 'moderator', 'creator', 'initiator'],
+                  'acm': {'principals':           ['participant', 'moderator', 'creator', 'initiator'],  # noqa
                           'permissions':
-                              [['create_proposal', 'Allow',        None,        None,      None],
-                               ['edit_proposal',    None,          None,       'Allow',    None],
-                               ['create_comment',  'Allow',       'Allow',      None,      None],
-                               ['edit_comment',     None,          None,       'Allow',    None],
-                               ['create_rate',     'Allow',        None,        None,      None],
-                               ['edit_rate',        None,          None,       'Allow',    None],
+                              [['create_proposal', 'Allow',        None,        None,      None],  # noqa
+                               ['edit_proposal',    None,          None,       'Allow',    None],  # noqa
+                               ['create_comment',  'Allow',       'Allow',      None,      None],  # noqa
+                               ['edit_comment',     None,          None,       'Allow',    None],  # noqa
+                               ['create_rate',     'Allow',        None,        None,      None],  # noqa
+                               ['edit_rate',        None,          None,       'Allow',    None],  # noqa
                                ]},
-                  'display_only_to_roles': []
+                  'display_only_to_roles': [],
                   },
         'frozen': {'title': 'Frozen',
                    'description': '',
                    'acm': {},
-                   'display_only_to_roles': []
+                   'display_only_to_roles': [],
                    },
     },
     'transitions': {

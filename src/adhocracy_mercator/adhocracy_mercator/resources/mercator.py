@@ -1,7 +1,6 @@
 """Mercator proposal."""
 from pyramid.registry import Registry
 from pyramid.security import Allow
-from pyramid.security import Deny
 
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
