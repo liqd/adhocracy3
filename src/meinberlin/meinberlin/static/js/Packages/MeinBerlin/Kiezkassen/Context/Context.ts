@@ -22,7 +22,7 @@ export var headerDirective = (adhConfig : AdhConfig.IService, adhTopLevelState :
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html",
         link: (scope) => {
-            adhTopLevelState.bind("processUrl", scope);
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
         }
     };
 
