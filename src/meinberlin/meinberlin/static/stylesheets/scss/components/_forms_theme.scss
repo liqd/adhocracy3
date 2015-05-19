@@ -13,7 +13,9 @@ select,
 textarea {
     background: $color-background-base-introvert;
     border: 0;
-    margin-bottom: 15px / $font-size-normal * 1em;
+    font-size: $font-size-small;
+    margin-bottom: 15px / $font-size-small * 1em;
+    padding: 0.4em $font-size-small;
 
     &:focus {
         border-color: $color-brand-one-normal;
@@ -21,7 +23,7 @@ textarea {
     }
 }
 
-.label-text, .form-row {
+.label-text, .form-row, .login-check-input {
     font-size: $font-size-small;
 }
 
@@ -31,7 +33,7 @@ textarea {
 }
 
 .form-row {
-    margin-bottom: 15px / $font-size-normal * 1em;
+    margin-bottom: 15px / $font-size-small * 1em;
 }
 
 //server errors
