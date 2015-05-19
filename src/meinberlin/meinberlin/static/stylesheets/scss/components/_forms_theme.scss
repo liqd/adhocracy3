@@ -13,7 +13,7 @@ select,
 textarea {
     background: $color-background-base-introvert;
     border: 0;
-    margin-bottom: 16px / $font-size-normal * 1em;
+    margin-bottom: 15px / $font-size-normal * 1em;
 
     &:focus {
         border-color: $color-brand-one-normal;
@@ -24,6 +24,10 @@ textarea {
 .input-error {
     position: relative;
     top: -(16px / $font-size-small * 1em);
+}
+
+.form-row {
+    margin-bottom: 15px / $font-size-normal * 1em;
 }
 
 //server errors
