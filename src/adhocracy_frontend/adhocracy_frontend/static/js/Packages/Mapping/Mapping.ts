@@ -150,7 +150,7 @@ export var mapInput = (
                     });
             };
 
-            if (typeof scope.lat !== "undefined" && typeof scope.lng !== "undefined") {
+            if (scope.lat || scope.lng) {
                 createMarker(leaflet.latLng(scope.lat, scope.lng));
                 marker.dragging.enable();
 
