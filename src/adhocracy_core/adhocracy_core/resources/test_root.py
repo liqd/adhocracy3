@@ -103,8 +103,6 @@ class TestRoot:
         acl = get_acl(inst)
         assert (Allow, 'system.Anonymous', 'view') in acl
         assert (Allow, 'system.Anonymous', 'create_user') in acl
-        assert (Allow, 'system.Anonymous', 'create_sheet_password') in acl
-        assert (Allow, 'system.Anonymous', 'create_sheet_userbasic') in acl
         assert (Allow, 'role:god', ALL_PERMISSIONS) == acl[0]
 
     def test_create_root_with_initial_god_user(self, registry, request_):

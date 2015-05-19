@@ -53,8 +53,6 @@ root_acm = ACM().deserialize(
                      ['edit_rate',                     None,        None,          None,         Allow,     None,        None],  # noqa
                      # user, groups, permissions
                      ['create_user',                   Allow,       None,          None,         None,      None,        Allow],  # noqa
-                     ['create_sheet_password',         Allow,       None,          None,         None,      None,        Allow],  # noqa
-                     ['create_sheet_userbasic',        Allow,       None,          None,         None,      None,        Allow],  # noqa
                      ['edit_userextended',             None,        None,          None,         Allow,     None,        Allow],  # noqa
                      ['view_userextended',             None,        None,          None,         Allow,     None,        Allow],  # noqa
                      ['edit_sheet_permissions',        None,        None,          None,         None,      None,        Allow],  # noqa
