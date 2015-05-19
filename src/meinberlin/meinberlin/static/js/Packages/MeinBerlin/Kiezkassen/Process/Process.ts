@@ -39,9 +39,6 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
-                        scope.announceDescription = resource.data[SIKiezkassenWorkflow.nick].announce.description;
-
                         var locationUrl = resource.data[SILocationReference.nick].location;
 
                         adhHttp.get(locationUrl).then((location) => {
@@ -52,6 +49,30 @@ export var detailDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => scope.path);
+        }
+    };
+};
+
+
+export var detailAnnounceDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DetailAnnounce.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.$watch("path", (value : string) => {
+                if (value) {
+                    adhHttp.get(value).then((resource) => {
+                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                        scope.announceDescription = resource.data[SIKiezkassenWorkflow.nick].announce.description;
+                    });
+                }
+            });
         }
     };
 };
@@ -192,5 +213,6 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
+        .directive("adhMeinBerlinKiezkassenDetailAnnounce", ["adhConfig", "adhHttp", detailAnnounceDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", editDirective]);
 };
