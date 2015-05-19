@@ -3,7 +3,6 @@ branch = True
 omit =
     # bcc code
     src/adhocracy_core/adhocracy_core/resources/resource.py
-    *export*.py
     *version.py
     *test*py
     *bootstrap.py*
@@ -13,7 +12,7 @@ omit =
     src/adhocracy/adhocracy/scaffolds/__init__
     src/adhocracy_*/adhocracy_*/__init__.py
     src/adhocracy_*/setup.py
-    src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/import_geodata.py
+    src/adhocracy_*/adhocracy_*/scripts/*
 source =
     src/adhocracy_core
     src/adhocracy_mercator
