@@ -3,7 +3,9 @@ export interface ISheetMetaApi {
     readable : string[];
     editable : string[];
     creatable : string[];
+    /* tslint:disable:variable-name */
     create_mandatory : string[];
+    /* tslint:enable:variable-name */
 
     // computed information
     references : string[];
@@ -14,6 +16,13 @@ export class Sheet {
     public getMeta() : ISheetMetaApi {
         return (<any>this).constructor._meta;
     }
+}
+
+
+export interface IResourceClass {
+    /* tslint:disable:variable-name */
+    content_type : string;
+    /* tslint:enable:variable-name */
 }
 
 
@@ -28,7 +37,7 @@ export class Resource {
     public root_versions : string[];
     /* tslint:enable:variable-name */
 
-    constructor(public content_type: string) {
+    constructor(public content_type : string) {
         this.data = {};
     }
 

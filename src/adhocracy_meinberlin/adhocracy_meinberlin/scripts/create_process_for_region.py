@@ -51,8 +51,7 @@ def create_process_for_region():
 def _fetch_district_by_name(root, district):
     pool = get_sheet(root, IPool)
     params = {'depth': 3,
-              'content_type': IMultiPolygon,
-              'elements': 'content',
+              'interfaces': IMultiPolygon,
               }
     results = pool.get(params)
     locations = results['elements']

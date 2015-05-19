@@ -1,6 +1,8 @@
 <div data-adh-moving-columns="" class="moving-columns">
     <adh-moving-column>
-        <adh-mein-berlin-kiezkassen-detail-column></adh-mein-berlin-kiezkassen-detail-column>
+        <adh-mein-berlin-kiezkassen-detail-column data-ng-if="currentPhase !== 'announce' && view !== 'edit_process'"></adh-mein-berlin-kiezkassen-detail-column>
+        <adh-mein-berlin-kiezkassen-detail-announce-column data-ng-if="currentPhase === 'announce' && view !== 'edit_process'"></adh-mein-berlin-kiezkassen-detail-announce-column>
+        <adh-mein-berlin-kiezkassen-edit-column data-ng-if="view === 'edit_process'"></adh-mein-berlin-kiezkassen-edit-column>
     </adh-moving-column>
     <adh-moving-column>
         <adh-mein-berlin-kiezkassen-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mein-berlin-kiezkassen-proposal-create-column>

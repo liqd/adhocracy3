@@ -139,9 +139,11 @@ var fill = (
     proposalVersion.data[SIDescription.nick] = new SIDescription.Sheet({
         description: scope.data.detail
     });
-    proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
-        coordinates: [scope.data.lng, scope.data.lat]
-    });
+    if (scope.data.lng && scope.data.lat) {
+        proposalVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+            coordinates: [scope.data.lng, scope.data.lat]
+        });
+    }
 };
 
 var postCreate = (
@@ -303,7 +305,7 @@ export var createDirective = (
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames)(scope, processUrl)
                         .then((result) => {
-                            $location.url(adhResourceUrlFilter(result[1].path));
+                            $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
                         });
                 });
             };
@@ -338,7 +340,7 @@ export var editDirective = (
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
                         .then((result) => {
-                            $location.url(adhResourceUrlFilter(result[0].path));
+                            $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));
                     });
                 });
             };

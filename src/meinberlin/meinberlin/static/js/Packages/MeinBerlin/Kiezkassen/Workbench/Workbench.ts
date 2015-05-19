@@ -13,18 +13,37 @@ import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
 import AdhMeinBerlinKiezkassenProposal = require("../Proposal/Proposal");
 
+import RIComment = require("../../../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
+import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
+import SIKiezkassenWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
 
-export var meinBerlinWorkbenchDirective = (adhConfig : AdhConfig.IService) => {
+export var meinBerlinWorkbenchDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            bindVariablesAndClear(scope, column, ["processUrl"]);
+
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    adhHttp.get(processUrl).then((resource) => {
+                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                    });
+                }
+            });
+        }
+
     };
 };
 
@@ -96,14 +115,36 @@ export var kiezkassenDetailColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, ["processUrl"]);
-            scope.isShowMap = false;
+            scope.shared = column.$scope.shared;
             scope.showMap = (isShowMap) => {
-                column.$scope.shared.isShowMap = scope.isShowMap = isShowMap;
+                scope.shared.isShowMap = isShowMap;
             };
         }
     };
 };
 
+export var kiezkassenDetailAnnounceColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService
+) => {
+    var directive = kiezkassenDetailColumnDirective(bindVariablesAndClear, adhConfig);
+    directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/KiezkassenDetailAnnounceColumn.html";
+    return directive;
+};
+
+export var kiezkassenEditColumnDirective = (
+    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            bindVariablesAndClear(scope, column, ["processUrl"]);
+        }
+    };
+};
 
 export var moduleName = "adhMeinBerlinWorkbench";
 
@@ -121,15 +162,34 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIKiezkassenProcess.content_type, "", RIKiezkassenProcess.content_type, "", {
+                .default(RIKiezkassenProcess, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .default(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "", {
+                .default(RIKiezkassenProcess, "edit_process", RIKiezkassenProcess.content_type, "", {
+                    space: "content",
+                    movingColumns: "is-show-hide-hide"
+                })
+                .specific(RIKiezkassenProcess, "edit_process", RIKiezkassenProcess.content_type, "", [
+                    "adhHttp", "adhUser", (
+                        adhHttp : AdhHttp.Service<any>,
+                        adhUser : AdhUser.Service
+                    ) => (resource : RIKiezkassenProcess) => {
+                        return adhUser.ready.then(() => {
+                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                                if (!options.PUT) {
+                                    throw 401;
+                                } else {
+                                    return {};
+                                }
+                            });
+                        });
+                    }])
+                .default(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIKiezkassenProcess.content_type, "create_proposal", RIKiezkassenProcess.content_type, "", [
+                .specific(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "", [
                     "adhHttp", "adhUser", (
                         adhHttp : AdhHttp.Service<any>,
                         adhUser : AdhUser.Service
@@ -144,53 +204,53 @@ export var register = (angular) => {
                             });
                         });
                     }])
-                .default(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion.content_type, "edit", RIKiezkassenProcess.content_type, "", [
+                .specificVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", [
                     "adhHttp", "adhUser", (
                         adhHttp : AdhHttp.Service<any>,
                         adhUser : AdhUser.Service
-                    ) => (resource : RIProposalVersion) => {
+                    ) => (item : RIProposal, version : RIProposalVersion) => {
                         return adhUser.ready.then(() => {
-                            return adhHttp.options(AdhUtil.parentPath(resource.path)).then((options : AdhHttp.IOptions) => {
+                            return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                                 if (!options.POST) {
                                     throw 401;
                                 } else {
                                     return {
-                                        proposalUrl: resource.path
+                                        proposalUrl: version.path
                                     };
                                 }
                             });
                         });
                     }])
-                .default(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIProposal, RIProposalVersion, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", [
-                    () => (resource : RIProposalVersion) => {
+                .specificVersionable(RIProposal, RIProposalVersion, "", RIKiezkassenProcess.content_type, "", [
+                    () => (item : RIProposal, version : RIProposalVersion) => {
                         return {
-                            proposalUrl: resource.path
+                            proposalUrl: version.path
                         };
                     }])
-                .default(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIProposal, RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "comments", RIKiezkassenProcess.content_type, "", [
-                    () => (resource : RIProposalVersion) => {
+                .specificVersionable(RIProposal, RIProposalVersion, "comments", RIKiezkassenProcess.content_type, "", [
+                    () => (item : RIProposal, version : RIProposalVersion) => {
                         return {
-                            commentableUrl: resource.path,
-                            proposalUrl: resource.path
+                            commentableUrl: version.path,
+                            proposalUrl: version.path
                         };
                     }])
-                .default(RICommentVersion.content_type, "", RIKiezkassenProcess.content_type, "", {
+                .defaultVersionable(RIComment, RICommentVersion, "", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "", RIKiezkassenProcess.content_type, "", ["adhHttp", "$q", (
+                .specificVersionable(RIComment, RICommentVersion, "", RIKiezkassenProcess.content_type, "", ["adhHttp", "$q", (
                     adhHttp : AdhHttp.Service<any>,
                     $q : angular.IQService
                 ) => {
@@ -203,8 +263,8 @@ export var register = (angular) => {
                         }
                     };
 
-                    return (resource : RICommentVersion) => {
-                        return getCommentableUrl(resource).then((commentable) => {
+                    return (item : RIComment, version : RICommentVersion) => {
+                        return getCommentableUrl(version).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
                                 proposalUrl: commentable.path
@@ -218,7 +278,7 @@ export var register = (angular) => {
                 return $q.when("<adh-mein-berlin-workbench></adh-mein-berlin-workbench>");
             }];
         }])
-        .directive("adhMeinBerlinWorkbench", ["adhConfig", meinBerlinWorkbenchDirective])
+        .directive("adhMeinBerlinWorkbench", ["adhBindVariablesAndClear", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
         .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalDetailColumn", [
             "adhBindVariablesAndClear", "adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
@@ -227,5 +287,9 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenProposalEditColumn", [
             "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalEditColumnDirective])
         .directive("adhMeinBerlinKiezkassenDetailColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailColumnDirective]);
+            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailColumnDirective])
+        .directive("adhMeinBerlinKiezkassenDetailAnnounceColumn", [
+            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailAnnounceColumnDirective])
+        .directive("adhMeinBerlinKiezkassenEditColumn", [
+            "adhBindVariablesAndClear", "adhConfig", kiezkassenEditColumnDirective]);
 };

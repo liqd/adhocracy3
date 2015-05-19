@@ -49,8 +49,8 @@ $arrow-width: 1em;
         border-left: 0;
     }
 
-    &:hover,
-    &:focus {
+    &:hover:not(.is-disabled),
+    &:focus:not(.is-disabled) {
         color: $color-text-inverted;
         background-color: $color-brand-one-extrovert;
 
@@ -63,7 +63,7 @@ $arrow-width: 1em;
         display: none;
     }
 
-    &:active,
+    &:active:not(.is-disabled),
     &.is-rate-button-active {
         background: $color-function-valid;
 
@@ -73,7 +73,7 @@ $arrow-width: 1em;
 
         // :focus is sometimes set on click and then stays.
         // That's why it is skipped here.
-        &:hover {
+        &:hover:not(.is-disabled) {
             // scss-lint:disable NestingDepth
             background: $color-brand-three-normal;
 
@@ -101,16 +101,23 @@ category: Widgets
 
 Rate up or down with counter
 
-The button has the is-rate-button-active state.
-rate-difference has the is-positive state. Can be is-negative.
+The button has the `is-rate-button-active` state.
+rate-difference has the `is-positive` state. Can be `is-negative`.
+
+The whole widget may be disabled, in which case itself and both buttons have
+the `is-disabled` state.
 
 ```html_example
 <div class="rate">
-    <span class="rate-difference is-positive">
-        1
-    </span>
-    <a href="" class="rate-pro is-rate-button-active" data-ng-click="cast(1)"><i class="icon-vote-up" title="Vote up"></i></a>
-    <a href="" class="rate-contra" data-ng-click="cast(-1)"><i class="icon-vote-down" title="Vote down"></i></a>
+    <span class="rate-difference is-positive">1</span>
+    <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+</div>
+
+<div class="rate is-disabled">
+    <span class="rate-difference is-positive">1</span>
+    <a href="" class="rate-pro is-rate-button-active is-disabled"><i class="icon-vote-up" title="Vote up"></i></a>
+    <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
 </div>
 ```
 */
@@ -119,22 +126,26 @@ rate-difference has the is-positive state. Can be is-negative.
     a {
         color: $color-text-highlight-introvert;
         text-decoration: none;
+
+        &.is-disabled {
+            cursor: not-allowed;
+        }
     }
 
     .rate-pro {
         &.is-rate-button-active,
-        &:hover,
-        &:focus,
-        &:active {
+        &:hover:not(.is-disabled),
+        &:focus:not(.is-disabled),
+        &:active:not(.is-disabled) {
             color: $color-function-valid;
         }
     }
 
     .rate-contra {
         &.is-rate-button-active,
-        &:hover,
-        &:focus,
-        &:active {
+        &:hover:not(.is-disabled),
+        &:focus:not(.is-disabled),
+        &:active:not(.is-disabled) {
             color: $color-brand-three-normal;
         }
     }

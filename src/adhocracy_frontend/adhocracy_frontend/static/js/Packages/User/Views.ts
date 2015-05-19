@@ -527,16 +527,16 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIUser.content_type, "", "", "", {
+                .default(RIUser, "", "", "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIUser.content_type, "", "", "", () => (resource : RIUser) => {
+                .specific(RIUser, "", "", "", () => (resource : RIUser) => {
                     return {
                         userUrl: resource.path
                     };
                 })
-                .default(RIUsersService.content_type, "", "", "", {
+                .default(RIUsersService, "", "", "", {
                     space: "user",
                     movingColumns: "is-show-hide-hide",
                     userUrl: "",  // not used by default, but should be overridable

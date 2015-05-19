@@ -9,6 +9,7 @@ var pkgLocation = "/Tabs";
 
 export interface ITabScope extends angular.IScope {
     active : boolean;
+    highlighted : boolean;
     heading : string;
     classes : string;
     select() : void;
@@ -66,7 +67,7 @@ export class TabSetController {
     public addTab(tab : ITabScope) {
         this.$scope.tabs.push(tab);
 
-        // we can"t run the select function on the first tab
+        // we can't run the select function on the first tab
         // since that would select it twice
         if (this.$scope.tabs.length === 1) {
             if (!this.$scope.closedByDefault) {
@@ -115,13 +116,15 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/tab.html",
         scope: {
             active: "=?",
+            highlighted: "=?",
             heading: "@",
             classes: "@"
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
+            var paneElement = element.find(".tab-pane");
             scope.height = 0;
-            scope.$watch(() => element.find(".tab-pane").outerHeight(), (value : number) => {
-                if (value !== 0) {
+            scope.$watch(() => paneElement.outerHeight(), (value : number) => {
+                if (value !== 0 && paneElement.height() !== 0) {
                     scope.height = value;
                 }
             });
