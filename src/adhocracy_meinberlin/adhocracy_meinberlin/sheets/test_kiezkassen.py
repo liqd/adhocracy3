@@ -80,6 +80,7 @@ class TestWorkflowSheet:
         from . import kiezkassen
         assert meta.isheet == kiezkassen.IWorkflowAssignment
         assert meta.schema_class == kiezkassen.WorkflowAssignmentSchema
+        assert meta.permission_edit == 'do_transition'
 
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
