@@ -24,6 +24,9 @@ export function parentPath(path : string) : string {
 
     var result;
 
+    if (typeof path === "undefined") {
+        return undefined;
+    }
     if (path[path.length - 1] === "/") {
         result = path.substring(0, path.lastIndexOf("/", path.length - 2) + 1);
     } else {

@@ -60,25 +60,25 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIBasicPool.content_type, "", "", "", {
+                .default(RIBasicPool, "", "", "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
                     content2Url: ""
                 })
-                .default(RIProposalVersion.content_type, "", "", "", {
+                .default(RIProposalVersion, "", "", "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion.content_type, "", "", "", () => (resource : RIProposalVersion) => {
+                .specific(RIProposalVersion, "", "", "", () => (resource : RIProposalVersion) => {
                     return {
                         content2Url: resource.path
                     };
                 })
-                .default(RIUser.content_type, "", "", "", {
+                .default(RIUser, "", "", "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"
                 })
-                .default(RIUsersService.content_type, "", "", "", {
+                .default(RIUsersService, "", "", "", {
                     space: "user",
                     movingColumns: "is-show-show-hide"
                 });

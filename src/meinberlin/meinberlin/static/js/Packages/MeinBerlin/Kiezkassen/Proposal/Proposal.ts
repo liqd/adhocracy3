@@ -305,7 +305,7 @@ export var createDirective = (
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames)(scope, processUrl)
                         .then((result) => {
-                            $location.url(adhResourceUrlFilter(result[1].path));
+                            $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
                         });
                 });
             };
@@ -340,7 +340,7 @@ export var editDirective = (
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
                         .then((result) => {
-                            $location.url(adhResourceUrlFilter(result[0].path));
+                            $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));
                     });
                 });
             };
