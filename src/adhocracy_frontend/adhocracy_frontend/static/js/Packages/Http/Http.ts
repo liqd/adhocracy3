@@ -32,6 +32,7 @@ export var logBackendError : (response : angular.IHttpPromiseCallbackArg<IBacken
 
 
 export interface IHttpConfig {
+    noCredentials? : boolean;
 }
 
 export interface IHttpOptionsConfig extends IHttpConfig {
@@ -122,6 +123,12 @@ export class Service<Content extends ResourcesBase.Resource> {
 
     private parseConfig(config : IHttpConfig) {
         var headers = {};
+        if (config.noCredentials) {
+            _.assign(headers, {
+                "X-User-Token": undefined,
+                "X-User-Path": undefined
+            });
+        }
         return headers;
     }
 
