@@ -35,8 +35,12 @@ export var meinBerlinWorkbenchDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, ["processUrl"]);
 
-            adhHttp.get(scope.processUrl).then((resource) => {
-                scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    adhHttp.get(processUrl).then((resource) => {
+                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                    });
+                }
             });
         }
 
