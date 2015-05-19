@@ -38,4 +38,17 @@
             }
         }
     }
+
+    &.is-disabled {
+        &:after {
+            @extend .icon-voting:before;
+            cursor: not-allowed;
+            line-height: 1.35em;
+            font-size: 150%;
+        }
+
+        .rate-pro, .rate-contra {
+            display: none;
+        }
+    }
 }

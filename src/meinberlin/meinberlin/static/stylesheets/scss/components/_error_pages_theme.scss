@@ -1,0 +1,11 @@
+.error-page-404 {
+    .error-page-image {
+        width: 300px;
+    }
+}
+
+.error-page-title {
+    color: $color-text-normal;
+    font-size: $font-size-large;
+    margin: (40px / $font-size-large * 1em) 0 0;
+}

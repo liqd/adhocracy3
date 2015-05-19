@@ -60,7 +60,9 @@
         <label class="login-check">
             <div class="login-check-input">
                 <input type="checkbox" name="registerCheck" data-ng-model="input.registerCheck" required="required" />
-                {{ "TR__I_ACCEPT_THE" | translate }} <a data-ng-href="{{ termsUrl }}" target="_blank">{{ "TR__TERMS_AND_CONDITIONS" | translate }}</a>
+                <span data-adh-html-translate="TR__I_ACCEPT_THE_TERMS_AND_CONDITIONS" data-translate-templates="{
+                    link: '&lt;a data-ng-href=&quot;\\{\\{ termsUrl \\}\\}&quot; target=&quot;_blank&quot;&gt;{{ content }}&lt;/a&gt;'
+                }"></span>
             </div>
             <span class="input-error" data-ng-show="showError(registerForm, registerForm.registerCheck, 'required')">
                 {{ "TR__ERROR_REQUIRED_TERMS_AND_CONDITIONS" | translate }}
