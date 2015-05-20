@@ -1,5 +1,6 @@
 import _ = require("lodash");
 
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhCredentials = require("../User/Credentials");
 import AdhDateTime = require("../DateTime/DateTime");
@@ -11,11 +12,10 @@ import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../Rate/Rate");
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
-import AdhResourceUtil = require("../Util/ResourceUtil");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -352,6 +352,7 @@ export var moduleName = "adhComment";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhAngularHelpers.moduleName,
             AdhCredentials.moduleName,
             AdhDateTime.moduleName,
             AdhDone.moduleName,
@@ -361,7 +362,6 @@ export var register = (angular) => {
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhRate.moduleName,
-            AdhAngularHelpers.moduleName,
             AdhResourceWidgets.moduleName,
             AdhTopLevelState.moduleName
         ])
