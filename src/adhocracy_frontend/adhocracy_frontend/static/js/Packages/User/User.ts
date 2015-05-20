@@ -136,7 +136,7 @@ export class Service {
         return _self.loadUser(userPath);
     }
 
-    public storeAndEnableToken(token : string, userPath : string) : angular.IPromise<void> {
+    private storeAndEnableToken(token : string, userPath : string) : angular.IPromise<void> {
         var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
@@ -229,6 +229,19 @@ export class Service {
 
         return _self.adhHttp.postRaw("/activate_account", {path: path})
             .then(success, AdhHttp.logBackendError);
+    }
+
+    public passwordReset(path : string, password : string) : angular.IPromise<any> {
+        var _self : Service = this;
+
+        var success = (response) => {
+            return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
+        };
+
+        return _self.adhHttp.postRaw("/password_reset", {
+            path: path,
+            password: password
+        }).then(success, AdhHttp.logBackendError);
     }
 }
 

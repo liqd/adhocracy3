@@ -231,14 +231,11 @@ export var passwordResetDirective = (
             scope.errors = [];
 
             scope.passwordReset = () => {
-                return adhHttp.postRaw(adhConfig.rest_url + "/password_reset", {
-                    path: adhTopLevelState.get("path"),
-                    password: scope.input.password
-                }).then((response) => {
-                    adhUser.storeAndEnableToken(response.data.user_token, response.data.user_path);
-                    scope.success = true;
-                }, AdhHttp.logBackendError)
-                .catch((errors) => bindServerErrors(scope, errors));
+                return adhUser.passwordReset(adhTopLevelState.get("path"), scope.input.password)
+                    .then(() => {
+                        scope.success = true;
+                    },
+                    (errors) => bindServerErrors(scope, errors));
             };
         }
     };
