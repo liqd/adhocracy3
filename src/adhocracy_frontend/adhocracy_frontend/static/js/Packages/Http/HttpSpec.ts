@@ -211,7 +211,10 @@ export var register = () => {
                     adhHttp.getNewestVersionPathNoFork(path).then(
                         (ret) => {
                             expect(ret).toBe(returnPath1);
-                            expect($httpMock.get).toHaveBeenCalledWith(path + "LAST/", { params: undefined });
+                            expect($httpMock.get).toHaveBeenCalledWith(path + "LAST/", {
+                                params: undefined,
+                                headers: {}
+                            });
                             done();
                         },
                         (msg) => {
@@ -267,6 +270,8 @@ export var register = () => {
                                         follows: ["/ome/path"]
                                     }
                                 }
+                            }, {
+                                headers: {}
                             });
                             done();
                         },
@@ -329,6 +334,8 @@ export var register = () => {
                                     }
                                 },
                                 root_versions: ["foo", "bar"]
+                            }, {
+                                headers: {}
                             });
                             done();
                         },

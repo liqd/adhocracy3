@@ -173,7 +173,7 @@ export var editDirective = (
                 scope.data.title = process.data[SITitle.nick].title;
                 scope.data.currentWorkflowState = process.data[SIKiezkassenWorkflow.nick].workflow_state;
             });
-            adhHttp.options(scope.path, false).then((raw) => {
+            adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
                 // extract available transitions
                 scope.data.availableWorkflowStates = AdhUtil.deepPluck(raw, [
                     "data", "PUT", "request_body", "data", SIKiezkassenWorkflow.nick, "workflow_state"]);

@@ -187,7 +187,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     if (count) {
                         params["count"] = "true";
                     }
-                    return adhHttp.get($scope.path, params, warmup);
+                    return adhHttp.get($scope.path, params, {
+                        warmupPoolCache: warmup
+                    });
                 };
 
                 $scope.update = (warmup? : boolean) : angular.IPromise<void> => {

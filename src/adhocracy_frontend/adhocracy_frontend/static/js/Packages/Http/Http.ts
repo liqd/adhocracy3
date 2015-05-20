@@ -31,6 +31,23 @@ export interface IBackendErrorItem extends AdhError.IBackendErrorItem {};
 export var logBackendError : (response : angular.IHttpPromiseCallbackArg<IBackendError>) => void = AdhError.logBackendError;
 
 
+export interface IHttpConfig {
+    noCredentials? : boolean;
+}
+
+export interface IHttpOptionsConfig extends IHttpConfig {
+    importOptions? : boolean;
+}
+
+export interface IHttpGetConfig extends IHttpConfig {
+    warmupPoolCache? : boolean;
+}
+
+export interface IHttpPutConfig extends IHttpConfig {
+    keepMetadata? : boolean;
+}
+
+
 export interface IOptions {
     OPTIONS : boolean;
     PUT : boolean;
@@ -104,6 +121,17 @@ export class Service<Content extends ResourcesBase.Resource> {
         }
     }
 
+    private parseConfig(config : IHttpConfig) {
+        var headers = {};
+        if (config.noCredentials) {
+            _.assign(headers, {
+                "X-User-Token": undefined,
+                "X-User-Path": undefined
+            });
+        }
+        return headers;
+    }
+
     private importOptions(raw : angular.IHttpPromiseCallbackArg<any>) : IOptions {
         var metadata = AdhUtil.deepPluck(raw.data, ["PUT", "request_body", "data", SIMetadata.nick]);
         return {
@@ -117,16 +145,17 @@ export class Service<Content extends ResourcesBase.Resource> {
         };
     }
 
-    public options(path : string, importOptions : boolean = true) : angular.IPromise<IOptions> {
+    public options(path : string, config : IHttpOptionsConfig = {}) : angular.IPromise<IOptions> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-options preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
 
         return this.adhCache.memoize(path, "OPTIONS",
-            () => this.$http({method: "OPTIONS", url: path})
+            () => this.$http({method: "OPTIONS", url: path, headers: headers})
         ).then((response) => {
-            if (importOptions) {
+            if (typeof config.importOptions === "undefined" || config.importOptions) {
                 return this.importOptions(response);
             } else {
                 return response;
@@ -134,13 +163,17 @@ export class Service<Content extends ResourcesBase.Resource> {
         }, AdhError.logBackendError);
     }
 
-    public getRaw(path : string, params?) : angular.IHttpPromise<any> {
+    public getRaw(path : string, params?, config : IHttpConfig = {}) : angular.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
 
-        return this.$http.get(path, { params : params });
+        return this.$http.get(path, {
+            params : params,
+            headers : headers
+        });
     }
 
     /**
@@ -155,11 +188,11 @@ export class Service<Content extends ResourcesBase.Resource> {
     public get(
         path : string,
         params?,
-        warmupPoolCache ?: boolean
+        config : IHttpGetConfig = {}
     ) : angular.IPromise<Content> {
         var query = (typeof params === "undefined") ? "" : "?" + $.param(params);
 
-        if (warmupPoolCache) {
+        if (config.warmupPoolCache) {
             if (_.has(params, "elements")) {
                 throw "cannot use warmupPoolCache when elements is set";
             } else {
@@ -168,26 +201,29 @@ export class Service<Content extends ResourcesBase.Resource> {
         }
 
         return this.adhCache.memoize(path, query,
-            () => this.getRaw(path, params).then(
+            () => this.getRaw(path, params, config).then(
                 (response) => AdhConvert.importContent(
-                    <any>response, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache, warmupPoolCache),
+                    <any>response, this.adhMetaApi, this.adhPreliminaryNames, this.adhCache, config.warmupPoolCache),
                 AdhError.logBackendError));
     }
 
-    public putRaw(path : string, obj : Content) : angular.IHttpPromise<any> {
+    public putRaw(path : string, obj : Content, config : IHttpConfig = {}) : angular.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
         this.adhCache.invalidate(path);
-        return this.$http
-            .put(path, obj);
+
+        return this.$http.put(path, obj, {
+            headers: headers
+        });
     }
 
-    public put(path : string, obj : Content, keepMetadata : boolean = false) : angular.IPromise<Content> {
+    public put(path : string, obj : Content, config : IHttpPutConfig = {}) : angular.IPromise<Content> {
         var _self = this;
 
-        return this.putRaw(path, AdhConvert.exportContent(this.adhMetaApi, obj, keepMetadata))
+        return this.putRaw(path, AdhConvert.exportContent(this.adhMetaApi, obj, config.keepMetadata), config)
             .then(
                 (response) => {
                     _self.adhCache.invalidateUpdated(response.data.updated_resources);
@@ -196,7 +232,7 @@ export class Service<Content extends ResourcesBase.Resource> {
                 AdhError.logBackendError);
     }
 
-    public hide(path : string, contentType : string) : angular.IPromise<any> {
+    public hide(path : string, contentType : string, config : IHttpConfig = {}) : angular.IPromise<any> {
         var obj = {
             content_type: contentType,
             data: {}
@@ -205,35 +241,37 @@ export class Service<Content extends ResourcesBase.Resource> {
             hidden: true
         };
 
-        return this.put(path, <any>obj, true);
+        return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
     }
 
-    public postRaw(path : string, obj : Content) : angular.IHttpPromise<any> {
+    public postRaw(path : string, obj : Content, config : IHttpConfig = {}) : angular.IHttpPromise<any> {
         var _self = this;
 
         if (_self.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-post preliminary path: " + path;
         }
         path = this.formatUrl(path);
+        var headers = this.parseConfig(config);
 
         if (typeof FormData !== "undefined" && FormData.prototype.isPrototypeOf(obj)) {
             return _self.$http({
                 method: "POST",
                 url: path,
                 data: obj,
-                headers: {"Content-Type": undefined},
+                headers: _.assign({"Content-Type": undefined}, headers),
                 transformRequest: undefined
             });
         } else {
-            return _self.$http
-                .post(path, obj);
+            return _self.$http.post(path, obj, {
+                headers: headers
+            });
         }
     }
 
-    public post(path : string, obj : Content) : angular.IPromise<Content> {
+    public post(path : string, obj : Content, config : IHttpConfig = {}) : angular.IPromise<Content> {
         var _self = this;
 
-        return _self.postRaw(path, AdhConvert.exportContent(_self.adhMetaApi, obj))
+        return _self.postRaw(path, AdhConvert.exportContent(_self.adhMetaApi, obj), config)
             .then(
                 (response) => {
                     this.adhCache.invalidateUpdated(response.data.updated_resources);
@@ -251,8 +289,8 @@ export class Service<Content extends ResourcesBase.Resource> {
      * LAST tag and adh-last-version directive.  (even though arguably
      * there is a difference between the LAST tag and this function.)
      */
-    public getNewestVersionPathNoFork(path : string) : angular.IPromise<string> {
-        return this.get(path + "LAST/")
+    public getNewestVersionPathNoFork(path : string, config : IHttpGetConfig = {}) : angular.IPromise<string> {
+        return this.get(path + "LAST/", undefined, config)
             .then((tag) => {
                 var heads = tag.data[SITag.nick].elements;
                 if (heads.length !== 1) {
