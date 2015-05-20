@@ -352,7 +352,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 });
 
             var allowRate = adhConfig.custom["allow_rate"];
-            scope.allowRate = typeof allowRate !== "undefined" && allowRate.toLowerCase() === "true";
+            scope.allowRate = typeof allowRate === "undefined" || allowRate.toLowerCase() === "true";
         }
     };
 };
