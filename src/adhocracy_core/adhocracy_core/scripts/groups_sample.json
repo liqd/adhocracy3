@@ -1,0 +1,4 @@
+[
+    {"name": "moderators-xyz", "roles": ["reader"]},
+    {"name": "reviewers-xyz", "roles": ["annotator"]}
+]

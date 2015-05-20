@@ -81,6 +81,7 @@ setup(name='adhocracy_core',
       [console_scripts]
       start_ws_server = adhocracy_core.websockets.start_ws_server:main
       import_users = adhocracy_core.scripts.import_users:import_users
+      import_groups = adhocracy_core.scripts.import_groups:import_groups
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,
