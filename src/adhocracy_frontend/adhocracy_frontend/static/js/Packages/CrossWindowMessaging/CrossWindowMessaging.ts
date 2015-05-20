@@ -146,7 +146,9 @@ export class Service implements IService {
         if (_self.embedderOrigin === "*") {
             _self.embedderOrigin = data.embedderOrigin;
 
-            _self.$rootScope.$watch(() => _self.adhCredentials.loggedIn, (loggedIn) => _self.sendLoginState(loggedIn));
+            if (typeof _self.adhCredentials !== "undefined") {
+                _self.$rootScope.$watch(() => _self.adhCredentials.loggedIn, (loggedIn) => _self.sendLoginState(loggedIn));
+            }
 
             _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl) => {
                 _self.postMessage(
