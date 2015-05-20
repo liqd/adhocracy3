@@ -25,7 +25,7 @@ from adhocracy_core.sheets.principal import IUserExtended
 def import_users():
     """Import users from a JSON file.
 
-    Already existing users will have their groups, roles and emails updated (TODO).
+    Already existing users will have their groups, roles and emails updated.
 
     usage::
 
