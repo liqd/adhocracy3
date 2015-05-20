@@ -384,13 +384,18 @@ class TestAddDefaultGroupToUserSubscriber:
         pool['principals']['users']['000000'] = user
         return pool['principals']
 
+    @fixture
+    def event(event, registry):
+        event.registry = registry
+        return event
+
     def call_fut(self, event):
         from adhocracy_core.resources.subscriber import\
             user_created_and_added_subscriber
         return user_created_and_added_subscriber(event)
 
-    def test_default_group_exists(
-            self, registry, principals, event, mock_sheet):
+    def test_default_group_exists_and_no_group_set(
+            self, registry, principals, event, mock_sheet, mock_user_locator):
         from adhocracy_core.sheets.principal import IPermissions
         default_group = principals['groups']['authenticated']
         user = principals['users']['000000']
@@ -398,8 +403,23 @@ class TestAddDefaultGroupToUserSubscriber:
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
         register_sheet(event.object, mock_sheet, registry)
         mock_sheet.get.return_value = {'groups': []}
+        mock_user_locator.get_groups.return_value = []
         self.call_fut(event)
         assert mock_sheet.set.call_args[0][0] == {'groups': [default_group]}
+
+    def test_default_group_exists_and_group_set(
+            self, registry, principals, event, mock_sheet, mock_user_locator):
+        from adhocracy_core.sheets.principal import IPermissions
+        default_group = principals['groups']['authenticated']
+        other_group = testing.DummyResource()
+        user = principals['users']['000000']
+        event.object = user
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
+        register_sheet(event.object, mock_sheet, registry)
+        mock_sheet.get.return_value = {'groups': []}
+        mock_user_locator.get_groups.return_value = [other_group]
+        self.call_fut(event)
+        assert mock_sheet.set.called is False
 
     def test_default_group_not_exists(
             self, registry, principals, event, mock_sheet):
