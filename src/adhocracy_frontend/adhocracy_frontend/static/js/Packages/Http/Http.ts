@@ -156,14 +156,15 @@ export class Service<Content extends ResourcesBase.Resource> {
 
         return this.adhCache.memoize(path, "OPTIONS",
             () => this.adhCredentials.ready.then(
-            () => this.$http({method: "OPTIONS", url: path, headers: headers}).then(
-            (response) => {
-                if (typeof config.importOptions === "undefined" || config.importOptions) {
-                    return this.importOptions(response);
-                } else {
-                    return response;
-                }
-            }, AdhError.logBackendError)));
+                () => this.$http({method: "OPTIONS", url: path, headers: headers})
+            )
+        ).then((response) => {
+            if (typeof config.importOptions === "undefined" || config.importOptions) {
+                return this.importOptions(response);
+            } else {
+                return response;
+            }
+        }, AdhError.logBackendError);
     }
 
     public getRaw(path : string, params?, config : IHttpConfig = {}) : angular.IPromise<any> {
