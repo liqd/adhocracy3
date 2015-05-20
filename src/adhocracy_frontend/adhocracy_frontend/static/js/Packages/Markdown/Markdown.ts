@@ -3,30 +3,24 @@
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 
-export var parsemarkdown = (adhConfig : AdhConfig.IService, markdownit : any) => {
+export var parseMarkdown = (adhConfig : AdhConfig.IService, markdownit) => {
     return {
         scope: {
             parsetext: "="
         },
         restrict: "E",
         link: (scope, element) => {
+            var md = new markdownit();
 
-            var parseMarkdown = (markdown: string): string => {
-                var markdownit = require("markdownit");
-                    md = new markdownit();
-                var result = md.render(markdown);
-                return result;
-            };
-
-			scope.$watch("parsetext", function(newValue) {
-				element.children().remove();
-				element.append(parseMarkdown(newValue));
-			});
+            scope.$watch("parsetext", (newValue) => {
+                element.children().remove();
+                element.append(md.render(newValue));
+            });
         }
     };
 };
 
-export var testmarkdown = (adhConfig: AdhConfig.IService) => {
+export var testMarkdown = (adhConfig: AdhConfig.IService) => {
     return {
         restrict: "E",
         template: "<textarea ng-model=\"data.parsetext\" cols=\"50\" rows=\"10\"></textarea>" +
@@ -47,6 +41,6 @@ export var register = (angular) => {
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.registerEmbeddableDirectives(["test-parse-markdown"]);
         }])
-        .directive("adhParseMarkdown", ["adhConfig", "markdownit", parsemarkdown])
-        .directive("adhTestParseMarkdown", ["adhConfig", testmarkdown]);
+        .directive("adhParseMarkdown", ["adhConfig", "markdownit", parseMarkdown])
+        .directive("adhTestParseMarkdown", ["adhConfig", testMarkdown]);
 };
