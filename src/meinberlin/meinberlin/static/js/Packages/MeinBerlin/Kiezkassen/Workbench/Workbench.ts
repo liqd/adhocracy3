@@ -6,7 +6,6 @@ import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhUser = require("../../../User/User");
 import AdhUtil = require("../../../Util/Util");
 import AdhPermissions = require("../../../Permissions/Permissions");
 
@@ -157,8 +156,7 @@ export var register = (angular) => {
             AdhMeinBerlinKiezkassenProposal.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhUser.moduleName
+            AdhResourceArea.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
@@ -171,18 +169,13 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide"
                 })
                 .specific(RIKiezkassenProcess, "edit_process", RIKiezkassenProcess.content_type, "", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (resource : RIKiezkassenProcess) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.PUT) {
-                                    throw 401;
-                                } else {
-                                    return {};
-                                }
-                            });
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.PUT) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
                         });
                     }])
                 .default(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "", {
@@ -190,18 +183,13 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 })
                 .specific(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (resource : RIKiezkassenProcess) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.POST) {
-                                    throw 401;
-                                } else {
-                                    return {};
-                                }
-                            });
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
                         });
                     }])
                 .defaultVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", {
@@ -209,20 +197,15 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 })
                 .specificVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (item : RIProposal, version : RIProposalVersion) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.POST) {
-                                    throw 401;
-                                } else {
-                                    return {
-                                        proposalUrl: version.path
-                                    };
-                                }
-                            });
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIProposal, version : RIProposalVersion) => {
+                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    proposalUrl: version.path
+                                };
+                            }
                         });
                     }])
                 .defaultVersionable(RIProposal, RIProposalVersion, "", RIKiezkassenProcess.content_type, "", {
