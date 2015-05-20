@@ -11,17 +11,8 @@ category: Widgets
         @include clearfix;
     }
 
-    .map-buttons .map-button-save {
-        &, &:hover, &:focus {
-            color: $color-brand-two-introvert;
-        }
-
-        &:active {
-            color: $color-brand-one-introvert;
-        }
-    }
-
-    .map-button-save, .map-button-cancel {
+    .map-button-clear,
+    .map-button-reset {
         @include inline-block;
         padding: 0 (10px / $font-size-normal * 1em);
     }
