@@ -154,6 +154,5 @@ class TestRoot:
         group_sheet = get_sheet(group, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']
-        assert not group is None
-        assert group_users == ['0000000']
+        assert group is not None
         assert group_roles == ['participant']
