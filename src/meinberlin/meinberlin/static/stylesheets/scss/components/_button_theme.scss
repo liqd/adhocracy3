@@ -16,6 +16,15 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
+    font-size: $font-size-small;
+    height: 24px / $font-size-small * 1em;
+    line-height: 24px / $font-size-small * 1em;
+    text-transform: none;
+
+    &:first-letter {
+        text-transform: capitalize;
+    }
+
     &, &.m-call-to-action {
         color: $color-text-normal;
         min-width: 1px;
@@ -30,6 +39,13 @@ input[type="button"] {
 
         &:active:not(:disabled):not(.ng-disabled) {
             color: $color-shadow;
+        }
+
+        &.m-call-to-action,
+        &.m-call-to-action-secondary {
+            height: 24px / $font-size-normal * 1em;
+            line-height: 24px / $font-size-normal * 1em;
+            font-size: $font-size-normal;
         }
 
         &.m-call-to-action {

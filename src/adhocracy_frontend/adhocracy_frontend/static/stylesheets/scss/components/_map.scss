@@ -9,7 +9,6 @@ category: Widgets
 .map-wrapper {
     .map-buttons {
         @include clearfix;
-        margin: 2px 0 -7px;
     }
 
     .map-buttons .map-button-save {
@@ -22,14 +21,9 @@ category: Widgets
         }
     }
 
-    .map-button-save {
-        float: left;
-        font-weight: $font-weight-extrovert;
-    }
-
-    .map-button-cancel {
-        @extend .disguised-link;
-        float: right;
+    .map-button-save, .map-button-cancel {
+        @include inline-block;
+        padding: 0 (10px / $font-size-normal * 1em);
     }
 }
 
