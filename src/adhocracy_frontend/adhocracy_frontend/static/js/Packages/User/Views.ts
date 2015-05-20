@@ -292,8 +292,13 @@ export var indicatorDirective = (adhConfig : AdhConfig.IService, adhResourceArea
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser : AdhUser.Service, $scope) => {
+        controller: ["adhUser", "adhCredentials", "$scope", (
+            adhUser : AdhUser.Service,
+            adhCredentials : AdhCredentials.Service,
+            $scope
+        ) => {
             $scope.user = adhUser;
+            $scope.credentials = adhCredentials;
             $scope.noLink = !adhResourceArea.has(RIUser.content_type);
 
             $scope.logOut = () => {

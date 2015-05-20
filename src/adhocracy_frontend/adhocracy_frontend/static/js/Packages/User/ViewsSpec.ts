@@ -195,8 +195,8 @@ export var register = () => {
                 beforeEach(() => {
                     scopeMock = {};
                     adhUserMock = jasmine.createSpyObj("adhUserMock", ["logOut"]);
-                    controller = <any>(directive.controller[2]);
-                    controller(adhUserMock, scopeMock);
+                    controller = <any>(directive.controller[3]);
+                    controller(adhUserMock, null, scopeMock);
                 });
 
                 describe("logOut", () => {
