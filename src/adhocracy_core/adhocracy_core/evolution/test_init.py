@@ -92,6 +92,7 @@ class TestMigrateNewSheet:
         pool_sheet.get.return_value = {'elements': []}
         self.call_fut(context, IResource, ISheet, ISheetB)
         pool_sheet.get.assert_called_with({'interfaces': (ISheetB, IResource),
+                                           'depth': 0,
                                            'only_visible': False,
                                            })
 
