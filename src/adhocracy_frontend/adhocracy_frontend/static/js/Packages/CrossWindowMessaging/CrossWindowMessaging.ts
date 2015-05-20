@@ -228,6 +228,6 @@ export var register = (angular, trusted = false) => {
     if (trusted) {
         mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", factory]);
     } else {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", "adhUser", factory]);
+        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", factory]);
     }
 };
