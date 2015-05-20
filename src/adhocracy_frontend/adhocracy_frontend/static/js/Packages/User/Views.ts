@@ -337,12 +337,12 @@ export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : Ad
 };
 
 
-export var userListDirective = (adhUser : AdhUser.Service, adhConfig : AdhConfig.IService) => {
+export var userListDirective = (adhCredentials : AdhCredentials.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html",
         link: (scope) => {
-            scope.user = adhUser;
+            scope.credentials = adhCredentials;
             scope.initialLimit = 50;
             scope.frontendOrderPredicate = (id) => id;
             scope.frontendOrderReverse = true;
@@ -550,7 +550,7 @@ export var register = (angular) => {
                     focus: "0"
                 });
         }])
-        .directive("adhListUsers", ["adhUser", "adhConfig", userListDirective])
+        .directive("adhListUsers", ["adhCredentials", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", [
             "adhConfig", "adhCredentials", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
