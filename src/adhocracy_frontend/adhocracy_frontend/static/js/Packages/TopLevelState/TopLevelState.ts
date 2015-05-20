@@ -26,9 +26,9 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhCredentials = require("../User/Credentials");
 import AdhEventManager = require("../EventManager/EventManager");
 import AdhTracking = require("../Tracking/Tracking");
-import AdhUser = require("../User/User");
 
 var pkgLocation = "/TopLevelState";
 
@@ -96,11 +96,11 @@ export class Provider {
         this.spaceDefaults = {};
 
         this.$get = [
-            "adhEventManagerClass", "adhTracking", "adhUser",
+            "adhEventManagerClass", "adhTracking", "adhCredentials",
             "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
-            (adhEventManagerClass, adhTracking, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+            (adhEventManagerClass, adhTracking, adhCredentials, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
                 return new Service(
-                    self, adhEventManagerClass, adhTracking, adhUser, $location, $rootScope, $http, $q, $injector, $templateRequest);
+                    self, adhEventManagerClass, adhTracking, adhCredentials, $location, $rootScope, $http, $q, $injector, $templateRequest);
             }
         ];
     }
@@ -148,7 +148,7 @@ export class Service {
         private provider : Provider,
         adhEventManagerClass : typeof AdhEventManager.EventManager,
         private adhTracking : AdhTracking.Service,
-        private adhUser : AdhUser.Service,
+        private adhCredentials : AdhCredentials.Service,
         private $location : angular.ILocationService,
         private $rootScope : angular.IScope,
         private $http : angular.IHttpService,
@@ -285,7 +285,7 @@ export class Service {
 
         switch (error.code) {
             case 401:
-                if (this.adhUser.loggedIn) {
+                if (this.adhCredentials.loggedIn) {
                     return this.handleRoutingError({
                         code: 403,
                         message: error.message
@@ -549,9 +549,9 @@ export var moduleName = "adhTopLevelState";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhCredentials.moduleName,
             AdhEventManager.moduleName,
-            AdhTracking.moduleName,
-            AdhUser.moduleName
+            AdhTracking.moduleName
         ])
         .provider("adhTopLevelState", Provider)
         .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])

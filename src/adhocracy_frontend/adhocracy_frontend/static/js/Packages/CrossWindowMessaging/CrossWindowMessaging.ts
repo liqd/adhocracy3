@@ -36,6 +36,7 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhCredentials = require("../User/Credentials");
 import AdhUser = require("../User/User");
 
 
@@ -73,6 +74,7 @@ export class Service implements IService {
         private $window : Window,
         private $rootScope,
         private trustedDomains : string[],
+        private adhCredentials? : AdhCredentials.Service,
         private adhUser? : AdhUser.Service
     ) {
         var _self : Service = this;
@@ -128,8 +130,8 @@ export class Service implements IService {
             // the case (loggedIn === undefined) doesn't trigger a message
             if (loggedIn === true) {
                 _self.postMessage("login", {
-                    token: _self.adhUser.token,
-                    userPath: _self.adhUser.userPath,
+                    token: _self.adhCredentials.token,
+                    userPath: _self.adhCredentials.userPath,
                     userData: _self.adhUser.data
                 });
             } else if (loggedIn === false) {
@@ -144,7 +146,7 @@ export class Service implements IService {
         if (_self.embedderOrigin === "*") {
             _self.embedderOrigin = data.embedderOrigin;
 
-            _self.$rootScope.$watch(() => _self.adhUser.loggedIn, (loggedIn) => _self.sendLoginState(loggedIn));
+            _self.$rootScope.$watch(() => _self.adhCredentials.loggedIn, (loggedIn) => _self.sendLoginState(loggedIn));
 
             _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl) => {
                 _self.postMessage(
@@ -206,11 +208,12 @@ export var factory = (
     $location : angular.ILocationService,
     $window : Window,
     $rootScope,
+    adhCredentials? : AdhCredentials.Service,
     adhUser? : AdhUser.Service
 ) : IService => {
     if (adhConfig.embedded) {
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
-        return new Service(postMessageToParent, $location, $window, $rootScope, adhConfig.trusted_domains, adhUser);
+        return new Service(postMessageToParent, $location, $window, $rootScope, adhConfig.trusted_domains, adhCredentials, adhUser);
     } else {
         return new Dummy();
     }
@@ -222,11 +225,12 @@ export var moduleName = "adhCrossWindowMessaging";
 export var register = (angular, trusted = false) => {
     var mod = angular
         .module(moduleName, [
+            AdhCredentials.moduleName,
             AdhUser.moduleName
         ]);
 
     if (trusted) {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", factory]);
+        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", "adhCredentials", "adhUser", factory]);
     } else {
         mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", factory]);
     }

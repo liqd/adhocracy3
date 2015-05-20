@@ -1,6 +1,7 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhCredentials = require("../User/Credentials");
 import AdhDateTime = require("../DateTime/DateTime");
 import AdhDone = require("../Done/Done");
 import AdhEmbed = require("../Embed/Embed");
@@ -13,7 +14,6 @@ import AdhRate = require("../Rate/Rate");
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 
@@ -294,7 +294,7 @@ export var adhCreateOrShowCommentListing = (
     adhDone,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhUser : AdhUser.Service
+    adhCredentials : AdhCredentials.Service
 ) => {
     return {
         restrict: "E",
@@ -321,7 +321,7 @@ export var adhCreateOrShowCommentListing = (
                     if (_.contains(result.data[SIPool.nick].elements, commentablePath)) {
                         setScope(commentablePath);
                     } else {
-                        var unwatch = scope.$watch(() => adhUser.loggedIn, (loggedIn) => {
+                        var unwatch = scope.$watch(() => adhCredentials.loggedIn, (loggedIn) => {
                             if (loggedIn) {
                                 var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: scope.key});
                                 return adhHttp.post(scope.poolPath, externalResource).then((obj) => {
@@ -352,6 +352,7 @@ export var moduleName = "adhComment";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhCredentials.moduleName,
             AdhDateTime.moduleName,
             AdhDone.moduleName,
             AdhEmbed.moduleName,
@@ -362,15 +363,14 @@ export var register = (angular) => {
             AdhRate.moduleName,
             AdhAngularHelpers.moduleName,
             AdhResourceWidgets.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhUser.moduleName
+            AdhTopLevelState.moduleName
         ])
         .directive("adhCommentListingPartial",
             ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
                 new AdhListing.Listing(new Adapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)])
         .directive("adhCommentListing", ["adhConfig", "adhTopLevelState", "$location", adhCommentListing])
         .directive("adhCreateOrShowCommentListing", [
-            "adhConfig", "adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", adhCreateOrShowCommentListing])
+            "adhConfig", "adhDone", "adhHttp", "adhPreliminaryNames", "adhCredentials", adhCreateOrShowCommentListing])
         .directive("adhCommentResource", [
             "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$window", "$q",
             (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $window, $q) => {
