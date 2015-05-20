@@ -5,6 +5,7 @@ from logging import getLogger
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
+from pyramid.request import Request
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import IResource
@@ -54,10 +55,13 @@ def update_modification_date_modified_by(event):
 
 
 def user_created_and_added_subscriber(event):
-    """Add default group to user."""
+    """Add default group to user if no group is set."""
     group = _get_default_group(event.object)
     if group is None:  # ease testing
         return
+    user_groups = _get_user_groups(event.object, event.registry)
+    if user_groups:
+        return None
     _add_user_to_group(event.object, group, event.registry)
 
 
@@ -65,6 +69,17 @@ def _get_default_group(context) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
     default_group = groups.get('authenticated', None)
     return default_group
+
+
+def _get_user_groups(user: IUser, registry: Registry):
+    from pyramid.traversal import resource_path
+    from adhocracy_core.interfaces import IRolesUserLocator
+    request = Request.blank('/')
+    request.registry = registry
+    locator = registry.getMultiAdapter((user, request), IRolesUserLocator)
+    user_id = resource_path(user)
+    groups = locator.get_groups(user_id)
+    return groups
 
 
 def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):

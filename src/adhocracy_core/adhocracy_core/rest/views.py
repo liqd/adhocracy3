@@ -369,7 +369,7 @@ class ResourceRESTView(RESTView):
         empty = {}  # tiny performance tweak
         cstruct = deepcopy(options_resource_response_data_dict)
 
-        if request.has_permission('edit_some_sheets', context):
+        if request.has_permission('edit_some', context):
             edits = self.registry.get_sheets_edit(context, request)
             put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
             if put_sheets:
@@ -393,9 +393,9 @@ class ResourceRESTView(RESTView):
             del cstruct['GET']
 
         is_users = IUsersService.providedBy(context) \
-            and request.has_permission('add_user', self.context)
+            and request.has_permission('create_user', self.context)
         # TODO move the is_user specific part the UsersRestView
-        if request.has_permission('add_resource', self.context) or is_users:
+        if request.has_permission('create', self.context) or is_users:
             addables = registry.get_resources_meta_addable(context, request)
             if addables:
                 for resource_meta in addables:
@@ -421,7 +421,7 @@ class ResourceRESTView(RESTView):
             return
         # everybody who can PUT metadata can delete the resource
         permission_info = {'deleted': [True, False]}
-        if self.request.has_permission('hide_resource', self.context):
+        if self.request.has_permission('hide', self.context):
             permission_info['hidden'] = [True, False]
         cstruct[IMetadata.__identifier__] = permission_info
 
@@ -471,7 +471,7 @@ class SimpleRESTView(ResourceRESTView):
     validation_PUT = (PUTResourceRequestSchema, [])
 
     @view_config(request_method='PUT',
-                 permission='edit_sheet',
+                 permission='edit_some',
                  content_type='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
@@ -536,7 +536,7 @@ class PoolRESTView(SimpleRESTView):
                 return child
 
     @view_config(request_method='POST',
-                 permission='add_resource',
+                 permission='create',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -553,7 +553,7 @@ class PoolRESTView(SimpleRESTView):
         return self.build_post_response(resource)
 
     @view_config(request_method='PUT',
-                 permission='edit_some_sheets',
+                 permission='edit_some',
                  content_type='application/json')
     def put(self) -> dict:
         return super().put()
@@ -584,7 +584,7 @@ class ItemRESTView(PoolRESTView):
         return cstruct
 
     @view_config(request_method='POST',
-                 permission='add_resource',
+                 permission='create',
                  content_type='application/json')
     def post(self):
         """Create new resource and get response data.
@@ -637,7 +637,7 @@ class UsersRESTView(PoolRESTView):
     """View the IUsersService pool overwrites POST handling."""
 
     @view_config(request_method='POST',
-                 permission='add_user',
+                 permission='create_user',
                  content_type='application/json')
     def post(self):
         return super().post()
@@ -652,7 +652,7 @@ class AssetsServiceRESTView(PoolRESTView):
     """View allowing multipart requests for asset upload."""
 
     @view_config(request_method='POST',
-                 permission='add_asset',
+                 permission='create_asset',
                  content_type='multipart/form-data')
     def post(self):
         return super().post()
@@ -667,7 +667,7 @@ class AssetRESTView(SimpleRESTView):
     """View for assets, allows PUTting new versions via multipart."""
 
     @view_config(request_method='PUT',
-                 permission='add_asset',
+                 permission='create_asset',
                  content_type='multipart/form-data')
     def put(self) -> dict:
         result = super().put()

@@ -1,25 +1,18 @@
 """Mercator proposal."""
-from pyramid.registry import Registry
-from pyramid.security import Allow
-from pyramid.security import Deny
-
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
-from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.asset import asset_meta
 from adhocracy_core.resources.asset import IAsset
-from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
+from adhocracy_core.resources import process
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.comment import ICommentable
-from adhocracy_core.resources.root import root_meta
-from adhocracy_core.resources.root import add_platform
-from adhocracy_core.schema import ACM
+
 import adhocracy_core.sheets.title
 import adhocracy_mercator.sheets.mercator
 
@@ -35,7 +28,7 @@ organization_info_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IOrganizationInfo,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -53,7 +46,7 @@ organization_info_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IOrganizationInfoVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -84,7 +77,7 @@ introduction_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IIntroduction,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -102,7 +95,7 @@ introduction_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IIntroductionVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -117,7 +110,7 @@ description_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IDescription,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -135,7 +128,7 @@ description_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IDescriptionVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -150,7 +143,7 @@ location_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.ILocation,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -168,7 +161,7 @@ location_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=ILocationVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -183,7 +176,7 @@ story_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IStory,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -201,7 +194,7 @@ story_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IStoryVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -216,7 +209,7 @@ outcome_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IOutcome,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -234,7 +227,7 @@ outcome_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IOutcomeVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -249,7 +242,7 @@ steps_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.ISteps,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -267,7 +260,7 @@ steps_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IStepsVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -282,7 +275,7 @@ value_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IValue,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -300,7 +293,7 @@ value_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IValueVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -315,7 +308,7 @@ partners_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IPartners,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -333,7 +326,7 @@ partners_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IPartnersVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -348,7 +341,7 @@ finance_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IFinance,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -366,7 +359,7 @@ finance_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IFinanceVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -381,7 +374,7 @@ experience_version_meta = itemversion_meta._replace(
     extended_sheets=[
         adhocracy_mercator.sheets.mercator.IExperience,
         ICommentable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -399,7 +392,7 @@ experience_meta = item_meta._replace(
         add_commentsservice,
     ],
     item_type=IExperienceVersion,
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -417,7 +410,7 @@ mercator_proposal_version_meta = itemversion_meta._replace(
                      adhocracy_mercator.sheets.mercator.IMercatorSubResources,
                      ICommentable,
                      ILikeable],
-    permission_add='add_mercator_proposal_version',
+    permission_create='edit_proposal',
 )
 
 
@@ -448,28 +441,22 @@ mercator_proposal_meta = item_meta._replace(
     ],
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
-    permission_add='add_proposal',
+    permission_create='create_proposal',
 )
 
 
-def _create_initial_content(context: IPool, registry: Registry, options: dict):
-    """Add mercator specific content."""
-    add_platform(context, registry, 'mercator', resource_type=IPoolWithAssets)
+class IProcess(process.IProcess):
+
+    """Mercator participation process."""
 
 
-mercator_acm = ACM().deserialize(
-    {'principals':                                   ['Everyone', 'annotator', 'contributor', 'creator', 'manager', 'admin', 'god'],  # noqa
-     'permissions': [['add_proposal',                  None,       None,        Deny,          Deny,      None,      None,    Allow],  # noqa
-                     ['add_mercator_proposal_version', None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
-                     ['add_comment',                   None,       Deny,        None,          None,      None,      None,    Allow],  # noqa
-                     ['add_commentversion',            None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
-                     ['add_rate',                      None,       Deny,        None,          None,      None,      None,    Allow],  # noqa
-                     ['add_rateversion',               None,       None,        None,          Deny,      None,      None,    Allow],  # noqa
-                     ]})
+process_meta = process.process_meta._replace(
+    iresource=IProcess,
+    element_types=[IMercatorProposal,
+                   ],
+    is_implicit_addable=True,
+)
 
-
-mercator_root_meta = root_meta._replace(after_creation=root_meta.after_creation
-                                        + [_create_initial_content])
 
 
 def includeme(config):
@@ -499,6 +486,4 @@ def includeme(config):
     add_resource_type_to_registry(finance_version_meta, config)
     add_resource_type_to_registry(experience_meta, config)
     add_resource_type_to_registry(experience_version_meta, config)
-    # overrides adhocracy root
-    config.commit()
-    add_resource_type_to_registry(mercator_root_meta, config)
+    add_resource_type_to_registry(process_meta, config)

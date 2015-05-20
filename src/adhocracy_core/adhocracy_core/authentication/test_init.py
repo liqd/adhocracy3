@@ -179,15 +179,17 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def test_effective_principals_without_headers(self):
         from pyramid.security import Everyone
+        from . import Anonymous
         inst = self.make_one('')
-        assert inst.effective_principals(self.request) == [Everyone]
+        assert inst.effective_principals(self.request) == [Everyone, Anonymous]
 
     def test_effective_principals_without_headers_and_groupfinder_returns_None(self):
         from pyramid.security import Everyone
+        from . import Anonymous
         def groupfinder(userid, request):
             return None
         inst = self.make_one('', groupfinder=groupfinder)
-        assert inst.effective_principals(self.request) == [Everyone]
+        assert inst.effective_principals(self.request) == [Everyone, Anonymous]
 
     def test_effective_principals_with_headers_and_grougfinder_returns_groups(self):
         from pyramid.security import Everyone
@@ -204,6 +206,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
     def test_effective_principals_with_only_user_header_and_groupfinder_returns_groups(self):
         from pyramid.security import Everyone
+        from . import Anonymous
         def groupfinder(userid, request):
             return ['group']
         self.request.headers = {'X-User-Path': self.user_url}
@@ -212,7 +215,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager,
                               groupfinder=groupfinder)
         result = inst.effective_principals(self.request)
-        assert result == [Everyone]
+        assert result == [Everyone, Anonymous]
 
     def test_effective_principals_set_cache(self):
         from pyramid.security import Authenticated

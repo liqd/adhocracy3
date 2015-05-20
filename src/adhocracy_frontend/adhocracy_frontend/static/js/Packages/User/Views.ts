@@ -6,6 +6,7 @@ import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
+import AdhCredentials = require("./Credentials");
 import AdhUser = require("./User");
 
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
@@ -150,6 +151,7 @@ export var loginDirective = (
 
 export var registerDirective = (
     adhConfig : AdhConfig.IService,
+    adhCredentials : AdhCredentials.Service,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError
@@ -167,7 +169,7 @@ export var registerDirective = (
                 adhUser.logOut();
             };
 
-            scope.$watch(() => adhUser.loggedIn, (value) => {
+            scope.$watch(() => adhCredentials.loggedIn, (value) => {
                 scope.loggedIn = value;
             });
 
@@ -231,14 +233,11 @@ export var passwordResetDirective = (
             scope.errors = [];
 
             scope.passwordReset = () => {
-                return adhHttp.postRaw(adhConfig.rest_url + "/password_reset", {
-                    path: adhTopLevelState.get("path"),
-                    password: scope.input.password
-                }).then((response) => {
-                    adhUser.storeAndEnableToken(response.data.user_token, response.data.user_path);
-                    scope.success = true;
-                }, AdhHttp.logBackendError)
-                .catch((errors) => bindServerErrors(scope, errors));
+                return adhUser.passwordReset(adhTopLevelState.get("path"), scope.input.password)
+                    .then(() => {
+                        scope.success = true;
+                    },
+                    (errors) => bindServerErrors(scope, errors));
             };
         }
     };
@@ -246,6 +245,7 @@ export var passwordResetDirective = (
 
 export var createPasswordResetDirective = (
     adhConfig : AdhConfig.IService,
+    adhCredentials : AdhCredentials.Service,
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
@@ -260,7 +260,7 @@ export var createPasswordResetDirective = (
             scope.showError = adhShowError;
             scope.siteName = adhConfig.site_name;
 
-            scope.$watch(() => adhUser.loggedIn, (value) => {
+            scope.$watch(() => adhCredentials.loggedIn, (value) => {
                 scope.loggedIn = value;
             });
 
@@ -292,8 +292,13 @@ export var indicatorDirective = (adhConfig : AdhConfig.IService, adhResourceArea
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser : AdhUser.Service, $scope) => {
+        controller: ["adhUser", "adhCredentials", "$scope", (
+            adhUser : AdhUser.Service,
+            adhCredentials : AdhCredentials.Service,
+            $scope
+        ) => {
             $scope.user = adhUser;
+            $scope.credentials = adhCredentials;
             $scope.noLink = !adhResourceArea.has(RIUser.content_type);
 
             $scope.logOut = () => {
@@ -378,6 +383,7 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
 
 export var userProfileDirective = (
     adhConfig : AdhConfig.IService,
+    adhCredentials : AdhCredentials.Service,
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
@@ -397,7 +403,7 @@ export var userProfileDirective = (
             scope.showMessaging = () => {
                 if (scope.messageOptions.POST) {
                     column.showOverlay("messaging");
-                } else if (!adhUser.loggedIn) {
+                } else if (!adhCredentials.loggedIn) {
                     adhTopLevelState.redirectToLogin();
                 } else {
                     // FIXME
@@ -487,6 +493,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
+            AdhCredentials.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTopLevelState.moduleName,
@@ -545,12 +552,13 @@ export var register = (angular) => {
         }])
         .directive("adhListUsers", ["adhUser", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
-        .directive("adhUserProfile", ["adhConfig", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
+        .directive("adhUserProfile", [
+            "adhConfig", "adhCredentials", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
         .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", passwordResetDirective])
         .directive("adhCreatePasswordReset", [
-            "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
-        .directive("adhRegister", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
+            "adhConfig", "adhCredentials", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
+        .directive("adhRegister", ["adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
         .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])

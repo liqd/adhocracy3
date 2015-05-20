@@ -60,9 +60,8 @@ class TransitionMeta(MappingSchema):
     callback = WorkflowCallback()
     from_state = SingleLine(missing=required)
     to_state = SingleLine(missing=required)
-    permission = SingleLine(missing='')
-
-    # TODO add default permission to do transitions
+    permission = SingleLine(missing='do_transition',
+                            default='do_transition')
 
 
 class StateMeta(MappingSchema):

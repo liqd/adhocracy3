@@ -1,6 +1,20 @@
 .login-form {
+    margin-bottom: 0;
+    padding-bottom: 0;
+
+    .login-info {
+        margin-top: 24px / $font-size-small * 1em;
+    }
+
     input[type="submit"] {
         margin-top: 0;
         width: auto;
     }
+}
+
+.login-cancel {
+    font-variant: normal;
+    font-size: $font-size-small;
+    margin-top: 0;
+    text-transform: capitalize;
 }

@@ -2,26 +2,34 @@
 from adhocracy_core.workflows import add_workflow
 
 sample_meta = {
-    'states_order': ['draft', 'announced'],
+    'states_order': ['participate', 'frozen'],
     'states': {
-        'draft': {'title': 'Draft',
-                  'description': 'This phase is for internal review.',
-                  'acm': {'principals': ['reader'],
-                          'permissions': [['view', 'Deny']]},
-                  'display_only_to_roles': ['manager']
+        'participate': {'title': 'Participate',
+                  'description': 'This phase is to participate.',
+                  'acm': {'principals':           ['participant', 'moderator', 'creator', 'initiator'],  # noqa
+                          'permissions':
+                              [['create_proposal', 'Allow',        None,        None,      None],  # noqa
+                               ['edit_proposal',    None,          None,       'Allow',    None],  # noqa
+                               ['create_comment',  'Allow',       'Allow',      None,      None],  # noqa
+                               ['edit_comment',     None,          None,       'Allow',    None],  # noqa
+                               ['create_rate',     'Allow',        None,        None,      None],  # noqa
+                               ['edit_rate',        None,          None,       'Allow',    None],  # noqa
+                               ]},
+                  'display_only_to_roles': [],
                   },
-        'announced': {'title': 'Announced',
-                      'description': '',
-                      'acm': {},
-                      },
+        'frozen': {'title': 'Frozen',
+                   'description': '',
+                   'acm': {},
+                   'display_only_to_roles': [],
+                   },
     },
     'transitions': {
-        'to_announced': {'from_state': 'draft',
-                         'to_state': 'announced',
-                         'callback': None,
-                         'permission': 'do_transition',
-                         },
-    },
+        'to_frozen': {'from_state': 'participate',
+                      'to_state': 'frozen',
+                      'callback': None,
+                      'permission': 'do_transition',
+                      },
+        },
 }
 
 

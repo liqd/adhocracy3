@@ -22,7 +22,7 @@ class IMultiPolygon(ISimple):
 
 multipolygon_meta = simple_meta._replace(
     iresource=IMultiPolygon,
-    permission_add='add_multipolygon',
+    permission_create='create_multipolygon',
     is_implicit_addable=False,
     extended_sheets=[
         adhocracy_core.sheets.geo.IMultiPolygon,

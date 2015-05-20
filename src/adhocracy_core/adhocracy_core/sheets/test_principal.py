@@ -23,7 +23,7 @@ class TestPasswordSheet:
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IPasswordAuthentication
         assert inst.meta.schema_class == PasswordAuthenticationSchema
-        assert inst.meta.permission_create == 'create_sheet_password'
+        assert inst.meta.permission_create == 'create_user'
 
     def test_set_password(self, meta, context):
         inst = meta.sheet_class(meta, context)
@@ -211,7 +211,7 @@ class TestUserBasicSheet:
         assert isinstance(inst, AttributeResourceSheet)
         assert inst.meta.isheet == IUserBasic
         assert inst.meta.schema_class == UserBasicSchema
-        assert inst.meta.permission_create == 'create_sheet_userbasic'
+        assert inst.meta.permission_create == 'create_user'
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
@@ -233,7 +233,7 @@ class TestUserExtendedSheet:
         assert isinstance(inst, AttributeResourceSheet)
         assert inst.meta.isheet == IUserExtended
         assert inst.meta.schema_class == UserExtendedSchema
-        assert inst.meta.permission_create == 'create_sheet_userbasic'
+        assert inst.meta.permission_create == 'create_user'
         assert inst.meta.permission_view == 'view_userextended'
         assert inst.meta.permission_edit == 'edit_userextended'
 
@@ -331,8 +331,8 @@ class TestPermissionsSheet:
         assert isinstance(inst, PermissionsAttributeResourceSheet)
         assert inst.meta.isheet == IPermissions
         assert inst.meta.schema_class == PermissionsSchema
-        assert inst.meta.permission_create == 'manage_principals'
-        assert inst.meta.permission_edit == 'manage_principals'
+        assert inst.meta.permission_create == 'create_edit_sheet_permissions'
+        assert inst.meta.permission_edit == 'create_edit_sheet_permissions'
         assert inst.meta.permission_view == 'view_userextended'
 
     def test_get_empty(self, meta, context):

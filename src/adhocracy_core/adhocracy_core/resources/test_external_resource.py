@@ -11,7 +11,7 @@ def test_external_resource_meta():
     import adhocracy_core.sheets
     meta = external_resource_meta
     assert meta.iresource is IExternalResource
-    assert meta.permission_add == 'add_externalresource'
+    assert meta.permission_create == 'create_external'
     assert meta.is_implicit_addable
     assert meta.extended_sheets == [adhocracy_core.sheets.comment.ICommentable]
     assert add_ratesservice in meta.after_creation

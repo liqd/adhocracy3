@@ -82,7 +82,7 @@ def _notify_referencing_resources_about_new_version(old_version,
 itemversion_meta = resource_meta._replace(
     iresource=IItemVersion,
     content_class=Base,
-    permission_add='add_tag',
+    permission_create='create_tag',
     permission_view='view',
     is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.metadata.IMetadata,

@@ -111,6 +111,7 @@ declare class FlowOpts {
     acceptedFileTypes : string[];
 }
 
+declare module "markdownit" {}
 declare module "socialSharePrivacy" {}
 declare module "adhTemplates" {}
 declare module "polyfiller" {

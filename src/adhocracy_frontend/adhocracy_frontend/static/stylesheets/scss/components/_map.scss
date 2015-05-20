@@ -9,27 +9,12 @@ category: Widgets
 .map-wrapper {
     .map-buttons {
         @include clearfix;
-        margin: 2px 0 -7px;
     }
 
-    .map-buttons .map-button-save {
-        &, &:hover, &:focus {
-            color: $color-brand-two-introvert;
-        }
-
-        &:active {
-            color: $color-brand-one-introvert;
-        }
-    }
-
-    .map-button-save {
-        float: left;
-        font-weight: $font-weight-extrovert;
-    }
-
-    .map-button-cancel {
-        @extend .disguised-link;
-        float: right;
+    .map-button-clear,
+    .map-button-reset {
+        @include inline-block;
+        padding: 0 (10px / $font-size-normal * 1em);
     }
 }
 

@@ -421,7 +421,7 @@ class HeardFromSchema(colander.MappingSchema):
 heardfrom_meta = sheet_meta._replace(
     isheet=IHeardFrom,
     schema_class=HeardFromSchema,
-    permission_view='view_sensitive',
+    permission_view='view_sheet_heardfrom',
 )
 
 

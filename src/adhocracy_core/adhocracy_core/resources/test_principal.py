@@ -17,7 +17,7 @@ def test_principals_meta():
     from .principal import IPrincipalsService
     meta = principals_meta
     assert meta.iresource is IPrincipalsService
-    assert meta.permission_add == 'add_service'
+    assert meta.permission_create == 'create_service'
     assert meta.content_name == 'principals'
 
 
@@ -26,7 +26,7 @@ def test_users_meta():
     from .principal import IUsersService
     meta = users_meta
     assert meta.iresource is IUsersService
-    assert meta.permission_add == 'add_service'
+    assert meta.permission_create == 'create_service'
     assert meta.content_name == 'users'
 
 
@@ -35,7 +35,7 @@ def test_groups_meta():
     from .principal import IGroupsService
     meta = groups_meta
     assert meta.iresource is IGroupsService
-    assert meta.permission_add == 'add_service'
+    assert meta.permission_create == 'create_service'
     assert meta.content_name == 'groups'
 
 
@@ -48,7 +48,7 @@ def test_user_meta():
     meta = user_meta
     assert meta.iresource is IUser
     assert meta.content_class == User  # TODO do we really need this class?
-    assert meta.permission_add == 'add_user'
+    assert meta.permission_create == 'create_user'
     assert meta.is_implicit_addable is False
     assert meta.basic_sheets == [adhocracy_core.sheets.principal.IUserBasic,
                                  adhocracy_core.sheets.principal.IUserExtended,
@@ -73,7 +73,7 @@ def test_group_meta():
     meta = group_meta
     assert meta.iresource is IGroup
     assert meta.content_class == Group
-    assert meta.permission_add == 'add_group'
+    assert meta.permission_create == 'create_group'
     assert meta.is_implicit_addable is False
     assert meta.element_types == []
 
@@ -83,7 +83,7 @@ def test_passwordresets_meta():
     from .principal import IPasswordResetsService
     meta = passwordresets_meta
     assert meta.iresource is IPasswordResetsService
-    assert meta.permission_add == 'add_service'
+    assert meta.permission_create == 'create_service'
     assert meta.permission_view == "manage_password_reset"
     assert meta.content_name == 'resets'
 
@@ -94,7 +94,7 @@ def test_passwordreset_meta():
     from .principal import IPasswordReset
     meta = passwordreset_meta
     assert meta.iresource is IPasswordReset
-    assert meta.permission_add == 'add_password_reset'
+    assert meta.permission_create == 'create_password_reset'
     assert meta.permission_view == 'manage_password_reset'
     assert meta.use_autonaming_random
     assert meta.basic_sheets == [adhocracy_core.sheets.metadata.IMetadata]

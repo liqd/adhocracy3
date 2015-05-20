@@ -4,7 +4,6 @@ import AdhHttp = require("../../../Http/Http");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUser = require("../../../User/User");
 
 import AdhMeinBerlinWorkbench = require("../Workbench/Workbench");
 
@@ -45,8 +44,7 @@ export var register = (angular) => {
             AdhMeinBerlinWorkbench.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhUser.moduleName
+            AdhTopLevelState.moduleName
         ])
         .directive("adhKiezkassenContextHeader", ["adhConfig", "adhPermissions", "adhTopLevelState", headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
@@ -69,18 +67,13 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 })
                 .specific(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (resource : RIKiezkassenProcess) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.POST) {
-                                    throw 401;
-                                } else {
-                                    return {};
-                                }
-                            });
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
                         });
                     }])
                 .defaultVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "kiezkassen", {
@@ -88,20 +81,15 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 })
                 .specificVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "kiezkassen", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (item : RIProposal, version : RIProposalVersion) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.POST) {
-                                    throw 401;
-                                } else {
-                                    return {
-                                        proposalUrl: version.path
-                                    };
-                                }
-                            });
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIProposal, version : RIProposalVersion) => {
+                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    proposalUrl: version.path
+                                };
+                            }
                         });
                     }])
                 .defaultVersionable(RIProposal, RIProposalVersion, "", RIKiezkassenProcess.content_type, "kiezkassen", {

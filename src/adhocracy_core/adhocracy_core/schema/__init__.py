@@ -185,18 +185,17 @@ class TimeZoneName(AdhocracySchemaNode):
     missing = colander.drop
     validator = colander.OneOf(_ZONES)
 
-ROLE_PRINCIPALS = ['reader',
-                   'annotator',
-                   'contributor',
+ROLE_PRINCIPALS = ['participant',
+                   'moderator',
                    'creator',
-                   'editor',
-                   'manager',
+                   'initiator',
                    'admin',
                    'god',
                    ]
 
-SYSTEM_PRINCIPALS = ['Everyone',
-                     'Authenticated',
+SYSTEM_PRINCIPALS = ['everyone',
+                     'authenticated',
+                     'anonymous'
                      ]
 
 
@@ -208,7 +207,7 @@ class Role(AdhocracySchemaNode):
     """
 
     schema_type = colander.String
-    default = 'reader'
+    default = 'creator'
     missing = colander.drop
     validator = colander.OneOf(ROLE_PRINCIPALS)
 
@@ -217,7 +216,7 @@ class Roles(colander.SequenceSchema):
 
     """List of Permssion :term:`role` names.
 
-    Example value: ['reader', 'editor']
+    Example value: ['initiator']
     """
 
     # TODO support the 'readonly' keyword, inherit AdhocracySchemaNode
@@ -848,6 +847,7 @@ class ACEPrincipalType(colander.SchemaType):
             return value
         if '.' in value:
             prefix, name = value.split('.')
+            name = name.lower()
         elif ':' in value:
             prefix, name = value.split(':')
         else:
@@ -861,7 +861,7 @@ class ACEPrincipalType(colander.SchemaType):
         if value in ROLE_PRINCIPALS:
             return 'role:' + value
         elif value in SYSTEM_PRINCIPALS:
-            return 'system.' + value
+            return 'system.' + value.capitalize()
         else:
             msg = '{0} is not one of {1}'.format(value, self.valid_principals)
             raise colander.Invalid(node, msg=msg, value=value)

@@ -1,11 +1,11 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
-import AdhUser = require("../User/User");
 
 
 export class Service {
-    constructor(private adhHttp : AdhHttp.Service<any>, private adhUser : AdhUser.Service) {}
+    constructor(private adhHttp : AdhHttp.Service<any>, private adhCredentials : AdhCredentials.Service) {}
 
     /**
      * Set result of OPTIONS request to scope.key and keep it fresh.
@@ -31,8 +31,8 @@ export class Service {
             }
         };
 
-        // FIXME: It would be better if adhUser would notify us on change
-        scope.$watch(() => self.adhUser.userPath, update);
+        // FIXME: It would be better if adhCredentials would notify us on change
+        scope.$watch(() => self.adhCredentials.userPath, update);
         scope.$watch(pathFn, (p : string) => {
             pathString = p;
             update();
@@ -46,8 +46,8 @@ export var moduleName = "adhPermissions";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhUser.moduleName
+            AdhCredentials.moduleName,
+            AdhHttp.moduleName
         ])
-        .service("adhPermissions", ["adhHttp", "adhUser", Service]);
+        .service("adhPermissions", ["adhHttp", "adhCredentials", Service]);
 };

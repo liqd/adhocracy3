@@ -18,6 +18,10 @@ from adhocracy_core.interfaces import IRolesUserLocator
 from adhocracy_core.schema import Resource
 
 
+Anonymous = 'system.Anonymous'
+"""The anonymous (not authenticated) principal"""
+
+
 @implementer(ITokenManger)
 class TokenMangerAnnotationStorage:
 
@@ -228,7 +232,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         if cached_principals:
             return cached_principals
         if self.authenticated_userid(request) is None:
-            return [Everyone]
+            return [Everyone, Anonymous]
         principals = super().effective_principals(request)
         request.__cached_principals__ = principals
         return principals

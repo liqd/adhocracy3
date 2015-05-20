@@ -23,7 +23,7 @@ external_resource_meta = pool_meta._replace(
     iresource=IExternalResource,
     element_types=[IComment],
     is_implicit_addable=True,
-    permission_add='add_externalresource',
+    permission_create='create_external',
     extended_sheets=[adhocracy_core.sheets.comment.ICommentable],
     after_creation=([add_commentsservice, add_ratesservice]
                     + pool_meta.after_creation),
