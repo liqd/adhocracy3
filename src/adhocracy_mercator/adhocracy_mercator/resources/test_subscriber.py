@@ -11,9 +11,9 @@ def test_application_created_subscriber(monkeypatch):
     event = Mock()
     # avoid substanced querying the real registry when the commit occurs
     monkeypatch.setattr(transaction, 'commit', lambda: None)
-    event.app.registry.content.permissions = ['edit_mercator_proposal']
+    event.app.registry.content.permissions = ['edit_proposal']
     root = testing.DummyResource(__acl__=[])
     event.app.root_factory.return_value = root
     _application_created_subscriber(event)
-    assert (Allow, 'role:admin', 'edit_mercator_proposal') in root.__acl__
+    assert (Allow, 'role:admin', 'edit_proposal') in root.__acl__
     assert (Allow, 'role:god', ALL_PERMISSIONS) == root.__acl__[0]

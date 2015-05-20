@@ -34,7 +34,7 @@ adhocracy.frontend.rest_url = http://localhost:9080
 adhocracy.frontend.site_name = Adhocracy Test Site
 
 adhocracy.custom = mercator_platform_path
-adhocracy.custom.mercator_platform_path = /mercator/
+adhocracy.custom.mercator_platform_path = /mercator/advocate/
 
 [server:main]
 use = egg:gunicorn#main

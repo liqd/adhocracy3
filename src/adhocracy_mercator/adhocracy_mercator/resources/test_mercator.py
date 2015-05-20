@@ -11,18 +11,6 @@ from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_b
 from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
 
 
-def test_root_meta():
-    from adhocracy_core.resources.root import root_meta
-    from adhocracy_core.resources.root import \
-        create_initial_content_for_app_root
-    from .mercator import _create_initial_content
-    from .mercator import mercator_root_meta
-    assert _create_initial_content not in root_meta.after_creation
-    assert _create_initial_content in mercator_root_meta.after_creation
-    assert create_initial_content_for_app_root in \
-        mercator_root_meta.after_creation
-
-
 def test_mercator_proposal_meta():
     from .mercator import mercator_proposal_meta
     from .mercator import IMercatorProposal
@@ -59,7 +47,7 @@ def test_mercator_proposal_meta():
     assert meta.item_type == IMercatorProposalVersion
     assert add_ratesservice in meta.after_creation
     assert add_commentsservice in meta.after_creation
-    assert meta.permission_create == 'create_mercator_proposal'
+    assert meta.permission_create == 'create_proposal'
 
 
 def test_mercator_proposal_version_meta():
@@ -67,7 +55,7 @@ def test_mercator_proposal_version_meta():
     from .mercator import IMercatorProposalVersion
     meta = mercator_proposal_version_meta
     assert meta.iresource == IMercatorProposalVersion
-    assert meta.permission_create == 'edit_mercator_proposal'
+    assert meta.permission_create == 'edit_proposal'
  
 
 @fixture
@@ -77,20 +65,13 @@ def integration(config):
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.rest')
-    config.include('adhocracy_core.authentication')
     config.include('adhocracy_core.resources.geo')
     config.include('adhocracy_core.resources.tag')
-    config.include('adhocracy_core.resources.comment')
-    config.include('adhocracy_core.resources.rate')
-    config.include('adhocracy_core.resources.principal')
     config.include('adhocracy_core.resources.pool')
     config.include('adhocracy_core.resources.asset')
     config.include('adhocracy_core.resources.item')
-    config.include('adhocracy_core.resources.sample_paragraph')
-    config.include('adhocracy_core.resources.sample_proposal')
-    config.include('adhocracy_core.resources.sample_section')
-    config.include('adhocracy_core.resources.external_resource')
+    config.include('adhocracy_core.resources.comment')
+    config.include('adhocracy_core.resources.rate')
     config.include('adhocracy_mercator.sheets.mercator')
     config.include('adhocracy_mercator.resources.mercator')
     config.include('adhocracy_mercator.resources.subscriber')
@@ -123,27 +104,50 @@ class TestIncludemeIntegration:
                                       )
         assert IMercatorProposalVersion.providedBy(res)
 
-    def test_create_mercator_root_with_initial_content(self, registry):
-        from adhocracy_core.resources.root import IRootPool
-        from adhocracy_core.resources.asset import IPoolWithAssets
-        inst = registry.content.create(IRootPool.__identifier__)
-        assert IRootPool.providedBy(inst)
-        assert IPoolWithAssets.providedBy(inst['mercator'])
+
+class TestProcess:
+
+    @fixture
+    def meta(self):
+        from .mercator import process_meta
+        return process_meta
+
+    def test_meta(self, meta):
+        import adhocracy_core.resources.process
+        from adhocracy_core.resources.asset import add_assets_service
+        from .mercator import IProcess
+        from .mercator import IMercatorProposal
+        assert meta.iresource is IProcess
+        assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
+        assert meta.is_implicit_addable is True
+        assert meta.permission_create == 'create_process'
+        assert meta.extended_sheets == [
+            adhocracy_core.sheets.workflow.ISample
+        ]
+        assert meta.element_types == [IMercatorProposal]
+        assert add_assets_service in meta.after_creation
+
+
+    @mark.usefixtures('integration')
+    def test_create(self, registry, meta):
+        res = registry.content.create(meta.iresource.__identifier__)
+        assert meta.iresource.providedBy(res)
+
 
 @fixture(scope='class')
 def app_anonymous(app_anonymous):
-    app_anonymous.base_path = '/mercator'
+    app_anonymous.base_path = '/mercator/advocate'
     return app_anonymous
 
 @fixture(scope='class')
 def app_participant(app_participant):
-    app_participant.base_path = '/mercator'
+    app_participant.base_path = '/mercator/advocate'
     return app_participant
 
 
 @fixture(scope='class')
 def app_god(app_god):
-    app_god.base_path = '/mercator'
+    app_god.base_path = '/mercator/advocate'
     return app_god
 
 
@@ -165,18 +169,14 @@ def _batch_post_full_sample_proposal(app_user) -> TestResponse:
 @mark.functional
 class TestMercatorProposalPermissionsAnonymous:
 
-    # FIXME add organisation/process/workflow for mercator
-    @mark.xfail(reason='migration to organisation/process needed')
     def test_cannot_create_proposal_item(self, app_anonymous):
         resp = _post_proposal_item(app_anonymous, path='/', name='proposal1')
         assert resp.status_code == 403
 
-    @mark.xfail(reason='migration to organisation/process needed')
     def test_cannot_create_proposal_per_batch(self, app_anonymous):
         resp = _batch_post_full_sample_proposal(app_anonymous)
         assert resp.status_code == 403
 
-    @mark.xfail(reason='migration to organisation/process needed')
     def test_cannot_create_proposal_per_batch_broken_token(
             self, app_broken_token):
         resp = _batch_post_full_sample_proposal(app_broken_token)
@@ -186,19 +186,16 @@ class TestMercatorProposalPermissionsAnonymous:
 @mark.functional
 class TestMercatorProposalPermissionsParticipant:
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_can_create_proposal_item(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/', name='proposal1')
         assert resp.status_code == 200
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_can_create_proposal_version(self, app_participant):
         from adhocracy_mercator.resources import mercator
         possible_types = mercator.mercator_proposal_meta.element_types
         postable_types = app_participant.get_postable_types('/proposal1')
         assert set(postable_types) == set(possible_types)
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_can_create_and_update_proposal_per_batch(self, app_participant):
         """Create full proposal then do batch request that first
          creates a new subresource Version (IOrganisationInfo) and then
@@ -211,28 +208,24 @@ class TestMercatorProposalPermissionsParticipant:
         assert app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
         assert "VERSION_0000002" in  app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_cannot_create_other_users_proposal_version(self, app_participant,
                                                         app_god):
         _post_proposal_item(app_god, path='/', name='proposal_other')
         postable_types = app_participant.get_postable_types('/proposal_other')
         assert postable_types == []
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_non_god_creator_is_set(self, app_participant):
         """Regression test issue #362"""
         from adhocracy_core.sheets.metadata import IMetadata
         resp = app_participant.get('/proposal1')
         creator = resp.json['data'][IMetadata.__identifier__]['creator']
-        assert '0000003' in creator
+        assert '0000001' in creator
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_god_can_create_proposal_item(self, app_god):
         """Regression test issue #362"""
         resp = _post_proposal_item(app_god, path='/', name='god1')
         assert resp.status_code == 200
 
-    @mark.xfail(reason='current process phase does not allow creating proposal')
     def test_god_creator_is_set(self, app_god):
         """Regression test issue #362"""
         from adhocracy_core.sheets.metadata import IMetadata
