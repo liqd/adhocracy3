@@ -73,7 +73,7 @@ export class Service implements IService {
         private $window : Window,
         private $rootScope,
         private trustedDomains : string[],
-        private adhUser ?: AdhUser.Service
+        private adhUser? : AdhUser.Service
     ) {
         var _self : Service = this;
 
@@ -144,8 +144,7 @@ export class Service implements IService {
         if (_self.embedderOrigin === "*") {
             _self.embedderOrigin = data.embedderOrigin;
 
-            _self.$rootScope.$watch(() => _self.adhUser.loggedIn, ((loggedIn) => _self.sendLoginState(loggedIn)));
-            _self.sendLoginState(_self.adhUser.loggedIn);
+            _self.$rootScope.$watch(() => _self.adhUser.loggedIn, (loggedIn) => _self.sendLoginState(loggedIn));
 
             _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl) => {
                 _self.postMessage(
@@ -207,7 +206,7 @@ export var factory = (
     $location : angular.ILocationService,
     $window : Window,
     $rootScope,
-    adhUser ?: AdhUser.Service
+    adhUser? : AdhUser.Service
 ) : IService => {
     if (adhConfig.embedded) {
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
