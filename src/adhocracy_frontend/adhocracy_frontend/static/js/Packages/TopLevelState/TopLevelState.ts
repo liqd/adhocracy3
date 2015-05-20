@@ -97,10 +97,10 @@ export class Provider {
 
         this.$get = [
             "adhEventManagerClass", "adhTracking", "adhCredentials",
-            "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
-            (adhEventManagerClass, adhTracking, adhCredentials, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+            "$location", "$rootScope", "$q", "$injector", "$templateRequest",
+            (adhEventManagerClass, adhTracking, adhCredentials, $location, $rootScope, $q, $injector, $templateRequest) => {
                 return new Service(
-                    self, adhEventManagerClass, adhTracking, adhCredentials, $location, $rootScope, $http, $q, $injector, $templateRequest);
+                    self, adhEventManagerClass, adhTracking, adhCredentials, $location, $rootScope, $q, $injector, $templateRequest);
             }
         ];
     }
@@ -151,7 +151,6 @@ export class Service {
         private adhCredentials : AdhCredentials.Service,
         private $location : angular.ILocationService,
         private $rootScope : angular.IScope,
-        private $http : angular.IHttpService,
         private $q : angular.IQService,
         private $injector : angular.auto.IInjectorService,
         private $templateRequest : angular.ITemplateRequestService
