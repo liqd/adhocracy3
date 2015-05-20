@@ -54,7 +54,11 @@ export var register = (angular, config, meta_api) => {
                     $http.defaults.headers.common["X-Credentials-Token"] = "SECRET_GOD";
                     $http.defaults.headers.common["X-Credentials-Path"] = "/principals/users/0000000/";
 
-                    return (new AdhHttp.Service($http, $q, $timeout, adhMetaApi, adhPreliminaryNames, config));
+                    var adhCredentialsMock = <any>{
+                        ready: $q.when(true)
+                    };
+
+                    return (new AdhHttp.Service($http, $q, $timeout, adhCredentialsMock, adhMetaApi, adhPreliminaryNames, config));
                 };
                 factory.$inject = ["$http", "$q", "$timeout"];
                 return angular.injector(["ng"]).invoke(factory);
