@@ -22,6 +22,9 @@ import moment = require("moment");
 import leaflet = require("leaflet");
 import webshim = require("polyfiller");
 
+// FIXME: just added here for testing
+import markdownit = require("markdownit");
+
 import AdhAbuse = require("./Packages/Abuse/Abuse");
 import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
@@ -53,6 +56,9 @@ import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
 import AdhMapping = require("./Packages/Mapping/Mapping");
+
+// FIXME: Just added here for testing
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 
 import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
@@ -87,6 +93,9 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhComment.moduleName,
         AdhDone.moduleName,
         AdhMapping.moduleName,
+
+        // FIXME: Just added here for testing
+        AdhMarkdown.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhMeinBerlin.moduleName,
@@ -157,6 +166,9 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     }]);
 
     app.value("angular", angular);
+
+    // FIXME: Just added here for testing
+    app.value("markdownit", markdownit);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
     app.value("leaflet", leaflet);
@@ -177,6 +189,9 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhLocalSocket.register(angular);
     AdhMeinBerlin.register(angular);
     AdhMapping.register(angular);
+
+    // FIXME: Just added here for testing
+    AdhMarkdown.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);

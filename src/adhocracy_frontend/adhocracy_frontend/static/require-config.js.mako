@@ -35,6 +35,7 @@ require.config({
         angularScroll: "../lib/angular-scroll/angular-scroll.min",
         angularFlow: "../lib/ng-flow/dist/ng-flow.min",
         angularMessages: "../lib/angular-messages/angular-messages.min",
+        markdownit: "../lib/markdown-it/dist/markdown-it.min",
         flow: "../lib/flow.js/dist/flow.min",
         leaflet: "../lib/leaflet/dist/leaflet",
         lodash: "../lib/lodash/lodash.min",
