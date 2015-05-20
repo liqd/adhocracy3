@@ -89,6 +89,7 @@ export var register = () => {
             var adhMetaApiMock;
             var adhConfigMock;
             var adhCacheMock;
+            var adhCredentialsMock;
             var adhHttp : AdhHttp.Service<any>;
 
             beforeEach(() => {
@@ -103,8 +104,11 @@ export var register = () => {
                     invalidateUpdated: (updated, posted) => undefined,
                     memoize: (path, subkey, closure) => closure()
                 };
+                adhCredentialsMock = {
+                    ready: q.when(true)
+                };
                 adhHttp = new AdhHttp.Service(
-                    $httpMock, <any>q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock, adhCacheMock);
+                    $httpMock, <any>q, $timeoutMock, adhCredentialsMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock, adhCacheMock);
             });
 
             describe("options", () => {
@@ -211,7 +215,10 @@ export var register = () => {
                     adhHttp.getNewestVersionPathNoFork(path).then(
                         (ret) => {
                             expect(ret).toBe(returnPath1);
-                            expect($httpMock.get).toHaveBeenCalledWith(path + "LAST/", { params: undefined });
+                            expect($httpMock.get).toHaveBeenCalledWith(path + "LAST/", {
+                                params: undefined,
+                                headers: {}
+                            });
                             done();
                         },
                         (msg) => {
@@ -267,6 +274,8 @@ export var register = () => {
                                         follows: ["/ome/path"]
                                     }
                                 }
+                            }, {
+                                headers: {}
                             });
                             done();
                         },
@@ -329,6 +338,8 @@ export var register = () => {
                                     }
                                 },
                                 root_versions: ["foo", "bar"]
+                            }, {
+                                headers: {}
                             });
                             done();
                         },

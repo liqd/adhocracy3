@@ -19,8 +19,8 @@ kiezkassen_meta = {
                         'description': '',
                         'acm': {'principals': [                   'participant', 'moderator', 'creator', 'initiator'],  # noqa
                                 'permissions':
-                                  [['create_kiezkassen_proposal', 'Allow',        None,        None,     'Allow'],  # noqa
-                                   ['edit_kiezkassen_proposal',    None,          None,       'Allow',   'Allow'],  # noqa
+                                  [['create_proposal',            'Allow',        None,        None,     'Allow'],  # noqa
+                                   ['edit_proposal',               None,          None,       'Allow',   'Allow'],  # noqa
                                    ['create_comment',             'Allow',       'Allow',      None,     'Allow'],  # noqa
                                    ['edit_comment',                None,          None,       'Allow',    None],  # noqa
                                    ['create_rate',                'Allow',        None,        None,      None],  # noqa
@@ -31,8 +31,8 @@ kiezkassen_meta = {
                    'description': '',
                    'acm': {'principals': [                    'participant', 'moderator', 'creator', 'initiator'],  # noqa
                            'permissions':
-                              [['create_kiezkassen_proposal',  None,         None,        None,     'Allow'],  # noqa
-                               ['edit_kiezkassen_proposal',    None,          None,        None,     'Allow'],  # noqa
+                              [['create_proposal',             None,          None,        None,     'Allow'],  # noqa
+                               ['edit_proposal',               None,          None,        None,     'Allow'],  # noqa
                                ]},
                    },
         'result': {'title': 'Result',

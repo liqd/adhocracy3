@@ -28,6 +28,12 @@ def app_initiator(app_initiator):
 
 
 @fixture(scope='class')
+def app_admin(app_admin):
+    app_admin.base_path = '/organisation'
+    return app_admin
+
+
+@fixture(scope='class')
 def app_god(app_god):
     app_god.base_path = '/organisation'
     return app_god
@@ -90,6 +96,10 @@ def _do_transition_to(app_user, path, state) -> TestResponse:
 
 @mark.functional
 class TestKiezkassenWorkflow:
+
+    def test_draft_admin_can_view_process(self, app_admin):
+        resp = app_admin.get('/kiezkasse')
+        assert resp.status_code == 200
 
     def test_draft_participant_cannot_view_process(self, app_participant):
         resp = app_participant.get('/kiezkasse')

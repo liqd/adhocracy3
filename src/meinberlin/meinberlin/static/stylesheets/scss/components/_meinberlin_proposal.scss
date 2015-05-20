@@ -1,12 +1,24 @@
 .mein-berlin-proposal-form {
+    background-color: $color-background-base-introvert;
+    bottom: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+
     label,
     .input-error {
         display: block;
     }
 
-    .map-wrapper {
-        margin-bottom: 10px / $font-size-normal * 1em;
+    .map-buttons {
+        background: $color-background-base;
     }
+}
+
+.mein-berlin-proposal-form-upper {
+    background: $color-background-base;
+    padding: 1em;
 }
 
 .mein-berlin-kiezkassen-proposal-detail {
@@ -166,4 +178,10 @@ as metadata.  It serves as an entry to a detail view.
 .meinberlin-kiezkassen-proposal-list-meta-item-icon {
     font-size: $font-size-normal;
     margin-right: 8px / $font-size-normal * 1em;
+}
+
+.mein-berlin-proposal-form-footer {
+    .form-footer-button {
+        padding-left: 10px / $font-size-normal * 1em;
+    }
 }

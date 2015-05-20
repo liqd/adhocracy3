@@ -3,15 +3,15 @@
        {{ text | translate }}
     </div>
     <div class="map"></div>
-    <div>
+    <div class="map-buttons">
         <a
             href=""
-            class="button"
+            class="button map-button-clear"
             data-ng-if="lat && lng"
             data-ng-click="clearCoordinates()">{{ "TR__MAP_COORDINATES_CLEAR" | translate }}</a>
         <a
             href=""
-            class="button"
+            class="button map-button-reset"
             data-ng-if="dirty"
             data-ng-click="resetCoordinates()">{{ "TR__MAP_COORDINATES_RESET" | translate }}</a>
     </div>

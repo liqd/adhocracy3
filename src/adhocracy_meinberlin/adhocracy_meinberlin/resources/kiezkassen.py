@@ -31,7 +31,7 @@ proposal_version_meta = itemversion_meta._replace(
                      IPoint,
                      ICommentable,
                      IRateable],
-    permission_create='edit_kiezkassen_proposal',
+    permission_create='edit_proposal',
 )
 
 
@@ -50,7 +50,7 @@ proposal_meta = item_meta._replace(
     ],
     item_type=IProposalVersion,
     is_implicit_addable=True,
-    permission_create='create_kiezkassen_proposal',
+    permission_create = 'create_proposal',
 )
 
 
@@ -70,7 +70,6 @@ process_meta = process.process_meta._replace(
         ILocationReference,
         IImageReference,
     ],
-    permission_create='create_kiezkassen_process',
 )
 
 
