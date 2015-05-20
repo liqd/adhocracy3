@@ -5,11 +5,10 @@
 import modernizr = require("modernizr");
 
 import AdhConfig = require("../Config/Config");
-
+import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
 import AdhMetaApi = require("../Http/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhUser = require("../User/User");
 
 import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
@@ -40,7 +39,7 @@ export var register = (angular, config, meta_api) => {
         var adhConfig : AdhConfig.IService;
         var adhHttp : AdhHttp.Service<any>;
         var adhCache;
-        var adhUser : AdhUser.Service;
+        var adhCredentials : AdhCredentials.Service;
 
         var _proposalVersion : RIProposalVersion;
         var _commentVersion : RICommentVersion;
@@ -52,8 +51,8 @@ export var register = (angular, config, meta_api) => {
 
             adhHttp = (() => {
                 var factory = ($http, $q, $timeout) => {
-                    $http.defaults.headers.common["X-User-Token"] = "SECRET_GOD";
-                    $http.defaults.headers.common["X-User-Path"] = "/principals/users/0000000/";
+                    $http.defaults.headers.common["X-Credentials-Token"] = "SECRET_GOD";
+                    $http.defaults.headers.common["X-Credentials-Path"] = "/principals/users/0000000/";
 
                     return (new AdhHttp.Service($http, $q, $timeout, adhMetaApi, adhPreliminaryNames, config));
                 };
@@ -61,35 +60,36 @@ export var register = (angular, config, meta_api) => {
                 return angular.injector(["ng"]).invoke(factory);
             })();
 
-            // When localstorage is available, adhUser will delete userPath
+            // When localstorage is available, adhCredentials will delete userPath
             // which prevents us from setting it synchronously.
             (<any>modernizr).localstorage = false;
 
-            adhUser = (() => {
+            adhCredentials = (() => {
                 var factory = (
                     $q,
                     $http,
+                    $timeout,
                     $rootScope,
                     $window
                 ) => {
-                    return (new AdhUser.Service(
+                    return (new AdhCredentials.Service(
                         adhConfig,
-                        adhHttp,
                         adhCache,
                         null,
+                        modernizr,
+                        angular,
                         $q,
                         $http,
+                        $timeout,
                         $rootScope,
-                        $window,
-                        angular,
-                        modernizr
+                        $window
                     ));
                 };
-                factory.$inject = ["$q", "$http", "$rootScope", "$window"];
+                factory.$inject = ["$q", "$http", "$timeout", "$rootScope", "$window"];
                 return angular.injector(["ng"]).invoke(factory);
             })();
 
-            adhUser.userPath = "/principals/users/0000000/";
+            adhCredentials.userPath = "/principals/users/0000000/";
 
             var poolPath = "/adhocracy";
             var proposalName = "Against_Curtains_" + Math.random();
@@ -160,7 +160,7 @@ export var register = (angular, config, meta_api) => {
                                 // post rate version
                                 var rateVersionResource = new RIRateVersion({preliminaryNames: adhPreliminaryNames});
                                 rateVersionResource.data[SIRate.nick] = new SIRate.Sheet({
-                                    subject: adhUser.userPath,
+                                    subject: adhCredentials.userPath,
                                     object: _commentVersion.path,
                                     rate: 1
                                 });
@@ -196,11 +196,11 @@ export var register = (angular, config, meta_api) => {
             });
 
             it("logs in god", () => {
-                // (this is not really a test, because adhUser is not
+                // (this is not really a test, because adhCredentials is not
                 // really a service.  it's all mocked.  it's still
                 // good to know that userPath is where it is needed.
                 // :-)
-                expect(adhUser.userPath).toContain("/principals/users/0000000/");
+                expect(adhCredentials.userPath).toContain("/principals/users/0000000/");
             });
 
             it("/adhocracy is postable", (done) => {
@@ -218,7 +218,7 @@ export var register = (angular, config, meta_api) => {
                 query.content_type = RIRateVersion.content_type;
                 query.depth = 2;
                 query.tag = "LAST";
-                query[SIRate.nick + ":subject"] = adhUser.userPath;
+                query[SIRate.nick + ":subject"] = adhCredentials.userPath;
 
                 adhHttp.get(ratePostPoolPath, query)
                     .then(
