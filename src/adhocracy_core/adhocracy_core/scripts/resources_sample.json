@@ -1,0 +1,9 @@
+[
+    {"path": "/organisation",
+     "content_type": "adhocracy_core.resources.organisation.IOrganisation",
+     "data": {"adhocracy_core.sheets.name.IName":
+              {"name": "alt-treptow"}
+             }
+     }
+]
+
