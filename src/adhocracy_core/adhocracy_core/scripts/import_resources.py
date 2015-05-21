@@ -83,12 +83,23 @@ def _resolve_path(resource_info: dict, context: IResource) -> dict:
 
 
 def _resolve_sheets_resources(resource_info: dict, context: IResource) -> dict:
-    data = resource_info['data']
-    for sheets_info in data.values():
-        for k, v in sheets_info.items():
-            if len(k) > 1 and v[0] == '/':
-                sheets_info[k] = find_resource(context, v)
+    resource_info['data'] = _resolve_value(resource_info['data'], context)
     return resource_info
+
+
+def _resolve_value(value, context):
+    typ = type(value)
+    if typ == list:
+        return [_resolve_value(v, context) for v in value]
+    elif typ == dict:
+        for k, v in value.items():
+            value[k] = _resolve_value(v, context)
+        return value
+    elif typ == str and len(value) > 1 and value[0] == '/':
+        # assume path to a resource
+        return find_resource(context, value)
+    else:
+        return value
 
 
 def _load_resources_info(filename: str) -> [dict]:
