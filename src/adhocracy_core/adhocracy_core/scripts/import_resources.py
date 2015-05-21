@@ -14,6 +14,7 @@ from adhocracy_core.interfaces import IResource
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from adhocracy_core.schema import ContentType
+from substanced.interfaces import IUserLocator
 
 
 def import_resources():
@@ -47,12 +48,24 @@ def _import_resources(context: IResource, registry: Registry, filename: str):
 
 
 def _create_resource(resource_info: dict, context: IResource, registry: Registry):
+    creator = _get_creator(resource_info, context, registry)
     registry.content.create(resource_info['content_type'].__identifier__,
                             parent=resource_info['path'],
                             appstructs=resource_info['data'],
                             after_creation=False,  # TODO: correct?
-                            registry=registry)
-    # TODO set creator
+                            registry=registry,
+                            creator=creator)
+
+
+def _get_creator(resource_info: dict,
+                 context: IResource,
+                 registry: Registry) -> IResource:
+    creator_name = resource_info.get('creator', None)
+    if not creator_name:
+        return None
+    locator = _get_user_locator(context, registry)
+    creator = locator.get_user_by_login(creator_name)
+    return creator
 
 
 def _deserialize_content_type(resource_info: dict, context: IResource) -> dict:
@@ -81,3 +94,9 @@ def _resolve_sheets_resources(resource_info: dict, context: IResource) -> dict:
 def _load_resources_info(filename: str) -> [dict]:
     with open(filename, 'r') as f:
         return json.load(f)
+
+
+def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
+    request = Request.blank('/dummy')
+    locator = registry.getMultiAdapter((context, request), IUserLocator)
+    return locator
