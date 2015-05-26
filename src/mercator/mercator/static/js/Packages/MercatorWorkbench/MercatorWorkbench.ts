@@ -29,17 +29,14 @@ export var mercatorWorkbenchDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
-var bindRedirectsToScope = (scope, adhConfig, $location) => {
-    // FIXME: use dependency injection instead
-    var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
-
+var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) => {
     scope.redirectAfterProposalCancel = (resourcePath : string) => {
         // FIXME: use adhTopLevelState.redirectToCameFrom
-        $location.url(adhResourceUrl(resourcePath));
+        $location.url(adhResourceUrlFilter(resourcePath));
     };
     scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
         var proposalVersionPath = result.slice(-1)[0].path;
-        $location.url(adhResourceUrl(proposalVersionPath));
+        $location.url(adhResourceUrlFilter(proposalVersionPath));
     };
 };
 
@@ -61,6 +58,7 @@ export var commentColumnDirective = (bindVariablesAndClear : AdhMovingColumns.IB
 export var mercatorProposalCreateColumnDirective = (
     bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService,
+    adhResourceUrlFilter : (path : string) : string,
     $location : angular.ILocationService
 ) => {
     return {
@@ -69,7 +67,7 @@ export var mercatorProposalCreateColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, ["platformUrl"]);
-            bindRedirectsToScope(scope, adhConfig, $location);
+            bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
 };
@@ -107,6 +105,7 @@ export var mercatorProposalDetailColumnDirective = (
 export var mercatorProposalEditColumnDirective = (
     bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService,
+    adhResourceUrlFilter : (path : string) : string,
     $location : angular.ILocationService
 ) => {
     return {
@@ -115,7 +114,7 @@ export var mercatorProposalEditColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             bindVariablesAndClear(scope, column, ["platformUrl", "proposalUrl"]);
-            bindRedirectsToScope(scope, adhConfig, $location);
+            bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
 };
@@ -245,7 +244,7 @@ export var register = (angular) => {
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", mercatorWorkbenchDirective])
         .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
-        .directive("adhMercatorProposalCreateColumn", ["adhBindVariablesAndClear", "adhConfig", "$location",
+        .directive("adhMercatorProposalCreateColumn", ["adhBindVariablesAndClear", "adhConfig", "adhResourceUrlFilter", "$location",
             mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", [
             "$window",
@@ -254,7 +253,7 @@ export var register = (angular) => {
             "adhPermissions",
             "adhConfig",
             mercatorProposalDetailColumnDirective])
-        .directive("adhMercatorProposalEditColumn", ["adhBindVariablesAndClear", "adhConfig", "$location",
+        .directive("adhMercatorProposalEditColumn", ["adhBindVariablesAndClear", "adhConfig", "adhResourceUrlFilter", "$location",
             mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhBindVariablesAndClear", "adhConfig", mercatorProposalListingColumnDirective]);
 };
