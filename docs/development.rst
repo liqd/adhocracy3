@@ -227,3 +227,15 @@ Apply a hotfix to an old release::
 
 There is more to tags, such as deleting and signing.  See `git tag
 --help`.
+
+
+Update translations backend
+---------------------------
+
+create new language::
+
+   bin/i18n en
+
+extract message ids, update po and create mo files::
+
+   bin/i18n
