@@ -33,43 +33,43 @@ def change_german_salutation():
     jsonfile = args[0]
     data = json.load(open(jsonfile, 'r'))
 
-    regexlist = {
-        'Bitte entschuldige': 'Bitte entschuldigen Sie',
-        'aktiviere': 'aktivieren Sie',
-        'registrierst hast': 'registriert haben',
-        'wechsle': 'wechseln Sie',
-        'Bitte setze': 'Bitte setzen Sie',
-        'stimme den': 'stimmen Sie den',
-        'Ziehe den': 'Ziehen Sie den',
-        'Gehe': 'Gehen Sie',
-        'gehe auf': 'gehen Sie auf',
-        'überprüfe': 'überprüfen Sie',
-        'kontaktiere': 'kontaktieren Sie',
-        'schaue': 'schauen Sie',
-        'Klicke': 'Klicken Sie',
-        'gib dabei': 'geben Sie dabei',
-        'Bitte gib': 'Bitte geben Sie',
-        'Du kannst': 'Sie können',
-        'Du hast': 'Sie haben',
-        'Du bist': 'Sie sind',
-        'Du auf den Aktivierungslink geklickt hast, kannst Du':
-            'Sie auf den Aktivierungslink geklickt haben, können Sie',
-        'Du diese E-Mail nicht erhältst, überprüfe':
-            'Sie diese E-Mail nicht erhalten, überprüfen Sie',
-        'Du kannst': 'Sie können',
-        'Du Dich': 'Sie sich',
-        'Dir': 'Ihnen',
-        'Dein': 'Ihr',
-        'überprüfe Deine': 'überprüfen Sie Ihre',
-        'Deine': 'Ihre',
-        'Deiner': 'Ihrer'}
+    regexlist = [
+        ('Bitte entschuldige', 'Bitte entschuldigen Sie'),
+        ('aktiviere', 'aktivieren Sie'),
+        ('registrierst hast', 'registriert haben'),
+        ('wechsle', 'wechseln Sie'),
+        ('Bitte setze', 'Bitte setzen Sie'),
+        ('stimme den', 'stimmen Sie den'),
+        ('Ziehe den', 'Ziehen Sie den'),
+        ('Gehe', 'Gehen Sie'),
+        ('gehe auf', 'gehen Sie auf'),
+        ('überprüfe', 'überprüfen Sie'),
+        ('kontaktiere', 'kontaktieren Sie'),
+        ('schaue', 'schauen Sie'),
+        ('Klicke', 'Klicken Sie'),
+        ('gib dabei', 'geben Sie dabei'),
+        ('Bitte gib', 'Bitte geben Sie'),
+        ('Du kannst', 'Sie können'),
+        ('Du hast', 'Sie haben'),
+        ('Du bist', 'Sie sind'),
+        ('Du auf den Aktivierungslink geklickt hast, kannst Du',
+            'Sie auf den Aktivierungslink geklickt haben, können Sie'),
+        ('Du diese E-Mail nicht erhältst, überprüfe',
+            'Sie diese E-Mail nicht erhalten, überprüfen Sie'),
+        ('Du kannst', 'Sie können'),
+        ('Du Dich', 'Sie sich'),
+        ('Dir', 'Ihnen'),
+        ('Dein', 'Ihr'),
+        ('überprüfe Deine', 'überprüfen Sie Ihre'),
+        ('Deine', 'Ihre'),
+        ('Deiner', 'Ihrer')]
 
     for entry in sorted(data.keys()):
         line = data[entry]
         print(line)
-        for regex in sorted(regexlist.keys()):
+        for regex, replacement in regexlist:
             if re.search(regex, data[entry]):
-                line = re.sub(regex, regexlist[regex], line)
+                line = re.sub(regex, replacement, line)
         if line != data[entry]:
             print(line)
         print('-----------------------------')
