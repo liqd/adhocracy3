@@ -90,7 +90,7 @@ frontend integration tests (jsint):
 
 protractor acceptance tests::
 
-     bin/polytester acceptance
+    bin/polytester acceptance
 
 run backend functional tests::
 
