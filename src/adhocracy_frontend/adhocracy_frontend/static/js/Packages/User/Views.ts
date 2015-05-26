@@ -1,6 +1,7 @@
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhLocale = require("../Locale/Locale");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
@@ -494,6 +495,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
             AdhCredentials.moduleName,
+            AdhLocale.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTopLevelState.moduleName,
