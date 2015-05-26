@@ -1,4 +1,5 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
+/// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
 import _ = require("lodash");
 
@@ -160,7 +161,9 @@ export var phaseDirective = (adhConfig : AdhConfig.IService) => {
 export var editDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhSubmitIfValid
+    adhShowError,
+    adhSubmitIfValid,
+    moment
 ) => {
     return {
         restrict: "E",
@@ -172,9 +175,29 @@ export var editDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             var process;
             scope.data = {};
+            scope.showError = adhShowError;
             adhHttp.get(scope.path).then((resource) => {
                 process = resource;
                 scope.data.title = process.data[SITitle.nick].title;
+
+                scope.data.announce_description = process.data[SIKiezkassenWorkflow.nick].announce.description;
+                scope.data.announce_start_date = moment(process.data[SIKiezkassenWorkflow.nick].announce.start_date).format("YYYY-MM-DD");
+
+                scope.data.draft_description = process.data[SIKiezkassenWorkflow.nick].draft.description;
+                scope.data.draft_start_date = moment(process.data[SIKiezkassenWorkflow.nick].draft.start_date).format("YYYY-MM-DD");
+
+                scope.data.participate_description = process.data[SIKiezkassenWorkflow.nick].participate.description;
+                scope.data.participate_start_date = moment(
+                                                            process.data[SIKiezkassenWorkflow.nick]
+                                                            .participate.start_date
+                                                           ).format("YYYY-MM-DD");
+
+                scope.data.frozen_description = process.data[SIKiezkassenWorkflow.nick].frozen.description;
+                scope.data.frozen_start_date = moment(process.data[SIKiezkassenWorkflow.nick].frozen.start_date).format("YYYY-MM-DD");
+
+                scope.data.result_description = process.data[SIKiezkassenWorkflow.nick].result.description;
+                scope.data.result_start_date = moment(process.data[SIKiezkassenWorkflow.nick].result.start_date).format("YYYY-MM-DD");
+
                 scope.data.currentWorkflowState = process.data[SIKiezkassenWorkflow.nick].workflow_state;
             });
             adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
@@ -187,13 +210,34 @@ export var editDirective = (
                     process.data[SITitle.nick].title = scope.data.title;
                     process.data["adhocracy_core.sheets.name.IName"] = undefined;
                     process.data["adhocracy_core.sheets.image.IImageReference"] = undefined;
+
                     if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
                         process.data[SIKiezkassenWorkflow.nick] = {
                             workflow_state: scope.data.workflowState
                         };
                     } else {
-                        process.data[SIKiezkassenWorkflow.nick] = undefined;
+                        process.data[SIKiezkassenWorkflow.nick] = {};
                     }
+
+                    process.data[SIKiezkassenWorkflow.nick]["announce"] = {};
+                    process.data[SIKiezkassenWorkflow.nick]["announce"].description = scope.data.announce_description;
+                    process.data[SIKiezkassenWorkflow.nick]["announce"].start_date = scope.data.announce_start_date;
+
+                    process.data[SIKiezkassenWorkflow.nick]["draft"] = {};
+                    process.data[SIKiezkassenWorkflow.nick]["draft"].description = scope.data.draft_description;
+                    process.data[SIKiezkassenWorkflow.nick]["draft"].start_date = scope.data.draft_start_date;
+
+                    process.data[SIKiezkassenWorkflow.nick]["participate"] = {};
+                    process.data[SIKiezkassenWorkflow.nick]["participate"].description = scope.data.participate_description;
+                    process.data[SIKiezkassenWorkflow.nick]["participate"].start_date = scope.data.participate_start_date;
+
+                    process.data[SIKiezkassenWorkflow.nick]["frozen"] = {};
+                    process.data[SIKiezkassenWorkflow.nick]["frozen"].description = scope.data.frozen_description;
+                    process.data[SIKiezkassenWorkflow.nick]["frozen"].start_date = scope.data.frozen_start_date;
+
+                    process.data[SIKiezkassenWorkflow.nick]["result"] = {};
+                    process.data[SIKiezkassenWorkflow.nick]["result"].description = scope.data.result_description;
+                    process.data[SIKiezkassenWorkflow.nick]["result"].start_date = scope.data.result_start_date;
 
                     return adhHttp.put(process.path, process);
                 });
@@ -218,5 +262,5 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhMeinBerlinKiezkassenDetailAnnounce", ["adhConfig", "adhHttp", detailAnnounceDirective])
-        .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", editDirective]);
+        .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", editDirective]);
 };
