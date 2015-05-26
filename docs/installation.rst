@@ -27,6 +27,7 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 3. build-essential libssl-dev libbz2-dev libyaml-dev libncurses5-dev
 4. graphviz
 5. ruby ruby-dev
+6. gettext
 
 If you don't use the custom compiled python (see below) you need some
 some basic dependencies to build PIL (python image library):

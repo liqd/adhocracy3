@@ -18,6 +18,7 @@ def includeme(config):
     config.include('.resources.mercator')
     config.include('.resources.subscriber')
     config.include('.evolution')
+    config.add_translation_dirs('adhocracy_core:locale/')
 
 
 def main(global_config, **settings):
