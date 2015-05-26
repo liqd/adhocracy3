@@ -185,11 +185,11 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .default(RIKiezkassenProcess, "edit_process", RIKiezkassenProcess.content_type, "", {
+                .default(RIKiezkassenProcess, "edit", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIKiezkassenProcess, "edit_process", RIKiezkassenProcess.content_type, "", [
+                .specific(RIKiezkassenProcess, "edit", RIKiezkassenProcess.content_type, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
                         return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                             if (!options.PUT) {
