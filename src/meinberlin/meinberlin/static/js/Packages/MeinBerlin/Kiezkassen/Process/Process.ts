@@ -161,6 +161,7 @@ export var phaseDirective = (adhConfig : AdhConfig.IService) => {
 export var editDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhShowError,
     adhSubmitIfValid,
     moment
 ) => {
@@ -174,6 +175,7 @@ export var editDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             var process;
             scope.data = {};
+            scope.showError = adhShowError;
             adhHttp.get(scope.path).then((resource) => {
                 process = resource;
                 scope.data.title = process.data[SITitle.nick].title;
@@ -209,15 +211,12 @@ export var editDirective = (
                     process.data["adhocracy_core.sheets.name.IName"] = undefined;
                     process.data["adhocracy_core.sheets.image.IImageReference"] = undefined;
 
-
                     if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
                         process.data[SIKiezkassenWorkflow.nick] = {
                             workflow_state: scope.data.workflowState
                         };
                     } else {
-                        process.data[SIKiezkassenWorkflow.nick] = {
-                            workflow_state: scope.data.currentWorkflowState
-                        };
+                        process.data[SIKiezkassenWorkflow.nick] = {};
                     }
 
                     process.data[SIKiezkassenWorkflow.nick]["announce"] = {};
@@ -263,5 +262,5 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhMeinBerlinKiezkassenDetailAnnounce", ["adhConfig", "adhHttp", detailAnnounceDirective])
-        .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhSubmitIfValid", "moment", editDirective]);
+        .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", editDirective]);
 };
