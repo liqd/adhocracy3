@@ -6,6 +6,7 @@ import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 import AdhPermissions = require("../../../Permissions/Permissions");
 
@@ -24,15 +25,15 @@ var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
 
 export var meinBerlinWorkbenchDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
 
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
@@ -156,7 +157,8 @@ export var register = (angular) => {
             AdhMeinBerlinKiezkassenProposal.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
-            AdhResourceArea.moduleName
+            AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
@@ -261,7 +263,7 @@ export var register = (angular) => {
                 return $q.when("<adh-mein-berlin-workbench></adh-mein-berlin-workbench>");
             }];
         }])
-        .directive("adhMeinBerlinWorkbench", ["adhBindVariablesAndClear", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
+        .directive("adhMeinBerlinWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
         .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalDetailColumn", [
             "adhBindVariablesAndClear", "adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
