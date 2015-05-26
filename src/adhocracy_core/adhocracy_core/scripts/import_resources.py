@@ -15,8 +15,6 @@ from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from adhocracy_core.schema import ContentType
 from substanced.interfaces import IUserLocator
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.sheets.name import IName
 
 
 def import_resources():
