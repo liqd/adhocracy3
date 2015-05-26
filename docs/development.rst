@@ -239,3 +239,10 @@ create new language::
 extract message ids, update po and create mo files::
 
    bin/i18n
+
+compile custom po file in extension package::
+
+    cd src/adhocracy_meinberlin/adhocracy_meinberlin/locale/en/LC_MESSAGES/
+    msgfmt --statistics -o adhocracy.mo adhocracy.po
+
+#TODO helper script that updates/compiles all po files

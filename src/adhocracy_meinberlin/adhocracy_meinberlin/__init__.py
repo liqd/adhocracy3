@@ -21,6 +21,7 @@ def includeme(config):
     config.include('adhocracy_meinberlin.resources.subscriber')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
     config.include('adhocracy_meinberlin.evolution')
+    config.add_translation_dirs('adhocracy_meinberlin:locale/')
 
 
 def main(global_config, **settings):
