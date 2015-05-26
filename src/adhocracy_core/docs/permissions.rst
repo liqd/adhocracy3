@@ -58,7 +58,7 @@ Create content annotations by participant::
     >>> participant_rate = resp['path']
 
 
-Everyone
+Anonymous
 ~~~~~~~~~
 
 Can read resources and normal sheets::
