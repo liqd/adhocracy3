@@ -7,6 +7,7 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhCredentials = require("../User/Credentials");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhUtil = require("../Util/Util");
@@ -100,6 +101,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $http : angular.IHttpService,
         private $q : angular.IQService,
         private $timeout : angular.ITimeoutService,
+        private adhCredentials : AdhCredentials.Service,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
         private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService,
@@ -153,7 +155,9 @@ export class Service<Content extends ResourcesBase.Resource> {
         var headers = this.parseConfig(config);
 
         return this.adhCache.memoize(path, "OPTIONS",
-            () => this.$http({method: "OPTIONS", url: path, headers: headers})
+            () => this.adhCredentials.ready.then(
+                () => this.$http({method: "OPTIONS", url: path, headers: headers})
+            )
         ).then((response) => {
             if (typeof config.importOptions === "undefined" || config.importOptions) {
                 return this.importOptions(response);
@@ -163,17 +167,17 @@ export class Service<Content extends ResourcesBase.Resource> {
         }, AdhError.logBackendError);
     }
 
-    public getRaw(path : string, params?, config : IHttpConfig = {}) : angular.IHttpPromise<any> {
+    public getRaw(path : string, params?, config : IHttpConfig = {}) : angular.IPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
         path = this.formatUrl(path);
         var headers = this.parseConfig(config);
 
-        return this.$http.get(path, {
+        return this.adhCredentials.ready.then(() => this.$http.get(path, {
             params : params,
             headers : headers
-        });
+        }));
     }
 
     /**
@@ -207,7 +211,7 @@ export class Service<Content extends ResourcesBase.Resource> {
                 AdhError.logBackendError));
     }
 
-    public putRaw(path : string, obj : Content, config : IHttpConfig = {}) : angular.IHttpPromise<any> {
+    public putRaw(path : string, obj : Content, config : IHttpConfig = {}) : angular.IPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
@@ -215,9 +219,9 @@ export class Service<Content extends ResourcesBase.Resource> {
         var headers = this.parseConfig(config);
         this.adhCache.invalidate(path);
 
-        return this.$http.put(path, obj, {
+        return this.adhCredentials.ready.then(() => this.$http.put(path, obj, {
             headers: headers
-        });
+        }));
     }
 
     public put(path : string, obj : Content, config : IHttpPutConfig = {}) : angular.IPromise<Content> {
@@ -244,7 +248,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
     }
 
-    public postRaw(path : string, obj : Content, config : IHttpConfig = {}) : angular.IHttpPromise<any> {
+    public postRaw(path : string, obj : Content, config : IHttpConfig = {}) : angular.IPromise<any> {
         var _self = this;
 
         if (_self.adhPreliminaryNames.isPreliminary(path)) {
@@ -253,19 +257,21 @@ export class Service<Content extends ResourcesBase.Resource> {
         path = this.formatUrl(path);
         var headers = this.parseConfig(config);
 
-        if (typeof FormData !== "undefined" && FormData.prototype.isPrototypeOf(obj)) {
-            return _self.$http({
-                method: "POST",
-                url: path,
-                data: obj,
-                headers: _.assign({"Content-Type": undefined}, headers),
-                transformRequest: undefined
-            });
-        } else {
-            return _self.$http.post(path, obj, {
-                headers: headers
-            });
-        }
+        return this.adhCredentials.ready.then(() => {
+            if (typeof FormData !== "undefined" && FormData.prototype.isPrototypeOf(obj)) {
+                return _self.$http({
+                    method: "POST",
+                    url: path,
+                    data: obj,
+                    headers: _.assign({"Content-Type": undefined}, headers),
+                    transformRequest: undefined
+                });
+            } else {
+                return _self.$http.post(path, obj, {
+                    headers: headers
+                });
+            }
+        });
     }
 
     public post(path : string, obj : Content, config : IHttpConfig = {}) : angular.IPromise<Content> {
@@ -562,6 +568,7 @@ export var moduleName = "adhHttp";
 export var register = (angular, config, metaApi) => {
     angular
         .module(moduleName, [
+            AdhCredentials.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhWebSocket.moduleName,
             "angular-data.DSCacheFactory",
@@ -572,7 +579,7 @@ export var register = (angular, config, metaApi) => {
         .service("adhHttpBusy", ["$q", Busy])
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
         .service("adhHttp", [
-            "$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
+            "$http", "$q", "$timeout", "adhCredentials", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
         .service("adhCache", ["$q", "adhConfig", "adhWebSocket", "DSCacheFactory", AdhCache.Service])
         .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
         .filter("adhFormatError", () => AdhError.formatError);

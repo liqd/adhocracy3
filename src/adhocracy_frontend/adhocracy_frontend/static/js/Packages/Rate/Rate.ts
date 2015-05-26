@@ -2,13 +2,13 @@ import _ = require("lodash");
 
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
+import AdhCredentials = require("../User/Credentials");
 import AdhEventManager = require("../EventManager/EventManager");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 
@@ -142,7 +142,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
     adhHttp : AdhHttp.Service<any>,
     adhWebSocket : AdhWebSocket.Service,
     adhPermissions : AdhPermissions.Service,
-    adhUser : AdhUser.Service,
+    adhCredentials : AdhCredentials.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhDone
@@ -215,8 +215,8 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
             var storeMyRateResource : (resource : RIRateVersion) => void;
 
             var updateMyRate = () : angular.IPromise<void> => {
-                if (adhUser.loggedIn) {
-                    return adhRate.fetchRate(postPoolPath, scope.refersTo, adhUser.userPath).then((resource) => {
+                if (adhCredentials.loggedIn) {
+                    return adhRate.fetchRate(postPoolPath, scope.refersTo, adhCredentials.userPath).then((resource) => {
                         storeMyRateResource(resource);
                         scope.myRate = adapter.rate(resource);
                     }, () => undefined);
@@ -294,7 +294,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 }
 
                 if (!scope.optionsPostPool.POST) {
-                    if (!adhUser.loggedIn) {
+                    if (!adhCredentials.loggedIn) {
                         adhTopLevelState.redirectToLogin();
                     } else {
                         // FIXME
@@ -310,7 +310,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
                         adapter.rate(newVersion, rate);
                         adapter.object(newVersion, scope.refersTo);
-                        adapter.subject(newVersion, adhUser.userPath);
+                        adapter.subject(newVersion, adhCredentials.userPath);
 
                         return adhHttp.postNewVersionNoFork(version.path, newVersion)
                             .then(() => {
@@ -351,7 +351,8 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     adhDone();
                 });
 
-            scope.allowRate = (adhConfig.custom["allow_rate"].toLowerCase() === "true");
+            var allowRate = adhConfig.custom["allow_rate"];
+            scope.allowRate = typeof allowRate === "undefined" || allowRate.toLowerCase() === "true";
         }
     };
 };
@@ -363,12 +364,12 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
+            AdhCredentials.moduleName,
             AdhEventManager.moduleName,
             AdhHttp.moduleName,
             AdhPermissions.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhTopLevelState.moduleName,
-            AdhUser.moduleName,
             AdhWebSocket.moduleName
         ])
         .service("adhRateEventManager", ["adhEventManagerClass", (cls) => new cls()])
@@ -381,7 +382,7 @@ export var register = (angular) => {
             "adhHttp",
             "adhWebSocket",
             "adhPermissions",
-            "adhUser",
+            "adhCredentials",
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhDone",
@@ -394,7 +395,7 @@ export var register = (angular) => {
             "adhHttp",
             "adhWebSocket",
             "adhPermissions",
-            "adhUser",
+            "adhCredentials",
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhDone",

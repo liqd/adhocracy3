@@ -90,6 +90,22 @@ the transifex-client can be used::
    has the technical strings themselves as translations and an exotic
    locale.
 
+
+German Du/Sie
+-------------
+
+Adhocracy is currently used mostly in Germany, i.e. in German language.
+Unfortunately, there are two variants of German, a formal (Sie) and an
+informal (Du) one.
+
+All translations should use the informal variant.  The script
+``bin/change_german_salutation`` can be used to convert informal
+translations to formal ones.  Note that you will need to extend that
+script whenever the translation changes. The common workflow for this
+is: Iteratively run the script, check the output and add new rules until
+everything is fine.
+
+
 Missing Features
 ----------------
 

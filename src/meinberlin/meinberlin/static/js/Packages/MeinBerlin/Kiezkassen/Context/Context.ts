@@ -1,9 +1,9 @@
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUser = require("../../../User/User");
 
 import AdhMeinBerlinWorkbench = require("../Workbench/Workbench");
 
@@ -17,12 +17,17 @@ import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment
 var pkgLocation = "/MeinBerlin/Kiezkassen/Context";
 
 
-export var headerDirective = (adhConfig : AdhConfig.IService, adhTopLevelState : AdhTopLevelState.Service) => {
+export var headerDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/header.html",
         link: (scope) => {
-            adhTopLevelState.bind("processUrl", scope);
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
         }
     };
 
@@ -37,11 +42,11 @@ export var register = (angular) => {
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhMeinBerlinWorkbench.moduleName,
+            AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhUser.moduleName
+            AdhTopLevelState.moduleName
         ])
-        .directive("adhKiezkassenContextHeader", ["adhConfig", "adhTopLevelState", headerDirective])
+        .directive("adhKiezkassenContextHeader", ["adhConfig", "adhPermissions", "adhTopLevelState", headerDirective])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerContext("kiezkassen");
         }])
@@ -62,18 +67,13 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 })
                 .specific(RIKiezkassenProcess, "create_proposal", RIKiezkassenProcess.content_type, "kiezkassen", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (resource : RIKiezkassenProcess) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.POST) {
-                                    throw 401;
-                                } else {
-                                    return {};
-                                }
-                            });
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
                         });
                     }])
                 .defaultVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "kiezkassen", {
@@ -81,20 +81,15 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 })
                 .specificVersionable(RIProposal, RIProposalVersion, "edit", RIKiezkassenProcess.content_type, "kiezkassen", [
-                    "adhHttp", "adhUser", (
-                        adhHttp : AdhHttp.Service<any>,
-                        adhUser : AdhUser.Service
-                    ) => (item : RIProposal, version : RIProposalVersion) => {
-                        return adhUser.ready.then(() => {
-                            return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.POST) {
-                                    throw 401;
-                                } else {
-                                    return {
-                                        proposalUrl: version.path
-                                    };
-                                }
-                            });
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIProposal, version : RIProposalVersion) => {
+                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    proposalUrl: version.path
+                                };
+                            }
                         });
                     }])
                 .defaultVersionable(RIProposal, RIProposalVersion, "", RIKiezkassenProcess.content_type, "kiezkassen", {

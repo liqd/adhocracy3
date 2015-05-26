@@ -10,13 +10,13 @@ export var register = () => {
         var locationMock;
         var windowMock;
         var rootScopeMock;
-        var adhUserMock;
+        var adhCredentialsMock;
 
         beforeEach(() => {
             locationMock = jasmine.createSpyObj("locationMock", ["absUrl"]);
             windowMock = jasmine.createSpyObj("windowMock", ["addEventListener"]);
             rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
-            adhUserMock = jasmine.createSpyObj("adhUserMock", ["loggedIn"]);
+            adhCredentialsMock = jasmine.createSpyObj("adhCredentialsMock", ["loggedIn"]);
         });
 
         describe("Service", () => {
@@ -26,7 +26,7 @@ export var register = () => {
             beforeEach(() => {
                 postMessageMock = jasmine.createSpy("postMessageMock");
                 service = new AdhCrossWindowMessaging.Service(
-                    postMessageMock, locationMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhUserMock);
+                    postMessageMock, locationMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhCredentialsMock, <any>true);
             });
 
             describe("registerMessageHandler", () => {
