@@ -1,0 +1,77 @@
+"""Import/create groups into the system.
+
+This is registered as console script 'import_groups' in setup.py.
+
+"""
+import argparse
+import inspect
+import json
+
+import adhocracy_core.sheets.principal
+import transaction
+from adhocracy_core.interfaces import IResource
+from pyramid.paster import bootstrap
+from pyramid.registry import Registry
+from substanced.util import find_service
+from adhocracy_core.utils import get_sheet
+from adhocracy_core.resources.principal import IGroup
+
+
+def import_groups():
+    """Import groups from a JSON file.
+
+    Already existing groups will have their roles updated.
+
+    usage::
+
+        bin/import_groups etc/development.ini  <filename>
+    """
+    docstring = inspect.getdoc(import_groups)
+    parser = argparse.ArgumentParser(description=docstring)
+    parser.add_argument('ini_file',
+                        help='path to the adhocracy backend ini file')
+    parser.add_argument('filename',
+                        type=str,
+                        help='file containing the groups')
+    args = parser.parse_args()
+    env = bootstrap(args.ini_file)
+    _import_groups(env['root'], env['registry'], args.filename)
+    env['closer']()
+
+
+def _import_groups(context: IResource, registry: Registry, filename: str):
+    groups_info = _load_groups_info(filename)
+    groups = find_service(context, 'principals', 'groups')
+    for group_info in groups_info:
+        name = group_info['name']
+        if name in groups.keys():
+            _update_group(group_info, groups)
+            print('Updating group {}'.format(name))
+        else:
+            _create_group(group_info, registry, groups)
+            print('Creating group {}'.format(name))
+    transaction.commit()
+
+
+def _load_groups_info(filename: str) -> [dict]:
+    with open(filename, 'r') as f:
+        return json.load(f)
+
+
+def _update_group(group_info: dict, groups: IResource):
+    group = groups[group_info['name']]
+    group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
+    group_sheet.set({'roles': group_info['roles']})
+    # mark resource as dirty otherwise commit does nothing?!
+    group._p_changed = True
+
+
+def _create_group(group_info: dict, registry: Registry, groups: IResource):
+    appstructs = {adhocracy_core.sheets.principal.IGroup.__identifier__:
+                  {'roles': group_info['roles']},
+                  adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': group_info['name']},
+                  }
+    registry.content.create(IGroup.__identifier__, groups,
+                            appstructs=appstructs,
+                            registry=registry)

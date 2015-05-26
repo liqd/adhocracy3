@@ -80,6 +80,10 @@ setup(name='adhocracy_core',
       adhocracy_core = adhocracy_core.testing
       [console_scripts]
       start_ws_server = adhocracy_core.websockets.start_ws_server:main
+      import_users = adhocracy_core.scripts.import_users:import_users
+      import_groups = adhocracy_core.scripts.import_groups:import_groups
+      import_resources = adhocracy_core.scripts.import_resources:import_resources
+      import_local_roles = adhocracy_core.scripts.import_local_roles:import_local_roles
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,

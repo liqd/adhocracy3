@@ -1,0 +1,4 @@
+[
+    {"name": "Alice", "email": "alice@example.org", "password": "weakpassword1", "roles": ["contributor"], "groups": ["gods"]},
+    {"name": "Bob", "email": "bob@example.org", "password": "weakpassword2", "roles": [], "groups": []}
+]
