@@ -104,36 +104,40 @@ export var phaseHeaderDirective = (
             // FIXME: dummy content
             scope.phases = [{
                 name: "announce",
-                title: "Informationsphase",
-                description: "Lorem ipsum Veniam deserunt nostrud aliquip officia aliqua esse Ut voluptate in consequat dolor.",
+                title: "Information",
+                description: "Mit den Kiezkassen können Projekte vor Ort unterstützt werden und sollen das " +
+                "bürgerschaftliche Engagement fördern. Alle interessierte Bürger*innen können ab sofort sich " +
+                "beteiligen und Vorschläge einreichen. Die Bürgerversammlung findet am 04. Juni 2015 um 19 Uhr in der " +
+                "Nachbarschaftsgalerie der KungerKiez-Initiative e.V.. Karl-Kuhger- Straße 15, 12435 Berlin.",
                 processType: "Kiezkasse",
                 votingAvailable: false,
                 commentAvailable: false
             }, {
                 name: "participate",
-                title: "Ideensammlungsphase",
-                description: "Alle Interessierten werden aufgerufen Vorschläge für Projekte in der Bezirksregion zu machen. " +
-                    "Die Angabe der Kosten soll bitte die Mehrwertsteuer enthalten. Vorschläge können aber auch noch offline " +
-                    "in der den. Alle Vorschläge (offline und online) werden dann bei der Bürgerversammlung beschlossen.",
+                title: "Ideensammlung",
+                description: "Alle Interessierten werden aufgerufen Vorschläge für Projekte in der Bezirksregion " +
+                "zu machen. Die Angabe der Kosten soll bitte die Mehrwertsteuer enthalten. Vorschläge können aber " +
+                "auch noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge (offline und online) " +
+                "werden dann bei der Bürgerversammlung beschlossen.",
                 processType: "Kiezkasse",
                 votingAvailable: true,
                 commentAvailable: true
             }, {
                 name: "frozen",
                 title: "Bürgerversammlung",
-                description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder bewertet " +
-                    "werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge " +
-                    "werden dann vor Ort die Art und Weise der Abstimmung bestimmt die Bürgerversammlung selbst. Offline " +
-                    "Vorschläge werden online",
+                description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder " +
+                "bewertet werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle " +
+                "Vorschläge werden dann vor Ort vorgestellt und abgestimmt. Die Art und Weise der Abstimmung bestimmt " +
+                "die Bürgerversammlung selbst. Offline Vorschläge werden online eingereicht.",
                 processType: "Kiezkasse",
-                votingAvailable: true,
+                votingAvailable: false,
                 commentAvailable: false
             }, {
                 name: "result",
                 title: "Ergebnisse",
-                description: "Nach der Prüfung vom zuständigen Fachamt des Bezirksamtes werden die Vorschläge, die realisiert " +
-                    "werden und ggf. diejenigen, die nicht realisierbar sind, online markiert und angezeigt. Die Projekte " +
-                    "müssen bis Mitte Dezember realisiert und abgerechnet werden",
+                description: "Nach der Prüfung vom zuständigen Fachamt des Bezirksamtes werden die Vorschläge, die " +
+                "realisiert werden und ggf. diejenigen, die nicht realisierbar sind, online markiert und angezeigt. " +
+                "Die Projekte müssen bis Mitte Dezember realisiert und abgerechnet werden.",
                 processType: "Kiezkasse",
                 votingAvailable: false,
                 commentAvailable: false

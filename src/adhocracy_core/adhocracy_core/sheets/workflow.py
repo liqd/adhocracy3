@@ -98,6 +98,7 @@ class State(AdhocracySchemaNode):
 
     workflow_name = ''
     schema_type = StateType
+    missing = drop
 
     @deferred
     def default(self, kw: dict) -> str:

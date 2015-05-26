@@ -92,12 +92,25 @@ and get the current state::
     'participate'
 
 
-in addition we can add custom metadata for specific workflow states::
+in addition we have custom metadata for specific workflow states::
 
     >>> workflow_data['participate']['start_date']
     '2015-02-14...
     >>> workflow_data['participate']['description']
     'Start...
+
+this metadata can be set::
+
+    >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'participate': {'description': 'new',
+    ...                                                                             'start_date': '2015-05-26T12:40:49.638293+00:00'}}}}
+    >>> resp = app_god.put('/proposals/proposal_item', data)
+    >>> resp.status_code
+    200
+
+    >>> resp = app_god.get('/proposals/proposal_item').json
+    >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
+    >>> workflow_data['participate']['description']
+    'new'
 
 
 Workflow transition to states
@@ -123,3 +136,5 @@ Then we can put the wanted next state:
 
 NOTE: The available next states depend on the workflow transitions and user permissions.
 NOTE: To make this work every state may have only one transition to another state.
+
+
