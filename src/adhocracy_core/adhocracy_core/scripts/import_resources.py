@@ -52,7 +52,6 @@ def _create_resource(resource_info: dict, context: IResource, registry: Registry
     registry.content.create(resource_info['content_type'].__identifier__,
                             parent=resource_info['path'],
                             appstructs=resource_info['data'],
-                            after_creation=False,  # TODO: correct?
                             registry=registry,
                             creator=creator)
 
