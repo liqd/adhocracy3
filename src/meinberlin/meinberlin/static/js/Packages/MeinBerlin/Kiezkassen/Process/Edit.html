@@ -20,7 +20,7 @@
             minlength="3"
             maxlength="100"
             required="required" />
-        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.title, 'required')">
+        <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.title, 'required')">
             {{ "TR__MEINBERLIN_ERROR_REQUIRED_TITLE" | translate }}
         </span>
     </label>
@@ -45,6 +45,9 @@
             minlength="3"
             maxlength="100"
             required="required" />
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.announce_description, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DESCRIPTION" | translate }}
+            </span>
     </label>
     <label>
         <span class="label-text">start date</span>
@@ -54,8 +57,17 @@
             name="announce_start_date"
             data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
             placeholder="yyyy-mm-dd"
+            required="required"
             />
+            <span
+                class="input-error"
+                data-ng-if="showError(kiezkassenProcessForm, kiezkassenProcessForm.announce_start_date,'pattern')">
+                {{ "TR__ERROR_INVALID_DATE" | translate }}</span>
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.announce_start_date, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DATE" | translate }}
+            </span>
     </label>
+
 
     <h4>Edit Draft Phase</h4>
     <label>
@@ -63,10 +75,14 @@
         <input
             type="text"
             data-ng-model="data.draft_description"
-            name="title"
+            name="draft_description"
             minlength="3"
             maxlength="100"
+            required="required"
             />
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.draft_description, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_DESCRIPTION" | translate }}
+            </span>
     </label>
     <label>
         <span class="label-text">start date</span>
@@ -76,8 +92,17 @@
             name="draft_start_date"
             data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
             placeholder="yyyy-mm-dd"
+            required="required"
             />
+            <span
+                class="input-error"
+                data-ng-if="showError(kiezkassenProcessForm, kiezkassenProcessForm.draft_start_date,'pattern')">
+                {{ "TR__ERROR_INVALID_DATE" | translate }}</span>
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.draft_start_date, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DATE" | translate }}
+            </span>
     </label>
+
 
     <h4>Edit Participate Phase</h4>
     <label>
@@ -88,7 +113,11 @@
             name="participate_description"
             minlength="3"
             maxlength="100"
+            required="required"
             />
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.participate_description, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DESCRIPTION" | translate }}
+            </span>
     </label>
     <label>
         <span class="label-text">start date</span>
@@ -98,7 +127,15 @@
             name="participate_start_date"
             data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
             placeholder="yyyy-mm-dd"
+            required="required"
             />
+            <span
+                class="input-error"
+                data-ng-if="showError(kiezkassenProcessForm, kiezkassenProcessForm.participate_start_date,'pattern')">
+                {{ "TR__ERROR_INVALID_DATE" | translate }}</span>
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.participate_start_date, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DATE" | translate }}
+            </span>
     </label>
 
     <h4>Edit Frozen Phase</h4>
@@ -111,7 +148,11 @@
             minlength="3"
             maxlength="100"
             required="required" />
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.frozen_description, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DESCRIPTION" | translate }}
+            </span>
     </label>
+
     <label>
         <span class="label-text">start date</span>
         <input
@@ -121,6 +162,12 @@
             data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
             placeholder="yyyy-mm-dd"
             required="required" />
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.frozen_start_date, 'pattern')">
+            {{ "TR__ERROR_INVALID_DATE" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.frozen_start_date, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DATE" | translate }}
+            </span>
     </label>
 
     <h4>Edit Result Phase</h4>
@@ -129,11 +176,15 @@
         <input
             type="text"
             data-ng-model="data.result_description"
-            name="title"
+            name="result_description"
             minlength="3"
             maxlength="100"
             required="required" />
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.result_description, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DESCRIPTION" | translate }}
+            </span>
     </label>
+
     <label>
         <span class="label-text">start date</span>
         <input
@@ -143,8 +194,13 @@
             data-ng-pattern="/([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|(0|1|2)[1-9])$/"
             placeholder="yyyy-mm-dd"
             required="required" />
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.result_start_date, 'pattern')">
+            {{ "TR__ERROR_INVALID_DATE" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="showError(kiezkassenProcessForm, kiezkassenProcessForm.result_start_date, 'required')">
+            {{ "TR__MEINBERLIN_ERROR_REQUIRED_DATE" | translate }}
+            </span>
     </label>
-
 
     <!-- DATA SUBMIT -->
     <footer class="form-footer mein-berlin-proposal-form-footer">
