@@ -39,10 +39,10 @@ def import_resources():
 
 def _import_resources(context: IResource, registry: Registry, filename: str):
     resources_info = _load_resources_info(filename)
-    resources_info = [_resolve_sheets_resources(info, context) for info in resources_info]
-    resources_info = [_resolve_path(info, context) for info in resources_info]
-    resources_info = [_deserialize_content_type(info, context) for info in resources_info]
     for resource_info in resources_info:
+        resource_info = _resolve_sheets_resources(resource_info, context)
+        resource_info = _resolve_path(resource_info, context)
+        resource_info = _deserialize_content_type(resource_info, context)
         _create_resource(resource_info, context, registry)
     transaction.commit()
 
