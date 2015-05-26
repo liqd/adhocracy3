@@ -45,6 +45,7 @@ def import_users():
 
 
 def _import_users(context: IResource, registry: Registry, filename: str):
+    registry.settings['adhocracy.skip_registration_mail'] = True
     users_info = _load_users_info(filename)
     users = find_service(context, 'principals', 'users')
     groups = find_service(context, 'principals', 'groups')
@@ -97,7 +98,6 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
     user = registry.content.create(IUser.__identifier__,
                                    users,
                                    appstruct,
-                                   run_after_creation=False,
                                    registry=registry)
     user.activate()
 
