@@ -15,6 +15,8 @@ from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from adhocracy_core.schema import ContentType
 from substanced.interfaces import IUserLocator
+from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.sheets.name import IName
 
 
 def import_resources():
@@ -43,14 +45,43 @@ def _import_resources(context: IResource, registry: Registry, filename: str):
         resource_info = _resolve_sheets_resources(resource_info, context)
         resource_info = _resolve_path(resource_info, context)
         resource_info = _deserialize_content_type(resource_info, context)
-        _create_resource(resource_info, context, registry)
+        expected_path = _expected_path(resource_info)
+        if _resource_exists(resource_info, context):
+            print('Skipping {}.'.format(expected_path))
+        else:
+            print('Creating {}'.format(expected_path))
+            _create_resource(resource_info, context, registry)
     transaction.commit()
+
+
+def _resource_exists(resource_info: dict, context: IResource) -> bool:
+    try:
+        find_resource(context, _expected_path(resource_info))
+        return True
+    except KeyError:
+        return False
+
+
+def _expected_path(resource_info: dict) -> str:
+    name = _get_resource_info_name(resource_info)
+    if resource_info['path'] == '/':
+        return '/' + name
+    else:
+        return resource_info['path'] + '/' + name
+
+
+def _get_resource_info_name(resource_info: dict) -> str:
+    name_field = resource_info['data'].get('adhocracy_core.sheets.name.IName', None)
+    if name_field is None:
+        return None
+    name = name_field.get('name', None)
+    return name
 
 
 def _create_resource(resource_info: dict, context: IResource, registry: Registry):
     creator = _get_creator(resource_info, context, registry)
     registry.content.create(resource_info['content_type'].__identifier__,
-                            parent=resource_info['path'],
+                            parent=resource_info['parent'],
                             appstructs=resource_info['data'],
                             registry=registry,
                             creator=creator)
@@ -77,7 +108,7 @@ def _deserialize_content_type(resource_info: dict, context: IResource) -> dict:
 
 
 def _resolve_path(resource_info: dict, context: IResource) -> dict:
-    resource_info['path'] = find_resource(context, resource_info['path'])
+    resource_info['parent'] = find_resource(context, resource_info['path'])
     return resource_info
 
 
