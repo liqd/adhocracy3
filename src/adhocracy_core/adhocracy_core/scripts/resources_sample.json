@@ -19,8 +19,7 @@
      "data": {"adhocracy_core.sheets.name.IName":
               {"name": "moderators-abc"},
               "adhocracy_core.sheets.principal.IGroup":
-              {"roles": ["creator", "initiator"],
-               "users": ["/principals/users/0000000"]}
+              {"roles": ["creator", "initiator"]}
              }
     }
 ]
