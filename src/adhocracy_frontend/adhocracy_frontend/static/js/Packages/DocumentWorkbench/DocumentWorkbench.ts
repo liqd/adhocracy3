@@ -6,6 +6,7 @@ import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhProcess = require("../Process/Process");
 import AdhProposal = require("../Proposal/Proposal");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
@@ -26,6 +27,7 @@ export interface IDocumentWorkbenchScope extends angular.IScope {
 
 export var documentWorkbench = (
     adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhUser : AdhUser.Service
 ) => {
     return {
@@ -36,6 +38,8 @@ export var documentWorkbench = (
             scope.contentType = RIProposal.content_type;
             scope.user = adhUser;
             scope.websocketTestPaths = JSON.stringify([scope.path]);
+
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
         }
     };
 };
@@ -51,6 +55,7 @@ export var register = (angular) => {
             AdhProcess.moduleName,
             AdhProposal.moduleName,
             AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider) => {
@@ -83,5 +88,5 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide"
                 });
         }])
-        .directive("adhDocumentWorkbench", ["adhConfig", "adhUser", documentWorkbench]);
+        .directive("adhDocumentWorkbench", ["adhConfig", "adhTopLevelState", "adhUser", documentWorkbench]);
 };

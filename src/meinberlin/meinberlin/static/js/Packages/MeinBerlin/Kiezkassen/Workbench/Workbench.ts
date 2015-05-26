@@ -33,6 +33,7 @@ export var meinBerlinWorkbenchDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
 
             scope.$watch("processUrl", (processUrl) => {

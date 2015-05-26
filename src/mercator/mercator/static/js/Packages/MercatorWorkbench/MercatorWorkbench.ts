@@ -21,10 +21,16 @@ import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComm
 var pkgLocation = "/MercatorWorkbench";
 
 
-export var mercatorWorkbenchDirective = (adhConfig : AdhConfig.IService) => {
+export var mercatorWorkbenchDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorWorkbench.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/MercatorWorkbench.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+        }
     };
 };
 
@@ -243,7 +249,7 @@ export var register = (angular) => {
                 return $q.when("<adh-mercator-workbench></adh-mercator-workbench>");
             }];
         }])
-        .directive("adhMercatorWorkbench", ["adhConfig", mercatorWorkbenchDirective])
+        .directive("adhMercatorWorkbench", ["adhConfig", "adhTopLevelState", mercatorWorkbenchDirective])
         .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", ["adhBindVariablesAndClear", "adhConfig", "$location",
             mercatorProposalCreateColumnDirective])
