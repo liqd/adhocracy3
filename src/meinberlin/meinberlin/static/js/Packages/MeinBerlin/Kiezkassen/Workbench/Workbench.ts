@@ -35,6 +35,31 @@ export var meinBerlinWorkbenchDirective = (
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("contentType", scope));
+
+            scope.views = {
+                process: "default",
+                proposal: "default",
+                comment: "default"
+            };
+
+            scope.$watchGroup(["contentType", "view"], (values) => {
+                console.log(values);
+                var contentType = values[0];
+                var view = values[1];
+
+                if (contentType === RIKiezkassenProcess.content_type) {
+                    scope.views.process = view;
+                } else {
+                    scope.views.process = "default";
+                }
+
+                if (contentType === RIProposal.content_type || contentType === RIProposalVersion.content_type) {
+                    scope.views.proposal = view;
+                } else {
+                    scope.views.proposal = "default";
+                }
+            });
 
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
