@@ -1,10 +1,10 @@
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
-    class="mein-berlin-proposal-form"
+    class="mein-berlin-kiezkassen-proposal-form"
     name="meinBerlinProposalForm">
 
-    <div class="mein-berlin-proposal-form-upper">
+    <div class="mein-berlin-kiezkassen-proposal-form-upper">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | adhFormatError | translate }}</p>
         </div>
@@ -95,7 +95,7 @@
     </label>
 
     <!-- DATA SUBMIT -->
-    <footer class="form-footer mein-berlin-proposal-form-footer">
+    <footer class="form-footer mein-berlin-kiezkassen-proposal-form-footer">
         <input
             type="submit"
             name="submit"
