@@ -72,7 +72,7 @@ var EmbeddedCommentsPage = function(referer) {
     };
 
     this.getCommentAuthor = function(comment) {
-        return comment.element(by.css("adh-user-meta a")).getText();
+        return comment.element(by.css("adh-user-meta span")).getText();
     };
 
     this.getRateWidget = function(comment) {
