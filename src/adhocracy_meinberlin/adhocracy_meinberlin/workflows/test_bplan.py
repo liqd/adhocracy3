@@ -10,15 +10,9 @@ def app_anonymous(app_anonymous):
     return app_anonymous
 
 @fixture(scope='class')
-def app_participant(app_participant):
-    app_participant.base_path = '/organisation'
-    return app_participant
-
-
-@fixture(scope='class')
-def app_participant2(app_participant2):
-    app_participant2.base_path = '/organisation'
-    return app_participant2
+def app_anonymous(app_anonymous):
+    app_anonymous.base_path = '/organisation'
+    return app_anonymous
 
 
 @fixture(scope='class')
@@ -33,12 +27,6 @@ def app_admin(app_admin):
     return app_admin
 
 
-@fixture(scope='class')
-def app_god(app_god):
-    app_god.base_path = '/organisation'
-    return app_god
-
-
 @fixture
 def integration(config):
     config.include('adhocracy_core.events')
@@ -47,7 +35,25 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_includeme_add_sample_workflow(registry):
+def test_includeme_add_bplan_private_workflow(registry):
+    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    workflow = registry.content.workflows['bplan_private']
+    assert isinstance(workflow, AdhocracyACLWorkflow)
+
+
+@mark.usefixtures('integration')
+def test_initiate_bplan_private_workflow(registry, context):
+    from substanced.util import get_acl
+    workflow = registry.content.workflows['bplan_private']
+    assert workflow.state_of(context) is None
+    workflow.initialize(context)
+    assert workflow.state_of(context) is 'private'
+    local_acl = get_acl(context)
+    assert ('Deny', 'system.Anonymous', 'view') in local_acl
+
+
+@mark.usefixtures('integration')
+def test_includeme_add_bplan_workflow(registry):
     from adhocracy_core.workflows import AdhocracyACLWorkflow
     workflow = registry.content.workflows['bplan']
     assert isinstance(workflow, AdhocracyACLWorkflow)
@@ -88,48 +94,43 @@ class TestBPlanWorkflow:
         resp = app_initiator.get(path='/bplan')
         assert resp.status_code == 200
 
-    def test_draft_participant_cannot_view_process(self, app_participant):
-        resp = app_participant.get('/bplan')
+    def test_draft_anonymous_cannot_view_process(self, app_anonymous):
+        resp = app_anonymous.get('/bplan')
         assert resp.status_code == 403
 
-    def test_draft_participant_cannot_create_proposal(self, app_participant):
+    def test_draft_anonymous_cannot_create_proposal(self, app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposal
-        assert IProposal not in app_participant.get_postable_types('/bplan')
+        assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
-    def test_change_state_to_announce(self, app_initiator, app_god):
+    def test_change_state_to_announce(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/bplan', 'announce')
         assert resp.status_code == 200
 
-    def test_announce_participant_can_view_process(self, app_participant):
-        resp = app_participant.get('/bplan')
+    def test_announce_anonymous_can_view_process(self, app_anonymous):
+        resp = app_anonymous.get('/bplan')
         assert resp.status_code == 200
 
-    def test_participant_cannot_create_proposal(self, app_participant):
+    def test_anonymous_cannot_create_proposal(self, app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposal
-        assert IProposal not in app_participant.get_postable_types('/bplan')
+        assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
     def test_change_state_to_participate(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/bplan', 'participate')
         assert resp.status_code == 200
 
-    def test_participate_participant_creates_proposal(self, app_participant):
-        resp = _post_proposal_item(app_participant, path='/bplan',
+    def test_participate_anonymous_creates_proposal(self, app_anonymous):
+        resp = _post_proposal_item(app_anonymous, path='/bplan',
                                    name='proposal')
         assert resp.status_code == 200
 
-    def test_participate_participant_cannot_edit_his_own_proposal(self, app_participant):
+    def test_participate_anonymous_cannot_edit_proposal(self, app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposalVersion
-        assert IProposalVersion not in app_participant.get_postable_types(
+        assert IProposalVersion not in app_anonymous.get_postable_types(
             '/bplan/proposal')
 
-    def test_participate_participant_can_view_his_own_proposal(self,
-                                                               app_participant):
-        resp = app_participant.get(path='/bplan/proposal')
-        assert resp.status_code == 200
-
-    def test_participate_participant_cannot_view_proposal(self, app_participant2):
-        resp = app_participant2.get(path='/bplan/proposal')
-        assert resp.status_code == 404
+    def test_participate_anonymous_cannot_view_proposal(self, app_anonymous):
+        resp = app_anonymous.get(path='/bplan/proposal')
+        assert resp.status_code == 403
 
     def test_participate_initiator_can_view_proposal(self, app_initiator):
         resp = app_initiator.get(path='/bplan/proposal')
@@ -139,18 +140,14 @@ class TestBPlanWorkflow:
         resp = _do_transition_to(app_initiator, '/bplan', 'frozen')
         assert resp.status_code == 200
 
-    def test_frozen_participant_cannot_create_proposal(self, app_participant):
+    def test_frozen_anonymous_cannot_create_proposal(self, app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposal
-        assert IProposal not in app_participant.get_postable_types('/bplan')
+        assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
-    def test_frozen_initiator_can_view_proposal(self, app_participant2):
-        resp = app_participant2.get(path='/bplan/proposal')
+    def test_frozen_initiator_can_view_proposal(self, app_initiator):
+        resp = app_initiator.get(path='/bplan/proposal')
         assert resp.status_code == 200
 
-    def test_frozen_participant_can_view_process(self, app_participant):
-        resp = app_participant.get('/bplan')
-        assert resp.status_code == 200
-
-    def test_frozen_participant_cannot_view_proposal(self, app_participant2):
-        resp = app_participant2.get('/bplan/proposal')
-        assert resp.status_code == 404
+    def test_frozen_anonymous_cannot_view_proposal(self, app_anonymous):
+        resp = app_anonymous.get('/bplan/proposal')
+        assert resp.status_code == 403

@@ -17,20 +17,24 @@ bplan_meta = {
                      },
         'participate': {'title': 'Participate',
                         'description': '',
-                        'acm': {'principals': [                   'participant', 'moderator', 'creator', 'initiator'],  # noqa
+                        'acm': {'principals': [                   'anonymous', 'moderator', 'creator', 'initiator'],  # noqa
                                 'permissions':
-                                  [['create_proposal',            'Allow',        None,        None,      None],  # noqa
-                                   ['edit_proposal',               None,          None,        None,      None],  # noqa
+                                  [['create',                     'Allow',     'Allow',   'Allow',     'Allow'],  # noqa
+                                   ['create_proposal',            'Allow',      None,      None,        None],  # noqa
+                                   ['edit_proposal',               None,        None,      None,        None],  # noqa
                                    ]},
                         },
+        # FIXME disable view proposals
         'frozen': {'title': 'Frozen',
                    'description': '',
-                   'acm': {'principals': [                    'participant', 'moderator', 'creator', 'initiator'],  # noqa
+                   'acm': {'principals': [                    'anonymous', 'moderator', 'creator', 'initiator'],  # noqa
                            'permissions':
-                              [['create_proposal',             None,          None,        None,      None],  # noqa
-                               ['edit_proposal',               None,          None,        None,      None],  # noqa
+                              [['create',                      None,       'Allow',     'Allow',   'Allow'],  # noqa
+                               ['create_proposal',             None,        None,        None,      None],  # noqa
+                               ['edit_proposal',               None,        None,        None,      None],  # noqa
                                ]},
                    },
+        # FIXME disable view proposals
     },
     'transitions': {
         'to_announce': {'from_state': 'draft',
@@ -49,6 +53,22 @@ bplan_meta = {
 }
 
 
+bplan_private_meta = {
+    'states_order': ['private'],
+    'states': {
+        'private': {'title': 'Private',
+                    'description': 'Disable view for non admins.',
+                    'acm': {'principals': ['anonymous', 'participant'],  # noqa
+                            'permissions':
+                                [['view',  'Deny',      'Deny'],  # noqa
+                                 ]},
+                  },
+    },
+    'transitions': {},
+}
+
+
 def includeme(config):
     """Add workflow."""
     add_workflow(config.registry, bplan_meta, 'bplan')
+    add_workflow(config.registry, bplan_private_meta, 'bplan_private')

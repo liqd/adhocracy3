@@ -103,3 +103,37 @@ class TestWorkflowSheet:
         from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=meta.isheet)
         assert get_sheet(context, meta.isheet)
+
+class TestPrivateWorkflowSheet:
+
+    @fixture
+    def meta(self):
+        from .bplan import private_workflow_meta
+        return private_workflow_meta
+
+    def test_meta(self, meta):
+        from . import bplan
+        assert meta.isheet == bplan.IPrivateWorkflowAssignment
+        assert meta.schema_class == bplan.PrivateWorkflowAssignmentSchema
+        assert meta.permission_edit == 'do_transition'
+
+    def test_create(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+
+    @mark.usefixtures('integration')
+    def test_get_empty(self, meta, context, registry):
+        bplan_private_workflow = registry.content.get_workflow('bplan_private')
+        inst = meta.sheet_class(meta, context)
+        wanted = {'workflow': bplan_private_workflow,
+                  'workflow_state': None}
+        assert inst.get() == wanted
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)

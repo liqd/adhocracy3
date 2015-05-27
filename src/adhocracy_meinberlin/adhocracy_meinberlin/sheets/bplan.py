@@ -52,7 +52,26 @@ workflow_meta = workflow.workflow_meta._replace(
 )
 
 
+class IPrivateWorkflowAssignment(workflow.IWorkflowAssignment):
+
+    """Marker interface for the bplan private workflow assignment sheet."""
+
+
+class PrivateWorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
+
+    """Data structure the bplan private workflow assignment sheet."""
+
+    workflow_name = 'bplan_private'
+
+
+private_workflow_meta = workflow.workflow_meta._replace(
+    isheet=IPrivateWorkflowAssignment,
+    schema_class=PrivateWorkflowAssignmentSchema,
+)
+
+
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(proposal_meta, config.registry)
     add_sheet_to_registry(workflow_meta, config.registry)
+    add_sheet_to_registry(private_workflow_meta, config.registry)
