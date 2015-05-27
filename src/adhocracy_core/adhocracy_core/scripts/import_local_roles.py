@@ -15,7 +15,7 @@ from adhocracy_core.authorization import set_local_roles
 from pyramid.traversal import find_resource
 
 
-def import_local_roles():
+def import_local_roles():  # pragma: no cover
     """Import/set local roles from a JSON file.
 
     usage::
