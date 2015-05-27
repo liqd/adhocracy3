@@ -72,7 +72,7 @@ class TestImportUsers:
         assert new_password == old_password
 
     def teardown_method(self, method):
-        if self._tempfd is not None:
+        if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
 
     def _get_user_locator(self, context, registry):

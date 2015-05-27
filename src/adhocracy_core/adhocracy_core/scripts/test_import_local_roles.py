@@ -4,7 +4,7 @@ import os
 import json
 
 
-class TestImportLocalRoles:  # pragma: no cover
+class TestImportLocalRoles:
 
     def test_import_local_roles(self, registry):
         from adhocracy_core.scripts.import_local_roles import _import_local_roles
@@ -23,5 +23,5 @@ class TestImportLocalRoles:  # pragma: no cover
             {'initiators-treptow-koepenick': set(['role:initiator'])}
 
     def teardown_method(self, method):
-        if self._tempfd is not None:
+        if hasattr(self, 'tempfd'):
             os.close(self._tempfd)

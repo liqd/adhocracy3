@@ -70,5 +70,5 @@ class TestImportGroups:
         assert reviewers.roles == ['annotator']
 
     def teardown_method(self, method):
-        if self._tempfd is not None:
+        if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
