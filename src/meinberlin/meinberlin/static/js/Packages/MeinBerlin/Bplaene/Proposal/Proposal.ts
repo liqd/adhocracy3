@@ -26,7 +26,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    console.log("success");
+                    console.log("success");  // FIXME: post to server
 
                     if (typeof scope.onSuccess !== "undefined") {
                         scope.onSuccess();
