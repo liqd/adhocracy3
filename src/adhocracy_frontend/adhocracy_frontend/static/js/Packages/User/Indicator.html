@@ -6,9 +6,9 @@
     </div>
     <div data-ng-switch-default="">
         <div class="user-indicator-primary">
-            <i class="icon-user user-indicator-login-icon"></i> <a class="user-indicator-login" href="/login">{{ "TR__LOGIN" | translate }}</a>
+            <i class="icon-user user-indicator-login-icon"></i> <a class="user-indicator-login" href="" data-ng-click="logIn()">{{ "TR__LOGIN" | translate }}</a>
             {{ "TR__OR" | translate }}
-            <a class="user-indicator-register" href="/register">{{ 'TR__REGISTER' | translate }}</a>
+            <a class="user-indicator-register" href="" data-ng-click="register()">{{ 'TR__REGISTER' | translate }}</a>
         </div>
     </div>
 </div>

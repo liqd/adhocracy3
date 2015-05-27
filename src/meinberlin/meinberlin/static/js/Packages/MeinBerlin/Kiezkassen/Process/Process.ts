@@ -101,24 +101,24 @@ export var phaseHeaderDirective = (
                 scope.phases[3].startDate = resource.data[SIKiezkassenWorkflow.nick].result.start_date;
             });
 
-            // FIXME: dummy content
             scope.phases = [{
                 name: "announce",
                 title: "Information",
-                description: "Mit den Kiezkassen können Projekte vor Ort unterstützt werden und sollen das " +
-                "bürgerschaftliche Engagement fördern. Alle interessierte Bürger*innen können ab sofort sich " +
-                "beteiligen und Vorschläge einreichen. Die Bürgerversammlung findet am 04. Juni 2015 um 19 Uhr in der " +
-                "Nachbarschaftsgalerie der KungerKiez-Initiative e.V.. Karl-Kuhger- Straße 15, 12435 Berlin.",
+                description: "Ab dem Start der Ideensammlungsphase können alle interessierten Bürger*innen sich " +
+                    "beteiligen und Vorschläge für Projekte in der Bezirksregion einreichen, diskutieren und " +
+                    "bewerten. Am Ende der Ideensammlungsphase findet die Bürgerversammlung statt, wo Vorschläge " +
+                    "vor Ort eingereicht, vorgestellt und abgestimmt werden. In der Phase „Ergebnisse“ können alle " +
+                    "Interessierten die Vorschläge sehen, die realisiert werden.",
                 processType: "Kiezkasse",
                 votingAvailable: false,
                 commentAvailable: false
             }, {
                 name: "participate",
                 title: "Ideensammlung",
-                description: "Alle Interessierten werden aufgerufen Vorschläge für Projekte in der Bezirksregion " +
-                "zu machen. Die Angabe der Kosten soll bitte die Mehrwertsteuer enthalten. Vorschläge können aber " +
-                "auch noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge (offline und online) " +
-                "werden dann bei der Bürgerversammlung beschlossen.",
+                description: "Alle Interessierten werden aufgerufen, Vorschläge für Projekte in der Bezirksregion " +
+                    "zu machen. Die Angabe der Kosten soll die Mehrwertsteuer enthalten. Vorschläge können aber " +
+                    "auch noch offline in der Bürgerversammlung gemacht werden. Alle Vorschläge (offline und online) " +
+                    "werden dann bei der Bürgerversammlung beschlossen.",
                 processType: "Kiezkasse",
                 votingAvailable: true,
                 commentAvailable: true
@@ -126,18 +126,18 @@ export var phaseHeaderDirective = (
                 name: "frozen",
                 title: "Bürgerversammlung",
                 description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder " +
-                "bewertet werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle " +
-                "Vorschläge werden dann vor Ort vorgestellt und abgestimmt. Die Art und Weise der Abstimmung bestimmt " +
-                "die Bürgerversammlung selbst. Offline Vorschläge werden online eingereicht.",
+                    "bewertet werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle " +
+                    "Vorschläge werden dann vor Ort vorgestellt und abgestimmt. Die Art und Weise der Abstimmung bestimmt " +
+                    "die Bürgerversammlung selbst. Offline-Vorschläge werden online eingereicht.",
                 processType: "Kiezkasse",
                 votingAvailable: false,
                 commentAvailable: false
             }, {
                 name: "result",
                 title: "Ergebnisse",
-                description: "Nach der Prüfung vom zuständigen Fachamt des Bezirksamtes werden die Vorschläge, die " +
-                "realisiert werden und ggf. diejenigen, die nicht realisierbar sind, online markiert und angezeigt. " +
-                "Die Projekte müssen bis Mitte Dezember realisiert und abgerechnet werden.",
+                description: "In der Ergebnisphase wird dargestellt, welche Vorschläge realisiert werden. Diese " +
+                    "werden vom zuständigen Fachamt des Bezirksamtes, ggf. gemeinsam mit den Antragstellern, umgesetzt. " +
+                    "Die Projekte müssen bis Mitte Dezember realisiert und abgerechnet werden.",
                 processType: "Kiezkasse",
                 votingAvailable: false,
                 commentAvailable: false

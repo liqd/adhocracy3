@@ -39,6 +39,8 @@ test_requires = [
     'pytest-timeout',
     'coverage',
     'python-coveralls',
+    'babel',
+    'lingua',
 ]
 
 debug_requires = [

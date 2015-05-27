@@ -1,0 +1,50 @@
+# 
+# SOME DESCRIPTIVE TITLE
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2015-05-27 14:02+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.10\n"
+
+#. Default: [${site_name} Abuse Complaint
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:173
+msgid "mail_abuse_complaint_subject"
+msgstr ""
+
+#. Default: [${site_name}] Message from ${sender_name}: ${title}
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:206
+msgid "mail_sent_message_to_user_subject"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:210
+msgid "mail_sent_message_to_user_body_txt"
+msgstr ""
+
+#. Default: ${site_name}: Account Verification / Aktivierung Deines
+#. Nutzerkontos
+#: ././src/adhocracy_core/adhocracy_core/resources/principal.py:158
+msgid "mail_account_verification_subject"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/principal.py:162
+msgid "mail_account_verification_body_txt"
+msgstr ""
+
+#. Default: ${site_name}: Reset Password / Password neu setzen
+#: ././src/adhocracy_core/adhocracy_core/resources/subscriber.py:223
+msgid "mail_reset_password_subject"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/subscriber.py:226
+msgid "mail_reset_password_body_txt"
+msgstr ""

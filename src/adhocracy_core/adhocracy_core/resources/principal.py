@@ -8,6 +8,7 @@ from pyramid.registry import Registry
 from pyramid.settings import asbool
 from pyramid.traversal import find_resource
 from pyramid.request import Request
+from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
 from zope.interface import Attribute
 from zope.interface import Interface
@@ -32,6 +33,8 @@ import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.rate
 
+
+_ = TranslationStringFactory('adhocracy')
 
 logger = getLogger(__name__)
 
@@ -141,7 +144,7 @@ def send_registration_mail(context: IUser,
                                     'false')):
         context.activate()
         return
-    # TODO subject should be configurable
+    request = options.get('request', None)
     name = context.name
     email = context.email
     activation_path = _generate_activation_path()
@@ -152,21 +155,24 @@ def send_registration_mail(context: IUser,
     site_name = registry.settings.get('adhocracy.site_name', 'Adhocracy')
     frontend_url = registry.settings.get('adhocracy.frontend_url',
                                          'http://localhost:6551')
-    subject = ('%s: Account Verification / Aktivierung Deines Nutzerkontos'
-               % site_name)
-
-    args = {
-        'activation_path': activation_path,
-        'frontend_url': frontend_url,
-        'name': name,
-        'site_name': site_name,
-    }
+    subject = _('mail_account_verification_subject',
+                mapping={'site_name': site_name},
+                default='${site_name}: Account Verification / '
+                        'Aktivierung Deines Nutzerkontos')
+    body_txt = _('mail_account_verification_body_txt',
+                 mapping={'activation_path': activation_path,
+                          'frontend_url': frontend_url,
+                          'name': name,
+                          'site_name': site_name,
+                          },
+                 )
     try:
-        registry.messenger.render_and_send_mail(
+        registry.messenger.send_mail(
             subject=subject,
             recipients=[email],
-            template_asset_base='adhocracy_core:templates/registration_mail',
-            args=args)
+            body=body_txt,
+            request=request,
+        )
     except SMTPException as err:
         msg = 'Cannot send registration mail: {}'.format(str(err))
         raise_colander_style_error(
