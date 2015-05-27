@@ -16,6 +16,7 @@ export var createDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {},
         link: (scope, element) => {
             scope.errors = [];
             scope.data = {};
