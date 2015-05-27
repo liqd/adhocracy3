@@ -81,7 +81,6 @@ class TestImportUsers:
         if self._tempfd is not None:
             os.close(self._tempfd)
 
-
     def _get_user_locator(self, context, registry):
         request = Request.blank('/dummy')
         locator = registry.getMultiAdapter((context, request), IUserLocator)
