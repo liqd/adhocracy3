@@ -288,7 +288,12 @@ export var createPasswordResetDirective = (
 };
 
 
-export var indicatorDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
+export var indicatorDirective = (
+    adhConfig : AdhConfig.IService,
+    adhResourceArea : AdhResourceArea.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    $location : angular.ILocationService
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
@@ -304,6 +309,16 @@ export var indicatorDirective = (adhConfig : AdhConfig.IService, adhResourceArea
 
             $scope.logOut = () => {
                 adhUser.logOut();
+            };
+
+            $scope.logIn = () => {
+                adhTopLevelState.setCameFrom($location.path());
+                $location.url("/login");
+            };
+
+            $scope.register = () => {
+                adhTopLevelState.setCameFrom($location.path());
+                $location.url("/register");
             };
         }]
     };
@@ -559,7 +574,7 @@ export var register = (angular) => {
         .directive("adhCreatePasswordReset", [
             "adhConfig", "adhCredentials", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
-        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", indicatorDirective])
+        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", "adhTopLevelState", "$location", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
         .directive("adhUserDetailColumn", ["adhPermissions", "adhConfig", userDetailColumnDirective])
