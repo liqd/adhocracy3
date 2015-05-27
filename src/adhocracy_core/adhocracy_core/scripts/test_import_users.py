@@ -35,10 +35,10 @@ class TestImportUsers:
         with open(filename, 'w') as f:
             f.write(json.dumps([
                 {'name': 'Alice', 'email': 'alice@example.org',
-                 'password': 'weakpassword1', 'roles': ['contributor'],
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
                  'groups': ['gods']},
                 {'name': 'Bob', 'email': 'bob@example.org',
-                 'password': 'weakpassword2', 'roles': [], 'groups': []}
+                 'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
             ]))
 
         root = registry.content.create(IRootPool.__identifier__)
@@ -55,10 +55,10 @@ class TestImportUsers:
         with open(filename, 'w') as f:
             f.write(json.dumps([
                 {'name': 'Alice', 'email': 'alice@example.org',
-                 'password': 'weakpassword1', 'roles': ['contributor'],
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
                  'groups': ['gods']},
                 {'name': 'Bob', 'email': 'bob@example.org',
-                 'password': 'weakpassword2', 'roles': [], 'groups': []}
+                 'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
             ]))
         root = registry.content.create(IRootPool.__identifier__)
         users = find_service(root, 'principals', 'users')
@@ -69,7 +69,7 @@ class TestImportUsers:
         with open(filename, 'w') as f:
             f.write(json.dumps([
                 {'name': 'Alice', 'email': 'alice@example.org',
-                 'password': 'newpassword', 'roles': ['reader'],
+                 'initial-password': 'newpassword', 'roles': ['reader'],
                  'groups': ['gods']}]))
         _import_users(root, registry, filename)
         alice = locator.get_user_by_login('Alice')
