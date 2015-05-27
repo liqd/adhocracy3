@@ -75,7 +75,7 @@ class TestImportUsers:
         alice = locator.get_user_by_login('Alice')
         new_password = alice.password
         assert alice.roles == ['reader']
-        assert new_password != old_password
+        assert new_password == old_password
 
     def teardown_method(self, method):
         if self._tempfd is not None:
