@@ -12,7 +12,8 @@ omit =
     src/adhocracy/adhocracy/scaffolds/__init__
     src/adhocracy_*/adhocracy_*/__init__.py
     src/adhocracy_*/setup.py
-    src/adhocracy_*/adhocracy_*/scripts/*
+    src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/*
+    src/adhocracy_mercator/adhocracy_mercator/scripts/*
 source =
     src/adhocracy_core
     src/adhocracy_mercator
