@@ -2,12 +2,12 @@
 
 var shared = require("./shared.js");
 
-var annotatorName = "participant";
-var annotatorEmail = "participant@example.org";
-var annotatorPassword = "password";
+var participantName = "participant";
+var participantEmail = "participant@example.org";
+var participantPassword = "password";
 
-var contributorName = "moderator";
-var contributorPassword = "password";
+var otherParticipantName = "participant2";
+var otherParticipantPassword = "password";
 
 
 var LoginPage = function() {
@@ -116,12 +116,12 @@ var logout = function() {
     browser.waitForAngular();
 };
 
-var loginAnnotator = function() {
-    login(annotatorName, annotatorPassword);
+var loginParticipant = function() {
+    login(participantName, participantPassword);
 };
 
-var loginContributor = function() {
-    login(contributorName, contributorPassword);
+var loginOtherParticipant = function() {
+    login(otherParticipantName, otherParticipantPassword);
 };
 
 var UserPage = function() {
@@ -169,9 +169,9 @@ module.exports = {
     login: login,
     logout: logout,
     isLoggedIn: isLoggedIn,
-    annotatorName: annotatorName,
-    annotatorEmail: annotatorEmail,
-    annotatorPassword: annotatorPassword,
-    loginAnnotator: loginAnnotator,
-    loginContributor: loginContributor
+    participantName: participantName,
+    participantEmail: participantEmail,
+    participantPassword: participantPassword,
+    loginParticipant: loginParticipant,
+    loginOtherParticipant: loginOtherParticipant
 }

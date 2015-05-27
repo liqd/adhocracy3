@@ -22,13 +22,13 @@ var shared = require("./shared");
 
 describe("user login", function() {
     it("can login with username", function() {
-        UserPages.login(UserPages.annotatorName, UserPages.annotatorPassword);
+        UserPages.login(UserPages.participantName, UserPages.participantPassword);
         expect(UserPages.isLoggedIn()).toBe(true);
         UserPages.logout();
     });
 
     it("can login with email", function() {
-        UserPages.login(UserPages.annotatorEmail, UserPages.annotatorPassword);
+        UserPages.login(UserPages.participantEmail, UserPages.participantPassword);
         expect(UserPages.isLoggedIn()).toBe(true);
         UserPages.logout();
     });
@@ -52,7 +52,7 @@ describe("user login", function() {
     });
 
     /*it("login is persistent", function() {
-        UserPages.login(UserPages.annotatorName, UserPages.annotatorPassword);
+        UserPages.login(UserPages.participantName, UserPages.participantPassword);
         expect(UserPages.isLoggedIn()).toBe(true);
         browser.refresh();
         browser.waitForAngular();
@@ -66,7 +66,7 @@ describe("user password reset", function() {
         var mailsBeforeMessaging = fs.readdirSync(browser.params.mail.queue_path + "/new");
 
         var page = new UserPages.ResetPasswordCreatePage().get();
-        page.fill(UserPages.annotatorEmail);
+        page.fill(UserPages.participantEmail);
         expect(element(by.css(".login-success")).getText()).toContain("SPAM");
 
         var flow = browser.controlFlow();
@@ -87,7 +87,7 @@ describe("user password reset", function() {
         var page = new UserPages.ResetPasswordCreatePage().get();
         var resetUrl = "";
 
-        page.fill(UserPages.annotatorEmail);
+        page.fill(UserPages.participantEmail);
 
         var flow = browser.controlFlow();
         flow.execute(function() {
@@ -114,7 +114,7 @@ describe("user password reset", function() {
 
             // and can now login with the new password
             UserPages.logout();
-            UserPages.login(UserPages.annotatorEmail, 'new password');
+            UserPages.login(UserPages.participantEmail, 'new password');
             expect(UserPages.isLoggedIn()).toBe(true);
         });
     });

@@ -22,7 +22,7 @@ describe("user page", function() {
     });
 
     it("is possible to send a message", function() {
-        shared.loginContributor();
+        shared.loginOtherParticipant();
 
         var mailsBeforeMessaging =
             fs.readdirSync(browser.params.mail.queue_path + "/new");
@@ -61,7 +61,7 @@ describe("user page", function() {
                 // console.log('mail', mail);
                 expect(mail.text).toContain(content);
                 expect(mail.subject).toContain(subject);
-                expect(mail.from[0].address).toContain("moderator");
+                expect(mail.from[0].address).toContain("participant2");
                 expect(mail.to[0].address).toContain("participant");
             });
         });
