@@ -11,14 +11,14 @@ describe("user page", function() {
     it("displays the correct name for each user", function() {
         var usersListing = new UserPages.UsersListing().get();
 
-        var annotatorPage = usersListing.getUserPage("annotator");
-        expect(annotatorPage.getUserName()).toBe("annotator");
+        var annotatorPage = usersListing.getUserPage("participant");
+        expect(annotatorPage.getUserName()).toBe("participant");
 
-        var contributorPage = usersListing.getUserPage("contributor");
-        expect(contributorPage.getUserName()).toBe("contributor");
+        var contributorPage = usersListing.getUserPage("moderator");
+        expect(contributorPage.getUserName()).toBe("moderator");
 
-        var reviewerPage = usersListing.getUserPage("reviewer");
-        expect(reviewerPage.getUserName()).toBe("reviewer");
+        var reviewerPage = usersListing.getUserPage("admin");
+        expect(reviewerPage.getUserName()).toBe("admin");
     });
 
     it("is possible to send a message", function() {
@@ -28,7 +28,7 @@ describe("user page", function() {
             fs.readdirSync(browser.params.mail.queue_path + "/new");
 
         var usersListing = new UserPages.UsersListing();
-        var annotatorPage = usersListing.getUserPage("annotator");
+        var annotatorPage = usersListing.getUserPage("participant");
         var currentDate = Date.now().toString();
         var subject = "title" + currentDate;
         var content = "content" + currentDate;
@@ -61,8 +61,8 @@ describe("user page", function() {
                 // console.log('mail', mail);
                 expect(mail.text).toContain(content);
                 expect(mail.subject).toContain(subject);
-                expect(mail.from[0].address).toContain("contributor");
-                expect(mail.to[0].address).toContain("annotator");
+                expect(mail.from[0].address).toContain("moderator");
+                expect(mail.to[0].address).toContain("participant");
             });
         });
     });

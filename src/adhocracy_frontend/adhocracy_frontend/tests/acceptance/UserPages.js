@@ -2,11 +2,11 @@
 
 var shared = require("./shared.js");
 
-var annotatorName = "annotator";
-var annotatorEmail = "annotator@example.org";
+var annotatorName = "participant";
+var annotatorEmail = "participant@example.org";
 var annotatorPassword = "password";
 
-var contributorName = "contributor";
+var contributorName = "moderator";
 var contributorPassword = "password";
 
 
