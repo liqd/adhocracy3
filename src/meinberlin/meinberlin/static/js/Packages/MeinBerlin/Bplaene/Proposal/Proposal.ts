@@ -2,24 +2,16 @@
 
 import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhEmbed = require("../../../Embed/Embed");
-import AdhHttp = require("../../../Http/Http");
-import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhConfig = require("../../../Config/Config");
-import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
 
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
-    adhSubmitIfValid,
-    adhResourceUrlFilter
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
@@ -47,22 +39,10 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhPermissions.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
+            AdhResourceArea.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-create");
         }])
-        .directive("adhMeinBerlinBplaeneProposalCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            createDirective
-        ]);
+        .directive("adhMeinBerlinBplaeneProposalCreate", ["adhConfig", "adhShowError", "adhSubmitIfValid", createDirective]);
 };
