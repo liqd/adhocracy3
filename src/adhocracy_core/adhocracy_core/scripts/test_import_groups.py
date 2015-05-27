@@ -1,12 +1,7 @@
-from pyramid import testing
 from substanced.util import find_service
 from pytest import fixture
 from pytest import mark
-from unittest.mock import Mock
 from adhocracy_core.resources.root import IRootPool
-from pyramid.request import Request
-from adhocracy_core.interfaces import IResource
-from substanced.interfaces import IUserLocator
 from tempfile import mkstemp
 import os
 import json
