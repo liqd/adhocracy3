@@ -38,6 +38,26 @@ export var createDirective = (
 };
 
 
+export var embedDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Embed.html",
+        scope: {},
+        link: (scope) => {
+            scope.success = false;
+
+            scope.showSuccess = () => {
+                scope.success = true;
+            };
+            scope.showForm = () => {
+                scope.success = false;
+            };
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBplaeneProposal";
 
@@ -49,7 +69,8 @@ export var register = (angular) => {
             AdhResourceArea.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-create");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-embed");
         }])
-        .directive("adhMeinBerlinBplaeneProposalCreate", ["adhConfig", "adhShowError", "adhSubmitIfValid", createDirective]);
+        .directive("adhMeinBerlinBplaeneProposalCreate", ["adhConfig", "adhShowError", "adhSubmitIfValid", createDirective])
+        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", embedDirective]);
 };
