@@ -22,7 +22,7 @@ from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.principal import IUserExtended
 
 
-def import_users():
+def import_users():  # pragma: no cover
     """Import users from a JSON file.
 
     Already existing users will have their groups, roles and emails updated.
