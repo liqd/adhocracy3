@@ -44,7 +44,6 @@ export var meinBerlinWorkbenchDirective = (
             };
 
             scope.$watchGroup(["contentType", "view"], (values) => {
-                console.log(values);
                 var contentType = values[0];
                 var view = values[1];
 

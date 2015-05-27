@@ -2,10 +2,11 @@
 # SOME DESCRIPTIVE TITLE
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-05-26 21:43+0200\n"
+"POT-Creation-Date: 2015-05-27 15:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,15 +30,6 @@ msgstr ""
 msgid "mail_sent_message_to_user_body_txt"
 msgstr ""
 
-#. Default: {site_name}: Reset Password / Password neu setzen
-#: ././src/adhocracy_core/adhocracy_core/resources/subscriber.py:223
-msgid "mail_reset_password_subject"
-msgstr ""
-
-#: ././src/adhocracy_core/adhocracy_core/resources/subscriber.py:226
-msgid "mail_reset_password_body_txt"
-msgstr ""
-
 #. Default: ${site_name}: Account Verification / Aktivierung Deines
 #. Nutzerkontos
 #: ././src/adhocracy_core/adhocracy_core/resources/principal.py:158
@@ -46,4 +38,13 @@ msgstr ""
 
 #: ././src/adhocracy_core/adhocracy_core/resources/principal.py:162
 msgid "mail_account_verification_body_txt"
+msgstr ""
+
+#. Default: ${site_name}: Reset Password / Password neu setzen
+#: ././src/adhocracy_core/adhocracy_core/resources/subscriber.py:223
+msgid "mail_reset_password_subject"
+msgstr ""
+
+#: ././src/adhocracy_core/adhocracy_core/resources/subscriber.py:226
+msgid "mail_reset_password_body_txt"
 msgstr ""

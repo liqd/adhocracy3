@@ -165,6 +165,7 @@ def send_registration_mail(context: IUser,
                           'name': name,
                           'site_name': site_name,
                           },
+                 default='${activation_path}',
                  )
     try:
         registry.messenger.send_mail(

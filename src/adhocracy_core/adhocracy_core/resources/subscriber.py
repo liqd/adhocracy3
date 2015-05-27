@@ -222,9 +222,10 @@ def send_password_reset_mail(event):
                }
     subject = _('mail_reset_password_subject',
                 mapping=mapping,
-                default='{site_name}: Reset Password / Password neu setzen')
+                default='${site_name}: Reset Password / Password neu setzen')
     body = _('mail_reset_password_body_txt',
              mapping=mapping,
+             default='${reset_url}',
              )
     event.registry.messenger.send_mail(subject=subject,
                                        recipients=[user.email],
