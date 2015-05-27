@@ -16,7 +16,9 @@ export var createDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        scope: {},
+        scope: {
+            onSuccess: "=?"
+        },
         link: (scope, element) => {
             scope.errors = [];
             scope.data = {};
@@ -25,6 +27,10 @@ export var createDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     console.log("success");
+
+                    if (typeof scope.onSuccess !== "undefined") {
+                        scope.onSuccess();
+                    }
                 });
             };
         }
