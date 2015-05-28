@@ -30,6 +30,8 @@
     "TR__MEINBERLIN_MEIN_BERLIN_BPLAENE_SIMPLE_PROPOSAL": "Stellungsnahmeformular",
     "TR__MEINBERLIN_NAME": "Ihr Name",
     "TR__MEINBERLIN_STATEMENT": "Stellungsnahme",
+    "TR__MEINBERLIN_STATEMENT_PRIVACY" : "(Es kann nicht auf Ihr Benutzerkonto zurückgeschlossen werden)",
+    "TR__MEINBERLIN_STATEMENT_THANKS" : "Danke! Ihre Stellungsnahme wurde erfolgreich versandt! Eine Antwort bekommen Sie an Ihre Email Adresse."
     "TR__MEINBERLIN_STREET": "Straße, Hausnummer",
     "TR__MEINBERLIN_TITLE": "Titel Ihres Projektvorschlages",
     "TR__ON": "am",

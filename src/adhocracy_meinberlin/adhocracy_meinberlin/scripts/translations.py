@@ -35,6 +35,7 @@ def change_german_salutation():
 
     regexlist = [
         ('Bitte entschuldige', 'Bitte entschuldigen Sie'),
+        ('bekommst Du an Deine' , 'bekommen Sie an Ihre'),
         ('aktiviere', 'aktivieren Sie'),
         ('registrierst hast', 'registriert haben'),
         ('wechsle', 'wechseln Sie'),
