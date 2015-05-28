@@ -40,13 +40,13 @@ def import_resources():
 def _import_resources(context: IResource, registry: Registry, filename: str):
     resources_info = _load_resources_info(filename)
     for resource_info in resources_info:
-        resource_info = _resolve_sheets_resources(resource_info, context)
-        resource_info = _resolve_path(resource_info, context)
-        resource_info = _deserialize_content_type(resource_info, context)
         expected_path = _expected_path(resource_info)
         if _resource_exists(resource_info, context):
             print('Skipping {}.'.format(expected_path))
         else:
+            resource_info = _deserialize_content_type(resource_info, context)
+            resource_info = _resolve_path(resource_info, context)
+            resource_info = _deserialize_sheets(resource_info, registry, context)
             print('Creating {}'.format(expected_path))
             _create_resource(resource_info, context, registry)
     transaction.commit()
@@ -110,24 +110,22 @@ def _resolve_path(resource_info: dict, context: IResource) -> dict:
     return resource_info
 
 
-def _resolve_sheets_resources(resource_info: dict, context: IResource) -> dict:
-    resource_info['data'] = _resolve_value(resource_info['data'], context)
+def _deserialize_sheets(resource_info: dict, registry: Registry, context: IResource) -> dict:
+    request = Request.blank('/')
+    request.root = context
+    for interface, sheet_fields in resource_info['data'].items():
+        sheets = registry.content.get_sheets_create(context, iresource=resource_info['content_type'])
+        for sheet in sheets:
+            name = sheet.meta.isheet.__identifier__
+            if name in resource_info['data'].keys():  # pragma: no branch
+                sheet_data = sheet.schema.bind(registry=registry,
+                                               request=request,
+                                               context=context,
+                                               parent_pool=resource_info['parent']) \
+                                         .deserialize(resource_info['data'][name])
+                resource_info['data'][name] = sheet_data
+
     return resource_info
-
-
-def _resolve_value(value, context):
-    typ = type(value)
-    if typ == list:
-        return [_resolve_value(v, context) for v in value]
-    elif typ == dict:
-        for k, v in value.items():
-            value[k] = _resolve_value(v, context)
-        return value
-    elif typ == str and len(value) > 1 and value[0] == '/':
-        # assume path to a resource
-        return find_resource(context, value)
-    else:
-        return value
 
 
 def _load_resources_info(filename: str) -> [dict]:
