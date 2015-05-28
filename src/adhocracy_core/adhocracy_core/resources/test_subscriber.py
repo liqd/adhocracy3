@@ -522,11 +522,12 @@ class TestSendAcitvationMail:
         from .subscriber import send_activation_mail_or_activate_user
         return send_activation_mail_or_activate_user(event)
 
-    def test_create_activation_and_notify_user(self, event, mock_messenger):
+    def test_add_activation_path_and_notify_user(self, event, mock_messenger):
         self.call_fut(event)
         send_mail_call_args = mock_messenger.send_registration_mail.call_args[0]
         assert send_mail_call_args[0] == event.object
         assert send_mail_call_args[1].startswith('/activate/')
+        assert event.object.activation_path.startswith('/activate/')
 
     def test_activate_user_if_skip_settings_is_set(self, event, mock_messenger):
         event.registry.settings['adhocracy.skip_registration_mail'] = 'true'

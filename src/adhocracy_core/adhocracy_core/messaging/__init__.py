@@ -236,10 +236,9 @@ class Messenger():
         """Send a registration mail to validate the email of a user account."""
         name = user.name
         email = user.email
-        user.activation_path = activation_path
         # TODO: debug log needed? if so move to adhocracy_core.messaging
         logger.debug('Sending registration mail to %s for new user named %s, '
-                     'activation path=%s', email, name, user.activation_path)
+                     'activation path=%s', email, name, activation_path)
         site_name = self.registry.settings.get('adhocracy.site_name',
                                                'Adhocracy')
         frontend_url = self.registry.settings.get('adhocracy.frontend_url',
