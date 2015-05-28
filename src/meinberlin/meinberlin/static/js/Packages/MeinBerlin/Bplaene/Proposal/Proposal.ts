@@ -94,11 +94,11 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
-
-                    if (typeof scope.onSuccess !== "undefined") {
-                        scope.onSuccess();
-                    }
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path).then(() => {
+                        if (typeof scope.onSuccess !== "undefined") {
+                            scope.onSuccess();
+                        }
+                    });
                 });
             };
         }
