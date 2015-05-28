@@ -61,7 +61,9 @@ var postCreate = (
         statement: scope.data.statement
     });
 
-    return adhHttp.deepPost([proposal, proposalVersion]);
+    return adhHttp.deepPost([proposal, proposalVersion], {
+        noCredentials: true
+    });
 };
 
 
