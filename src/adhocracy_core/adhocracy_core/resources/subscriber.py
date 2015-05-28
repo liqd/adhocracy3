@@ -1,11 +1,14 @@
 """Autoupdate resources."""
+from base64 import b64encode
 from urllib.request import quote
 from collections import Sequence
 from logging import getLogger
+from os import urandom
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 from pyramid.request import Request
+from pyramid.settings import asbool
 from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
 
@@ -232,6 +235,32 @@ def send_password_reset_mail(event):
                                        body=body,
                                        )
 
+def send_activation_mail_or_activate_user(event):
+    """Send mail with activation link if a user is crated.
+
+    If the setting "adhocracy.skip_registration_mail" is true, no mail is send
+    but the user is activated directly.
+    """
+    settings = event.registry.settings
+    user = event.object
+    skip_mail = asbool(settings.get('adhocracy.skip_registration_mail', False))
+    if skip_mail:
+        user.activate()
+        return
+    activation_path = _generate_activation_path()
+    event.registry.messenger.send_registration_mail(user, activation_path)
+
+
+def _generate_activation_path() -> str:
+    random_bytes = urandom(18)
+    # TODO: not DRY, .resources.generate_name does almost the same
+    # We use '+_' as altchars since both are reliably recognized in URLs,
+    # even if they occur at the end. Conversely, '-' at the end of URLs is
+    # not recognized as part of the URL by some programs such as Thunderbird,
+    # and '/' might cause problems as well, especially if it occurs multiple
+    # times in a row.
+    return '/activate/' + b64encode(random_bytes, altchars=b'+_').decode()
+
 
 def autoupdate_tag_has_new_version(event):
     """Auto update last but not first tag if a reference has new version."""
@@ -261,6 +290,9 @@ def includeme(config):
                           ISheetReferenceNewVersion,
                           event_isheet=ITag)
     config.add_subscriber(user_created_and_added_subscriber,
+                          IResourceCreatedAndAdded,
+                          object_iface=IUser)
+    config.add_subscriber(send_activation_mail_or_activate_user,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
     config.add_subscriber(update_modification_date_modified_by,

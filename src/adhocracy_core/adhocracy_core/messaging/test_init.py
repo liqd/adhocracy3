@@ -11,6 +11,7 @@ def integration(config):
     config.include('pyramid_mailer.testing')
     config.include('pyramid_mako')
     config.include('adhocracy_core.content')
+    config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_core.messaging')
 
 
@@ -239,3 +240,34 @@ class TestSendMessageToUser():
         assert 'From: sender@example.org' in msgtext
         assert 'Subject: [Adhocracy] Message from Sandy Sender: Important Adhocracy notice' in msgtext
         assert 'To: recipient@example.org' in msgtext
+
+
+class TestSendRegistrationMail:
+
+    @fixture
+    def registry(self, config):
+        config.include('pyramid_mailer.testing')
+        return config.registry
+
+    @fixture
+    def inst(self, registry):
+        from . import Messenger
+        return Messenger(registry)
+
+    @fixture
+    def user(self):
+        user = testing.DummyResource(name = 'Anna Müller',
+                                     email = 'anna@example.org')
+        return user
+
+    def test_send_registration_mail(self, inst, registry, user, request_):
+        mailer = inst._get_mailer()
+        assert len(mailer.outbox) == 0
+        inst.send_registration_mail(user, '/activate/91X', request=request_)
+        assert len(mailer.outbox) == 1
+        msg = mailer.outbox[0]
+        # The DummyMailer is too stupid to use a default sender, hence we add
+        # one manually
+        msg.sender = 'support@unconfigured.domain'
+        text = str(msg.to_message())
+        assert '/activate/91X' in text

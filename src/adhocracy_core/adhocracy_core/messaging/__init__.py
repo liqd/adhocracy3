@@ -14,6 +14,7 @@ from pyramid.threadlocal import get_current_request
 from pyramid.i18n import TranslationStringFactory
 
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.utils import get_sheet_field
@@ -229,6 +230,37 @@ class Messenger():
                                                   'http://localhost:6551')
         sender_path = resource_path(user)
         return '%s/r%s/' % (frontend_url, sender_path)
+
+    def send_registration_mail(self, user: IUser, activation_path: str,
+                               request: Request=None):
+        """Send a registration mail to validate the email of a user account."""
+        name = user.name
+        email = user.email
+        user.activation_path = activation_path
+        # TODO: debug log needed? if so move to adhocracy_core.messaging
+        logger.debug('Sending registration mail to %s for new user named %s, '
+                     'activation path=%s', email, name, user.activation_path)
+        site_name = self.registry.settings.get('adhocracy.site_name',
+                                               'Adhocracy')
+        frontend_url = self.registry.settings.get('adhocracy.frontend_url',
+                                                  'http://localhost:6551')
+        subject = _('mail_account_verification_subject',
+                    mapping={'site_name': site_name},
+                    default='${site_name}: Account Verification / '
+                            'Aktivierung Deines Nutzerkontos')
+        body_txt = _('mail_account_verification_body_txt',
+                     mapping={'activation_path': activation_path,
+                              'frontend_url': frontend_url,
+                              'name': name,
+                              'site_name': site_name,
+                              },
+                     default='${activation_path}',
+                     )
+        self.send_mail(subject=subject,
+                       recipients=[email],
+                       body=body_txt,
+                       request=request,
+                       )
 
 
 def includeme(config):

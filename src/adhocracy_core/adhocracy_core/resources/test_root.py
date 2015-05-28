@@ -28,6 +28,7 @@ def test_add_platform():
 
 @fixture
 def integration(config):
+    config.include('pyramid_mailer.testing')
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.changelog')
