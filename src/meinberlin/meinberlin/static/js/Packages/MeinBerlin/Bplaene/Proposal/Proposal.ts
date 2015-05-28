@@ -2,28 +2,23 @@
 
 import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhEmbed = require("../../../Embed/Embed");
-import AdhHttp = require("../../../Http/Http");
-import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhConfig = require("../../../Config/Config");
-import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
 
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
-    adhSubmitIfValid,
-    adhResourceUrlFilter
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            onSuccess: "=?"
+        },
         link: (scope, element) => {
             scope.errors = [];
             scope.data = {};
@@ -31,13 +26,37 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    console.log("success");
+                    console.log("success");  // FIXME: post to server
+
+                    if (typeof scope.onSuccess !== "undefined") {
+                        scope.onSuccess();
+                    }
                 });
             };
         }
     };
 };
 
+
+export var embedDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Embed.html",
+        scope: {},
+        link: (scope) => {
+            scope.success = false;
+
+            scope.showSuccess = () => {
+                scope.success = true;
+            };
+            scope.showForm = () => {
+                scope.success = false;
+            };
+        }
+    };
+};
 
 
 export var moduleName = "adhMeinBplaeneProposal";
@@ -47,22 +66,11 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhPermissions.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
+            AdhResourceArea.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-create");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-embed");
         }])
-        .directive("adhMeinBerlinBplaeneProposalCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            createDirective
-        ]);
+        .directive("adhMeinBerlinBplaeneProposalCreate", ["adhConfig", "adhShowError", "adhSubmitIfValid", createDirective])
+        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", embedDirective]);
 };
