@@ -423,7 +423,8 @@ export class Service {
             "/activate"
         ];
 
-        if (!_.includes(denylist, path)) {
+        // FIXME: DefinitelyTyped
+        if (!(<any>_).includes(denylist, path)) {
             this.cameFrom = path;
             return true;
         } else {
