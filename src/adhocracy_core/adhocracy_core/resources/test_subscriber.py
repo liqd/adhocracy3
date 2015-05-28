@@ -391,8 +391,8 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def call_fut(self, event):
         from adhocracy_core.resources.subscriber import\
-            user_created_and_added_subscriber
-        return user_created_and_added_subscriber(event)
+            add_default_group_to_user
+        return add_default_group_to_user(event)
 
     def test_default_group_exists_and_no_group_set(
             self, registry, principals, event, mock_sheet, mock_user_locator):

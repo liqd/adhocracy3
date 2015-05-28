@@ -60,7 +60,7 @@ def update_modification_date_modified_by(event):
               )
 
 
-def user_created_and_added_subscriber(event):
+def add_default_group_to_user(event):
     """Add default group to user if no group is set."""
     group = _get_default_group(event.object)
     if group is None:  # ease testing
@@ -235,6 +235,7 @@ def send_password_reset_mail(event):
                                        body=body,
                                        )
 
+
 def send_activation_mail_or_activate_user(event):
     """Send mail with activation link if a user is crated.
 
@@ -289,7 +290,7 @@ def includeme(config):
     config.add_subscriber(autoupdate_tag_has_new_version,
                           ISheetReferenceNewVersion,
                           event_isheet=ITag)
-    config.add_subscriber(user_created_and_added_subscriber,
+    config.add_subscriber(add_default_group_to_user,
                           IResourceCreatedAndAdded,
                           object_iface=IUser)
     config.add_subscriber(send_activation_mail_or_activate_user,
