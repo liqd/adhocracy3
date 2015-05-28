@@ -2,7 +2,6 @@
 from collections.abc import Sequence
 from logging import getLogger
 
-from pkg_resources import resource_exists
 from pyramid.registry import Registry
 from pyramid.renderers import render
 from pyramid.settings import asbool
@@ -94,62 +93,6 @@ class Messenger:
         else:
             self.mailer.send_immediately(message)
 
-    def render_and_send_mail(self,
-                             subject: str,
-                             recipients: Sequence,
-                             template_asset_base: str,
-                             args: dict={},
-                             request: Request=None,
-                             sender: str=None):
-        """Render a message from a template and send it as mail.
-
-        The message can contain just a plain text part, an HTML part, or both,
-        depending on the templates provided. For example, if you set
-        ``template_asset_base`` to 'adhocracy_core:templates/sample', the file
-        'adhocracy_core:templates/sample.txt.mako' (if it exists) will be used
-        to render the plain text view, and
-        'adhocracy_core:templates/sample.html.mako' (if it exists) will be
-        used to render the HTML view. If neither file exists, a ValueError is
-        thrown.
-
-        Template files are parsed by `Mako <http://www.makotemplates.org/>`,
-        see
-        `Mako Syntax <http://docs.makotemplates.org/en/latest/syntax.html>`.
-
-        :param subject: the subject of the message
-        :param recipients: non-empty list of the email addresses of recipients
-        :param template_asset_base: the base name of template file(s) to use,
-            in format: ``packagename:path/to/file``
-        :param args: dictionary of arguments to pass to the renderer
-        :param sender: the email message of the sender; if None, the configured
-            default sender address will be used
-        :param request: the current request object, if None
-            pyramid.threadlocal.get_current_request is used
-        :raise ConnectionError: if no connection to the configured mail server
-            can be established
-        :raise smtplib.SMTPException: if the mail cannot be sent because the
-            target mail server doesn't exist or rejects the connection
-        """
-        # TODO Adapt the _resource_exists check to make it work with Pyramid
-        # asset overriding, cf.
-        # http://docs.pylonsproject.org/docs/pyramid/en/latest/narr/assets.html#overriding-assets
-        package, path = template_asset_base.split(':', 1)
-        if resource_exists(package, path + '.txt.mako'):
-            body = render(template_asset_base + '.txt.mako', args)
-        else:
-            body = None
-        if resource_exists(package, path + '.html.mako'):
-            html = render(template_asset_base + '.html.mako', args)
-        else:
-            html = None
-        return self.send_mail(subject=subject,
-                              recipients=recipients,
-                              sender=sender,
-                              body=body,
-                              html=html,
-                              request=request,
-                              )
-
     def send_abuse_complaint(self, url: str, remark: str,
                              user: IResource=None, request: Request=None):
         """Send an abuse complaint to the preconfigured abuse handler.
@@ -163,21 +106,22 @@ class Messenger:
         if user is not None:
             user_name = self._get_user_name(user)
             user_url = self._get_user_url(user)
-        args = {'url': url,
-                'remark': remark,
-                'user_name': user_name,
-                'user_url': user_url}
+        kwargs = {'url': url,
+                  'remark': remark,
+                  'user_name': user_name,
+                  'user_url': user_url}
         subject = _('mail_abuse_complaint_subject',
                     mapping={'site_name': self.site_name},
                     default='[${site_name} Abuse Complaint')
+        body = render('adhocracy_core:templates/abuse_complaint.txt.mako',
+                      kwargs)
         # FIXME For security reasons, we should check that the url starts
         # with one of the prefixes where frontends are supposed to be running
-        self.render_and_send_mail(
-            subject=subject,
-            recipients=[self.abuse_handler_mail],
-            template_asset_base='adhocracy_core:templates/abuse_complaint',
-            request=request,
-            args=args)
+        self.send_mail(subject=subject,
+                       recipients=[self.abuse_handler_mail],
+                       body=body,
+                       request=request,
+                       )
 
     def send_message_to_user(self,
                              recipient: IResource,

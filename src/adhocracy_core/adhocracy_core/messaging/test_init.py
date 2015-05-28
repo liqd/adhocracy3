@@ -83,61 +83,6 @@ class TestSendMailToQueue():
         assert len(mailer.outbox) == 0
 
 
-@mark.usefixtures('integration')
-class TestRenderAndSendMail:
-
-    @fixture
-    def mock_localizer(self, request_):
-        localizer = Mock()
-        localizer.translate = lambda x: x
-        request_.localizer = localizer
-        return localizer
-
-    @fixture
-    def mock_resource_exists(self, monkeypatch):
-        exists = Mock()
-        monkeypatch.setattr('adhocracy_core.messaging.resource_exists', exists)
-        return exists
-
-    @fixture
-    def mock_render(self, monkeypatch):
-        render = Mock()
-        monkeypatch.setattr('adhocracy_core.messaging.render', render)
-        return render
-
-    def test_render_and_send_mail_both_templates_exist(self, registry, request_,
-                                                       mock_resource_exists,
-                                                       mock_render,
-                                                       mock_localizer):
-        mock_resource_exists.return_value = True
-        registry.messenger.render_and_send_mail(
-            subject='Test mail',
-            recipients=['user@example.org'],
-            template_asset_base='adhocracy_core:foo',
-            request=request_,
-            args={'name': 'value'})
-        assert mock_resource_exists.call_count == 2
-        assert mock_resource_exists.call_args == (
-            ('adhocracy_core', 'foo.html.mako'),)
-        assert mock_render.call_count == 2
-        assert mock_render.call_args == (
-            ('adhocracy_core:foo.html.mako', {'name': 'value'}),)
-
-    def test_render_and_send_mail_no_template_exist(self, registry, request_,
-                                                    mock_resource_exists,
-                                                    mock_render):
-        mock_resource_exists.return_value = False
-        with raises(ValueError):
-            registry.messenger.render_and_send_mail(
-                subject='Test mail',
-                recipients=['user@example.org'],
-                template_asset_base='adhocracy_core:foo',
-                request=request_,
-                args={'name': 'value'})
-        assert mock_resource_exists.call_count == 2
-        assert not mock_render.called
-
-
 def _msg_to_str(msg):
     """Convert an email message into a string."""
     # The DummyMailer is too stupid to use a default sender, hence we add
