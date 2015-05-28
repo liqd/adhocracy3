@@ -25,7 +25,7 @@ Server
 The routing is done on the client.  However, the server still needs to
 serve the frontend code on all valid URLs.  The existing rules already
 cover quite a lot.  If you want to add another rule (basically if you
-want to add another *space*, see below) you need to edit
+want to add another *area*, see below) you need to edit
 ``src/adhocracy_frontend/adhocracy_frontend/__init__.py`` or the
 corresponding file in a customization package.  Simply add a line like
 this to :py:func:`includeme`::
