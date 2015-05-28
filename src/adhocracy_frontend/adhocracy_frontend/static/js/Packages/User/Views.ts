@@ -288,7 +288,12 @@ export var createPasswordResetDirective = (
 };
 
 
-export var indicatorDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
+export var indicatorDirective = (
+    adhConfig : AdhConfig.IService,
+    adhResourceArea : AdhResourceArea.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    $location : angular.ILocationService
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
@@ -304,6 +309,16 @@ export var indicatorDirective = (adhConfig : AdhConfig.IService, adhResourceArea
 
             $scope.logOut = () => {
                 adhUser.logOut();
+            };
+
+            $scope.logIn = () => {
+                adhTopLevelState.setCameFrom($location.path());
+                $location.url("/login");
+            };
+
+            $scope.register = () => {
+                adhTopLevelState.setCameFrom($location.path());
+                $location.url("/register");
             };
         }]
     };
@@ -457,7 +472,6 @@ export var userMessageDirective = (adhConfig : AdhConfig.IService, adhHttp : Adh
 
 
 export var userDetailColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhPermissions : AdhPermissions.Service,
     adhConfig : AdhConfig.IService
 ) => {
@@ -466,7 +480,7 @@ export var userDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["userUrl"]);
+            column.bindVariablesAndClear(scope, ["userUrl"]);
             adhPermissions.bindScope(scope, adhConfig.rest_url + "/message_user", "messageOptions");
         }
     };
@@ -474,7 +488,6 @@ export var userDetailColumnDirective = (
 
 
 export var userListingColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
 ) => {
     return {
@@ -482,7 +495,7 @@ export var userListingColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserListingColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["userUrl"]);
+            column.bindVariablesAndClear(scope, ["userUrl"]);
         }
     };
 };
@@ -561,9 +574,9 @@ export var register = (angular) => {
         .directive("adhCreatePasswordReset", [
             "adhConfig", "adhCredentials", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
-        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", indicatorDirective])
+        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", "adhTopLevelState", "$location", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
-        .directive("adhUserDetailColumn", ["adhBindVariablesAndClear", "adhPermissions", "adhConfig", userDetailColumnDirective])
-        .directive("adhUserListingColumn", ["adhBindVariablesAndClear", "adhConfig", userListingColumnDirective]);
+        .directive("adhUserDetailColumn", ["adhPermissions", "adhConfig", userDetailColumnDirective])
+        .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective]);
 };

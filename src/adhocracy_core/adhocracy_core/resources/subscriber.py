@@ -6,6 +6,7 @@ from logging import getLogger
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 from pyramid.request import Request
+from pyramid.i18n import TranslationStringFactory
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import IResource
@@ -37,6 +38,8 @@ from adhocracy_core.sheets.tags import ITag
 
 
 logger = getLogger(__name__)
+
+_ = TranslationStringFactory('adhocracy')
 
 
 def update_modification_date_modified_by(event):
@@ -85,7 +88,7 @@ def _get_user_groups(user: IUser, registry: Registry):
 def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
     sheet = get_sheet(user, IPermissions)
     groups = sheet.get()['groups']
-    groups.append(group)
+    groups = groups + [group]
     sheet.set({'groups': groups})
 
 
@@ -208,22 +211,26 @@ def autoupdate_non_versionable_has_new_version(event):
 def send_password_reset_mail(event):
     """Send mail with reset password link if a reset resource is created."""
     site_name = event.registry.settings.get('adhocracy.site_name', '')
-    subject = '{0}: Reset Password / Password neu setzen'.format(site_name)
-    template = 'adhocracy_core:templates/reset_password_mail'
     user = get_sheet_field(event.object, IMetadata, 'creator')
     frontend_url = event.registry.settings.get('adhocracy.frontend_url', '')
     path = resource_path(event.object)
     path_quoted = quote(path, safe='')
-    args = {'reset_url': '{0}/password_reset/?path={1}'.format(frontend_url,
-                                                               path_quoted),
-            'name': user.name,
-            'site_name': site_name,
-            }
-    event.registry.messenger.render_and_send_mail(subject=subject,
-                                                  recipients=[user.email],
-                                                  template_asset_base=template,
-                                                  args=args,
-                                                  )
+    mapping = {'reset_url': '{0}/password_reset/?path={1}'.format(frontend_url,
+                                                                  path_quoted),
+               'name': user.name,
+               'site_name': site_name,
+               }
+    subject = _('mail_reset_password_subject',
+                mapping=mapping,
+                default='${site_name}: Reset Password / Password neu setzen')
+    body = _('mail_reset_password_body_txt',
+             mapping=mapping,
+             default='${reset_url}',
+             )
+    event.registry.messenger.send_mail(subject=subject,
+                                       recipients=[user.email],
+                                       body=body,
+                                       )
 
 
 def autoupdate_tag_has_new_version(event):

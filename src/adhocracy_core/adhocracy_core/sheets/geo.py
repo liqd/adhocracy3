@@ -8,6 +8,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import AdhocracySequenceNode
 
 
 class WebMercatorLongitude(colander.SchemaNode):
@@ -51,43 +52,31 @@ class Point(colander.TupleSchema):
     y = WebMercatorLatitude()
 
 
-class LineString(colander.SequenceSchema):
+class LineString(AdhocracySequenceNode):
 
     """List of geographical points on the earth."""
 
+    missing = []
+
     point = Point()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:  # pragma: no branch
-            self.default = []
-            self.missing = []
 
-
-class Polygon(colander.SequenceSchema):
+class Polygon(AdhocracySequenceNode):
 
     """List of geographical lines on the earth."""
 
+    missing = []
+
     line = LineString()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:  # pragma: no branch
-            self.default = []
-            self.missing = []
 
-
-class MultiPolygon(colander.SequenceSchema):
+class MultiPolygon(AdhocracySequenceNode):
 
     """List of geographical polygons on the earth."""
 
-    polygon = Polygon()
+    missing = []
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:  # pragma: no branch
-            self.default = []
-            self.missing = []
+    polygon = Polygon()
 
 
 class IMultiPolygon(ISheet):

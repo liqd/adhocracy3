@@ -486,12 +486,16 @@ class TestSendPasswordResetMail:
         registry.content.get_sheet.return_value = mock_sheet
         event.object.__name__ = '/reset'
         self.call_fut(event)
-        send_mail = registry.messenger.render_and_send_mail
+        send_mail = registry.messenger.send_mail
         assert send_mail.call_args[1]['recipients'] == ['test@test.de']
-        assert 'Reset' in send_mail.call_args[1]['subject']
-        assert send_mail.call_args[1]['args']['name'] == 'user name'
-        assert send_mail.call_args[1]['args']['reset_url'] ==\
-               'http://front.end/password_reset/?path=%252Freset'
+        assert send_mail.call_args[1]['subject'] ==\
+               'mail_reset_password_subject'
+        assert send_mail.call_args[1]['body'] == \
+               'mail_reset_password_body_txt'
+        assert send_mail.call_args[1]['body'].mapping ==\
+            {'name': 'user name',
+             'site_name': 'sitename',
+             'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
 
 
 @fixture()

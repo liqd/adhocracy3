@@ -6,6 +6,7 @@ import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 import AdhPermissions = require("../../../Permissions/Permissions");
 
@@ -24,15 +25,40 @@ var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
 
 export var meinBerlinWorkbenchDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["processUrl"]);
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("contentType", scope));
+
+            scope.views = {
+                process: "default",
+                proposal: "default",
+                comment: "default"
+            };
+
+            scope.$watchGroup(["contentType", "view"], (values) => {
+                var contentType = values[0];
+                var view = values[1];
+
+                if (contentType === RIKiezkassenProcess.content_type) {
+                    scope.views.process = view;
+                } else {
+                    scope.views.process = "default";
+                }
+
+                if (contentType === RIProposal.content_type || contentType === RIProposalVersion.content_type) {
+                    scope.views.proposal = view;
+                } else {
+                    scope.views.proposal = "default";
+                }
+            });
 
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
@@ -47,7 +73,6 @@ export var meinBerlinWorkbenchDirective = (
 };
 
 export var commentColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
 ) => {
     return {
@@ -55,13 +80,12 @@ export var commentColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["proposalUrl", "commentableUrl"]);
+            column.bindVariablesAndClear(scope, ["proposalUrl", "commentableUrl"]);
         }
     };
 };
 
 export var kiezkassenProposalDetailColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
 ) => {
@@ -70,14 +94,13 @@ export var kiezkassenProposalDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenProposalDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["processUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
         }
     };
 };
 
 export var kiezkassenProposalCreateColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
 ) => {
     return {
@@ -85,13 +108,12 @@ export var kiezkassenProposalCreateColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["processUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl"]);
         }
     };
 };
 
 export var kiezkassenProposalEditColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
 ) => {
     return {
@@ -99,13 +121,12 @@ export var kiezkassenProposalEditColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenProposalEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["processUrl", "proposalUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
         }
     };
 };
 
 export var kiezkassenDetailColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
 ) => {
     return {
@@ -113,7 +134,7 @@ export var kiezkassenDetailColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["processUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl"]);
             scope.shared = column.$scope.shared;
             scope.showMap = (isShowMap) => {
                 scope.shared.isShowMap = isShowMap;
@@ -123,16 +144,14 @@ export var kiezkassenDetailColumnDirective = (
 };
 
 export var kiezkassenDetailAnnounceColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
 ) => {
-    var directive = kiezkassenDetailColumnDirective(bindVariablesAndClear, adhConfig);
+    var directive = kiezkassenDetailColumnDirective(adhConfig);
     directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/KiezkassenDetailAnnounceColumn.html";
     return directive;
 };
 
 export var kiezkassenEditColumnDirective = (
-    bindVariablesAndClear : AdhMovingColumns.IBindVariablesAndClear,
     adhConfig : AdhConfig.IService
 ) => {
     return {
@@ -140,7 +159,7 @@ export var kiezkassenEditColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/KiezkassenEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            bindVariablesAndClear(scope, column, ["processUrl"]);
+            column.bindVariablesAndClear(scope, ["processUrl"]);
         }
     };
 };
@@ -156,7 +175,8 @@ export var register = (angular) => {
             AdhMeinBerlinKiezkassenProposal.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
-            AdhResourceArea.moduleName
+            AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
@@ -164,11 +184,11 @@ export var register = (angular) => {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .default(RIKiezkassenProcess, "edit_process", RIKiezkassenProcess.content_type, "", {
+                .default(RIKiezkassenProcess, "edit", RIKiezkassenProcess.content_type, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIKiezkassenProcess, "edit_process", RIKiezkassenProcess.content_type, "", [
+                .specific(RIKiezkassenProcess, "edit", RIKiezkassenProcess.content_type, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIKiezkassenProcess) => {
                         return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                             if (!options.PUT) {
@@ -261,18 +281,12 @@ export var register = (angular) => {
                 return $q.when("<adh-mein-berlin-workbench></adh-mein-berlin-workbench>");
             }];
         }])
-        .directive("adhMeinBerlinWorkbench", ["adhBindVariablesAndClear", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhBindVariablesAndClear", "adhConfig", commentColumnDirective])
-        .directive("adhMeinBerlinKiezkassenProposalDetailColumn", [
-            "adhBindVariablesAndClear", "adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
-        .directive("adhMeinBerlinKiezkassenProposalCreateColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalCreateColumnDirective])
-        .directive("adhMeinBerlinKiezkassenProposalEditColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenProposalEditColumnDirective])
-        .directive("adhMeinBerlinKiezkassenDetailColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailColumnDirective])
-        .directive("adhMeinBerlinKiezkassenDetailAnnounceColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenDetailAnnounceColumnDirective])
-        .directive("adhMeinBerlinKiezkassenEditColumn", [
-            "adhBindVariablesAndClear", "adhConfig", kiezkassenEditColumnDirective]);
+        .directive("adhMeinBerlinWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
+        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
+        .directive("adhMeinBerlinKiezkassenProposalDetailColumn", ["adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
+        .directive("adhMeinBerlinKiezkassenProposalCreateColumn", ["adhConfig", kiezkassenProposalCreateColumnDirective])
+        .directive("adhMeinBerlinKiezkassenProposalEditColumn", ["adhConfig", kiezkassenProposalEditColumnDirective])
+        .directive("adhMeinBerlinKiezkassenDetailColumn", ["adhConfig", kiezkassenDetailColumnDirective])
+        .directive("adhMeinBerlinKiezkassenDetailAnnounceColumn", ["adhConfig", kiezkassenDetailAnnounceColumnDirective])
+        .directive("adhMeinBerlinKiezkassenEditColumn", ["adhConfig", kiezkassenEditColumnDirective]);
 };

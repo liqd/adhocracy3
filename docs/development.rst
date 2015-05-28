@@ -227,3 +227,22 @@ Apply a hotfix to an old release::
 
 There is more to tags, such as deleting and signing.  See `git tag
 --help`.
+
+
+Update translations backend
+---------------------------
+
+create new language::
+
+   bin/i18n en
+
+extract message ids, update po and create mo files::
+
+   bin/i18n
+
+compile custom po file in extension package::
+
+    cd src/adhocracy_meinberlin/adhocracy_meinberlin/locale/en/LC_MESSAGES/
+    msgfmt --statistics -o adhocracy.mo adhocracy.po
+
+#TODO helper script that updates/compiles all po files

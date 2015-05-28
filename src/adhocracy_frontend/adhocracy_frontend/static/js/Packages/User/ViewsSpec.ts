@@ -184,7 +184,7 @@ export var register = () => {
                 };
                 adhResourceAreaMock = jasmine.createSpyObj("adhResourceArea", ["has"]);
                 adhResourceAreaMock.has.and.returnValue(false);
-                directive = AdhUserViews.indicatorDirective(adhConfigMock, adhResourceAreaMock);
+                directive = AdhUserViews.indicatorDirective(adhConfigMock, adhResourceAreaMock, null, null);
             });
 
             describe("controller", () => {

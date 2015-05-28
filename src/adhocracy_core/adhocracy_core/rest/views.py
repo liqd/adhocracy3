@@ -794,7 +794,7 @@ class MetaApiView(RESTView):
                 readonly = getattr(node, 'readonly', False)
 
                 if issubclass(valuetype, References):
-                    empty_appstruct = node.default
+                    empty_appstruct = node.bind().default
                     containertype = empty_appstruct.__class__.__name__
                     typ = to_dotted_name(AbsolutePath)
                 elif isinstance(node, SequenceSchema):
