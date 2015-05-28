@@ -80,11 +80,11 @@ would be ``/r/some/path``.
 
 Much like ``adhTopLevelState``, the resource area only provides an
 infrastructure.  You need to configure what the state should be based on
-*resource type*, *view* and *process type*.
+*resource type*, *view*, *process type* and *embed context*.
 
-While the resource type can be deduced from the path, view and process
-type are new concepts. *Process type* will be discussed later in this
-document.
+While the resource type can be deduced from the path, view, process type
+and embed context are new concepts. *Process type* and *embed context*
+will be discussed later in this document.
 
 *Views* allow to have multiple routes to a single resource.  So while
 ``/r/some/path`` might point to a detail view of the resource,
@@ -115,6 +115,15 @@ roles and permissions for that subtree.
 In the frontend it also defines which template should be used.  The
 directive ``adhProcessView`` is used to render that template.  It is
 currently used in the resource area's content space.
+
+Embed Context
+-------------
+
+For a general discussion of embedding, see :ref:`Embedding`.
+
+When entering adhocracy through the embed area, an embed context is
+defined. This changes how the resource area behaves. For example there
+might be a different template or different routes.
 
 Conclusion
 ----------
