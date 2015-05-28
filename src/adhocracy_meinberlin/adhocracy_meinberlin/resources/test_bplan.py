@@ -30,6 +30,8 @@ class TestProposal:
         assert meta.item_type == resources.bplan.IProposalVersion
         assert meta.permission_create == 'create_proposal'
         assert meta.extended_sheets == [sheets.bplan.IPrivateWorkflowAssignment]
+        assert meta.use_autonaming
+
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

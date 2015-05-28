@@ -36,6 +36,8 @@ proposal_meta = item_meta._replace(
     permission_create='create_proposal',
     extended_sheets=[
         adhocracy_meinberlin.sheets.bplan.IPrivateWorkflowAssignment],
+    use_autonaming=True,
+    autonaming_prefix='PROPOSAL_',
 )
 
 
