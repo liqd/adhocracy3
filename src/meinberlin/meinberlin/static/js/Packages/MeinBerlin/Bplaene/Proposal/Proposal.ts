@@ -110,7 +110,9 @@ export var embedDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Embed.html",
-        scope: {},
+        scope: {
+            path: "@"
+        },
         link: (scope) => {
             scope.success = false;
 
