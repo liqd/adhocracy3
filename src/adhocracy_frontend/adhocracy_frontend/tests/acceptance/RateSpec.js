@@ -8,7 +8,7 @@ describe("ratings", function() {
     var page;
 
     beforeEach(function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
         page = new EmbeddedCommentsPage("c1").get();
     });
 
@@ -36,11 +36,11 @@ describe("ratings", function() {
     });
 
     it("is not affected by the edition of the comment", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
         var page = new EmbeddedCommentsPage("c2");
         page.getUrl().then(function() {
             // at this point annotator may not be logged
-            // if we don't add the first shared.loginAnnotator();
+            // if we don't add the first shared.loginParticipant();
             // even if the same call is performed by the beforeEach
             // function?!
             var comment = page.createComment("c4");
