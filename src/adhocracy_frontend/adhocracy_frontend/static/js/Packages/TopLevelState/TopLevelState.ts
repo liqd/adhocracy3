@@ -410,20 +410,26 @@ export class Service {
         }, space);
     }
 
-    // FIXME: {set,get}CameFrom should be worked into the class
-    // doc-comment, but I don't feel I understand that comment well
-    // enough to edit it.  (also, the entire toplevelstate thingy will
-    // be refactored soon in order to get state mgmt with link support
-    // right.  see /docs/source/api/frontend-state.rst)
-    //
-    // Open problem: if the user navigates away from the, say, login,
-    // and the cameFrom stack will never be cleaned up...  how do we
-    // clean it up?
+    // FIXME: There currently is no real concept for cameFrom
 
     private cameFrom : string;
 
-    public setCameFrom(path : string) : void {
-        this.cameFrom = path;
+    public setCameFrom(path : string) : boolean {
+        var denylist = [
+            "/login",
+            "/register",
+            "/password_reset",
+            "/create_password_reset",
+            "/activate"
+        ];
+
+        // FIXME: DefinitelyTyped
+        if (!(<any>_).includes(denylist, path)) {
+            this.cameFrom = path;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public getCameFrom() : string {
