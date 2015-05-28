@@ -24,7 +24,7 @@ logger = getLogger(__name__)
 _ = TranslationStringFactory('adhocracy')
 
 
-class Messenger():
+class Messenger:
 
     """Send messages to other people."""
 
@@ -34,13 +34,15 @@ class Messenger():
         :param registry: used to retrieve and configure the mailer
         """
         self.registry = registry
-        self.use_mail_queue = asbool(registry.settings.get(
-            'adhocracy.use_mail_queue', 'false'))
+        settings = registry.settings
+        self.use_mail_queue = asbool(settings.get('adhocracy.use_mail_queue',
+                                                  False))
         logger.debug('Messenger will use mail queue: %s', self.use_mail_queue)
-        self.abuse_handler_mail = registry.settings.get(
-            'adhocracy.abuse_handler_mail')
-        self.message_user_subject = registry.settings.get(
-            'adhocracy.message_user_subject')
+        self.abuse_handler_mail = settings.get('adhocracy.abuse_handler_mail')
+        self.site_name = settings.get('adhocracy.site_name', 'Adhocracy')
+        self.frontend_url = settings.get('adhocracy.frontend_url',
+                                         'http://localhost:6551')
+        self.mailer = registry.getUtility(IMailer)
 
     def send_mail(self,
                   subject: str,
@@ -74,7 +76,7 @@ class Messenger():
         if not (body or html):
             raise ValueError('Email has neither body nor html')
         request = request or get_current_request()
-        if request is not None:  # ease testing
+        if request:  # ease testing
             translate = request.localizer.translate
             subject = subject and translate(subject)
             body = body and translate(body)
@@ -83,15 +85,14 @@ class Messenger():
                           sender=sender,
                           recipients=recipients,
                           body=body,
-                          html=html)
-        mailer = self._get_mailer()
+                          html=html,
+                          )
+        debug_msg = 'Sending message "{0}" from {1} to {2} with body:\n{3}'
+        logger.debug(debug_msg.format(subject, sender, recipients, body))
         if self.use_mail_queue:
-            mailer.send_to_queue(message)
+            self.mailer.send_to_queue(message)
         else:
-            mailer.send_immediately(message)
-
-    def _get_mailer(self) -> IMailer:
-        return self.registry.getUtility(IMailer)
+            self.mailer.send_immediately(message)
 
     def render_and_send_mail(self,
                              subject: str,
@@ -157,22 +158,17 @@ class Messenger():
         :param remark: explanation provided by the complaining user
         :param user: the complaining user, or `None` if not logged in
         """
-        assert self.abuse_handler_mail, 'No abuse handler mail specified!'
-        logger.debug('Sending abuse complaint about %s', url)
+        user_name = None
+        user_url = None
         if user is not None:
             user_name = self._get_user_name(user)
             user_url = self._get_user_url(user)
-        else:
-            user_name = None
-            user_url = None
         args = {'url': url,
                 'remark': remark,
                 'user_name': user_name,
                 'user_url': user_url}
-        site_name = self.registry.settings.get('adhocracy.site_name',
-                                               'Adhocracy')
         subject = _('mail_abuse_complaint_subject',
-                    mapping={'site_name': site_name},
+                    mapping={'site_name': self.site_name},
                     default='[${site_name} Abuse Complaint')
         # FIXME For security reasons, we should check that the url starts
         # with one of the prefixes where frontends are supposed to be running
@@ -193,13 +189,9 @@ class Messenger():
         """Send a message to a specific user."""
         from_email = self._get_user_email(from_user)
         recipient_email = self._get_user_email(recipient)
-        logger.debug('Sending message entitled "%s" from %s to %s', title,
-                     from_email, recipient_email)
         sender_name = self._get_user_name(from_user)
         sender_url = self._get_user_url(from_user)
-        site_name = self.registry.settings.get('adhocracy.site_name',
-                                               'Adhocracy')
-        mapping = {'site_name': site_name,
+        mapping = {'site_name': self.site_name,
                    'sender_name': sender_name,
                    'sender_url': sender_url,
                    'title': title,
@@ -210,7 +202,7 @@ class Messenger():
                             '${title}')
         body = _('mail_sent_message_to_user_body_txt',
                  mapping=mapping,
-                 )
+                 default='${text}')
         self.send_mail(
             subject=subject,
             recipients=[recipient_email],
@@ -226,37 +218,25 @@ class Messenger():
         return get_sheet_field(user, IUserBasic, 'name', self.registry)
 
     def _get_user_url(self, user: IResource)-> str:
-        frontend_url = self.registry.settings.get('adhocracy.frontend_url',
-                                                  'http://localhost:6551')
         sender_path = resource_path(user)
-        return '%s/r%s/' % (frontend_url, sender_path)
+        return '%s/r%s/' % (self.frontend_url, sender_path)
 
     def send_registration_mail(self, user: IUser, activation_path: str,
                                request: Request=None):
         """Send a registration mail to validate the email of a user account."""
-        name = user.name
-        email = user.email
-        # TODO: debug log needed? if so move to adhocracy_core.messaging
-        logger.debug('Sending registration mail to %s for new user named %s, '
-                     'activation path=%s', email, name, activation_path)
-        site_name = self.registry.settings.get('adhocracy.site_name',
-                                               'Adhocracy')
-        frontend_url = self.registry.settings.get('adhocracy.frontend_url',
-                                                  'http://localhost:6551')
         subject = _('mail_account_verification_subject',
-                    mapping={'site_name': site_name},
+                    mapping={'site_name': self.site_name},
                     default='${site_name}: Account Verification / '
                             'Aktivierung Deines Nutzerkontos')
         body_txt = _('mail_account_verification_body_txt',
                      mapping={'activation_path': activation_path,
-                              'frontend_url': frontend_url,
-                              'name': name,
-                              'site_name': site_name,
+                              'frontend_url': self.frontend_url,
+                              'name': user.name,
+                              'site_name': self.site_name,
                               },
-                     default='${activation_path}',
-                     )
+                     default='${activation_path}')
         self.send_mail(subject=subject,
-                       recipients=[email],
+                       recipients=[user.email],
                        body=body_txt,
                        request=request,
                        )
