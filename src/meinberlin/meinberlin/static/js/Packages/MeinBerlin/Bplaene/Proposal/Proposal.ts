@@ -17,7 +17,7 @@ import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/ver
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
 
 
-interface IScope extends angular.IScope {
+export interface IScope extends angular.IScope {
     path : string;
     data : {
         name : string;
@@ -40,7 +40,7 @@ var postCreate = (
 ) => (
     scope : IScope,
     poolPath : string
-) => {
+) : angular.IPromise<any> => {
     var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
     proposal.parent = poolPath;
     // FIXME: dummy name
