@@ -12,6 +12,7 @@ from pytest import mark
 from pytest import fixture
 
 
+
 def test_principals_meta():
     from .principal import principals_meta
     from .principal import IPrincipalsService
@@ -476,6 +477,19 @@ class TestGroupsAndRolesFinder:
 class TestIntegrationSendRegistrationMail:
 
     @fixture
+    def request_(self, registry):
+        request = testing.DummyRequest()
+        request.registry = registry
+        return request
+
+    @fixture
+    def mock_localizer(self, request_):
+        localizer = Mock()
+        localizer.translate = lambda x: x
+        request_.localizer = localizer
+        return localizer
+
+    @fixture
     def sample_user(self):
         from zope.interface import directlyProvides
         from adhocracy_core.resources.principal import User
@@ -487,11 +501,13 @@ class TestIntegrationSendRegistrationMail:
         return user
 
     @mark.usefixtures('integration')
-    def test_send_registration_mail_successfully(self, registry, sample_user):
+    def test_send_registration_mail_successfully(self, registry, sample_user,
+                                                 request_):
         from adhocracy_core.resources.principal import send_registration_mail
         mailer = registry.messenger._get_mailer()
         assert len(mailer.outbox) == 0
-        send_registration_mail(context=sample_user, registry=registry)
+        send_registration_mail(context=sample_user, registry=registry,
+                               options={'request': request_})
         assert sample_user.activation_path.startswith('/activate/')
         assert len(mailer.outbox) == 1
         msg = mailer.outbox[0]
@@ -499,7 +515,7 @@ class TestIntegrationSendRegistrationMail:
         # one manually
         msg.sender = 'support@unconfigured.domain'
         msgtext = str(msg.to_message())
-        assert sample_user.activation_path in msgtext
+        assert 'activate' in msgtext
 
     @mark.usefixtures('integration')
     def test_send_registration_mail_smtp_error(self, registry, sample_user):
@@ -508,7 +524,7 @@ class TestIntegrationSendRegistrationMail:
         from adhocracy_core.messaging import Messenger
         from adhocracy_core.resources.principal import send_registration_mail
         mock_messenger = Mock(spec=Messenger)
-        mock_messenger.render_and_send_mail = Mock(
+        mock_messenger.send_mail = Mock(
             side_effect=SMTPException('bad luck'))
         registry.messenger = mock_messenger
         with raises(Invalid) as err_info:

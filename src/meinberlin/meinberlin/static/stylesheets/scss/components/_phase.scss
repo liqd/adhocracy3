@@ -48,6 +48,7 @@ category: Widgets
     &.is-active .tab-button {
         background: $color-background-base-introvert;
         color: $color-text-highlight-introvert;
+        font-size: $font-size-small;
         top: 0;
         margin: 0;
         padding-top: 0;

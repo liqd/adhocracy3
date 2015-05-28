@@ -17,7 +17,7 @@ from adhocracy_core.schema import ContentType
 from substanced.interfaces import IUserLocator
 
 
-def import_resources():
+def import_resources():  # pragma: no cover
     """Import resources from a JSON file.
 
     usage::

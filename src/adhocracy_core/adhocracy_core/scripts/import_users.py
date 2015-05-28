@@ -18,11 +18,11 @@ from pyramid.request import Request
 from substanced.interfaces import IUserLocator
 from substanced.util import find_service
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.sheets.principal import IPasswordAuthentication
+# from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.principal import IUserExtended
 
 
-def import_users():
+def import_users():  # pragma: no cover
     """Import users from a JSON file.
 
     Already existing users will have their groups, roles and emails updated.
@@ -74,8 +74,8 @@ def _update_user(user: IUser, user_info: dict, groups: IResource):
     permissions_sheet = get_sheet(user, IPermissions)
     permissions_sheet.set({'roles': user_info['roles'],
                            'groups': user_groups})
-    password_sheet = get_sheet(user, IPasswordAuthentication)
-    password_sheet.set({'password': user_info['password']})
+    # password_sheet = get_sheet(user, IPasswordAuthentication)
+    # password_sheet.set({'password': user_info['password']})
 
 
 def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
@@ -93,7 +93,7 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
                  adhocracy_core.sheets.principal.IPermissions.__identifier__:
                  {'roles': user_info['roles'], 'groups': groups},
                  adhocracy_core.sheets.principal.IPasswordAuthentication.
-                 __identifier__: {'password': user_info['password']},
+                 __identifier__: {'password': user_info['initial-password']},
                  }
     user = registry.content.create(IUser.__identifier__,
                                    users,

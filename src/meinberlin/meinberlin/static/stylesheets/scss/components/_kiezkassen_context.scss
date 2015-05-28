@@ -1,5 +1,6 @@
 .mein-berlin-keizkassen-context-header {
     @include clearfix;
+    margin-bottom: 10px / $font-size-normal * 1em;
     margin-top: 2px;
 
     .user-indicator {

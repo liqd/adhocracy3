@@ -1,13 +1,13 @@
 <div data-adh-moving-columns="" class="moving-columns">
     <adh-moving-column>
-        <adh-mein-berlin-kiezkassen-detail-column data-ng-if="currentPhase !== 'announce' && view !== 'edit_process'"></adh-mein-berlin-kiezkassen-detail-column>
-        <adh-mein-berlin-kiezkassen-detail-announce-column data-ng-if="currentPhase === 'announce' && view !== 'edit_process'"></adh-mein-berlin-kiezkassen-detail-announce-column>
-        <adh-mein-berlin-kiezkassen-edit-column data-ng-if="view === 'edit_process'"></adh-mein-berlin-kiezkassen-edit-column>
+        <adh-mein-berlin-kiezkassen-detail-column data-ng-if="currentPhase !== 'announce' && views.process !== 'edit'"></adh-mein-berlin-kiezkassen-detail-column>
+        <adh-mein-berlin-kiezkassen-detail-announce-column data-ng-if="currentPhase === 'announce' && views.process !== 'edit'"></adh-mein-berlin-kiezkassen-detail-announce-column>
+        <adh-mein-berlin-kiezkassen-edit-column data-ng-if="views.process === 'edit'"></adh-mein-berlin-kiezkassen-edit-column>
     </adh-moving-column>
     <adh-moving-column>
-        <adh-mein-berlin-kiezkassen-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mein-berlin-kiezkassen-proposal-create-column>
-        <adh-mein-berlin-kiezkassen-proposal-edit-column data-ng-if="view === 'edit'"></adh-mein-berlin-kiezkassen-proposal-edit-column>
-        <adh-mein-berlin-kiezkassen-proposal-detail-column data-ng-if="view !== 'create_proposal' && view !== 'edit'"></adh-mein-berlin-kiezkassen-proposal-detail-column>
+        <adh-mein-berlin-kiezkassen-proposal-create-column data-ng-if="views.process === 'create_proposal'"></adh-mein-berlin-kiezkassen-proposal-create-column>
+        <adh-mein-berlin-kiezkassen-proposal-edit-column data-ng-if="views.proposal === 'edit'"></adh-mein-berlin-kiezkassen-proposal-edit-column>
+        <adh-mein-berlin-kiezkassen-proposal-detail-column data-ng-if="views.process !== 'create_proposal' && views.proposal !== 'edit'"></adh-mein-berlin-kiezkassen-proposal-detail-column>
     </adh-moving-column>
     <adh-moving-column>
         <adh-comment-column></adh-comment-column>

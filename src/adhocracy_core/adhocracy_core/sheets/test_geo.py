@@ -23,7 +23,7 @@ class TestMultiPolygonSchema:
     @fixture
     def inst(self):
         from .geo import MultiPolygonSchema
-        return MultiPolygonSchema()
+        return MultiPolygonSchema().bind()
 
     def test_create(self, inst):
         from .geo import MultiPolygon

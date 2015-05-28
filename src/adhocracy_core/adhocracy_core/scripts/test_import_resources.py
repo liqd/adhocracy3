@@ -54,6 +54,7 @@ class TestImportResources:
         assert IOrganisation.providedBy(root['alt-treptow'])
         assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
 
+
     def test_import_resources_invalid_data(self, registry):
         from adhocracy_core.scripts.import_resources import _import_resources
         import colander
@@ -73,6 +74,7 @@ class TestImportResources:
         root = registry.content.create(IRootPool.__identifier__)
         with pytest.raises(colander.Invalid):
             _import_resources(root, registry, filename)
+
 
     def test_import_resources_already_exists(self, registry):
         from adhocracy_core.scripts.import_resources import _import_resources
