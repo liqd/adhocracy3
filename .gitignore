@@ -67,3 +67,4 @@ src/meinberlin/meinberlin/build/
 .fontcustom-manifest.json
 RELEASE-VERSION
 *-requirements.txt
+/src/Mako/
