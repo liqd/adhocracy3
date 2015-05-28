@@ -134,6 +134,25 @@ class TestImportResources:
         god = root['principals']['users'].values()[0]
         assert get_sheet_field(root['alt-treptow'], IMetadata, 'creator') == god
 
+    def test_import_resource_create_group(self, registry):
+        from adhocracy_core.scripts.import_resources import _import_resources
+
+        (self._tempfd, filename) = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {"path": "/principals/groups",
+                 "content_type": "adhocracy_core.resources.principal.IGroup",
+                 "data": {"adhocracy_core.sheets.name.IName":
+                          {"name": "moderators-abc"},
+                          "adhocracy_core.sheets.principal.IGroup":
+                          {"roles": ["creator", "initiator"]}
+                 }
+                }
+
+            ]))
+        root = registry.content.create(IRootPool.__identifier__)
+        _import_resources(root, registry, filename)
+
     def test_get_resource_info_name(self):
         from adhocracy_core.scripts.import_resources import _get_resource_info_name
 
