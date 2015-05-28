@@ -422,8 +422,21 @@ export class Service {
 
     private cameFrom : string;
 
-    public setCameFrom(path : string) : void {
-        this.cameFrom = path;
+    public setCameFrom(path : string) : boolean {
+        var denylist = [
+            "/login",
+            "/register",
+            "/password_reset",
+            "/create_password_reset",
+            "/activate"
+        ];
+
+        if (!_.includes(denylist, path)) {
+            this.cameFrom = path;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public getCameFrom() : string {
