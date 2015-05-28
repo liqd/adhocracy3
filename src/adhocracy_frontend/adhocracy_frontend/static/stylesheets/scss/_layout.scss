@@ -165,13 +165,13 @@ depends on a lot of factors:
     }
 }
 
-.l-header-wrapper {
+.l-header {
     @include clearfix;
     margin: 0 auto;
     position: relative;
 }
 
-.l-header-wrapper,
+.l-header,
 .l-header-center {
     @extend %moving-column-single-width;
 }
