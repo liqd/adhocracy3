@@ -60,7 +60,7 @@ For testing, we import the needed stuff and start the Adhocracy testapp::
 
 We need a pool with an asset pool::
 
-    >>> data = {'content_type': 'adhocracy_core.resources.asset.IPoolWithAssets',
+    >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...        'data': {'adhocracy_core.sheets.name.IName': {
     ...                     'name':  'ProposalPool'}}}
     >>> resp_data = testapp.post_json(rest_url + '/adhocracy', data,

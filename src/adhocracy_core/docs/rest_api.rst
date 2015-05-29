@@ -28,7 +28,7 @@ Resource structure
 ------------------
 
 Resources have one content interface to set its type, like
-"adhocracy_core.resources.pool.IBasicPool".
+"adhocracy_core.resources.organisation.IOrganisation".
 
 Terminology: we refer to content interfaces and the objects specified
 by content interfaces as "resources"; resources consist of "sheets"
@@ -37,33 +37,40 @@ interfaces.
 
 Every Resource has multiple sheets that define schemata to set/get data.
 
-There are 4 main types of resources:
+There are 5 base types of resources:
 
-* Pool: folder content in the object hierarchy, can contain other Pools
-  (subfolders) and Items of any kind.
-* Item (old name: FubelVersions-Pool): base class of any versionable items,
-  such as Proposals, Documents, Sections etc. Contains a list of
-  ItemVersions, sub-Items (e.g. Sections within Documents), and meta-data
-  such as Tags.
-* ItemVersion (old name: Versionable-Fubel): a specific version of a
-  versionable item, e.g. a ProposalVersion, DocumentVersion, or
-  SectionVersion.
-* Simple: Base class of anything that is neither versionable nor a
-  container (old name: any Fubel that is not a Versionable-Fubel).  For
-  versionables, use Item instead; for non-versionable containers, use Pool
-  instead.
+* `Pool`: folder in the resource hierarchy, can contain other Pools of any kind.
 
-A frequently used derived type is:
+* `Item`: container Pool for ItemVersions of a specific type that belong to the
+  same DAG (TODO: add DAG term to glossary), `Tag`s for these Versions and
+  `Sub-Items` that are closely related (e.g. Sections within Documents)
 
-* Tag: a subtype of Simple, points to one (or sometimes zero or many)
+* `ItemVersion`: a specific version of an item (SectionVersion, DocumentVersion)
+
+* `Simple`: Anything that is neither versionable/item nor a pool.
+
+* `Tag`: a subtype of Simple, points to one (or sometimes zero or many)
   ItemVersion, e.g. the current HEAD or the last APPROVED version of a
-  Document (old name: Tag-Fubel). Can be modified but doesn't have its own
+  Document. Can be modified but doesn't have its own
   version history, hence it's a Simple instead of an Item.
+
+To model the application domain we  have some frequently use derived types with
+semantically meaning::
+
+* `Organisation`: a subtype of Pool to do basic structuring for the resource
+                  hierarchy. Typical subtypes are other Organisations or
+                  `Process`.
+
+* `Process`: a subtype of Pool to add configuration and resources for a specific
+             participation process. Typical subtypes are `Proposal`s
+
+* `Proposal`:  a subtype of Item, this is normally content created by participants
+               during a paticipation process.
 
 Example resource hierarchy::
 
-    Pool:         categories
-    Simple:       categories/blue
+    Pool:         locations
+    Simple:       locations/berlin
 
     Pool:         proposals
     Item:         proposals/proposal1
@@ -106,15 +113,15 @@ The "resources" key points to an object whose keys are all the resources
 (content types) defined by the system::
 
     >>> sorted(resp_data['resources'].keys())
-    [...'adhocracy_core.resources.pool.IBasicPool', ...'adhocracy_core.resources.sample_section.ISection'...]
+    [...'adhocracy_core.resources.organisation.IOrganisation'...]
 
 Each of these keys points to an object describing the resource. If the
 resource implements sheets (and a resource that doesn't would be
 rather useless!), the object will have a "sheets" key whose value is a list
 of the sheets implemented by the resource::
 
-    >>> basicpool_desc = resp_data['resources']['adhocracy_core.resources.pool.IBasicPool']
-    >>> sorted(basicpool_desc['sheets'])
+    >>> organisation_desc = resp_data['resources']['adhocracy_core.resources.organisation.IOrganisation']
+    >>> sorted(organisation_desc['sheets'])
     ['adhocracy_core.sheets.metadata.IMetadata', 'adhocracy_core.sheets.name.IName', 'adhocracy_core.sheets.pool.IPool'...]
 
 In addition we get the listing of resource super types (excluding IResource)::
@@ -135,8 +142,8 @@ have an "element_types" key whose value is the list of all resources the
 pool/item can contain (including the "item_type" if it's an item). For
 example, a pool can contain other pools; a section can contain tags. ::
 
-    >>> basicpool_desc['element_types']
-    ['adhocracy_core.interfaces.IPool'...]
+    >>> organisation_desc['element_types']
+    [...adhocracy_core.resources.process.IProcess...
     >>> sorted(section_desc['element_types'])
     ['adhocracy_core.interfaces.ITag', ...'adhocracy_core.resources.sample_section.ISectionVersion'...]
 
@@ -277,7 +284,7 @@ If the current user has the right to post new versions of the resource or
 add new details to it, the "request_body" sub-key returned for POST points
 to a array of stub views of allowed requests::
 
-    >>> data_post_pool = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    >>> data_post_pool = {'content_type': 'adhocracy_core.resources.organisation.IOrganisation',
     ...                   'data': {'adhocracy_core.sheets.metadata.IMetadata': {},
     ...                            'adhocracy_core.sheets.title.ITitle': {},
     ...                            'adhocracy_core.sheets.name.IName': {}}}
@@ -319,7 +326,7 @@ HEAD
 Returns only http headers::
 
     >>> resp = testapp.head(rest_url + "/adhocracy")
-    >>> resp.headerlist # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> resp.headerlist
     [...('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
     ''
@@ -345,20 +352,18 @@ POST
 
 Create a new resource ::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-    ...         'data': {
-    ...              'adhocracy_core.sheets.name.IName': {
-    ...                  'name': 'Proposals'}}}
+    >>> prop = {'content_type': 'adhocracy_core.resources.process.IProcess',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", prop, headers=god_header).json
     >>> resp_data["content_type"]
-    'adhocracy_core.resources.pool.IBasicPool'
+    'adhocracy_core.resources.process.IProcess'
 
 The response object has 3 top-level entries:
 
 * The content type and the path of the new resource::
 
       >>> resp_data['content_type']
-      'adhocracy_core.resources.pool.IBasicPool'
+      'adhocracy_core.resources.process.IProcess'
       >>> resp_data['path']
       '.../adhocracy/Proposals/'
 
@@ -371,7 +376,7 @@ The response object has 3 top-level entries:
   transaction::
 
       >>> resp_data['updated_resources']['created']
-      ['http://localhost/adhocracy/Proposals/']
+      [...'http://localhost/adhocracy/Proposals/'...
 
   The subkey 'modified' lists any resources that have been modified::
 
@@ -436,7 +441,7 @@ FIXME: ... is not working anymore in this doctest
 
 The normal return code is 200 ::
 
-    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
 
 .. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data, headers=god_header)

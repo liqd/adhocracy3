@@ -6,11 +6,11 @@ from substanced.objectmap import ObjectMap
 from substanced.util import set_acl
 from substanced.util import find_service
 
-from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import pool_meta
-from adhocracy_core.resources.pool import IBasicPool
+from adhocracy_core.resources.organisation import IOrganisation
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
@@ -106,20 +106,20 @@ def _add_acl_to_app_root(context, registry):
     set_god_all_permissions(context, registry)
 
 
-def add_platform(context, registry, platform_id=None,
-                 resource_type: IResource=IBasicPool):
-    """Register the platform in the content registry."""
-    if platform_id is None:
-        platform_id = registry.settings.get('adhocracy.platform_id',
-                                            'adhocracy')
-    appstructs = {'adhocracy_core.sheets.name.IName': {'name': platform_id}}
-    registry.content.create(resource_type.__identifier__, context,
-                            appstructs=appstructs, registry=registry)
+def add_example_process(context: IPool, registry: Registry, options: dict):
+    """Add example organisation and process."""
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'adhocracy'}}
+    registry.content.create(IOrganisation.__identifier__,
+                            parent=context,
+                            appstructs=appstructs)
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'process'}}
+    registry.content.create(IProcess.__identifier__,
+                            parent=context['adhocracy'],
+                            appstructs=appstructs)
 
 
-def _add_adhocracy_platform(context: IPool, registry: Registry,
-                            options: dict):
-    add_platform(context, registry)
 
 
 def _add_default_group(context, registry):
@@ -180,7 +180,7 @@ def _add_initial_user_and_group(context, registry):
 root_meta = pool_meta._replace(
     iresource=IRootPool,
     after_creation=[create_initial_content_for_app_root,
-                    _add_adhocracy_platform]
+                    add_example_process]
 )
 
 

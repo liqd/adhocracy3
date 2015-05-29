@@ -27,8 +27,6 @@ substanced.autoevolve = true
 
 # The websocket url to notify about resource modifications
 adhocracy.ws_url = ws://localhost:8080
-# The id for the root level adhocracy resource
-adhocracy.platform_id = adhocracy
 # The login name for the initial user
 adhocracy.initial_login = god
 # The password for the initial user

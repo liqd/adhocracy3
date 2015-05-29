@@ -15,6 +15,7 @@ Some imports to work with rest api calls::
     >>> from pprint import pprint
     >>> from adhocracy_core.resources.sample_proposal import IProposal
     >>> from adhocracy_core.resources.sample_proposal import IProposalVersion
+    >>> from adhocracy_core.resources.organisation import IOrganisation
 
 Start adhocracy app and log in some users::
 
@@ -213,10 +214,12 @@ Initiator
 
 Cannot create process structure organisation::
 
-   >>> 'POST' in initiator.options('/').json
-   False
+   >>> resp = initiator.options('/organisation').json
+   >>> postables = sorted([r['content_type'] for r in resp['POST']['request_body']])
+   >>> IOrganisation.__identifier__ not in postables
+   True
 
-Cannot edit process structure organisation::
+Can edit process structure organisation::
 
    >>> 'PUT' in initiator.options('/organisation').json
    False
@@ -245,16 +248,13 @@ Can create process structure::
 
     >>> resp = admin.options('/').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.interfaces.IPool',
-     'adhocracy_core.resources.asset.IPoolWithAssets',
-     'adhocracy_core.resources.external_resource.IExternalResource',
-     'adhocracy_core.resources.organisation.IOrganisation',
-     'adhocracy_core.resources.pool.IBasicPool',
-     'adhocracy_core.resources.sample_proposal.IProposal']
+    ['adhocracy_core.resources.organisation.IOrganisation',
+     'adhocracy_core.resources.process.IProcess']
 
     >>> resp = admin.options('/organisation').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.resources.process.IProcess']
+    ['adhocracy_core.resources.organisation.IOrganisation',
+     'adhocracy_core.resources.process.IProcess']
 
 Cannot edit process structure::
 

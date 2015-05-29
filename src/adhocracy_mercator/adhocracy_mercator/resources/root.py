@@ -7,14 +7,17 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.process import IProcess
 from adhocracy_core.resources.root import root_meta
-from adhocracy_core.resources.root import add_platform
+from adhocracy_core.resources.root import create_initial_content_for_app_root
 from adhocracy_core.schema import ACM
 from adhocracy_core import sheets
 
 
-def _create_initial_content(context: IPool, registry: Registry, options: dict):
+def add_mercator_process(context: IPool, registry: Registry, options: dict):
     """Add mercator specific content."""
-    add_platform(context, registry, 'mercator', resource_type=IOrganisation)
+    appstructs = {sheets.name.IName.__identifier__: {'name': 'mercator'}}
+    registry.content.create(IOrganisation.__identifier__,
+                            parent=context,
+                            appstructs=appstructs)
     appstructs = {sheets.name.IName.__identifier__: {'name': 'advocate'}}
     registry.content.create(IProcess.__identifier__,
                             parent=context['mercator'],
@@ -27,8 +30,10 @@ mercator_acm = ACM().deserialize(
                      ]})
 
 
-mercator_root_meta = root_meta._replace(after_creation=root_meta.after_creation
-                                        + [_create_initial_content])
+mercator_root_meta = root_meta._replace(
+    after_creation=[create_initial_content_for_app_root,
+                    add_mercator_process,
+                    ])
 
 
 def includeme(config):
