@@ -11,6 +11,7 @@ def integration(config):
     config.include('adhocracy_core.sheets.geo')
     config.include('adhocracy_core.resources.process')
     config.include('adhocracy_core.resources.asset')
+    config.include('adhocracy_core.resources.badge')
 
 
 class TestProcess:
@@ -23,6 +24,7 @@ class TestProcess:
     def test_meta(self, meta):
         from .process import IProcess
         from .asset import add_assets_service
+        from .badge import add_badges_service
         from adhocracy_core.interfaces import IPool
         from adhocracy_core import sheets
         assert meta.iresource is IProcess
@@ -30,8 +32,10 @@ class TestProcess:
         assert meta.is_implicit_addable is False
         assert meta.permission_create == 'create_process'
         assert sheets.asset.IHasAssetPool in meta.basic_sheets
+        assert sheets.badge.IHasBadgesPool in meta.basic_sheets
         assert meta.extended_sheets == [sheets.workflow.ISample]
         assert add_assets_service in meta.after_creation
+        assert add_badges_service in meta.after_creation
 
 
     @mark.usefixtures('integration')

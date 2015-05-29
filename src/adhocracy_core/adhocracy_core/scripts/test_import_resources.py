@@ -17,6 +17,7 @@ def integration(config):
     config.include('adhocracy_core.resources.organisation')
     config.include('adhocracy_core.resources.process')
     config.include('adhocracy_core.resources.asset')
+    config.include('adhocracy_core.resources.badge')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.resources.root')

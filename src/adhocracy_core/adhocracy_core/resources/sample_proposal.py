@@ -14,6 +14,7 @@ import adhocracy_core.sheets.document
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.workflow
 import adhocracy_core.sheets.image
+import adhocracy_core.sheets.badge
 
 
 class IProposalVersion(IItemVersion):
@@ -29,6 +30,7 @@ proposalversion_meta = itemversion_meta._replace(
                   ],
     extended_sheets=[adhocracy_core.sheets.document.IDocument,
                      adhocracy_core.sheets.comment.ICommentable,
+                     adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.image.IImageReference,
                      ],
     permission_create='edit_proposal',

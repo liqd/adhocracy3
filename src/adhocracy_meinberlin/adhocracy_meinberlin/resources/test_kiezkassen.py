@@ -12,6 +12,7 @@ def integration(config):
     config.include('adhocracy_core.resources.rate')
     config.include('adhocracy_core.resources.process')
     config.include('adhocracy_core.resources.asset')
+    config.include('adhocracy_core.resources.badge')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
     config.include('adhocracy_meinberlin.resources.kiezkassen')
 
