@@ -759,11 +759,10 @@ class PostPoolMappingSchema(colander.MappingSchema):
 
     """Check that the referenced nodes respect the :term:`post_pool`.
 
-    To validate `references` (:class:`adhocracy_core.schems.Reference`) you
+    To validate `references` (:class:`adhocracy_core.schemas.Reference`) you
     need to add a :class:`adhocracy_core.schema.PostPool` node to this schema.
-    To validate `backreferences` the referenced sheet needs to be a subtype
-    of :class:`adhocracy_core.intefaces.IPostPoolSheet and the schema needs a
-    a :class:`adhocracy_core.schema.PostPool` node.
+    To validate `back_references` the referenced sheet needs to be a subtype
+    of :class:`adhocracy_core.interfaces.IPostPoolSheet in addition.
     """
 
     validator = deferred_validate_references_post_pool

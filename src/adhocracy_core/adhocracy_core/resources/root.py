@@ -69,7 +69,7 @@ class IRootPool(IPool, IRoot):
 
 def create_initial_content_for_app_root(context: IPool, registry: Registry,
                                         options: dict):
-    """Add the platform object, Catalog, principals services to the context."""
+    """Add the Catalog, principals services to the context."""
     _add_objectmap_to_app_root(context)
     _add_graph(context, registry)
     _add_catalog_service(context, registry)
