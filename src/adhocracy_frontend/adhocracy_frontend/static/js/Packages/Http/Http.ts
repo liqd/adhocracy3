@@ -336,7 +336,8 @@ export class Service<Content extends ResourcesBase.Resource> {
      * errors) are passed back to the caller.
      */
     public deepPost(
-        resources : ResourcesBase.Resource[]
+        resources : ResourcesBase.Resource[],
+        config : IHttpConfig = {}
     ) : angular.IPromise<ResourcesBase.Resource[]> {
 
         var sortedResources : ResourcesBase.Resource[] = AdhResourceUtil.sortResourcesTopologically(resources, this.adhPreliminaryNames);
@@ -347,7 +348,7 @@ export class Service<Content extends ResourcesBase.Resource> {
                 transaction.post(resource.parent, resource);
             });
 
-            return transaction.commit().then(postedResources => {
+            return transaction.commit(config).then(postedResources => {
                 _.forEach(postedResources, (resource) => {
                     this.adhCache.invalidate(AdhUtil.parentPath(resource.path));
                 });

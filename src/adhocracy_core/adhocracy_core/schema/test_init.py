@@ -88,6 +88,29 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
             inst.deserialize('1')
 
 
+class TestAdhocracySchemaNode:
+
+    def make_one(self, **kwargs):
+        from adhocracy_core.schema import AdhocracySequenceNode
+
+        class AdhocracySequenceExample(AdhocracySequenceNode):
+            child1 = colander.Schema(typ=colander.Int())
+        return AdhocracySequenceExample().bind()
+
+    def test_create(self):
+        from . import AdhocracySchemaNode
+        inst = self.make_one()
+        assert isinstance(inst, colander.SequenceSchema)
+        assert isinstance(inst, AdhocracySchemaNode)
+        assert inst.schema_type == colander.Sequence
+        assert inst.default == []
+
+    def test_default_value_is_unique(self):
+        inst = self.make_one()
+        inst2 = self.make_one()
+        assert not (inst.default is inst2.default)
+
+
 class TestInterface():
 
     @fixture
@@ -491,13 +514,12 @@ class TestResources:
 
     def make_one(self, **kwargs):
         from adhocracy_core.schema import Resources
-        return Resources(**kwargs)
+        return Resources(**kwargs).bind()
 
     def test_create(self):
         from adhocracy_core.schema import ResourceObject
         inst = self.make_one()
         assert isinstance(inst, colander.SequenceSchema)
-        assert inst.__class__.default != []
         assert inst.default == []
         assert inst['resource'].schema_type == ResourceObject
 
@@ -1059,14 +1081,13 @@ class TestRoles:
     @fixture
     def inst(self):
         from adhocracy_core.schema import Roles
-        return Roles()
+        return Roles().bind()
 
     def test_create(self, inst):
         from adhocracy_core.schema import Role
         assert inst.validator.min == 0
         assert inst.validator.max == 6
         assert inst.schema_type == colander.Sequence
-        assert inst.__class__.default != []
         assert inst.default == []
         assert isinstance(inst['role'], Role)
 

@@ -26,19 +26,21 @@ def test_add_example_process(pool_graph_catalog, registry):
     from adhocracy_core.resources.geo import IMultiPolygon
     from adhocracy_core.resources.geo import add_locations_service
     import adhocracy_core.sheets.geo
-    from .root import IProcess
+    from adhocracy_meinberlin import resources
     from .root import add_example_process
     root = pool_graph_catalog
     add_locations_service(root, registry, {})
     add_example_process(root, registry, {})
     assert IOrganisation.providedBy(root['organisation'])
     kiezkasse =  root['organisation']['kiezkasse']
-    assert IProcess.providedBy(kiezkasse)
+    assert resources.kiezkassen.IProcess.providedBy(kiezkasse)
     kiezregion = get_sheet_field(kiezkasse,
                                  adhocracy_core.sheets.geo.ILocationReference,
                                  'location'
                                  )
     assert IMultiPolygon.providedBy(kiezregion)
+    bplan =  root['organisation']['bplan']
+    assert resources.bplan.IProcess.providedBy(bplan)
 
 
 

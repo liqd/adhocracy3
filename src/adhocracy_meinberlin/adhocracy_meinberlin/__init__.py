@@ -17,9 +17,11 @@ def includeme(config):
     # include custom resource types
     config.include('adhocracy_meinberlin.workflows')
     config.include('adhocracy_meinberlin.resources.kiezkassen')
+    config.include('adhocracy_meinberlin.resources.bplan')
     config.include('adhocracy_meinberlin.resources.root')
     config.include('adhocracy_meinberlin.resources.subscriber')
     config.include('adhocracy_meinberlin.sheets.kiezkassen')
+    config.include('adhocracy_meinberlin.sheets.bplan')
     config.include('adhocracy_meinberlin.evolution')
     config.add_translation_dirs('adhocracy_core:locale/',
                                 'adhocracy_meinberlin:locale/')

@@ -106,7 +106,7 @@ export class Service {
 
             if (!search.hasOwnProperty("noheader")) {
                 template = "<header class=\"l-header main-header\">" +
-                "<div class=\"l-header-wrapper\"><div class=\"l-header-right\">" +
+                "<div class=\"l-header\"><div class=\"l-header-right\">" +
                 "<adh-user-indicator></adh-user-indicator>" +
                 "</div></div></header>" + template;
             }

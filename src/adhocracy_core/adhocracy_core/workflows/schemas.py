@@ -3,7 +3,6 @@ from colander import GlobalObject
 from colander import Mapping
 from colander import MappingSchema
 from colander import SchemaNode
-from colander import SequenceSchema
 from colander import null
 from colander import drop
 from colander import required
@@ -11,20 +10,16 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import ACM
 from adhocracy_core.schema import Roles
+from adhocracy_core.schema import AdhocracySequenceNode
 
 
-class StatesOrder(SequenceSchema):
+class StatesOrder(AdhocracySequenceNode):
 
     """List of state names.
 
     The first one is the initial state,
     the others are only a hint how to list them
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:  # pragma: no branch
-            self.default = []
 
     state_name = SingleLine()
 
@@ -93,7 +88,7 @@ def create_workflow_meta_schema(data: dict) -> SchemaNode:
     :dict: data to deserialize/serialize. For every key in states and
            transitions a child schema is added.
     """
-    node = WorkflowMeta().clone()
+    node = WorkflowMeta().clone().bind()
     for name in data['states']:
         schema = StateMeta(name=name, missing=drop)
         node['states'].add(schema)
