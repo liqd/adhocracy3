@@ -16,8 +16,8 @@ pyramid.default_locale_name = en
 
 tm.attempts = 5
 
-# The id for the root level adhocracy resource
-adhocracy.platform_id = adhocracy
+# The path to the root level adhocracy resource
+rest_platform_path = /adhocracy
 # The url to find the backend websocket service
 # If you don't set this, the url is build based on the domain of the current
 # Request.
