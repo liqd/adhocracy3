@@ -35,6 +35,7 @@ def change_german_salutation():
 
     regexlist = [
         ('Bitte entschuldige', 'Bitte entschuldigen Sie'),
+        ('bekommst Du an Deine', 'bekommen Sie an Ihre'),
         ('aktiviere', 'aktivieren Sie'),
         ('registrierst hast', 'registriert haben'),
         ('wechsle', 'wechseln Sie'),
@@ -54,8 +55,8 @@ def change_german_salutation():
         ('Du bist', 'Sie sind'),
         ('Du auf den Aktivierungslink geklickt hast, kannst Du',
             'Sie auf den Aktivierungslink geklickt haben, können Sie'),
-        ('Du diese E-Mail nicht erhältst, überprüfe ',
-            'Sie diese E-Mail nicht erhalten, überprüfen Sie '),
+        ('Du diese E-Mail nicht erhältst',
+            'Sie diese E-Mail nicht erhalten'),
         ('Du kannst', 'Sie können'),
         ('Du Dich', 'Sie sich'),
         ('Dir', 'Ihnen'),
