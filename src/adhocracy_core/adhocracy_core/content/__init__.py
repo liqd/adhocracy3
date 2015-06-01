@@ -13,6 +13,8 @@ from zope.interface.interfaces import IInterface
 
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import IItemVersion
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.utils import get_iresource
 
 
@@ -56,9 +58,26 @@ class ResourceContentRegistry(ContentRegistry):
         addables_allowed = []
         for resource_meta in addables:
             permission = resource_meta.permission_create
-            if request.has_permission(permission, context):
+            ignore_permission = self._only_first_version_exists(context,
+                                                                resource_meta)
+            if ignore_permission:
+                # FIXME this is a work around to allow the bplan workfow
+                # to disable edit permission but allow create permision for
+                # proposals. This might cause security issues if you don't
+                # create the version 0 and 1 in one batch request!
+                addables_allowed.append(resource_meta)
+            elif request.has_permission(permission, context):
                 addables_allowed.append(resource_meta)
         return addables_allowed
+
+    def _only_first_version_exists(self, item, resource_meta) -> bool:
+        only_first_version = False
+        is_item_version = resource_meta.iresource.isOrExtends(IItemVersion)
+        has_item_parent = IItem.providedBy(item)
+        if has_item_parent and is_item_version:
+            versions = [x for x in item.values() if IItemVersion.providedBy(x)]
+            only_first_version = len(versions) == 1
+        return only_first_version
 
     @reify
     def resources_meta_addable(self):
