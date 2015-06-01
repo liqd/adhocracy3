@@ -1,5 +1,3 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular-route.d.ts"/>
-
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
