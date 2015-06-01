@@ -14,7 +14,7 @@ describe("mercator proposal form", function() {
     });
 
     it("is validated correctly", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var page = new MercatorProposalFormPage().create();
         expect(page.isValid()).toBe(false);
@@ -55,7 +55,7 @@ describe("mercator proposal form", function() {
     });
 
     it("is submitted properly", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var page = new MercatorProposalFormPage().create();
         page.fillValid();
@@ -93,7 +93,7 @@ describe("mercator proposal form", function() {
     });
 
     it("can be commented by the contributor", function() {
-        shared.loginContributor();
+        shared.loginOtherParticipant();
 
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
@@ -105,7 +105,7 @@ describe("mercator proposal form", function() {
     });
 
     it("can be upvoted by the annotator", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
@@ -116,7 +116,7 @@ describe("mercator proposal form", function() {
     });
 
     it("can be downvoted by the annotator", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
@@ -128,7 +128,7 @@ describe("mercator proposal form", function() {
     });
 
     it("can be upvoted and then downvoted by the annotator", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
@@ -140,7 +140,7 @@ describe("mercator proposal form", function() {
     });
 
     it("can be upvoted by the contributor", function() {
-        shared.loginContributor();
+        shared.loginOtherParticipant();
 
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
@@ -151,7 +151,7 @@ describe("mercator proposal form", function() {
     });
 
     it("can be downvoted by the contributor", function() {
-        shared.loginContributor();
+        shared.loginOtherParticipant();
 
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
@@ -163,7 +163,7 @@ describe("mercator proposal form", function() {
     });
 
     it("can be upvoted and then downvoted by the contributor", function() {
-        shared.loginContributor();
+        shared.loginOtherParticipant();
 
         var list = new MercatorProposalListing().get();
         var page = list.getDetailPage(0);
@@ -183,7 +183,7 @@ describe("mercator proposal form", function() {
     });
 
     it("allows creator to edit existing proposals (depends on submit)", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var list = new MercatorProposalListing().get();
         browser.waitForAngular();
@@ -206,7 +206,7 @@ describe("mercator proposal form", function() {
     });
 
     it("disallows other users to edit existing proposals (depends on submit)", function() {
-        shared.loginContributor();
+        shared.loginOtherParticipant();
         var list = new MercatorProposalListing().get();
         var editButton = list.getDetailPage(0).editButton;
         expect(editButton.isPresent()).toBe(false);
@@ -272,7 +272,7 @@ describe("column navigation (depends on created proposal)", function() {
 
 describe("space navigation", function() {
     it("content of comment being written is kept when switching", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var list = new MercatorProposalListing().get();
         var proposal = list.getDetailPage(0);
@@ -295,7 +295,7 @@ describe("space navigation", function() {
 
 describe("abuse complaint", function() {
     it("can be sent and is received as email", function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
 
         var mailsBeforeComplaint =
             fs.readdirSync(browser.params.mail.queue_path + "/new");

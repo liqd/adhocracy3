@@ -515,7 +515,7 @@ class TestIntegrationSendRegistrationMail:
         # one manually
         msg.sender = 'support@unconfigured.domain'
         msgtext = str(msg.to_message())
-        assert 'mail_account_verification_body_txt' in msgtext
+        assert 'activate' in msgtext
 
     @mark.usefixtures('integration')
     def test_send_registration_mail_smtp_error(self, registry, sample_user):

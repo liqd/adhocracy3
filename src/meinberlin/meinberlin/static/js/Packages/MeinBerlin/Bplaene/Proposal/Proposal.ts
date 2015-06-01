@@ -1,43 +1,132 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
+import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhConfig = require("../../../Config/Config");
+import AdhUtil = require("../../../Util/Util");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
+import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+
+import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal");
+import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion");
+import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
+import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal");
+import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
+
+
+export interface IScope extends angular.IScope {
+    path : string;
+    data : {
+        name : string;
+        street : string;
+        city : string;
+        email : string;
+        statement : string;
+    };
+    errors : any[];
+    showError : Function;
+    onSuccess? : Function;
+    submit() : void;
+    meinBerlinProposalForm : any;
+}
+
+
+var postCreate = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (
+    scope : IScope,
+    poolPath : string
+) : angular.IPromise<any> => {
+    var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
+    proposal.parent = poolPath;
+    // FIXME: dummy name
+    proposal.data[SIName.nick] = new SIName.Sheet({
+        name: AdhUtil.normalizeName(scope.data.name)
+    });
+
+    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    proposalVersion.parent = proposal.path;
+    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+        follows: [proposal.first_version_path]
+    });
+    proposalVersion.data[SIProposal.nick] = new SIProposal.Sheet({
+        name: scope.data.name,
+        street_number: scope.data.street,
+        postal_code_city: scope.data.city,
+        email: scope.data.email,
+        statement: scope.data.statement
+    });
+
+    return adhHttp.deepPost([proposal, proposalVersion], {
+        noCredentials: true
+    });
+};
 
 
 export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
-    adhSubmitIfValid,
-    adhResourceUrlFilter
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        link: (scope, element) => {
+        scope: {
+            path: "@",
+            onSuccess: "=?"
+        },
+        link: (scope : IScope, element) => {
             scope.errors = [];
-            scope.data = {};
+            scope.data = {
+                name: "",
+                street: "",
+                city: "",
+                email: "",
+                statement: ""
+            };
             scope.showError = adhShowError;
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    console.log("success");
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path).then(() => {
+                        if (typeof scope.onSuccess !== "undefined") {
+                            scope.onSuccess();
+                        }
+                    });
                 });
             };
         }
     };
 };
 
+
+export var embedDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Embed.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.success = false;
+
+            scope.showSuccess = () => {
+                scope.success = true;
+            };
+            scope.showForm = () => {
+                scope.success = false;
+            };
+        }
+    };
+};
 
 
 export var moduleName = "adhMeinBplaeneProposal";
@@ -48,21 +137,13 @@ export var register = (angular) => {
             AdhAngularHelpers.moduleName,
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
-            AdhPermissions.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
+            AdhPreliminaryNames.moduleName,
+            AdhResourceArea.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-create");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-embed");
         }])
         .directive("adhMeinBerlinBplaeneProposalCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            createDirective
-        ]);
+            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
+        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", embedDirective]);
 };

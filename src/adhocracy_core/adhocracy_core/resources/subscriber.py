@@ -88,7 +88,7 @@ def _get_user_groups(user: IUser, registry: Registry):
 def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
     sheet = get_sheet(user, IPermissions)
     groups = sheet.get()['groups']
-    groups.append(group)
+    groups = groups + [group]
     sheet.set({'groups': groups})
 
 
@@ -225,6 +225,7 @@ def send_password_reset_mail(event):
                 default='${site_name}: Reset Password / Password neu setzen')
     body = _('mail_reset_password_body_txt',
              mapping=mapping,
+             default='${reset_url}',
              )
     event.registry.messenger.send_mail(subject=subject,
                                        recipients=[user.email],

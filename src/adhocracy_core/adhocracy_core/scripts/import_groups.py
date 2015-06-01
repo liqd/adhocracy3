@@ -17,7 +17,7 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.resources.principal import IGroup
 
 
-def import_groups():
+def import_groups():  # pragma: no cover
     """Import groups from a JSON file.
 
     Already existing groups will have their roles updated.

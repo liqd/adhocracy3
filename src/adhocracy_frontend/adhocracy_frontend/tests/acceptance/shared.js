@@ -27,9 +27,9 @@ module.exports = {
     login: UserPages.login,
     logout: UserPages.logout,
     isLoggedIn: UserPages.isLoggedIn,
-    loginAnnotator: UserPages.loginAnnotator,
-    annotatorName: UserPages.annotatorName,
-    loginContributor: UserPages.loginContributor,
+    loginParticipant: UserPages.loginParticipant,
+    participantName: UserPages.participantName,
+    loginOtherParticipant: UserPages.loginOtherParticipant,
     hasClass: hasClass,
     parseEmail: parseEmail
 }

@@ -6,7 +6,7 @@ var EmbeddedCommentsPage = require("./EmbeddedCommentsPage.js");
 
 describe("comments", function() {
     beforeEach(function() {
-        shared.loginAnnotator();
+        shared.loginParticipant();
     });
 
     it("can be created", function() {
@@ -14,7 +14,7 @@ describe("comments", function() {
         var comment = page.createComment("comment 1");
         expect(comment.isPresent()).toBe(true);
         expect(page.getCommentText(comment)).toEqual("comment 1");
-        expect(page.getCommentAuthor(comment)).toEqual(shared.annotatorName);
+        expect(page.getCommentAuthor(comment)).toEqual(shared.participantName);
     });
 
     it("cannot be created empty", function() {
@@ -57,7 +57,7 @@ describe("comments", function() {
         var page = new EmbeddedCommentsPage("c6").get();
         var comment = page.createComment("comment 1");
         shared.logout();
-        shared.loginContributor();
+        shared.loginOtherParticipant();
         page.get();
         expect(page.getEditLink(comment).isPresent()).toBe(false);
     });
@@ -73,7 +73,7 @@ describe("comments", function() {
         var page = new EmbeddedCommentsPage("c8").get();
         var comment = page.createComment("comment 1");
         shared.logout();
-        shared.loginContributor();
+        shared.loginOtherParticipant();
         page.get();
         expect(page.getReplyLink(comment).isPresent()).toBe(true);
         var reply = page.createReply(comment, "reply 1");

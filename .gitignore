@@ -47,6 +47,7 @@ etc/tslint.json
 /src/adhocracy/tests/report.html
 /src/adhocracy/tests/log.html
 /src/adhocracy/tests/output.xml
+/src/Mako
 /src/supervisor
 *.js.map
 *.css.map
@@ -68,3 +69,4 @@ src/spd/spd/build/
 .fontcustom-manifest.json
 RELEASE-VERSION
 *-requirements.txt
+/src/Mako/

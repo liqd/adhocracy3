@@ -17,7 +17,7 @@ from adhocracy_core.schema import ContentType
 from substanced.interfaces import IUserLocator
 
 
-def import_resources():
+def import_resources():  # pragma: no cover
     """Import resources from a JSON file.
 
     usage::
@@ -123,7 +123,7 @@ def _resolve_value(value, context):
         for k, v in value.items():
             value[k] = _resolve_value(v, context)
         return value
-    elif typ == str and len(value) > 1 and value[0] == '/':
+    elif typ == str and len(value) > 0 and value[0] == '/':
         # assume path to a resource
         return find_resource(context, value)
     else:
