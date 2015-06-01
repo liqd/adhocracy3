@@ -7,7 +7,7 @@ from adhocracy_core import root_factory
 def includeme(config):
     """Setup adhocracy extension."""
     # include adhocracy_core
-    config.include('adhocracy_core')
+    config.include('adhocracy_sample')
 
 
 def main(global_config, **settings):
