@@ -5,6 +5,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources import process
+import adhocracy_core.sheets
 import adhocracy_meinberlin.sheets.bplan
 
 
@@ -34,6 +35,12 @@ proposal_meta = item_meta._replace(
     item_type=IProposalVersion,
     is_implicit_addable=True,
     permission_create='create_proposal',
+    basic_sheets=[adhocracy_core.sheets.tags.ITags,
+                  adhocracy_core.sheets.versions.IVersions,
+                  adhocracy_core.sheets.pool.IPool,
+                  adhocracy_core.sheets.metadata.IMetadata,
+                  ],
+    # TODO add auto_naming for all proposals
     extended_sheets=[
         adhocracy_meinberlin.sheets.bplan.IPrivateWorkflowAssignment],
     use_autonaming=True,

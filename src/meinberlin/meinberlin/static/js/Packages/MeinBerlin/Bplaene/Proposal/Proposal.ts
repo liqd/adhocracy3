@@ -4,13 +4,11 @@ import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
-import AdhUtil = require("../../../Util/Util");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion");
-import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -43,10 +41,6 @@ var postCreate = (
 ) : angular.IPromise<any> => {
     var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
     proposal.parent = poolPath;
-    // FIXME: dummy name
-    proposal.data[SIName.nick] = new SIName.Sheet({
-        name: AdhUtil.normalizeName(scope.data.name)
-    });
 
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = proposal.path;
