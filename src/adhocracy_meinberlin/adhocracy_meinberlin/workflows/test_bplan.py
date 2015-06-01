@@ -65,6 +65,12 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
     return resp
 
 
+def _post_proposal_itemversion(app_user, path='') -> TestResponse:
+    from adhocracy_meinberlin.resources.bplan import IProposalVersion
+    resp = app_user.post_resource(path, IProposalVersion, {})
+    return resp
+
+
 def _do_transition_to(app_user, path, state) -> TestResponse:
     from adhocracy_meinberlin.sheets.bplan import IWorkflowAssignment
     data = {'data': {IWorkflowAssignment.__identifier__:\
@@ -112,7 +118,11 @@ class TestBPlanWorkflow:
         resp = _post_proposal_item(app_anonymous, path='/bplan')
         assert resp.status_code == 200
 
-    def test_participate_anonymous_cannot_edit_proposal(self, app_anonymous):
+    def test_participate_anonymous_edits_proposal_version0(self, app_anonymous):
+        resp = _post_proposal_itemversion(app_anonymous, path='/bplan/PROPOSAL_0000000')
+        assert resp.status_code == 200
+
+    def test_participate_anonymous_cannot_edit_proposal_version1(self, app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposalVersion
         assert IProposalVersion not in app_anonymous.get_postable_types(
             '/bplan/PROPOSAL_0000000')
