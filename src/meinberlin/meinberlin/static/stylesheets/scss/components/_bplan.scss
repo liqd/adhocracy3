@@ -20,3 +20,16 @@
     @include border-radius(0);
 }
 // scss-lint:enable QualifyingElement
+
+.mein-berlin-bplaene-proposal-success {
+    @extend .standalone-wrapper;
+}
+
+.mein-berlin-bplaene-proposal-success-title {
+    @extend .standalone-wrapper-title;
+}
+
+.mein-berlin-bplaene-proposal-success-show-form {
+    @extend .button;
+    margin: 2em 0;
+}
