@@ -4,6 +4,9 @@ import AdhConfig = require("../Config/Config");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
+var pkgLocation = "/Embed";
+
+
 var metaParams = [
     "autoresize",
     "initialUrl",
@@ -38,7 +41,7 @@ export class Provider {
             "plain"
         ];
 
-        this.$get = () => new Service(this);
+        this.$get = ["adhConfig", (adhConfig) => new Service(this, adhConfig)];
     }
 
     public registerEmbeddableDirectives(directives : string[]) : void {
@@ -59,7 +62,10 @@ export class Provider {
 export class Service {
     private widget : string;
 
-    constructor(private provider : Provider) {}
+    constructor(
+        protected provider : Provider,
+        protected adhConfig : AdhConfig.IService
+    ) {/* pass */}
 
     private location2template(widget : string, search) {
         var attrs = [];
@@ -103,10 +109,8 @@ export class Service {
             }
 
             if (!search.hasOwnProperty("noheader")) {
-                template = "<header class=\"l-header main-header\">" +
-                "<div class=\"l-header\"><div class=\"l-header-right\">" +
-                "<adh-user-indicator></adh-user-indicator>" +
-                "</div></div></header>" + template;
+                var headerTemplateUrl = this.adhConfig.pkg_path + pkgLocation + "/Header.html";
+                template = "<ng-include src=\"'" + headerTemplateUrl + "'\"></ng-include>" + template;
             }
 
             return {
