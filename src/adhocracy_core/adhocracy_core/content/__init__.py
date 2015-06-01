@@ -15,6 +15,7 @@ from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.utils import get_iresource
 
 
@@ -70,12 +71,14 @@ class ResourceContentRegistry(ContentRegistry):
                 addables_allowed.append(resource_meta)
         return addables_allowed
 
-    def _only_first_version_exists(self, item, resource_meta) -> bool:
+    def _only_first_version_exists(self, context: object,
+                                   meta: ResourceMetadata) -> bool:
         only_first_version = False
-        is_item_version = resource_meta.iresource.isOrExtends(IItemVersion)
-        has_item_parent = IItem.providedBy(item)
+        is_item_version = meta.iresource.isOrExtends(IItemVersion)
+        has_item_parent = IItem.providedBy(context)
         if has_item_parent and is_item_version:
-            versions = [x for x in item.values() if IItemVersion.providedBy(x)]
+            children = context.values()
+            versions = [x for x in children if IItemVersion.providedBy(x)]
             only_first_version = len(versions) == 1
         return only_first_version
 
