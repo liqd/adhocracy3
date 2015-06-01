@@ -120,20 +120,20 @@ class TestBPlanWorkflow:
 
     def test_participate_anonymous_creates_proposal(self, app_anonymous):
         resp = _post_proposal_item(app_anonymous, path='/bplan',
-                                   name='proposal')
+                                   name='PROPOSAL_0000000')
         assert resp.status_code == 200
 
     def test_participate_anonymous_cannot_edit_proposal(self, app_anonymous):
         from adhocracy_meinberlin.resources.bplan import IProposalVersion
         assert IProposalVersion not in app_anonymous.get_postable_types(
-            '/bplan/proposal')
+            '/bplan/PROPOSAL_0000000')
 
     def test_participate_anonymous_cannot_view_proposal(self, app_anonymous):
-        resp = app_anonymous.get(path='/bplan/proposal')
+        resp = app_anonymous.get(path='/bplan/PROPOSAL_0000000')
         assert resp.status_code == 403
 
     def test_participate_initiator_can_view_proposal(self, app_initiator):
-        resp = app_initiator.get(path='/bplan/proposal')
+        resp = app_initiator.get(path='/bplan/PROPOSAL_0000000')
         assert resp.status_code == 200
 
     def test_change_state_to_frozen(self, app_initiator):
@@ -145,9 +145,9 @@ class TestBPlanWorkflow:
         assert IProposal not in app_anonymous.get_postable_types('/bplan')
 
     def test_frozen_initiator_can_view_proposal(self, app_initiator):
-        resp = app_initiator.get(path='/bplan/proposal')
+        resp = app_initiator.get(path='/bplan/PROPOSAL_0000000')
         assert resp.status_code == 200
 
     def test_frozen_anonymous_cannot_view_proposal(self, app_anonymous):
-        resp = app_anonymous.get('/bplan/proposal')
+        resp = app_anonymous.get('/bplan/PROPOSAL_0000000')
         assert resp.status_code == 403
