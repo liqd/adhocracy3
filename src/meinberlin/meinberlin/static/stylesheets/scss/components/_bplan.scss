@@ -1,0 +1,22 @@
+// FIXME: This is very much like a moving column. Maybe we can share some code?
+
+.mein-berlin-bplaene-proposal-embed {
+    background: $color-background-base-introvert;
+    padding: 5px;
+}
+
+.mein-berlin-bplaene-proposal-form {
+    padding: 0;
+}
+
+.mein-berlin-bplaene-proposal-form-inner {
+    background: $color-background-base;
+    padding: 15px;
+}
+
+// HACK
+// scss-lint:disable QualifyingElement
+.mein-berlin-kiezkassen-proposal-form-footer input[type="submit"].m-call-to-action {
+    @include border-radius(0);
+}
+// scss-lint:enable QualifyingElement
