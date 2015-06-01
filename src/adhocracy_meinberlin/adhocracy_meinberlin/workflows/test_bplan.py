@@ -59,19 +59,9 @@ def test_includeme_add_bplan_workflow(registry):
     assert isinstance(workflow, AdhocracyACLWorkflow)
 
 
-def _post_proposal_item(app_user, name='', path='') -> TestResponse:
+def _post_proposal_item(app_user, path='') -> TestResponse:
     from adhocracy_meinberlin.resources.bplan import IProposal
-    from adhocracy_core.sheets.name import IName
-    sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post_resource(path, IProposal, sheets_cstruct)
-    return resp
-
-
-def _post_proposal_item(app_user, name='', path='') -> TestResponse:
-    from adhocracy_meinberlin.resources.bplan import IProposal
-    from adhocracy_core.sheets.name import IName
-    sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post_resource(path, IProposal, sheets_cstruct)
+    resp = app_user.post_resource(path, IProposal, {})
     return resp
 
 
@@ -119,8 +109,7 @@ class TestBPlanWorkflow:
         assert resp.status_code == 200
 
     def test_participate_anonymous_creates_proposal(self, app_anonymous):
-        resp = _post_proposal_item(app_anonymous, path='/bplan',
-                                   name='proposal')
+        resp = _post_proposal_item(app_anonymous, path='/bplan')
         assert resp.status_code == 200
 
     def test_participate_anonymous_cannot_edit_proposal(self, app_anonymous):
