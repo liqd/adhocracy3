@@ -144,8 +144,8 @@ Create scaffold for extension packages
 
 1.  Run the following commands::
 
-        bin/pcreate -s adocracy adhocracy_xx
-        bin/pcreate -s adocracy_frontend xx
+        bin/pcreate -s adhocracy adhocracy_xx
+        bin/pcreate -s adhocracy_frontend xx
 
     In the current repository layout, you then need to move the
     generated directories (``adhocracy_xx/`` and ``xx/``) to ``src/``.
