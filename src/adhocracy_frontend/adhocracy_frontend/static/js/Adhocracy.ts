@@ -169,7 +169,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
     AdhMapping.register(angular);
-    AdhMarkdwon.register(angular);
+    AdhMarkdown.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);

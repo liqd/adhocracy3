@@ -39,7 +39,8 @@ export var documentWorkbench = (
             scope.user = adhUser;
             scope.websocketTestPaths = JSON.stringify([scope.path]);
 
-            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+            // FIXME anycast
+            scope.$on("$destroy", <any>adhTopLevelState.bind("view", scope));
         }
     };
 };
