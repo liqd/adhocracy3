@@ -441,7 +441,7 @@ class ResourceObject(colander.SchemaType):
         :return: the resource registered under that path
         :raise colander.Invalid: if the object does not exist.
         """
-        if value is colander.null:
+        if value in (colander.null, None):
             return value
         try:
             resource = self._deserialize_location_or_url(node, value)

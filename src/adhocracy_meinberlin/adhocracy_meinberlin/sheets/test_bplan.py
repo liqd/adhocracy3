@@ -57,13 +57,27 @@ class TestProposalSchema:
         from .bplan import ProposalSchema
         return ProposalSchema()
 
+    @fixture
+    def cstruct_required(self):
+        cstruct = {'name': 'name',
+                   'street_number': 'y',
+                   'postal_code': '12',
+                   'statement': 'statement'
+                   }
+        return cstruct
+
     def test_create(self, inst):
         import colander
         assert inst['name'].required
         assert inst['street_number'].required
         assert inst['postal_code_city'].required
-        assert inst['email'].validator == colander.Email
+        assert isinstance(inst['email'].validator, colander.Email)
         assert inst['statement'].required
+
+    def test_deserialize_raise_if_wrong_email(self, inst, cstruct_required):
+        cstruct_required['email'] = 'wrong'
+        with raises(colander.Invalid):
+            inst.deserialize()
 
 
 class TestWorkflowSheet:
