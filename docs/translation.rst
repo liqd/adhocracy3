@@ -66,12 +66,6 @@ the transifex-client can be used::
 .. NOTE:: The configuration for transifex-client is stored in
    ``src/{package_name}/.tx/config``.
 
-.. NOTE:: transifex-client is currently not compatible with python3.4
-   and can therefore not be installed in the usual way.  If you need
-   it, just install it via::
-
-      pip install --user transifex-client
-
 .. WARNING:: Transifiex requires us to specify a "source language"
    (currently english). This has the benefit that translators do not
    need to handle technical strings. But it also has several
