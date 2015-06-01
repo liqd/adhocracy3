@@ -21,7 +21,7 @@ class ProposalSchema(colander.MappingSchema):
     name = SingleLine(missing=colander.required)
     street_number = SingleLine(missing=colander.required)
     postal_code_city = SingleLine(missing=colander.required)
-    email = SingleLine(validator=colander.Email)
+    email = SingleLine(validator=colander.Email())
     statement = Text(missing=colander.required)
 
 
