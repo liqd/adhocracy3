@@ -48,6 +48,7 @@ export var dummydata : IParagraph[] = [{
 
 export interface IParagraph {
     body : string;
+    commentCount? : number;
 }
 
 export interface IScope extends angular.IScope {
@@ -55,9 +56,10 @@ export interface IScope extends angular.IScope {
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
-        // FIXME: not final
         title : string;
-        paragraphs : IParagraph[];
+        paragraphs? : IParagraph[];
+        commentCountTotal? : number;
+        picture? : string;
     };
     selectedState? : string;
     resource: any;
