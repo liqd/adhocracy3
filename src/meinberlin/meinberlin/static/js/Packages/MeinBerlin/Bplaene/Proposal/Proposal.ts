@@ -11,6 +11,7 @@ import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resourc
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SIWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
 
@@ -101,7 +102,8 @@ export var createDirective = (
 
 
 export var embedDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -118,6 +120,12 @@ export var embedDirective = (
             scope.showForm = () => {
                 scope.success = false;
             };
+
+            adhHttp.get(scope.path).then((resource) => {
+                scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                scope.announceText = resource.data[SIWorkflow.nick].announce.description;
+                scope.frozenText = resource.data[SIWorkflow.nick].frozen.description;
+            });
         }
     };
 };
@@ -139,5 +147,5 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinBplaeneProposalCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
-        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", embedDirective]);
+        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", "adhHttp", embedDirective]);
 };
