@@ -32,6 +32,7 @@ import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventManager = require("./Packages/EventManager/EventManager");
 import AdhHttp = require("./Packages/Http/Http");
+import AdhImage = require("./Packages/Image/Image");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
@@ -174,6 +175,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhEmbed.register(angular);
     AdhEventManager.register(angular);
     AdhHttp.register(angular, config, meta_api);
+    AdhImage.register(angular);
     AdhInject.register(angular);
     AdhListing.register(angular);
     AdhLocale.register(angular);
