@@ -36,14 +36,14 @@ branding.
     padding: (40px / $font-size-normal * 1em) (90px / $font-size-normal * 1em);
     position: relative;
 
-    .standalone-wrapper-title {
-        color: $color-text-normal;
-        font-size: $font-size-large;
-        font-weight: $font-weight-extrovert;
-        margin-bottom: 50px / $font-size-large * 1em;
-    }
-
     form {
         padding: 0;
     }
+}
+
+.standalone-wrapper-title {
+    color: $color-text-normal;
+    font-size: $font-size-plus;
+    font-weight: $font-weight-extrovert;
+    margin-bottom: 50px / $font-size-plus * 1em;
 }

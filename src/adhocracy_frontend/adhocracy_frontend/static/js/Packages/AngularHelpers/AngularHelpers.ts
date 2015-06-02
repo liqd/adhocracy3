@@ -249,12 +249,12 @@ export var submitIfValid = (
     scope : {errors : AdhHttp.IBackendErrorItem[]},
     element,
     form : angular.IFormController,
-    submitFn : () => angular.IPromise<any>
+    submitFn : () => any
 ) : angular.IPromise<any> => {
     var container = element.parents("[data-du-scroll-container]");
 
     if (form.$valid) {
-        return submitFn()
+        return $q.when(submitFn())
             .then((result) => {
                 scope.errors = [];
                 return result;

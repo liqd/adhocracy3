@@ -141,9 +141,27 @@ Open html documentation::
 
 Create scaffold for extension packages
 ---------------------------------------
-::
 
-    bin/pcreate -s adocracy_extension adhocracy_XX
+1.  Run the following commands::
+
+        bin/pcreate -s adhocracy adhocracy_xx
+        bin/pcreate -s adhocracy_frontend xx
+
+    In the current repository layout, you then need to move the
+    generated directories (``adhocracy_xx/`` and ``xx/``) to ``src/``.
+
+2.  The frontend currently always depends on ``adhocracy_sample``. For
+    that, you need to replace the line
+    ``config.include('adhocracy_core')`` by
+    ``config.include('adhocracy_sample')`` in
+    ``src/adhocracy_xx/adhocracy_xx/__init__.py``.
+
+3.  Add the new paths to ``develop`` and ``eggs`` in ``base.cfg``.
+
+4.  Create ``buildout-xx.cfg``
+
+You may then want to run ``bin/buildout -c buildout-xx.cfg`` to check
+that everything works fine.
 
 Update packages
 ---------------

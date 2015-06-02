@@ -23,13 +23,21 @@ class TestProposal:
         return proposal_meta
 
     def test_meta(self, meta):
+        import adhocracy_core.sheets
         from adhocracy_meinberlin import resources
         from adhocracy_meinberlin import sheets
         assert meta.iresource == resources.bplan.IProposal
         assert meta.element_types == [resources.bplan.IProposalVersion]
         assert meta.item_type == resources.bplan.IProposalVersion
         assert meta.permission_create == 'create_proposal'
+        assert meta.basic_sheets == [adhocracy_core.sheets.tags.ITags,
+                                     adhocracy_core.sheets.versions.IVersions,
+                                     adhocracy_core.sheets.pool.IPool,
+                                     adhocracy_core.sheets.metadata.IMetadata,
+                                     ]
         assert meta.extended_sheets == [sheets.bplan.IPrivateWorkflowAssignment]
+        assert meta.use_autonaming
+
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

@@ -511,7 +511,10 @@ export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         transclude: true,
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Wrapper.html"
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Wrapper.html",
+        link: (scope) => {
+            scope.headerTemplateUrl = adhConfig.pkg_path + pkgLocation + "/templates/" + "Header.html";
+        }
     };
 };
 

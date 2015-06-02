@@ -13,9 +13,9 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
-import RIPoolWithAssets = require("../../Resources_/adhocracy_core/resources/asset/IPoolWithAssets");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
+import RIOrganisation = require("../../Resources_/adhocracy_core/resources/organisation/IOrganisation");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -215,19 +215,19 @@ export var register = (angular) => {
                     })
                     .then(() => specifics);
                 }])
-                .default(RIPoolWithAssets, "", "", "", {
+                .default(RIOrganisation, "", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
                     proposalUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIPoolWithAssets, "create_proposal", "", "", {
+                .default(RIOrganisation, "create_proposal", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIPoolWithAssets, "create_proposal", "", "", ["adhHttp",
+                .specific(RIOrganisation, "create_proposal", "", "", ["adhHttp",
                     (adhHttp : AdhHttp.Service<any>) => {
-                        return (resource : RIPoolWithAssets) => {
+                        return (resource : RIOrganisation) => {
                             return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                                 if (!options.POST) {
                                     throw 401;
