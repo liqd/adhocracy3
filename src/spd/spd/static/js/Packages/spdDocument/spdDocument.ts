@@ -3,16 +3,16 @@
 
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
+import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhRate = require("../Rate/Rate");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhRate = require("../Rate/Rate");
 import AdhSticky = require("../Sticky/Sticky");
-import AdhEmbed = require("../Embed/Embed");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 var pkgLocation = "/spdDocument";
 
