@@ -14,9 +14,35 @@ import AdhRate = require("../Rate/Rate");
 import AdhSticky = require("../Sticky/Sticky");
 import AdhEmbed = require("../Embed/Embed");
 
-
-
 var pkgLocation = "/spdDocument";
+
+// FIXME: Can be removed when we work with real data
+export var dummydata = [
+    "## Hallo \n Lorem ipsum dolor sit amet, " +
+     "consectetur adipiscing elit. Phasellus quis " +
+     "lectus metus, at posuere neque. Sed pharetra " +
+     "nibh eget orci convallis at posuere leo convallis. " +
+     "Sed blandit augue vitae augue scelerisque bibendum. " +
+     "Vivamus sit amet libero turpis, non venenatis urna. " +
+     "In blandit, odio convallis suscipit venenatis, ante " +
+     "ipsum cursus augue.",
+     "## Toll \n Lorem ipsum dolor sit amet, " +
+     "consectetur adipiscing elit. Phasellus quis " +
+     "lectus metus, at posuere neque. Sed pharetra " +
+     "nibh eget orci convallis at posuere leo convallis. " +
+     "Sed blandit augue vitae augue scelerisque bibendum. " +
+     "Vivamus sit amet libero turpis, non venenatis urna. " +
+     "In blandit, odio convallis suscipit venenatis, ante " +
+     "ipsum cursus augue.",
+     "## Klasse! \n Lorem ipsum dolor sit amet," +
+     "consectetur adipiscing elit. Phasellus quis " +
+     "lectus metus, at posuere neque. Sed pharetra " +
+     "nibh eget orci convallis at posuere leo convallis. " +
+     "Sed blandit augue vitae augue scelerisque bibendum. " +
+     "Vivamus sit amet libero turpis, non venenatis urna. " +
+     "In blandit, odio convallis suscipit venenatis, ante " +
+     "ipsum cursus augue."
+];
 
 export interface IScope extends angular.IScope {
     path? : string;
@@ -26,7 +52,7 @@ export interface IScope extends angular.IScope {
 
         // FIXME: not final
         title : string;
-        detail : string;
+        paragraphs : string[][];
     };
     selectedState? : string;
     resource: any;
@@ -45,8 +71,10 @@ export var detailDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : IScope) => {
-            console.log("here comes the stuff");
+        link: (scope : any) => {
+            scope.data = {};
+            scope.data.title = "Toller Titel";
+            scope.data.paragraphs = dummydata;
         }
     };
 };
@@ -75,16 +103,18 @@ export var createDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError,
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        scope: {
-            path: "@"
-        },
-        link: (scope : IScope) => {
-            console.log("here comes the stuff");
+        link: (scope, element) => {
+            scope.errors = [];
+            scope.data = {};
+            scope.create = true;
+            scope.showError = adhShowError;
         }
     };
 };
@@ -133,7 +163,8 @@ export var register = (angular) => {
         .directive("adhSpdDocumentDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
         .directive("adhSpdDocumentCreate", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", createDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhShowError",
+            "adhSubmitIfValid", createDirective])
         .directive("adhSpdDocumentEdit", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", editDirective])
         .directive("adhSpdDocumentListItem", [

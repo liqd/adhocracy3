@@ -1,1 +1,56 @@
-<div>Create</div>
+<form
+    novalidate="novalidate"
+    data-ng-submit="submit()"
+    class="spd-document-form"
+    name="spdDocumentForm">
+
+    <div class="">
+    	<div class="form-error" data-ng-repeat="error in errors track by $index">
+            <p>{{ error | adhFormatError | translate }}</p>
+        </div>
+
+        <!-- Title -->
+        <label>
+            <span class="label-text">{{ "TR__SPD_TITLE" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.title"
+                name="title"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm.title, 'required')">
+                {{ "TR__SPD_ERROR_REQUIRED_TITLE" | translate }}
+            </span>
+        </label>
+
+        <!-- 1. Parapraph -->
+        <label>
+            <span class="label-text">{{ "TR__SPD_PARAGRAPH" | translate }}</span>
+
+            <textarea
+                data-msd-elastic=""
+                data-ng-model="data.detail"
+                name="detail"
+                maxlength="500"
+                required="required"></textarea>
+
+            <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm.detail, 'required')">
+                {{ "TR__SPD_ERROR_REQUIRED_PARAGRAPH" | translate }}
+            </span>
+        </label>
+
+    <!-- DATA SUBMIT -->
+    <footer class="form-footer">
+        <input
+            type="submit"
+            name="submit"
+            value="{{ 'TR__PUBLISH' | translate }}"
+            class="m-call-to-action form-footer-button-cta" />
+
+        <a data-ng-show="create" href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
+        {{ "TR__CANCEL" | translate }}</a>
+        <a data-ng-show="!create" href="{{ path | adhParentPath | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
+        {{ "TR__CANCEL" | translate }}</a>
+    </footer>
+</form>

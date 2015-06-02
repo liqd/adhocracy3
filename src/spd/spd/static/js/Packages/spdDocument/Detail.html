@@ -1,1 +1,5 @@
-<div>Detail</div>
+<h1>{{ data.title }}</h1>
+
+<div data-ng-repeat="paragraph in data.paragraphs">
+	<adh-parse-markdown parsetext="paragraph"></adh-parse-markdown>
+</div>
