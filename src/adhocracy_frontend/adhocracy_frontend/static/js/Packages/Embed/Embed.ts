@@ -105,7 +105,7 @@ export class Service {
             var template = this.location2template(widget, search);
 
             if (!search.hasOwnProperty("nocenter")) {
-                template = "<div class=\"l-center\">" + template + "</div>";
+                template = "<div class=\"l-center m-embed\">" + template + "</div>";
             }
 
             if (!search.hasOwnProperty("noheader")) {
