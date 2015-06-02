@@ -54,8 +54,8 @@ There are 5 base types of resources:
   Document. Can be modified but doesn't have its own
   version history, hence it's a Simple instead of an Item.
 
-To model the application domain we  have some frequently use derived types with
-semantically meaning::
+To model the application domain we have some frequently use derived types with
+semantics::
 
 * `Organisation`: a subtype of Pool to do basic structuring for the resource
                   hierarchy. Typical subtypes are other Organisations or
@@ -64,8 +64,8 @@ semantically meaning::
 * `Process`: a subtype of Pool to add configuration and resources for a specific
              participation process. Typical subtypes are `Proposal`s
 
-* `Proposal`:  a subtype of Item, this is normally content created by participants
-               during a paticipation process.
+* `Proposal`: a subtype of Item, this is normally content created by participants
+              during a paticipation process.
 
 Example resource hierarchy::
 
@@ -87,16 +87,16 @@ Meta-API
 
 The backend needs to answer to kinds of questions:
 
- 1. Globally: What resources (content types) exist?  What sheets may or
-    must they contain?  (What parts of) what sheets are
-    read-only?  mandatory?  optional?
+ 1. Globally: What resources (content types) exist? What sheets may or
+    must they contain? (What parts of) what sheets are
+    read-only? mandatory? optional?
 
  2. In the context of a given session and URL: What HTTP methods are
-    allowed?  With what resource objects in the body?  What are the
+    allowed? With what resource objects in the body? What are the
     authorizations (display / edit / vote-on / ...)?
 
 The second kind is implemented with the OPTIONS method on the existing
-URLs.  The first is implemented with the GET method on a dedicated URL.
+URLs. The first is implemented with the GET method on a dedicated URL.
 
 
 Global Info
@@ -412,7 +412,7 @@ PUT
 
 Modify data of an existing resource ::
 
-    FIXME: disable because IName.name is not editable.  use another example!
+    FIXME: disable because IName.name is not editable. use another example!
     FIXME: what we do here is a `patch` actually, so we should rename this.
 
 ...    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
@@ -429,7 +429,7 @@ Check the changed resource ::
 ...   'youdidntexpectthis'
 
 FIXME: write test cases for attributes with "create_mandatory",
-"editable", etc.  (those work the same in PUT and POST, and on any
+"editable", etc. (those work the same in PUT and POST, and on any
 attribute in the json tree.)
 
 PUT responses have the same fields as POST responses.
@@ -482,9 +482,9 @@ Create and Update Versionable Resources
 Introduction and Motivation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This section explains updates to resources with version control.  Two
+This section explains updates to resources with version control. Two
 sheets are central to version control in adhocracy: IDAG and
-IVersion.  IVersion is in all resources that support version
+IVersion. IVersion is in all resources that support version
 control, and IDAG is a container that manages all versions of a
 particular content element in a directed acyclic graph.
 
@@ -495,19 +495,19 @@ The server supports updating a resource that implements IVersion by
 letting you post a content element with missing IVersion sheet
 to the DAG (IVersion is read-only and managed by the server), and
 passing a list of parent versions in the post parameters of the
-request.  If there is only one parent version, the new version either
-forks off an existing branch or just continues a linear history.  If
+request. If there is only one parent version, the new version either
+forks off an existing branch or just continues a linear history. If
 there are several parent versions, we have a merge commit.
 
 Example: If a new versionable content element has been created by the
-user, the front-end first posts an IDAG.  The IDAG works a little like
-an IPool in that it allows posting versions to it.  The front-end will
+user, the front-end first posts an IDAG. The IDAG works a little like
+an IPool in that it allows posting versions to it. The front-end will
 then simply post the initial version into the IDAG with an empty
 predecessor version list.
 
 IDAGs may also implement the IPool sheet for
 containing further IDAGs for sub-structures of
-structured versionable content types.  Example: A document may consist
+structured versionable content types. Example: A document may consist
 of a title, description, and a list of references to sections.
 There is a DAG for each document and each such dag contains one DAG
 for each section that occurs in any version of the document.
@@ -515,7 +515,7 @@ Section refs in the document object point to specific versions in
 those DAGs.
 
 When posting updates to nested sub-structures, the front-end must
-decide for which parent objects it wants to trigger an update.  To
+decide for which parent objects it wants to trigger an update. To
 stay in the example above: If we have a document with two sections,
 and update a section, the post request must contain both the parent
 version(s) of the section, but also the parent version(s) of the
@@ -532,7 +532,7 @@ To see why, consider the following situation::
           >-----> time >-------->
 
 We want Doc to be available in 3 versions that are linearly dependent
-on each other.  But when the update to Par2 is posted, the server has
+on each other. But when the update to Par2 is posted, the server has
 no way of knowing that it should update v1 of Doc, BUT NOT v0!
 
 
@@ -559,7 +559,7 @@ The return data has the new attribute 'first_version_path' to get the path first
     '.../adhocracy/Proposals/kommunismus/VERSION_0000000/'
 
 
-Version IDs are numeric and assigned by the server.  The front-end has
+Version IDs are numeric and assigned by the server. The front-end has
 no control over them, and they are not supposed to be human-memorable.
 For human-memorable version pointers that also allow for complex
 update behavior (fixed-commit, always-newest, ...), consider
@@ -806,18 +806,18 @@ This api has been designed to allow implementation of complex merge
 conflict resolution, both automatic and with user-involvement. Many
 resource types, however, only supports a simplified version control strategy
 with a *linear history*: If any version that is not head is used as a
-predecessor, the backend responds with an error.  The frontend has to handle
+predecessor, the backend responds with an error. The frontend has to handle
 these errors, as they can always occur in race conditions with other users.
 
 Current and potential future conflict resolution strategies are:
 
 1. If a race condition is reported by the backend, the frontend
-   updates the predecessor version to head and tries again.  (In the
+   updates the predecessor version to head and tries again. (In the
    unlikely case where lots of post activity is going on, it may be
    necessary to repeat this several times.)
 
    Example: IRatingVersion can only legally be modified by one user
-   and should not experience any race conditions.  If it does, the
+   and should not experience any race conditions. If it does, the
    second post wins and silently reverts the previous one.
 
 2. (Future work) Like 1., but the frontend posts two new versions on top of
@@ -838,13 +838,13 @@ Current and potential future conflict resolution strategies are:
 
           >-----> time >-------->
 
-   v0' is a copy of v0 that differs only in its predecessor.  It is
-   called a 'revert' version.  (FIXME: is there a way to enrich the
+   v0' is a copy of v0 that differs only in its predecessor. It is
+   called a 'revert' version. (FIXME: is there a way to enrich the
    data with a 'is_revert' flag?)
 
    This must be done in a batch request (a transaction) in order to
    avoid that only the revert is successfully posted, but the actual
-   change fails.  Again, it is possible that this batch request fails,
+   change fails. Again, it is possible that this batch request fails,
    and has to be attempted several times.
 
    Example: IProposalVersion can be modified by many users
@@ -852,9 +852,9 @@ Current and potential future conflict resolution strategies are:
 
 3. (Future work) Both authors of the conflict are notified (email,
    dashboard, ...), and explained how they can inspect the situation
-   and add new versions.  (The email should probably contain a warning
+   and add new versions. (The email should probably contain a warning
    that it's best to get on the phone and talk it through before
-   generating more merge conflicts.  :)
+   generating more merge conflicts.)
 
 4. (Future work) Ideally, the user would to be notified that there
    is a conflict, display the differences between the three versions,
@@ -1094,11 +1094,11 @@ A batch request a POST request with a json array in the body that
 contains certain HTTP requests encoded in a certain way.
 
 A success response contains in its body an array of encoded HTTP
-responses.  This way, the client can see what happened to the
+responses. This way, the client can see what happened to the
 individual POSTS, and collect all the paths of the individual
 resources that were posted.
 
-Batch requests are processed as a transaction.  By this, we mean that
+Batch requests are processed as a transaction. By this, we mean that
 either all encoded HTTP requests succeed and the response to the batch
 request is a success response, or any one of them fails, the database
 state is rolled back to the beginning of the request, and the response
@@ -1116,15 +1116,15 @@ is used to store all modifications.
 *Preliminary resource paths: motivation and general idea.*
 
 All requests with methods POST, GET, PUT as allowed in the rest of
-this document are allowed in batch requests.  POST differs in that it
-yields *preliminary resource paths*.  To understand what that is,
+this document are allowed in batch requests. POST differs in that it
+yields *preliminary resource paths*. To understand what that is,
 consider this example: In step 4 of a batch request, the front-end
 wants to post to the path that resulted from posting the parent
 resource in step 3 of the same request, so batch requests need to
 allow for an abstraction over the resource paths resulting from POST
-requests.  POST yields preliminary paths instead of actual ones, and
+requests. POST yields preliminary paths instead of actual ones, and
 POST, GET, and PUT are all allowed to use preliminary paths in
-addition to the "normal" ones.  Apart from this, nothing changes in
+addition to the "normal" ones. Apart from this, nothing changes in
 the individual requests.
 
 *Preliminary resource paths: implementation.*
@@ -1146,8 +1146,8 @@ omitted or left empty. ::
 
 Preliminary paths can be used anywhere in subsequent requests, either
 in the 'path' item of the request itself, or anywhere in the json data
-in the body where the schemas expect to find resource paths.  It must
-be prefixed with "@" in order to mark it as preliminary.  Right
+in the body where the schemas expect to find resource paths. It must
+be prefixed with "@" in order to mark it as preliminary. Right
 before executing the request, the backend will traverse the request
 object and replace all preliminary paths with the actual ones that
 will be available by then.
@@ -1560,31 +1560,3 @@ will be 1 or higher. ::
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])
     {'tag': {'FIRST': 2, 'LAST': 2}}
-
-Other stuff
------------
-
-GET /interfaces/..::
-
-    Get schema/interface information: attribute type/required/readonly, ...
-    Get interface inheritage
-
-
-GET/POST /workflows/..::
-
-    Get workflow, apply workflow to resource.
-
-
-GET/POST /transitions/..::
-
-    Get available workflow transitions for resource, execute transition.
-
-
-GET /query/..::
-
-    query catalog to find content below /instances/spd
-
-
-GET/POST /users::
-
-    Get/Add user
