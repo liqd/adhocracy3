@@ -63,6 +63,11 @@ export interface IScope extends angular.IScope {
     resource: any;
 }
 
+export interface IFormScope extends IScope {
+    create : boolean;
+    showError;
+}
+
 export var detailDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -116,9 +121,12 @@ export var createDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        link: (scope, element) => {
+        link: (scope : IFormScope) => {
             scope.errors = [];
-            scope.data = {};
+            scope.data = {
+                title: "Toller Titel",
+                paragraphs: dummydata
+            };
             scope.create = true;
             scope.showError = adhShowError;
         }
@@ -138,7 +146,7 @@ export var editDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : IScope) => {
+        link: (scope : IFormScope) => {
             console.log("here comes the stuff");
         }
     };

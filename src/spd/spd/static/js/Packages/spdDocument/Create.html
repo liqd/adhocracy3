@@ -24,18 +24,17 @@
             </span>
         </label>
 
-        <!-- 1. Parapraph -->
-        <label>
+        <label data-ng-repeat="paragraph in data.paragraphs">
             <span class="label-text">{{ "TR__SPD_PARAGRAPH" | translate }}</span>
 
             <textarea
                 data-msd-elastic=""
-                data-ng-model="data.detail"
-                name="detail"
+                data-ng-model="paragraph.body"
+                name="paragraph-{{ $index }}"
                 maxlength="500"
                 required="required"></textarea>
 
-            <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm.detail, 'required')">
+            <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm['paragraph-' + $index], 'required')">
                 {{ "TR__SPD_ERROR_REQUIRED_PARAGRAPH" | translate }}
             </span>
         </label>
