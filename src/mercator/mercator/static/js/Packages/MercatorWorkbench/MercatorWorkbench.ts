@@ -63,7 +63,7 @@ export var commentColumnDirective = (adhConfig : AdhConfig.IService) => {
 
 export var mercatorProposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhResourceUrlFilter : (path : string) : string,
+    adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
@@ -108,7 +108,7 @@ export var mercatorProposalDetailColumnDirective = (
 
 export var mercatorProposalEditColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhResourceUrlFilter : (path : string) : string,
+    adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
