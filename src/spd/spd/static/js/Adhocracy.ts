@@ -21,6 +21,8 @@ import modernizr = require("modernizr");
 import moment = require("moment");
 import webshim = require("polyfiller");
 
+import markdownit = require("markdownit");
+
 import AdhAbuse = require("./Packages/Abuse/Abuse");
 import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
@@ -53,6 +55,7 @@ import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
 import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
 webshim.setOptions("forms-ext", {"replaceUI": true});
@@ -94,7 +97,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhProposal.moduleName,
         AdhSticky.moduleName,
         AdhTracking.moduleName,
-        AdhUserViews.moduleName
+        AdhUserViews.moduleName,
+        AdhMarkdown.moduleName
     ];
 
     if (config.cachebust) {
@@ -154,12 +158,14 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         });
     }]);
 
+    app.value("markdownit", markdownit);
     app.value("angular", angular);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
 
     // register our modules
     app.value("adhConfig", config);
+    AdhMarkdown.register(angular);
     AdhAbuse.register(angular);
     AdhComment.register(angular);
     AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);

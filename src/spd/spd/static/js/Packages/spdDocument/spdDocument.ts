@@ -14,22 +14,59 @@ import AdhRate = require("../Rate/Rate");
 import AdhSticky = require("../Sticky/Sticky");
 import AdhEmbed = require("../Embed/Embed");
 
-
-
 var pkgLocation = "/spdDocument";
+
+// FIXME: Can be removed when we work with real data
+export var dummydata : IParagraph[] = [{
+   body: "## Hallo \n\n Lorem ipsum dolor sit amet, " +
+       "consectetur adipiscing elit. Phasellus quis " +
+       "lectus metus, at posuere neque. Sed pharetra " +
+       "nibh eget orci convallis at posuere leo convallis. " +
+       "Sed blandit augue vitae augue scelerisque bibendum. " +
+       "Vivamus sit amet libero turpis, non venenatis urna. " +
+       "In blandit, odio convallis suscipit venenatis, ante " +
+       "ipsum cursus augue."
+}, {
+    body: "## Toll \n\n Lorem ipsum dolor sit amet, " +
+       "consectetur adipiscing elit. Phasellus quis " +
+       "lectus metus, at posuere neque. Sed pharetra " +
+       "nibh eget orci convallis at posuere leo convallis. " +
+       "Sed blandit augue vitae augue scelerisque bibendum. " +
+       "Vivamus sit amet libero turpis, non venenatis urna. " +
+       "In blandit, odio convallis suscipit venenatis, ante " +
+       "ipsum cursus augue."
+}, {
+    body: "## Klasse! \n\n Lorem ipsum dolor sit amet," +
+       "consectetur adipiscing elit. Phasellus quis " +
+       "lectus metus, at posuere neque. Sed pharetra " +
+       "nibh eget orci convallis at posuere leo convallis. " +
+       "Sed blandit augue vitae augue scelerisque bibendum. " +
+       "Vivamus sit amet libero turpis, non venenatis urna. " +
+       "In blandit, odio convallis suscipit venenatis, ante " +
+       "ipsum cursus augue."
+}];
+
+export interface IParagraph {
+    body : string;
+}
 
 export interface IScope extends angular.IScope {
     path? : string;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
-
         // FIXME: not final
         title : string;
-        detail : string;
+        paragraphs : IParagraph[];
     };
     selectedState? : string;
     resource: any;
+}
+
+export interface IFormScope extends IScope {
+    create : boolean;
+    showError;
+    addParagraph() : void;
 }
 
 export var detailDirective = (
@@ -46,7 +83,10 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            console.log("here comes the stuff");
+            scope.data = {
+                title: "Toller Titel",
+                paragraphs: dummydata
+            };
         }
     };
 };
@@ -75,16 +115,27 @@ export var createDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhShowError,
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
-        scope: {
-            path: "@"
-        },
-        link: (scope : IScope) => {
-            console.log("here comes the stuff");
+        link: (scope : IFormScope) => {
+            scope.errors = [];
+            scope.data = {
+                title: "Toller Titel",
+                paragraphs: dummydata
+            };
+            scope.create = true;
+            scope.showError = adhShowError;
+
+            scope.addParagraph = () => {
+                scope.data.paragraphs.push({
+                    body: ""
+                });
+            };
         }
     };
 };
@@ -102,7 +153,7 @@ export var editDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : IScope) => {
+        link: (scope : IFormScope) => {
             console.log("here comes the stuff");
         }
     };
@@ -133,7 +184,7 @@ export var register = (angular) => {
         .directive("adhSpdDocumentDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
         .directive("adhSpdDocumentCreate", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", createDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhShowError", "adhSubmitIfValid", createDirective])
         .directive("adhSpdDocumentEdit", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", editDirective])
         .directive("adhSpdDocumentListItem", [
