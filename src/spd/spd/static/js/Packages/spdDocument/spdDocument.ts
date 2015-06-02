@@ -18,7 +18,7 @@ var pkgLocation = "/spdDocument";
 
 // FIXME: Can be removed when we work with real data
 export var dummydata = [
-    "## Hallo \n Lorem ipsum dolor sit amet, " +
+    "## Hallo \n\n Lorem ipsum dolor sit amet, " +
      "consectetur adipiscing elit. Phasellus quis " +
      "lectus metus, at posuere neque. Sed pharetra " +
      "nibh eget orci convallis at posuere leo convallis. " +
@@ -26,7 +26,7 @@ export var dummydata = [
      "Vivamus sit amet libero turpis, non venenatis urna. " +
      "In blandit, odio convallis suscipit venenatis, ante " +
      "ipsum cursus augue.",
-     "## Toll \n Lorem ipsum dolor sit amet, " +
+     "## Toll \n\n Lorem ipsum dolor sit amet, " +
      "consectetur adipiscing elit. Phasellus quis " +
      "lectus metus, at posuere neque. Sed pharetra " +
      "nibh eget orci convallis at posuere leo convallis. " +
@@ -34,7 +34,7 @@ export var dummydata = [
      "Vivamus sit amet libero turpis, non venenatis urna. " +
      "In blandit, odio convallis suscipit venenatis, ante " +
      "ipsum cursus augue.",
-     "## Klasse! \n Lorem ipsum dolor sit amet," +
+     "## Klasse! \n\n Lorem ipsum dolor sit amet," +
      "consectetur adipiscing elit. Phasellus quis " +
      "lectus metus, at posuere neque. Sed pharetra " +
      "nibh eget orci convallis at posuere leo convallis. " +
@@ -52,7 +52,7 @@ export interface IScope extends angular.IScope {
 
         // FIXME: not final
         title : string;
-        paragraphs : string[][];
+        paragraphs : string[];
     };
     selectedState? : string;
     resource: any;
@@ -71,10 +71,11 @@ export var detailDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : any) => {
-            scope.data = {};
-            scope.data.title = "Toller Titel";
-            scope.data.paragraphs = dummydata;
+        link: (scope : IScope) => {
+            scope.data = {
+                title: "Toller Titel",
+                paragraphs: dummydata
+            };
         }
     };
 };
@@ -163,8 +164,7 @@ export var register = (angular) => {
         .directive("adhSpdDocumentDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
         .directive("adhSpdDocumentCreate", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhShowError",
-            "adhSubmitIfValid", createDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhShowError", "adhSubmitIfValid", createDirective])
         .directive("adhSpdDocumentEdit", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", editDirective])
         .directive("adhSpdDocumentListItem", [

@@ -4,8 +4,8 @@
     class="spd-document-form"
     name="spdDocumentForm">
 
-    <div class="">
-    	<div class="form-error" data-ng-repeat="error in errors track by $index">
+    <div>
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | adhFormatError | translate }}</p>
         </div>
 
@@ -39,6 +39,7 @@
                 {{ "TR__SPD_ERROR_REQUIRED_PARAGRAPH" | translate }}
             </span>
         </label>
+    </div>
 
     <!-- DATA SUBMIT -->
     <footer class="form-footer">
