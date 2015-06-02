@@ -26,7 +26,7 @@
 
         <div class="mercator-proposal-chapters" data-du-spy-context="">
             <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="mercator-proposal-chapter-{{$index}}">
-                <adh-parse-markdown data-parsetext="paragraph"></adh-parse-markdown>
+                <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="commentable-section-show-comments" href="">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
                 </a>
