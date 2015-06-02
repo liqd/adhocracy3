@@ -312,12 +312,12 @@ export var indicatorDirective = (
             };
 
             $scope.logIn = () => {
-                adhTopLevelState.setCameFrom($location.path());
+                adhTopLevelState.setCameFrom($location.url());
                 $location.url("/login");
             };
 
             $scope.register = () => {
-                adhTopLevelState.setCameFrom($location.path());
+                adhTopLevelState.setCameFrom($location.url());
                 $location.url("/register");
             };
         }]
