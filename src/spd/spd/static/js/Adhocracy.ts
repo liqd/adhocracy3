@@ -141,9 +141,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 prefix: "/static/i18n/core_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }, {
-                prefix: "/static/i18n/countries_",
-                suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
-            }, {
                 prefix: "/static/i18n/spd_",
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }]
