@@ -66,6 +66,7 @@ export interface IScope extends angular.IScope {
 export interface IFormScope extends IScope {
     create : boolean;
     showError;
+    addParagraph() : void;
 }
 
 export var detailDirective = (
@@ -129,6 +130,12 @@ export var createDirective = (
             };
             scope.create = true;
             scope.showError = adhShowError;
+
+            scope.addParagraph = () => {
+                scope.data.paragraphs.push({
+                    body: ""
+                });
+            };
         }
     };
 };
