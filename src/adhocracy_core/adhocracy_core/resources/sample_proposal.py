@@ -3,6 +3,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources.comment import add_commentsservice
+from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.sample_section import ISection
 from adhocracy_core.resources.sample_paragraph import IParagraph
 from adhocracy_core.resources import add_resource_type_to_registry
@@ -54,6 +55,7 @@ proposal_meta = item_meta._replace(
     after_creation=item_meta.after_creation + [
         add_commentsservice,
         add_ratesservice,
+        add_badge_assignments_service,
     ],
     item_type=IProposalVersion,
     permission_create='create_proposal',

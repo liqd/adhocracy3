@@ -20,7 +20,7 @@ class TestBadgeableSheet:
 
     @fixture
     def inst(self, pool, service, meta):
-        pool['badges'] = service
+        pool['badge_assignments'] = service
         return meta.sheet_class(meta, pool)
 
     @fixture
@@ -43,14 +43,14 @@ class TestBadgeableSheet:
 
     def test_get_empty(self, inst, service ):
         assert inst.get() == {'post_pool': service,
-                              'badged_by': [],
+                              'assignments': [],
                               }
 
     def test_get_back_reference(self, inst, sheet_catalogs, search_result):
         badge = testing.DummyResource()
         sheet_catalogs.search.return_value =\
             search_result._replace(elements=[badge])
-        assert inst.get()['badged_by'] == [badge]
+        assert inst.get()['assignments'] == [badge]
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
@@ -63,8 +63,8 @@ class TestBadgeAssignmentsSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.badge import badge_assignments_meta
-        return badge_assignments_meta
+        from adhocracy_core.sheets.badge import badge_assignment_meta
+        return badge_assignment_meta
 
     @fixture
     def inst(self, context, meta):
@@ -74,10 +74,10 @@ class TestBadgeAssignmentsSheet:
     def test_meta(self, meta):
         from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
         from . import badge
-        assert badge.IBadgeAssignments.extends(ISheetReferenceAutoUpdateMarker)
-        assert meta.isheet == badge.IBadgeAssignments
-        assert meta.schema_class == badge.BadgeAssignmentsSchema
-        assert meta.edit_permission == 'edit_sheet_badge_assignments'
+        assert badge.IBadgeAssignment.extends(ISheetReferenceAutoUpdateMarker)
+        assert meta.isheet == badge.IBadgeAssignment
+        assert meta.schema_class == badge.BadgeAssignmentSchema
+        assert meta.edit_permission == 'edit'
 
     def test_create(self, inst):
         from zope.interface.verify import verifyObject
@@ -87,13 +87,9 @@ class TestBadgeAssignmentsSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'badges': []}
-
-    def test_get_reference(self, inst, sheet_catalogs, search_result):
-        badged = testing.DummyResource()
-        sheet_catalogs.search.return_value =\
-            search_result._replace(elements=[badged])
-        assert inst.get()['badges'] == [badged]
+        assert inst.get() == {'subject': None,
+                              'badge': None,
+                              'object': None}
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
@@ -102,12 +98,12 @@ class TestBadgeAssignmentsSheet:
         assert get_sheet(context, meta.isheet)
 
 
-class TestBadgeDataSheet:
+class TestBadgeSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.badge import badge_data_meta
-        return badge_data_meta
+        from adhocracy_core.sheets.badge import badge_meta
+        return badge_meta
 
     @fixture
     def inst(self, context, meta):
@@ -116,9 +112,9 @@ class TestBadgeDataSheet:
     @fixture
     def test_meta(self, meta):
         from . import badge
-        assert meta.isheet == badge.IBadgeData
-        assert meta.schema_class == badge.BadgeDataSchema
-        assert meta.edit_permission == 'edit_sheet_badge_data'
+        assert meta.isheet == badge.IBadge
+        assert meta.schema_class == badge.BadgeSchema
+        assert meta.edit_permission == 'edit'
 
     def test_create(self, inst):
         from zope.interface.verify import verifyObject

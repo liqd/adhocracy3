@@ -38,42 +38,68 @@ Create participation process structure/content to get started::
 Create Badge
 ~~~~~~~~~~~~
 
-Badges can be created in `badges` pools. The IHasBadgesPool sheet of the process
+BadgeData can be created in `badges` pools. The IHasBadgesPool sheet of the process
 gives us the right pool:
 
 
     >>> resp = initiator.get('/organisation/process').json
-    >>> badges = resp['data']['adhocracy_core.sheets.badge.IHasBadgesPool']['badges_pool']
+    >>> badges_pool = resp['data']['adhocracy_core.sheets.badge.IHasBadgesPool']['badges_pool']
 
 # TODO First we crate a badge Group pool
 
-Now we can create a Badge
+Now we can create BadgeData::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadge',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'badge1'},
-    ...                  'adhocracy_core.sheets.badge.IBadgeData':
-    ...                       {'title': 'Badge 1',
-    ...                         'description': 'This badge show greatness.',
-    ...                         'color': '#666666',
-    ...                        },
-    ...         }}
-    >>> resp = initiator.post(badges, prop).json
-    >>> badge = resp['path']
+    ...                  'adhocracy_core.sheets.title.ITitle': {'title': 'Badge 1'},
+    ...                  'adhocracy_core.sheets.description.IDescription': {'description': 'This is 1'},
+    ...                  },
+    ...         }
+    >>> resp = initiator.post(badges_pool, prop).json
+    >>> badge_data = resp['path']
 
 
-Badge Process Content
-~~~~~~~~~~~~~~~~~~~~~
+Assign badges to process content
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To assign badges to content we have to edit an existing badge::
+To assign badges we have to post a badge assignment between user, content
+and badgedata to the badgeable post pool::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadge',
-    ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignments':
-    ...                      {'badges': [proposal_version]},
+
+    >>> resp = initiator.get(proposal_version).json
+    >>> post_pool = resp['data']['adhocracy_core.sheets.badge.IBadgeable']['post_pool']
+
+    >>> user = initiator.header['X-User-Path']
+
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
+    ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
+    ...                      {'subject': user,
+    ...                       'badge': badge_data,
+    ...                       'object': proposal_version}
     ...          }}
-    >>> resp = initiator.put(badge, prop)
+    >>> resp = initiator.post(post_pool, prop).json
 
-Now the badged content shows the back reference targeting the badge::
+Now the badged content shows the back reference targeting the badge assignment::
 
     >>> resp = participant.get(proposal_version).json
-    >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['badged_by']
-    [.../organisation/process/badges/badge1/']
+    >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
+    [...organisation/process/proposal/badge_assignments/0000000/']
+
+TODO Notes:
+
+possible to configure what group,
+                      what user,
+                      exclusive?
+
+Maybe with this data structure:
+
+IBadgeable:{
+    'assignables': [{
+        'name': status,
+        'select_pool': ...
+        'post_pool':
+        'exclusive': True,
+         }
+        ]
+}
+
