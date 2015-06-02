@@ -180,10 +180,9 @@ Class to add styling to a label when the label itself is used as a container.
 }
 
 .input-error {
-    @include inline-block;
+    display: block;
     color: $color-function-invalid;
     font-size: $font-size-small;
-    width: 100%;
 }
 
 /*doc
