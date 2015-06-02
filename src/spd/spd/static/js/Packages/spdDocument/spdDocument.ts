@@ -5,6 +5,7 @@ import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
+import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -107,7 +108,10 @@ export var listItemDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            console.log("here comes the stuff");
+            scope.data = {
+                title: "Toller Titel",
+                commentCountTotal: 3
+            };
         }
     };
 };
@@ -170,6 +174,7 @@ export var register = (angular) => {
             "ngMessages",
             AdhAngularHelpers.moduleName,
             AdhHttp.moduleName,
+            AdhImage.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhResourceArea.moduleName,
