@@ -51,6 +51,63 @@ export var detailDirective = (
     };
 };
 
+export var listItemDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope) => {
+            console.log("here comes the stuff");
+        }
+    };
+};
+
+export var createDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope) => {
+            console.log("here comes the stuff");
+        }
+    };
+};
+
+export var editDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhRate : AdhRate.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope : IScope) => {
+            console.log("here comes the stuff");
+        }
+    };
+};
+
 export var moduleName = "adhSPDDocument";
 
 export var register = (angular) => {
@@ -69,7 +126,16 @@ export var register = (angular) => {
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("spd-document-detail");
+            adhEmbedProvider.embeddableDirectives.push("spd-document-create");
+            adhEmbedProvider.embeddableDirectives.push("spd-document-edit");
+            adhEmbedProvider.embeddableDirectives.push("spd-document-list-item");
         }])
-        .directive("adhSPDDocumentDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective]);
+        .directive("adhSpdDocumentDetail", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
+        .directive("adhSpdDocumentCreate", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", createDirective])
+        .directive("adhSpdDocumentEdit", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", editDirective])
+        .directive("adhSpdDocumentListItem", [
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", listItemDirective]);
 };
