@@ -146,7 +146,7 @@ the `is-disabled` state.
         &:hover:not(.is-disabled),
         &:focus:not(.is-disabled),
         &:active:not(.is-disabled) {
-            color: $color-brand-three-normal;
+            color: $color-function-invalid;
         }
     }
 

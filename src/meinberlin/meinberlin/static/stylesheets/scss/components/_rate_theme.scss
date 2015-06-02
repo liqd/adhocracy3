@@ -22,10 +22,10 @@
     .rate-contra {
         @include icon-button;
 
-        &:active,
         &.is-rate-button-active,
-        &:hover,
-        &:focus {
+        &:hover:not(.is-disabled),
+        &:focus:not(.is-disabled),
+        &:active:not(.is-disabled) {
             background: $color-brand-two-normal;
             color: $color-text-inverted;
         }

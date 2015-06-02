@@ -28,16 +28,15 @@ Switch the space (content/user)
         text-decoration: none;
 
         i {
-            color: $color-structure-extrovert;
+            color: $color-text-highlight-introvert;
             font-size: 130%;
         }
 
-        &.is-active i, &:active i {
-            color: $color-text-highlight-normal;
-        }
-
-        &:hover i, &:focus i {
-            color: $color-text-highlight-extrovert;
+        &.is-active i,
+        &:active i,
+        &:hover i,
+        &:focus i {
+            color: $color-brand-two-normal;
         }
     }
 
