@@ -42,7 +42,7 @@ There are 5 base types of resources:
 * `Pool`: folder in the resource hierarchy, can contain other Pools of any kind.
 
 * `Item`: container Pool for ItemVersions of a specific type that belong to the
-  same DAG (TODO: add DAG term to glossary), `Tag`s for these Versions and
+  same :term:`DAG` `Tag`s for these Versions and
   `Sub-Items` that are closely related (e.g. Sections within Documents)
 
 * `ItemVersion`: a specific version of an item (SectionVersion, DocumentVersion)
