@@ -14,15 +14,10 @@
     padding: 15px;
 }
 
-// HACK
-// scss-lint:disable QualifyingElement
-.mein-berlin-kiezkassen-proposal-form-footer input[type="submit"].m-call-to-action {
-    @include border-radius(0);
-}
-// scss-lint:enable QualifyingElement
-
 .mein-berlin-bplaene-proposal-success {
     @extend .standalone-wrapper;
+    padding-left: 2.5em;
+    padding-right: 2.5em;
 }
 
 .mein-berlin-bplaene-proposal-success-title {
@@ -30,6 +25,5 @@
 }
 
 .mein-berlin-bplaene-proposal-success-show-form {
-    @extend .button;
     margin: 2em 0;
 }
