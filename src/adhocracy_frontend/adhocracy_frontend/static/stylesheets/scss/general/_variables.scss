@@ -60,6 +60,9 @@ $annotation-width: 34%;
 $padding-small: 0.5em;
 $padding-medium: 1em;
 
+//Other
+$section-jump-navigation-width: 2em;
+
 @mixin font-tracking($value) {
     @if $value == narrow {
         word-spacing: 0.025em;
