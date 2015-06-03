@@ -15,6 +15,7 @@ from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.schema import ACM
@@ -120,7 +121,7 @@ def add_platform(context, registry, platform_id=None,
 
 def _add_adhocracy_platform(context: IPool, registry: Registry,
                             options: dict):
-    add_platform(context, registry)
+    add_platform(context, registry, resource_type=IProcess)
 
 
 def _add_default_group(context, registry):
