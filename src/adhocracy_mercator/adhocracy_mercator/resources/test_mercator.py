@@ -108,12 +108,13 @@ class TestProcess:
         from adhocracy_core.resources.asset import add_assets_service
         from .mercator import IProcess
         from .mercator import IMercatorProposal
+        import adhocracy_mercator.sheets.mercator
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == [
-            adhocracy_core.sheets.workflow.ISample
+            adhocracy_mercator.sheets.mercator.IWorkflowAssignment
         ]
         assert meta.element_types == [IMercatorProposal]
         assert add_assets_service in meta.after_creation

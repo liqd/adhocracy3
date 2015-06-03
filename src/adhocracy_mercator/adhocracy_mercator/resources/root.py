@@ -4,10 +4,10 @@ from pyramid.security import Allow
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.process import IProcess
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.schema import ACM
 from adhocracy_core import sheets
+from adhocracy_mercator.resources.mercator import IProcess
 
 
 def _create_initial_content(context: IPool, registry: Registry, options: dict):

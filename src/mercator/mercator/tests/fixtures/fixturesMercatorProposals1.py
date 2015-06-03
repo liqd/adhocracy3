@@ -45,7 +45,7 @@ def login():
 
 
 create_proposal_batch = \
-    [{"method": "POST", "path": "http://localhost/mercator/advocate", "body": {
+    [{"method": "POST", "path": "http://localhost/mercator", "body": {
         "content_type": "adhocracy_mercator.resources.mercator.IMercatorProposal",
         "data": {"adhocracy_core.sheets.name.IName": {"name": "proposal2"}},
         "first_version_path": "@pn2", "root_versions": [],
@@ -272,11 +272,11 @@ create_proposal_batch = \
 
 update_proposal_batch = \
     [{"method": "POST",
-      "path": "http://localhost/mercator/advocate/proposal2/organization_info/", "body": {
+      "path": "http://localhost/mercator/proposal2/organization_info/", "body": {
         "content_type": "adhocracy_mercator.resources.mercator"
                         ".IOrganizationInfoVersion",
         "data": {"adhocracy_core.sheets.versions.IVersionable": {"follows": [
-            "http://localhost/mercator/advocate/proposal2/organization_info"
+            "http://localhost/mercator/proposal2/organization_info"
             "/VERSION_0000001/"]},
                  "adhocracy_core.sheets.metadata.IMetadata": {"deleted": false,
                                                               "preliminaryNames":
@@ -285,9 +285,9 @@ update_proposal_batch = \
                      "name": "organization name Updated", "country": "CL",
                      "status": "registered_nonprofit",
                      "website": "http://example.org"}}, "root_versions": [],
-        "parent": "http://localhost/mercator/advocate/proposal2/organization_info/"},
+        "parent": "http://localhost/mercator/proposal2/organization_info/"},
       "result_path": "@pn65", "result_first_version_path": "@pn77"},
-     {"method": "POST", "path": "http://localhost/mercator/advocate/proposal2/", "body": {
+     {"method": "POST", "path": "http://localhost/mercator/proposal2/", "body": {
          "content_type": "adhocracy_mercator.resources.mercator"
                          ".IMercatorProposalVersion",
          "data": {
@@ -295,11 +295,11 @@ update_proposal_batch = \
                                                           "preliminaryNames":
                                                               {"state": 78}},
              "adhocracy_core.sheets.versions.IVersionable": {"follows": [
-                 "http://localhost/mercator/advocate/proposal2/VERSION_0000001/"]},
+                 "http://localhost/mercator/proposal2/VERSION_0000001/"]},
              "adhocracy_mercator.sheets.mercator.IUserInfo": {
                  "personal_name": "pita Updated", "family_name": "pasta",
                  "country": "AR"}}, "root_versions": [],
-         "parent": "http://localhost/mercator/advocate/proposal2/"}, "result_path": "@pn64",
+         "parent": "http://localhost/mercator/proposal2/"}, "result_path": "@pn64",
       "result_first_version_path": "@pn78"}]
 
 

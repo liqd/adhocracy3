@@ -455,6 +455,9 @@ process_meta = process.process_meta._replace(
     element_types=[IMercatorProposal,
                    ],
     is_implicit_addable=True,
+    extended_sheets=[
+        adhocracy_mercator.sheets.mercator.IWorkflowAssignment
+    ]
 )
 
 
