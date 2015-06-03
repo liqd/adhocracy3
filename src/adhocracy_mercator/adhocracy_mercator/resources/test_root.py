@@ -26,6 +26,6 @@ def test_create_root_with_initial_content(registry):
         from adhocracy_core.resources.process import IProcess
         inst = registry.content.create(IRootPool.__identifier__)
         assert IRootPool.providedBy(inst)
-        assert IOrganisation.providedBy(inst['mercator'])
-        assert IProcess.providedBy(inst['mercator']['advocate'])
+        assert IOrganisation.providedBy(inst)
+        assert IProcess.providedBy(inst['mercator'])
 

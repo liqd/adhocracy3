@@ -9,6 +9,7 @@ from substanced.util import find_service
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
@@ -62,7 +63,7 @@ root_acm = ACM().deserialize(
 # fixme: remove edit_xx_permission
 
 
-class IRootPool(IPool, IRoot):
+class IRootPool(IOrganisation, IRoot):
 
     """The application root object."""
 
