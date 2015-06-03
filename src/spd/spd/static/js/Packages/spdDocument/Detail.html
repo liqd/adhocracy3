@@ -23,13 +23,13 @@
             </ol>
         </nav>
 
-        <div class="section-jump-chapters" data-du-spy-context="">
-            <section class="commentable-section section-jump-chapter" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
+        <div class="section-jump-main" data-du-spy-context="">
+            <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="commentable-section-show-comments" href="">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
                 </a>
             </section>
-        </div><!-- /.section-jump-chapters -->
+        </div><!-- /.section-jump-main -->
     </div><!-- /.section-jump-body -->
 </div><!-- /.section-jump -->
