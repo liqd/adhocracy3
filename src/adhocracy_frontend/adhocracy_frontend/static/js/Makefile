@@ -18,10 +18,7 @@ compile: compile_tests_browser
 AdhocracySpec.ts: .phony
 	./AdhocracySpec.sh > AdhocracySpec.ts
 
-AdhocracyIg.ts: .phony
-	./AdhocracyIg.sh > AdhocracyIg.ts
-
-compile_tests_browser: AdhocracySpec.ts AdhocracyIg.ts
+compile_tests_browser: AdhocracySpec.ts
 	$(TSC) --module amd --sourcemap Adhocracy*.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
 test-no-blanket: .phony

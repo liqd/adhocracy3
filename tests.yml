@@ -4,7 +4,5 @@ pyfunc:
     command: bin/py.test --timeout=60 -m"functional and not jasmine" src/adhocracy_*
 jsunit:
     command: bin/py.test -m"jasmine" src/adhocracy_frontend/adhocracy_frontend/tests/unit/
-jsint:
-    command: bin/py.test -m"jasmine" src/adhocracy_frontend/adhocracy_frontend/tests/integration/
 acceptance:
     command: bin/protractor etc/protractorConf.js
