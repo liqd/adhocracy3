@@ -83,6 +83,7 @@ Default
     -   No dedicated pages
     -   No icon
     -   No image
+    -   have colour
     -   Can be created and assigned by moderators
     -   All badges can exist globally and additonally per instance
 

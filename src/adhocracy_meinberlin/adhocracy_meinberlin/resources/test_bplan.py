@@ -11,6 +11,7 @@ def integration(config):
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.process')
     config.include('adhocracy_core.resources.asset')
+    config.include('adhocracy_core.resources.badge')
     config.include('adhocracy_meinberlin.sheets.bplan')
     config.include('adhocracy_meinberlin.resources.bplan')
 

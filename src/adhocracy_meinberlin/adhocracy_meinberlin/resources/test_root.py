@@ -11,27 +11,26 @@ def test_root_meta():
     from adhocracy_core.resources.root import root_meta
     from adhocracy_core.resources.root import \
         create_initial_content_for_app_root
-    from .root import create_initial_content_for_meinberlin
+    from .root import add_example_process
     from .root import meinberlin_root_meta
-    assert create_initial_content_for_meinberlin not in root_meta.after_creation
-    assert create_initial_content_for_meinberlin in\
-           meinberlin_root_meta.after_creation
+    assert add_example_process  not in root_meta.after_creation
+    assert add_example_process in meinberlin_root_meta.after_creation
     assert create_initial_content_for_app_root in\
            meinberlin_root_meta.after_creation
 
 
 @mark.usefixtures('integration')
-def test_create_initial_content_for_meinberlin(pool_graph_catalog, registry):
+def test_add_example_process(pool_graph_catalog, registry):
     from adhocracy_core.utils import get_sheet_field
     from adhocracy_core.resources.organisation import IOrganisation
     from adhocracy_core.resources.geo import IMultiPolygon
     from adhocracy_core.resources.geo import add_locations_service
     import adhocracy_core.sheets.geo
     from adhocracy_meinberlin import resources
-    from .root import create_initial_content_for_meinberlin
+    from .root import add_example_process
     root = pool_graph_catalog
     add_locations_service(root, registry, {})
-    create_initial_content_for_meinberlin(root, registry, {})
+    add_example_process(root, registry, {})
     assert IOrganisation.providedBy(root['organisation'])
     kiezkasse =  root['organisation']['kiezkasse']
     assert resources.kiezkassen.IProcess.providedBy(kiezkasse)

@@ -63,6 +63,7 @@ def integration(config):
     config.include('adhocracy_core.resources.item')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.badge')
     config.include('adhocracy_mercator.sheets.mercator')
     config.include('adhocracy_mercator.resources.mercator')
     config.include('adhocracy_mercator.resources.subscriber')

@@ -6,15 +6,14 @@ from substanced.objectmap import ObjectMap
 from substanced.util import set_acl
 from substanced.util import find_service
 
-from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.organisation import IOrganisation
-from adhocracy_core.resources.pool import pool_meta
-from adhocracy_core.resources.pool import IBasicPool
+from adhocracy_core.resources.organisation import organisation_meta
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.schema import ACM
@@ -45,6 +44,9 @@ root_acm = ACM().deserialize(
                      # simple content resources
                      ['create_asset',                  None,        Allow,         None,         None,      None,        Allow],  # noqa
                      ['create_external',               None,        Allow,         None,         None,      None,        Allow],  # noqa
+                     ['create_badge_data',             None,        None,          Allow,        None,      Allow,       Allow],  # noqa
+                     ['create_badge',                  None,        None,          Allow,        None,      Allow,       Allow],  # noqa
+                     ['create_badge_assignment',       None,        None,          Allow,        None,      Allow,       Allow],  # noqa
                      # versioned content resources
                      ['create_proposal',               None,        None,          None,         None,      None,        Allow],  # noqa
                      ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],  # noqa
@@ -60,8 +62,6 @@ root_acm = ACM().deserialize(
                      ['create_group',                  None,        None,          None,         None,      None,        Allow],  # noqa
                      ]})
 
-# fixme: remove edit_xx_permission
-
 
 class IRootPool(IOrganisation, IRoot):
 
@@ -70,7 +70,7 @@ class IRootPool(IOrganisation, IRoot):
 
 def create_initial_content_for_app_root(context: IPool, registry: Registry,
                                         options: dict):
-    """Add the platform object, Catalog, principals services to the context."""
+    """Add the Catalog, principals services to the context."""
     _add_objectmap_to_app_root(context)
     _add_graph(context, registry)
     _add_catalog_service(context, registry)
@@ -107,20 +107,13 @@ def _add_acl_to_app_root(context, registry):
     set_god_all_permissions(context, registry)
 
 
-def add_platform(context, registry, platform_id=None,
-                 resource_type: IResource=IBasicPool):
-    """Register the platform in the content registry."""
-    if platform_id is None:
-        platform_id = registry.settings.get('adhocracy.platform_id',
-                                            'adhocracy')
-    appstructs = {'adhocracy_core.sheets.name.IName': {'name': platform_id}}
-    registry.content.create(resource_type.__identifier__, context,
-                            appstructs=appstructs, registry=registry)
-
-
-def _add_adhocracy_platform(context: IPool, registry: Registry,
-                            options: dict):
-    add_platform(context, registry)
+def add_example_process(context: IPool, registry: Registry, options: dict):
+    """Add example organisation and process."""
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'adhocracy'}}
+    registry.content.create(IProcess.__identifier__,
+                            parent=context,
+                            appstructs=appstructs)
 
 
 def _add_default_group(context, registry):
@@ -178,10 +171,11 @@ def _add_initial_user_and_group(context, registry):
     user.activate()
 
 
-root_meta = pool_meta._replace(
+root_meta = organisation_meta._replace(
     iresource=IRootPool,
     after_creation=[create_initial_content_for_app_root,
-                    _add_adhocracy_platform]
+                    add_example_process],
+    is_implicit_addable=False,
 )
 
 
