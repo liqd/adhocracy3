@@ -1,9 +1,3 @@
-
-.section-jump-body {
-    background-color: $color-background-base-introvert;
-    clear: left;
-}
-
 .section-jump-cover-header {
     @include text(header);
     margin: 0;
@@ -18,19 +12,15 @@
     border-bottom: 2px solid $color-structure-normal;
     padding: 1.07142857em 0.71428571em 0.71428571em;
 
-    .chapter-header {
-        margin: 0;
-        font-size: $font-size-large;
-    }
-
-    .like {
-        margin-top: -0.35714285em;
-    }
-
     @media print {
         border: 0;
         padding: 0;
     }
+}
+
+.section-jump-body {
+    background-color: $color-background-base-introvert;
+    clear: left;
 }
 
 .section-jump-navigation {
