@@ -1,0 +1,22 @@
+.section-jump-cover {
+    .like {
+        margin-top: -0.35714285em;
+    }
+}
+
+.section-jump-chapters {
+    h3 {
+        color: $color-text-introvert;
+        font-size: $font-size-small;
+        font-weight: $font-weight-normal;
+        letter-spacing: 0.03em;
+        line-height: 1.15;
+        margin: 0 0 (15px / $font-size-small * 1em);
+        text-transform: uppercase;
+
+        @media print {
+            font-size: $font-size-plus;
+            margin-bottom: 3px;
+        }
+    }
+}
