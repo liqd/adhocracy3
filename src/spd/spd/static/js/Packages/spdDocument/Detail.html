@@ -24,12 +24,12 @@
         </nav>
 
         <div class="section-jump-chapters" data-du-spy-context="">
-            <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="mercator-proposal-chapter-{{$index}}">
+            <section class="commentable-section section-jump-chapter" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="commentable-section-show-comments" href="">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
                 </a>
             </section>
-        </div><!-- /.mercator-detail-body -->
+        </div><!-- /.section-jump-chapters -->
     </div><!-- /.section-jump-body -->
-</div><!-- /.mercator-proposal-detail-view -->
+</div><!-- /.section-jump -->
