@@ -16,7 +16,7 @@ A high-level section of a document with its own heading.
 */
 .chapter {
     .chapter-header {
-        background-color: $color-text-introvert;
-        padding: 0.5em 1em;
+        color: $color-text-introvert;
+        margin: 0 0 1em;
     }
 }

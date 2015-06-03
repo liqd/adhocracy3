@@ -233,23 +233,20 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 }
 
-.mercator-proposal-detail-cover {
-    @include span(full);
-    border-bottom: 2px solid $color-structure-normal;
-    padding: 1.07142857em 0.71428571em 0.71428571em;
+.section-jump-chapters {
+    h3 {
+        color: $color-text-introvert;
+        font-size: $font-size-small;
+        font-weight: $font-weight-normal;
+        letter-spacing: 0.03em;
+        line-height: 1.15;
+        margin: 0 0 (15px / $font-size-small * 1em);
+        text-transform: uppercase;
 
-    .chapter-header {
-        margin: 0;
-        font-size: $font-size-large;
-    }
-
-    .like {
-        margin-top: -0.35714285em;
-    }
-
-    @media print {
-        border: 0;
-        padding: 0;
+        @media print {
+            font-size: $font-size-plus;
+            margin-bottom: 3px;
+        }
     }
 }
 
@@ -267,88 +264,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
     @media print {
         display: none;
-    }
-}
-
-.mercator-proposal-cover-header {
-    @include text(header);
-    margin: 0;
-
-    @media print {
-        margin-bottom: 1em;
-    }
-}
-
-.mercator-proposal-detail-container {
-    background-color: $color-background-base-introvert;
-    clear: left;
-}
-
-$mercator-proposal-detail-nav-width: 2em;
-
-.mercator-proposal-detail-nav {
-    @extend .jump-navigation;
-    padding-top: 1em;
-    text-align: center;
-    width: $mercator-proposal-detail-nav-width;
-    float: left;
-
-    li {
-        a {
-            margin: 0 0 1em;
-        }
-    }
-
-    @media print {
-        display: none;
-    }
-}
-
-.mercator-proposal-chapters {
-    background-color: $color-background-base;
-    border-left: 2px solid $color-structure-normal;
-    counter-reset: chapter-counter;
-    margin-left: $mercator-proposal-detail-nav-width;
-
-    .chapter-header {
-        background: transparent;
-        color: $color-text-introvert;
-        font-size: $font-size-normal;
-        margin: 0 0 1em;
-        padding: 0;
-
-        &.active {
-            color: $color-text-highlight-normal;
-        }
-
-        &:before {
-            content: counter(chapter-counter) ". ";
-            counter-increment: chapter-counter;
-        }
-    }
-
-    h3 {
-        color: $color-text-introvert;
-        font-size: $font-size-small;
-        font-weight: $font-weight-normal;
-        letter-spacing: 0.03em;
-        line-height: 1.15;
-        margin: 0 0 (15px / $font-size-small * 1em);
-        text-transform: uppercase;
-
-        @media print {
-            font-size: $font-size-plus;
-            margin-bottom: 3px;
-        }
-    }
-
-    @media print {
-        border: 0;
-        margin: 0;
-
-        .chapter-header:before {
-            display: none;
-        }
     }
 }
 

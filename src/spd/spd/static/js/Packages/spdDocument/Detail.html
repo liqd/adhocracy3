@@ -1,30 +1,29 @@
-<div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
-    <h2 class="print-only mercator-proposal-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
+<div class="section-jump" id="section-jump-top">
+    <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
-    <div class="mercator-proposal-detail-cover">
-        <h1 class="mercator-proposal-cover-header screen-only">{{ data.title }}</h1>
+    <div class="section-jump-cover">
+        <h1 class="section-jump-cover-header screen-only">{{ data.title }}</h1>
         <ul class="mercator-proposal-detail-meta">
-            <li class="mercator-proposal-detail-meta-item mercator-proposal-detail-meta-item-total-comments">
+            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
             </li>
         </ul>
     </div><!-- /.cover -->
 
-    <div class="mercator-proposal-detail-container">
-
-        <nav class="mercator-proposal-detail-nav m-unnumbered" data-adh-sticky="">
+    <div class="section-jump-body">
+        <nav class="section-jump-navigation m-unnumbered" data-adh-sticky="">
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs">
                     <a
-                        href="#mercator-proposal-chapter-{{ $index }}"
+                        href="section-jump-chapter-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index }}.</a>
                 </li>
             </ol>
         </nav>
 
-        <div class="mercator-proposal-chapters" data-du-spy-context="">
+        <div class="section-jump-chapters" data-du-spy-context="">
             <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="mercator-proposal-chapter-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="commentable-section-show-comments" href="">
@@ -32,5 +31,5 @@
                 </a>
             </section>
         </div><!-- /.mercator-detail-body -->
-    </div><!-- /.mercator-proposal-detail-container -->
+    </div><!-- /.section-jump-body -->
 </div><!-- /.mercator-proposal-detail-view -->
