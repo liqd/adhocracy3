@@ -13,14 +13,14 @@ Some imports to work with rest api calls::
 Start adhocracy app and log in some users::
 
     >>> app_god = getfixture('app_god')
-    >>> app_god.base_path = '/adhocracy'
+    >>> app_god.base_path = '/'
 
 Lets create some content::
 
-    >>> data = {'adhocracy_core.sheets.name.IName': {'name': 'proposals'}}
+    >>> data = {'adhocracy_core.sheets.name.IName': {'name': 'process'}}
     >>> resp = app_god.post_resource('/', IProcess, data)
     >>> data = {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}
-    >>> resp = app_god.post_resource('/proposals', IProposal, data)
+    >>> resp = app_god.post_resource('/process', IProposal, data)
 
 
 Workflows
@@ -81,7 +81,7 @@ Workflow Assignment
 
 Resources have a WorkflowAssignment sheet to assign the wanted workflow::
 
-    >>> resp = app_god.get('/proposals/proposal_item').json
+    >>> resp = app_god.get('/process').json
     >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
     >>> workflow_data['workflow']
     'sample'
@@ -103,11 +103,11 @@ this metadata can be set::
 
     >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'participate': {'description': 'new',
     ...                                                                             'start_date': '2015-05-26T12:40:49.638293+00:00'}}}}
-    >>> resp = app_god.put('/proposals/proposal_item', data)
+    >>> resp = app_god.put('/process/proposal_item', data)
     >>> resp.status_code
     200
 
-    >>> resp = app_god.get('/proposals/proposal_item').json
+    >>> resp = app_god.get('/process/proposal_item').json
     >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
     >>> workflow_data['participate']['description']
     'new'
@@ -119,18 +119,18 @@ Workflow transition to states
 We can also modify the state if the workflow has a suitable transition.
 First we check the available next states::
 
-    >>> resp = app_god.options('/proposals/proposal_item').json
+    >>> resp = app_god.options('/process/proposal_item').json
     >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.ISample']
     {'workflow_state': ['frozen']}
 
 Then we can put the wanted next state:
 
      >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'workflow_state': 'frozen'}}}
-     >>> resp = app_god.put('/proposals/proposal_item', data)
+     >>> resp = app_god.put('/process/proposal_item', data)
      >>> resp.status_code
      200
 
-    >>> resp = app_god.get('/proposals/proposal_item').json
+    >>> resp = app_god.get('/process/proposal_item').json
     >>> resp['data']['adhocracy_core.sheets.workflow.ISample']['workflow_state']
     'frozen'
 

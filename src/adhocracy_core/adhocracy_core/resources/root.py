@@ -8,12 +8,12 @@ from substanced.util import find_service
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.organisation import IOrganisation
-from adhocracy_core.resources.process import IProcess
+from adhocracy_core.resources.organisation import organisation_meta
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.schema import ACM
@@ -62,10 +62,8 @@ root_acm = ACM().deserialize(
                      ['create_group',                  None,        None,          None,         None,      None,        Allow],  # noqa
                      ]})
 
-# fixme: remove edit_xx_permission
 
-
-class IRootPool(IPool, IRoot):
+class IRootPool(IOrganisation, IRoot):
 
     """The application root object."""
 
@@ -113,13 +111,8 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     """Add example organisation and process."""
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'adhocracy'}}
-    registry.content.create(IOrganisation.__identifier__,
-                            parent=context,
-                            appstructs=appstructs)
-    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
-                  {'name': 'process'}}
     registry.content.create(IProcess.__identifier__,
-                            parent=context['adhocracy'],
+                            parent=context,
                             appstructs=appstructs)
 
 
@@ -178,10 +171,11 @@ def _add_initial_user_and_group(context, registry):
     user.activate()
 
 
-root_meta = pool_meta._replace(
+root_meta = organisation_meta._replace(
     iresource=IRootPool,
     after_creation=[create_initial_content_for_app_root,
-                    add_example_process]
+                    add_example_process],
+    is_implicit_addable=False,
 )
 
 

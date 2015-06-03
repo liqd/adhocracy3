@@ -122,13 +122,10 @@ class TestRoot:
         assert group_roles == ['god']
 
     def test_create_root_with_example_process(self, registry):
-        from adhocracy_core.resources.organisation import IOrganisation
         from adhocracy_core.resources.process import IProcess
         from .root import IRootPool
         inst = registry.content.create(IRootPool.__identifier__)
-        assert IOrganisation.providedBy(inst['adhocracy'])
-        process = inst['adhocracy']['process']
-        assert IProcess.providedBy(process)
+        assert IProcess.providedBy(inst['adhocracy'])
 
     def test_includeme_registry_add_default_group(self, registry, request_):
         from substanced.util import find_service

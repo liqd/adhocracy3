@@ -62,12 +62,12 @@ We need a pool with an asset pool::
 
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...        'data': {'adhocracy_core.sheets.name.IName': {
-    ...                     'name':  'ProposalPool'}}}
-    >>> resp_data = testapp.post_json(rest_url + '/adhocracy', data,
+    ...                     'name':  'process'}}}
+    >>> resp_data = testapp.post_json(rest_url + '/', data,
     ...                               headers=god_header).json
     >>> proposal_pool_path = resp_data['path']
     >>> proposal_pool_path
-    'http://localhost/adhocracy/ProposalPool/'
+    'http://localhost/process/'
 
 We can ask the pool for the location of the asset pool::
 
@@ -75,7 +75,7 @@ We can ask the pool for the location of the asset pool::
     >>> asset_pool_path = resp_data['data'][
     ...         'adhocracy_core.sheets.asset.IHasAssetPool']['asset_pool']
     >>> asset_pool_path
-    'http://localhost/adhocracy/ProposalPool/assets/'
+    'http://localhost/process/assets/'
 
 
 Asset Subtypes, MIME Type Validators, and Images Size Mappers
@@ -148,10 +148,10 @@ references it. But first we have to create a proposal::
     >>> resp = testapp.post_json(proposal_pool_path, prop_data, headers=god_header)
     >>> prop_path = resp.json["path"]
     >>> prop_path
-    'http://localhost/adhocracy/ProposalPool/kommunismus/'
+    'http://localhost/process/kommunismus/'
     >>> prop_v0_path = resp.json['first_version_path']
     >>> prop_v0_path
-    'http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000000/'
+    'http://localhost/process/kommunismus/VERSION_0000000/'
 
 Now we can upload a sample picture::
 
@@ -171,7 +171,7 @@ path of the new resource (just as with other resource types)::
     'adhocracy_core.resources.image.IImage'
     >>> pic_path = resp_data["path"]
     >>> pic_path
-    'http://localhost/adhocracy/ProposalPool/assets/0000000/'
+    'http://localhost/process/assets/0000000/'
 
 If the frontend tries to upload an asset that is overly large (more than 16
 MB), the backend responds with an error. Stricter size limits may be
@@ -255,14 +255,14 @@ Lets post a new proposal version that refers to the image::
     >>> resp = testapp.post_json(prop_path, vers_data, headers=god_header)
     >>> prop_v1_path = resp.json["path"]
     >>> prop_v1_path
-    'http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/'
+    'http://localhost/process/kommunismus/VERSION_0000001/'
 
 If we re-download the image metadata, we see that it is now attached to the
 proposal version::
 
     >>> resp_data = testapp.get(pic_path).json
     >>> resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']['attached_to']
-    ['http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/']
+    ['http://localhost/process/kommunismus/VERSION_0000001/']
 
 
 Replacing Assets
@@ -307,10 +307,10 @@ As usual, the response lists the resources affected by the transaction::
     >>> sorted(updated_resources)
     ['changed_descendants', 'created', 'modified', 'removed']
     >>> resp_data['updated_resources']['modified']
-    ['http://localhost/adhocracy/ProposalPool/assets/0000000/']
+    ['http://localhost/process/assets/0000000/']
     >>> updated_resources['created'] == updated_resources['removed'] == []
     True
-    >>> 'http://localhost/adhocracy/ProposalPool/' in updated_resources['changed_descendants']
+    >>> 'http://localhost/process/' in updated_resources['changed_descendants']
     True
 
 If we download the image metadata again, we see that filename and size have
@@ -318,7 +318,7 @@ changed accordingly::
 
     >>> resp_data = testapp.get(pic_path).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.image.IImageMetadata'])
-    {'attached_to': ['http://localhost/adhocracy/ProposalPool/kommunismus/VERSION_0000001/'],
+    {'attached_to': ['http://localhost/process/kommunismus/VERSION_0000001/'],
      'filename': 'python2.jpg',
      'mime_type': 'image/jpeg',
      'size': '112107'}

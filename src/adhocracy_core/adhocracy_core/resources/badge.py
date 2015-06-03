@@ -6,7 +6,6 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.resources.service import service_meta
 import adhocracy_core.sheets.description
@@ -21,7 +20,7 @@ class IBadge(IPool):
     """A generic badge."""
 
 
-badge_data_meta = pool_meta._replace(
+badge_data_meta = simple_meta._replace(
     iresource=IBadge,
     extended_sheets=[
         adhocracy_core.sheets.description.IDescription,

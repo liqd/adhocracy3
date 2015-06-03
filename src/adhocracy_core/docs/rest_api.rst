@@ -341,11 +341,9 @@ GET
 
 Returns resource and child elements meta data and all sheet with data::
 
-    >>> resp_data = testapp.get(rest_url + "/adhocracy").json
+    >>> resp_data = testapp.get(rest_url + "/").json
     >>> pprint(resp_data["data"])
-    {'adhocracy_core.sheets.metadata.IMetadata': ...
-     'adhocracy_core.sheets.name.IName': {'name': 'adhocracy'},
-     'adhocracy_core.sheets.pool.IPool': {'elements': [...
+    {...'adhocracy_core.sheets.metadata.IMetadata': ...
 
 POST
 ~~~~
@@ -354,7 +352,7 @@ Create a new resource ::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/adhocracy", prop, headers=god_header).json
+    >>> resp_data = testapp.post_json(rest_url + "/", prop, headers=god_header).json
     >>> resp_data["content_type"]
     'adhocracy_core.resources.process.IProcess'
 
@@ -365,7 +363,7 @@ The response object has 3 top-level entries:
       >>> resp_data['content_type']
       'adhocracy_core.resources.process.IProcess'
       >>> resp_data['path']
-      '.../adhocracy/Proposals/'
+      '.../Proposals/'
 
 * A listing of resources affected by the transaction::
 
@@ -376,12 +374,12 @@ The response object has 3 top-level entries:
   transaction::
 
       >>> resp_data['updated_resources']['created']
-      [...'http://localhost/adhocracy/Proposals/'...
+      [...'http://localhost/Proposals/'...
 
   The subkey 'modified' lists any resources that have been modified::
 
       >>> sorted(resp_data['updated_resources']['modified'])
-      ['http://localhost/adhocracy/', 'http://localhost/principals/users/0000000/']
+      ['http://localhost/', 'http://localhost/principals/users/0000000/']
 
   Modifications also include that case that a reference from another
   resource has been added or removed, since references are often exposed in
@@ -417,14 +415,14 @@ Modify data of an existing resource ::
 
 ...    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
-...    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/Proposals", data, headers=god_header).json
+...    >>> resp_data = testapp.put_json(rest_url + "/Proposals", data, headers=god_header).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-...     'path': rest_url + '/adhocracy/Proposals'}
+...     'path': rest_url + '/Proposals'}
 
 Check the changed resource ::
 
-...   >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals").json
+...   >>> resp_data = testapp.get(rest_url + "/Proposals").json
 ...   >>> resp_data["data"]["adhocracy_core.sheets.name.IName"]["name"]
 ...   'youdidntexpectthis'
 
@@ -444,7 +442,7 @@ The normal return code is 200 ::
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data, headers=god_header)
+.. >>> testapp.put_json(rest_url + "/Proposals", data, headers=god_header)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400 ::
@@ -452,7 +450,7 @@ If you submit invalid data the return error code is 400 ::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data, headers=god_header)
+.. >>> testapp.put_json(rest_url + "/Proposals", data, headers=god_header)
 .. Traceback (most recent call last):
 .. ...
 .. {"errors": [{"description": ...
@@ -547,16 +545,16 @@ Create a Proposal (a subclass of Item which pools ProposalVersions) ::
     ...                  'name': 'kommunismus'}
     ...              }
     ...         }
-    >>> resp = testapp.post_json(rest_url + "/adhocracy/Proposals", pdag, headers=god_header)
+    >>> resp = testapp.post_json(rest_url + "/Proposals", pdag, headers=god_header)
     >>> pdag_path = resp.json["path"]
     >>> pdag_path
-    '.../adhocracy/Proposals/kommunismus/'
+    '.../Proposals/kommunismus/'
 
 The return data has the new attribute 'first_version_path' to get the path first Version::
 
     >>> pvrs0_path = resp.json['first_version_path']
     >>> pvrs0_path
-    '.../adhocracy/Proposals/kommunismus/VERSION_0000000/'
+    '.../Proposals/kommunismus/VERSION_0000000/'
 
 
 Version IDs are numeric and assigned by the server. The front-end has
@@ -569,10 +567,10 @@ The Proposal has the IVersions and ITags interfaces to work with Versions::
 
     >>> resp = testapp.get(pdag_path)
     >>> resp.json['data']['adhocracy_core.sheets.versions.IVersions']['elements']
-    ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/']
+    ['.../Proposals/kommunismus/VERSION_0000000/']
 
     >>> resp.json['data']['adhocracy_core.sheets.tags.ITags']['elements']
-    ['.../adhocracy/Proposals/kommunismus/FIRST/', '.../adhocracy/Proposals/kommunismus/LAST/']
+    ['.../Proposals/kommunismus/FIRST/', '.../Proposals/kommunismus/LAST/']
 
 
 Update
@@ -695,12 +693,12 @@ version is automatically created along with the updated Section version::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
-    {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/',
-                  '.../adhocracy/Proposals/kommunismus/VERSION_0000001/',
-                  '.../adhocracy/Proposals/kommunismus/VERSION_0000002/',
-                  '.../adhocracy/Proposals/kommunismus/VERSION_0000003/']}
+    {'elements': ['.../Proposals/kommunismus/VERSION_0000000/',
+                  '.../Proposals/kommunismus/VERSION_0000001/',
+                  '.../Proposals/kommunismus/VERSION_0000002/',
+                  '.../Proposals/kommunismus/VERSION_0000003/']}
 
-    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000003')
+    >>> resp = testapp.get(rest_url + '/Proposals/kommunismus/VERSION_0000003')
     >>> pvrs3_path = resp.json['path']
 
     >>> s2vrs1_path = resp.json['path']
@@ -744,22 +742,22 @@ a new version is automatically created only for pvrs3, not for pvrs2::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
-    {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/',
-                  '.../adhocracy/Proposals/kommunismus/VERSION_0000001/',
-                  '.../adhocracy/Proposals/kommunismus/VERSION_0000002/',
-                  '.../adhocracy/Proposals/kommunismus/VERSION_0000003/',
-                  '.../adhocracy/Proposals/kommunismus/VERSION_0000004/']}
+    {'elements': ['.../Proposals/kommunismus/VERSION_0000000/',
+                  '.../Proposals/kommunismus/VERSION_0000001/',
+                  '.../Proposals/kommunismus/VERSION_0000002/',
+                  '.../Proposals/kommunismus/VERSION_0000003/',
+                  '.../Proposals/kommunismus/VERSION_0000004/']}
 
-    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> resp = testapp.get(rest_url + '/Proposals/kommunismus/VERSION_0000004')
     >>> pvrs4_path = resp.json['path']
-    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000002')
+    >>> resp = testapp.get(rest_url + '/Proposals/kommunismus/VERSION_0000002')
     >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     1
 
     >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     1
 
-    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> resp = testapp.get(rest_url + '/Proposals/kommunismus/VERSION_0000004')
     >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     0
 
@@ -776,24 +774,24 @@ Tags
 
 Each Versionable has a FIRST tag that points to the initial version::
 
-    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/FIRST')
+    >>> resp = testapp.get(rest_url + '/Proposals/kommunismus/FIRST')
     >>> pprint(resp.json)
     {'content_type': 'adhocracy_core.interfaces.ITag',
      'data': {...
               'adhocracy_core.sheets.name.IName': {'name': 'FIRST'},
-              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/']}},
-     'path': '.../adhocracy/Proposals/kommunismus/FIRST/'}
+              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../Proposals/kommunismus/VERSION_0000000/']}},
+     'path': '.../Proposals/kommunismus/FIRST/'}
 
 It also has a LAST tag that points to the newest versions -- any versions
 that aren't 'followed_by' any later version::
 
-    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/LAST')
+    >>> resp = testapp.get(rest_url + '/Proposals/kommunismus/LAST')
     >>> pprint(resp.json)
     {'content_type': 'adhocracy_core.interfaces.ITag',
      'data': {...
               'adhocracy_core.sheets.name.IName': {'name': 'LAST'},
-              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000004/']}},
-     'path': '.../adhocracy/Proposals/kommunismus/LAST/'}
+              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../Proposals/kommunismus/VERSION_0000004/']}},
+     'path': '.../Proposals/kommunismus/LAST/'}
 
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
@@ -868,7 +866,7 @@ To give an example, *Comments* only allow a linear version history (just a
 single heads). Lets create a comment with an initial version (see below
 for more on comments and *post pools*)::
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> resp = testapp.get('/Proposals/kommunismus/VERSION_0000004')
     >>> commentable = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']
     >>> post_pool_path = commentable['post_pool']
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
@@ -877,7 +875,7 @@ for more on comments and *post pools*)::
     >>> comment_path = resp.json["path"]
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
+    '.../Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
 
 We can create a second version that refers to the first (auto-created)
 version as predecessor::
@@ -893,7 +891,7 @@ version as predecessor::
     >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
+    '.../Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
 
 However, if we try to add another version that *also* gives the first
 version (no longer head) as predecessor, we get an error::
@@ -921,7 +919,7 @@ To give another example of a versionable content type, we can write comments
 about proposals.
 The proposal has a commentable sheet::
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> resp = testapp.get('/Proposals/kommunismus/VERSION_0000004')
     >>> commentable = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']
 
 This sheet has a special field :term:`post_pool` referencing a pool::
@@ -935,10 +933,10 @@ We can post comments to this pool only::
     >>> resp = testapp.post_json(post_pool_path, comment, headers=god_header)
     >>> comment_path = resp.json["path"]
     >>> comment_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000...'
+    '.../Proposals/kommunismus/comments/comment_000...'
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
+    '.../Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
 
 The first comment version is empty (as with all versionables), so lets add
 another version to say something meaningful. A comment contains *content*
@@ -955,7 +953,7 @@ another version to say something meaningful. A comment contains *content*
     >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
+    '.../Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
 
 Comments can be about any versionable that allows posting comments. Hence
 it's also possible to write a comment about another comment::
@@ -965,12 +963,12 @@ it's also possible to write a comment about another comment::
     >>> resp = testapp.post_json(post_pool_path, metacomment, headers=god_header)
     >>> metacomment_path = resp.json["path"]
     >>> metacomment_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000...'
+    '.../Proposals/kommunismus/comments/comment_000...'
     >>> comment_path != metacomment_path
     True
     >>> first_metacommvers_path = resp.json['first_version_path']
     >>> first_metacommvers_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
+    '.../Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
 
 As usual, we have to add another version to actually say something::
 
@@ -985,7 +983,7 @@ As usual, we have to add another version to actually say something::
     >>> resp = testapp.post_json(metacomment_path, metacommvers, headers=god_header)
     >>> snd_metacommvers_path = resp.json['path']
     >>> snd_metacommvers_path
-    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
+    '.../Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
 
 
 Lets view all the comments referring to the proposal.
@@ -1042,7 +1040,7 @@ resource and then post a `IRateVersion` resource below it::
     >>> resp = testapp.post_json(rate_path, ratevers, headers=god_header)
     >>> snd_ratevers_path = resp.json['path']
     >>> snd_ratevers_path
-    '...adhocracy/Proposals/kommunismus/rates/rate_0000000/VERSION_0000001/'
+    '...Proposals/kommunismus/rates/rate_0000000/VERSION_0000001/'
 
 If we want to change our rate, we can post a new version::
 
@@ -1138,7 +1136,7 @@ omitted or left empty. ::
 
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
-    ...     'path': rest_url + '/adhocracy/Proposal/kommunismus',
+    ...     'path': rest_url + '/Proposal/kommunismus',
     ...     'body': { 'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph' },
     ...     'result_path': '@par1_item',
     ...     'result_first_version_path': '@par1_item/v1'
@@ -1216,9 +1214,9 @@ requests in the batch request. If the batch requests doesn't contain any such
 requests (only GET etc.), all of its sub-entries will be empty. ::
 
     >>> updated_resources = batch_resp['updated_resources']
-    >>> 'http://localhost/adhocracy/Proposals/' in updated_resources['changed_descendants']
+    >>> 'http://localhost/Proposals/' in updated_resources['changed_descendants']
     True
-    >>> 'http://localhost/adhocracy/Proposals/kommunismus/par1/VERSION_0000001/' in updated_resources['created']
+    >>> 'http://localhost/Proposals/kommunismus/par1/VERSION_0000001/' in updated_resources['created']
     True
 
 Lets inspect some of the responses. The 'code' field contains the HTTP status
@@ -1230,17 +1228,17 @@ omitted::
     3
     >>> pprint(batch_resp['responses'][0])
     {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
-              'first_version_path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000000/',
-              'path': '.../adhocracy/Proposals/kommunismus/par1/'},
+              'first_version_path': '.../Proposals/kommunismus/par1/VERSION_0000000/',
+              'path': '.../Proposals/kommunismus/par1/'},
      'code': 200}
     >>> pprint(batch_resp['responses'][1])
     {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
-              'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
+              'path': '.../Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
     >>> pprint(batch_resp['responses'][2])
     {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
               'data': {...},
-              'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
+              'path': '.../Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
      >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['content']
      'sein blick ist vom vorüberziehn der stäbchen'
@@ -1258,9 +1256,9 @@ created paragraph version as its only successor ::
 
 The LAST tag should point to the version we created within the batch request::
 
-    >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals/kommunismus/par1/LAST").json
+    >>> resp_data = testapp.get(rest_url + "/Proposals/kommunismus/par1/LAST").json
     >>> resp_data['data']['adhocracy_core.sheets.tags.ITag']['elements']
-    ['.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/']
+    ['.../Proposals/kommunismus/par1/VERSION_0000001/']
 
 All creation and modification dates are equal for one batch request:
 
@@ -1335,19 +1333,19 @@ It's possible to filter and aggregate the information collected in pools by
 adding suitable GET parameters. For example, we can only retrieve children
 of a specific content type::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISection'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/',
-     'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/']
+    ['http://localhost/Proposals/kommunismus/kapitel1/',
+     'http://localhost/Proposals/kommunismus/kapitel2/']
 
 Or only children that implement a specific sheet::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
-     'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
+    ['http://localhost/Proposals/kommunismus/FIRST/',
+     'http://localhost/Proposals/kommunismus/LAST/']
 
 Note that multiple filters are combined by AND. If we specify a content_type
 filter and a sheet filter, only the elements matched by *both* filters will be
@@ -1364,16 +1362,16 @@ value allows also including grandchildren (depth=2) or even great-grandchildren
 (depth=3) etc. Allowed values are arbitrary positive numbers and *all*.
 *all* can be used to get nested elements of arbitrary nesting depth::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'depth': 'all'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    [...'http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/'...]
+    [...'http://localhost/Proposals/kommunismus/kapitel1/VERSION_0000001/'...]
 
 Without specifying a deeper depth, the above query for ISectionVersions
 wouldn't have found anything, since they are children of children of the pool::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion'
     ...             }).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
@@ -1383,7 +1381,7 @@ To retrieve a count of the elements matching your query, specify
 *count=true* or just *count*. If you do so, an additional *count* field will
 be added to the returned IPool sheet::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'count': 'true'}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
@@ -1395,7 +1393,7 @@ the count is returned as a string, though it is actually a number.
 If you specify *count* without any other query parameters,
 you'll get the number of children in the pool::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'count': 'true'}).json
     >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
     >>> assert int(child_count) >= 10
@@ -1403,10 +1401,10 @@ you'll get the number of children in the pool::
 If you specify *sort* you can set a *<custom>* filter (see below) that supports
 sorting to sort the result::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sort': 'name'}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/', ...
+    ['http://localhost/Proposals/kommunismus/FIRST/', ...
 
 *Note* All resource in the result set must have a value in the chosen sort
 filter. For example if you use *rates* you have to limit the result to resources
@@ -1414,7 +1412,7 @@ with :class:`adhocracy_core.sheets.rate.IRateable` sheet.
 
 Not supported filters cannot be used for sorting::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...                         params={'sort': 'path'},
     ...                         status=400).json
     >>> resp_data['errors'][0]['description']
@@ -1422,21 +1420,21 @@ Not supported filters cannot be used for sorting::
 
 If *reverse* is set to ``True`` the sorting will be reversed::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sort': 'name', 'reverse': True}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    [... 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/']
+    [... 'http://localhost/Proposals/kommunismus/FIRST/']
 
 You can also specifiy a *limit* and an *offset* for pagination::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sort': 'name', 'limit': 1, 'offset': 0}).json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/']
+    ['http://localhost/Proposals/kommunismus/FIRST/']
 
 The *count* is not affected by *limit*::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'count': 'true', 'limit': 1}).json
     >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
     >>> assert int(child_count) >= 10
@@ -1445,18 +1443,18 @@ The *elements* parameter allows controlling how matching element are
 returned. By default, 'elements' in the IPool sheet contains a list of paths.
 This corresponds to setting *elements=paths*.
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'elements': 'paths'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
-     'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
+    ['http://localhost/Proposals/kommunismus/FIRST/',
+     'http://localhost/Proposals/kommunismus/LAST/']
 
 Setting *elements=omit* will yield a response with an empty 'elements' listing.
 This makes only sense if you ask for something else instead, e.g. a count of
 elements::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'elements': 'omit', 'count': 'true'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
@@ -1466,12 +1464,12 @@ Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
 their paths::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'elements': 'content'}).json
     >>> tag = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'][0]
     >>> pprint(tag)
-    {'content_type': 'adhocracy_core.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
+    {'content_type': 'adhocracy_core.interfaces.ITag',...'path': 'http://localhost/Proposals/kommunismus/FIRST/'...
 
 
 *tag* is a filter that allows filtering only resources with a
@@ -1479,12 +1477,12 @@ specific tag. Often we are only interested in the newest versions of
 Versionables. We can get them by setting *tag=LAST*. Let's find the latest
 versions of all sections::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
-     'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
+    ['http://localhost/Proposals/kommunismus/kapitel1/VERSION_0000001/',
+     'http://localhost/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
 *<custom>* filter: depending on the backend configuration there are additional
 custom filters:
@@ -1511,29 +1509,29 @@ filters that refer to sheet fields with references. The key is the name of
 the isheet plus the field name separated by ':' The value is the wanted
 reference target. ::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'adhocracy_core.sheets.versions.IVersionable:follows':
-    ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/',
+    ...             'http://localhost/Proposals/kommunismus/kapitel2/VERSION_0000000/',
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
+    ['http://localhost/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
 If the specified sheet or field doesn't exist or if the field exists but is
 not a reference field, the backend responds with an error::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'adhocracy_core.sheets.NoSuchSheet:nowhere':
-    ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/'},
+    ...             'http://localhost/Proposals/kommunismus/kapitel2/VERSION_0000000/'},
     ...     status=400).json
     >>> resp_data['errors'][0]['description']
     'No such sheet or field'
     >>> resp_data['errors'][0]['location']
     'querystring'
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'adhocracy_core.sheets.name.IName:name':
-    ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/'},
+    ...             'http://localhost/Proposals/kommunismus/kapitel2/VERSION_0000000/'},
     ...     status=400).json
     >>> resp_data['errors'][0]['description']
     'Not a reference node'
@@ -1542,7 +1540,7 @@ not a reference field, the backend responds with an error::
 
 You'll also get an error if you try to filter by a catalog that doesn't exist::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'foocat': 'whatever'},
     ...     status=400).json
@@ -1555,7 +1553,7 @@ to an existing filter like *aggregateby=tag*. Only index values that exist in
 the query result will be reported, i.e. the count reported for each value
 will be 1 or higher. ::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])

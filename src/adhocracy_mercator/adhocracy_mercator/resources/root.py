@@ -4,7 +4,6 @@ from pyramid.security import Allow
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.process import IProcess
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import create_initial_content_for_app_root
@@ -15,12 +14,8 @@ from adhocracy_core import sheets
 def add_mercator_process(context: IPool, registry: Registry, options: dict):
     """Add mercator specific content."""
     appstructs = {sheets.name.IName.__identifier__: {'name': 'mercator'}}
-    registry.content.create(IOrganisation.__identifier__,
-                            parent=context,
-                            appstructs=appstructs)
-    appstructs = {sheets.name.IName.__identifier__: {'name': 'advocate'}}
     registry.content.create(IProcess.__identifier__,
-                            parent=context['mercator'],
+                            parent=context,
                             appstructs=appstructs)
 
 

@@ -15,7 +15,7 @@ import AdhUtil = require("../Util/Util");
 
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
-import RIOrganisation = require("../../Resources_/adhocracy_core/resources/organisation/IOrganisation");
+import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -35,17 +35,14 @@ export var mercatorWorkbenchDirective = (
 };
 
 
-var bindRedirectsToScope = (scope, adhConfig, $location) => {
-    // FIXME: use dependency injection instead
-    var adhResourceUrl = AdhResourceArea.resourceUrl(adhConfig);
-
+var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) => {
     scope.redirectAfterProposalCancel = (resourcePath : string) => {
         // FIXME: use adhTopLevelState.redirectToCameFrom
-        $location.url(adhResourceUrl(resourcePath));
+        $location.url(adhResourceUrlFilter(resourcePath));
     };
     scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
         var proposalVersionPath = result.slice(-1)[0].path;
-        $location.url(adhResourceUrl(proposalVersionPath));
+        $location.url(adhResourceUrlFilter(proposalVersionPath));
     };
 };
 
@@ -66,6 +63,7 @@ export var commentColumnDirective = (adhConfig : AdhConfig.IService) => {
 
 export var mercatorProposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
+    adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
@@ -74,7 +72,7 @@ export var mercatorProposalCreateColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl"]);
-            bindRedirectsToScope(scope, adhConfig, $location);
+            bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
 };
@@ -110,6 +108,7 @@ export var mercatorProposalDetailColumnDirective = (
 
 export var mercatorProposalEditColumnDirective = (
     adhConfig : AdhConfig.IService,
+    adhResourceUrlFilter : (path : string) => string,
     $location : angular.ILocationService
 ) => {
     return {
@@ -118,7 +117,7 @@ export var mercatorProposalEditColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
-            bindRedirectsToScope(scope, adhConfig, $location);
+            bindRedirectsToScope(scope, adhConfig, adhResourceUrlFilter, $location);
         }
     };
 };
@@ -216,19 +215,19 @@ export var register = (angular) => {
                     })
                     .then(() => specifics);
                 }])
-                .default(RIOrganisation, "", "", "", {
+                .default(RIProcess, "", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
                     proposalUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIOrganisation, "create_proposal", "", "", {
+                .default(RIProcess, "create_proposal", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIOrganisation, "create_proposal", "", "", ["adhHttp",
+                .specific(RIProcess, "create_proposal", "", "", ["adhHttp",
                     (adhHttp : AdhHttp.Service<any>) => {
-                        return (resource : RIOrganisation) => {
+                        return (resource : RIProcess) => {
                             return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                                 if (!options.POST) {
                                     throw 401;
@@ -247,9 +246,11 @@ export var register = (angular) => {
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", "adhTopLevelState", mercatorWorkbenchDirective])
         .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
-        .directive("adhMercatorProposalCreateColumn", ["adhConfig", "$location", mercatorProposalCreateColumnDirective])
+        .directive("adhMercatorProposalCreateColumn", [
+            "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", [
             "$window", "adhTopLevelState", "adhPermissions", "adhConfig", mercatorProposalDetailColumnDirective])
-        .directive("adhMercatorProposalEditColumn", ["adhConfig", "$location", mercatorProposalEditColumnDirective])
+        .directive("adhMercatorProposalEditColumn", [
+            "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalEditColumnDirective])
         .directive("adhMercatorProposalListingColumn", ["adhConfig", mercatorProposalListingColumnDirective]);
 };
