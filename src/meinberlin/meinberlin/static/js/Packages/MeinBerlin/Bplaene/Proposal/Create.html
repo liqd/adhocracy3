@@ -4,90 +4,90 @@
     class="mein-berlin-bplaene-proposal-form"
     name="meinBerlinProposalForm">
 
-    <h2 class="mein-berlin-kiezkassen-proposal-form-heading">{{ "TR__MEINBERLIN_MEIN_BERLIN_BPLAENE_SIMPLE_PROPOSAL" | translate }}</h2>
+    <div class="mein-berlin-bplaene-proposal-form-inner">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
+            <p>{{ error | adhFormatError | translate }}</p>
+        </div>
 
-    <div class="form-error" data-ng-repeat="error in errors track by $index">
-        <p>{{ error | adhFormatError | translate }}</p>
+        <!-- Name -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_NAME" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.name"
+                name="name"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.name, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_NAME" | translate }}
+            </span>
+        </label>
+
+        <!-- Street and house number -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_STREET" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.street"
+                name="street"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.street, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_STREET" | translate }}
+            </span>
+        </label>
+
+        <!-- city code and city -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_CITY" | translate }}</span>
+            <input
+                type="text"
+                data-ng-model="data.city"
+                name="city"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.city, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_CITY" | translate }}
+            </span>
+        </label>
+
+        <!-- email -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_EMAIL" | translate }}</span>
+            <input
+                type="email"
+                data-ng-model="data.email"
+                name="email"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.email, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_EMAIL" | translate }}
+            </span>
+            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.email, 'email')">
+                {{ "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING" | translate }}
+            </span>
+        </label>
+
+        <!--  statement -->
+        <label>
+            <span class="label-text">{{ "TR__MEINBERLIN_STATEMENT" | translate }}</span>
+
+            <textarea
+                data-msd-elastic=""
+                data-ng-model="data.statement"
+                name="statement"
+                maxlength="500"
+                required="required"></textarea>
+
+            <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.statement, 'required')">
+                {{ "TR__MEINBERLIN_ERROR_REQUIRED_STATEMENT" | translate }}
+            </span>
+        </label>
     </div>
-
-    <!-- Name -->
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_NAME" | translate }}</span>
-        <input
-            type="text"
-            data-ng-model="data.name"
-            name="name"
-            minlength="3"
-            maxlength="100"
-            required="required" />
-        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.name, 'required')">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_NAME" | translate }}
-        </span>
-    </label>
-
-    <!-- Street and house number -->
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_STREET" | translate }}</span>
-        <input
-            type="text"
-            data-ng-model="data.street"
-            name="street"
-            minlength="3"
-            maxlength="100"
-            required="required" />
-        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.street, 'required')">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_STREET" | translate }}
-        </span>
-    </label>
-
-    <!-- city code and city -->
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_CITY" | translate }}</span>
-        <input
-            type="text"
-            data-ng-model="data.city"
-            name="city"
-            minlength="3"
-            maxlength="100"
-            required="required" />
-        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.city, 'required')">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_CITY" | translate }}
-        </span>
-    </label>
-
-    <!-- email -->
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_EMAIL" | translate }}</span>
-        <input
-            type="email"
-            data-ng-model="data.email"
-            name="email"
-            minlength="3"
-            maxlength="100"
-            required="required" />
-        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.email, 'required')">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_EMAIL" | translate }}
-        </span>
-        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.email, 'email')">
-            {{ "TR__ERROR_MUST_BE_A_VALID_EMAIL_STRING" | translate }}
-        </span>
-    </label>
-
-    <!--  statement -->
-    <label>
-        <span class="label-text">{{ "TR__MEINBERLIN_STATEMENT" | translate }}</span>
-
-        <textarea
-            data-msd-elastic=""
-            data-ng-model="data.statement"
-            name="statement"
-            maxlength="500"
-            required="required"></textarea>
-
-        <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.statement, 'required')">
-            {{ "TR__MEINBERLIN_ERROR_REQUIRED_STATEMENT" | translate }}
-        </span>
-    </label>
 
     <!-- DATA SUBMIT -->
     <footer class="form-footer mein-berlin-kiezkassen-proposal-form-footer">

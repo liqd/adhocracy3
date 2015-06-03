@@ -98,6 +98,8 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
 
     :returns: :class:'adhocracy_core.interfaces.ITokenManager or None.
     """
+    if getattr(request, 'root', None) is None:  # ease testing
+        return None
     try:
         return ITokenManger(request.root)
     except (ComponentLookupError, TypeError):
@@ -178,8 +180,6 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
     def authenticated_userid(self, request):
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager is None:
-            return None
-        if request.root is None:  # ease testing
             return None
         try:
             return self._get_authenticated_user_id(request, tokenmanager)

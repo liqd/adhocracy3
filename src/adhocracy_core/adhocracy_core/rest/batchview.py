@@ -10,7 +10,6 @@ from pyramid.view import view_config
 from pyramid.view import view_defaults
 
 from adhocracy_core.resources.root import IRootPool
-from adhocracy_core.rest.exceptions import internal_exception_to_dict
 from adhocracy_core.rest.schemas import POSTBatchRequestSchema
 from adhocracy_core.rest.schemas import UpdatedResourcesSchema
 from adhocracy_core.rest.views import RESTView
@@ -64,6 +63,10 @@ class BatchView(RESTView):
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
             if not item_response.was_successful():
+                err_msg = 'Exception in sub request {0} {1}: {2}'
+                logger.exception(err_msg.format(item['method'],
+                                                item['path'],
+                                                item_response.body))
                 err = _JSONError([], status=item_response.code)
                 err.text = dumps(self._response_list_to_json(response_list))
                 raise err
@@ -176,12 +179,6 @@ class BatchView(RESTView):
         except HTTPException as err:
             code = err.status_code
             body = self._try_to_decode_json(err.body)
-        # TODO catch PredicateMismatch, if you do a put instead of post
-        # you dont't get any help what is going wrong.
-        except Exception as err:
-            code = 500
-            error_dict = internal_exception_to_dict(err)
-            body = {'status': 'error', 'errors': [error_dict]}
         return BatchItemResponse(code, body)
 
     def _extend_path_map(self, path_map: dict, result_path: str,
