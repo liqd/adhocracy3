@@ -3,16 +3,17 @@
 
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
+import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
+import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhRate = require("../Rate/Rate");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhRate = require("../Rate/Rate");
 import AdhSticky = require("../Sticky/Sticky");
-import AdhEmbed = require("../Embed/Embed");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 var pkgLocation = "/spdDocument";
 
@@ -48,6 +49,7 @@ export var dummydata : IParagraph[] = [{
 
 export interface IParagraph {
     body : string;
+    commentCount? : number;
 }
 
 export interface IScope extends angular.IScope {
@@ -55,9 +57,10 @@ export interface IScope extends angular.IScope {
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
-        // FIXME: not final
         title : string;
-        paragraphs : IParagraph[];
+        paragraphs? : IParagraph[];
+        commentCountTotal? : number;
+        picture? : string;
     };
     selectedState? : string;
     resource: any;
@@ -105,7 +108,10 @@ export var listItemDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            console.log("here comes the stuff");
+            scope.data = {
+                title: "Toller Titel",
+                commentCountTotal: 3
+            };
         }
     };
 };
@@ -168,6 +174,7 @@ export var register = (angular) => {
             "ngMessages",
             AdhAngularHelpers.moduleName,
             AdhHttp.moduleName,
+            AdhImage.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhResourceArea.moduleName,
