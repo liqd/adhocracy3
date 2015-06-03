@@ -303,7 +303,7 @@ With authentication instead we may::
 
     >>> resp = admin.options("/").json
     >>> pprint(resp['POST']['request_body'])
-    [...'adhocracy_core.resources.pool.IBasicPool',...]
+    [...'adhocracy_core.resources.organisation.IOrganisation',...]
 
 If the token is not valid or expired the backend responds with an error status
 that identifies the "X-User-Token" header as source of the problem::
@@ -334,7 +334,7 @@ the user must log in again.
 Viewing Users
 -------------
 
-Without dataer authorization, only very limited information on each user is
+Without authorization, only very limited information on each user is
 visible::
 
     >>> resp = anonymous.get(user_path).json

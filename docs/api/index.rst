@@ -15,3 +15,4 @@ API
    deletion
    messaging
    abuse
+   badges

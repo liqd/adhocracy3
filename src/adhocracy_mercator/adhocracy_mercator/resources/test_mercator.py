@@ -72,6 +72,7 @@ def integration(config):
     config.include('adhocracy_core.resources.item')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.badge')
     config.include('adhocracy_mercator.sheets.mercator')
     config.include('adhocracy_mercator.resources.mercator')
     config.include('adhocracy_mercator.resources.subscriber')
@@ -136,18 +137,18 @@ class TestProcess:
 
 @fixture(scope='class')
 def app_anonymous(app_anonymous):
-    app_anonymous.base_path = '/mercator/advocate'
+    app_anonymous.base_path = '/mercator'
     return app_anonymous
 
 @fixture(scope='class')
 def app_participant(app_participant):
-    app_participant.base_path = '/mercator/advocate'
+    app_participant.base_path = '/mercator'
     return app_participant
 
 
 @fixture(scope='class')
 def app_god(app_god):
-    app_god.base_path = '/mercator/advocate'
+    app_god.base_path = '/mercator'
     return app_god
 
 
@@ -157,6 +158,13 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
     iresource = IMercatorProposal
     sheets_cstruct = {IName.__identifier__: {'name': name}}
     resp = app_user.post_resource(path, iresource, sheets_cstruct)
+    return resp
+
+
+def _post_proposal_version(app_user, path='/') -> TestResponse:
+    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+    iresource = IMercatorProposalVersion
+    resp = app_user.post_resource(path, iresource, {})
     return resp
 
 
@@ -211,6 +219,7 @@ class TestMercatorProposalPermissionsParticipant:
     def test_cannot_create_other_users_proposal_version(self, app_participant,
                                                         app_god):
         _post_proposal_item(app_god, path='/', name='proposal_other')
+        _post_proposal_version(app_god, path='/proposal_other')
         postable_types = app_participant.get_postable_types('/proposal_other')
         assert postable_types == []
 
