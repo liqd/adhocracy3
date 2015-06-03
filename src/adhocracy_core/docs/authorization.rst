@@ -99,7 +99,7 @@ Customizing
 
 
 Questions
----------
+.........
 
 What is the difference (conceptually) between a role and a group?
 
@@ -128,7 +128,7 @@ run time?
 
 
 API
----
+...
 
 The user object must contain a list of roles and a list of groups she
 is a member of.  This is necessary because the UI looks different for
