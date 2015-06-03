@@ -142,68 +142,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 }
 
-.mercator-proposal-detail-meta,
-.mercator-proposal-list-item-meta {
-    @include container;
-    @include text(functional-introvert);
-
-    // reset ul default styling
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.mercator-proposal-list-item-meta-item,
-.mercator-proposal-detail-meta-item {
-    @include text(functional-introvert);
-    float: left;
-    margin-right: 0.83333333em;
-
-    i {
-        font-size: 140%;
-        line-height: 1;
-        margin-right: 1px;
-        vertical-align: middle;
-    }
-
-    &.mercator-proposal-list-item-meta-item-total-comments,
-    &.mercator-proposal-detail-meta-item-total-comments {
-        i {
-            color: $color-brand-three-normal;
-        }
-    }
-
-    &.mercator-proposal-list-item-meta-item-supporters,
-    &.mercator-proposal-detail-meta-item-total-supporters {
-        i {
-            color: $color-brand-one-normal;
-        }
-    }
-
-    &:last-child {
-        float: right;
-        margin-right: 0;
-
-        @media print {
-            float: none;
-        }
-    }
-
-    &.mercator-proposal-list-item-meta-item-budget {
-        color: $color-text-highlight-normal;
-        font-size: $font-size-plus;
-    }
-
-    @media print {
-        float: none;
-        font-size: $font-size-normal;
-
-        i:not(.m-definition-before):not(.m-definition-after), &.mercator-proposal-detail-meta-item-rate {
-            display: none;
-        }
-    }
-}
-
 .mercator-proposal-detail-orgs-columns {
     @media screen {
         margin: (20px / $font-size-normal * 1em) 0;
@@ -219,16 +157,6 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     @media print {
         i:not(.m-definition) {
             display: none;
-        }
-    }
-}
-
-.mercator-proposal-detail-meta {
-    padding-bottom: 1.66666666em;
-
-    .mercator-proposal-detail-meta-item-total-comments {
-        i {
-            color: $color-text-highlight-introvert;
         }
     }
 }
@@ -368,7 +296,7 @@ $mercator-proposal-detail-nav-width: 2em;
         background: $color-background-base-introvert;
 
         i[class*=icon-],
-        .mercator-proposal-list-item-meta-item-budget {
+        .meta-list-item-budget {
             color: $color-text-highlight-introvert;
         }
 
