@@ -10,6 +10,7 @@ API
    websockets
    authorization
    permissions
+   workflows
    assets_and_images
    caching_strategy
    deletion
