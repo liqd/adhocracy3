@@ -92,6 +92,10 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     font-size: $font-size-small;
     padding: 1px 1px 0;
 
+    ul, ol {
+        padding: 0;
+    }
+
     li {
         background: $color-background-base-introvert;
         line-height: 2;

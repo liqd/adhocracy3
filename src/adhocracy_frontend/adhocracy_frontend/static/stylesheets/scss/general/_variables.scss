@@ -61,7 +61,7 @@ $padding-small: 0.5em;
 $padding-medium: 1em;
 
 //Other
-$jump-navigation-width: 2em;
+$section-jump-navigation-width: 2em;
 
 @mixin font-tracking($value) {
     @if $value == narrow {
