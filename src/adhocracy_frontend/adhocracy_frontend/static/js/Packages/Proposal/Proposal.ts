@@ -10,18 +10,16 @@ import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraph");
-import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraphVersion");
-import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
-import RIProposalVersion = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposalVersion");
-import RISection = require("../../Resources_/adhocracy_core/resources/sample_section/ISection");
-import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
+import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
+import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
+import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
+import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SISection = require("../../Resources_/adhocracy_core/sheets/document/ISection");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
-var pkgLocation = "/Proposal";
+var pkgLocation = "/Document";
 
 /**
  * contents of the resource with view mode.
@@ -36,7 +34,7 @@ export interface DetailRefScope<Data> extends DetailScope<Data> {
     ref : string;
 }
 
-export interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
+export interface IDocumentVersionDetailScope<Data> extends DetailScope<Data> {
     list : () => void;
     display : () => void;
     edit : () => void;
@@ -46,18 +44,18 @@ export interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
     hideComments : () => void;
 }
 
-export class ProposalDetail {
+export class DocumentDetail {
     public createDirective() {
         return {
             restrict: "E",
-            template: "<adh-proposal-version-detail data-content=\"content\" data-viewmode=\"list\"></adh-proposal-version-detail>",
+            template: "<adh-document-version-detail data-content=\"content\" data-viewmode=\"list\"></adh-document-version-detail>",
             scope: {
                 path: "="
             },
             controller: ["adhHttp", "adhWebSocket", "$scope", (
                 adhHttp : AdhHttp.Service<any>,
                 adhWebSocket : AdhWebSocket.Service,
-                $scope : DetailScope<RIProposal>
+                $scope : DetailScope<RIDocument>
             ) => {
                 var fetchAndUpdateContent = (itemPath : string) : void => {
                     adhHttp.getNewestVersionPathNoFork(itemPath)
@@ -77,8 +75,8 @@ export class ProposalDetail {
     }
 }
 
-export class ProposalVersionDetail {
-    public static templateUrl : string = "Proposal.html";
+export class DocumentVersionDetail {
+    public static templateUrl : string = "Document.html";
 
     public createDirective(adhConfig : AdhConfig.IService) {
         var _self = this;
@@ -94,7 +92,7 @@ export class ProposalVersionDetail {
             controller: ["adhTopLevelState", "adhHttp", "$scope", (
                 adhTopLevelState : AdhTopLevelState.Service,
                 adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
-                $scope : IProposalVersionDetailScope<any>
+                $scope : IDocumentVersionDetailScope<any>
             ) : void => {
                 $scope.list = () => {
                     $scope.viewmode = "list";
@@ -135,36 +133,36 @@ export class ProposalVersionDetail {
     }
 }
 
-export interface IScopeProposalVersion {
-    content : RIProposalVersion;
+export interface IScopeDocumentVersion {
+    content : RIDocumentVersion;
     paragraphVersions : RIParagraphVersion[];
     addParagraphVersion : () => void;
     commit : () => void;
-    onNewProposal : (any) => void;
+    onNewDocument : (any) => void;
     onCancel : () => void;
     poolPath : string;
     viewmode : string;
 }
 
-export class ProposalVersionNew {
+export class DocumentVersionNew {
 
-    public createDirective(adhHttp : angular.IHttpService, adhConfig : AdhConfig.IService, adhProposal : Service) {
+    public createDirective(adhHttp : angular.IHttpService, adhConfig : AdhConfig.IService, adhDocument : Service) {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Proposal.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Document.html",
             scope: {
-                onNewProposal: "=",
+                onNewDocument: "=",
                 onCancel: "=",
                 poolPath: "@"
             },
             controller: ["$scope", "adhPreliminaryNames", (
-                $scope : IScopeProposalVersion,
+                $scope : IScopeDocumentVersion,
                 adhPreliminaryNames : AdhPreliminaryNames.Service
             ) => {
                 $scope.viewmode = "edit";
 
-                $scope.content = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+                $scope.content = new RIDocumentVersion({preliminaryNames: adhPreliminaryNames});
                 $scope.content.data[SIDocument.nick] =
                     new SIDocument.Sheet({
                         title: "",
@@ -179,16 +177,16 @@ export class ProposalVersionNew {
                     pv.data[SIParagraph.nick] =
                         new SIParagraph.Sheet({
                             content: "",
-                            elements_backrefs: []
+                            elements: []
                         });
                     $scope.paragraphVersions.push(pv);
                 };
 
                 $scope.commit = () => {
-                    adhProposal.postProposalWithParagraphs($scope.poolPath, $scope.content, $scope.paragraphVersions)
+                    adhDocument.postDocumentWithParagraphs($scope.poolPath, $scope.content, $scope.paragraphVersions)
                         .then((resp) => {
                             adhHttp.get(resp.path).then((respGet) => {
-                                $scope.onNewProposal(respGet);
+                                $scope.onNewDocument(respGet);
                             });
                         });
                 };
@@ -198,7 +196,7 @@ export class ProposalVersionNew {
 }
 
 var explainPreliminaryGetIssue : string = (
-    "The version resources for proposal, sections, and paragraphs are created and rendered into the\n" +
+    "The version resources for document, sections, and paragraphs are created and rendered into the\n" +
     "DOM before the user clicks on 'safe'.  Once 'safe' is clicked, these resources wake up and some-\n" +
     "how decide they need to be updated.  This update happens before the batch post returns and can\n" +
     "replace the preliminary paths, so there is an exception.  Fix: use ResourceWidgets for what we\n" +
@@ -285,9 +283,9 @@ export class Service {
     ) {}
 
 
-    public postProposalWithParagraphs(
+    public postDocumentWithParagraphs(
         poolPath : string,
-        proposalVersion : RIProposalVersion,
+        documentVersion : RIDocumentVersion,
         paragraphVersions : RIParagraphVersion[]
     ) {
         var _self = this;
@@ -300,7 +298,7 @@ export class Service {
                 subsections : []
             });
 
-        var name = proposalVersion.data[SIDocument.nick].title;
+        var name = documentVersion.data[SIDocument.nick].title;
         name = AdhUtil.normalizeName(name);
 
         // this is the batch-request logic.  it works a bit different
@@ -316,14 +314,14 @@ export class Service {
         return _self.adhHttp
             .withTransaction((transaction) : angular.IPromise<ResourcesBase.Resource> => {
                 // items
-                var postProposal : AdhHttp.ITransactionResult =
-                    transaction.post(poolPath, new RIProposal({preliminaryNames: _self.adhPreliminaryNames, name: name}));
+                var postDocument : AdhHttp.ITransactionResult =
+                    transaction.post(poolPath, new RIDocument({preliminaryNames: _self.adhPreliminaryNames, name: name}));
                 var postSection : AdhHttp.ITransactionResult =
-                    transaction.post(postProposal.path, new RISection({preliminaryNames: _self.adhPreliminaryNames, name: "section"}));
+                    transaction.post(postDocument.path, new RISection({preliminaryNames: _self.adhPreliminaryNames, name: "section"}));
                 var postParagraphs : AdhHttp.ITransactionResult[] =
                     paragraphVersions.map((paragraphVersion, i) =>
                         transaction.post(
-                            postProposal.path,
+                            postDocument.path,
                             new RIParagraph({preliminaryNames: _self.adhPreliminaryNames, name: "paragraph" + i})));
 
                 // versions
@@ -342,24 +340,24 @@ export class Service {
                 sectionVersion.data[SISection.nick].elements = postParagraphVersions.map((p) => p.path);
                 var postSectionVersion = transaction.post(postSection.path, sectionVersion);
 
-                proposalVersion.data[SIVersionable.nick] =
+                documentVersion.data[SIVersionable.nick] =
                     new SIVersionable.Sheet({
-                        follows: [postProposal.first_version_path]
+                        follows: [postDocument.first_version_path]
                     });
-                proposalVersion.data[SIDocument.nick].elements = [postSectionVersion.path];
-                var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
+                documentVersion.data[SIDocument.nick].elements = [postSectionVersion.path];
+                var postDocumentVersion : AdhHttp.ITransactionResult = transaction.post(postDocument.path, documentVersion);
 
                 return transaction.commit()
                     .then((postedResources) => {
-                        // return the latest proposal Version
-                        return postedResources[postProposalVersion.index];
+                        // return the latest document Version
+                        return postedResources[postDocumentVersion.index];
                     });
             });
     }
 };
 
 
-export var moduleName = "adhProposal";
+export var moduleName = "adhDocument";
 
 export var register = (angular) => {
     angular
@@ -370,13 +368,13 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName,
             AdhWebSocket.moduleName
         ])
-        .service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", Service])
-        .directive("adhProposalDetail", () => new ProposalDetail().createDirective())
-        .directive("adhProposalVersionDetail",
-            ["adhConfig", (adhConfig) => new ProposalVersionDetail().createDirective(adhConfig)])
-        .directive("adhProposalVersionNew",
-            ["adhHttp", "adhConfig", "adhProposal", (adhHttp, adhConfig, adhProposal) =>
-                new ProposalVersionNew().createDirective(adhHttp, adhConfig, adhProposal)])
+        .service("adhDocument", ["adhHttp", "adhPreliminaryNames", "$q", Service])
+        .directive("adhDocumentDetail", () => new DocumentDetail().createDirective())
+        .directive("adhDocumentVersionDetail",
+            ["adhConfig", (adhConfig) => new DocumentVersionDetail().createDirective(adhConfig)])
+        .directive("adhDocumentVersionNew",
+            ["adhHttp", "adhConfig", "adhDocument", (adhHttp, adhConfig, adhDocument) =>
+                new DocumentVersionNew().createDirective(adhHttp, adhConfig, adhDocument)])
         .directive("adhSectionVersionDetail",
             ["adhConfig", "adhRecursionHelper", (adhConfig, adhRecursionHelper) =>
                 new SectionVersionDetail().createDirective(adhConfig, adhRecursionHelper)])

@@ -96,17 +96,17 @@ class TestItemVersion:
 
     def test_autoupdate_with_referencing_items(self, config, context):
         # for more tests see adhocracy_core.resources.subscriber
-        from adhocracy_core.sheets.document import ISection
+        from adhocracy_core.sheets.document import IDocument
         from adhocracy_core.resources.itemversion import itemversion_meta
         from adhocracy_core.resources import add_resource_type_to_registry
         from adhocracy_core.sheets.versions import IVersionable
         from adhocracy_core.utils import get_sheet
         config.include('adhocracy_core.sheets.document')
         config.include('adhocracy_core.sheets.versions')
-        metadata = itemversion_meta._replace(extended_sheets=[ISection])
+        metadata = itemversion_meta._replace(extended_sheets=[IDocument])
         add_resource_type_to_registry(metadata, config)
         referenced_v0 = self.make_one(config, context)
-        appstructs={ISection.__identifier__: {'subsections': [referenced_v0]}}
+        appstructs={IDocument.__identifier__: {'subsections': [referenced_v0]}}
         referenceing_v0 = self.make_one(config, context, appstructs=appstructs)
         config.registry.changelog.clear()
         referenced_v1 = self.make_one(config, context, follows=[referenced_v0])

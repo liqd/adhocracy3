@@ -4,14 +4,14 @@ import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhProcess = require("../Process/Process");
-import AdhProposal = require("../Proposal/Proposal");
+import AdhDocument = require("../Document/Document");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
-import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
-import RIProposalVersion = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposalVersion");
+import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
+import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 
@@ -35,7 +35,7 @@ export var documentWorkbench = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentWorkbench.html",
         link: (scope : IDocumentWorkbenchScope) => {
             scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
-            scope.contentType = RIProposal.content_type;
+            scope.contentType = RIDocument.content_type;
             scope.user = adhUser;
             scope.websocketTestPaths = JSON.stringify([scope.path]);
 
@@ -54,7 +54,7 @@ export var register = (angular) => {
             AdhComment.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
-            AdhProposal.moduleName,
+            AdhDocument.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
@@ -71,11 +71,11 @@ export var register = (angular) => {
                     movingColumns: "is-show-show-hide",
                     content2Url: ""
                 })
-                .default(RIProposalVersion, "", "", "", {
+                .default(RIDocumentVersion, "", "", "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIProposalVersion, "", "", "", () => (resource : RIProposalVersion) => {
+                .specific(RIDocumentVersion, "", "", "", () => (resource : RIDocumentVersion) => {
                     return {
                         content2Url: resource.path
                     };

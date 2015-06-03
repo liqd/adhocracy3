@@ -145,7 +145,7 @@ Lets create some content::
     >>> data = {'content_type': 'adhocracy_core.resources.process.IProcess',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
     >>> resp = admin.post("/pool1", data)
-    >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    >>> data = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}}
     >>> resp = participant.post("/pool1/child", data)
     >>> proposal_item = resp.json['path']
@@ -157,7 +157,7 @@ Lets create some content::
     >>> resp = participant.post(proposal_item, data)
     >>> section_item = resp.json["path"]
     >>> section_item_first_version = resp.json["first_version_path"]
-    >>> data = {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
+    >>> data = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'paragraph_item'},}
     ...         }
     >>> resp = participant.post(proposal_item, data)
@@ -274,7 +274,7 @@ that there actually is a listed version::
 
 Now we hide the item::
 
-    >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalItem',
+    >>> data = {'content_type': 'adhocracy_core.resources.document.IDocumentItem',
     ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
     ...                      {'hidden': True}}}
     >>> resp = moderator.put(section_item, data)

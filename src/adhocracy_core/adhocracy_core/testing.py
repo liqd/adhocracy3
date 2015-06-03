@@ -657,17 +657,11 @@ def app(app_settings):
 
 def _make_app(app_config):
     import adhocracy_core
-    import adhocracy_core.resources.sample_paragraph
-    import adhocracy_core.resources.sample_section
-    import adhocracy_core.resources.sample_proposal
+    import adhocracy_core.resources.paragraph
+    import adhocracy_core.resources.document
     configurator = Configurator(settings=app_config,
                                 root_factory=adhocracy_core.root_factory)
     configurator.include(adhocracy_core)
-    configurator.include(adhocracy_core.resources.sample_paragraph)
-    configurator.include(adhocracy_core.resources.sample_proposal)
-    configurator.include(adhocracy_core.resources.sample_section)
-    configurator.include(adhocracy_core.resources.comment)
-    configurator.include(adhocracy_core.resources.rate)
     add_create_test_users_subscriber(configurator)
 
     app = configurator.make_wsgi_app()
