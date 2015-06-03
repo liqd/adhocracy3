@@ -15,7 +15,7 @@ import AdhUtil = require("../Util/Util");
 
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
-import RIOrganisation = require("../../Resources_/adhocracy_core/resources/organisation/IOrganisation");
+import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -215,19 +215,19 @@ export var register = (angular) => {
                     })
                     .then(() => specifics);
                 }])
-                .default(RIOrganisation, "", "", "", {
+                .default(RIProcess, "", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
                     proposalUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIOrganisation, "create_proposal", "", "", {
+                .default(RIProcess, "create_proposal", "", "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIOrganisation, "create_proposal", "", "", ["adhHttp",
+                .specific(RIProcess, "create_proposal", "", "", ["adhHttp",
                     (adhHttp : AdhHttp.Service<any>) => {
-                        return (resource : RIOrganisation) => {
+                        return (resource : RIProcess) => {
                             return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                                 if (!options.POST) {
                                     throw 401;
