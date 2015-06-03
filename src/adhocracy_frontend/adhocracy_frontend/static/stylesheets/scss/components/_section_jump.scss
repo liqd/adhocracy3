@@ -5,8 +5,8 @@ name: section-jump
 category: Widgets
 ---
 
-A module with a header, a left navigation of jump links and a center section
-of chapters. Often used for navigating proposal details
+A widget with a header, a left navigation and a main section. Often used in
+combination with `.jump-navigation.m-narrow.m-unnumbered`.
 
 ```html_example
 <div class="section-jump" id="section-jump-top">
