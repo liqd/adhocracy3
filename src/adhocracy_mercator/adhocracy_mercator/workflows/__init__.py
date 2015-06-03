@@ -31,8 +31,8 @@ mercator_meta = {
                    'description': '',
                    'acm': {'principals':                      ['participant', 'moderator', 'creator', 'initiator'],  # noqa
                            'permissions':
-                              [['create_proposal',             None,          None,        None,     'Allow'],  # noqa
-                               ['edit_proposal',               None,          None,        None,     'Allow'],  # noqa
+                              [['create_proposal',             None,          None,        None,      'Allow'],  # noqa
+                               ['edit_proposal',               None,          None,        None,      'Allow'],  # noqa
                                ]},
                    },
         'result': {'title': 'Result',
