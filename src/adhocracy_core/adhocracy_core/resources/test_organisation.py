@@ -25,7 +25,9 @@ class TestOrganisation:
         assert IOrganisation.isOrExtends(IPool)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_organisation'
-        assert meta.element_types == [IProcess]
+        assert meta.element_types == [IProcess,
+                                      IOrganisation,
+                                      ]
 
 
     @mark.usefixtures('integration')

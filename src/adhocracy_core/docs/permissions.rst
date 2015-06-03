@@ -15,6 +15,7 @@ Some imports to work with rest api calls::
     >>> from pprint import pprint
     >>> from adhocracy_core.rre.documenore.document import IDocument
     >>> from adhocracy_core.resources.document import IDocumentVersion
+    >>> from adhocracy_core.resources.organisation import IOrganisation
 
 Start adhocracy app and log in some users::
 
@@ -45,6 +46,9 @@ Create participation process content by participant::
     >>> participant_proposal_comments = resp['path'] + 'comments'
     >>> participant_proposal_rates = resp['path'] + 'rates'
 
+    >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    ...         'data': {}}
+    >>> resp = participant.post(participant_proposal, prop).json
 
 Create content annotations by participant::
 
@@ -52,6 +56,9 @@ Create content annotations by participant::
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'com'}}}
     >>> resp = participant.post('/organisation/process/prop/comments', prop).json
     >>> participant_comment = resp['path']
+    >>> prop = {'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
+    ...         'data': {'adhocracy_core.sheets.comment.IComment': {'comment': 'com'}}}
+    >>> resp = participant.post(participant_comment, prop)
 
     >>> prop = {'content_type': 'adhocracy_core.resources.rate.IRate', 'data': {}}
     >>> resp = participant.post('/organisation/process/prop/rates', prop).json
@@ -153,6 +160,7 @@ Can edit his own process content::
 
 
 Cannot edit process content::
+
     >>> 'POST' in participant2.options('/organisation/process/prop').json
     False
 
@@ -213,10 +221,12 @@ Initiator
 
 Cannot create process structure organisation::
 
-   >>> 'POST' in initiator.options('/').json
-   False
+   >>> resp = initiator.options('/organisation').json
+   >>> postables = sorted([r['content_type'] for r in resp['POST']['request_body']])
+   >>> IOrganisation.__identifier__ not in postables
+   True
 
-Cannot edit process structure organisation::
+Can edit process structure organisation::
 
    >>> 'PUT' in initiator.options('/organisation').json
    False
@@ -243,18 +253,15 @@ Cannot edit annotations for participation process content::
 
 Can create process structure::
 
-    >>> resp = admin.options('/').json
+    >>> resp = admin.options('/organisation').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.interfaces.IPool',
-     'adhocracy_core.resources.asset.IPoolWithAssets',
-     'adhocracy_core.resources.external_resource.IExternalResource',
-     'adhocracy_core.resources.organisation.IOrganisation',
-     'adhocracy_core.resources.pool.IBasicPool',
-     'adhocracy_core.resources.document.IDocument']
+    ['adhocracy_core.resources.organisation.IOrganisation',
+     'adhocracy_core.resources.process.IProcess']
 
     >>> resp = admin.options('/organisation').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.resources.process.IProcess']
+    ['adhocracy_core.resources.organisation.IOrganisation',
+     'adhocracy_core.resources.process.IProcess']
 
 Cannot edit process structure::
 
