@@ -4,7 +4,7 @@
 Badges
 ------
 
-Badges are resources that can be baged to mark special process content.
+Badges are resources that can be badged to mark special process content.
 
 Prerequisites
 ~~~~~~~~~~~~~
@@ -45,7 +45,7 @@ gives us the right pool:
     >>> resp = initiator.get('/organisation/process').json
     >>> badges_pool = resp['data']['adhocracy_core.sheets.badge.IHasBadgesPool']['badges_pool']
 
-# TODO First we crate a badge Group pool
+# TODO First we create a badge Group pool
 
 Now we can create BadgeData::
 
