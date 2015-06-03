@@ -1,3 +1,56 @@
+/*doc
+---
+title: Section Jump
+name: section-jump
+category: Widgets
+---
+
+A module with a header, a left navigation of jump links and a center section
+of chapters. Often used fo navigating proposal details
+
+```html_example
+<div class="section-jump" id="section-jump-top">
+    <div class="section-jump-cover">
+        <h1 class="section-jump-cover-header">Section Jump header</h1>
+    </div>
+
+    <div class="section-jump-body">
+        <nav class="section-jump-navigation m-unnumbered" data-adh-sticky="">
+            <ol class="section-jump-navigation-list-container">
+                <li class="section-jump-navigation-list-item">
+                    <a href="#section-jump-chapter-1">1</a>
+                </li>
+                <li class="section-jump-navigation-list-item">
+                    <a href="#section-jump-chapter-2">2</a>
+                </li>
+                <li class="section-jump-navigation-list-item">
+                    <a href="#section-jump-chapter-3">3</a>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="section-jump-chapters">
+            <section id="section-jump-chapter-1" class="section-jump-chapter">
+                <h2 class="section-jump-chapter-header">Heading 1</h2>
+                Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
+                Lorem ipsum Dolor eiusmod tempor adipisicing pariatur nulla in deserunt ad aute dolor et ea id exercitation reprehenderit ex consequat culpa velit sit laboris consectetur consectetur Excepteur exercitation do nostrud eiusmod sed velit exercitation non velit in sunt in irure in aliquip in aliquip velit commodo cupidatat fugiat id dolore fugiat ex adipisicing laborum incididunt est dolore in aliqua quis anim enim ad nulla proident Duis voluptate ut aute sed occaecat adipisicing cillum esse ea amet irure laborum cillum mollit eiusmod id eiusmod sunt id nostrud in pariatur sed velit deserunt id ea irure ut aute ullamco velit velit magna consectetur irure ex aliquip amet aliquip dolore nostrud eu Duis in cillum et deserunt dolore ut anim consequat in ullamco et in amet ullamco velit et consectetur enim dolore sit aliqua sit Excepteur fugiat quis proident in amet reprehenderit mollit labore proident nulla laboris eu sint quis eu qui consectetur Duis occaecat Duis elit pariatur veniam in sed reprehenderit exercitation Ut deserunt exercitation enim aute amet sunt.
+            </section>
+            <section id="section-jump-chapter-2" class="section-jump-chapter">
+                <h2 class="section-jump-chapter-header">Heading 2</h2>
+                Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
+                Lorem ipsum Veniam dolore cillum et irure dolor labore dolore laborum non exercitation sed ea in eiusmod est reprehenderit officia ad aliquip proident pariatur anim occaecat quis dolore elit voluptate culpa nostrud adipisicing pariatur nulla labore fugiat nulla officia ex magna dolor adipisicing ex et id ea in culpa sed dolor eiusmod dolor aliquip adipisicing sunt commodo dolore ad eu proident ad officia dolor enim quis voluptate elit ex deserunt in laboris laborum ut ut ut dolor eiusmod proident proident in aute commodo aliqua Duis deserunt sunt ex sit dolor exercitation magna veniam commodo nisi in in mollit id est irure cupidatat exercitation adipisicing Ut do est in labore fugiat cupidatat amet deserunt nisi tempor velit ex sint irure irure ex anim nostrud ut dolor sint officia est Ut dolor qui et pariatur ut in laboris veniam ullamco veniam quis occaecat occaecat Excepteur est commodo tempor esse esse voluptate dolor dolor deserunt officia ad ea qui est irure Ut dolor elit sint nulla reprehenderit voluptate nostrud quis fugiat Duis ad voluptate id in veniam fugiat deserunt dolor dolore quis consectetur tempor amet ad cupidatat laborum ut id occaecat elit exercitation veniam ad exercitation dolore est nisi mollit ullamco commodo non sint ut ex aute amet esse id et qui qui consequat eiusmod aute Ut minim sed in sit ad sit irure esse ullamco aliqua ex ut sunt exercitation est Duis commodo id nostrud sunt proident dolor pariatur et dolore sit Duis velit elit nostrud ullamco sint consequat cupidatat ut consectetur quis qui nostrud qui deserunt.
+            </section>
+            <section id="section-jump-chapter-3" class="section-jump-chapter">
+                <h2 class="section-jump-chapter-header">Heading 3</h2>
+                Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
+                Lorem ipsum Voluptate eu sunt sed proident in incididunt cupidatat pariatur voluptate elit cupidatat pariatur aliqua Ut nostrud ut ullamco dolor exercitation cupidatat ea anim consectetur irure ea ad pariatur nulla sunt qui aliqua deserunt in laboris exercitation labore reprehenderit amet cillum eu Excepteur eiusmod dolor exercitation sed deserunt cupidatat cillum ad laboris et incididunt reprehenderit ad sed voluptate reprehenderit commodo aute consequat fugiat ea pariatur laborum laborum qui labore et et do magna sint occaecat ullamco aute nulla nulla dolore commodo eiusmod reprehenderit velit incididunt non anim irure nisi nulla pariatur est consequat dolor esse ex in ad in velit sed commodo Ut ut irure ut dolore magna adipisicing deserunt do fugiat dolore quis laboris eu velit sint officia mollit dolor sed mollit minim sed voluptate est elit incididunt anim in aliqua id sit minim in dolore in ullamco commodo velit id sed ut amet Ut exercitation adipisicing in nisi reprehenderit et fugiat esse in dolore ut eiusmod reprehenderit elit ea enim consectetur sit nostrud enim nisi irure labore magna amet in mollit Excepteur ex ea nisi aliquip anim enim laboris proident dolor culpa dolor ut consequat ea Excepteur ut ex quis proident occaecat id ex dolor in aliqua officia velit quis in Duis tempor aliqua consectetur magna sed nostrud velit reprehenderit laborum fugiat qui dolor enim fugiat aute elit officia nostrud irure eu ut pariatur velit in non elit sint reprehenderit dolore enim consequat consequat enim ad nisi minim.
+            </section>
+        </div>
+    </div>
+</div>
+```
+*/
+
 .section-jump-cover-header {
     @include text(header);
     margin: 0;
@@ -51,7 +104,13 @@
     counter-reset: chapter-counter;
     margin-left: $section-jump-navigation-width;
 
+    .section-jump-chapter {
+        padding: 1em;
+    }
+
     .section-jump-chapter-header {
+        margin: 0 0 1em;
+
         &.active {
             color: $color-text-highlight-normal;
         }
