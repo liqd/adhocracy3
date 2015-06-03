@@ -15,18 +15,8 @@ of chapters. Often used for navigating proposal details
     </div>
 
     <div class="section-jump-body">
-        <nav class="section-jump-navigation m-unnumbered" data-adh-sticky="">
-            <ol class="section-jump-navigation-list-container">
-                <li class="section-jump-navigation-list-item">
-                    <a href="#section-jump-chapter-1">1</a>
-                </li>
-                <li class="section-jump-navigation-list-item">
-                    <a href="#section-jump-chapter-2">2</a>
-                </li>
-                <li class="section-jump-navigation-list-item">
-                    <a href="#section-jump-chapter-3">3</a>
-                </li>
-            </ol>
+        <nav class="section-jump-navigation">
+            1.
         </nav>
 
         <div class="section-jump-chapters">
@@ -77,21 +67,10 @@ of chapters. Often used for navigating proposal details
 }
 
 .section-jump-navigation {
-    @extend .jump-navigation;
     padding-top: 1em;
     text-align: center;
     width: $section-jump-navigation-width;
     float: left;
-
-    .section-jump-navigation-list-container {
-        padding: 0;
-    }
-
-    .section-jump-navigation-list-item {
-        a {
-            margin: 0 0 1em;
-        }
-    }
 
     @media print {
         display: none;

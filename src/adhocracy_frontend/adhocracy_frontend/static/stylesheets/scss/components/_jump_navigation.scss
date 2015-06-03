@@ -16,8 +16,18 @@ A navigation list containing hash tag links
         <li><a class="active">Element (A active)</a></li>
     </ol>
 </nav>
+
 <strong>Unumbered</strong>
 <nav class="jump-navigation m-unnumbered">
+    <ol>
+        <li><a>Element</a></li>
+        <li class="active"><a>Element (LI Active)</a></li>
+        <li><a class="active">Element (A active)</a></li>
+    </ol>
+</nav>
+
+<strong>Narrow</strong>
+<nav class="jump-navigation m-narrow">
     <ol>
         <li><a>Element</a></li>
         <li class="active"><a>Element (LI Active)</a></li>
@@ -69,6 +79,16 @@ A navigation list containing hash tag links
     &.m-unnumbered {
         ol a:before {
             content: "";
+        }
+    }
+
+    &.m-narrow {
+        ol {
+            padding: 0;
+        }
+
+        li a {
+            margin: 0 0 1em;
         }
     }
 }
