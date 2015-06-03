@@ -4,15 +4,14 @@ import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
-import AdhUtil = require("../../../Util/Util");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion");
-import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SIWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
 
@@ -43,10 +42,6 @@ var postCreate = (
 ) : angular.IPromise<any> => {
     var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
     proposal.parent = poolPath;
-    // FIXME: dummy name
-    proposal.data[SIName.nick] = new SIName.Sheet({
-        name: AdhUtil.normalizeName(scope.data.name)
-    });
 
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = proposal.path;
@@ -107,7 +102,8 @@ export var createDirective = (
 
 
 export var embedDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -124,6 +120,12 @@ export var embedDirective = (
             scope.showForm = () => {
                 scope.success = false;
             };
+
+            adhHttp.get(scope.path).then((resource) => {
+                scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                scope.announceText = resource.data[SIWorkflow.nick].announce.description;
+                scope.frozenText = resource.data[SIWorkflow.nick].frozen.description;
+            });
         }
     };
 };
@@ -145,5 +147,5 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinBplaeneProposalCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
-        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", embedDirective]);
+        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", "adhHttp", embedDirective]);
 };

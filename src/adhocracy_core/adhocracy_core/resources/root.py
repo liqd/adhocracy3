@@ -9,11 +9,13 @@ from substanced.util import find_service
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources.organisation import IOrganisation
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.schema import ACM
@@ -62,7 +64,7 @@ root_acm = ACM().deserialize(
 # fixme: remove edit_xx_permission
 
 
-class IRootPool(IPool, IRoot):
+class IRootPool(IOrganisation, IRoot):
 
     """The application root object."""
 
@@ -119,7 +121,7 @@ def add_platform(context, registry, platform_id=None,
 
 def _add_adhocracy_platform(context: IPool, registry: Registry,
                             options: dict):
-    add_platform(context, registry)
+    add_platform(context, registry, resource_type=IProcess)
 
 
 def _add_default_group(context, registry):

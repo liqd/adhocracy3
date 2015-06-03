@@ -6,6 +6,7 @@ import _ = require("lodash");
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
 import AdhLocale = require("../Locale/Locale");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -967,17 +968,6 @@ export var addButton = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var imageUriFilter = () => {
-    return (path? : string, format : string = "detail") : string => {
-        if (path) {
-            return path + "/" + format;
-        } else {
-            return "/static/fallback_" + format + ".jpg";
-        }
-    };
-};
-
-
 export var mercatorProposalFormController = ($scope : IControllerScope, $element, $window, adhShowError, adhSubmitIfValid) => {
     var heardFromCheckboxes = [
         "heard-from-colleague",
@@ -1107,6 +1097,7 @@ export var register = (angular) => {
             "ngMessages",
             AdhAngularHelpers.moduleName,
             AdhHttp.moduleName,
+            AdhImage.moduleName,
             AdhInject.moduleName,
             AdhLocale.moduleName,
             AdhPreliminaryNames.moduleName,
@@ -1220,7 +1211,6 @@ export var register = (angular) => {
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
         .directive("adhMercatorProposalAddButton", ["adhConfig", addButton])
-        .filter("adhImageUri", imageUriFilter)
         .controller("mercatorProposalFormController", [
             "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", mercatorProposalFormController]);
 };

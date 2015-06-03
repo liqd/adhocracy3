@@ -1,0 +1,12 @@
+<a data-ng-href="{{ path | adhResourceUrl }}" class="spd-document-list-item {{ selectedState }}">
+    <img class="spd-document-item-image"
+        data-ng-src="{{ data.picture | adhImageUri:'thumbnail' }}" alt="" />
+    <div class="spd-document-list-item-body">
+        <h3 class="spd-document-list-item-title">{{ data.title }}</h3>
+        <ul class="spd-document-list-item-meta">
+            <li class="spd-document-list-item-meta-item spd-document-list-item-meta-item-total-comments">
+                <i class="icon-speechbubbles"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
+            </li>
+        </ul>
+    </div>
+</a>

@@ -3,19 +3,19 @@
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
     <div class="mercator-proposal-detail-cover">
         <ul class="mercator-proposal-detail-meta">
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-total-comments">
+            <li class="mercator-proposal-detail-meta-item mercator-proposal-detail-meta-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-date">
+            <li class="mercator-proposal-detail-meta-item mercator-proposal-detail-meta-item-date">
                 <i class="icon-calendar m-definition-before" title="{{ 'TR__CREATION_DATE' | translate }}:"></i>
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-budget screen-only">
+            <li class="mercator-proposal-detail-meta-item mercator-proposal-detail-meta-item-budget screen-only">
                 <i class="icon-pig" title="{{ 'TR__MERCATOR_PROPOSAL_REQUESTED' | translate }}"></i>
                 {{data.finance.requested_funding | number}} &euro;
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-rate">
+            <li class="mercator-proposal-detail-meta-item mercator-proposal-detail-meta-item-rate">
                 <adh-like data-refers-to="{{path}}"></adh-like>
             </li>
         </ul>

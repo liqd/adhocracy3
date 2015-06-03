@@ -143,7 +143,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-meta,
-.mercator-propsal-list-item-meta {
+.mercator-proposal-list-item-meta {
     @include container;
     @include text(functional-introvert);
 
@@ -153,8 +153,8 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     list-style: none;
 }
 
-.mercator-propsal-list-item-meta-item,
-.mercator-propsal-detail-meta-item {
+.mercator-proposal-list-item-meta-item,
+.mercator-proposal-detail-meta-item {
     @include text(functional-introvert);
     float: left;
     margin-right: 0.83333333em;
@@ -166,15 +166,15 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         vertical-align: middle;
     }
 
-    &.mercator-propsal-list-item-meta-item-total-comments,
-    &.mercator-propsal-detail-meta-item-total-comments {
+    &.mercator-proposal-list-item-meta-item-total-comments,
+    &.mercator-proposal-detail-meta-item-total-comments {
         i {
             color: $color-brand-three-normal;
         }
     }
 
-    &.mercator-propsal-list-item-meta-item-supporters,
-    &.mercator-propsal-detail-meta-item-total-supporters {
+    &.mercator-proposal-list-item-meta-item-supporters,
+    &.mercator-proposal-detail-meta-item-total-supporters {
         i {
             color: $color-brand-one-normal;
         }
@@ -189,7 +189,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         }
     }
 
-    &.mercator-propsal-list-item-meta-item-budget {
+    &.mercator-proposal-list-item-meta-item-budget {
         color: $color-text-highlight-normal;
         font-size: $font-size-plus;
     }
@@ -198,7 +198,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         float: none;
         font-size: $font-size-normal;
 
-        i:not(.m-definition-before):not(.m-definition-after), &.mercator-propsal-detail-meta-item-rate {
+        i:not(.m-definition-before):not(.m-definition-after), &.mercator-proposal-detail-meta-item-rate {
             display: none;
         }
     }
@@ -226,7 +226,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 .mercator-proposal-detail-meta {
     padding-bottom: 1.66666666em;
 
-    .mercator-propsal-detail-meta-item-total-comments {
+    .mercator-proposal-detail-meta-item-total-comments {
         i {
             color: $color-text-highlight-introvert;
         }
@@ -368,7 +368,7 @@ $mercator-proposal-detail-nav-width: 2em;
         background: $color-background-base-introvert;
 
         i[class*=icon-],
-        .mercator-propsal-list-item-meta-item-budget {
+        .mercator-proposal-list-item-meta-item-budget {
             color: $color-text-highlight-introvert;
         }
 
