@@ -17,7 +17,7 @@ bplan_meta = {
                      },
         'participate': {'title': 'Participate',
                         'description': '',
-                        'acm': {'principals': [                   'anonymous', 'moderator', 'creator', 'initiator'],  # noqa
+                        'acm': {'principals':                    ['anonymous', 'moderator', 'creator', 'initiator'],  # noqa
                                 'permissions':
                                   [['create',                     'Allow',     'Allow',   'Allow',     'Allow'],  # noqa
                                    ['create_proposal',            'Allow',      None,      None,        None],  # noqa
@@ -27,7 +27,7 @@ bplan_meta = {
         # FIXME disable view proposals
         'frozen': {'title': 'Frozen',
                    'description': '',
-                   'acm': {'principals': [                    'anonymous', 'moderator', 'creator', 'initiator'],  # noqa
+                   'acm': {'principals':                     ['anonymous', 'moderator', 'creator', 'initiator'],  # noqa
                            'permissions':
                               [['create',                      None,       'Allow',     'Allow',   'Allow'],  # noqa
                                ['create_proposal',             None,        None,        None,      None],  # noqa
