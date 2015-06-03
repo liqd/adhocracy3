@@ -37,10 +37,14 @@
     @extend .jump-navigation;
     padding-top: 1em;
     text-align: center;
-    width: $jump-navigation-width;
+    width: $section-jump-navigation-width;
     float: left;
 
-    li {
+    .section-jump-navigation-list-container {
+        padding: 0;
+    }
+
+    .section-jump-navigation-list-item {
         a {
             margin: 0 0 1em;
         }
