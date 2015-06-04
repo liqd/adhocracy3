@@ -12,6 +12,7 @@ from adhocracy_core.resources import process
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.comment import ICommentable
+from adhocracy_core.resources.badge import add_badge_assignments_service
 
 import adhocracy_core.sheets.title
 import adhocracy_mercator.sheets.mercator
@@ -404,7 +405,8 @@ class IMercatorProposalVersion(IItemVersion):
 mercator_proposal_version_meta = itemversion_meta._replace(
     content_name='MercatorProposalVersion',
     iresource=IMercatorProposalVersion,
-    extended_sheets=[adhocracy_core.sheets.title.ITitle,
+    extended_sheets=[adhocracy_core.sheets.badge.IBadgeable,
+                     adhocracy_core.sheets.title.ITitle,
                      adhocracy_mercator.sheets.mercator.IUserInfo,
                      adhocracy_mercator.sheets.mercator.IHeardFrom,
                      adhocracy_mercator.sheets.mercator.IMercatorSubResources,
@@ -438,6 +440,7 @@ mercator_proposal_meta = item_meta._replace(
     after_creation=item_meta.after_creation + [
         add_commentsservice,
         add_ratesservice,
+        add_badge_assignments_service,
     ],
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
@@ -456,7 +459,6 @@ process_meta = process.process_meta._replace(
                    ],
     is_implicit_addable=True,
 )
-
 
 
 def includeme(config):
