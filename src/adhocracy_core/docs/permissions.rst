@@ -13,7 +13,7 @@ Prerequisites
 Some imports to work with rest api calls::
 
     >>> from pprint import pprint
-    >>> from adhocracy_core.rre.documenore.document import IDocument
+    >>> from adhocracy_core.resources.document import IDocument
     >>> from adhocracy_core.resources.document import IDocumentVersion
     >>> from adhocracy_core.resources.organisation import IOrganisation
 
