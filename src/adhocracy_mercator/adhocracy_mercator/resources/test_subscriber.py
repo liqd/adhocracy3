@@ -15,8 +15,6 @@ def test_application_created_subscriber(monkeypatch):
     mock_initialize_workflow = Mock()
     monkeypatch.setattr(adhocracy_mercator.resources.subscriber,
                         '_set_permissions', mock_set_permissions)
-    monkeypatch.setattr(adhocracy_mercator.resources.subscriber,
-                        '_initialize_workflow', mock_initialize_workflow)
     monkeypatch.setattr(transaction, 'commit', commit_mock)
     event = Mock()
     from adhocracy_mercator.resources.subscriber import _application_created_subscriber
@@ -34,27 +32,3 @@ def test_set_permissions():
     _set_permissions(app)
     assert (Allow, 'role:admin', 'edit_proposal') in root.__acl__
     assert (Allow, 'role:god', ALL_PERMISSIONS) == root.__acl__[0]
-
-
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.rest')
-    config.include('adhocracy_core.workflows.sample')
-    config.include('adhocracy_mercator.workflows')
-
-
-@mark.usefixtures('integration')
-def test_initialize_workflow(registry):
-    from adhocracy_mercator.resources.subscriber import _initialize_workflow
-    app = Mock()
-    root = testing.DummyResource()
-    mercator = testing.DummyResource()
-    root['mercator'] = mercator
-    root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
-    app.root_factory.return_value = root
-    app.registry = registry
-    workflow = registry.content.workflows['mercator']
-    _initialize_workflow(app)
-    assert workflow.state_of(mercator) == 'participate'
