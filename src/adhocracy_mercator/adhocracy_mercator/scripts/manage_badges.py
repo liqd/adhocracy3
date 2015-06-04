@@ -31,9 +31,9 @@ def add_badge_assignment():
     )
 
     options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 4:
-        print('You must provide four arguments')
-        return 4
+    if not len(args) >= 5:
+        print('You must provide five arguments')
+        return 5
 
     env = bootstrap(args[0])
     root = env['root']
