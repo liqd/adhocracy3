@@ -1,0 +1,80 @@
+/*doc
+---
+title: Section Jump
+name: section-jump
+category: Widgets
+---
+
+A widget with a header, a left navigation and a main section. Often used in
+combination with `.jump-navigation.m-narrow.m-unnumbered`.
+
+```html_example
+<div class="section-jump" id="section-jump-top">
+    <div class="section-jump-cover">
+        <h1 class="section-jump-cover-header">Section Jump header</h1>
+    </div>
+
+    <div class="section-jump-body">
+        <nav class="section-jump-navigation">
+            1.
+        </nav>
+
+        <div class="section-jump-main">
+            <div style="padding: 1em">
+                Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
+                Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
+                Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
+                Lorem ipsum Ullamco laboris commodo sit commodo nulla adipisicing in fugiat nostrud mollit irure esse velit reprehenderit commodo dolor.
+            </div>
+        </div>
+    </div>
+</div>
+```
+*/
+
+.section-jump-cover-header {
+    @include text(header);
+    margin: 0;
+
+    @media print {
+        margin-bottom: 1em;
+    }
+}
+
+.section-jump-cover {
+    @include span(full);
+    border-bottom: 2px solid $color-structure-normal;
+    padding: 1.07142857em 0.71428571em 0.71428571em;
+
+    @media print {
+        border: 0;
+        padding: 0;
+    }
+}
+
+.section-jump-body {
+    background-color: $color-background-base-introvert;
+    clear: left;
+}
+
+.section-jump-navigation {
+    padding-top: 1em;
+    text-align: center;
+    width: $section-jump-navigation-width;
+    float: left;
+
+    @media print {
+        display: none;
+    }
+}
+
+.section-jump-main {
+    background-color: $color-background-base;
+    border-left: 2px solid $color-structure-normal;
+    margin-left: $section-jump-navigation-width;
+
+    @media print {
+        border: 0;
+        margin: 0;
+    }
+}

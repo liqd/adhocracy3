@@ -43,8 +43,7 @@ export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBacken
         // FIXME: the backend currently responds with errors in HTML,
         // not in json, which provokes $http to throw an exception and
         // whipe the response object before passing it to the error
-        // handler callback.  See #256 and disabled test "do not lose
-        // error response status and body" in HttpIg.ts).
+        // handler callback.  See #256.
         //
         // the following line works around that.
         throw [{ name: "unknown", location: "unknown", description: "unknown" }];

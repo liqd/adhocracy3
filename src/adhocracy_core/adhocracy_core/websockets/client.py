@@ -183,3 +183,5 @@ def includeme(config):
     if ws_url:
         ws_client = Client(ws_url=ws_url)
         config.registry.ws_client = ws_client
+    else:
+        logger.info('No websocket server setup, add config "adhocracy.ws_url"')

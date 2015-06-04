@@ -26,8 +26,8 @@ def config_view(request):
                                       'http://localhost:6541')
     config['canonical_url'] = settings.get('adhocracy.canonical_url',
                                            'http://localhost:6551')
-    platform_id = settings.get('adhocracy.platform_id', 'adhocracy')
-    config['rest_platform_path'] = '/{}/'.format(platform_id)
+    config['rest_platform_path'] = settings.get('adhocracy.rest_platform_path',
+                                                '/adhocracy/')
     config['pkg_path'] = settings.get('adhocracy.frontend.pkg_path',
                                       '/static/js/Packages')
     config['trusted_domains'] = aslist(

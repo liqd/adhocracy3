@@ -1,8 +1,7 @@
-<div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
-    <h2 class="print-only mercator-proposal-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
-
-    <div class="mercator-proposal-detail-cover">
-        <h1 class="mercator-proposal-cover-header screen-only">{{ data.title }}</h1>
+<div class="section-jump" id="section-jump-top">
+    <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
+    <div class="section-jump-cover">
+        <h1 class="section-jump-cover-header screen-only">{{ data.title }}</h1>
         <ul class="meta-list">
             <li class="meta-list-item meta-list-item-total-comments">
                 <i class="icon-speechbubbles"></i>
@@ -11,26 +10,25 @@
         </ul>
     </div><!-- /.cover -->
 
-    <div class="mercator-proposal-detail-container">
-
-        <nav class="mercator-proposal-detail-nav m-unnumbered" data-adh-sticky="">
+    <div class="section-jump-body">
+        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
             <ol>
                 <li data-ng-repeat="paragraph in data.paragraphs">
                     <a
-                        href="#mercator-proposal-chapter-{{ $index }}"
+                        href="#section-jump-chapter-{{$index}}"
                         data-du-smooth-scroll=""
                         data-du-scrollspy="">{{ $index }}.</a>
                 </li>
             </ol>
         </nav>
 
-        <div class="mercator-proposal-chapters" data-du-spy-context="">
-            <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="mercator-proposal-chapter-{{$index}}">
+        <div class="section-jump-main" data-du-spy-context="">
+            <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="commentable-section-show-comments" href="">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
                 </a>
             </section>
-        </div><!-- /.mercator-detail-body -->
-    </div><!-- /.mercator-proposal-detail-container -->
-</div><!-- /.mercator-proposal-detail-view -->
+        </div><!-- /.section-jump-main -->
+    </div><!-- /.section-jump-body -->
+</div><!-- /.section-jump -->

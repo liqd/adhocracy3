@@ -59,4 +59,6 @@ Glossary
        A :term:`role` mapped to a :term:`principal` within a local
        context and all his children.
 
+   DAG
+       Versions of one resource that build a directed acyclic graph.
 
