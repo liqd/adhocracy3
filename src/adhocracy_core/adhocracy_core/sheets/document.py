@@ -31,7 +31,7 @@ class DocumentElementsReference(SheetToSheet):
     """Document elements reference."""
 
     source_isheet = IDocument
-    source_isheet_field = 'sections'
+    source_isheet_field = 'elements'
     target_isheet = ISection
 
 
