@@ -106,7 +106,7 @@ class TestItemVersion:
         metadata = itemversion_meta._replace(extended_sheets=[IDocument])
         add_resource_type_to_registry(metadata, config)
         referenced_v0 = self.make_one(config, context)
-        appstructs={IDocument.__identifier__: {'subsections': [referenced_v0]}}
+        appstructs={IDocument.__identifier__: {'elements': [referenced_v0]}}
         referenceing_v0 = self.make_one(config, context, appstructs=appstructs)
         config.registry.changelog.clear()
         referenced_v1 = self.make_one(config, context, follows=[referenced_v0])

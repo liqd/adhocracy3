@@ -9,6 +9,7 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources.badge')
     config.include('adhocracy_core.resources.document')
     config.include('adhocracy_core.resources.tag')
     config.include('adhocracy_core.resources.comment')
@@ -53,6 +54,7 @@ class TestDocumentVersion:
         assert meta.iresource == resources.document.IDocumentVersion
         assert meta.extended_sheets == [sheets.document.IDocument,
                                         sheets.comment.ICommentable,
+                                        sheets.badge.IBadgeable,
                                         sheets.rate.IRateable,
                                         sheets.image.IImageReference,
                                         ]
