@@ -12,8 +12,8 @@ Prerequisites
 Some imports to work with rest api calls::
 
     >>> from pprint import pprint
-    >>> from adhocracy_core.resources.sample_proposal import IProposal
-    >>> from adhocracy_core.resources.sample_proposal import IProposalVersion
+    >>> from adhocracy_core.resources.document import IDocument
+    >>> from adhocracy_core.resources.document import IDocumentVersion
 
 Start adhocracy app and log in some users::
 
@@ -30,7 +30,7 @@ Create participation process structure/content to get started::
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'process'}}}
     >>> resp = admin.post('/organisation', prop)
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal'}}}
     >>> resp = participant.post('/organisation/process', prop).json
     >>> proposal_version = resp['first_version_path']

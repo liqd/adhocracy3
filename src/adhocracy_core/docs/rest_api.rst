@@ -144,8 +144,8 @@ example, a pool can contain other pools; a document can contain tags. ::
 
     >>> organisation_desc['element_types']
     [...adhocracy_core.resources.process.IProcess...
-    >>> sorted(section_desc['element_types'])
-    ['adhocracy_core.interfaces.ITag', ...'adhocracy_core.resources.sample_section.ISectionVersion'...]
+    >>> sorted(document_desc['element_types'])
+    ['adhocracy_core.interfaces.ITag', ...'adhocracy_core.resources.paragraph.IParagraph']
 
 The "sheets" key points to an object whose keys are all the sheets
 implemented by any of the resources::
@@ -373,8 +373,8 @@ The response object has 3 top-level entries:
   The subkey 'created' lists any resources that have been created by the
   transaction::
 
-      >>> resp_data['updated_resources']['created']
-      ['http://localhost/Documents/']
+      >>> sorted(resp_data['updated_resources']['created'])
+      ['http://localhost/Documents/', 'http://localhost/Documents/assets/', 'http://localhost/Documents/badges/']
 
   The subkey 'modified' lists any resources that have been modified::
 
@@ -570,7 +570,7 @@ The Document has the IVersions and ITags interfaces to work with Versions::
     ['.../Documents/kommunismus/VERSION_0000000/']
 
     >>> resp.json['data']['adhocracy_core.sheets.tags.ITags']['elements']
-    ['.../Documents/kommunismus/FIRST/', '.../adhocracy/Documents/kommunismus/LAST/']
+    ['.../Documents/kommunismus/FIRST/', '.../Documents/kommunismus/LAST/']
 
 
 Update
@@ -634,7 +634,7 @@ Therefore 'followed_by' is read-only, while 'follows' is writable.
 
 Create a Section item inside the Document item ::
 
-    >>> sdag = {'content_type': 'adhocracy_core.resources.document.IParagraph',
+    >>> sdag = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag, headers=god_header)
@@ -643,7 +643,7 @@ Create a Section item inside the Document item ::
 
 and a second Section ::
 
-    >>> sdag = {'content_type': 'adhocracy_core.resources.document.IParagraph',
+    >>> sdag = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel2'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag, headers=god_header)
@@ -665,9 +665,9 @@ initial versions ::
 
 If we create a second version of kapitel1 ::
 
-    >>> svrs = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    >>> svrs = {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...         'data': {
-    ...              'adhocracy_core.sheets.document.IDocument': {
+    ...              'adhocracy_core.sheets.document.IParagraph': {
     ...                  'title': 'Kapitel Überschrift Bla',
     ...                  'elements': []},
     ...               'adhocracy_core.sheets.versions.IVersionable': {
@@ -709,9 +709,9 @@ More interestingly, if we try to create a second version of kapitel2 we
 get an error because this would automatically create two new version for pvrs3
 and pvrs2 (both contain s2vrs0_path)::
 
-    >>> svrs = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    >>> svrs = {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...         'data': {
-    ...              'adhocracy_core.sheets.document.IDocument': {
+    ...              'adhocracy_core.sheets.document.IParagraph': {
     ...                  'title': 'on the hardness of version control',
     ...                  'elements': []},
     ...               'adhocracy_core.sheets.versions.IVersionable': {
@@ -725,9 +725,9 @@ and pvrs2 (both contain s2vrs0_path)::
     {'description': 'No fork allowed - The auto update ...
 
 But if we set the `root_version` to the last  Document version (pvrs3)::
-    >>> svrs = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    >>> svrs = {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...         'data': {
-    ...              'adhocracy_core.sheets.document.IDocument': {
+    ...              'adhocracy_core.sheets.document.IParagraph': {
     ...                  'title': 'on the hardness of version control',
     ...                  'elements': []},
     ...               'adhocracy_core.sheets.versions.IVersionable': {
@@ -1189,7 +1189,7 @@ Let's add some more paragraphs to the second document above ::
     ...                         'follows': ['@par1_item/v1']
     ...                     },
     ...                     'adhocracy_core.sheets.document.IParagraph': {
-    ...                         'content': 'sein blick ist vom vorüberziehn der stäbchen'
+    ...                         'text': 'sein blick ist vom vorüberziehn der stäbchen'
     ...                     }
     ...                 },
     ...             },
@@ -1228,7 +1228,7 @@ omitted::
     3
     >>> pprint(batch_resp['responses'][0])
     {'body': {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
-              'first_version_path': '.../adhocracy/Documents/kommunismus/par1/VERSION_0000000/',
+              'first_version_path': '.../Documents/kommunismus/par1/VERSION_0000000/',
               'path': '.../Documents/kommunismus/par1/'},
      'code': 200}
     >>> pprint(batch_resp['responses'][1])
@@ -1240,7 +1240,7 @@ omitted::
               'data': {...},
               'path': '.../Documents/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
-     >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['content']
+     >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['text']
      'sein blick ist vom vorüberziehn der stäbchen'
 
 
@@ -1334,10 +1334,11 @@ adding suitable GET parameters. For example, we can only retrieve children
 of a specific content type::
 
     >>> resp_data = testapp.get('/Documents/kommunismus',
-    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISection'}).json
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/kommunismus/kapitel1/',
-     'http://localhost/Documents/kommunismus/kapitel2/']
+     'http://localhost/Documents/kommunismus/kapitel2/',
+     'http://localhost/Documents/kommunismus/par1/']
 
 Or only children that implement a specific sheet::
 
@@ -1362,16 +1363,16 @@ value allows also including grandchildren (depth=2) or even great-grandchildren
 (depth=3) etc. Allowed values are arbitrary positive numbers and *all*.
 *all* can be used to get nested elements of arbitrary nesting depth::
 
-    >>> resp_data = testapp.get('/Documents/kommunismus',
+    >>> resp_data = testapp.get('/Documents',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...             'depth': 'all'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    [...'http://localhost/Documents/kommunismus/kapitel1/VERSION_0000001/'...]
+    [...'http://localhost/Documents/kommunismus/VERSION_0000001/'...]
 
 Without specifying a deeper depth, the above query for IDocumentVersions
 wouldn't have found anything, since they are children of children of the pool::
 
-    >>> resp_data = testapp.get('/Documents/kommunismus',
+    >>> resp_data = testapp.get('/Documents',
     ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion'
     ...             }).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
@@ -1478,11 +1479,12 @@ Versionables. We can get them by setting *tag=LAST*. Let's find the latest
 versions of all documents::
 
     >>> resp_data = testapp.get('/Documents/kommunismus',
-    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/kommunismus/kapitel1/VERSION_0000001/',
-     'http://localhost/Documents/kommunismus/kapitel2/VERSION_0000001/']
+     'http://localhost/Documents/kommunismus/kapitel2/VERSION_0000001/',
+     'http://localhost/Documents/kommunismus/par1/VERSION_0000001/']
 
 *<custom>* filter: depending on the backend configuration there are additional
 custom filters:
@@ -1510,7 +1512,7 @@ the isheet plus the field name separated by ':' The value is the wanted
 reference target. ::
 
     >>> resp_data = testapp.get('/Documents/kommunismus',
-    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'adhocracy_core.sheets.versions.IVersionable:follows':
     ...             'http://localhost/Documents/kommunismus/kapitel2/VERSION_0000000/',
     ...             'depth': 'all', 'tag': 'LAST'}).json
@@ -1541,7 +1543,7 @@ not a reference field, the backend responds with an error::
 You'll also get an error if you try to filter by a catalog that doesn't exist::
 
     >>> resp_data = testapp.get('/Documents/kommunismus',
-    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'foocat': 'whatever'},
     ...     status=400).json
     >>> resp_data['errors'][0]['description']
@@ -1554,7 +1556,7 @@ the query result will be reported, i.e. the count reported for each value
 will be 1 or higher. ::
 
     >>> resp_data = testapp.get('/Documents/kommunismus',
-    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])
-    {'tag': {'FIRST': 2, 'LAST': 2}}
+    {'tag': {'FIRST': 3, 'LAST': 3}}

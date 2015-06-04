@@ -151,7 +151,7 @@ Lets create some content::
     >>> proposal_item = resp.json['path']
     >>> proposal_item_first_version = resp.json['first_version_path']
 
-    >>> data = {'content_type': 'adhocracy_core.resources.sample_section.ISection',
+    >>> data = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'section_item'},}
     ...         }
     >>> resp = participant.post(proposal_item, data)
@@ -163,9 +163,9 @@ Lets create some content::
     >>> resp = participant.post(proposal_item, data)
     >>> paragraph_item = resp.json["path"]
     >>> paragraph_item_first_version = resp.json["first_version_path"]
-    >>> data = {'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    >>> data = {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...         'data': {
-    ...              'adhocracy_core.sheets.document.ISection': {
+    ...              'adhocracy_core.sheets.document.IParagraph': {
     ...                  'elements': [paragraph_item_first_version]},
     ...               'adhocracy_core.sheets.versions.IVersionable': {
     ...                  'follows': [section_item_first_version]
