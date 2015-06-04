@@ -63,6 +63,11 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
     resp = app_user.post_resource(path, iresource, sheets_cstruct)
     return resp
 
+def _post_proposal_version(app_user, path='/') -> TestResponse:
+    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+    iresource = IMercatorProposalVersion
+    resp = app_user.post_resource(path, iresource, {})
+    return resp
 
 def _batch_post_full_sample_proposal(app_user) -> TestResponse:
     subrequests = _create_proposal()
@@ -137,6 +142,7 @@ class TestMercatorWorkflow:
     def test_cannot_edit_other_users_proposal(self, app_participant,
                                                         app_god):
         _post_proposal_item(app_god, path='/', name='proposal_other')
+        _post_proposal_version(app_god, path='/proposal_other')
         postable_types = app_participant.get_postable_types('/proposal_other')
         assert postable_types == []
 
