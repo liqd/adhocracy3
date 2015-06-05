@@ -292,7 +292,7 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
         });
 };
 
-var getBadges = (adhHttp, proposal, list) => {
+var getBadges = (adhHttp : AdhHttp.Service<any>, proposal : any, list : string[]) => {
 
     _.forEach(proposal.data[SIBadgeable.nick].assignments, function(assignment) {
         adhHttp.get(<any>assignment).then((assignment) => {
