@@ -166,7 +166,7 @@ export interface IScopeData {
     accept_disclaimer : string;
 
     // 7. badges
-    assignments: string[];
+    assignments: BadgeAssignment[];
 }
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
@@ -292,13 +292,25 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
         });
 };
 
-var getBadges = (adhHttp : AdhHttp.Service<any>, proposal : any, list : string[]) => {
+export class BadgeAssignment {
+    private title : string;
+    private description : string;
+
+    constructor(title : string, description : string) {
+        this.title = title;
+        this.description = description;
+    }
+}
+
+var getBadges = (adhHttp : AdhHttp.Service<any>, proposal : any, list : BadgeAssignment[]) => {
 
     _.forEach(proposal.data[SIBadgeable.nick].assignments, function(assignment) {
         adhHttp.get(<any>assignment).then((assignment) => {
             var description = assignment.data[IBadgeAssignment.nick].description;
             adhHttp.get(assignment.data[IBadgeAssignment.nick].badge).then((badge) => {
-                list.push({ title: badge.data[SITitle.nick].title, description: description });
+                var title = badge.data[SITitle.nick].title;
+                var assignment = new BadgeAssignment(title, description);
+                list.push(assignment);
             });
         });
     });
