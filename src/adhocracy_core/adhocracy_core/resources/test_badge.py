@@ -17,8 +17,8 @@ class TestBadge:
 
     @fixture
     def meta(self):
-        from .badge import badge_data_meta
-        return badge_data_meta
+        from .badge import badge_meta
+        return badge_meta
 
     def test_meta(self, meta):
         from adhocracy_core import resources

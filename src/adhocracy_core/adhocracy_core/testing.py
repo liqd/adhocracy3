@@ -333,14 +333,11 @@ def query() -> SearchQuery:
 
 
 @fixture
-def sheet_catalogs(monkeypatch, search_result) -> Mock:
+def sheet_catalogs(monkeypatch, mock_catalogs) -> Mock:
     """Mock _catalogs property for sheets."""
-    from adhocracy_core.catalog import CatalogsServiceAdhocracy
     from adhocracy_core import sheets
-    mock = Mock(spec=CatalogsServiceAdhocracy)
-    mock.search.return_value = search_result
-    monkeypatch.setattr(sheets, 'find_service', lambda x, y: mock)
-    return mock
+    monkeypatch.setattr(sheets, 'find_service', lambda x, y: mock_catalogs)
+    return mock_catalogs
 
 
 @fixture

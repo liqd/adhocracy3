@@ -38,7 +38,7 @@ Create participation process structure/content to get started::
 Create Badge
 ~~~~~~~~~~~~
 
-BadgeData can be created in `badges` pools. The IHasBadgesPool sheet of the process
+Badges can be created in `badges` pools. The IHasBadgesPool sheet of the process
 gives us the right pool:
 
 
@@ -47,7 +47,7 @@ gives us the right pool:
 
 # TODO First we create a badge Group pool
 
-Now we can create BadgeData::
+Now we can create a Badge::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadge',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'badge1'},
@@ -56,25 +56,30 @@ Now we can create BadgeData::
     ...                  },
     ...         }
     >>> resp = initiator.post(badges_pool, prop).json
-    >>> badge_data = resp['path']
+    >>> badge = resp['path']
 
 
 Assign badges to process content
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To assign badges we have to post a badge assignment between user, content
-and badgedata to the badgeable post pool::
+and badge.
 
+First we need the pool to post badge assignments to::
 
     >>> resp = initiator.get(proposal_version).json
     >>> post_pool = resp['data']['adhocracy_core.sheets.badge.IBadgeable']['post_pool']
 
+The user is typically the current logged in user::
+
     >>> user = initiator.header['X-User-Path']
+
+Now we can post the assignment::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
     ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
     ...                      {'subject': user,
-    ...                       'badge': badge_data,
+    ...                       'badge': badge,
     ...                       'object': proposal_version}
     ...          }}
     >>> resp = initiator.post(post_pool, prop).json

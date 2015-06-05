@@ -8,19 +8,19 @@ from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.resources.service import service_meta
+import adhocracy_core.sheets.badge
 import adhocracy_core.sheets.description
 import adhocracy_core.sheets.metadata
-import adhocracy_core.sheets.title
 import adhocracy_core.sheets.name
-import adhocracy_core.sheets.badge
+import adhocracy_core.sheets.title
 
 
-class IBadge(IPool):
+class IBadge(ISimple):
 
     """A generic badge."""
 
 
-badge_data_meta = simple_meta._replace(
+badge_meta = simple_meta._replace(
     iresource=IBadge,
     extended_sheets=[
         adhocracy_core.sheets.description.IDescription,
@@ -85,7 +85,7 @@ def add_badge_assignments_service(context: IPool, registry: Registry,
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(badge_data_meta, config)
+    add_resource_type_to_registry(badge_meta, config)
     add_resource_type_to_registry(badges_service_meta, config)
     add_resource_type_to_registry(badge_assignment_meta, config)
     add_resource_type_to_registry(badge_assignments_service_meta, config)

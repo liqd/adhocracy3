@@ -23,7 +23,6 @@ class TestBadgeableSheet:
         pool['badge_assignments'] = service
         return meta.sheet_class(meta, pool)
 
-    @fixture
     def test_meta(self, meta):
         from adhocracy_core.interfaces import IPostPoolSheet
         from adhocracy_core.schema import PostPoolMappingSchema
@@ -70,7 +69,6 @@ class TestBadgeAssignmentsSheet:
     def inst(self, context, meta):
         return meta.sheet_class(meta, context)
 
-    @fixture
     def test_meta(self, meta):
         from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
         from . import badge
@@ -109,7 +107,6 @@ class TestBadgeSheet:
     def inst(self, context, meta):
         return meta.sheet_class(meta, context)
 
-    @fixture
     def test_meta(self, meta):
         from . import badge
         assert meta.isheet == badge.IBadge
@@ -148,7 +145,6 @@ class TestHasBadgesPoolSheet:
         pool['badges'] = service
         return meta.sheet_class(meta, pool)
 
-    @fixture
     def test_meta(self, meta):
         from . import badge
         assert meta.isheet == badge.IHasBadgesPool
