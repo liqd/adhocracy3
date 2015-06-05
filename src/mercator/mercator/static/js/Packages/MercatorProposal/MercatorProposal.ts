@@ -70,6 +70,8 @@ import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
+import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
+import IBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MercatorProposal";
@@ -935,6 +937,17 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                         requested_funding: finance.data[SIMercatorFinance.nick].requested_funding
                     };
                 });
+
+                scope.data.assignments = [];
+
+                _.forEach(proposal.data[SIBadgeable.nick].assignments, function(assignment) {
+                    adhHttp.get(<any>assignment).then((assignment) => {
+                        adhHttp.get(assignment.data[IBadgeAssignment.nick].badge).then((badge) => {
+                            scope.data.assignments.push(badge.data[SITitle.nick].title);
+                        });
+                    });
+                });
+
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
                         scope.selectedState = "";
