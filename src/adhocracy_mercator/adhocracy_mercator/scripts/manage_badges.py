@@ -23,7 +23,7 @@ def add_badge_assignment():
     usage::
       bin/create_badge <config> <user> <badge> <proposal> <parent>
     """
-    usage = 'usage: %prog config_file region organisation'
+    usage = 'usage: %prog config_file user badge proposal parent'
     description = textwrap.dedent(inspect.getdoc(add_badge_assignment))
     parser = optparse.OptionParser(
         usage=usage,
