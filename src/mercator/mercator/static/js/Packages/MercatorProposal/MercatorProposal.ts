@@ -296,8 +296,9 @@ var getBadges = (adhHttp : AdhHttp.Service<any>, proposal : any, list : string[]
 
     _.forEach(proposal.data[SIBadgeable.nick].assignments, function(assignment) {
         adhHttp.get(<any>assignment).then((assignment) => {
+            var description = assignment.data[IBadgeAssignment.nick].description;
             adhHttp.get(assignment.data[IBadgeAssignment.nick].badge).then((badge) => {
-                list.push(badge.data[SITitle.nick].title);
+                list.push({ title: badge.data[SITitle.nick].title, description: description });
             });
         });
     });
