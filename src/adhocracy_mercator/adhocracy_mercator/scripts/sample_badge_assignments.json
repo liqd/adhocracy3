@@ -1,0 +1,20 @@
+[
+    {"user": "/principals/users/0000000",
+     "badge": "/mercator/badges/winning/",
+     "proposalversion": "/mercator/Winning_17235/VERSION_0000001/",
+     "proposalitem": "/mercator/Winning_17235/",
+     "description" : "## Lorem ipsum dolor sit amet, \n consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque. Sed pharetra nibh eget orci convallis at posuere leo convallis. Sed blandit augue vitae augue scelerisque bibendum. Vivamus sit amet libero turpis, non venenatis urna. In blandit, odio convallis suscipit venenatis, ante ipsum cursus augue."
+    },
+    {"user": "/principals/users/0000000",
+     "badge": "/mercator/badges/winning/",
+     "proposalversion": "/mercator/Winning_25974/VERSION_0000001/",
+     "proposalitem": "/mercator/Winning_25974/",
+     "description" : "## Lorem ipsum dolor sit amet, \n consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque. Sed pharetra nibh eget orci convallis at posuere leo convallis. Sed blandit augue vitae augue scelerisque bibendum. Vivamus sit amet libero turpis, non venenatis urna. In blandit, odio convallis suscipit venenatis, ante ipsum cursus augue."
+    },
+    {"user": "/principals/users/0000000",
+     "badge": "/mercator/badges/community/",
+     "proposalversion": "/mercator/Community6136/VERSION_0000001/",
+     "proposalitem": "/mercator/Community6136/",
+     "description" : "## Lorem ipsum dolor sit amet, \n consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque. Sed pharetra nibh eget orci convallis at posuere leo convallis. Sed blandit augue vitae augue scelerisque bibendum. Vivamus sit amet libero turpis, non venenatis urna. In blandit, odio convallis suscipit venenatis, ante ipsum cursus augue."
+    }
+]
