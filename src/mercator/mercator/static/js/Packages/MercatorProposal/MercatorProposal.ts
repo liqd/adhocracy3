@@ -292,17 +292,15 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
         });
 };
 
-var getBadges = (adhHttp, proposal) => {
+var getBadges = (adhHttp, proposal, list) => {
 
-    var assignments = [];
     _.forEach(proposal.data[SIBadgeable.nick].assignments, function(assignment) {
         adhHttp.get(<any>assignment).then((assignment) => {
             adhHttp.get(assignment.data[IBadgeAssignment.nick].badge).then((badge) => {
-                assignments.push(badge.data[SITitle.nick].title);
+                list.push(badge.data[SITitle.nick].title);
             });
         });
     });
-    return assignments;
 };
 
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
@@ -444,7 +442,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         countSupporters(this.adhHttp, mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
             .then((count : number) => { data.supporterCount = count; });
 
-        data.assignments = getBadges(this.adhHttp, mercatorProposalVersion);
+         getBadges(this.adhHttp, mercatorProposalVersion, data.assignments);
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -956,7 +954,8 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                     };
                 });
 
-                scope.data.assignments = getBadges(adhHttp, proposal);
+                scope.data.assignments = [];
+                getBadges(adhHttp, proposal, scope.data.assignments);
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
