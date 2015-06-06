@@ -2,6 +2,7 @@ from pyramid import testing
 from pytest import fixture
 from pytest import raises
 from pytest import mark
+from unittest.mock import Mock
 
 
 @fixture
@@ -29,10 +30,10 @@ class TestBadgeableSheet:
         from . import badge
         assert badge.IBadgeable.extends(IPostPoolSheet)
         assert meta.isheet == badge.IBadgeable
-        assert isinstance(badge.BadgeableSchema, PostPoolMappingSchema)
         assert meta.schema_class == badge.BadgeableSchema
-        assert meta.edit is False
-        assert meta.create is False
+        assert issubclass(meta.schema_class, PostPoolMappingSchema)
+        assert meta.editable is False
+        assert meta.creatable is False
 
     def test_create(self, inst):
         from zope.interface.verify import verifyObject
@@ -75,7 +76,7 @@ class TestBadgeAssignmentsSheet:
         assert badge.IBadgeAssignment.extends(ISheetReferenceAutoUpdateMarker)
         assert meta.isheet == badge.IBadgeAssignment
         assert meta.schema_class == badge.BadgeAssignmentSchema
-        assert meta.edit_permission == 'edit'
+        assert meta.permission_edit == 'edit'
 
     def test_create(self, inst):
         from zope.interface.verify import verifyObject
@@ -83,8 +84,7 @@ class TestBadgeAssignmentsSheet:
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
+    def test_get_empty(self, inst):
         assert inst.get() == {'subject': None,
                               'badge': None,
                               'object': None}
@@ -111,7 +111,7 @@ class TestBadgeSheet:
         from . import badge
         assert meta.isheet == badge.IBadge
         assert meta.schema_class == badge.BadgeSchema
-        assert meta.edit_permission == 'edit'
+        assert meta.permission_edit == 'edit'
 
     def test_create(self, inst):
         from zope.interface.verify import verifyObject
@@ -119,12 +119,18 @@ class TestBadgeSheet:
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'title': '',
-                              'description': '',
-                              'color': '',
-                              }
+    def test_get_empty(self, inst):
+        assert inst.get() == {'groups': []}
+
+    def test_get_with_groups(self, inst):
+        from adhocracy_core.resources.badge import IBadgeGroup
+        group1 = testing.DummyResource(__provides__=IBadgeGroup,
+                                       __name__='group1')
+        group2 = testing.DummyResource(__provides__=IBadgeGroup)
+        group1['group2'] = group2
+        group2['badge'] = inst.context
+        assert inst.get() == {'groups': [group2, group1]}
+
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
@@ -149,8 +155,8 @@ class TestHasBadgesPoolSheet:
         from . import badge
         assert meta.isheet == badge.IHasBadgesPool
         assert meta.schema_class == badge.HasBadgesPoolSchema
-        assert meta.edit is False
-        assert meta.create is False
+        assert meta.editable is False
+        assert meta.creatable is False
 
     def test_create(self, inst):
         from zope.interface.verify import verifyObject

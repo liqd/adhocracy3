@@ -46,6 +46,7 @@ root_acm = ACM().deserialize(
                      ['create_external',               None,        Allow,         None,         None,      None,        Allow],  # noqa
                      ['create_badge',                  None,        None,          Allow,        None,      Allow,       Allow],  # noqa
                      ['create_badge_assignment',       None,        None,          Allow,        None,      Allow,       Allow],  # noqa
+                     ['create_badge_group',            None,        None,          Allow,        None,      Allow,       Allow],  # noqa
                      # versioned content resources
                      ['create_proposal',               None,        None,          None,         None,      None,        Allow],  # noqa
                      ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],  # noqa

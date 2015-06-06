@@ -1,18 +1,20 @@
 """Badge sheet."""
 import colander
+from pyramid.request import Request
+from pyramid.traversal import lineage
+from substanced.util import find_service
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
-from adhocracy_core.schema import SingleLine
-from adhocracy_core.schema import Text
 
 
 class IBadge(IPostPoolSheet):
@@ -67,13 +69,39 @@ class BadgeObjectReference(SheetToSheet):
     target_isheet = IBadgeable
 
 
+class BadgeGroupReference(SheetToSheet):
+
+    """Reference from badge to badge group."""
+
+    source_isheet = IBadge
+    source_isheet_field = 'groups'
+    target_isheet = IPool  # TODO add special sheet for badge groups
+
+
+@colander.deferred
+def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
+    from adhocracy_core.resources.badge import IBadgeGroup  # no circle imports
+    context = kw.get('context', None)
+    if context is None:
+        return []
+    parents = [x for x in lineage(context)][1:]
+    groups = []
+    for parent in parents:
+        if IBadgeGroup.providedBy(parent):
+            groups.append(parent)
+        else:
+            break
+    return groups
+
+
 class BadgeSchema(colander.MappingSchema):
 
     """Badge sheet data structure."""
 
-    title = SingleLine()
-    description = Text()
-    color = SingleLine()
+    groups = UniqueReferences(reftype=BadgeGroupReference,
+                              readonly=True,
+                              default=deferred_groups_default,
+                              )
 
 
 badge_meta = sheet_meta._replace(isheet=IBadge,

@@ -8,6 +8,7 @@ from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.resources.service import service_meta
+from adhocracy_core.resources.pool import pool_meta
 import adhocracy_core.sheets.badge
 import adhocracy_core.sheets.description
 import adhocracy_core.sheets.metadata
@@ -30,6 +31,23 @@ badge_meta = simple_meta._replace(
 )
 
 
+class IBadgeGroup(IPool):
+
+    """A generic badge group pool."""
+
+
+badge_group_meta = pool_meta._replace(
+    iresource=IBadgeGroup,
+    extended_sheets=[
+        adhocracy_core.sheets.description.IDescription,
+    ],
+    permission_create='create_badge_group',
+    element_types=[IBadge,
+                   IBadgeGroup,
+                   ],
+)
+
+
 class IBadgesService(IServicePool):
 
     """The 'badges' ServicePool."""
@@ -38,7 +56,9 @@ class IBadgesService(IServicePool):
 badges_service_meta = service_meta._replace(
     iresource=IBadgesService,
     content_name='badges',
-    element_types=[IBadge],
+    element_types=[IBadge,
+                   IBadgeGroup,
+                   ],
 )
 
 
@@ -86,6 +106,7 @@ def add_badge_assignments_service(context: IPool, registry: Registry,
 def includeme(config):
     """Add resource type to registry."""
     add_resource_type_to_registry(badge_meta, config)
+    add_resource_type_to_registry(badge_group_meta, config)
     add_resource_type_to_registry(badges_service_meta, config)
     add_resource_type_to_registry(badge_assignment_meta, config)
     add_resource_type_to_registry(badge_assignments_service_meta, config)

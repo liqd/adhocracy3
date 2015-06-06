@@ -45,8 +45,6 @@ gives us the right pool:
     >>> resp = initiator.get('/organisation/process').json
     >>> badges_pool = resp['data']['adhocracy_core.sheets.badge.IHasBadgesPool']['badges_pool']
 
-# TODO First we create a badge Group pool
-
 Now we can create a Badge::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadge',
@@ -57,6 +55,30 @@ Now we can create a Badge::
     ...         }
     >>> resp = initiator.post(badges_pool, prop).json
     >>> badge = resp['path']
+
+To add a badge to a badge group we first create the group::
+
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeGroup',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'group1'},
+    ...                  },
+    ...         }
+    >>> resp = initiator.post(badges_pool, prop).json
+    >>> group = resp['path']
+
+then create the badge inside this group::
+
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadge',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'badge1'},
+    ...                  },
+    ...         }
+    >>> resp = initiator.post(group, prop).json
+    >>> badge_with_group = resp['path']
+
+The badge groups hierarchy is also shown with the badge sheet::
+
+    >>> resp = initiator.get(badge_with_group).json
+    >>> resp['data']['adhocracy_core.sheets.badge.IBadge']
+    {'groups': [.../group1/']}
 
 
 Assign badges to process content
@@ -90,7 +112,6 @@ Now the badged content shows the back reference targeting the badge assignment::
     >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
     [...organisation/process/proposal/badge_assignments/0000000/']
 
-TODO add badge groups
 TODO add badge groups to search filters
 TODO give information about assignable badges
 TODO add permission to assign_badges

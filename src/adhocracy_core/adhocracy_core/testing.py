@@ -93,9 +93,9 @@ class DummyPool(testing.DummyResource):
         return prefix + '_0000000'
 
     def add_service(self, name, resource, **kwargs):
-        from substanced.interfaces import IService
+        from adhocracy_core.interfaces import IServicePool
         from zope.interface import alsoProvides
-        alsoProvides(resource, IService)
+        alsoProvides(resource, IServicePool)
         resource.__is_service__ = True
         self.add(name, resource)
 
@@ -312,10 +312,15 @@ def mock_graph() -> Mock:
 @fixture
 def mock_catalogs(search_result) -> Mock:
     """Mock :class:`adhocracy_core.catalogs.ICatalalogsService`."""
+    from zope.interface import alsoProvides
+    from adhocracy_core.interfaces import IServicePool
     from adhocracy_core.catalog import CatalogsServiceAdhocracy
-    mock = Mock(spec=CatalogsServiceAdhocracy)
-    mock.search.return_value = search_result
-    return mock
+    catalogs = testing.DummyResource()
+    alsoProvides(catalogs, IServicePool)
+    search_mock = Mock(spec=CatalogsServiceAdhocracy.search)
+    search_mock.return_value = search_result
+    catalogs.search = search_mock
+    return catalogs
 
 
 @fixture
