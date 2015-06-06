@@ -90,21 +90,11 @@ Now the badged content shows the back reference targeting the badge assignment::
     >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
     [...organisation/process/proposal/badge_assignments/0000000/']
 
-TODO Notes:
+TODO add badge groups
+TODO add badge groups to search filters
+TODO give information about assignable badges
+TODO add permission to assign_badges
+TODO add validators for post_pool and subject (assignable?)
+TODO add options to make badges from one group exclusive
 
-possible to configure what group,
-                      what user,
-                      exclusive?
-
-Maybe with this data structure:
-
-IBadgeable:{
-    'assignables': [{
-        'name': status,
-        'select_pool': ...
-        'post_pool':
-        'exclusive': True,
-         }
-        ]
-}
 
