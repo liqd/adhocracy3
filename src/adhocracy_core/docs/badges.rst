@@ -92,6 +92,12 @@ First we need the pool to post badge assignments to::
     >>> resp = initiator.get(proposal_version).json
     >>> post_pool = resp['data']['adhocracy_core.sheets.badge.IBadgeable']['post_pool']
 
+To get assignable badges we send an options request to this post pool::
+
+    >>> resp = initiator.options(post_pool).json
+    >>> resp['POST']['request_body'][0]['data']['adhocracy_core.sheets.badge.IBadgeAssignment']['badge']
+    [.../process/badges/badge1/',.../process/badges/group1/badge1/']
+
 The user is typically the current logged in user::
 
     >>> user = initiator.header['X-User-Path']
@@ -113,8 +119,6 @@ Now the badged content shows the back reference targeting the badge assignment::
     [...organisation/process/proposal/badge_assignments/0000000/']
 
 TODO add badge groups to search filters
-TODO give information about assignable badges
-TODO add permission to assign_badges
 TODO add validators for post_pool and subject (assignable?)
 TODO add options to make badges from one group exclusive
 

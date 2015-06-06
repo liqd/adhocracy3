@@ -8,11 +8,12 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
-from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
 
@@ -172,6 +173,21 @@ badge_assignment_meta = sheet_meta._replace(
     isheet=IBadgeAssignment,
     schema_class=BadgeAssignmentSchema,
 )
+
+
+def get_assignable_badges(context: IBadgeable, request: Request) -> [IBadge]:
+    """Get assignable badges for the IBadgeAssignment sheet."""
+    badges = find_service(context, 'badges')
+    if badges is None:
+        return []
+    catalogs = find_service(context, 'catalogs')
+    principals = request.effective_principals
+    query = search_query._replace(root=badges,
+                                  interfaces=IBadge,
+                                  allows=(principals, 'assign_badge'),
+                                  )
+    result = catalogs.search(query)
+    return result.elements
 
 
 def includeme(config):

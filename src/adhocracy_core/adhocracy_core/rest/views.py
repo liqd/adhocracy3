@@ -39,6 +39,7 @@ from adhocracy_core.resources.asset import validate_and_complete_asset
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.resources.principal import IPasswordReset
+from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
 from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
@@ -59,6 +60,8 @@ from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
+from adhocracy_core.sheets.badge import get_assignable_badges
+from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
@@ -626,6 +629,50 @@ class ItemRESTView(PoolRESTView):
                                             is_batchmode=batchmode,
                                             )
         return self.build_post_response(resource)
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IBadgeAssignmentsService,
+)
+class BadgeAssignmentsRESTView(PoolRESTView):
+
+    @view_config(request_method='GET',
+                 permission='view')
+    def get(self) -> dict:
+         return super().get()
+
+    @view_config(request_method='POST',
+                  permission='create',
+                  content_type='application/json')
+    def post(self):
+        return super().post()
+
+    @view_config(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Get possible request/response data structures and http methods."""
+        cstruct = super().options()
+        if 'POST' not in cstruct:
+            return cstruct
+        for info in cstruct['POST']['request_body']:
+            if IBadgeAssignment.__identifier__ not in info['data']:
+                continue
+            assignables = get_assignable_badges(self.context, self.request)
+            urls = [self.request.resource_url(x) for x in assignables]
+            info['data'][IBadgeAssignment.__identifier__] =\
+                {'badge': urls}
+        return cstruct
+
+    def _get_post_request_body_for_isheet(self, cstruct: dict,
+                                          isheet: IInterface) -> [dict]:
+        if 'POST' not in cstruct:
+            return []
+        sheet_bodies = []
+        for resource_info in cstruct['POST']['request_body']:
+            for sheet_name, sheet_info in resource_info['data'].items():
+                if sheet_name == isheet.__identifier__:
+                    sheet_bodies.append(sheet_info)
+        return sheet_bodies and sheet_bodies[0]
 
 
 @view_defaults(

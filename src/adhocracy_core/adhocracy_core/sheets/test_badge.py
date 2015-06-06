@@ -173,3 +173,43 @@ class TestHasBadgesPoolSheet:
         context = testing.DummyResource(__provides__=meta.isheet)
         assert get_sheet(context, meta.isheet)
 
+
+class TestGetAssignableBadges:
+
+    @fixture
+    def mock_badges(self, service):
+        return service
+
+    @fixture
+    def context(self, pool, mock_badges, mock_catalogs):
+        pool['badges'] = mock_badges
+        pool['catalogs'] = mock_catalogs
+        return pool
+
+    @fixture
+    def request_(self):
+        request = testing.DummyRequest()
+        return request
+
+    def call_fut(self, context, request):
+        from .badge import get_assignable_badges
+        return get_assignable_badges(context, request)
+
+    def test_none_if_no_badges_services(self, request_):
+        context_without_badges_service = testing.DummyResource()
+        assert self.call_fut(context_without_badges_service, request_) == []
+
+    def test_all_badges_inside_badges_service(self,
+            mock_catalogs, search_result, query, mock_badges, context, request_):
+        from .badge import IBadge
+        badge = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(elements=[badge])
+        assert self.call_fut(context, request_) == [badge]
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            root=mock_badges,
+            interfaces=IBadge,
+            allows=(request_.effective_principals, 'assign_badge')
+            )
+
+
+
