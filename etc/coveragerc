@@ -10,10 +10,15 @@ omit =
     src/adhocracy_core/adhocracy_core/websockets/start_ws_server.py
     # no unit test coverage
     src/adhocracy/adhocracy/scaffolds/__init__
-    src/adhocracy_*/adhocracy_*/__init__.py
     src/adhocracy_*/setup.py
+    src/adhocracy_core/adhocracy_core/__init__.py
+    src/adhocracy/adhocracy/scaffolds/__init__
+    src/adhocracy_sample/adhocracy_sample/__init__.py
+    src/adhocracy_meinberlin/adhocracy_meinberlin/__init__.py
+    src/adhocracy_mercator/adhocracy_mercator/__init__.py
     src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/*
     src/adhocracy_mercator/adhocracy_mercator/scripts/*
+
 source =
     src/adhocracy_core
     src/adhocracy_mercator
