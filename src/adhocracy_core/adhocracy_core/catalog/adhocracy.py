@@ -10,6 +10,8 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.tags import TagElementsReference
+from adhocracy_core.sheets.badge import IBadgeAssignment
+from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import find_graph
@@ -30,6 +32,7 @@ class AdhocracyCatalogIndexes:
 
     tag = catalog.Keyword()
     private_visibility = catalog.Keyword()  # visible / deleted / hidden
+    badge = catalog.Keyword()
     rate = catalog.Field()
     rates = catalog.Field()
     creator = catalog.Field()
@@ -104,6 +107,25 @@ def index_tag(resource, default) -> [str]:
     return tagnames if tagnames else default
 
 
+def index_badge(resource, default) -> [str]:
+    """Return value for the badge index."""
+    catalogs = find_service(resource, 'catalogs')
+    reference = (None, IBadgeAssignment, 'object', resource)
+    query = search_query._replace(references=[reference],
+                                  only_visible=True,
+                                  )
+    assignments = catalogs.search(query).elements
+    badge_names = []
+    for assignment in assignments:
+        reference = (assignment, IBadgeAssignment, 'badge', None)
+        query = search_query._replace(references=[reference],
+                                      only_visible=True,
+                                      )
+        badges = catalogs.search(query).elements
+        badge_names += [b.__name__ for b in badges]
+    return badge_names
+
+
 def includeme(config):
     """Register adhocracy catalog factory."""
     config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
@@ -134,4 +156,9 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='tag',
                          context=IVersionable,
+                         )
+    config.add_indexview(index_badge,
+                         catalog_name='adhocracy',
+                         index_name='badge',
+                         context=IBadgeable,
                          )

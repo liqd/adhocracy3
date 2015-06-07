@@ -894,8 +894,6 @@ class TestCreatePostPoolValidator:
 
     @fixture
     def back_reference_sheet(self, mock_sheet):
-        from adhocracy_core.interfaces import IPostPoolSheet
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPostPoolSheet)
         schema = colander.MappingSchema()
         _add_post_pool_node(schema, iresource_or_service_name='right')
         mock_sheet.schema = schema

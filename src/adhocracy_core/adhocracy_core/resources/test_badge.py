@@ -47,8 +47,8 @@ class TestBadgeGroup:
         assert meta.extended_sheets == [sheets.description.IDescription,
                                         ]
         assert meta.permission_create == 'create_badge_group'
-        assert meta.element_types == [meta.iresource,
-                                      resources.badge.IBadge,
+        assert meta.element_types == [resources.badge.IBadge,
+                                      meta.iresource,
                                       ]
 
     @mark.usefixtures('integration')

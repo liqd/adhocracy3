@@ -123,6 +123,14 @@ Now the badged content shows the back reference targeting the badge assignment::
     >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
     [...organisation/process/proposal/badge_assignments/0000000/']
 
+We can also use the filtering pool api to search for content with specific badge names::
+
+    >>> prop = {'badge': 'badge1',
+    ...         'depth': 'all'}
+    >>> resp = initiator.get('/organisation/process', params=prop).json
+    >>> resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    ['.../proposal/VERSION_0000000/']
+
 
 PostPool and Assignable validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,7 +152,6 @@ If we use the wrong post_pool we get an error::
     {...'You can only add references inside .../proposal/badge_assignments...
 
 
-TODO add badge groups to search filters
 TODO add validators for subject (assignable?)
 TODO add options to make badges from one group exclusive
 
