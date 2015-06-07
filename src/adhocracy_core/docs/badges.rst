@@ -35,6 +35,11 @@ Create participation process structure/content to get started::
     >>> resp = participant.post('/organisation/process', prop).json
     >>> proposal_version = resp['first_version_path']
 
+    >>> prop = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal2'}}}
+    >>> resp = participant.post('/organisation/process', prop).json
+    >>> proposal2_version = resp['first_version_path']
+
 Create Badge
 ~~~~~~~~~~~~
 
@@ -118,8 +123,29 @@ Now the badged content shows the back reference targeting the badge assignment::
     >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
     [...organisation/process/proposal/badge_assignments/0000000/']
 
+
+PostPool and Assignable validation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+If we use the wrong post_pool we get an error::
+
+    >>> resp = initiator.get(proposal2_version).json
+    >>> wrong_post_pool = resp['data']['adhocracy_core.sheets.badge.IBadgeable']['post_pool']
+
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
+    ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
+    ...                      {'subject': user,
+    ...                       'badge': badge,
+    ...                       'object': proposal_version}
+    ...          }}
+    >>> resp = initiator.post(wrong_post_pool, prop).json
+    >>> resp
+    {...'You can only add references inside .../proposal/badge_assignments...
+
+
 TODO add badge groups to search filters
-TODO add validators for post_pool and subject (assignable?)
+TODO add validators for subject (assignable?)
 TODO add options to make badges from one group exclusive
 
 

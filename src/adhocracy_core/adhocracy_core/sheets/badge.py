@@ -14,7 +14,7 @@ from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import PostPool
-
+from adhocracy_core.schema import create_post_pool_validator
 
 
 class IBadge(ISheet):
@@ -80,6 +80,7 @@ class BadgeGroupReference(SheetToSheet):
 
 @colander.deferred
 def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
+    """Return badge groups."""
     from adhocracy_core.resources.badge import IBadgeGroup  # no circle imports
     context = kw.get('context', None)
     if context is None:
@@ -166,6 +167,12 @@ class BadgeAssignmentSchema(colander.MappingSchema):
     subject = Reference(reftype=BadgeSubjectReference)
     badge = Reference(reftype=BadgeReference)
     object = Reference(reftype=BadgeObjectReference)
+
+    @colander.deferred
+    def validator(self, kw: dict) -> callable:
+        """Validate the :term:`post_pool` for the object reference."""
+        object_validator = create_post_pool_validator(self['object'], kw)
+        return colander.All(object_validator)
 
 
 badge_assignment_meta = sheet_meta._replace(

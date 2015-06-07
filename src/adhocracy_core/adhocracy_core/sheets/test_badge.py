@@ -66,6 +66,13 @@ class TestBadgeAssignmentsSheet:
     def inst(self, context, meta):
         return meta.sheet_class(meta, context)
 
+    @fixture
+    def mock_create_post_pool_validator(self, monkeypatch):
+        from . import badge
+        mock = Mock(spec=badge.create_post_pool_validator)
+        monkeypatch.setattr(badge, 'create_post_pool_validator', mock)
+        return mock
+
     def test_meta(self, meta):
         from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
         from . import badge
@@ -84,6 +91,12 @@ class TestBadgeAssignmentsSheet:
         assert inst.get() == {'subject': None,
                               'badge': None,
                               'object': None}
+
+    def test_validate_object_post_pool(self, inst,
+                                       mock_create_post_pool_validator):
+        inst.schema.validator(inst.schema, {})
+        mock_create_post_pool_validator.assert_called_with(inst.schema['object'],
+                                                           {})
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
