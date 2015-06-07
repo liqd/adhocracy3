@@ -5,7 +5,6 @@ from pyramid.traversal import lineage
 from substanced.util import find_service
 
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import search_query
@@ -14,11 +13,11 @@ from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
-from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
 
 
-class IBadge(IPostPoolSheet):
+
+class IBadge(ISheet):
 
     """Marker interface for badge data sheet."""
 
@@ -33,7 +32,7 @@ class ICanBadge(ISheet):
     """Marker interface for principals that can assign badges."""
 
 
-class IBadgeable(IPostPoolSheet):
+class IBadgeable(ISheet):
 
     """Marker interface for resources that can be badged."""
 
@@ -138,7 +137,7 @@ can_badge_meta = sheet_meta._replace(
 )
 
 
-class BadgeableSchema(PostPoolMappingSchema):
+class BadgeableSchema(colander.MappingSchema):
 
     """Badgeable sheet data structure.
 

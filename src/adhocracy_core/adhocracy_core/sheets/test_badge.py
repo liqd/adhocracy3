@@ -25,13 +25,9 @@ class TestBadgeableSheet:
         return meta.sheet_class(meta, pool)
 
     def test_meta(self, meta):
-        from adhocracy_core.interfaces import IPostPoolSheet
-        from adhocracy_core.schema import PostPoolMappingSchema
         from . import badge
-        assert badge.IBadgeable.extends(IPostPoolSheet)
         assert meta.isheet == badge.IBadgeable
         assert meta.schema_class == badge.BadgeableSchema
-        assert issubclass(meta.schema_class, PostPoolMappingSchema)
         assert meta.editable is False
         assert meta.creatable is False
 
