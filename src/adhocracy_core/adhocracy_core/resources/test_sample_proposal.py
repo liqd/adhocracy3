@@ -11,6 +11,7 @@ def test_proposalversion_meta():
     assert meta.iresource is IProposalVersion
     assert meta.extended_sheets == [adhocracy_core.sheets.document.IDocument,
                                     adhocracy_core.sheets.comment.ICommentable,
+                                    adhocracy_core.sheets.badge.IBadgeable,
                                     adhocracy_core.sheets.image.IImageReference,
                                     ]
     assert meta.permission_create == 'edit_proposal'
@@ -24,6 +25,7 @@ def test_proposal_meta():
     from .sample_proposal import IParagraph
     from .comment import add_commentsservice
     from .rate import add_ratesservice
+    from .badge import add_badge_assignments_service
     from .tag import ITag
     from adhocracy_core.sheets.workflow import ISample
     meta = proposal_meta
@@ -38,6 +40,7 @@ def test_proposal_meta():
     assert meta.permission_create == 'create_proposal'
     assert add_commentsservice in meta.after_creation
     assert add_ratesservice in meta.after_creation
+    assert add_badge_assignments_service in meta.after_creation
 
 
 @fixture
@@ -50,6 +53,7 @@ def integration(config):
     config.include('adhocracy_core.resources.tag')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources.badge')
 
 
 @mark.usefixtures('integration')

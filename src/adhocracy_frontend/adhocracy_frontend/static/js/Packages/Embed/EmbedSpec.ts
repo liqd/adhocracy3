@@ -6,6 +6,7 @@ export var register = () => {
     describe("Embed", () => {
         var $locationMock;
         var $compileMock;
+        var adhConfigMock;
 
         beforeEach(() => {
             $locationMock = jasmine.createSpyObj("$location", ["path", "search", "host", "port", "protocol"]);
@@ -17,6 +18,9 @@ export var register = () => {
             });
             $compileMock = jasmine.createSpy("$compileMock")
                 .and.returnValue(() => undefined);
+            adhConfigMock = {
+                pkg_path: ""
+            };
         });
 
         describe("Provider", () => {
@@ -49,7 +53,8 @@ export var register = () => {
 
             describe("$get", () => {
                 it("returns a service instance", () => {
-                    expect(provider.$get().constructor).toBe(AdhEmbed.Service);
+                    var fn = provider.$get[1];
+                    expect(fn(adhConfigMock).constructor).toBe(AdhEmbed.Service);
                 });
             });
         });
@@ -62,7 +67,7 @@ export var register = () => {
                 providerMock = {
                     embeddableDirectives: ["document-workbench", "empty"]
                 };
-                service = new AdhEmbed.Service(providerMock);
+                service = new AdhEmbed.Service(providerMock, adhConfigMock);
             });
 
             describe("location2template", () => {

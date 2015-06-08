@@ -55,6 +55,7 @@ def test_user_meta():
     assert meta.extended_sheets == \
            [adhocracy_core.sheets.principal.IPasswordAuthentication,
             adhocracy_core.sheets.rate.ICanRate,
+            adhocracy_core.sheets.badge.ICanBadge,
            ]
     assert meta.iresource == IUser
     assert meta.element_types == []

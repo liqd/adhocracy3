@@ -1,34 +1,34 @@
-<div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
-    <h2 class="print-only mercator-proposal-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
+<div class="section-jump" id="section-jump-top">
+    <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
-    <div class="mercator-proposal-detail-cover">
-        <ul class="mercator-proposal-detail-meta">
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-total-comments">
+    <div class="section-jump-cover">
+        <ul class="meta-list mercator-proposal-detail-meta-list">
+            <li class="meta-list-item meta-list-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-date">
+            <li class="meta-list-item meta-list-item-date">
                 <i class="icon-calendar m-definition-before" title="{{ 'TR__CREATION_DATE' | translate }}:"></i>
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-budget screen-only">
+            <li class="meta-list-item meta-list-item-budget screen-only">
                 <i class="icon-pig" title="{{ 'TR__MERCATOR_PROPOSAL_REQUESTED' | translate }}"></i>
                 {{data.finance.requested_funding | number}} &euro;
             </li>
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-rate">
+            <li class="meta-list-item meta-list-item-rate">
                 <adh-like data-refers-to="{{path}}"></adh-like>
             </li>
         </ul>
-        <h1 class="mercator-proposal-cover-header screen-only">{{ data.title }}
+        <h1 class="section-jump-cover-header screen-only">{{ data.title }}
             <a class="mercator-proposal-cover-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments' }}">
                 <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>
         </h1>
     </div><!-- /.cover -->
 
-    <div class="mercator-proposal-detail-container">
+    <div class="section-jump-body">
 
-        <nav class="mercator-proposal-detail-nav m-unnumbered" data-adh-sticky="">
+        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
             <ol>
                 <li><a
                     href="#mercator-detail-view-brief-proposal"
@@ -58,10 +58,10 @@
             </ol>
         </nav>
 
-        <div class="mercator-proposal-chapters" data-du-spy-context="">
+        <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
             <section class="chapter" id="mercator-detail-view-brief-proposal">
                 <section class="commentable-section {{subResourceSelectedState('introduction')}}">
-                    <h2 class="chapter-header"
+                    <h2 class="chapter-header m-counted"
                         data-du-scrollspy="mercator-detail-view-brief-proposal"
                         data-offset="50">{{ "TR__MERCATOR_PROPOSAL_PITCH" | translate }}</h2>
                     <p>{{ data.introduction.teaser }}</p>
@@ -106,7 +106,7 @@
 
             <section class="chapter" id="mercator-proposal-detail-whos">
                 <section class="commentable-section {{subResourceSelectedState('organization_info')}}">
-                    <h2 class="chapter-header"
+                    <h2 class="chapter-header m-counted"
                         data-du-scrollspy="mercator-proposal-detail-whos"
                         data-offset="50">{{ "TR__MERCATOR_PROPOSAL_WHO_BEHIND" | translate }}</h2>
 
@@ -195,7 +195,7 @@
 
             <section class="chapter" id="mercator-detail-view-detailed-proposal">
                 <section class="commentable-section {{subResourceSelectedState('description')}}">
-                    <h2 class="chapter-header"
+                    <h2 class="chapter-header m-counted"
                         data-du-scrollspy="mercator-detail-view-detailed-proposal"
                         data-offset="50">{{ "TR__MERCATOR_PROPOSAL_DETAIL" | translate }}</h2>
                     <h3>{{ "TR__DESCRIPTION" | translate }}</h3>
@@ -217,7 +217,7 @@
 
             <section class="chapter" id="mercator-detail-view-goals-and-vision">
                 <section class="commentable-section {{subResourceSelectedState('outcome')}}">
-                    <h2 class="chapter-header"
+                    <h2 class="chapter-header m-counted"
                         data-du-scrollspy="mercator-detail-view-goals-and-vision"
                         data-offset="50">{{ "TR__MERCATOR_PROPOSAL_MOTIVATION" | translate }}</h2>
                     <h3>{{ "TR__MERCATOR_PROPOSAL_OUTCOME_LABEL" | translate }}</h3>
@@ -256,7 +256,7 @@
             <section class="chapter" id="mercator-detail-view-additional">
                 <section class="commentable-section {{subResourceSelectedState('experience')}}">
                     <div data-ng-if="data.experience">
-                        <h2 class="chapter-header"
+                        <h2 class="chapter-header m-counted"
                             data-du-scrollspy="mercator-detail-view-additional"
                             data-offset="50">{{ "TR__MERCATOR_PROPOSAL_EXTRA" | translate }}</h2>
                         <h3>{{ "TR__MERCATOR_PROPOSAL_SHARE_EXPERIENCE_LABEL" | translate }}</h3>
@@ -281,12 +281,12 @@
 
             <footer class="mercator-proposal-detail-footer">
 
-                <a class="button-back-to-top" data-du-smooth-scroll="" href="#mercator-detail-view-top">
+                <a class="button-back-to-top" data-du-smooth-scroll="" href="#section-jump-top">
                 <i class="icon-back-to-top"></i> {{ "TR__BACK_TO_TOP" | translate }}</a>
                 <adh-like data-refers-to="{{path}}"></adh-like>
 
             </footer>
 
         </div><!-- /.mercator-detail-body -->
-    </div><!-- /.mercator-proposal-detail-container -->
+    </div><!-- /.section-jump-body -->
 </div><!-- /.mercator-proposal-detail-view -->

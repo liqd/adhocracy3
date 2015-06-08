@@ -203,16 +203,14 @@
     </label>
 
     <!-- DATA SUBMIT -->
-    <footer class="form-footer mein-berlin-proposal-form-footer">
+    <footer class="form-footer mein-berlin-kiezkassen-proposal-form-footer">
         <input
             type="submit"
             name="submit"
             value="{{ 'TR__PUBLISH' | translate }}"
             class="m-call-to-action form-footer-button-cta" />
 
-        <a data-ng-show="create" href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
-        {{ "TR__CANCEL" | translate }}</a>
-        <a data-ng-show="!create" href="{{ path | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
+        <a href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
         {{ "TR__CANCEL" | translate }}</a>
     </footer>
 </form>

@@ -60,6 +60,18 @@ class AdhocracySchemaNode(colander.SchemaNode):
         return super().serialize(appstruct)
 
 
+class AdhocracySequenceNode(colander.SequenceSchema, AdhocracySchemaNode):
+
+    """Subclass of :class: `AdhocracySchema` with Sequence type.
+
+    The default value is a deferred returning [] to prevent modify it.
+    """
+
+    @colander.deferred
+    def default(node: colander.Schema, kw: dict) -> list:
+        return []
+
+
 def raise_attribute_error_if_not_location_aware(context) -> None:
     """Ensure that the argument is location-aware.
 
@@ -212,24 +224,17 @@ class Role(AdhocracySchemaNode):
     validator = colander.OneOf(ROLE_PRINCIPALS)
 
 
-class Roles(colander.SequenceSchema):
+class Roles(AdhocracySequenceNode):
 
     """List of Permssion :term:`role` names.
 
     Example value: ['initiator']
     """
 
-    # TODO support the 'readonly' keyword, inherit AdhocracySchemaNode
-
     missing = colander.drop
     validator = colander.Length(min=0, max=6)
 
     role = Role()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:
-            self.default = []
 
     def preparer(self, value: Sequence) -> list:
         if value is colander.null:
@@ -436,7 +441,7 @@ class ResourceObject(colander.SchemaType):
         :return: the resource registered under that path
         :raise colander.Invalid: if the object does not exist.
         """
-        if value is colander.null:
+        if value in (colander.null, None):
             return value
         try:
             resource = self._deserialize_location_or_url(node, value)
@@ -525,18 +530,13 @@ class Reference(Resource):
     validator = colander.All(_validate_reftype)
 
 
-class Resources(colander.SequenceSchema):
+class Resources(AdhocracySequenceNode):
 
     """List of :class:`Resource:`s."""
 
     missing = []
 
     resource = Resource()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'default' not in kwargs:
-            self.default = []
 
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
@@ -759,11 +759,10 @@ class PostPoolMappingSchema(colander.MappingSchema):
 
     """Check that the referenced nodes respect the :term:`post_pool`.
 
-    To validate `references` (:class:`adhocracy_core.schems.Reference`) you
+    To validate `references` (:class:`adhocracy_core.schemas.Reference`) you
     need to add a :class:`adhocracy_core.schema.PostPool` node to this schema.
-    To validate `backreferences` the referenced sheet needs to be a subtype
-    of :class:`adhocracy_core.intefaces.IPostPoolSheet and the schema needs a
-    a :class:`adhocracy_core.schema.PostPool` node.
+    To validate `back_references` the referenced sheet needs to be a subtype
+    of :class:`adhocracy_core.interfaces.IPostPoolSheet in addition.
     """
 
     validator = deferred_validate_references_post_pool

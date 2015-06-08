@@ -28,9 +28,6 @@ $color-structure-transparent: transparent;
 
 //Brand colors
 $color-brand-one-normal: #fcb813;
-$color-brand-three-normal: #ce128b;
-
-$color-brand-one-normal: #fcb813;
 $color-brand-one-introvert: darken($color-brand-one-normal, 10%);
 $color-brand-one-extrovert: lighten($color-brand-one-normal, 10%);
 $color-brand-two-normal: #00aae5;
@@ -62,6 +59,9 @@ $annotation-width: 34%;
 
 $padding-small: 0.5em;
 $padding-medium: 1em;
+
+//Other
+$section-jump-navigation-width: 2em;
 
 @mixin font-tracking($value) {
     @if $value == narrow {

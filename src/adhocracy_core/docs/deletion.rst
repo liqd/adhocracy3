@@ -189,7 +189,7 @@ Both pools show up in the pool sheet::
     >>> resp = anonymous.get("/").json
     >>> pprint(sorted(resp['data']['adhocracy_core.sheets.pool.IPool']
     ...                        ['elements']))
-    ['.../adhocracy/pool1/', '.../adhocracy/pool2/']
+    ['.../adhocracy/pool1/',.../adhocracy/pool2/'...
 
 Lets check whether we have the permission to delete or hide resources.
 The person who has created a resource (creator role) has the right to delete

@@ -27,6 +27,7 @@ import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.rate
+import adhocracy_core.sheets.badge
 
 _ = TranslationStringFactory('adhocracy')
 
@@ -134,7 +135,9 @@ user_meta = pool_meta._replace(
                   adhocracy_core.sheets.pool.IPool,
                   ],
     extended_sheets=[adhocracy_core.sheets.principal.IPasswordAuthentication,
-                     adhocracy_core.sheets.rate.ICanRate],
+                     adhocracy_core.sheets.rate.ICanRate,
+                     adhocracy_core.sheets.badge.ICanBadge,
+                     ],
     element_types=[],  # we don't want the frontend to post resources here
     use_autonaming=True,
     permission_create='create_user',

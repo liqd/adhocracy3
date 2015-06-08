@@ -91,7 +91,7 @@ def _get_user_groups(user: IUser, registry: Registry):
 def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
     sheet = get_sheet(user, IPermissions)
     groups = sheet.get()['groups']
-    groups.append(group)
+    groups = groups + [group]
     sheet.set({'groups': groups})
 
 

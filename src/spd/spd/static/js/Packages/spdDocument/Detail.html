@@ -1,0 +1,35 @@
+<div class="section-jump" id="section-jump-top">
+    <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
+
+    <div class="section-jump-cover">
+        <h1 class="section-jump-cover-header screen-only">{{ data.title }}</h1>
+        <ul class="meta-list">
+            <li class="meta-list-item meta-list-item-total-comments">
+                <i class="icon-speechbubbles"></i>
+                {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
+            </li>
+        </ul>
+    </div><!-- /.cover -->
+
+    <div class="section-jump-body">
+        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
+            <ol>
+                <li data-ng-repeat="paragraph in data.paragraphs">
+                    <a
+                        href="#section-jump-chapter-{{$index}}"
+                        data-du-smooth-scroll=""
+                        data-du-scrollspy="">{{ $index + 1}}</a>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
+            <section class="commentable-section chapter" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
+                <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
+                <a class="commentable-section-show-comments" href="">
+                    <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
+                </a>
+            </section>
+        </div><!-- /.section-jump-main -->
+    </div><!-- /.section-jump-body -->
+</div><!-- /.section-jump -->

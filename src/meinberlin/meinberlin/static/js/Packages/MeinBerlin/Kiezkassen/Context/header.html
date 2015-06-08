@@ -1,13 +1,17 @@
 <div class="l-header mein-berlin-keizkassen-context-header">
     <div class="l-header-left">
-        <i class="mein-berlin-keizkassen-context-header-logo icon-meinberlin-logo" title="mein Berlin"></i>
+        <i class="header-logo icon-meinberlin-logo" title="mein Berlin"></i>
     </div>
     <div class="l-header-right">
         <a
             href="{{processUrl | adhResourceUrl:'create_proposal'}}"
             class="button m-call-to-action"
-            data-ng-class="{'ng-disabled': !processOptions.POST && processOptions.loggedIn}">
+            data-ng-if="!(!processOptions.POST && processOptions.loggedIn)">
             {{ "TR__CREATE_PROPOSAL" | translate }}</a>
+        <span
+            class="button m-call-to-action ng-disabled"
+            data-ng-if="!processOptions.POST && processOptions.loggedIn">
+            {{ "TR__CREATE_PROPOSAL" | translate }}</span>
         <adh-user-indicator></adh-user-indicator>
     </div>
 </div>

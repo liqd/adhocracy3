@@ -47,6 +47,7 @@ etc/tslint.json
 /src/adhocracy/tests/report.html
 /src/adhocracy/tests/log.html
 /src/adhocracy/tests/output.xml
+/src/Mako
 /src/supervisor
 *.js.map
 *.css.map
@@ -61,9 +62,12 @@ src/pyramid_cachebust/
 src/adhocracy_frontend/adhocracy_frontend/build/
 src/mercator/mercator/build/
 src/meinberlin/meinberlin/build/
+src/pcompass/pcompass/build/
+src/spd/spd/build/
 /tmp
 /wheelhouse
 /share
 .fontcustom-manifest.json
 RELEASE-VERSION
 *-requirements.txt
+/src/Mako/

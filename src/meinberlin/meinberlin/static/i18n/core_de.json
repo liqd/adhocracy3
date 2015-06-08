@@ -113,7 +113,7 @@
     "TR__RATE_VOTE_DOWN": "dagegen",
     "TR__RATE_VOTE_UP": "dafür",
     "TR__REGISTER": "registrieren",
-    "TR__REGISTER_SUCCESS": "Danke für Ihre Registrierung. Wir haben Ihnen eine E-Mail mit einem Aktivierungslink gesendet. Falls Du diese E-Mail nicht erhältst, überprüfen Sie bitte auch Ihren Spamordner.",
+    "TR__REGISTER_SUCCESS": "Danke für Ihre Registrierung. Wir haben Ihnen eine E-Mail mit einem Aktivierungslink gesendet. Falls Sie diese E-Mail nicht erhalten, überprüfen Sie bitte auch Ihren Spamordner.",
     "TR__REGISTRATION_ALREADY_LOGGED_IN": "Sie sind bereits angemeldet. Bitte gehen Sie auf [[link:logout]] um einen neuen Account anzumelden.",
     "TR__REGISTRATION_CALL_FOR_ACTIVATION": "Sobald Sie auf den Aktivierungslink geklickt haben, können Sie {{siteName}} benutzen.",
     "TR__REGISTRATION_LOGIN_INSTEAD": "Ich habe bereits einen Account. [[link:Hier]] anmelden.",

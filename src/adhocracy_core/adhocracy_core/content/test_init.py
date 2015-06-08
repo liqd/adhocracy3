@@ -189,6 +189,17 @@ class TestResourceContentRegistry:
         config.testing_securitypolicy(userid='hank', permissive=False)
         assert inst.get_resources_meta_addable(context, request_) == []
 
+    def test_get_resources_meta_addable_no_permission_but_only_first_version_exists(
+            self, inst, item, config, request_, resource_meta):
+        from adhocracy_core.interfaces import IItem
+        from adhocracy_core.interfaces import IItemVersion
+        version0 = testing.DummyResource(__provides__=IItemVersion)
+        item['VERSION_0000000'] = version0
+        version_meta = resource_meta._replace(iresource=IItemVersion)
+        inst.resources_meta_addable = {IItem: [version_meta]}
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.get_resources_meta_addable(item, request_) == [version_meta]
+
     def test_permissions_resource_permission_create_defined(
             self, inst, resource_meta, mock_registry):
         simple_meta = resource_meta._replace(

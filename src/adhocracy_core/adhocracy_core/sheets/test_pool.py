@@ -26,7 +26,7 @@ class TestPoolSchema:
 
     def make_one(self):
         from .pool import PoolSchema
-        return PoolSchema()
+        return PoolSchema().bind()
 
     def test_serialize_empty(self):
         inst = self.make_one()
