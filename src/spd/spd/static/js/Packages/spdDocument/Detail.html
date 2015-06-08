@@ -24,7 +24,7 @@
         </nav>
 
         <div class="section-jump-main" data-du-spy-context="">
-            <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
+            <section class="commentable-section chapter" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="commentable-section-show-comments" href="">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}
