@@ -5,12 +5,8 @@ from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
-from pytest import raises
-
-
 from pytest import mark
 from pytest import fixture
-
 
 
 def test_principals_meta():
@@ -43,7 +39,6 @@ def test_groups_meta():
 def test_user_meta():
     from .principal import user_meta
     from .principal import IUser
-    from .principal import send_registration_mail
     from .principal import User
     import adhocracy_core.sheets
     meta = user_meta
@@ -65,7 +60,6 @@ def test_user_meta():
     assert meta.iresource == IUser
     assert meta.element_types == []
     assert meta.use_autonaming is True
-    assert send_registration_mail in meta.after_creation
 
 
 def test_group_meta():
@@ -473,70 +467,3 @@ class TestGroupsAndRolesFinder:
     def test_userid_with_groups_and_group_roles(self, request, mock_user_locator):
         mock_user_locator.get_role_and_group_roleids.return_value = ['group:Readers']
         assert self.call_fut('userid', request) == ['group:Readers']
-
-
-class TestIntegrationSendRegistrationMail:
-
-    @fixture
-    def request_(self, registry):
-        request = testing.DummyRequest()
-        request.registry = registry
-        return request
-
-    @fixture
-    def mock_localizer(self, request_):
-        localizer = Mock()
-        localizer.translate = lambda x: x
-        request_.localizer = localizer
-        return localizer
-
-    @fixture
-    def sample_user(self):
-        from zope.interface import directlyProvides
-        from adhocracy_core.resources.principal import User
-        from adhocracy_core.sheets.metadata import IMetadata
-        user = User()
-        user.name = 'Anna Müller'
-        user.email = 'anna@example.org'
-        directlyProvides(user, IMetadata)
-        return user
-
-    @mark.usefixtures('integration')
-    def test_send_registration_mail_successfully(self, registry, sample_user,
-                                                 request_):
-        from adhocracy_core.resources.principal import send_registration_mail
-        mailer = registry.messenger._get_mailer()
-        assert len(mailer.outbox) == 0
-        send_registration_mail(context=sample_user, registry=registry,
-                               options={'request': request_})
-        assert sample_user.activation_path.startswith('/activate/')
-        assert len(mailer.outbox) == 1
-        msg = mailer.outbox[0]
-        # The DummyMailer is too stupid to use a default sender, hence we add
-        # one manually
-        msg.sender = 'support@unconfigured.domain'
-        msgtext = str(msg.to_message())
-        assert 'activate' in msgtext
-
-    @mark.usefixtures('integration')
-    def test_send_registration_mail_smtp_error(self, registry, sample_user):
-        from colander import Invalid
-        from smtplib import SMTPException
-        from adhocracy_core.messaging import Messenger
-        from adhocracy_core.resources.principal import send_registration_mail
-        mock_messenger = Mock(spec=Messenger)
-        mock_messenger.send_mail = Mock(
-            side_effect=SMTPException('bad luck'))
-        registry.messenger = mock_messenger
-        with raises(Invalid) as err_info:
-            send_registration_mail(context=sample_user, registry=registry)
-        assert 'Cannot send' in err_info.exconly()
-        assert 'bad luck' in err_info.exconly()
-
-    @mark.usefixtures('integration')
-    def test_send_registration_mail_skip(self, registry, sample_user):
-        from adhocracy_core.resources.principal import send_registration_mail
-        registry.settings['adhocracy.skip_registration_mail'] = 'true'
-        send_registration_mail(context=sample_user, registry=registry)
-        assert sample_user.active is True
-        assert sample_user.activation_path is None

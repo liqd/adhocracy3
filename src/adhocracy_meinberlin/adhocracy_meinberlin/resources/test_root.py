@@ -4,6 +4,7 @@ from pytest import mark
 
 @fixture
 def integration(config, pool_graph_catalog):
+    config.include('pyramid_mailer.testing')
     config.include('adhocracy_meinberlin')
 
 

@@ -391,8 +391,8 @@ class TestAddDefaultGroupToUserSubscriber:
 
     def call_fut(self, event):
         from adhocracy_core.resources.subscriber import\
-            user_created_and_added_subscriber
-        return user_created_and_added_subscriber(event)
+            add_default_group_to_user
+        return add_default_group_to_user(event)
 
     def test_default_group_exists_and_no_group_set(
             self, registry, principals, event, mock_sheet, mock_user_locator):
@@ -498,6 +498,44 @@ class TestSendPasswordResetMail:
              'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
 
 
+class TestSendAcitvationMail:
+
+    @fixture
+    def registry(self, registry, mock_messenger):
+        registry.messenger = mock_messenger
+        return registry
+
+    @fixture
+    def user(self):
+        user = testing.DummyResource(name='user name',
+                                     email='test@test.de',
+                                     activate=Mock())
+        return user
+
+    @fixture
+    def event(self, user, registry):
+        event.object = user
+        event.registry = registry
+        return event
+
+    def call_fut(self, event):
+        from .subscriber import send_activation_mail_or_activate_user
+        return send_activation_mail_or_activate_user(event)
+
+    def test_add_activation_path_and_notify_user(self, event, mock_messenger):
+        self.call_fut(event)
+        send_mail_call_args = mock_messenger.send_registration_mail.call_args[0]
+        assert send_mail_call_args[0] == event.object
+        assert send_mail_call_args[1].startswith('/activate/')
+        assert event.object.activation_path.startswith('/activate/')
+
+    def test_activate_user_if_skip_settings_is_set(self, event, mock_messenger):
+        event.registry.settings['adhocracy.skip_registration_mail'] = 'true'
+        self.call_fut(event)
+        assert event.object.activate.called
+        assert mock_messenger.send_registration_mail.called is False
+
+
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')
@@ -511,8 +549,9 @@ def test_register_subscriber(registry):
     assert subscriber.autoupdate_non_versionable_has_new_version.__name__ in handlers
     assert subscriber.autoupdate_versionable_has_new_version.__name__ in handlers
     assert subscriber.autoupdate_tag_has_new_version.__name__ in handlers
-    assert subscriber.user_created_and_added_subscriber.__name__ in handlers
+    assert subscriber.add_default_group_to_user.__name__ in handlers
     assert subscriber.update_modification_date_modified_by.__name__ in handlers
     assert subscriber.send_password_reset_mail.__name__ in handlers
+    assert subscriber.send_activation_mail_or_activate_user.__name__ in handlers
 
 

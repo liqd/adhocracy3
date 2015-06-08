@@ -19,6 +19,7 @@ pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_zodbconn
     pyramid_tm
+    pyramid_mailer
 
 tm.attempts = 5
 
@@ -32,6 +33,7 @@ substanced.uploads_tempdir = %(here)s/../var/uploads_tmp
 substanced.autosync_catalogs = false
 substanced.autoevolve = false
 adhocracy.ws_url =
+adhocracy.use_mail_queue = true
 # The id for the root level adhocracy resource
 adhocracy.platform_id = adhocracy
 
