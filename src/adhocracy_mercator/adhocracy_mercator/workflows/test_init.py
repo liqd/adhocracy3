@@ -101,23 +101,25 @@ class TestMercatorProposalPermissionsAnonymous:
 @mark.functional
 class TestMercatorWorkflow:
 
-    ## the state is currently set to 'participate' when creating the mercator process
+    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
+    def test_draft_participant_cannot_create_proposal_item(self, app_participant):
+        from adhocracy_mercator.resources.mercator import IMercatorProposal
+        assert IMercatorProposal not in app_participant.get_postable_types('/')
 
-    # def test_draft_participant_cannot_create_proposal_item(self, app_participant):
-    #     from adhocracy_mercator.resources.mercator import IMercatorProposal
-    #     assert IMercatorProposal not in app_participant.get_postable_types('/')
+    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
+    def test_change_state_to_announce(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/', 'announce')
+        assert resp.status_code == 200
 
-    # def test_change_state_to_announce(self, app_initiator):
-    #     resp = _do_transition_to(app_initiator, '/', 'announce')
-    #     assert resp.status_code == 200
+    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
+    def test_announce_participant_cannot_create_proposal_item(self, app_participant):
+        from adhocracy_mercator.resources.mercator import IMercatorProposal
+        assert IMercatorProposal not in app_participant.get_postable_types('/')
 
-    # def test_announce_participant_cannot_create_proposal_item(self, app_participant):
-    #     from adhocracy_mercator.resources.mercator import IMercatorProposal
-    #     assert IMercatorProposal not in app_participant.get_postable_types('/')
-
-    # def test_change_state_to_participate(self, app_initiator):
-    #     resp = _do_transition_to(app_initiator, '/', 'participate')
-    #     assert resp.status_code == 200
+    @mark.xfail(reason='state is currently set to participate when creating the mercator process')
+    def test_change_state_to_participate(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/', 'participate')
+        assert resp.status_code == 200
 
     def test_participate_participant_can_create_proposal_item(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/', name='proposal1')
