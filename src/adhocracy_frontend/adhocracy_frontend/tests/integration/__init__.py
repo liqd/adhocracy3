@@ -1,1 +1,0 @@
-"""frontend integration tests."""

@@ -3,8 +3,8 @@
 
     <div class="section-jump-cover">
         <h1 class="section-jump-cover-header screen-only">{{ data.title }}</h1>
-        <ul class="mercator-proposal-detail-meta">
-            <li class="mercator-propsal-detail-meta-item mercator-propsal-detail-meta-item-total-comments">
+        <ul class="meta-list">
+            <li class="meta-list-item meta-list-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
             </li>
@@ -18,13 +18,13 @@
                     <a
                         href="#section-jump-chapter-{{$index}}"
                         data-du-smooth-scroll=""
-                        data-du-scrollspy="">{{ $index }}.</a>
+                        data-du-scrollspy="">{{ $index + 1}}</a>
                 </li>
             </ol>
         </nav>
 
-        <div class="section-jump-main" data-du-spy-context="">
-            <section class="commentable-section" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
+        <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
+            <section class="commentable-section chapter" data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
                 <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
                 <a class="commentable-section-show-comments" href="">
                     <i class="icon-speechbubble"></i> {{ paragraph.commentCount }}

@@ -8,20 +8,20 @@
             </span>
         </p>
         <h3 class="mercator-proposal-list-item-title">{{ data.title.title }} {{ data.assignments }}</h3>
-        <ul class="mercator-proposal-list-item-meta">
-            <li class="mercator-proposal-list-item-meta-item mercator-proposal-list-item-meta-item-date">
+        <ul class="meta-list mercator-proposal-list-item-meta-list">
+            <li class="meta-list-item meta-list-item-date">
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li class="mercator-proposal-list-item-meta-item mercator-proposal-list-item-meta-item-total-comments">
+            <li class="meta-list-item meta-list-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} <span class="print-only" aria-hidden="true">{{ "TR__COMMENTS_TOTAL" | translate }}</span>
             </li>
-            <li class="mercator-proposal-list-item-meta-item  mercator-proposal-list-item-meta-item-supporters">
+            <li class="meta-list-item  meta-list-item-supporters">
                 <i class="icon-pointy-rectangle-left"></i>
                 {{ data.supporterCount }}
                 {{ "TR__SUPPORTERS" | translate }}
             </li>
-            <li class="mercator-proposal-list-item-meta-item mercator-proposal-list-item-meta-item-budget">
+            <li class="meta-list-item meta-list-item-budget">
                 {{ data.finance.requested_funding | number }} &euro; <span class="print-only" aria-hidden="true">{{ "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING" | translate }}</span>
             </li>
         </ul>
