@@ -6,9 +6,7 @@ setup.py.
 """
 
 import inspect
-import optparse
-import sys
-import textwrap
+import argparse
 import transaction
 import json
 
@@ -24,26 +22,33 @@ def add_badge_assignment():
     usage::
       bin/create_badge <config> <user> <badge> <proposal> <parent>
     """
-    usage = 'usage: %prog config_file user badge proposal parent'
-    description = textwrap.dedent(inspect.getdoc(add_badge_assignment))
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=description
-    )
+    docstring = inspect.getdoc(add_badge_assignment)
+    parser = argparse.ArgumentParser(description=docstring)
+    parser.add_argument('ini_file',
+                        help='path to the adhocracy backend ini file')
+    parser.add_argument('user',
+                        type=str,
+                        help='path to user')
+    parser.add_argument('badge',
+                        type=str,
+                        help='path to badge')
+    parser.add_argument('proposal',
+                        type=str,
+                        help='path to proposal')
+    parser.add_argument('parent',
+                        type=str,
+                        help='path to parent')
 
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 5:
-        print('You must provide five arguments')
-        return 5
+    args = parser.parse_args()
+    env = bootstrap(args.ini_file)
 
-    env = bootstrap(args[0])
     root = env['root']
     registry = env['registry']
 
-    user = args[1]
-    badge = args[2]
-    proposal_version = args[3]
-    parent = args[4]
+    user = args.user
+    badge = args.badge
+    proposal_version = args.proposal
+    parent = args.parent
 
     user = find_resource(root, user)
     badge = find_resource(root, badge)
@@ -68,24 +73,20 @@ def add_badge_assignment_from_json():
     usage::
       bin/create_badge <config> <jsonfile>
     """
-    usage = 'usage: %prog config_file jsonfile'
-    description = inspect.getdoc(add_badge_assignment_from_json)
-    description = textwrap.dedent(description)
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=description
-    )
+    docstring = inspect.getdoc(add_badge_assignment)
+    parser = argparse.ArgumentParser(description=docstring)
+    parser.add_argument('ini_file',
+                        help='path to the adhocracy backend ini file')
+    parser.add_argument('jsonfile',
+                        type=str,
+                        help='path to jsonfile')
 
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 2:
-        print('You must provide two arguments')
-        return 2
-
-    env = bootstrap(args[0])
+    args = parser.parse_args()
+    env = bootstrap(args.ini_file)
     root = env['root']
     registry = env['registry']
 
-    entries = _load_json(args[1])
+    entries = _load_json(args.jsonfile)
 
     for entry in entries:
         user = find_resource(root, entry['user'])
