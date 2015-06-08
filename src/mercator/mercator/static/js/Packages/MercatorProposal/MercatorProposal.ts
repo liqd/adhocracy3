@@ -300,19 +300,20 @@ export class BadgeAssignment {
     ) {}
 }
 
-var getBadges = (adhHttp : AdhHttp.Service<any>, proposal : ResourcesBase.Resource, list : BadgeAssignment[]) => {
-
-    _.forEach(proposal.data[SIBadgeable.nick].assignments, (assignmentPath : string) => {
-        adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
+var getBadges = (
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (proposal : ResourcesBase.Resource) : angular.IPromise<BadgeAssignment[]> => {
+    return $q.all(_.map(proposal.data[SIBadgeable.nick].assignments, (assignmentPath : string) => {
+        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
             var description = assignment.data[SIBadgeAssignment.nick].description;
 
-            adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
+            return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
                 var title = badge.data[SITitle.nick].title;
-                var assignment = new BadgeAssignment(title, description);
-                list.push(assignment);
+                return new BadgeAssignment(title, description);
             });
         });
-    });
+    }));
 };
 
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
@@ -325,7 +326,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         private moment : moment.MomentStatic,
         private $window : Window,
         private $location : angular.ILocationService,
-        $q : angular.IQService
+        public $q : angular.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ListItem.html";
@@ -454,7 +455,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         countSupporters(this.adhHttp, mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
             .then((count : number) => { data.supporterCount = count; });
 
-        getBadges(this.adhHttp, mercatorProposalVersion, data.assignments);
+        getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
+            data.assignments = assignments;
+        });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -930,7 +933,12 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, adhTopLevelState : AdhTopLevelState.Service) => {
+export var listItem = (
+    $q : angular.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
@@ -966,8 +974,9 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                     };
                 });
 
-                scope.data.assignments = [];
-                getBadges(adhHttp, proposal, scope.data.assignments);
+                getBadges(adhHttp, $q)(proposal).then((assignments) => {
+                    scope.data.assignments = assignments;
+                });
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
@@ -1218,7 +1227,7 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhTopLevelState", listItem])
+        .directive("adhMercatorProposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", listItem])
         .directive("adhMercatorProposalDetailView",
             ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$window", "$location", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q) => {
