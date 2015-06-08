@@ -89,7 +89,8 @@ class TestBadgeAssignmentsSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'subject': None,
                               'badge': None,
-                              'object': None}
+                              'object': None,
+                              'description' : ''}
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
