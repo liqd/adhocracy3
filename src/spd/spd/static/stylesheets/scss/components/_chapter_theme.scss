@@ -1,3 +1,4 @@
 .chapter h2 {
     @extend .chapter-header;
+    @extend .m-counted.chapter-header;
 }
