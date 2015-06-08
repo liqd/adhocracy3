@@ -17,7 +17,6 @@ def integration(config):
     config.include('adhocracy_core.resources.root')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.resources.root')
     config.include('adhocracy_core.resources.pool')
     config.include('adhocracy_core.resources.principal')
     config.include('adhocracy_core.resources.organisation')
@@ -153,24 +152,20 @@ class TestImportResources:
         root = registry.content.create(IRootPool.__identifier__)
         _import_resources(root, registry, filename)
 
-    def test_get_resource_info_name(self):
-        from adhocracy_core.scripts.import_resources import _get_resource_info_name
+    def test_get_expected_path(self):
+        from adhocracy_core.scripts.import_resources import _get_expected_path
 
         resource_info = {"path": "/",
-                         "creator": "god",
-                         "content_type": "adhocracy_core.resources.organisation.IOrganisation",
                          "data": {"adhocracy_core.sheets.name.IName":
                                   {"name": "alt-treptow"}}}
-        assert _get_resource_info_name(resource_info) == 'alt-treptow'
+        assert _get_expected_path(resource_info) == '/alt-treptow'
 
-    def test_get_resource_info_name_noname(self):
-        from adhocracy_core.scripts.import_resources import _get_resource_info_name
+    def test_get_expected_path_no_name_noname(self):
+        from adhocracy_core.scripts.import_resources import _get_expected_path
 
         resource_info = {"path": "/",
-                         "creator": "god",
-                         "content_type": "adhocracy_core.resources.organisation.IOrganisation",
                          "data": {}}
-        assert _get_resource_info_name(resource_info) is None
+        assert _get_expected_path(resource_info) == ''
 
 
     def teardown_method(self, method):
