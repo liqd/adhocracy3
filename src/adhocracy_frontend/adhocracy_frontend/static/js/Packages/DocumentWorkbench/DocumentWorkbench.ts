@@ -4,7 +4,6 @@ import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhProcess = require("../Process/Process");
-import AdhProposal = require("../Proposal/Proposal");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
@@ -54,7 +53,6 @@ export var register = (angular) => {
             AdhComment.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
-            AdhProposal.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
