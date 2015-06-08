@@ -1,0 +1,61 @@
+/*doc
+---
+title: Badges
+name: badges
+category: Widgets
+---
+
+Add a winning badge or similar to an element. Must have a position:relative or absolute container.
+
+```html_example
+<ol class="listing-elements">
+    <li class="listing-element debug-placeholder has-badge m-winner" style="min-height:75px; position: relative">Winner</li>
+    <li class="listing-element debug-placeholder has-badge m-community-award" style="min-height:75px; position: relative">Community Winner</li>
+</ol>
+
+<div class="debug-placeholder has-badge m-winner" style="position: relative; height:100px; width: 200px">Winner</div>
+```
+*/
+
+.has-badge {
+    &:after {
+        border-top: (50px / $font-size-plus * 1em) solid $color-brand-two-normal;
+        border-left: (50px / $font-size-plus * 1em)  solid transparent;
+        content: " ";
+        height: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 0;
+    }
+
+    &.m-winner,
+    &.m-community-award {
+        &:before {
+            color: $color-text-inverted;
+            position: absolute;
+            top: 6px / $font-size-plus * 1em;
+            z-index: 10;
+        }
+    }
+
+    &.m-winner {
+        &:after {
+            border-top-color: $color-brand-one-normal;
+        }
+
+        &:before {
+            @extend .icon-star:before;
+            font-size: 20px / $font-size-plus * 1em;
+            right: 3px / $font-size-plus * 1em;
+        }
+    }
+
+    &.m-community-award {
+        &:before {
+            @extend .icon-community-award:before;
+            font-size: 18px / $font-size-plus * 1em;
+            right: 6px / $font-size-plus * 1em;
+        }
+    }
+}
