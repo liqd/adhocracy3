@@ -11,6 +11,7 @@ import transaction
 
 from pyramid.paster import bootstrap
 from pyramid.traversal import find_resource
+from substanced.util import find_service
 from adhocracy_core.utils import load_json
 from adhocracy_core.resources.badge import IBadgeAssignment as BadgeRessource
 from adhocracy_core.sheets.badge import IBadgeAssignment as BadgeSheet
@@ -44,6 +45,8 @@ def add_badge_assignment_from_json():
         parent = find_resource(root, entry['proposalitem'])
         description = entry['description']
 
+        service = find_service(parent, 'badge_assignments')
+
         appstructs = {BadgeSheet.__identifier__:
                       {'subject': user,
                        'badge': badge,
@@ -51,11 +54,8 @@ def add_badge_assignment_from_json():
                        'description': description}}
 
         registry.content.create(BadgeRessource.__identifier__,
-                                parent=parent,
+                                parent=service,
                                 appstructs=appstructs)
 
     transaction.commit()
     env['closer']()
-
-
-
