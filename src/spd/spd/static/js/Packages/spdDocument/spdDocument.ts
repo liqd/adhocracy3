@@ -257,7 +257,7 @@ export var listItemDirective = (
         },
         link: (scope : IScope) => {
             scope.data = {
-                title: "Toller Titel",
+                title: "",
                 commentCountTotal: 3
             };
         }
@@ -282,7 +282,7 @@ export var createDirective = (
         link: (scope : IFormScope, element) => {
             scope.errors = [];
             scope.data = {
-                title: "Toller Titel",
+                title: "",
                 paragraphs: [{
                     body: ""
                 }]
