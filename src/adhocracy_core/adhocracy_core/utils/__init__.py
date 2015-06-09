@@ -494,14 +494,15 @@ def create_filename(directory='.', prefix='', suffix='.csv') -> str:
     return path
 
 
-def load_json(filename):
-    with open(filename, 'r') as f:
-        return json.load(f)
-
-
 def get_root(app):
     """Return the root of the application."""
     request = Request.blank('/path-is-meaningless-here')
     request.registry = app.registry
     root = app.root_factory(request)
     return root
+
+
+def load_json(filename):
+    """Load a json file from the disk."""
+    with open(filename, 'r') as f:
+        return json.load(f)
