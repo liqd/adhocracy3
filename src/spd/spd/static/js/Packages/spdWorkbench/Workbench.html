@@ -1,0 +1,14 @@
+<div data-adh-moving-columns="" class="moving-columns">
+    <adh-moving-column>
+        <adh-spd-process-detail-column data-ng-if="currentPhase !== 'announce' && view !== 'create_document'"></adh-spd-process-detail-column>
+        <adh-spd-document-create-column data-ng-if="currentPhase !== 'announce' && view === 'create_document'"></adh-spd-document-create-column>
+        <adh-spd-process-detail-announce-column data-ng-if="currentPhase === 'announce'"></adh-spd-process-detail-announce-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-spd-document-edit-column data-ng-if="view === 'edit'"></adh-spd-document-edit-column>
+        <adh-spd-document-detail-column data-ng-if="view !== 'edit'"></adh-spd-document-detail-column>
+    </adh-moving-column>
+    <adh-moving-column>
+        <adh-comment-column></adh-comment-column>
+    </adh-moving-column>
+</div>
