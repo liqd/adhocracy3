@@ -15,8 +15,11 @@ import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IC
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
+import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
+import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
+import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 
 var pkgLocation = "/spdWorkbench";
 
@@ -178,15 +181,15 @@ export var register = (angular) => {
                             }
                         });
                     }])
-                .defaultVersionable(RIDocument, RIDocumentVersion, "comments", processType, "", {
+                .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specificVersionable(RIDocument, RIDocumentVersion, "comments", processType, "", [
-                    () => (item : RIDocument, version : RIDocumentVersion) => {
+                .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", [
+                    () => (item : RIParagraph, version : RIParagraphVersion) => {
                         return {
                             commentableUrl: version.path,
-                            documentUrl: version.path
+                            documentUrl: version.data[SIParagraph.nick].documents[0]
                         };
                     }])
                 .defaultVersionable(RIComment, RICommentVersion, "", processType, "", {
