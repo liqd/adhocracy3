@@ -48,6 +48,9 @@ export interface IScope extends angular.IScope {
     };
     selectedState? : string;
     resource: any;
+
+    documentVersion? : RIDocumentVersion;
+    paragraphVersions? : RIParagraphVersion[];
 }
 
 export interface IFormScope extends IScope {
@@ -81,6 +84,9 @@ var bindPath = (
                             path: paragraphVersion.path
                         };
                     });
+
+                    scope.documentVersion = documentVersion;
+                    scope.paragraphVersions = paragraphVersions;
 
                     scope.data = {
                         title: documentVersion.data[SIDocument.nick].title,
@@ -287,18 +293,18 @@ export var createDirective = (
             };
 
             scope.submit = () => {
-                return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path).then((r) => console.log(r));
+                return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path)
+                    .then((r) => console.log(r));
             };
         }
     };
 };
 
 export var editDirective = (
+    $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => {
     return {
         restrict: "E",
@@ -307,7 +313,12 @@ export var editDirective = (
             path: "@"
         },
         link: (scope : IFormScope) => {
-            console.log("here comes the stuff");
+            bindPath($q, adhHttp)(scope);
+
+            scope.submit = () => {
+                return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions)
+                    .then((r) => console.log(r));
+            };
         }
     };
 };
@@ -340,7 +351,7 @@ export var register = (angular) => {
         .directive("adhSpdDocumentCreate", [
             "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
         .directive("adhSpdDocumentEdit", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", editDirective])
+            "$q", "adhConfig", "adhHttp", "adhPreliminaryNames", editDirective])
         .directive("adhSpdDocumentListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", listItemDirective]);
 };
