@@ -8,7 +8,7 @@ Some imports to work with rest api calls::
 
     >>> from pprint import pprint
     >>> from adhocracy_core.resources.process import IProcess
-    >>> from adhocracy_core.resources.sample_proposal import IProposal
+    >>> from adhocracy_core.resources.document import IDocument
 
 Start adhocracy app and log in some users::
 
@@ -20,7 +20,7 @@ Lets create some content::
     >>> data = {'adhocracy_core.sheets.name.IName': {'name': 'process'}}
     >>> resp = app_god.post_resource('/', IProcess, data)
     >>> data = {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}
-    >>> resp = app_god.post_resource('/process', IProposal, data)
+    >>> resp = app_god.post_resource('/process', IDocument, data)
 
 
 Workflows

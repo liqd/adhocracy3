@@ -21,7 +21,7 @@ class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the section sheet."""
 
 
-class IParagraph(ISheet, ISheetReferenceAutoUpdateMarker):
+class IParagraph(ISection):
 
     """Marker interface for the paragraph sheet."""
 
@@ -35,35 +35,15 @@ class DocumentElementsReference(SheetToSheet):
     target_isheet = ISection
 
 
-class SectionElementsReference(SheetToSheet):
-
-    """Section element reference."""
-
-    source_isheet = ISection
-    source_isheet_field = 'elements'
-    target_isheet = IParagraph
-
-
-class SectionSubsectionsReference(SheetToSheet):
-
-    """Section subsection reference."""
-
-    source_isheet = ISection
-    source_isheet_field = 'subsections'
-    target_isheet = ISection
-
-
 class DocumentSchema(colander.MappingSchema):
 
     """Document sheet data structure.
 
     `title`: one line title
-    `description`: summary text
     `elements`: structural subelements like sections
     """
 
     title = SingleLine()
-    description = Text()
     elements = UniqueReferences(reftype=DocumentElementsReference)
 
 
@@ -72,34 +52,18 @@ document_meta = sheet_meta._replace(isheet=IDocument,
                                     )
 
 
-class SectionSchema(colander.MappingSchema):
-
-    """Section sheet data structure.
-
-    `elements`: content subelements like paragraphs
-    `subsections`: structural subelements like sections
-    """
-
-    title = SingleLine()
-    elements = UniqueReferences(reftype=SectionElementsReference)
-    subsections = UniqueReferences(reftype=SectionSubsectionsReference)
-
-
-section_meta = sheet_meta._replace(isheet=ISection,
-                                   schema_class=SectionSchema)
-
-
 class ParagraphSchema(colander.MappingSchema):
 
-    """Section sheet data structure.
+    """Paragraph Section sheet data structure.
 
     `content`:  Text
-    `elements_backrefs`: sections referencing this paragraph
+    `documents`: Documents referencing this paragraph
     """
 
-    content = Text()
-    elements_backrefs = UniqueReferences(reftype=SectionElementsReference,
-                                         backref=True)
+    text = Text()
+    documents = UniqueReferences(reftype=DocumentElementsReference,
+                                 readonly=True,
+                                 backref=True)
 
 
 paragraph_meta = sheet_meta._replace(isheet=IParagraph,
@@ -109,5 +73,4 @@ paragraph_meta = sheet_meta._replace(isheet=IParagraph,
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(document_meta, config.registry)
-    add_sheet_to_registry(section_meta, config.registry)
     add_sheet_to_registry(paragraph_meta, config.registry)

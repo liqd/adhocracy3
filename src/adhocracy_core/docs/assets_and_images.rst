@@ -139,7 +139,7 @@ IAssetMetadata sheet, matching the given resource type.
 For example, lets upload a little picture and create a proposal version that
 references it. But first we have to create a proposal::
 
-    >>> prop_data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    >>> prop_data = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...              'data': {
     ...                  'adhocracy_core.sheets.name.IName': {
     ...                      'name': 'kommunismus'}
@@ -242,7 +242,7 @@ IImageMetadata`).
 
 Lets post a new proposal version that refers to the image::
 
-    >>> vers_data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalVersion',
+    >>> vers_data = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...              'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'title': 'We need more pics!',
     ...                     'description': 'Or maybe just nicer ones?',

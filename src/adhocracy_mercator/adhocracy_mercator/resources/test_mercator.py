@@ -168,7 +168,7 @@ def _post_proposal_version(app_user, path='/') -> TestResponse:
     return resp
 
 
-def _batch_post_full_sample_proposal(app_user) -> TestResponse:
+def _batch_post_full_proposal(app_user) -> TestResponse:
     subrequests = _create_proposal()
     resp = app_user.batch(subrequests)
     return resp
@@ -182,12 +182,12 @@ class TestMercatorProposalPermissionsAnonymous:
         assert resp.status_code == 403
 
     def test_cannot_create_proposal_per_batch(self, app_anonymous):
-        resp = _batch_post_full_sample_proposal(app_anonymous)
+        resp = _batch_post_full_proposal(app_anonymous)
         assert resp.status_code == 403
 
     def test_cannot_create_proposal_per_batch_broken_token(
             self, app_broken_token):
-        resp = _batch_post_full_sample_proposal(app_broken_token)
+        resp = _batch_post_full_proposal(app_broken_token)
         assert resp.status_code == 400
 
 
