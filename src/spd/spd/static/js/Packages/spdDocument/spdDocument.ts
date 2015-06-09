@@ -141,6 +141,77 @@ var postCreate = (
     return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]));
 };
 
+var postEdit = (
+    adhHttp : AdhHttp.Service<any>,
+    adhPreliminaryNames : AdhPreliminaryNames.Service
+) => (
+    scope : IFormScope,
+    oldVersion : RIDocumentVersion,
+    oldParagraphVersions : RIParagraphVersion[]
+) => {
+    // This function assumes that paragraphs can not be reordered or deleted
+    // and that new paragraphs are always appended to the end.
+
+    var documentPath = AdhUtil.parentPath(oldVersion.path);
+
+    var paragraphItems : RIParagraph[] = [];
+    var paragraphVersions : RIParagraphVersion[] = [];
+    var paragraphRefs : string[] = [];
+
+    var paragraphVersion : RIParagraphVersion;
+
+    _.forEach(scope.data.paragraphs, (paragraph : IParagraph, index : number) => {
+        if (index >= oldParagraphVersions.length) {
+            var item = new RIParagraph({preliminaryNames: adhPreliminaryNames});
+            item.parent = documentPath;
+
+            paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
+            paragraphVersion.parent = item.path;
+            paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                follows: [item.first_version_path]
+            });
+            paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                text: paragraph.body
+            });
+
+            paragraphItems.push(item);
+            paragraphVersions.push(paragraphVersion);
+            paragraphRefs.push(paragraphVersion.path);
+        } else {
+            var oldParagraphVersion = oldParagraphVersions[index];
+
+            if (paragraph.body !== oldParagraphVersion.data[SIParagraph.nick].text) {
+                paragraphVersion = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
+                paragraphVersion.parent = AdhUtil.parentPath(oldParagraphVersion.path);
+                paragraphVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+                    follows: [oldParagraphVersion.path]
+                });
+                paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
+                    text: paragraph.body
+                });
+
+                paragraphVersions.push(paragraphVersion);
+                paragraphRefs.push(paragraphVersion.path);
+            } else {
+                paragraphRefs.push(oldParagraphVersion.path);
+            }
+        }
+    });
+
+    var documentVersion = new RIDocumentVersion({preliminaryNames: adhPreliminaryNames});
+    documentVersion.parent = documentPath;
+    documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+        follows: [oldVersion.path]
+    });
+    documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
+        title: scope.data.title,
+        description: "",
+        elements: paragraphRefs
+    });
+
+    return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]));
+};
+
 
 export var detailDirective = (
     $q : angular.IQService,
