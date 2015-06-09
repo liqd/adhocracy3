@@ -4,17 +4,23 @@ from pytest import mark
 
 
 def test_paragraphversion_meta():
+    from adhocracy_core import sheets
     from .paragraph import paragraphversion_meta
     from .paragraph import IParagraphVersion
     meta = paragraphversion_meta
     assert meta.iresource is IParagraphVersion
     assert meta.permission_create == 'edit_proposal'
+    assert meta.extended_sheets == [sheets.document.IParagraph,
+                                    sheets.comment.ICommentable,
+                                    ]
 
 
 def test_paragraph_meta():
     from .paragraph import paragraph_meta
     from .paragraph import IParagraphVersion
     from .paragraph import IParagraph
+    from .comment import add_commentsservice
+
     from .tag import ITag
     from adhocracy_core import sheets
     meta = paragraph_meta
@@ -29,6 +35,7 @@ def test_paragraph_meta():
     assert meta.permission_create == 'edit_proposal'
     assert meta.use_autonaming
     assert meta.autonaming_prefix == 'PARAGRAPH_'
+    assert add_commentsservice in meta.after_creation
 
 
 @fixture
@@ -39,6 +46,7 @@ def integration(config):
     config.include('adhocracy_core.sheets')
     config.include('adhocracy_core.resources.paragraph')
     config.include('adhocracy_core.resources.tag')
+    config.include('adhocracy_core.resources.comment')
 
 
 @mark.usefixtures('integration')

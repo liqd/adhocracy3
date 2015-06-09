@@ -5,7 +5,8 @@ from adhocracy_core.interfaces import ITag
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
-
+from adhocracy_core.resources.comment import add_commentsservice
+import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.document
 
 
@@ -18,6 +19,7 @@ paragraphversion_meta = itemversion_meta._replace(
     content_name='ParagraphVersion',
     iresource=IParagraphVersion,
     extended_sheets=[adhocracy_core.sheets.document.IParagraph,
+                     adhocracy_core.sheets.comment.ICommentable,
                      ],
     permission_create='edit_proposal',
 )
@@ -43,6 +45,7 @@ paragraph_meta = item_meta._replace(
     permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='PARAGRAPH_',
+    after_creation=item_meta.after_creation + [add_commentsservice]
 )
 
 
