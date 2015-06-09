@@ -18,9 +18,13 @@ Add a winning badge or similar to an element. Must have a position:relative or a
 */
 
 .has-badge {
+    &:after, &:before {
+        font-size: $font-size-normal;
+    }
+
     &:after {
-        border-top: (50px / $font-size-plus * 1em) solid $color-brand-two-normal;
-        border-left: (50px / $font-size-plus * 1em)  solid transparent;
+        border-top: (50px / font-size-normal * 1em) solid $color-brand-two-normal;
+        border-left: (50px / font-size-normal * 1em)  solid transparent;
         content: " ";
         height: 0;
         position: absolute;
@@ -34,7 +38,7 @@ Add a winning badge or similar to an element. Must have a position:relative or a
         &:before {
             color: $color-text-inverted;
             position: absolute;
-            top: 6px / $font-size-plus * 1em;
+            top: 6px / font-size-normal * 1em;
             z-index: 10;
         }
     }
@@ -46,16 +50,16 @@ Add a winning badge or similar to an element. Must have a position:relative or a
 
         &:before {
             @extend .icon-star:before;
-            font-size: 20px / $font-size-plus * 1em;
-            right: 3px / $font-size-plus * 1em;
+            font-size: 20px / font-size-normal * 1em;
+            right: 3px / font-size-normal * 1em;
         }
     }
 
     &.m-community-award {
         &:before {
             @extend .icon-community-award:before;
-            font-size: 18px / $font-size-plus * 1em;
-            right: 6px / $font-size-plus * 1em;
+            font-size: 18px / font-size-normal * 1em;
+            right: 6px / font-size-normal * 1em;
         }
     }
 }
