@@ -87,6 +87,31 @@ export interface IFormScope extends IScope {
 }
 
 
+var bindPath = (
+    $q : angular.IQService,
+    adhHttp : AdhHttp.Service<any>
+) => (
+    scope : IScope,
+    pathKey : string = "path"
+) => {
+    scope.$watch(pathKey, (path : string) => {
+        if (path) {
+            adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
+                var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
+                var paragraphPromises = _.map(paragraphPaths, (path) => adhHttp.get(path));
+
+                return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
+                    scope.data = {
+                        title: documentVersion.data[SIDocument.nick].title,
+                        paragraphs: dummydata,
+                        commentCountTotal: 0
+                    };
+                });
+            });
+        }
+    });
+};
+
 var postCreate = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service
@@ -136,6 +161,7 @@ var postCreate = (
 
 
 export var detailDirective = (
+    $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
@@ -149,10 +175,7 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            scope.data = {
-                title: "Toller Titel",
-                paragraphs: dummydata
-            };
+            bindPath($q, adhHttp)(scope);
         }
     };
 };
@@ -258,7 +281,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("spd-document-list-item");
         }])
         .directive("adhSpdDocumentDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
+            "$q", "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
         .directive("adhSpdDocumentCreate", [
             "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
         .directive("adhSpdDocumentEdit", [
