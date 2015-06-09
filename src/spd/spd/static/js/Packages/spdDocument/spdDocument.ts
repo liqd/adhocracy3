@@ -58,6 +58,7 @@ export interface IFormScope extends IScope {
     showError;
     addParagraph() : void;
     submit() : angular.IPromise<any>;
+    spdDocumentForm : any;
 }
 
 
@@ -275,7 +276,7 @@ export var createDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : IFormScope) => {
+        link: (scope : IFormScope, element) => {
             scope.errors = [];
             scope.data = {
                 title: "Toller Titel",
@@ -293,8 +294,9 @@ export var createDirective = (
             };
 
             scope.submit = () => {
-                return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path)
-                    .then((r) => console.log(r));
+                return adhSubmitIfValid(scope, element, scope.spdDocumentForm, () => {
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
+                }).then((r) => console.log(r));
             };
         }
     };
@@ -305,7 +307,8 @@ export var editDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
-    adhShowError
+    adhShowError,
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
@@ -313,7 +316,7 @@ export var editDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : IFormScope) => {
+        link: (scope : IFormScope, element) => {
             scope.errors = [];
             scope.create = false;
             scope.showError = adhShowError;
@@ -327,8 +330,9 @@ export var editDirective = (
             bindPath($q, adhHttp)(scope);
 
             scope.submit = () => {
-                return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions)
-                    .then((r) => console.log(r));
+                return adhSubmitIfValid(scope, element, scope.spdDocumentForm, () => {
+                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
+                }).then((r) => console.log(r));
             };
         }
     };
@@ -362,7 +366,7 @@ export var register = (angular) => {
         .directive("adhSpdDocumentCreate", [
             "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
         .directive("adhSpdDocumentEdit", [
-            "$q", "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", editDirective])
+            "$q", "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", editDirective])
         .directive("adhSpdDocumentListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", listItemDirective]);
 };
