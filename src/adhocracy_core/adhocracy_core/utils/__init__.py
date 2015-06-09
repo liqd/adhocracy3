@@ -494,7 +494,7 @@ def create_filename(directory='.', prefix='', suffix='.csv') -> str:
     return path
 
 
-def load_json(filename: str) -> [dict]:
+def load_json(filename):
     with open(filename, 'r') as f:
         return json.load(f)
 

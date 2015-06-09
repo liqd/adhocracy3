@@ -530,6 +530,15 @@ def test_create_filename():
     assert name.startswith('./')
     assert name.endswith('.csv')
 
+def test_load_json():
+    from . import load_json
+    import json
+    import os
+    dir = os.path.dirname(__file__)
+    filename = os.path.join(dir, '../scripts/users_sample.json')
+    json = load_json(filename)
+    assert(type(json) is list)
+
 
 def test_create_filename_with_kwargs():
     from datetime import datetime
