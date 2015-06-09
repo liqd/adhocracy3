@@ -304,7 +304,8 @@ export var editDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhShowError
 ) => {
     return {
         restrict: "E",
@@ -313,6 +314,16 @@ export var editDirective = (
             path: "@"
         },
         link: (scope : IFormScope) => {
+            scope.errors = [];
+            scope.create = false;
+            scope.showError = adhShowError;
+
+            scope.addParagraph = () => {
+                scope.data.paragraphs.push({
+                    body: ""
+                });
+            };
+
             bindPath($q, adhHttp)(scope);
 
             scope.submit = () => {
@@ -351,7 +362,7 @@ export var register = (angular) => {
         .directive("adhSpdDocumentCreate", [
             "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
         .directive("adhSpdDocumentEdit", [
-            "$q", "adhConfig", "adhHttp", "adhPreliminaryNames", editDirective])
+            "$q", "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", editDirective])
         .directive("adhSpdDocumentListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", listItemDirective]);
 };
