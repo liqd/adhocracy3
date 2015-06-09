@@ -1,5 +1,6 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging
+from functools import wraps
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from pyramid.security import Allow
@@ -58,6 +59,22 @@ def migrate_new_sheet(context: IPool,
         if remove_isheet_old:
             logger.info('Remove {0} sheet'.format(isheet_old))
             noLongerProvides(resource, isheet_old)
+
+
+def migration_script(func):
+    """Decorator for the migration scripts.
+
+    The decorator logs the call to the evolve script.
+    """
+    logger = logging.getLogger(func.__module__)
+
+    @wraps(func)
+    def logger_decorator(*args, **kwargs):
+        logger.info('Running evolve step: ' + func.__doc__)
+        func(*args, **kwargs)
+        logger.info('Finished evolve step: ' + func.__doc__)
+
+    return logger_decorator
 
 
 def _migrate_field_values(registry: Registry, resource: IResource,
