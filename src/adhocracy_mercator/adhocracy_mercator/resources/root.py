@@ -35,7 +35,7 @@ def initialize_workflow(context: IPool, registry: Registry, options: dict):
 
 mercator_acm = ACM().deserialize(
     {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
-     'permissions': [['view_sheet_heardfrom',          None,        None,          None,          Allow,     Allow,       Allow],  # noqa
+     'permissions': [['view_sheet_heardfrom',          None,        None,          None,         Allow,     Allow,       Allow],  # noqa
                      ]})
 
 
