@@ -93,16 +93,6 @@ class ISheetReferenceAutoUpdateMarker(ISheet):
     """
 
 
-class IPostPoolSheet(ISheet):
-
-    """Marker interfaces for sheets with :term:`post_pool` Attributes.
-
-    This implies the sheet schema is a subtype of
-    :class:`adhocracy_core.schema.PostPoolSchema` or has at least a
-    field node with :class:`adhocracy_core.Schema.PostPool`.
-    """
-
-
 class IPredicateSheet(ISheet):
 
     """Marker interface for predicate sheets.

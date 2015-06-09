@@ -1,11 +1,7 @@
 """Principal types (user/group) and helpers to search/get user information."""
-from base64 import b64encode
 from logging import getLogger
-from os import urandom
-from smtplib import SMTPException
 
 from pyramid.registry import Registry
-from pyramid.settings import asbool
 from pyramid.traversal import find_resource
 from pyramid.request import Request
 from pyramid.i18n import TranslationStringFactory
@@ -25,7 +21,6 @@ from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.service import service_meta
 from adhocracy_core.resources.base import Base
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
@@ -33,7 +28,6 @@ import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.rate
 import adhocracy_core.sheets.badge
-
 
 _ = TranslationStringFactory('adhocracy')
 
@@ -131,71 +125,9 @@ class User(Pool):
         sheet.set(appstruct)
 
 
-def send_registration_mail(context: IUser,
-                           registry: Registry,
-                           options: dict={}):
-    """
-    Send a registration mail to validate the email of a user account.
-
-    But if the "adhocracy.skip_registration_mail" parameter is true, no mail
-    is sent and the account is instead activated immediately. This can be
-    useful for testing.
-    """
-    if asbool(registry.settings.get('adhocracy.skip_registration_mail',
-                                    'false')):
-        context.activate()
-        return
-    request = options.get('request', None)
-    name = context.name
-    email = context.email
-    activation_path = _generate_activation_path()
-    context.activation_path = activation_path
-    # TODO: debug log needed? if so move to adhocracy_core.messaging
-    logger.debug('Sending registration mail to %s for new user named %s, '
-                 'activation path=%s', email, name, context.activation_path)
-    site_name = registry.settings.get('adhocracy.site_name', 'Adhocracy')
-    frontend_url = registry.settings.get('adhocracy.frontend_url',
-                                         'http://localhost:6551')
-    subject = _('mail_account_verification_subject',
-                mapping={'site_name': site_name},
-                default='${site_name}: Account Verification / '
-                        'Aktivierung Deines Nutzerkontos')
-    body_txt = _('mail_account_verification_body_txt',
-                 mapping={'activation_path': activation_path,
-                          'frontend_url': frontend_url,
-                          'name': name,
-                          'site_name': site_name,
-                          },
-                 default='${activation_path}',
-                 )
-    try:
-        registry.messenger.send_mail(
-            subject=subject,
-            recipients=[email],
-            body=body_txt,
-            request=request,
-        )
-    except SMTPException as err:
-        msg = 'Cannot send registration mail: {}'.format(str(err))
-        raise_colander_style_error(
-            adhocracy_core.sheets.principal.IUserExtended, 'email', msg)
-
-
-def _generate_activation_path() -> str:
-    random_bytes = urandom(18)
-    # TODO: not DRY, .resources.generate_name does almost the same
-    # We use '+_' as altchars since both are reliably recognized in URLs,
-    # even if they occur at the end. Conversely, '-' at the end of URLs is
-    # not recognized as part of the URL by some programs such as Thunderbird,
-    # and '/' might cause problems as well, especially if it occurs multiple
-    # times in a row.
-    return '/activate/' + b64encode(random_bytes, altchars=b'+_').decode()
-
-
 user_meta = pool_meta._replace(
     iresource=IUser,
     content_class=User,
-    after_creation=[send_registration_mail] + pool_meta.after_creation,
     basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
                   adhocracy_core.sheets.principal.IUserExtended,
                   adhocracy_core.sheets.principal.IPermissions,

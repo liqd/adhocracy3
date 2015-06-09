@@ -11,9 +11,8 @@ def includeme(config):
     config.include('adhocracy_core.resources.geo')
     # include sample packages
     # TODO: fix tests and remove
-    config.include('adhocracy_core.resources.sample_paragraph')
-    config.include('adhocracy_core.resources.sample_section')
-    config.include('adhocracy_core.resources.sample_proposal')
+    config.include('adhocracy_core.resources.paragraph')
+    config.include('adhocracy_core.resources.document')
     # include custom resource types
     config.include('adhocracy_meinberlin.workflows')
     config.include('adhocracy_meinberlin.resources.kiezkassen')

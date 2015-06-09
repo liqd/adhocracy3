@@ -33,7 +33,7 @@ def _add_post_pool_node(inst: colander.Schema, iresource_or_service_name=IPool):
     inst.add(post_pool_node)
 
 
-def _add_reference_node(inst: colander.Schema, target_isheet=None):
+def _add_reference_node(schema: colander.Schema, target_isheet=None):
     from adhocracy_core.interfaces import ISheet
     from adhocracy_core.interfaces import SheetToSheet
     from adhocracy_core.schema import Reference
@@ -41,8 +41,8 @@ def _add_reference_node(inst: colander.Schema, target_isheet=None):
     isheet = target_isheet or ISheet
     class PostPoolReference(SheetToSheet):
         target_isheet = isheet
-    inst.add(reference_node)
-    inst['reference'].reftype = PostPoolReference
+    schema.add(reference_node)
+    schema['reference'].reftype = PostPoolReference
 
 
 def _add_references_node(inst: colander.Schema):
@@ -871,90 +871,39 @@ class TestISOCountryCode:
             inst.deserialize('1A')
 
 
-class TestPostPool:
+class TestCreatePostPoolValidator:
+
+    def call_fut(self, node, kw):
+        from . import create_post_pool_validator
+        return create_post_pool_validator(node, kw)
 
     @fixture
-    def request(self, context):
-        request = testing.DummyRequest()
-        request.root = context
-        return request
-
-    def make_one(self, **kwargs):
-        from adhocracy_core.schema import PostPool
-        return PostPool(**kwargs)
-
-    def test_create(self):
-        from adhocracy_core.interfaces import IPool
-        from adhocracy_core.schema import ResourceObject
-        inst = self.make_one()
-        assert inst.schema_type is ResourceObject
-        assert inst.iresource_or_service_name is IPool
-        assert inst.readonly is True
-        assert isinstance(inst.default, colander.deferred)
-        assert isinstance(inst.missing, colander.deferred)
-
-    def test_deserialize_empty(self):
-        inst = self.make_one()
-        with raises(colander.Invalid):
-            inst.deserialize()
-
-    def test_bind_context_without_post_pool_and_deserialize_empty(self, context):
-        from adhocracy_core.exceptions import RuntimeConfigurationError
-        with raises(RuntimeConfigurationError):
-            self.make_one().bind(context=context)
-
-    def test_bind_context_with_post_pool_and_deserialize_empty(self, pool):
-        from adhocracy_core.interfaces import IPool
-        inst = self.make_one(iresource_or_service_name=IPool).bind(context=pool)
-        assert inst.deserialize() is pool
-
-    def test_bind_context_with_service_post_pool_and_deserialize_empty(self, pool):
-        from adhocracy_core.interfaces import IServicePool
-        pool['service'] = testing.DummyResource(__provides__=IServicePool,
-                                                __is_service__=True)
-        inst = self.make_one(iresource_or_service_name='service').bind(context=pool)
-        assert inst.deserialize() is pool['service']
-
-    def test_serialize_empty(self):
-        inst = self.make_one()
-        assert inst.serialize() == ''
-
-    def test_bind_context_with_post_pool_and_serialize_empty(self, pool, request):
-        from adhocracy_core.interfaces import IPool
-        inst = self.make_one(iresource_or_service_name=IPool).bind(context=pool,
-                                                                    request=request)
-        assert inst.serialize() == request.resource_url(pool)
-
-    def test_bind_context_without_post_pool_and_serialize_empty(self, context, request):
-        from adhocracy_core.exceptions import RuntimeConfigurationError
-        with raises(RuntimeConfigurationError):
-            self.make_one().bind(context=context,
-                                  request=request)
-
-
-class TestPostPoolMappingSchema:
-
-
-    @fixture
-    def context(self, pool):
-        from adhocracy_core.interfaces import ISheet
-        from adhocracy_core.interfaces import IPool
-        wrong_post_pool = testing.DummyResource()
-        wrong_post_pool['child'] = testing.DummyResource(__provides__=ISheet)
+    def context(self, pool, service):
+        from copy import deepcopy
+        wrong_post_pool = service
+        wrong_post_pool['child'] = testing.DummyResource()
         pool['wrong'] = wrong_post_pool
-        right_post_pool = testing.DummyResource(__provides__=IPool)
-        right_post_pool['child'] = testing.DummyResource(__provides__=ISheet)
+        right_post_pool = deepcopy(service)
+        right_post_pool['child'] = testing.DummyResource()
         pool['right'] = right_post_pool
         return pool
 
     @fixture
-    def mock_sheet(self, mock_sheet):
-        from adhocracy_core.interfaces import IPostPoolSheet
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPostPoolSheet)
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def back_reference_sheet(self, mock_sheet):
         schema = colander.MappingSchema()
-        _add_post_pool_node(schema)
+        _add_post_pool_node(schema, iresource_or_service_name='right')
         mock_sheet.schema = schema
         return mock_sheet
+
+    @fixture
+    def node(self, node):
+        _add_reference_node(node)
+        _add_other_node(node)
+        return node
 
     @fixture
     def request_(self, context):
@@ -962,79 +911,34 @@ class TestPostPoolMappingSchema:
         request.root = context
         return request
 
-    def make_one(self, **kwargs):
-        from adhocracy_core.schema import PostPoolMappingSchema
-        return PostPoolMappingSchema(**kwargs)
+    def test_raise_if_wrong_post_pool(
+            self, node, back_reference_sheet, context, registry):
+        registry.content.get_sheet.return_value = back_reference_sheet
+        kw = {'registry': registry, 'context': context['wrong']}
+        validator = self.call_fut(node['reference'], kw)
+        with raises(colander.Invalid) as err:
+            validator(node, {'reference': context['right']['child']})
+        assert err.value.msg == 'You can only add references inside /right'
 
-    def test_create(self):
-        inst = self.make_one()
-        assert isinstance(inst.validator, colander.deferred)
+    def test_raise_if_missing_post_pool(
+            self, node, back_reference_sheet, context, registry):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        registry.content.get_sheet.return_value = back_reference_sheet
+        kw = {'registry': registry, 'context': context['wrong']}
+        validator = self.call_fut(node['reference'], kw)
+        del context['right']
+        with raises(RuntimeConfigurationError) as err:
+            validator(node, {'reference': context['wrong']['child']})
+        assert err.value.details == 'Cannot find post_pool with interface or '\
+                                    'service name right for context /wrong/child.'
 
-    def test_deserialize_empty(self):
-        inst = self.make_one()
-        assert inst.deserialize() == {}
-
-    def test_deserialize_empty(self):
-        inst = self.make_one()
-        assert inst.serialize() == {}
-
-    def test_bind_context_without_reference_post_context_and_deserialize(self, context, request_):
-        inst = self.make_one()
-        _add_reference_node(inst)
-        _add_other_node(inst)
-        inst = inst.bind(context=context['right'], request=request_)
-        assert inst.deserialize({'reference': request_.application_url + '/right/child/'})
-
-    def test_bind_context_with_valid_reference_post_context_and_deserialize(self, context, request_):
-        inst = self.make_one()
-        _add_post_pool_node(inst)
-        _add_reference_node(inst)
-        inst = inst.bind(context=context['right'], request=request_)
-        assert inst.deserialize({'reference': request_.application_url + '/right/child/'})
-
-    def test_bind_context_with_nonvalid_reference_post_context_and_deserialize(self, context, request_):
-        inst = self.make_one()
-        _add_post_pool_node(inst)
-        _add_reference_node(inst)
-        inst = inst.bind(context=context['right'], request=request_)
-        with raises(colander.Invalid):
-            inst.deserialize({'reference': request_.application_url + '/wrong/child'})
-
-    def test_bind_context_with_valid_references_post_context_and_deserialize(self, context, request_):
-        inst = self.make_one()
-        _add_post_pool_node(inst)
-        _add_references_node(inst)
-        inst = inst.bind(context=context['right'], request=request_)
-        assert inst.deserialize({'references': [request_.application_url + '/right/child']})
-
-    def test_bind_context_with_valid_backreference_post_context_and_deserialize(
-            self, context, mock_sheet, registry_with_content, request_):
-        from adhocracy_core.interfaces import IPostPoolSheet
-        inst = self.make_one()
-
-        referenced = context['right']['child']
-        register_sheet(referenced, mock_sheet, registry_with_content)
-        mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
-
-        _add_reference_node(inst, target_isheet=IPostPoolSheet)
-        inst = inst.bind(context=context['right'], request=request_)
-
-        assert inst.deserialize({'reference': request_.application_url + '/right/child'})
-
-    def test_bind_context_with_nonvalid_backreference_post_context_and_deserialize(
-            self, context, mock_sheet, registry_with_content, request_):
-        from adhocracy_core.interfaces import IPostPoolSheet
-        inst = self.make_one()
-
-        referenced = context['right']['child']
-        register_sheet(referenced, mock_sheet, registry_with_content)
-        mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
-
-        _add_reference_node(inst, target_isheet=IPostPoolSheet)
-        inst = inst.bind(context=context['right'], request=request_)
-
-        with raises(colander.Invalid):
-            inst.deserialize({'reference': request_.application_url + '/wrong/child'})
+    def test_valid(
+            self, node, back_reference_sheet, context, registry):
+        registry.content.get_sheet.return_value = back_reference_sheet
+        kw = {'registry': registry, 'context': context['right']}
+        validator = self.call_fut(node['reference'], kw)
+        result = validator(node, {'reference': context['right']['child']})
+        assert result is None
 
 
 class TestInteger:

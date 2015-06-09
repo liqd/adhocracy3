@@ -11,6 +11,7 @@ from adhocracy_core.workflows import setup_workflow
 from adhocracy_core import sheets
 from adhocracy_mercator.resources.mercator import IProcess
 from pyramid.security import ALL_PERMISSIONS
+import adhocracy_core.resources.root
 
 
 def add_mercator_process(context: IPool, registry: Registry, options: dict):
@@ -42,7 +43,8 @@ mercator_acm = ACM().deserialize(
 mercator_root_meta = root_meta._replace(
     after_creation=[create_initial_content_for_app_root,
                     add_mercator_process,
-                    initialize_workflow
+                    initialize_workflow,
+                    adhocracy_core.resources.root.add_example_process
                     ])
 
 

@@ -1,7 +1,6 @@
 include RELEASE-VERSION version.py
 recursive-include mercator/build *.js *.js.map *.min.map *.css *.css.map *.woff *.eot *.ttf *.svg *.xml *.ico *.json *.jpg *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
-global-exclude *Ig.js
 prune mercator/build/lib/DefinitelyTyped
 prune mercator/build/lib/q
 prune mercator/build/lib/jasmine

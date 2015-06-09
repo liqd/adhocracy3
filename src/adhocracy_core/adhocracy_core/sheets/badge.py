@@ -1,21 +1,23 @@
 """Badge sheet."""
 import colander
+from pyramid.request import Request
+from pyramid.traversal import lineage
+from substanced.util import find_service
 
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
-from adhocracy_core.sheets import sheet_meta
-from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
-from adhocracy_core.schema import SingleLine
-from adhocracy_core.schema import Text
+from adhocracy_core.schema import create_post_pool_validator
 
 
-class IBadge(IPostPoolSheet):
+class IBadge(ISheet):
 
     """Marker interface for badge data sheet."""
 
@@ -30,7 +32,7 @@ class ICanBadge(ISheet):
     """Marker interface for principals that can assign badges."""
 
 
-class IBadgeable(IPostPoolSheet):
+class IBadgeable(ISheet):
 
     """Marker interface for resources that can be badged."""
 
@@ -67,13 +69,40 @@ class BadgeObjectReference(SheetToSheet):
     target_isheet = IBadgeable
 
 
+class BadgeGroupReference(SheetToSheet):
+
+    """Reference from badge to badge group."""
+
+    source_isheet = IBadge
+    source_isheet_field = 'groups'
+    target_isheet = IPool  # TODO add special sheet for badge groups
+
+
+@colander.deferred
+def deferred_groups_default(node: colander.SchemaNode, kw: dict) -> []:
+    """Return badge groups."""
+    from adhocracy_core.resources.badge import IBadgeGroup  # no circle imports
+    context = kw.get('context', None)
+    if context is None:
+        return []
+    parents = [x for x in lineage(context)][1:]
+    groups = []
+    for parent in parents:
+        if IBadgeGroup.providedBy(parent):
+            groups.append(parent)
+        else:
+            break
+    return groups
+
+
 class BadgeSchema(colander.MappingSchema):
 
     """Badge sheet data structure."""
 
-    title = SingleLine()
-    description = Text()
-    color = SingleLine()
+    groups = UniqueReferences(reftype=BadgeGroupReference,
+                              readonly=True,
+                              default=deferred_groups_default,
+                              )
 
 
 badge_meta = sheet_meta._replace(isheet=IBadge,
@@ -109,7 +138,7 @@ can_badge_meta = sheet_meta._replace(
 )
 
 
-class BadgeableSchema(PostPoolMappingSchema):
+class BadgeableSchema(colander.MappingSchema):
 
     """Badgeable sheet data structure.
 
@@ -139,11 +168,32 @@ class BadgeAssignmentSchema(colander.MappingSchema):
     badge = Reference(reftype=BadgeReference)
     object = Reference(reftype=BadgeObjectReference)
 
+    @colander.deferred
+    def validator(self, kw: dict) -> callable:
+        """Validate the :term:`post_pool` for the object reference."""
+        object_validator = create_post_pool_validator(self['object'], kw)
+        return colander.All(object_validator)
+
 
 badge_assignment_meta = sheet_meta._replace(
     isheet=IBadgeAssignment,
     schema_class=BadgeAssignmentSchema,
 )
+
+
+def get_assignable_badges(context: IBadgeable, request: Request) -> [IBadge]:
+    """Get assignable badges for the IBadgeAssignment sheet."""
+    badges = find_service(context, 'badges')
+    if badges is None:
+        return []
+    catalogs = find_service(context, 'catalogs')
+    principals = request.effective_principals
+    query = search_query._replace(root=badges,
+                                  interfaces=IBadge,
+                                  allows=(principals, 'assign_badge'),
+                                  )
+    result = catalogs.search(query)
+    return result.elements
 
 
 def includeme(config):

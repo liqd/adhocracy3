@@ -17,9 +17,6 @@ class IParagraphVersion(IItemVersion):
 paragraphversion_meta = itemversion_meta._replace(
     content_name='ParagraphVersion',
     iresource=IParagraphVersion,
-    basic_sheets=[adhocracy_core.sheets.versions.IVersionable,
-                  adhocracy_core.sheets.metadata.IMetadata,
-                  ],
     extended_sheets=[adhocracy_core.sheets.document.IParagraph,
                      ],
     permission_create='edit_proposal',
@@ -34,11 +31,18 @@ class IParagraph(IItem):
 paragraph_meta = item_meta._replace(
     content_name='Paragraph',
     iresource=IParagraph,
+    basic_sheets=[adhocracy_core.sheets.tags.ITags,
+                  adhocracy_core.sheets.versions.IVersions,
+                  adhocracy_core.sheets.pool.IPool,
+                  adhocracy_core.sheets.metadata.IMetadata,
+                  ],
     element_types=[ITag,
                    IParagraphVersion,
                    ],
     item_type=IParagraphVersion,
     permission_create='edit_proposal',
+    use_autonaming=True,
+    autonaming_prefix='PARAGRAPH_',
 )
 
 

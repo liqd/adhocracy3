@@ -274,7 +274,7 @@ class TestBatchView:
     def test_make_subrequest_post_with_non_empty_body(self, context, request):
         inst = self.make_one(context, request)
         body = {'content_type':
-                    'adhocracy_core.resources.sample_paragraph.IParagraph',
+                    'adhocracy_core.resources.paragraph.IParagraph',
                 'data': {'adhocracy_core.sheets.name.IName': {'name': 'par1'}}
                }
         subrequest_cstruct = self._make_subrequest_cstruct(method='POST', body=body)

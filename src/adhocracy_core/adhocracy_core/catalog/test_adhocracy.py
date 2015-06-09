@@ -39,6 +39,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'creator' in catalogs['adhocracy']
     assert 'item_creation_date' in catalogs['adhocracy']
     assert 'private_visibility' in catalogs['adhocracy']
+    assert 'badge' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -214,4 +215,48 @@ def test_includeme_register_index_rates(registry):
     from substanced.interfaces import IIndexView
     assert registry.adapters.lookup((IVersionable,), IIndexView,
                                     name='adhocracy|tag')
+
+
+class TestIndexBadge:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        from . import adhocracy
+        monkeypatch.setattr(adhocracy, 'find_service',
+                            lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+    def test_index_badge(self, context, mock_catalogs, search_result, query):
+        from adhocracy_core.sheets.badge import IBadgeAssignment
+        from .adhocracy import index_badge
+
+        badge = testing.DummyResource(__name__='badge')
+        assignment = testing.DummyResource(__name__='assignement')
+        result_assignments = search_result._replace(elements=[assignment])
+        result_badges = search_result._replace(elements=[badge])
+        mock_catalogs.search.side_effect = [result_assignments, result_badges]
+
+        assert index_badge(context, None) == ['badge']
+        search_calls = mock_catalogs.search.call_args_list
+        query_assignments = query._replace(references = [(None, IBadgeAssignment,
+                                                          'object', context)],
+                                           only_visible=True)
+        assert search_calls[0][0][0] == query_assignments
+        query_badges = query._replace(references = [(assignment, IBadgeAssignment,
+                                                     'badge', None)],
+                                            only_visible=True)
+        assert search_calls[1][0][0] == query_badges
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_index_badge(registry):
+    from adhocracy_core.sheets.badge import IBadgeable
+    from substanced.interfaces import IIndexView
+    assert registry.adapters.lookup((IBadgeable,), IIndexView,
+                                    name='adhocracy|badge')
+
 

@@ -17,8 +17,8 @@ class TestBadge:
 
     @fixture
     def meta(self):
-        from .badge import badge_data_meta
-        return badge_data_meta
+        from .badge import badge_meta
+        return badge_meta
 
     def test_meta(self, meta):
         from adhocracy_core import resources
@@ -28,6 +28,28 @@ class TestBadge:
                                         sheets.badge.IBadge,
                                         ]
         assert meta.permission_create == 'create_badge'
+
+    @mark.usefixtures('integration')
+    def test_create(self, context, registry, meta):
+        assert registry.content.create(meta.iresource.__identifier__)
+
+class TestBadgeGroup:
+
+    @fixture
+    def meta(self):
+        from .badge import badge_group_meta
+        return badge_group_meta
+
+    def test_meta(self, meta):
+        from adhocracy_core import resources
+        from adhocracy_core import sheets
+        assert meta.iresource is resources.badge.IBadgeGroup
+        assert meta.extended_sheets == [sheets.description.IDescription,
+                                        ]
+        assert meta.permission_create == 'create_badge_group'
+        assert meta.element_types == [resources.badge.IBadge,
+                                      meta.iresource,
+                                      ]
 
     @mark.usefixtures('integration')
     def test_create(self, context, registry, meta):
@@ -46,7 +68,9 @@ class TestBadgesService:
         from adhocracy_core import resources
         assert meta.iresource is resources.badge.IBadgesService
         assert meta.iresource.extends(IServicePool)
-        assert meta.element_types == [resources.badge.IBadge]
+        assert meta.element_types == [resources.badge.IBadge,
+                                      resources.badge.IBadgeGroup,
+                                      ]
         assert meta.content_name == 'badges'
         assert meta.permission_create == 'create_service'
 

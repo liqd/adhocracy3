@@ -6,33 +6,21 @@ from pyramid.security import ALL_PERMISSIONS
 
 @fixture
 def integration(config, pool_graph_catalog):
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.resources.geo')
-    config.include('adhocracy_core.resources.asset')
-    config.include('adhocracy_core.resources.root')
-    config.include('adhocracy_core.resources.pool')
-    config.include('adhocracy_core.resources.principal')
-    config.include('adhocracy_core.resources.badge')
-    config.include('adhocracy_core.rest')
+    config.include('pyramid_mailer.testing')
     config.include('adhocracy_core.workflows.sample')
-    config.include('adhocracy_core.resources.process')
     config.include('adhocracy_mercator')
-    config.include('adhocracy_mercator.workflows')
-    config.include('adhocracy_mercator.resources.mercator')
 
 
 def test_root_meta():
     from adhocracy_core.resources.root import root_meta
     from adhocracy_core.resources.root import \
         create_initial_content_for_app_root
+    from adhocracy_core.resources.root import add_example_process
     from .root import add_mercator_process
     from .root import mercator_root_meta
     assert add_mercator_process not in root_meta.after_creation
     assert add_mercator_process in mercator_root_meta.after_creation
+    assert add_example_process in mercator_root_meta.after_creation
     assert create_initial_content_for_app_root in \
         mercator_root_meta.after_creation
 

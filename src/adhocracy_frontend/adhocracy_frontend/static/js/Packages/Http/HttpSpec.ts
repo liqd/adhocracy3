@@ -7,7 +7,7 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraph");
+import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 
 import Convert = require("./Convert");

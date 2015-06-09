@@ -16,6 +16,7 @@ def test_root_meta():
 
 @fixture
 def integration(config):
+    config.include('pyramid_mailer.testing')
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.changelog')
@@ -32,9 +33,8 @@ def integration(config):
     config.include('adhocracy_core.resources.process')
     config.include('adhocracy_core.resources.rate')
     config.include('adhocracy_core.resources.item')
-    config.include('adhocracy_core.resources.sample_paragraph')
-    config.include('adhocracy_core.resources.sample_proposal')
-    config.include('adhocracy_core.resources.sample_section')
+    config.include('adhocracy_core.resources.paragraph')
+    config.include('adhocracy_core.resources.document')
     config.include('adhocracy_core.resources.external_resource')
     config.include('adhocracy_core.rest')
     config.include('adhocracy_core.resources.geo')

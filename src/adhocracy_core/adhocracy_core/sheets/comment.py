@@ -3,14 +3,12 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.schema import Text
-from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
 
 
@@ -19,7 +17,7 @@ class IComment(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the comment sheet."""
 
 
-class ICommentable(IPostPoolSheet, ISheetReferenceAutoUpdateMarker):
+class ICommentable(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for resources that can be commented upon."""
 
@@ -42,13 +40,14 @@ class CommentSchema(colander.MappingSchema):
 
     refers_to = Reference(reftype=CommentRefersToReference)
     content = Text()
+    # TODO add post_pool validator
 
 
 comment_meta = sheet_meta._replace(isheet=IComment,
                                    schema_class=CommentSchema)
 
 
-class CommentableSchema(PostPoolMappingSchema):
+class CommentableSchema(colander.MappingSchema):
 
     """Commentable sheet data structure.
 
