@@ -16,6 +16,8 @@ import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
+import AdhCommentAdapter = require("../Comment/Adapter");
+
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
@@ -63,6 +65,8 @@ var bindPath = (
     scope : IScope,
     pathKey : string = "path"
 ) => {
+    var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
+
     scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
@@ -73,6 +77,7 @@ var bindPath = (
                     var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
                         return {
                             body: paragraphVersion.data[SIParagraph.nick].text,
+                            commentCount: commentableAdapter.totalCount(paragraphVersion),
                             path: paragraphVersion.path
                         };
                     });
@@ -80,7 +85,8 @@ var bindPath = (
                     scope.data = {
                         title: documentVersion.data[SIDocument.nick].title,
                         paragraphs: paragraphs,
-                        commentCountTotal: 0
+                        // FIXME: DefinitelyTyped
+                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount"))
                     };
                 });
             });
