@@ -6,7 +6,6 @@ from pytest import mark
 from pytest import fixture
 from unittest.mock import Mock
 
-
 def test_find_graph_graph_exists():
     from adhocracy_core.utils import find_graph
     dummy_graph = object()
@@ -530,15 +529,6 @@ def test_create_filename():
     assert name.startswith('./')
     assert name.endswith('.csv')
 
-def test_load_json():
-    from . import load_json
-    import json
-    import os
-    dir = os.path.dirname(__file__)
-    filename = os.path.join(dir, '../scripts/users_sample.json')
-    json = load_json(filename)
-    assert(type(json) is list)
-
 
 def test_create_filename_with_kwargs():
     from datetime import datetime
@@ -567,3 +557,28 @@ def test_get_root(app, registry):
     app.root_factory.return_value = fake_root
     root = get_root(app)
     assert root == fake_root
+
+
+class TestLoadJson:
+
+    def call_fut(self, filename):
+        from . import load_json
+        return load_json(filename)
+
+    def test_loadjson(self):
+        from tempfile import mkstemp
+        import json
+
+        (self._tempfd, filename) = mkstemp()
+        value = [{'name': 'Alice', 'email': 'alice@example.org',
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
+                 'groups': ['gods']}]
+        with open(filename, 'w') as f:
+            f.write(json.dumps(value))
+
+        result = self.call_fut(filename)
+        assert result == value
+
+    def teardown_method(self, method):
+        if hasattr(self, 'tempfd'):
+            os.close(self._tempfd)
