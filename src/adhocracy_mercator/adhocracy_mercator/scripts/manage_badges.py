@@ -8,11 +8,11 @@ setup.py.
 import inspect
 import argparse
 import transaction
-import json
 
 from pyramid.paster import bootstrap
 from pyramid.traversal import find_resource
-from adhocracy_core.resources.badge import IBadgeAssignment as BadgeResource
+from adhocracy_core.utils import load_json
+from adhocracy_core.resources.badge import IBadgeAssignment as BadgeRessource
 from adhocracy_core.sheets.badge import IBadgeAssignment as BadgeSheet
 
 
@@ -35,7 +35,7 @@ def add_badge_assignment_from_json():
     root = env['root']
     registry = env['registry']
 
-    entries = _load_json(args.jsonfile)
+    entries = load_json(args.jsonfile)
 
     for entry in entries:
         user = find_resource(root, entry['user'])
@@ -50,13 +50,12 @@ def add_badge_assignment_from_json():
                        'object': proposal_version,
                        'description': description}}
 
-        registry.content.create(BadgeResource.__identifier__,
+        registry.content.create(BadgeRessource.__identifier__,
                                 parent=parent,
                                 appstructs=appstructs)
 
     transaction.commit()
+    env['closer']()
 
 
-def _load_json(filename: str) -> [dict]:
-    with open(filename, 'r') as f:
-        return json.load(f)
+

@@ -494,6 +494,11 @@ def create_filename(directory='.', prefix='', suffix='.csv') -> str:
     return path
 
 
+def load_json(filename: str) -> [dict]:
+    with open(filename, 'r') as f:
+        return json.load(f)
+
+
 def get_root(app):
     """Return the root of the application."""
     request = Request.blank('/path-is-meaningless-here')
