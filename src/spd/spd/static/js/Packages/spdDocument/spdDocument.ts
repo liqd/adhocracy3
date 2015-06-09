@@ -27,37 +27,6 @@ import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/
 
 var pkgLocation = "/spdDocument";
 
-// FIXME: Can be removed when we work with real data
-export var dummydata : IParagraph[] = [{
-    body: "## Hallo \n\n Lorem ipsum dolor sit amet, " +
-        "consectetur adipiscing elit. Phasellus quis " +
-        "lectus metus, at posuere neque. Sed pharetra " +
-        "nibh eget orci convallis at posuere leo convallis. " +
-        "Sed blandit augue vitae augue scelerisque bibendum. " +
-        "Vivamus sit amet libero turpis, non venenatis urna. " +
-        "In blandit, odio convallis suscipit venenatis, ante " +
-        "ipsum cursus augue.",
-    commentCount: 5,
-    path: "/adhocracy/Toller_Titel/PARAGRAPH_0000001/VERSION_0000001"
-}, {
-     body: "## Toll \n\n Lorem ipsum dolor sit amet, " +
-        "consectetur adipiscing elit. Phasellus quis " +
-        "lectus metus, at posuere neque. Sed pharetra " +
-        "nibh eget orci convallis at posuere leo convallis. " +
-        "Sed blandit augue vitae augue scelerisque bibendum. " +
-        "Vivamus sit amet libero turpis, non venenatis urna. " +
-        "In blandit, odio convallis suscipit venenatis, ante " +
-        "ipsum cursus augue."
-}, {
-     body: "## Klasse! \n\n Lorem ipsum dolor sit amet," +
-        "consectetur adipiscing elit. Phasellus quis " +
-        "lectus metus, at posuere neque. Sed pharetra " +
-        "nibh eget orci convallis at posuere leo convallis. " +
-        "Sed blandit augue vitae augue scelerisque bibendum. " +
-        "Vivamus sit amet libero turpis, non venenatis urna. " +
-        "In blandit, odio convallis suscipit venenatis, ante " +
-        "ipsum cursus augue."
-}];
 
 export interface IParagraph {
     body : string;
@@ -101,9 +70,16 @@ var bindPath = (
                 var paragraphPromises = _.map(paragraphPaths, (path) => adhHttp.get(path));
 
                 return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
+                    var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
+                        return {
+                            body: paragraphVersion.data[SIParagraph.nick].text,
+                            path: paragraphVersion.path
+                        };
+                    });
+
                     scope.data = {
                         title: documentVersion.data[SIDocument.nick].title,
-                        paragraphs: dummydata,
+                        paragraphs: paragraphs,
                         commentCountTotal: 0
                     };
                 });
@@ -220,7 +196,9 @@ export var createDirective = (
             scope.errors = [];
             scope.data = {
                 title: "Toller Titel",
-                paragraphs: dummydata
+                paragraphs: [{
+                    body: ""
+                }]
             };
             scope.create = true;
             scope.showError = adhShowError;
