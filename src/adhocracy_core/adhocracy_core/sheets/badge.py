@@ -138,7 +138,6 @@ class BadgeAssignmentSchema(colander.MappingSchema):
     subject = Reference(reftype=BadgeSubjectReference)
     badge = Reference(reftype=BadgeReference)
     object = Reference(reftype=BadgeObjectReference)
-    description = Text()
 
 
 badge_assignment_meta = sheet_meta._replace(

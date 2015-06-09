@@ -90,7 +90,7 @@ class TestBadgeAssignmentsSheet:
         assert inst.get() == {'subject': None,
                               'badge': None,
                               'object': None,
-                              'description' : ''}
+                              }
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):

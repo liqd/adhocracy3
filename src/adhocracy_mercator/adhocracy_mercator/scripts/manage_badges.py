@@ -15,6 +15,7 @@ from substanced.util import find_service
 from adhocracy_core.utils import load_json
 from adhocracy_core.resources.badge import IBadgeAssignment as BadgeRessource
 from adhocracy_core.sheets.badge import IBadgeAssignment as BadgeSheet
+from adhocracy_core.sheets.description import IDescription
 
 
 def add_badge_assignment_from_json():
@@ -42,8 +43,10 @@ def _create_appstructs(subject, badge, object, description):
     appstructs = {BadgeSheet.__identifier__:
                   {'subject': subject,
                    'badge': badge,
-                   'object': object,
-                   'description': description}}
+                   'object': object
+                   }, IDescription.__identifier__:
+                  {'description': description}
+                  }
 
     return appstructs
 
