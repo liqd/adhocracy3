@@ -24,6 +24,8 @@ def add_mercator_process(context: IPool, registry: Registry, options: dict):
 def initialize_workflow(context: IPool, registry: Registry, options: dict):
     """Initialize mercator workflow."""
     root = context
+    # at this point the permissions are not setup so we need to add
+    # the god's permissions
     root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
     request = Request.blank('/dummy')
     request.root = root
