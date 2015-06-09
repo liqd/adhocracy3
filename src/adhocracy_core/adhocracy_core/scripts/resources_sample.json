@@ -11,7 +11,7 @@
      "data": {"adhocracy_core.sheets.geo.IMultiPolygon":
               {"coordinates": [[[[13.43965471730573, 52.489910057553196],
                                  [13.440449901319173, 52.48950315294476]]]],
-               "administrative_division": "bezirksregion42"},
+               "administrative_division": "landkreis"},
               "adhocracy_core.sheets.name.IName":
               {"name": "alt-treptow42"}}},
     {"path": "/principals/groups",
