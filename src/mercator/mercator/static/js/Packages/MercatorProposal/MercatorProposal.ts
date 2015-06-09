@@ -71,8 +71,9 @@ import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
-import IBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
+import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
 
 var pkgLocation = "/MercatorProposal";
 
@@ -306,8 +307,8 @@ var getBadges = (adhHttp : AdhHttp.Service<any>, proposal : any, list : BadgeAss
 
     _.forEach(proposal.data[SIBadgeable.nick].assignments, function(assignment) {
         adhHttp.get(<any>assignment).then((assignment) => {
-            var description = assignment.data[IBadgeAssignment.nick].description;
-            adhHttp.get(assignment.data[IBadgeAssignment.nick].badge).then((badge) => {
+            var description = assignment.data[SIDescription.nick].description;
+            adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
                 var title = badge.data[SITitle.nick].title;
                 var assignment = new BadgeAssignment(title, description);
                 list.push(assignment);
