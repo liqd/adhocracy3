@@ -96,9 +96,30 @@ def evolve4_disable_voting_and_commenting(root):
                 'edit_comment permissions')
 
 
+def change_mercator_type_to_iprocess(root):
+    """Change mercator type from IBasicPoolWithAssets to IProcess."""
+    from adhocracy_mercator.resources.mercator import IProcess
+    from pyramid.threadlocal import get_current_registry
+    from adhocracy_core import sheets
+
+    logger.info('Running evolve step:' + change_mercator_type_to_iprocess.__doc__)
+    registry = get_current_registry()
+    old_mercator = root['mercator']
+    root.rename('mercator', 'old_mercator')
+    appstructs = {sheets.name.IName.__identifier__: {'name': 'mercator'}}
+    new_mercator = registry.content.create(IProcess.__identifier__,
+                                           parent=root,
+                                           appstructs=appstructs)
+    for name in old_mercator.keys():
+        old_mercator.move(name, new_mercator)
+    root.remove('old_mercator')
+    logger.info('Finished evolve step:' + change_mercator_type_to_iprocess.__doc__)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
     config.add_evolution_step(evolve2_disable_add_proposal_permission)
     config.add_evolution_step(evolve3_use_adhocracy_core_title_sheet)
     config.add_evolution_step(evolve4_disable_voting_and_commenting)
+    config.add_evolution_step(change_mercator_type_to_iprocess)
