@@ -35,7 +35,7 @@ Create participation process structure/content to get started::
     >>> resp = participant.post('/organisation/process', prop).json
     >>> proposal_version = resp['first_version_path']
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal2'}}}
     >>> resp = participant.post('/organisation/process', prop).json
     >>> proposal2_version = resp['first_version_path']
