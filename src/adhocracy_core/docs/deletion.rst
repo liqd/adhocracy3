@@ -146,34 +146,11 @@ Lets create some content::
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
     >>> resp = admin.post("/pool1", data)
     >>> data = {'content_type': 'adhocracy_core.resources.document.IDocument',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}}
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'document_item'}}}
     >>> resp = participant.post("/pool1/child", data)
-    >>> proposal_item = resp.json['path']
-    >>> proposal_item_first_version = resp.json['first_version_path']
+    >>> document_item = resp.json['path']
+    >>> document_first_version = resp.json['first_version_path']
 
-    >>> data = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'section_item'},}
-    ...         }
-    >>> resp = participant.post(proposal_item, data)
-    >>> section_item = resp.json["path"]
-    >>> section_item_first_version = resp.json["first_version_path"]
-    >>> data = {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'paragraph_item'},}
-    ...         }
-    >>> resp = participant.post(proposal_item, data)
-    >>> paragraph_item = resp.json["path"]
-    >>> paragraph_item_first_version = resp.json["first_version_path"]
-    >>> data = {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
-    ...         'data': {
-    ...              'adhocracy_core.sheets.document.IParagraph': {
-    ...                  'elements': [paragraph_item_first_version]},
-    ...               'adhocracy_core.sheets.versions.IVersionable': {
-    ...                  'follows': [section_item_first_version]
-    ...                  }
-    ...          },
-    ...         }
-    >>> resp = participant.post(section_item, data)
-    >>> section_item_second_version = resp.json["path"]
 
 As expected, we can retrieve the pool and its child::
 
@@ -195,15 +172,15 @@ Lets check whether we have the permission to delete or hide resources.
 The person who has created a resource (creator role) has the right to delete
 it::
 
-    >>> resp = anonymous.get("/pool1/child/proposal_item").json
+    >>> resp = anonymous.get("/pool1/child/document_item").json
 
-    >>> resp = participant.options("/pool1/child/proposal_item").json
+    >>> resp = participant.options("/pool1/child/document_item").json
     >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata']
     {'deleted': [True, False]}
 
 But they cannot hide it -- that special right is reserved to managers::
 
-    >>> resp = moderator.options("/pool1/child/proposal_item").json
+    >>> resp = moderator.options("/pool1/child/document_item").json
     >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
     {'deleted': [True, False], 'hidden': [True, False]}
 
@@ -265,31 +242,25 @@ private and cannot be directly queried from the frontend::
     >>> resp.json['errors'][0]['description']
     'No such catalog'
 
-Lets hide an item with referenced item versions. Prior to doing so, lets check
+Lets hide an item with referenced resources. Prior to doing so, lets check
 that there actually is a listed version::
 
-    >>> resp = anonymous.get(paragraph_item_first_version)
-    >>> resp.json['data']['adhocracy_core.sheets.document.IParagraph']['elements_backrefs']
-    ['http://localhost/adhocracy/pool1/child/proposal_item/section_item/VERSION_0000001/']
+    >>> resp = anonymous.get(document_item)
+    >>> resp.json['data']['adhocracy_core.sheets.metadata.IMetadata']['creator']
+    'http://localhost/principals/users/0000001/'
 
 Now we hide the item::
 
     >>> data = {'content_type': 'adhocracy_core.resources.document.IDocumentItem',
     ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
     ...                      {'hidden': True}}}
-    >>> resp = moderator.put(section_item, data)
+    >>> resp = moderator.put(document_item, data)
     >>> resp.status
     '200 OK'
 
-The paragraph version that was referenced from the now hidden section version
-is affected by this change since its backreferences have changed. Therefore,
-it shows up in the list of modified resources::
+The referenced user resource is affected by this change since its
+back references have changed. Therefore, it shows up in the list of modified
+resources::
 
-    >>> paragraph_item_first_version in resp.json['updated_resources']['modified']
+    >>> 'http://localhost/principals/users/0000001/' in resp.json['updated_resources']['modified']
     True
-
-Now the hidden item versions are removed from backreference listings:
-
-    >>> resp = anonymous.get(paragraph_item_first_version)
-    >>> resp.json['data']['adhocracy_core.sheets.document.IParagraph']['elements_backrefs']
-    []

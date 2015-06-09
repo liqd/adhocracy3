@@ -16,11 +16,19 @@ def test_paragraph_meta():
     from .paragraph import IParagraphVersion
     from .paragraph import IParagraph
     from .tag import ITag
+    from adhocracy_core import sheets
     meta = paragraph_meta
     assert meta.iresource is IParagraph
     assert meta.element_types == [ITag, IParagraphVersion]
     assert meta.item_type == IParagraphVersion
+    assert meta.basic_sheets == [sheets.tags.ITags,
+                                 sheets.versions.IVersions,
+                                 sheets.pool.IPool,
+                                 sheets.metadata.IMetadata,
+                                 ]
     assert meta.permission_create == 'edit_proposal'
+    assert meta.use_autonaming
+    assert meta.autonaming_prefix == 'PARAGRAPH_'
 
 
 @fixture
@@ -42,10 +50,7 @@ class TestParagraph:
 
     def test_create_paragraph(self, context, registry):
         from adhocracy_core.resources.paragraph import IParagraph
-        from adhocracy_core.sheets.name import IName
-        appstructs = {IName.__identifier__: {'name': 'name1'}}
         res = registry.content.create(IParagraph.__identifier__,
-                                      appstructs=appstructs,
                                       parent=context)
         assert IParagraph.providedBy(res)
 
