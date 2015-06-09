@@ -107,7 +107,7 @@ var postCreate = (
 ) => (
     scope : IFormScope,
     poolPath : string
-) => {
+) : angular.IPromise<RIDocumentVersion> => {
     var doc = new RIDocument({preliminaryNames: adhPreliminaryNames});
     doc.parent = poolPath;
     doc.data[SIName.nick] = new SIName.Sheet({
@@ -145,7 +145,8 @@ var postCreate = (
         elements: <string[]>_.map(paragraphVersions, "path")
     });
 
-    return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]));
+    return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
+        .then((result) => result[1]);
 };
 
 var postEdit = (
@@ -155,7 +156,7 @@ var postEdit = (
     scope : IFormScope,
     oldVersion : RIDocumentVersion,
     oldParagraphVersions : RIParagraphVersion[]
-) => {
+) : angular.IPromise<RIDocumentVersion> => {
     // This function assumes that paragraphs can not be reordered or deleted
     // and that new paragraphs are always appended to the end.
 
@@ -216,7 +217,8 @@ var postEdit = (
         elements: paragraphRefs
     });
 
-    return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]));
+    return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
+        .then((result) => result[0]);
 };
 
 
@@ -263,12 +265,13 @@ export var listItemDirective = (
 };
 
 export var createDirective = (
+    $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
-    adhSubmitIfValid
+    adhSubmitIfValid,
+    adhResourceUrlFilter
 ) => {
     return {
         restrict: "E",
@@ -296,19 +299,24 @@ export var createDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.spdDocumentForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
-                }).then((r) => console.log(r));
+                }).then((documentVersion : RIDocumentVersion) => {
+                    var itemPath = AdhUtil.parentPath(documentVersion.path);
+                    $location.url(adhResourceUrlFilter(itemPath));
+                });
             };
         }
     };
 };
 
 export var editDirective = (
+    $location : angular.ILocationService,
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
-    adhSubmitIfValid
+    adhSubmitIfValid,
+    adhResourceUrlFilter
 ) => {
     return {
         restrict: "E",
@@ -332,7 +340,10 @@ export var editDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.spdDocumentForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
-                }).then((r) => console.log(r));
+                }).then((documentVersion : RIDocumentVersion) => {
+                    var itemPath = AdhUtil.parentPath(documentVersion.path);
+                    $location.url(adhResourceUrlFilter(itemPath));
+                });
             };
         }
     };
@@ -364,9 +375,24 @@ export var register = (angular) => {
         .directive("adhSpdDocumentDetail", [
             "$q", "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
         .directive("adhSpdDocumentCreate", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
+            "$location",
+            "adhConfig",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            createDirective])
         .directive("adhSpdDocumentEdit", [
-            "$q", "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", editDirective])
+            "$location",
+            "$q",
+            "adhConfig",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhResourceUrlFilter",
+            editDirective])
         .directive("adhSpdDocumentListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", listItemDirective]);
 };
