@@ -6,7 +6,6 @@ import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IPredicateSheet
-from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import IRateValidator
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
@@ -15,9 +14,8 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.schema import UniqueReferences
-from adhocracy_core.sheets import sheet_meta
-from adhocracy_core.schema import PostPoolMappingSchema
 from adhocracy_core.schema import PostPool
+from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.utils import get_user
 
 
@@ -26,7 +24,7 @@ class IRate(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the rate sheet."""
 
 
-class IRateable(IPostPoolSheet, ISheetReferenceAutoUpdateMarker):
+class IRateable(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for resources that can be rated."""
 
@@ -111,8 +109,6 @@ class RateSchema(colander.MappingSchema):
         """
         Validate the rate.
 
-        This performs 3 checks:
-
         1. Validate that the subject is the user who is currently logged-in.
 
         2. Ensure that no other rate for the same subject/object combination
@@ -122,6 +118,8 @@ class RateSchema(colander.MappingSchema):
            In this way, `IRateable` subclasses can modify the range of allowed
            ratings by registering their own `IRateValidator` adapter.
         """
+        # TODO make this validator deferred
+        # TODO add post_pool validator
         request = node.bindings['request']
         self._validate_subject_is_current_user(node, value, request)
         self._ensure_rate_is_unique(node, value, request)
@@ -176,7 +174,7 @@ can_rate_meta = sheet_meta._replace(isheet=ICanRate,
                                     schema_class=CanRateSchema)
 
 
-class RateableSchema(PostPoolMappingSchema):
+class RateableSchema(colander.MappingSchema):
 
     """Commentable sheet data structure.
 

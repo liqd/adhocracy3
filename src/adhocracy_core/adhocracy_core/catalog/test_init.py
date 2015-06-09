@@ -88,11 +88,6 @@ class TestCatalogsServiceAdhocracy:
     def pool(self, pool_graph):
         return pool_graph
 
-    @fixture
-    def query(self):
-        from adhocracy_core.interfaces import search_query
-        return search_query
-
     def _make_resource(self, registry, parent=None, iresource=None):
         from datetime import datetime
         from adhocracy_core.interfaces import IPool

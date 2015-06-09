@@ -10,6 +10,7 @@ import re
 from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
+from pyramid.traversal import lineage
 from pyramid import security
 from pyramid.traversal import find_interface
 from substanced.file import File
@@ -29,7 +30,6 @@ from adhocracy_core.utils import now
 from adhocracy_core.interfaces import SheetReference
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import IPostPoolSheet
 
 
 class AdhocracySchemaNode(colander.SchemaNode):
@@ -639,13 +639,6 @@ class DateTime(AdhocracySchemaNode):
     missing = deferred_date_default
 
 
-def _get_post_pool(context: IPool, iresource_or_service_name) -> IResource:
-    if IInterface.providedBy(iresource_or_service_name):
-        return find_interface(context, iresource_or_service_name)
-    else:
-        return find_service(context, iresource_or_service_name)
-
-
 @colander.deferred
 def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
     """Return the post_pool path for the given `context`.
@@ -659,6 +652,20 @@ def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
     if post_pool is None:
         context_path = resource_path(context)
         post_pool_type = str(node.iresource_or_service_name)
+        msg = 'Cannot find post_pool with interface or service name {}'\
+              ' for context {}.'.format(post_pool_type, context_path)
+        raise RuntimeConfigurationError(msg)
+    return post_pool
+
+
+def _get_post_pool(context: IPool, iresource_or_service_name) -> IResource:
+    if IInterface.providedBy(iresource_or_service_name):
+        post_pool = find_interface(context, iresource_or_service_name)
+    else:
+        post_pool = find_service(context, iresource_or_service_name)
+    if post_pool is None:
+        context_path = resource_path(context)
+        post_pool_type = str(iresource_or_service_name)
         msg = 'Cannot find post_pool with interface or service name {}'\
               ' for context {}.'.format(post_pool_type, context_path)
         raise RuntimeConfigurationError(msg)
@@ -687,85 +694,42 @@ class PostPool(Reference):
     iresource_or_service_name = IPool
 
 
-@colander.deferred
-def deferred_validate_references_post_pool(node: colander.SchemaNode,
-                                           kw: dict) -> callable:
-    """Validate the :term:`post_pool` for all reference children of `node`."""
-    context = kw.get('context')
-    request = kw.get('request', None)
-    if request is None:
-        return None
-    reference_nodes = _get_reference_childs(node)
-    validators = []
-    registry = request.registry
-    for child in reference_nodes:
-        _add_post_pool_validator(node, child, context, validators)
-        _add_referenced_post_pool_validator(node, child, validators, registry)
-    return colander.All(*validators)
+def create_post_pool_validator(child_node: Reference, kw: dict) -> callable:
+    """Create validator to check `kw['context']` is inside :term:`post_pool`.
+
+    :param:`child_node` Reference to a sheet with :term:`post_pool` field.
+    :param:`kw`: dictionary with keys `context` and `registry`.
+    """
+    isheet = child_node.reftype.getTaggedValue('target_isheet')
+    context = kw['context']
+    registry = kw['registry']
+
+    def validator(node, value):
+        child_node_value = node.get_value(value, child_node.name)
+        referenced = normalize_to_tuple(child_node_value)
+        for resource in referenced:
+            sheet = get_sheet(resource, isheet, registry=registry)
+            post_pool_type = _get_post_pool_type(sheet.schema)
+            post_pool = _get_post_pool(resource, post_pool_type)
+            _validate_post_pool(node, (context,), post_pool)
+
+    return validator
 
 
-def _get_reference_childs(node):
-    for child in node:
-        if isinstance(child, PostPool):
-            continue
-        if isinstance(child, (Reference, References)):
-            yield child
-
-
-def _add_post_pool_validator(node, child, context, validators):
-    post_pool = _get_post_pool_from_node(node, context)
-
-    def validate_node(node, value):
-        references = node.get_value(value, child.name)
-        references = normalize_to_tuple(references)
-        _validate_post_pool(child, references, post_pool)
-
-    if post_pool is not None:
-        validators.append(validate_node)
-
-
-def _add_referenced_post_pool_validator(node, child, validators, registry):
-    referenced_isheet = child.reftype.getTaggedValue('target_isheet')
-
-    def validate_node(node, value):
-        references = node.get_value(value, child.name)
-        references = normalize_to_tuple(references)
-        for reference in references:
-            sheet = get_sheet(reference, referenced_isheet, registry=registry)
-            post_pool = _get_post_pool_from_node(sheet.schema, reference)
-            _validate_post_pool(child, (reference,), post_pool)
-
-    if referenced_isheet.isOrExtends(IPostPoolSheet):
-        validators.append(validate_node)
-
-
-def _get_post_pool_from_node(node, context):
+def _get_post_pool_type(node: colander.SchemaNode) -> str:
     post_pool_nodes = [child for child in node if isinstance(child, PostPool)]
-    for child in post_pool_nodes:
-        type = child.iresource_or_service_name
-        return _get_post_pool(context, type)
+    if post_pool_nodes == []:
+        return None
+    return post_pool_nodes[0].iresource_or_service_name
 
 
-def _validate_post_pool(node, references: list, post_pool: IPool):
-    post_pool_path = resource_path(post_pool)
-    for reference in references:
-        if reference.__parent__ is post_pool:
+def _validate_post_pool(node, resources: list, post_pool: IPool):
+    for resource in resources:
+        if post_pool in lineage(resource):
             continue
+        post_pool_path = resource_path(post_pool)
         msg = 'You can only add references inside {}'.format(post_pool_path)
         raise colander.Invalid(node, msg)
-
-
-class PostPoolMappingSchema(colander.MappingSchema):
-
-    """Check that the referenced nodes respect the :term:`post_pool`.
-
-    To validate `references` (:class:`adhocracy_core.schemas.Reference`) you
-    need to add a :class:`adhocracy_core.schema.PostPool` node to this schema.
-    To validate `back_references` the referenced sheet needs to be a subtype
-    of :class:`adhocracy_core.interfaces.IPostPoolSheet in addition.
-    """
-
-    validator = deferred_validate_references_post_pool
 
 
 class Integer(AdhocracySchemaNode):
