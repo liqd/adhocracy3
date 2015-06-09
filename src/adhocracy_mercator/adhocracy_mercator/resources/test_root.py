@@ -4,6 +4,7 @@ from pytest import mark
 
 @fixture
 def integration(config, pool_graph_catalog):
+    config.include('pyramid_mailer.testing')
     config.include('adhocracy_mercator')
 
 
@@ -11,10 +12,12 @@ def test_root_meta():
     from adhocracy_core.resources.root import root_meta
     from adhocracy_core.resources.root import \
         create_initial_content_for_app_root
+    from adhocracy_core.resources.root import add_example_process
     from .root import add_mercator_process
     from .root import mercator_root_meta
     assert add_mercator_process not in root_meta.after_creation
     assert add_mercator_process in mercator_root_meta.after_creation
+    assert add_example_process in mercator_root_meta.after_creation
     assert create_initial_content_for_app_root in \
         mercator_root_meta.after_creation
 

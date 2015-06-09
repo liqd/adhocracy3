@@ -39,6 +39,16 @@ def test_reindex_rate_index(event, catalog):
     catalog.reindex_index.assert_called_with(event.object, 'rates')
 
 
+def test_reindex_badge_index(event, catalog, mock_sheet, registry_with_content):
+    from .subscriber import reindex_badge
+    badgeable = testing.DummyResource()
+    mock_sheet.get.return_value = {'object': badgeable}
+    registry_with_content.content.get_sheet.return_value = mock_sheet
+    event.registry = registry_with_content
+    reindex_badge(event)
+    catalog.reindex_index.assert_called_with(badgeable, 'badge')
+
+
 @fixture
 def mock_reindex(monkeypatch):
     from . import subscriber
@@ -141,5 +151,6 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_tag.__name__ in handlers
     assert subscriber.reindex_visibility.__name__ in handlers
     assert subscriber.reindex_rate.__name__ in handlers
+    assert subscriber.reindex_badge.__name__ in handlers
 
 

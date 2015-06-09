@@ -835,6 +835,67 @@ class TestItemRESTView:
         assert wanted == response
 
 
+class TestBadgeAssignmentsRESTView:
+
+    @fixture
+    def registry(self, mock_content_registry):
+        return mock_content_registry
+
+    @fixture
+    def request_(self, cornice_request, registry):
+        cornice_request.registry.content = registry
+        return cornice_request
+
+    @fixture
+    def assignment_sheet(self, mock_sheet):
+        from copy import deepcopy
+        from adhocracy_core.sheets.badge import IBadgeAssignment
+        sheet = deepcopy(mock_sheet)
+        sheet.meta = sheet.meta._replace(isheet=IBadgeAssignment)
+        return sheet
+
+    @fixture
+    def mock_get_assignables(self, monkeypatch):
+        from adhocracy_core.rest import views
+        mock = Mock(spec=views.get_assignable_badges)
+        monkeypatch.setattr(views, 'get_assignable_badges', mock)
+        return mock
+
+    @fixture
+    def inst(self, context, request_):
+        from adhocracy_core.rest.views import BadgeAssignmentsRESTView
+        inst = BadgeAssignmentsRESTView(context, request_)
+        return inst
+
+    def test_create(self, inst):
+        from adhocracy_core.rest.views import PoolRESTView
+        assert isinstance(inst, PoolRESTView)
+
+    def test_options_ignore_if_no_postable_resources(self, inst):
+        response = inst.options()
+        assert response == {'HEAD': {}, 'OPTIONS': {}}
+
+    def test_options_ignore_if_no_postable_assignments_sheets(
+            self, inst, registry, resource_meta,  mock_sheet):
+        registry.get_resources_meta_addable.return_value = [resource_meta]
+        registry.get_sheets_create.return_value = [mock_sheet]
+        response = inst.options()
+        assert response['POST']['request_body'][0]['data'] ==\
+            {'adhocracy_core.interfaces.ISheet': {}}
+
+    def test_options_add_assignable_badges(
+            self, inst, registry, resource_meta, assignment_sheet,
+            mock_get_assignables):
+        registry.get_resources_meta_addable.return_value = [resource_meta]
+        registry.get_sheets_create.return_value = [assignment_sheet]
+        badge = testing.DummyResource()
+        mock_get_assignables.return_value = [badge]
+        response = inst.options()
+        assert response['POST']['request_body'][0]['data'] ==\
+            {'adhocracy_core.sheets.badge.IBadgeAssignment':
+                 {'badge': ['http://example.com/']}}
+
+
 class TestMetaApiView:
 
     @fixture

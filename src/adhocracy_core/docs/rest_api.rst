@@ -1493,6 +1493,9 @@ custom filters:
   user resource url.
   Supports sorting.
 
+* *badge* the badge names of resources with :class:`adhocracy_core.sheets.badge.IBadgeable`
+  sheet.
+
 *<package.sheets.sheet.ISheet:FieldName>* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
 the isheet plus the field name separated by ':' The value is the wanted

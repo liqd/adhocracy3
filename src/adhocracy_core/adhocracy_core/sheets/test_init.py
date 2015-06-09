@@ -169,7 +169,7 @@ class TestBaseResourceSheet:
         query = search_query._replace(references=[reference],
                                       resolve=True,
                                       )
-        sheet_catalogs.search.assert_called_with(query)
+        sheet_catalogs.search.call_args[0] == query
         assert appstruct['references'] == [source]
 
     def test_get_omit_valid_back_references(self, inst, context, sheet_catalogs,
@@ -215,7 +215,7 @@ class TestBaseResourceSheet:
         query = search_query._replace(references=[reference],
                                       resolve=True,
                                       )
-        sheet_catalogs.search.assert_called_with(query)
+        sheet_catalogs.search.call_args[0] == query
         assert appstruct['reference'] == target
 
     def test_get_valid_back_reference(self, inst, context, sheet_catalogs,

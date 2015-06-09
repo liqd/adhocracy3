@@ -29,20 +29,6 @@ A high-level section of a document with its own heading.
 }
 
 .chapter {
-    .chapter-header {
-        color: $color-text-introvert;
-        margin: 0 0 1em;
-
-        &.active {
-            color: $color-text-highlight-normal;
-        }
-
-        &.m-counted:before {
-            content: counter(chapter-counter) ". ";
-            counter-increment: chapter-counter;
-        }
-    }
-
     @media print {
         border: 0;
         margin: 0;
@@ -50,5 +36,19 @@ A high-level section of a document with its own heading.
         .chapter-header:before {
             display: none;
         }
+    }
+}
+
+.chapter-header {
+    color: $color-text-introvert;
+    margin: 0 0 1em;
+
+    &.active {
+        color: $color-text-highlight-normal;
+    }
+
+    &.m-counted:before {
+        content: counter(chapter-counter) ". ";
+        counter-increment: chapter-counter;
     }
 }

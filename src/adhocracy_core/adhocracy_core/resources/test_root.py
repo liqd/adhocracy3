@@ -16,6 +16,7 @@ def test_root_meta():
 
 @fixture
 def integration(config):
+    config.include('pyramid_mailer.testing')
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.changelog')

@@ -43,7 +43,6 @@ import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProcess = require("./Packages/Process/Process");
-import AdhProposal = require("./Packages/Proposal/Proposal");
 import AdhRate = require("./Packages/Rate/Rate");
 import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
@@ -91,7 +90,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhResourceArea.moduleName,
-        AdhProposal.moduleName,
         AdhSticky.moduleName,
         AdhTracking.moduleName,
         AdhUserViews.moduleName,
@@ -175,7 +173,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
-    AdhProposal.register(angular);
     AdhProcess.register(angular);
     AdhRate.register(angular);
     AdhAngularHelpers.register(angular);
