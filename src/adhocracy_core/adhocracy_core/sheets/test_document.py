@@ -31,7 +31,6 @@ class TestDocumentSheet:
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'title': '',
-                              'description': '',
                               'elements': []}
 
     @mark.usefixtures('integration')

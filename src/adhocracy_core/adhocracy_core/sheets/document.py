@@ -40,12 +40,10 @@ class DocumentSchema(colander.MappingSchema):
     """Document sheet data structure.
 
     `title`: one line title
-    `description`: summary text
     `elements`: structural subelements like sections
     """
 
     title = SingleLine()
-    description = Text()
     elements = UniqueReferences(reftype=DocumentElementsReference)
 
 
