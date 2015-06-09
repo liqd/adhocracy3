@@ -77,6 +77,7 @@ badge_assignment_meta = simple_meta._replace(
     basic_sheets=[
         adhocracy_core.sheets.metadata.IMetadata,
         adhocracy_core.sheets.badge.IBadgeAssignment,
+        adhocracy_core.sheets.description.IDescription
     ],
     autonaming_prefix='',
     use_autonaming=True,

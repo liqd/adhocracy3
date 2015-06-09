@@ -19,6 +19,7 @@ import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
+import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorDescription = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescription");
 import RIMercatorDescriptionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescriptionVersion");
@@ -47,7 +48,10 @@ import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/res
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
+import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
+import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
+import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
 import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
 import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
@@ -162,6 +166,9 @@ export interface IScopeData {
         other_specify : string;
     };
     accept_disclaimer : string;
+
+    // 7. badges
+    assignments : BadgeAssignment[];
 }
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
@@ -287,6 +294,28 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
         });
 };
 
+export class BadgeAssignment {
+    constructor(
+        private title : string,
+        private description : string
+    ) {}
+}
+
+var getBadges = (
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (proposal : ResourcesBase.Resource) : angular.IPromise<BadgeAssignment[]> => {
+    return $q.all(_.map(proposal.data[SIBadgeable.nick].assignments, (assignmentPath : string) => {
+        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
+            var description = assignment.data[SIDescription.nick].description;
+            return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
+                var title = badge.data[SITitle.nick].title;
+                return new BadgeAssignment(title, description);
+            });
+        });
+    }));
+};
+
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
         public adhConfig : AdhConfig.IService,
@@ -297,7 +326,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         private moment : moment.MomentStatic,
         private $window : Window,
         private $location : angular.ILocationService,
-        $q : angular.IQService
+        public $q : angular.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ListItem.html";
@@ -374,6 +403,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.description = data.description || <any>{};
         data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
+        data.assignments = data.assignments || [];
 
         return data;
     }
@@ -404,7 +434,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
         data.title = mercatorProposalVersion.data[SITitle.nick].title;
 
-
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
         if (typeof heardFrom !== "undefined") {
             data.heard_from = {
@@ -425,6 +454,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.supporterCount = 0;
         countSupporters(this.adhHttp, mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
             .then((count : number) => { data.supporterCount = count; });
+
+        getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
+            data.assignments = assignments;
+        });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -900,7 +933,12 @@ export var userListing = (adhConfig : AdhConfig.IService) => {
 };
 
 
-export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>, adhTopLevelState : AdhTopLevelState.Service) => {
+export var listItem = (
+    $q : angular.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
@@ -935,6 +973,11 @@ export var listItem = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service
                         requested_funding: finance.data[SIMercatorFinance.nick].requested_funding
                     };
                 });
+
+                getBadges(adhHttp, $q)(proposal).then((assignments) => {
+                    scope.data.assignments = assignments;
+                });
+
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
                         scope.selectedState = "";
@@ -1184,7 +1227,7 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhTopLevelState", listItem])
+        .directive("adhMercatorProposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", listItem])
         .directive("adhMercatorProposalDetailView",
             ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$window", "$location", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q) => {

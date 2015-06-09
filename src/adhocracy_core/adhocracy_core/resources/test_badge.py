@@ -99,6 +99,7 @@ class TestBadgeAssignment:
         assert meta.iresource is resources.badge.IBadgeAssignment
         assert meta.basic_sheets == [sheets.metadata.IMetadata,
                                      sheets.badge.IBadgeAssignment,
+                                     sheets.description.IDescription
                                     ]
         assert meta.permission_create == 'create_badge_assignment'
         assert meta.use_autonaming
