@@ -7,9 +7,9 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.root import root_meta
 from adhocracy_core.resources.root import create_initial_content_for_app_root
 from adhocracy_core.schema import ACM
+from adhocracy_core.workflows import setup_workflow
 from adhocracy_core import sheets
 from adhocracy_mercator.resources.mercator import IProcess
-from pyramid.request import Request
 from pyramid.security import ALL_PERMISSIONS
 
 
@@ -27,15 +27,10 @@ def initialize_workflow(context: IPool, registry: Registry, options: dict):
     # at this point the permissions are not setup so we need to add
     # the god's permissions
     root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
-    request = Request.blank('/dummy')
-    request.root = root
-    request.registry = registry
-    request.__cached_principals__ = ['role:god']
+    mercator_workflow = registry.content.workflows['mercator']
     mercator_process = root['mercator']
-    workflow = registry.content.workflows['mercator']
-    workflow.initialize(mercator_process)
-    workflow.transition_to_state(mercator_process, request, 'announce')
-    workflow.transition_to_state(mercator_process, request, 'participate')
+    setup_workflow(mercator_workflow, mercator_process,
+                   ['announce', 'participate'], registry)
 
 
 mercator_acm = ACM().deserialize(
