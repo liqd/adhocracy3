@@ -36,7 +36,9 @@ export var dummydata : IParagraph[] = [{
         "Sed blandit augue vitae augue scelerisque bibendum. " +
         "Vivamus sit amet libero turpis, non venenatis urna. " +
         "In blandit, odio convallis suscipit venenatis, ante " +
-        "ipsum cursus augue."
+        "ipsum cursus augue.",
+    commentCount: 5,
+    path: "/adhocracy/Toller_Titel/PARAGRAPH_0000001/VERSION_0000001"
 }, {
      body: "## Toll \n\n Lorem ipsum dolor sit amet, " +
         "consectetur adipiscing elit. Phasellus quis " +
@@ -60,6 +62,7 @@ export var dummydata : IParagraph[] = [{
 export interface IParagraph {
     body : string;
     commentCount? : number;
+    path? : string;
 }
 
 export interface IScope extends angular.IScope {
