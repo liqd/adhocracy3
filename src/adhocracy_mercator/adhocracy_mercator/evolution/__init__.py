@@ -2,10 +2,12 @@
 import logging  # pragma: no cover
 from substanced.util import find_catalog  # pragma: no cover
 from adhocracy_core.evolution import migrate_new_sheet
+from adhocracy_core.evolution import migration_script
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
 
+@migration_script
 def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
     """Migrate title value from ole IIntroduction sheet to ITitle sheet."""
     from pyramid.threadlocal import get_current_registry
@@ -15,7 +17,6 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
     from adhocracy_mercator.sheets.mercator import IIntroduction
     from zope.interface import alsoProvides
     from adhocracy_core.utils import get_sheet_field
-    logger.info('Running substanced evolve step 1: add new ITitle sheet')
     registry = get_current_registry()
     catalog = find_catalog(root, 'system')
     path = catalog['path']
@@ -37,18 +38,15 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         title = registry.content.get_sheet(proposal, ITitle)
         title.set({'title': value})
         del introduction._sheets[IIntroduction.__identifier__]['title']
-    logger.info('Finished substanced evolve step 1: add new ITitle sheet')
 
 
+@migration_script
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     """Disable add_proposal permissions."""
     from adhocracy_core.authorization import set_acl
     from substanced.util import get_acl
     from pyramid.threadlocal import get_current_registry
     from pyramid.security import Deny
-
-    logger.info('Running substanced evolve step 2:'
-                'remove add_proposal permission')
 
     registry = get_current_registry()
     acl = get_acl(root)
@@ -57,10 +55,8 @@ def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     updated_acl = deny_acl + acl
     set_acl(root, updated_acl, registry=registry)
 
-    logger.info('Finished substanced evolve step 2:'
-                'remove add_proposal permission')
 
-
+@migration_script
 def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
     """Migrate mercator title sheet to adhocracy_core title sheet."""
     from adhocracy_core.sheets.title import ITitle
@@ -71,16 +67,13 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
                       fields_mapping=[('title', 'title')])
 
 
+@migration_script
 def evolve4_disable_voting_and_commenting(root):
     """Disable rate and comment permissions."""
     from adhocracy_core.authorization import set_acl
     from substanced.util import get_acl
     from pyramid.threadlocal import get_current_registry
     from pyramid.security import Deny
-
-    logger.info('Running substanced evolve step 3:'
-                'remove add_rate, edit_rate, add_comment and'
-                'edit_comment permissions')
 
     registry = get_current_registry()
     acl = get_acl(root)
@@ -91,18 +84,14 @@ def evolve4_disable_voting_and_commenting(root):
     updated_acl = deny_acl + acl
     set_acl(root, updated_acl, registry=registry)
 
-    logger.info('Finished substanced evolve step 3:'
-                'remove add_rate, edit_rate, add_comment and'
-                'edit_comment permissions')
 
-
+@migration_script
 def change_mercator_type_to_iprocess(root):
     """Change mercator type from IBasicPoolWithAssets to IProcess."""
     from adhocracy_mercator.resources.mercator import IProcess
     from pyramid.threadlocal import get_current_registry
     from adhocracy_core import sheets
 
-    logger.info('Running evolve step:' + change_mercator_type_to_iprocess.__doc__)
     registry = get_current_registry()
     old_mercator = root['mercator']
     root.rename('mercator', 'old_mercator')
@@ -113,7 +102,6 @@ def change_mercator_type_to_iprocess(root):
     for name in old_mercator.keys():
         old_mercator.move(name, new_mercator)
     root.remove('old_mercator')
-    logger.info('Finished evolve step:' + change_mercator_type_to_iprocess.__doc__)
 
 
 def includeme(config):  # pragma: no cover

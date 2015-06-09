@@ -90,6 +90,7 @@ def _migrate_field_values(registry: Registry, resource: IResource,
     sheet.set(appstruct)
 
 
+@migration_script
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
     migrate_new_sheet(root, IBasicPool, ITitle, IPool,
@@ -98,10 +99,9 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
                       remove_isheet_old=False)
 
 
+@migration_script
 def add_kiezkassen_permissions(root):
     """Add permission to use the kiezkassen process."""
-    logger.info('Running evolve step:' + add_kiezkassen_permissions.__doc__)
-
     registry = get_current_registry()
     acl = get_acl(root)
     new_acl = [(Allow, 'role:contributor', 'add_kiezkassen_proposal'),
@@ -111,13 +111,10 @@ def add_kiezkassen_permissions(root):
     updated_acl = acl + new_acl
     set_acl(root, updated_acl, registry=registry)
 
-    logger.info('Finished evolve step:' + add_kiezkassen_permissions.__doc__)
 
-
+@migration_script
 def upgrade_catalogs(root):
     """Upgrade catalogs."""
-    logger.info('Running evolve step:' + upgrade_catalogs.__doc__)
-
     registry = get_current_registry()
     old_catalogs = root['catalogs']
 
@@ -136,8 +133,6 @@ def upgrade_catalogs(root):
 
     catalogs.reindex_all(catalogs['system'])
     catalogs.reindex_all(catalogs['adhocracy'])
-
-    logger.info('Finished evolve step:' + upgrade_catalogs.__doc__)
 
 
 def includeme(config):  # pragma: no cover
