@@ -29,32 +29,32 @@ var pkgLocation = "/spdDocument";
 
 // FIXME: Can be removed when we work with real data
 export var dummydata : IParagraph[] = [{
-   body: "## Hallo \n\n Lorem ipsum dolor sit amet, " +
-       "consectetur adipiscing elit. Phasellus quis " +
-       "lectus metus, at posuere neque. Sed pharetra " +
-       "nibh eget orci convallis at posuere leo convallis. " +
-       "Sed blandit augue vitae augue scelerisque bibendum. " +
-       "Vivamus sit amet libero turpis, non venenatis urna. " +
-       "In blandit, odio convallis suscipit venenatis, ante " +
-       "ipsum cursus augue."
+    body: "## Hallo \n\n Lorem ipsum dolor sit amet, " +
+        "consectetur adipiscing elit. Phasellus quis " +
+        "lectus metus, at posuere neque. Sed pharetra " +
+        "nibh eget orci convallis at posuere leo convallis. " +
+        "Sed blandit augue vitae augue scelerisque bibendum. " +
+        "Vivamus sit amet libero turpis, non venenatis urna. " +
+        "In blandit, odio convallis suscipit venenatis, ante " +
+        "ipsum cursus augue."
 }, {
-    body: "## Toll \n\n Lorem ipsum dolor sit amet, " +
-       "consectetur adipiscing elit. Phasellus quis " +
-       "lectus metus, at posuere neque. Sed pharetra " +
-       "nibh eget orci convallis at posuere leo convallis. " +
-       "Sed blandit augue vitae augue scelerisque bibendum. " +
-       "Vivamus sit amet libero turpis, non venenatis urna. " +
-       "In blandit, odio convallis suscipit venenatis, ante " +
-       "ipsum cursus augue."
+     body: "## Toll \n\n Lorem ipsum dolor sit amet, " +
+        "consectetur adipiscing elit. Phasellus quis " +
+        "lectus metus, at posuere neque. Sed pharetra " +
+        "nibh eget orci convallis at posuere leo convallis. " +
+        "Sed blandit augue vitae augue scelerisque bibendum. " +
+        "Vivamus sit amet libero turpis, non venenatis urna. " +
+        "In blandit, odio convallis suscipit venenatis, ante " +
+        "ipsum cursus augue."
 }, {
-    body: "## Klasse! \n\n Lorem ipsum dolor sit amet," +
-       "consectetur adipiscing elit. Phasellus quis " +
-       "lectus metus, at posuere neque. Sed pharetra " +
-       "nibh eget orci convallis at posuere leo convallis. " +
-       "Sed blandit augue vitae augue scelerisque bibendum. " +
-       "Vivamus sit amet libero turpis, non venenatis urna. " +
-       "In blandit, odio convallis suscipit venenatis, ante " +
-       "ipsum cursus augue."
+     body: "## Klasse! \n\n Lorem ipsum dolor sit amet," +
+        "consectetur adipiscing elit. Phasellus quis " +
+        "lectus metus, at posuere neque. Sed pharetra " +
+        "nibh eget orci convallis at posuere leo convallis. " +
+        "Sed blandit augue vitae augue scelerisque bibendum. " +
+        "Vivamus sit amet libero turpis, non venenatis urna. " +
+        "In blandit, odio convallis suscipit venenatis, ante " +
+        "ipsum cursus augue."
 }];
 
 export interface IParagraph {
