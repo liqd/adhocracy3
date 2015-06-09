@@ -1,7 +1,6 @@
 include RELEASE-VERSION version.py
 recursive-include src/pcompass/build *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
-global-exclude *Ig.js
 prune src/pcompass/build/styleguide
 prune src/pcompass/build/lib/DefinitelyTyped
 prune src/pcompass/build/lib/q

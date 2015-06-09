@@ -1,0 +1,31 @@
+.meta-list-item {
+    &:last-child {
+        float: right;
+        margin-right: 0;
+
+        @media print {
+            float: none;
+        }
+    }
+}
+
+.mercator-proposal-list-item-meta-list {
+    padding-bottom: 0;
+
+    .meta-list-item-budget {
+        color: $color-text-highlight-normal;
+        font-size: $font-size-plus;
+    }
+
+    .meta-list-item-supporters {
+        i {
+            color: $color-brand-one-normal;
+        }
+    }
+
+    .meta-list-item-total-comments {
+        i {
+            color: $color-brand-three-normal;
+        }
+    }
+}

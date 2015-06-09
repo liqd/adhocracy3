@@ -1,0 +1,56 @@
+/*doc
+---
+title: Meta List
+name: meta-list
+category: Widgets
+---
+
+A Meta list of items, often with icons
+
+```html_example
+<ul class="meta-list">
+    <li class="meta-list-item">
+        <i class="icon-speechbubbles"></i>
+        12 Comments
+    </li>
+    <li class="meta-list-item">
+        <i class="icon-calendar"></i>
+        3/6/2015
+    </li>
+    <li class="meta-list-item">
+        <i class="icon-pig"></i>
+        20,000 €
+    </li>
+</ul>
+```
+*/
+
+.meta-list {
+    @include container;
+    margin: 0;
+    padding: 0 0 1.66666666em;
+    list-style: none;
+}
+
+.meta-list-item {
+    color: $color-text-introvert;
+    font-size: $font-size-small;
+    float: left;
+    margin-right: 0.83333333em;
+
+    i {
+        font-size: 140%;
+        line-height: 1;
+        margin-right: 1px;
+        vertical-align: middle;
+    }
+
+    @media print {
+        float: none;
+        font-size: $font-size-normal;
+
+        i:not(.m-definition-before):not(.m-definition-after), &.meta-list-item-rate {
+            display: none;
+        }
+    }
+}
