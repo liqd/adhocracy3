@@ -7,6 +7,7 @@ from pyramid.interfaces import ILocation
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IRequest
 from pyramid.security import ACLPermitsResult
+from zope.deprecation import deprecated
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface.interface import InterfaceClass
@@ -91,6 +92,19 @@ class ISheetReferenceAutoUpdateMarker(ISheet):
     changes the reference to the new version.
 
     """
+
+
+class IPostPoolSheet(ISheet):
+
+    """Marker interfaces for sheets with :term:`post_pool` Attributes.
+
+    This implies the sheet schema is a subtype of
+    :class:`adhocracy_core.schema.PostPoolSchema` or has at least a
+    field node with :class:`adhocracy_core.Schema.PostPool`.
+    """
+
+
+deprecated('IPostPoolSheet', 'Not used anymore; kept for evolution scripts.')
 
 
 class IPredicateSheet(ISheet):
