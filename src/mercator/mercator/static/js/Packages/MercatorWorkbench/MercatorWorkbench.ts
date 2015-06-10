@@ -150,6 +150,13 @@ export var mercatorProposalListingColumnDirective = (
                     {key: "20000", name: "10000 - 20000 €"},
                     {key: "50000", name: "20000 - 50000 €"}
                 ]
+            }, {
+                key: "badge",
+                name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
+                items: [
+                    {key: "winning", name: "TR__MERCATOR_BADGE_WINNERS"},
+                    {key: "community", name: "TR__MERCATOR_BADGE_COMMUNITY_AWARD"}
+                ]
             }];
             scope.shared.sort = "item_creation_date";
             scope.shared.reverse = true;
