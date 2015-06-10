@@ -10,7 +10,7 @@ Highlighted section for proposal detail that contains the winning proposals jury
 Example navigation
 
 ```html_example
-<nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
+<nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered">
     <ol>
         <li><a
             href="#jury-decision"
@@ -26,8 +26,7 @@ Example navigation
 <div class="section-jump-main chapter-wrapper">
     <section class="chapter m-jury-decision" id="jury-decision">
         <section class="jury-decision-section">
-            <h2 class="chapter-header"
-                data-offset="50">Jury Decision</h2>
+            <h2 class="chapter-header">Jury Decision</h2>
             <p>Lorem ipsum Ex veniam anim proident fugiat culpa est mollit ea minim Excepteur ut Ut in adipisicing
             officia commodo id magna ex culpa et veniam magna non dolor reprehenderit ea commodo sit.</p>
             <div class="jury-decision-section-icon">
