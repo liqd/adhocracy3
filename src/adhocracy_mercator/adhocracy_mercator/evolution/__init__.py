@@ -105,7 +105,7 @@ def change_mercator_type_to_iprocess(root):
     from pyramid.threadlocal import get_current_registry
     from adhocracy_core.resources.asset import IPoolWithAssets
     from adhocracy_mercator.resources.mercator import process_meta
-    from adhocracy_core.badge import add_badges_service
+    from adhocracy_core.resources.badge import add_badges_service
 
     logger.info('Running evolve step:' + change_mercator_type_to_iprocess.__doc__)
     mercator = root['mercator']
