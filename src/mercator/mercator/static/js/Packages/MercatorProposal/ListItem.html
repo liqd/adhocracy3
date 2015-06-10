@@ -1,4 +1,11 @@
-<a data-ng-href="{{ path | adhResourceUrl }}" class="mercator-proposal-list-item {{ selectedState }}">
+<a 
+    data-ng-href="{{ path | adhResourceUrl }}"
+    data-ng-class="{
+        'has-badge': data.assignments.length>0,
+        'm-winner': data.assignments[0].title == 'Winning',
+        'm-community-award': data.assignments[0].title == 'Community'
+    }"
+    class="mercator-proposal-list-item {{ selectedState }}">
     <img class="mercator-proposal-list-item-image"
         data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}" alt="" />
     <div class="mercator-proposal-list-item-body">
@@ -7,7 +14,7 @@
                 {{data.organization_info.name}}
             </span>
         </p>
-        <h3 class="mercator-proposal-list-item-title">{{ data.title.title }} {{ data.assignments }}</h3>
+        <h3 class="mercator-proposal-list-item-title">{{ data.title.title }}</h3>
         <ul class="meta-list mercator-proposal-list-item-meta-list">
             <li class="meta-list-item meta-list-item-date">
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
