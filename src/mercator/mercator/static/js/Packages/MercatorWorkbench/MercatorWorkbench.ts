@@ -15,7 +15,7 @@ import AdhUtil = require("../Util/Util");
 
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
-import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
+import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 
 var pkgLocation = "/MercatorWorkbench";

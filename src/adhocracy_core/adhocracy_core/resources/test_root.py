@@ -35,6 +35,7 @@ def integration(config):
     config.include('adhocracy_core.resources.item')
     config.include('adhocracy_core.resources.paragraph')
     config.include('adhocracy_core.resources.document')
+    config.include('adhocracy_core.resources.document_process')
     config.include('adhocracy_core.resources.external_resource')
     config.include('adhocracy_core.rest')
     config.include('adhocracy_core.resources.geo')
