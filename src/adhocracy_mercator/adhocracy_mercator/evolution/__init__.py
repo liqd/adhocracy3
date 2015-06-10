@@ -1,14 +1,22 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
 from pyramid.threadlocal import get_current_registry
+from pyramid.security import Deny
+from substanced.util import get_acl
 from substanced.util import find_catalog  # pragma: no cover
 from substanced.util import find_service
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
 from zope.interface import noLongerProvides
+from adhocracy_core.authorization import set_acl
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.evolution import log_migration
 from adhocracy_core.evolution import migrate_new_sheet
+from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+from adhocracy_mercator.sheets.mercator import ITitle
+from adhocracy_mercator.sheets.mercator import IMercatorSubResources
+from adhocracy_mercator.sheets.mercator import IIntroduction
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
@@ -16,13 +24,6 @@ logger = logging.getLogger(__name__)  # pragma: no cover
 @log_migration
 def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
     """Migrate title value from ole IIntroduction sheet to ITitle sheet."""
-    from pyramid.threadlocal import get_current_registry
-    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
-    from adhocracy_mercator.sheets.mercator import ITitle
-    from adhocracy_mercator.sheets.mercator import IMercatorSubResources
-    from adhocracy_mercator.sheets.mercator import IIntroduction
-    from zope.interface import alsoProvides
-    from adhocracy_core.utils import get_sheet_field
     registry = get_current_registry()
     catalog = find_catalog(root, 'system')
     path = catalog['path']
@@ -49,10 +50,6 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
 @log_migration
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     """Disable add_proposal permissions."""
-    from adhocracy_core.authorization import set_acl
-    from substanced.util import get_acl
-    from pyramid.security import Deny
-
     registry = get_current_registry()
     acl = get_acl(root)
     deny_acl = [(Deny, 'role:contributor', 'add_proposal'),
@@ -66,7 +63,6 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
     """Migrate mercator title sheet to adhocracy_core title sheet."""
     from adhocracy_core.sheets.title import ITitle
     from adhocracy_mercator.sheets import mercator
-    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
     migrate_new_sheet(root, IMercatorProposalVersion, ITitle, mercator.ITitle,
                       remove_isheet_old=True,
                       fields_mapping=[('title', 'title')])
@@ -75,11 +71,6 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
 @log_migration
 def evolve4_disable_voting_and_commenting(root):
     """Disable rate and comment permissions."""
-    from adhocracy_core.authorization import set_acl
-    from substanced.util import get_acl
-    from pyramid.threadlocal import get_current_registry
-    from pyramid.security import Deny
-
     registry = get_current_registry()
     acl = get_acl(root)
     deny_acl = [(Deny, 'role:annotator', 'add_comment'),
@@ -111,6 +102,7 @@ def change_mercator_type_to_iprocess(root):
     catalogs.reindex_index(mercator, 'interfaces')
 
 
+@log_migration
 def add_badge_assignments_services(root):
     """Add badge assignments services to proposals."""
     from adhocracy_mercator.resources.mercator import IMercatorProposal
@@ -128,6 +120,7 @@ def add_badge_assignments_services(root):
         add_badge_assignments_service(proposal, registry, {})
 
 
+@log_migration
 def add_missing_sheets_for_mercator_proposals(root):
     """Add badge assignments services to proposals."""
     from adhocracy_mercator.resources.mercator import IMercatorProposalVersion

@@ -93,10 +93,8 @@ def _migrate_field_values(registry: Registry, resource: IResource,
 @log_migration
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
-    migrate_new_sheet(root, IBasicPool, ITitle, IPool,
-                      remove_isheet_old=False)
-    migrate_new_sheet(root, IPoolWithAssets, ITitle, IPool,
-                      remove_isheet_old=False)
+    migrate_new_sheet(root, IBasicPool, ITitle)
+    migrate_new_sheet(root, IPoolWithAssets, ITitle)
 
 
 @log_migration
