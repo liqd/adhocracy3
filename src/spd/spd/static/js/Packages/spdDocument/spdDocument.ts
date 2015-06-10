@@ -54,10 +54,10 @@ export interface IScope extends angular.IScope {
 }
 
 export interface IFormScope extends IScope {
-    create : boolean;
     showError;
     addParagraph() : void;
     submit() : angular.IPromise<any>;
+    cancel() : void;
     spdDocumentForm : any;
 }
 
@@ -290,6 +290,7 @@ export var createDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
     adhSubmitIfValid,
     adhResourceUrlFilter
@@ -308,13 +309,17 @@ export var createDirective = (
                     body: ""
                 }]
             };
-            scope.create = true;
             scope.showError = adhShowError;
 
             scope.addParagraph = () => {
                 scope.data.paragraphs.push({
                     body: ""
                 });
+            };
+
+            scope.cancel = () => {
+                var processUrl = adhTopLevelState.get("processUrl");
+                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(processUrl));
             };
 
             scope.submit = () => {
@@ -335,6 +340,7 @@ export var editDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
     adhSubmitIfValid,
     adhResourceUrlFilter
@@ -347,7 +353,6 @@ export var editDirective = (
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
-            scope.create = false;
             scope.showError = adhShowError;
 
             scope.addParagraph = () => {
@@ -357,6 +362,10 @@ export var editDirective = (
             };
 
             bindPath($q, adhHttp)(scope);
+
+            scope.cancel = () => {
+                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(scope.documentVersion.path));
+            };
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.spdDocumentForm, () => {
@@ -400,6 +409,7 @@ export var register = (angular) => {
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
+            "adhTopLevelState",
             "adhShowError",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
@@ -410,6 +420,7 @@ export var register = (angular) => {
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
+            "adhTopLevelState",
             "adhShowError",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",

@@ -50,9 +50,6 @@
 
         <a href="" class="button m-call-to-action-secondary" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
 
-        <a data-ng-show="create" href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
-        {{ "TR__CANCEL" | translate }}</a>
-        <a data-ng-show="!create" href="{{ path | adhParentPath | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
-        {{ "TR__CANCEL" | translate }}</a>
+        <a data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
     </footer>
 </form>
