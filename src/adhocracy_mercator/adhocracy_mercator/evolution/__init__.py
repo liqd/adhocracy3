@@ -4,14 +4,12 @@ from pyramid.threadlocal import get_current_registry
 from substanced.util import get_acl
 from pyramid.security import Deny
 from substanced.util import find_catalog  # pragma: no cover
-from substanced.util import find_service
 from adhocracy_core.authorization import set_acl
 from adhocracy_core.evolution import migrate_new_sheet
+from adhocracy_core.evolution import migrate_new_iresource
 from adhocracy_core.evolution import log_migration
 from adhocracy_core.utils import get_sheet_field
 from zope.interface import alsoProvides
-from zope.interface import directlyProvides
-from zope.interface import noLongerProvides
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
@@ -86,20 +84,11 @@ def change_mercator_type_to_iprocess(root):
     """Change mercator type from IBasicPoolWithAssets to IProcess."""
     from adhocracy_mercator.resources.mercator import IProcess
     from adhocracy_core.resources.asset import IPoolWithAssets
-    from adhocracy_mercator.resources.mercator import process_meta
     from adhocracy_core.resources.badge import add_badges_service
-
-    mercator = root['mercator']
-    noLongerProvides(mercator, IPoolWithAssets)
-    directlyProvides(mercator, IProcess)
-
-    for sheet in process_meta.basic_sheets + process_meta.extended_sheets:
-        alsoProvides(mercator, sheet)
-
+    migrate_new_iresource(root, IPoolWithAssets, IProcess)
     registry = get_current_registry()
-    add_badges_service(mercator, registry, {})
-    catalogs = find_service(root, 'catalogs')
-    catalogs.reindex_index(mercator, 'interfaces')
+    add_badges_service(root['mercator'], registry, {})
+
 
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
