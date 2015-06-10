@@ -19,7 +19,7 @@ def test_includeme_add_sample_workflow(registry):
 
 
 @mark.usefixtures('integration')
-def test_initate_and_transition_to_announce(registry, context):
+def test_initate_and_transition_to_frozen(registry, context):
     from substanced.util import get_acl
     workflow = registry.content.workflows['sample']
     assert workflow.state_of(context) is None
