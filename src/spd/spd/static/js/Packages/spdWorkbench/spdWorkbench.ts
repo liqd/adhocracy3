@@ -117,7 +117,7 @@ export var processDetailAnnounceColumnDirective = (
 export var moduleName = "adhSPDWorkbench";
 
 export var register = (angular) => {
-    var processType = "";  // FIXME: change to RIProcess.content_type
+    var processType = RIProcess.content_type;
 
     angular
         .module(moduleName, [
