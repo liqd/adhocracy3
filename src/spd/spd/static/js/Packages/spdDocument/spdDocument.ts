@@ -264,6 +264,21 @@ export var listItemDirective = (
     };
 };
 
+export var listingDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.contentType = RIDocumentVersion.content_type;
+        }
+    };
+};
+
 export var createDirective = (
     $location : angular.ILocationService,
     adhConfig : AdhConfig.IService,
@@ -393,6 +408,7 @@ export var register = (angular) => {
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
             editDirective])
+        .directive("adhSpdListing", ["adhConfig", listingDirective])
         .directive("adhSpdDocumentListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", listItemDirective]);
 };
