@@ -253,7 +253,7 @@ Returns possible methods for this resource, example request/response data
 structures and available interfaces with resource data. The result is a
 JSON object that has the allowed request methods as keys::
 
-    >>> resp_data = testapp.options(rest_url + "/adhocracy", headers=god_header).json
+    >>> resp_data = testapp.options(rest_url + "/", headers=god_header).json
     >>> sorted(resp_data.keys())
     ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 
