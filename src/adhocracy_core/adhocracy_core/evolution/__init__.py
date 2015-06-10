@@ -61,7 +61,7 @@ def migrate_new_sheet(context: IPool,
             noLongerProvides(resource, isheet_old)
 
 
-def migration_script(func):
+def log_migration(func):
     """Decorator for the migration scripts.
 
     The decorator logs the call to the evolve script.
@@ -90,7 +90,7 @@ def _migrate_field_values(registry: Registry, resource: IResource,
     sheet.set(appstruct)
 
 
-@migration_script
+@log_migration
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
     migrate_new_sheet(root, IBasicPool, ITitle, IPool,
@@ -99,7 +99,7 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
                       remove_isheet_old=False)
 
 
-@migration_script
+@log_migration
 def add_kiezkassen_permissions(root):
     """Add permission to use the kiezkassen process."""
     registry = get_current_registry()
@@ -112,7 +112,7 @@ def add_kiezkassen_permissions(root):
     set_acl(root, updated_acl, registry=registry)
 
 
-@migration_script
+@log_migration
 def upgrade_catalogs(root):
     """Upgrade catalogs."""
     registry = get_current_registry()

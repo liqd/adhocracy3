@@ -2,12 +2,12 @@
 import logging  # pragma: no cover
 from substanced.util import find_catalog  # pragma: no cover
 from adhocracy_core.evolution import migrate_new_sheet
-from adhocracy_core.evolution import migration_script
+from adhocracy_core.evolution import log_migration
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
 
-@migration_script
+@log_migration
 def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
     """Migrate title value from ole IIntroduction sheet to ITitle sheet."""
     from pyramid.threadlocal import get_current_registry
@@ -40,7 +40,7 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         del introduction._sheets[IIntroduction.__identifier__]['title']
 
 
-@migration_script
+@log_migration
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     """Disable add_proposal permissions."""
     from adhocracy_core.authorization import set_acl
@@ -56,7 +56,7 @@ def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     set_acl(root, updated_acl, registry=registry)
 
 
-@migration_script
+@log_migration
 def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
     """Migrate mercator title sheet to adhocracy_core title sheet."""
     from adhocracy_core.sheets.title import ITitle
@@ -67,7 +67,7 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
                       fields_mapping=[('title', 'title')])
 
 
-@migration_script
+@log_migration
 def evolve4_disable_voting_and_commenting(root):
     """Disable rate and comment permissions."""
     from adhocracy_core.authorization import set_acl
@@ -85,7 +85,7 @@ def evolve4_disable_voting_and_commenting(root):
     set_acl(root, updated_acl, registry=registry)
 
 
-@migration_script
+@log_migration
 def change_mercator_type_to_iprocess(root):
     """Change mercator type from IBasicPoolWithAssets to IProcess."""
     from adhocracy_mercator.resources.mercator import IProcess

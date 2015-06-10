@@ -128,13 +128,13 @@ class TestMigrateNewSheet:
         b_sheet.delete_field_values.assert_called_with(['field_b'])
 
 
-class TestMigrationScriptDecorator:
+class TestLogMigrationDecorator:
 
-    def test_migration_script_decorator_call(self, monkeypatch):
-        from . import migration_script
+    def test_log_migration_decorator_call(self, monkeypatch):
+        from . import log_migration
         mock_func = Mock()
 
-        @migration_script
+        @log_migration
         def evolve():
             """doc."""
             mock_func()
@@ -143,11 +143,11 @@ class TestMigrationScriptDecorator:
 
         assert mock_func.called
 
-    def test_migration_script_decorator_call_with_args(self, monkeypatch):
-        from . import migration_script
+    def test_log_migration_decorator_call_with_args(self, monkeypatch):
+        from . import log_migration
         mock_func = Mock()
 
-        @migration_script
+        @log_migration
         def evolve(i):
             """doc."""
             mock_func(i)
@@ -156,13 +156,13 @@ class TestMigrationScriptDecorator:
 
         assert mock_func.called
 
-    def test_migration_script_decorator_log(self, monkeypatch):
+    def test_log_migration_decorator_log(self, monkeypatch):
         import adhocracy_core.evolution
-        from . import migration_script
+        from . import log_migration
         mock_logger = Mock()
         monkeypatch.setattr(adhocracy_core.evolution, 'logger', mock_logger)
 
-        @migration_script
+        @log_migration
         def evolve():
             """Somedoc."""
             pass
@@ -172,10 +172,10 @@ class TestMigrationScriptDecorator:
         mock_logger.info.assert_has_calls([call('Running evolve step: Somedoc.'),
                                            call('Finished evolve step: Somedoc.')])
 
-    def test_migration_script_decorator_keep_func_attributes(self):
-        from . import migration_script
+    def test_log_migration_decorator_keep_func_attributes(self):
+        from . import log_migration
 
-        @migration_script
+        @log_migration
         def f():
             pass
 
