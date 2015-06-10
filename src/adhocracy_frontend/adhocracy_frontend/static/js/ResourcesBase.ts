@@ -35,6 +35,7 @@ export class Resource {
     public parent : string;
     public first_version_path : string;
     public root_versions : string[];
+    public static super_types : string[];
     /* tslint:enable:variable-name */
 
     constructor(public content_type : string) {
@@ -56,7 +57,11 @@ export class Resource {
     }
 
     public isInstanceOf(resourceType : string) : boolean {
+        var _class = <any>this.constructor;
+
         if (resourceType === this.content_type) {
+            return true;
+        } else if ((<any>_).includes(_class.super_types, resourceType)) {  // FIXME: DefinitelyTyped
             return true;
         } else {
             return false;
