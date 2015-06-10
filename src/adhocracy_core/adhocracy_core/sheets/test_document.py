@@ -1,5 +1,12 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
+
+
+@fixture
+def integration(config):
+    config.include('adhocracy_core.content')
+    config.include('adhocracy_core.sheets.document')
 
 
 class TestDocumentSheet:
@@ -9,28 +16,28 @@ class TestDocumentSheet:
         from adhocracy_core.sheets.document import document_meta
         return document_meta
 
+    def test_meta(self, meta):
+        from adhocracy_core import sheets
+        assert meta.isheet == sheets.document.IDocument
+        assert meta.schema_class == sheets.document.DocumentSchema
+
     def test_create(self, meta, context):
-        from adhocracy_core.sheets.document import IDocument
-        from adhocracy_core.sheets.document import DocumentSchema
-        from adhocracy_core.sheets import AnnotationRessourceSheet
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationRessourceSheet)
-        assert inst.meta.isheet == IDocument
-        assert inst.meta.schema_class == DocumentSchema
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'title': '', 'description': '',
+        assert inst.get() == {'title': '',
                               'elements': []}
 
-
-def test_includeme_register_document_sheet(config):
-    from adhocracy_core.sheets.document import IDocument
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.document')
-    context = testing.DummyResource(__provides__=IDocument)
-    assert get_sheet(context, IDocument)
+    @mark.usefixtures('integration')
+    def test_includeme_register_document_sheet(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)
 
 
 class TestParagraphSheet:
@@ -40,55 +47,26 @@ class TestParagraphSheet:
         from adhocracy_core.sheets.document import paragraph_meta
         return paragraph_meta
 
+    def test_meta(self, meta):
+        from adhocracy_core import sheets
+        assert meta.isheet == sheets.document.IParagraph
+        assert meta.isheet.extends(sheets.document.ISection)
+        assert meta.schema_class == sheets.document.ParagraphSchema
+
     def test_create(self, meta, context):
-        from adhocracy_core.sheets.document import IParagraph
-        from adhocracy_core.sheets.document import ParagraphSchema
-        from adhocracy_core.sheets import AnnotationRessourceSheet
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationRessourceSheet)
-        assert inst.meta.isheet == IParagraph
-        assert inst.meta.schema_class == ParagraphSchema
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'content': '',
-                              'elements_backrefs': []}
+        assert inst.get() == {'text': '',
+                              'documents': []}
 
-
-def test_includeme_register_paragraph_sheet(config):
-    from adhocracy_core.sheets.document import IParagraph
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.document')
-    context = testing.DummyResource(__provides__=IParagraph)
-    assert get_sheet(context, IParagraph)
-
-
-class TestSectionSheet:
-
-    @fixture
-    def meta(self):
-        from adhocracy_core.sheets.document import section_meta
-        return section_meta
-
-    def test_create(self, meta, context):
-        from adhocracy_core.sheets.document import ISection
-        from adhocracy_core.sheets.document import SectionSchema
-        from adhocracy_core.sheets import AnnotationRessourceSheet
-        inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationRessourceSheet)
-        assert inst.meta.isheet == ISection
-        assert inst.meta.schema_class == SectionSchema
-
-    def test_get_empty(self, meta, context):
-        inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'elements': [], 'subsections': [], 'title': ''}
-
-
-def test_includeme_register_section_sheet(config):
-    from adhocracy_core.sheets.document import ISection
-    from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.document')
-    context = testing.DummyResource(__provides__=ISection)
-    assert get_sheet(context, ISection)
+    @mark.usefixtures('integration')
+    def test_includeme_register_document_sheet(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)

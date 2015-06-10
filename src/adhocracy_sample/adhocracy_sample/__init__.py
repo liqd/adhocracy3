@@ -9,9 +9,8 @@ def includeme(config):
     # include adhocracy_core
     config.include('adhocracy_core')
     # include custom resource types
-    config.include('adhocracy_core.resources.sample_paragraph')
-    config.include('adhocracy_core.resources.sample_section')
-    config.include('adhocracy_core.resources.sample_proposal')
+    config.include('adhocracy_core.resources.paragraph')
+    config.include('adhocracy_core.resources.document')
     # include custom sheets
     config.include('adhocracy_sample.sheets.sample_sheets')
 

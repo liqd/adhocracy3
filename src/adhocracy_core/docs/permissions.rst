@@ -13,8 +13,8 @@ Prerequisites
 Some imports to work with rest api calls::
 
     >>> from pprint import pprint
-    >>> from adhocracy_core.resources.sample_proposal import IProposal
-    >>> from adhocracy_core.resources.sample_proposal import IProposalVersion
+    >>> from adhocracy_core.resources.document import IDocument
+    >>> from adhocracy_core.resources.document import IDocumentVersion
     >>> from adhocracy_core.resources.organisation import IOrganisation
 
 Start adhocracy app and log in some users::
@@ -39,14 +39,14 @@ Create participation process structure by god (sysadmin)
 
 Create participation process content by participant::
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'prop'}}}
     >>> resp = participant.post('/organisation/process', prop).json
     >>> participant_proposal = resp['path']
     >>> participant_proposal_comments = resp['path'] + 'comments'
     >>> participant_proposal_rates = resp['path'] + 'rates'
 
-    >>> prop = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalVersion',
+    >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...         'data': {}}
     >>> resp = participant.post(participant_proposal, prop).json
 
@@ -147,16 +147,15 @@ Can create process content::
 
     >>> resp = participant.options('/organisation/process').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.resources.external_resource.IExternalResource',
-     'adhocracy_core.resources.sample_proposal.IProposal']
+    ['adhocracy_core.resources.document.IDocument',
+     'adhocracy_core.resources.external_resource.IExternalResource']
 
 Can edit his own process content::
 
     >>> resp = participant.options('/organisation/process/prop').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.resources.sample_paragraph.IParagraph',
-     'adhocracy_core.resources.sample_proposal.IProposalVersion',
-     'adhocracy_core.resources.sample_section.ISection']
+    ['adhocracy_core.resources.document.IDocumentVersion',
+     'adhocracy_core.resources.paragraph.IParagraph']
 
 
 Cannot edit process content::

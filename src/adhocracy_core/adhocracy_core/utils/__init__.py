@@ -500,3 +500,9 @@ def get_root(app):
     request.registry = app.registry
     root = app.root_factory(request)
     return root
+
+
+def load_json(filename):
+    """Load a json file from the disk."""
+    with open(filename, 'r') as f:
+        return json.load(f)

@@ -90,7 +90,8 @@ class TestBadgeAssignmentsSheet:
     def test_get_empty(self, inst):
         assert inst.get() == {'subject': None,
                               'badge': None,
-                              'object': None}
+                              'object': None,
+                              }
 
     def test_validate_object_post_pool(self, inst,
                                        mock_create_post_pool_validator):
