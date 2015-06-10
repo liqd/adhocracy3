@@ -1,14 +1,5 @@
 from pytest import fixture
 from pytest import mark
-from webtest import TestResponse
-
-
-
-# TODO: move _create_proposal to somewhere in backend fixtures as the
-# natural dependency ordering is "frontend depends on backend"
-from mercator.tests.fixtures.fixturesMercatorProposals1 import _create_proposal
-from mercator.tests.fixtures.fixturesMercatorProposals1 import create_proposal_batch
-from mercator.tests.fixtures.fixturesMercatorProposals1 import update_proposal_batch
 
 
 def test_mercator_proposal_meta():
@@ -118,12 +109,13 @@ class TestProcess:
         from adhocracy_core.resources.asset import add_assets_service
         from .mercator import IProcess
         from .mercator import IMercatorProposal
+        import adhocracy_mercator.sheets.mercator
         assert meta.iresource is IProcess
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == [
-            adhocracy_core.sheets.workflow.ISample
+            adhocracy_mercator.sheets.mercator.IWorkflowAssignment
         ]
         assert meta.element_types == [IMercatorProposal]
         assert add_assets_service in meta.after_creation
@@ -133,111 +125,3 @@ class TestProcess:
     def test_create(self, registry, meta):
         res = registry.content.create(meta.iresource.__identifier__)
         assert meta.iresource.providedBy(res)
-
-
-@fixture(scope='class')
-def app_anonymous(app_anonymous):
-    app_anonymous.base_path = '/mercator'
-    return app_anonymous
-
-@fixture(scope='class')
-def app_participant(app_participant):
-    app_participant.base_path = '/mercator'
-    return app_participant
-
-
-@fixture(scope='class')
-def app_god(app_god):
-    app_god.base_path = '/mercator'
-    return app_god
-
-
-def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
-    from adhocracy_mercator.resources.mercator import IMercatorProposal
-    from adhocracy_core.sheets.name import IName
-    iresource = IMercatorProposal
-    sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post_resource(path, iresource, sheets_cstruct)
-    return resp
-
-
-def _post_proposal_version(app_user, path='/') -> TestResponse:
-    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
-    iresource = IMercatorProposalVersion
-    resp = app_user.post_resource(path, iresource, {})
-    return resp
-
-
-def _batch_post_full_proposal(app_user) -> TestResponse:
-    subrequests = _create_proposal()
-    resp = app_user.batch(subrequests)
-    return resp
-
-
-@mark.functional
-class TestMercatorProposalPermissionsAnonymous:
-
-    def test_cannot_create_proposal_item(self, app_anonymous):
-        resp = _post_proposal_item(app_anonymous, path='/', name='proposal1')
-        assert resp.status_code == 403
-
-    def test_cannot_create_proposal_per_batch(self, app_anonymous):
-        resp = _batch_post_full_proposal(app_anonymous)
-        assert resp.status_code == 403
-
-    def test_cannot_create_proposal_per_batch_broken_token(
-            self, app_broken_token):
-        resp = _batch_post_full_proposal(app_broken_token)
-        assert resp.status_code == 400
-
-
-@mark.functional
-class TestMercatorProposalPermissionsParticipant:
-
-    def test_can_create_proposal_item(self, app_participant):
-        resp = _post_proposal_item(app_participant, path='/', name='proposal1')
-        assert resp.status_code == 200
-
-    def test_can_create_proposal_version(self, app_participant):
-        from adhocracy_mercator.resources import mercator
-        possible_types = mercator.mercator_proposal_meta.element_types
-        postable_types = app_participant.get_postable_types('/proposal1')
-        assert set(postable_types) == set(possible_types)
-
-    def test_can_create_and_update_proposal_per_batch(self, app_participant):
-        """Create full proposal then do batch request that first
-         creates a new subresource Version (IOrganisationInfo) and then
-         creates a new proposal Version manually (IUserInfo).
-
-        Fix regression issue #697
-        """
-        app_participant.batch(create_proposal_batch)
-        app_participant.batch(update_proposal_batch)
-        assert app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
-        assert "VERSION_0000002" in  app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
-
-    def test_cannot_create_other_users_proposal_version(self, app_participant,
-                                                        app_god):
-        _post_proposal_item(app_god, path='/', name='proposal_other')
-        _post_proposal_version(app_god, path='/proposal_other')
-        postable_types = app_participant.get_postable_types('/proposal_other')
-        assert postable_types == []
-
-    def test_non_god_creator_is_set(self, app_participant):
-        """Regression test issue #362"""
-        from adhocracy_core.sheets.metadata import IMetadata
-        resp = app_participant.get('/proposal1')
-        creator = resp.json['data'][IMetadata.__identifier__]['creator']
-        assert '0000001' in creator
-
-    def test_god_can_create_proposal_item(self, app_god):
-        """Regression test issue #362"""
-        resp = _post_proposal_item(app_god, path='/', name='god1')
-        assert resp.status_code == 200
-
-    def test_god_creator_is_set(self, app_god):
-        """Regression test issue #362"""
-        from adhocracy_core.sheets.metadata import IMetadata
-        resp = app_god.get('/god1')
-        creator = resp.json['data'][IMetadata.__identifier__]['creator']
-        assert '0000000' in creator

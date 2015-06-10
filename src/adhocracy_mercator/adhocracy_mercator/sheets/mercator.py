@@ -8,6 +8,7 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.sheets import workflow
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.sheets.asset import asset_metadata_meta
 from adhocracy_core.schema import AdhocracySchemaNode
@@ -425,6 +426,29 @@ heardfrom_meta = sheet_meta._replace(
 )
 
 
+class IWorkflowAssignment(workflow.IWorkflowAssignment):
+
+    """Marker interface for the mercator workflow assignment sheet."""
+
+
+class WorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
+
+    """Data structure the mercator workflow assignment sheet."""
+
+    workflow_name = 'mercator'
+
+    draft = workflow.StateAssignment()
+    announce = workflow.StateAssignment()
+    participate = workflow.StateAssignment()
+    frozen = workflow.StateAssignment()
+    result = workflow.StateAssignment()
+
+workflow_meta = workflow.workflow_meta._replace(
+    isheet=IWorkflowAssignment,
+    schema_class=WorkflowAssignmentSchema,
+)
+
+
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(mercator_sub_resources_meta, config.registry)
@@ -443,3 +467,4 @@ def includeme(config):
     add_sheet_to_registry(experience_meta, config.registry)
     add_sheet_to_registry(heardfrom_meta, config.registry)
     add_sheet_to_registry(intro_image_metadata_meta, config.registry)
+    add_sheet_to_registry(workflow_meta, config.registry)
