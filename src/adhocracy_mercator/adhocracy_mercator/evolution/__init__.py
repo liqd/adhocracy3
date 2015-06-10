@@ -6,6 +6,8 @@ from adhocracy_core.evolution import migrate_new_sheet
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
 from zope.interface import noLongerProvides
+from adhocracy_core.utils import get_sheet
+from pyramid.threadlocal import get_current_registry
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
@@ -123,6 +125,42 @@ def change_mercator_type_to_iprocess(root):
     logger.info('Finished evolve step:' + change_mercator_type_to_iprocess.__doc__)
 
 
+def add_badge_assignments_services(root):
+    """Add badge assignments services to proposals."""
+    from adhocracy_mercator.resources.mercator import IMercatorProposal
+    from adhocracy_core.sheets.pool import IPool
+    from adhocracy_core.resources.badge import add_badge_assignments_service
+
+    registry = get_current_registry(root)
+    pool = get_sheet(root['mercator'], IPool, registry=registry)
+    query = {'interfaces': IMercatorProposal,
+             'only_visible': False,
+             'depth': 2
+             }
+    proposals = pool.get(query)['elements']
+    for proposal in proposals:
+        add_badge_assignments_service(proposal, registry, {})
+
+
+def add_missing_sheets_for_mercator_proposals(root):
+    """Add badge assignments services to proposals."""
+    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+    from adhocracy_core.sheets.pool import IPool
+    from adhocracy_mercator.resources.mercator import mercator_proposal_version_meta
+
+    registry = get_current_registry(root)
+    pool = get_sheet(root['mercator'], IPool, registry=registry)
+    query = {'interfaces': IMercatorProposalVersion,
+             'only_visible': False,
+             'depth': 3
+             }
+    proposal_versions = pool.get(query)['elements']
+    for proposal_version in proposal_versions:
+        for sheet in mercator_proposal_version_meta.basic_sheets +\
+                mercator_proposal_version_meta.extended_sheets:
+            alsoProvides(proposal_version, sheet)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -130,3 +168,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(evolve3_use_adhocracy_core_title_sheet)
     config.add_evolution_step(evolve4_disable_voting_and_commenting)
     config.add_evolution_step(change_mercator_type_to_iprocess)
+    config.add_evolution_step(add_badge_assignments_services)
+    config.add_evolution_step(add_missing_sheets_for_mercator_proposals)
