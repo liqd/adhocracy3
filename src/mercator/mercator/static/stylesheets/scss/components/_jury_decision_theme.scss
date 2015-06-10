@@ -49,6 +49,10 @@ Example navigation
     .jury-decision-section-icon {
         @extend .commentable-section-show-comments;
         color: $color-text-inverted;
+
+        &:hover, &:focus {
+            color: $color-text-inverted;
+        }
     }
 
     .chapter-header {
