@@ -8,6 +8,7 @@ def includeme(config):
     """Setup adhocracy extension."""
     config.include('adhocracy_sample')
     config.include('.resources.root')
+    config.include('.resources.subscriber')
 
 
 def main(global_config, **settings):
