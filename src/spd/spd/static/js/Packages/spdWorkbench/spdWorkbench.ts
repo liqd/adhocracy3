@@ -93,7 +93,8 @@ export var spdDocumentEditColumnDirective = (
 };
 
 export var processDetailColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -101,6 +102,7 @@ export var processDetailColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
         }
     };
 };
@@ -224,6 +226,6 @@ export var register = (angular) => {
         .directive("adhSpdDocumentDetailColumn", ["adhConfig", "adhPermissions", spdDocumentDetailColumnDirective])
         .directive("adhSpdDocumentCreateColumn", ["adhConfig", spdDocumentCreateColumnDirective])
         .directive("adhSpdDocumentEditColumn", ["adhConfig", spdDocumentEditColumnDirective])
-        .directive("adhSpdProcessDetailColumn", ["adhConfig", processDetailColumnDirective])
+        .directive("adhSpdProcessDetailColumn", ["adhConfig", "adhPermissions", processDetailColumnDirective])
         .directive("adhSpdProcessDetailAnnounceColumn", ["adhConfig", processDetailAnnounceColumnDirective]);
 };
