@@ -1,7 +1,7 @@
-"""Bplan workflow."""
+"""Workflows for Mercator."""
 from adhocracy_core.workflows import add_workflow
 
-bplan_meta = {
+mercator_meta = {
     'states_order': ['draft', 'announce', 'participate', 'frozen', 'result'],
     'states': {
         'draft': {'title': 'Draft',
@@ -17,24 +17,27 @@ bplan_meta = {
                      },
         'participate': {'title': 'Participate',
                         'description': '',
-                        'acm': {'principals':                    ['anonymous', 'moderator', 'creator', 'initiator'],  # noqa
+                        'acm': {'principals':                    ['participant', 'moderator', 'creator', 'initiator'],  # noqa
                                 'permissions':
-                                  [['create',                     'Allow',     'Allow',   'Allow',     'Allow'],  # noqa
-                                   ['create_proposal',            'Allow',      None,      None,        None],  # noqa
-                                   ['edit_proposal',               None,        None,      None,        None],  # noqa
+                                  [['create_proposal',            'Allow',        None,        None,     'Allow'],  # noqa
+                                   ['edit_proposal',               None,          None,       'Allow',    None],  # noqa
+                                   ['create_comment',             'Allow',       'Allow',      None,     'Allow'],  # noqa
+                                   ['edit_comment',                None,          None,       'Allow',    None],  # noqa
+                                   ['create_rate',                'Allow',        None,        None,      None],  # noqa
+                                   ['edit_rate',                   None,          None,       'Allow',    None],  # noqa
                                    ]},
                         },
-        # FIXME disable view proposals
         'frozen': {'title': 'Frozen',
                    'description': '',
-                   'acm': {'principals':                     ['anonymous', 'moderator', 'creator', 'initiator'],  # noqa
+                   'acm': {'principals':                      ['participant', 'moderator', 'creator', 'initiator'],  # noqa
                            'permissions':
-                              [['create',                      None,       'Allow',     'Allow',   'Allow'],  # noqa
-                               ['create_proposal',             None,        None,        None,      None],  # noqa
-                               ['edit_proposal',               None,        None,        None,      None],  # noqa
+                              [['create_proposal',             None,          None,        None,      'Allow'],  # noqa
+                               ['edit_proposal',               None,          None,        None,      'Allow'],  # noqa
                                ]},
                    },
-        # FIXME disable view proposals
+        'result': {'title': 'Result',
+                   'description': '',
+                   },
     },
     'transitions': {
         'to_announce': {'from_state': 'draft',
@@ -49,26 +52,13 @@ bplan_meta = {
         'to_frozen': {'from_state': 'participate',
                       'to_state': 'frozen',
                       },
+        'to_result': {'from_state': 'frozen',
+                      'to_state': 'result',
+                      },
     },
-}
-
-
-bplan_private_meta = {
-    'states_order': ['private'],
-    'states': {
-        'private': {'title': 'Private',
-                    'description': 'Disable view for non admins.',
-                    'acm': {'principals': ['anonymous', 'participant'],  # noqa
-                            'permissions':
-                                [['view',  'Deny',      'Deny'],  # noqa
-                                 ]},
-                  },
-    },
-    'transitions': {},
 }
 
 
 def includeme(config):
     """Add workflow."""
-    add_workflow(config.registry, bplan_meta, 'bplan')
-    add_workflow(config.registry, bplan_private_meta, 'bplan_private')
+    add_workflow(config.registry, mercator_meta, 'mercator')

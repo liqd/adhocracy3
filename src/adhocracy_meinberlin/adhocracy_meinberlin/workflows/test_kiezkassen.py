@@ -78,14 +78,6 @@ def _post_proposal_item(app_user, name='', path='') -> TestResponse:
     return resp
 
 
-def _post_proposal_item(app_user, name='', path='') -> TestResponse:
-    from adhocracy_meinberlin.resources.kiezkassen import IProposal
-    from adhocracy_core.sheets.name import IName
-    sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post_resource(path, IProposal, sheets_cstruct)
-    return resp
-
-
 def _do_transition_to(app_user, path, state) -> TestResponse:
     from adhocracy_meinberlin.sheets.kiezkassen import IWorkflowAssignment
     data = {'data': {IWorkflowAssignment.__identifier__:\

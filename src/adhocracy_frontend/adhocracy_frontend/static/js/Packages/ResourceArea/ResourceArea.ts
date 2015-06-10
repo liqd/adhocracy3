@@ -9,7 +9,7 @@ import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
-import RIOrganisation = require("../../Resources_/adhocracy_core/resources/organisation/IOrganisation");
+import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/ResourceArea";
@@ -243,11 +243,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return _.map(requests, (request) => responses[request.index]);
             });
         }).then((resources) => {
-            // FIXME: a process can not be identified directly. Instead, we look
-            // for resources that are directly below an organisation.
-            for (var i = 1; i < resources.length; i++) {
-                if (resources[i].content_type === RIOrganisation.content_type) {
-                    return resources[i - 1];
+            for (var i = 0; i < resources.length; i++) {
+                if (resources[i].isInstanceOf(RIProcess.content_type)) {
+                    return resources[i];
                 }
             }
             if (fail) {

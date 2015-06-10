@@ -21,6 +21,7 @@ def integration(config):
     config.include('adhocracy_core.resources.pool')
     config.include('adhocracy_core.resources.principal')
     config.include('adhocracy_core.resources.geo')
+    config.include('adhocracy_core.resources.document_process')
     config.include('adhocracy_core.sheets')
 
 

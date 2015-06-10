@@ -1,8 +1,8 @@
 from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 from pytest import raises
-
 
 class TestAdhocracyACLWorkflow:
 
@@ -129,3 +129,17 @@ class TestAddWorkflow:
         with raises(ConfigurationError) as err:
             self.call_fut(registry, cstruct, 'sample')
         assert 'msg' in err.value.__str__()
+
+
+@fixture
+def integration(config):
+    config.include('adhocracy_core.content')
+    config.include('adhocracy_core.workflows.sample')
+
+@mark.usefixtures('integration')
+def test_setup_workflow(registry):
+    from . import setup_workflow
+    context = testing.DummyResource()
+    sample = registry.content.workflows['sample']
+    setup_workflow(sample, context, ['participate', 'frozen'], registry)
+    assert sample.state_of(context) is 'frozen'

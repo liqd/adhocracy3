@@ -17,10 +17,10 @@ kiezkassen_meta = {
                      },
         'participate': {'title': 'Participate',
                         'description': '',
-                        'acm': {'principals': [                   'participant', 'moderator', 'creator', 'initiator'],  # noqa
+                        'acm': {'principals':                    ['participant', 'moderator', 'creator', 'initiator'],  # noqa
                                 'permissions':
                                   [['create_proposal',            'Allow',        None,        None,     'Allow'],  # noqa
-                                   ['edit_proposal',               None,          None,       'Allow',    None ],  # noqa
+                                   ['edit_proposal',               None,          None,       'Allow',    None],  # noqa
                                    ['create_comment',             'Allow',       'Allow',      None,     'Allow'],  # noqa
                                    ['edit_comment',                None,          None,       'Allow',    None],  # noqa
                                    ['create_rate',                'Allow',        None,        None,      None],  # noqa
@@ -29,7 +29,7 @@ kiezkassen_meta = {
                         },
         'frozen': {'title': 'Frozen',
                    'description': '',
-                   'acm': {'principals': [                    'participant', 'moderator', 'creator', 'initiator'],  # noqa
+                   'acm': {'principals':                      ['participant', 'moderator', 'creator', 'initiator'],  # noqa
                            'permissions':
                               [['create_proposal',             None,          None,        None,     'Allow'],  # noqa
                                ['edit_proposal',               None,          None,        None,     'Allow'],  # noqa
