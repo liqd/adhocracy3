@@ -1,6 +1,7 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
 from substanced.util import find_catalog  # pragma: no cover
+from substanced.util import find_service
 from adhocracy_core.evolution import migrate_new_sheet
 from zope.interface import alsoProvides
 from zope.interface import directlyProvides
@@ -117,7 +118,8 @@ def change_mercator_type_to_iprocess(root):
 
     registry = get_current_registry()
     add_badges_service(mercator, registry, {})
-
+    catalogs = find_service(root, 'catalogs')
+    catalogs.reindex_index(mercator, 'interfaces')
     logger.info('Finished evolve step:' + change_mercator_type_to_iprocess.__doc__)
 
 
