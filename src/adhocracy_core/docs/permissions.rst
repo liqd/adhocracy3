@@ -234,7 +234,8 @@ Can create process structure process::
 
    >>> resp = initiator.options('/organisation').json
    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-   ['adhocracy_core.resources.process.IProcess']
+   ['adhocracy_core.resources.document_process.IDocumentProcess',
+    'adhocracy_core.resources.process.IProcess']
 
 
 Admin
@@ -254,12 +255,8 @@ Can create process structure::
 
     >>> resp = admin.options('/organisation').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.resources.organisation.IOrganisation',
-     'adhocracy_core.resources.process.IProcess']
-
-    >>> resp = admin.options('/organisation').json
-    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
-    ['adhocracy_core.resources.organisation.IOrganisation',
+    ['adhocracy_core.resources.document_process.IDocumentProcess',
+     'adhocracy_core.resources.organisation.IOrganisation',
      'adhocracy_core.resources.process.IProcess']
 
 Cannot edit process structure::
