@@ -9,14 +9,17 @@ from zope.interface import alsoProvides
 from zope.interface import directlyProvides
 from zope.interface import noLongerProvides
 from adhocracy_core.authorization import set_acl
-from adhocracy_core.utils import get_sheet
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.evolution import log_migration
 from adhocracy_core.evolution import migrate_new_sheet
+from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import ITitle
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
 from adhocracy_mercator.sheets.mercator import IIntroduction
+from adhocracy_mercator.resources.mercator import IMercatorProposal
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
@@ -103,42 +106,21 @@ def change_mercator_type_to_iprocess(root):
 
 
 @log_migration
-def add_badge_assignments_services(root):
+def add_badge_assignments_services_to_proposal_items(root):
     """Add badge assignments services to proposals."""
-    from adhocracy_mercator.resources.mercator import IMercatorProposal
-    from adhocracy_core.sheets.pool import IPool
-    from adhocracy_core.resources.badge import add_badge_assignments_service
-
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=IMercatorProposal)
+    proposals = catalogs.search(query).elements
     registry = get_current_registry(root)
-    pool = get_sheet(root['mercator'], IPool, registry=registry)
-    query = {'interfaces': IMercatorProposal,
-             'only_visible': False,
-             'depth': 2
-             }
-    proposals = pool.get(query)['elements']
     for proposal in proposals:
+        logger.info('add badge assignments to {0}'.format(proposal))
         add_badge_assignments_service(proposal, registry, {})
 
 
 @log_migration
-def add_missing_sheets_for_mercator_proposals(root):
-    """Add badge assignments services to proposals."""
-    from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
-    from adhocracy_core.sheets.pool import IPool
-    from adhocracy_mercator.resources.mercator import \
-        mercator_proposal_version_meta
-
-    registry = get_current_registry(root)
-    pool = get_sheet(root['mercator'], IPool, registry=registry)
-    query = {'interfaces': IMercatorProposalVersion,
-             'only_visible': False,
-             'depth': 3
-             }
-    proposal_versions = pool.get(query)['elements']
-    for proposal_version in proposal_versions:
-        for sheet in mercator_proposal_version_meta.basic_sheets +\
-                mercator_proposal_version_meta.extended_sheets:
-            alsoProvides(proposal_version, sheet)
+def add_badgeable_sheet_to_proposal_versions(root):
+    """Add badgeable sheet to proposals versions."""
+    migrate_new_sheet(root, IMercatorProposalVersion, IBadgeable)
 
 
 def includeme(config):  # pragma: no cover
@@ -148,5 +130,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(evolve3_use_adhocracy_core_title_sheet)
     config.add_evolution_step(evolve4_disable_voting_and_commenting)
     config.add_evolution_step(change_mercator_type_to_iprocess)
-    config.add_evolution_step(add_badge_assignments_services)
-    config.add_evolution_step(add_missing_sheets_for_mercator_proposals)
+    config.add_evolution_step(add_badge_assignments_services_to_proposal_items)
+    config.add_evolution_step(add_badgeable_sheet_to_proposal_versions)
