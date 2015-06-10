@@ -41,7 +41,6 @@ class IDocument(IItem):
 
 document_meta = item_meta._replace(
     iresource=IDocument,
-    extended_sheets=[adhocracy_core.sheets.workflow.ISample],
     element_types=[ITag,
                    IParagraph,
                    IDocumentVersion,
