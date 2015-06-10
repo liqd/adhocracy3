@@ -3,6 +3,7 @@ from colander import Invalid
 
 from pyramid.interfaces import IRequest
 from pyramid.registry import Registry
+from pyramid.request import Request
 from substanced.workflow import ACLWorkflow
 from substanced.workflow import WorkflowError
 from substanced.workflow import IWorkflow
@@ -10,6 +11,7 @@ from zope.interface import implementer
 
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 from adhocracy_core.authorization import acm_to_acl
 
@@ -49,6 +51,17 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
         msg = error_msg.format(name, str(error))
         raise ConfigurationError(msg)
     _add_workflow_to_registry(registry, appstruct, workflow, name)
+
+
+def setup_workflow(workflow: AdhocracyACLWorkflow, context: IResource,
+                   states: [str], registry: Registry):
+    """Reset workflow and transition to the given states."""
+    request = Request.blank('/dummy')
+    request.registry = registry
+    request.__cached_principals__ = ['role:god']
+    workflow.reset(context)
+    for state in states:
+        workflow.transition_to_state(context, request, state)
 
 
 def _validate_workflow_cstruct(cstruct: dict) -> dict:

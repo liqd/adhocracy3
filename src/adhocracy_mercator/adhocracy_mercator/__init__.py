@@ -12,6 +12,7 @@ def includeme(config):
     config.include('adhocracy_core.resources.paragraph')
     config.include('adhocracy_core.resources.document')
     config.include('.catalog')
+    config.include('.workflows')
     config.include('.sheets.mercator')
     config.include('.resources.root')
     config.include('.resources.mercator')

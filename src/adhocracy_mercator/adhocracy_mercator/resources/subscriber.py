@@ -12,12 +12,16 @@ import transaction
 def _application_created_subscriber(event):
     """Called when the Pyramid application is started."""
     app = event.app
+    _set_permissions(app)
+    transaction.commit()
+
+
+def _set_permissions(app):
     root = get_root(app)
     clean_acl(root, app.registry)
     add_acm(root, root_acm, app.registry)
     add_acm(root, mercator_acm, app.registry)
     set_god_all_permissions(root, app.registry)
-    transaction.commit()
 
 
 def includeme(config):
