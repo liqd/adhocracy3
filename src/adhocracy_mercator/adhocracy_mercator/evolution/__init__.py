@@ -2,6 +2,9 @@
 import logging  # pragma: no cover
 from substanced.util import find_catalog  # pragma: no cover
 from adhocracy_core.evolution import migrate_new_sheet
+from zope.interface import alsoProvides
+from zope.interface import directlyProvides
+from zope.interface import noLongerProvides
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
@@ -97,22 +100,24 @@ def evolve4_disable_voting_and_commenting(root):
 
 
 def change_mercator_type_to_iprocess(root):
-    """Change mercator type from IBasicPoolWithAssets to IProcess."""
+    """Change mercator type from IBasicPoolWithAssets to IProcess with badges service."""
     from adhocracy_mercator.resources.mercator import IProcess
     from pyramid.threadlocal import get_current_registry
-    from adhocracy_core import sheets
+    from adhocracy_core.resources.asset import IPoolWithAssets
+    from adhocracy_mercator.resources.mercator import process_meta
+    from adhocracy_core.badge import add_badges_service
 
     logger.info('Running evolve step:' + change_mercator_type_to_iprocess.__doc__)
+    mercator = root['mercator']
+    noLongerProvides(mercator, IPoolWithAssets)
+    directlyProvides(mercator, IProcess)
+
+    for sheet in process_meta.basic_sheets + process_meta.extended_sheets:
+        alsoProvides(mercator, sheet)
+
     registry = get_current_registry()
-    old_mercator = root['mercator']
-    root.rename('mercator', 'old_mercator')
-    appstructs = {sheets.name.IName.__identifier__: {'name': 'mercator'}}
-    new_mercator = registry.content.create(IProcess.__identifier__,
-                                           parent=root,
-                                           appstructs=appstructs)
-    for name in old_mercator.keys():
-        old_mercator.move(name, new_mercator)
-    root.remove('old_mercator')
+    add_badges_service(mercator, registry, {})
+
     logger.info('Finished evolve step:' + change_mercator_type_to_iprocess.__doc__)
 
 
