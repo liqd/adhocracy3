@@ -166,7 +166,7 @@ Both pools show up in the pool sheet::
     >>> resp = anonymous.get("/").json
     >>> pprint(sorted(resp['data']['adhocracy_core.sheets.pool.IPool']
     ...                        ['elements']))
-    ['.../adhocracy/pool1/',.../adhocracy/pool2/'...
+    ['.../pool1/',.../pool2/'...
 
 Lets check whether we have the permission to delete or hide resources.
 The person who has created a resource (creator role) has the right to delete
@@ -203,7 +203,7 @@ Inspecting the 'updated_resources' listing in the response, we see that
 pool2 was removed::
 
     >>> resp['updated_resources']['removed']
-    ['http://localhost/adhocracy/pool2/']
+    ['http://localhost/pool2/']
 
 Now we get an error message when trying to retrieve the pool2::
 
@@ -230,7 +230,7 @@ Only the pool1 is still visible in the pool::
 
     >>> resp = anonymous.get("/").json
     >>> resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['.../adhocracy/pool1/']
+    ['.../pool1/']
 
 Sanity check: internally, the backend uses a *private_visibility* index to keep
 track of the visibility/deletion status of resources. But this filter is

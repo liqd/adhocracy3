@@ -1,6 +1,5 @@
 <div class="section-jump" id="section-jump-top">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
-    {{ data.assignments }}
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
     <div class="section-jump-cover">
         <ul class="meta-list mercator-proposal-detail-meta-list">
@@ -31,6 +30,12 @@
 
         <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
             <ol>
+                <li ng-if="data.assignments.length > 0"><a
+                    href="#jury-decision"
+                    title="Jury Decision"
+                    data-du-smooth-scroll=""
+                    data-du-scrollspy=""
+                    ><i class="icon-star"></i></a></li>
                 <li><a
                     href="#mercator-detail-view-brief-proposal"
                     data-du-smooth-scroll=""
@@ -60,6 +65,15 @@
         </nav>
 
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
+            <section ng-if="data.assignments.length > 0" class="chapter m-jury-decision" id="jury-decision">
+                <section class="jury-decision-section">
+                    <h2 class="chapter-header">Jury Decision</h2>
+                    <p>{{ data.assignments[0].description }}</p>
+                    <div class="jury-decision-section-icon">
+                        <i class="icon-star"></i>
+                    </div>
+                </section>
+            </section>
             <section class="chapter" id="mercator-detail-view-brief-proposal">
                 <section class="commentable-section {{subResourceSelectedState('introduction')}}">
                     <h2 class="chapter-header m-counted"
