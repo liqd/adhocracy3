@@ -22,8 +22,8 @@ def test_root_meta():
 
 @mark.usefixtures('integration')
 def test_add_spd_process(pool, registry):
-    from adhocracy_core.resources.document_process import IDocumentProcess
+    from .digital_leben import IProcess
     from .root import add_spd_process
     add_spd_process(pool, registry, {})
-    IDocumentProcess.providedBy(pool['digital_leben'])
+    IProcess.providedBy(pool['digital_leben'])
 

@@ -9,6 +9,7 @@ def includeme(config):
     config.include('adhocracy_sample')
     config.include('.resources.root')
     config.include('.resources.subscriber')
+    config.include('.resources.digital_leben')
 
 
 def main(global_config, **settings):
