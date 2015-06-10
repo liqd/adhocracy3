@@ -54,4 +54,12 @@ export class Resource {
 
         return result;
     }
+
+    public isInstanceOf(resourceType : string) : boolean {
+        if (resourceType === this.content_type) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
