@@ -1,8 +1,8 @@
-<a data-ng-href="{{ path | adhResourceUrl }}" class="spd-document-list-item {{ selectedState }}">
-    <img class="spd-document-list-item-image"
+<a data-ng-href="{{ path | adhResourceUrl }}" class="proposal-list-item {{ selectedState }}">
+    <img class="proposal-list-item-image"
         data-ng-src="{{ data.picture | adhImageUri:'thumbnail' }}" alt="" />
-    <div class="spd-document-list-item-body">
-        <h3 class="spd-document-list-item-title">{{ data.title }}</h3>
+    <div class="proposal-list-item-body">
+        <h3 class="proposal-list-item-title">{{ data.title }}</h3>
         <ul class="meta-list">
             <li class="meta-list-item">
                 <i class="icon-speechbubbles"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
