@@ -1,0 +1,81 @@
+/*doc
+---
+title: Proposal List
+name: proposal-list
+category: Proposal
+---
+
+A proposal list item. How a proposal appears when in a list
+
+```html_example
+<a class="proposal-list-item" href="#">
+    <img class="proposal-list-item-image" alt="" src="/static/fallback_thumbnail.jpg" />
+    <div class="proposal-list-item-body">
+        <p class="proposal-list-item-username">Username</p>
+        <h3 class="proposal-list-item-title">Title here</h3>
+        <ul class="meta-list">
+            <li class="meta-list-item">
+                <i class="icon-speechbubbles"></i> 0 Comments
+            </li>
+        </ul>
+    </div>
+</a>
+```
+*/
+
+$image-margin: 11px;
+$thumbnail-width: 105px;
+$thumbnail-height: 90px;
+
+.proposal-list-item {
+    @include container;
+    display: block;
+    border-bottom: 2px solid $color-structure-normal;
+    font-size: $font-size-plus;
+    line-height: 1;
+    padding: 1em 1.25em 1.125em 0.875em;
+    position: relative;
+
+    // reset link styling
+    color: inherit;
+    text-decoration: none;
+
+    &.is-not-selected {
+        background: $color-background-base-introvert;
+
+        i[class*=icon-],
+        .meta-list-item-budget {
+            color: $color-text-highlight-introvert;
+        }
+
+        &:hover, &:focus {
+            background: $color-background-base;
+        }
+    }
+}
+
+.proposal-list-item-image {
+    float: left;
+    margin-right: $image-margin;
+}
+
+.proposal-list-item-body {
+    margin-left: $thumbnail-width + $image-margin;
+}
+
+.proposal-list-item-title,
+.proposal-list-item-username {
+    margin: 0;
+}
+
+.proposal-list-item-username {
+    font-size: $font-size-small;
+    margin-bottom: 15px / $font-size-small * 1em;
+}
+
+.proposal-list-item-title {
+    font-size: $font-size-plus;
+    font-weight: $font-weight-normal;
+    margin-bottom: 15px / $font-size-plus * 1em;
+}
+
