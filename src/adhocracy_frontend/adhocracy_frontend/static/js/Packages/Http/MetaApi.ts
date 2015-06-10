@@ -26,6 +26,7 @@ export interface IResource {
     sheets : string[];
     item_type ?: string;
     element_types : string[];
+    super_types : string[];
 
     // generated after import
     nick ?: string;

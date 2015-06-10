@@ -838,46 +838,46 @@ class AppUser:
 @fixture(scope='class')
 def app_anonymous(app) -> TestApp:
     """Return backend test app wrapper with participant authentication."""
-    return AppUser(app, base_path='/adhocracy')
+    return AppUser(app)
 
 
 @fixture(scope='class')
 def app_broken_token(app) -> TestApp:
     """Return backend test app wrapper with participant authentication."""
-    return AppUser(app, base_path='/adhocracy', header=broken_header)
+    return AppUser(app, header=broken_header)
 
 
 @fixture(scope='class')
 def app_participant(app) -> TestApp:
     """Return backend test app wrapper with participant authentication."""
-    return AppUser(app, base_path='/adhocracy', header=participant_header)
+    return AppUser(app, header=participant_header)
 
 
 @fixture(scope='class')
 def app_participant2(app) -> TestApp:
     """Return backend test app wrapper with participant authentication."""
-    return AppUser(app, base_path='/adhocracy', header=participant2_header)
+    return AppUser(app, header=participant2_header)
 
 
 @fixture(scope='class')
 def app_moderator(app):
     """Return backend test app wrapper with moderator authentication."""
-    return AppUser(app, base_path='/adhocracy', header=moderator_header)
+    return AppUser(app, header=moderator_header)
 
 
 @fixture(scope='class')
 def app_initiator(app):
     """Return backend test app wrapper with initiator authentication."""
-    return AppUser(app, base_path='/adhocracy', header=initiator_header)
+    return AppUser(app, header=initiator_header)
 
 
 @fixture(scope='class')
 def app_admin(app):
     """Return backend test app wrapper with admin authentication."""
-    return AppUser(app, base_path='/adhocracy', header=admin_header)
+    return AppUser(app, header=admin_header)
 
 
 @fixture(scope='class')
 def app_god(app):
     """Return backend test app wrapper with god authentication."""
-    return AppUser(app, base_path='/adhocracy', header=god_header)
+    return AppUser(app, header=god_header)

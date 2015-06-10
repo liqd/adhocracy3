@@ -1,5 +1,6 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging
+from functools import wraps
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from pyramid.security import Allow
@@ -60,6 +61,22 @@ def migrate_new_sheet(context: IPool,
             noLongerProvides(resource, isheet_old)
 
 
+def log_migration(func):
+    """Decorator for the migration scripts.
+
+    The decorator logs the call to the evolve script.
+    """
+    logger = logging.getLogger(func.__module__)
+
+    @wraps(func)
+    def logger_decorator(*args, **kwargs):
+        logger.info('Running evolve step: ' + func.__doc__)
+        func(*args, **kwargs)
+        logger.info('Finished evolve step: ' + func.__doc__)
+
+    return logger_decorator
+
+
 def _migrate_field_values(registry: Registry, resource: IResource,
                           isheet: IInterface, isheet_old: IInterface,
                           fields_mapping=[(str, str)]):
@@ -73,6 +90,7 @@ def _migrate_field_values(registry: Registry, resource: IResource,
     sheet.set(appstruct)
 
 
+@log_migration
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
     migrate_new_sheet(root, IBasicPool, ITitle, IPool,
@@ -81,10 +99,9 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
                       remove_isheet_old=False)
 
 
+@log_migration
 def add_kiezkassen_permissions(root):
     """Add permission to use the kiezkassen process."""
-    logger.info('Running evolve step:' + add_kiezkassen_permissions.__doc__)
-
     registry = get_current_registry()
     acl = get_acl(root)
     new_acl = [(Allow, 'role:contributor', 'add_kiezkassen_proposal'),
@@ -94,13 +111,10 @@ def add_kiezkassen_permissions(root):
     updated_acl = acl + new_acl
     set_acl(root, updated_acl, registry=registry)
 
-    logger.info('Finished evolve step:' + add_kiezkassen_permissions.__doc__)
 
-
+@log_migration
 def upgrade_catalogs(root):
     """Upgrade catalogs."""
-    logger.info('Running evolve step:' + upgrade_catalogs.__doc__)
-
     registry = get_current_registry()
     old_catalogs = root['catalogs']
 
@@ -119,8 +133,6 @@ def upgrade_catalogs(root):
 
     catalogs.reindex_all(catalogs['system'])
     catalogs.reindex_all(catalogs['adhocracy'])
-
-    logger.info('Finished evolve step:' + upgrade_catalogs.__doc__)
 
 
 def includeme(config):  # pragma: no cover
