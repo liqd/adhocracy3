@@ -99,7 +99,6 @@ class TestDigitalLebenWorkflow:
 
     def test_frozen_participant_cannot_comment_document(self, app_participant):
         from adhocracy_core.resources.comment import IComment
-        import ipdb;ipdb.set_trace()
         assert IComment not in app_participant.get_postable_types(
             '/digital_leben/document/comments')
 
