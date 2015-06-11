@@ -9,9 +9,11 @@ from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
 from substanced.evolution import add_evolution_step
 from substanced.util import get_acl
+from substanced.util import find_service
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.resources.pool import IBasicPool
@@ -25,7 +27,7 @@ logger = logging.getLogger(__name__)
 def migrate_new_sheet(context: IPool,
                       iresource: IInterface,
                       isheet: IInterface,
-                      isheet_old: IInterface,
+                      isheet_old: IInterface=None,
                       remove_isheet_old=False,
                       fields_mapping: [(str, str)]=[]):
     """Add new `isheet` to `iresource` resources and migrate field values.
@@ -33,18 +35,17 @@ def migrate_new_sheet(context: IPool,
     :param context: Pool to search for `iresource` resources
     :param iresource: resource type to migrate
     :param isheet: new sheet interface to add
-    :param isheet_old: old sheet interface
+    :param isheet_old: old sheet interface to migrate,
+        must not be None if `fields_mapping` or `remove_isheet_old` is set.
     :param remove_isheet_old: remove old sheet interface
     :param fields_mapping: list of (field name, old field name) to
                            migrate field values.
     """
     registry = get_current_registry(context)
-    pool = get_sheet(context, IPool, registry=registry)
-    query = {'interfaces': (isheet_old, iresource),
-             'only_visible': False,
-             'depth': 0
-             }
-    resources = pool.get(query)['elements']
+    catalogs = find_service(context, 'catalogs')
+    interfaces = isheet_old and (isheet_old, iresource) or iresource
+    query = search_query._replace(interfaces=interfaces)
+    resources = catalogs.search(query).elements
     count = len(resources)
     logger.info('Migrating {0} {1} to new sheet {2}'.format(count, iresource,
                                                             isheet))
@@ -93,10 +94,8 @@ def _migrate_field_values(registry: Registry, resource: IResource,
 @log_migration
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
-    migrate_new_sheet(root, IBasicPool, ITitle, IPool,
-                      remove_isheet_old=False)
-    migrate_new_sheet(root, IPoolWithAssets, ITitle, IPool,
-                      remove_isheet_old=False)
+    migrate_new_sheet(root, IBasicPool, ITitle)
+    migrate_new_sheet(root, IPoolWithAssets, ITitle)
 
 
 @log_migration
