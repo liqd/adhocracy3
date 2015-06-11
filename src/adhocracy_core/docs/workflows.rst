@@ -79,7 +79,7 @@ execute arbitrary tasks::
 Workflow Assignment
 -------------------
 
-Resources have a WorkflowAssignment sheet to assign the wanted workflow::
+Resources can have a WorkflowAssignment sheet to assign the wanted workflow::
 
     >>> resp = app_god.get('/process').json
     >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
