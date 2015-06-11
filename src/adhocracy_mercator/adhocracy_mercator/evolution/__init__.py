@@ -74,7 +74,9 @@ def change_mercator_type_to_iprocess(root):
     from adhocracy_core.resources.badge import add_badges_service
     migrate_new_iresource(root, IPoolWithAssets, IProcess)
     registry = get_current_registry()
-    add_badges_service(root['mercator'], registry, {})
+    mercator = root['mercator']
+    if find_service(mercator, 'badges') is None:
+        add_badges_service(mercator, registry, {})
 
 
 @log_migration
@@ -85,8 +87,9 @@ def add_badge_assignments_services_to_proposal_items(root):
     proposals = catalogs.search(query).elements
     registry = get_current_registry(root)
     for proposal in proposals:
-        logger.info('add badge assignments to {0}'.format(proposal))
-        add_badge_assignments_service(proposal, registry, {})
+        if find_service(proposal, 'badge_assignments') is None:
+            logger.info('add badge assignments to {0}'.format(proposal))
+            add_badge_assignments_service(proposal, registry, {})
 
 
 @log_migration
