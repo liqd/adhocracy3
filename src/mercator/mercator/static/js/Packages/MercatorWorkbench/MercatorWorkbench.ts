@@ -172,6 +172,8 @@ export var mercatorProposalListingColumnDirective = (
 export var moduleName = "adhMercatorWorkbench";
 
 export var register = (angular) => {
+    var processType = RIProcess.content_type;
+
     angular
         .module(moduleName, [
             AdhAbuse.moduleName,
@@ -187,11 +189,11 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RICommentVersion, "", "", "", {
+                .default(RICommentVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RICommentVersion, "", "", "", ["adhHttp", "$q", (
+                .specific(RICommentVersion, "", processType, "", ["adhHttp", "$q", (
                     adhHttp : AdhHttp.Service<any>,
                     $q : angular.IQService
                 ) => (resource : RICommentVersion) => {
@@ -222,17 +224,17 @@ export var register = (angular) => {
                     })
                     .then(() => specifics);
                 }])
-                .default(RIProcess, "", "", "", {
+                .default(RIProcess, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
                     proposalUrl: "",  // not used by default, but should be overridable
                     focus: "0"
                 })
-                .default(RIProcess, "create_proposal", "", "", {
+                .default(RIProcess, "create_proposal", processType, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIProcess, "create_proposal", "", "", ["adhHttp",
+                .specific(RIProcess, "create_proposal", processType, "", ["adhHttp",
                     (adhHttp : AdhHttp.Service<any>) => {
                         return (resource : RIProcess) => {
                             return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
@@ -247,7 +249,7 @@ export var register = (angular) => {
                 );
         }])
         .config(["adhProcessProvider", (adhProcessProvider) => {
-            adhProcessProvider.templateFactories[""] = ["$q", ($q : angular.IQService) => {
+            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
                 return $q.when("<adh-mercator-workbench></adh-mercator-workbench>");
             }];
         }])

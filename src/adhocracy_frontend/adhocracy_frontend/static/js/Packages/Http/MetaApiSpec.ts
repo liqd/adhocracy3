@@ -12,7 +12,8 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
             ],
             "element_types" : [
                 "adhocracy_core.interfaces.IPool"
-            ]
+            ],
+            "super_types" : []
         }
     },
     "sheets" : {
