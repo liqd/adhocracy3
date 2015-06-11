@@ -7,6 +7,7 @@ from pyramid.security import Allow
 from zope.interface.interfaces import IInterface
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
+from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
 from substanced.util import get_acl
 from substanced.util import find_service
@@ -14,6 +15,7 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
+from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.resources.pool import IBasicPool
@@ -60,6 +62,36 @@ def migrate_new_sheet(context: IPool,
         if remove_isheet_old:
             logger.info('Remove {0} sheet'.format(isheet_old))
             noLongerProvides(resource, isheet_old)
+
+
+def migrate_new_iresource(context: IResource,
+                          old_iresource: IInterface,
+                          new_iresource: IInterface):
+    """Migrate resources with `old_iresource` interface to `new_iresource`."""
+    meta = _get_resource_meta(context, new_iresource)
+    catalogs = find_service(context, 'catalogs')
+    resources = _search_for_interfaces(catalogs, old_iresource)
+    for resource in resources:
+        logger.info('Migrate iresource of {0}'.format(resource))
+        noLongerProvides(resource, old_iresource)
+        directlyProvides(resource, new_iresource)
+        for sheet in meta.basic_sheets + meta.extended_sheets:
+            alsoProvides(resource, sheet)
+        catalogs.reindex_index(resource, 'interfaces')
+
+
+def _get_resource_meta(context: IResource,
+                       iresource: IInterface) -> ResourceMetadata:
+    registry = get_current_registry(context)
+    meta = registry.content.resources_meta[iresource]
+    return meta
+
+
+def _search_for_interfaces(catalogs: ICatalogsService,
+                           interfaces: (IInterface)) -> [IResource]:
+    query = search_query._replace(interfaces=interfaces)
+    resources = catalogs.search(query).elements
+    return resources
 
 
 def log_migration(func):

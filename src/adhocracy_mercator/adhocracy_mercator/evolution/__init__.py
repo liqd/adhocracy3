@@ -4,15 +4,14 @@ from pyramid.threadlocal import get_current_registry
 from pyramid.security import Deny
 from substanced.util import get_acl
 from substanced.util import find_catalog  # pragma: no cover
+from adhocracy_core.authorization import set_acl
+from adhocracy_core.evolution import migrate_new_sheet
+from adhocracy_core.evolution import migrate_new_iresource
+from adhocracy_core.evolution import log_migration
+from adhocracy_core.utils import get_sheet_field
 from substanced.util import find_service
 from zope.interface import alsoProvides
-from zope.interface import directlyProvides
-from zope.interface import noLongerProvides
-from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import search_query
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.evolution import log_migration
-from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
@@ -89,20 +88,10 @@ def change_mercator_type_to_iprocess(root):
     """Change mercator type from IBasicPoolWithAssets to IProcess."""
     from adhocracy_mercator.resources.mercator import IProcess
     from adhocracy_core.resources.asset import IPoolWithAssets
-    from adhocracy_mercator.resources.mercator import process_meta
     from adhocracy_core.resources.badge import add_badges_service
-
-    mercator = root['mercator']
-    noLongerProvides(mercator, IPoolWithAssets)
-    directlyProvides(mercator, IProcess)
-
-    for sheet in process_meta.basic_sheets + process_meta.extended_sheets:
-        alsoProvides(mercator, sheet)
-
+    migrate_new_iresource(root, IPoolWithAssets, IProcess)
     registry = get_current_registry()
-    add_badges_service(mercator, registry, {})
-    catalogs = find_service(root, 'catalogs')
-    catalogs.reindex_index(mercator, 'interfaces')
+    add_badges_service(root['mercator'], registry, {})
 
 
 @log_migration

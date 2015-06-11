@@ -6,6 +6,7 @@ from unittest.mock import call
 import unittest
 
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import IResource
 
 #############
 #  helpers  #
@@ -32,6 +33,9 @@ class ISheetA(ISheet):
 class ISheetB(ISheet):
     pass
 
+
+class IResourceA(IResource):
+    pass
 
 ################
 #  tests       #
@@ -128,6 +132,42 @@ class TestMigrateNewSheet:
         self.call_fut(context, IResource, ISheetA, ISheetB,
                       fields_mapping=[('field_a', 'field_b')])
         b_sheet.delete_field_values.assert_called_with(['field_b'])
+
+
+
+class TestChangeIResource:
+
+    @fixture
+    def registry(self, registry_with_content, resource_meta):
+        registry = registry_with_content
+        resource_meta_a = resource_meta._replace(basic_sheets=[ISheetA])
+        registry.content.resources_meta[IResourceA] = resource_meta_a
+        return registry
+
+    @fixture
+    def context(self, pool, mock_catalogs):
+        pool['catalogs'] = mock_catalogs
+        return pool
+
+    def call_fut(self, root, old_iresource, new_iresource):
+        from . import migrate_new_iresource
+        return migrate_new_iresource(root, old_iresource, new_iresource)
+
+    def test_ignore_if_no_old_resources_are_found(self, context, registry,
+                                                  mock_catalogs, search_result):
+        mock_catalogs.search.return_value = search_result
+        self.call_fut(context, IResource, IResourceA)
+        assert mock_catalogs.search.called
+
+    def test_add_new_iresource_and_resource_type_isheets(
+            self, context, registry, mock_catalogs, query, search_result):
+        old = testing.DummyResource(__provides__=(IResource, ISheet))
+        mock_catalogs.search.return_value = search_result._replace(elements=[old])
+        self.call_fut(context, IResource, IResourceA)
+        assert [x for x in old.__provides__] == [IResourceA, ISheetA]
+        assert mock_catalogs.search.call_args[0][0] == \
+               query._replace(interfaces=IResource)
+        assert mock_catalogs.reindex_index.call_args[0] == (old, 'interfaces')
 
 
 class TestLogMigrationDecorator:
