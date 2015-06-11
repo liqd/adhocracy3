@@ -2,8 +2,8 @@
     data-ng-href="{{ path | adhResourceUrl }}"
     data-ng-class="{
         'has-badge': data.assignments.length > 0,
-        'm-winner': data.assignments[0].title === 'Winning',
-        'm-community-award': data.assignments[0].title === 'Community'
+        'm-winner': data.assignments[0].name === 'winning',
+        'm-community-award': data.assignments[0].name === 'community'
     }"
     class="mercator-proposal-list-item {{ selectedState }}">
     <img class="mercator-proposal-list-item-image"

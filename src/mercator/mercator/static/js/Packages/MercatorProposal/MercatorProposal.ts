@@ -298,7 +298,8 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
 export class BadgeAssignment {
     constructor(
         private title : string,
-        private description : string
+        private description : string,
+        private name : string
     ) {}
 }
 
@@ -311,7 +312,8 @@ var getBadges = (
             var description = assignment.data[SIDescription.nick].description;
             return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
                 var title = badge.data[SITitle.nick].title;
-                return new BadgeAssignment(title, description);
+                var name = badge.data[SIName.nick].name;
+                return new BadgeAssignment(title, description, name);
             });
         });
     }));
