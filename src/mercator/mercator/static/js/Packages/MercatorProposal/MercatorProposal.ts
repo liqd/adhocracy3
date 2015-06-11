@@ -47,6 +47,7 @@ import RIMercatorStory = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IStoryVersion");
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
+import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
 import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
@@ -1134,6 +1135,8 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
+    var processType = RIProcess.content_type;
+
     angular
         .module(moduleName, [
             "duScroll",
@@ -1151,20 +1154,20 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIMercatorProposalVersion, "", "", "", {
+                .default(RIMercatorProposalVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIMercatorProposalVersion, "", "", "", () => (resource : RIMercatorProposalVersion) => {
+                .specific(RIMercatorProposalVersion, "", processType, "", () => (resource : RIMercatorProposalVersion) => {
                     return {
                         proposalUrl: resource.path
                     };
                 })
-                .default(RIMercatorProposalVersion, "edit", "", "", {
+                .default(RIMercatorProposalVersion, "edit", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-hide"
                 })
-                .specific(RIMercatorProposalVersion, "edit", "", "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                .specific(RIMercatorProposalVersion, "edit", processType, "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
                     return (resource : RIMercatorProposalVersion) => {
                         var poolPath = AdhUtil.parentPath(resource.path);
 
@@ -1179,11 +1182,11 @@ export var register = (angular) => {
                         });
                     };
                 }])
-                .default(RIMercatorProposalVersion, "comments", "", "", {
+                .default(RIMercatorProposalVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIMercatorProposalVersion, "comments", "", "", () => (resource : RIMercatorProposalVersion) => {
+                .specific(RIMercatorProposalVersion, "comments", processType, "", () => (resource : RIMercatorProposalVersion) => {
                     return {
                         proposalUrl: resource.path,
                         commentableUrl: resource.path
@@ -1192,11 +1195,11 @@ export var register = (angular) => {
 
             _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
                 adhResourceAreaProvider
-                    .default(RIMercatorProposalVersion, "comments:" + section, "", "", {
+                    .default(RIMercatorProposalVersion, "comments:" + section, processType, "", {
                         space: "content",
                         movingColumns: "is-collapse-show-show"
                     })
-                    .specific(RIMercatorProposalVersion, "comments:" + section, "", "", () =>
+                    .specific(RIMercatorProposalVersion, "comments:" + section, processType, "", () =>
                         (resource : RIMercatorProposalVersion) => {
                             return {
                                 proposalUrl: resource.path,
