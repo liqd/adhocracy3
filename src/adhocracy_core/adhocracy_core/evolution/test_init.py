@@ -1,11 +1,12 @@
 from copy import deepcopy
 from pyramid import testing
+from pytest import fixture
 from unittest.mock import Mock
 from unittest.mock import call
+import unittest
+
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
-
-import unittest
 
 #############
 #  helpers  #
@@ -52,7 +53,6 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
     def test_includeme_add_directives(self):
         assert 'add_evolution_step' in self.config.registry._directives
 
-from pytest import fixture
 
 
 class TestMigrateNewSheet:
@@ -79,53 +79,55 @@ class TestMigrateNewSheet:
         return deepcopy(mock_sheet)
 
     @fixture
-    def context(self, context):
+    def context(self, pool, mock_catalogs):
         from zope.interface import alsoProvides
-        from adhocracy_core.sheets.pool import IPool
-        alsoProvides(context, ISheetB)
-        alsoProvides(context, IPool)
-        return context
+        alsoProvides(pool, ISheetB)
+        pool['catalogs'] = mock_catalogs
+        return pool
 
     def call_fut(self, *args, **kwargs):
         from . import migrate_new_sheet
         return migrate_new_sheet(*args, **kwargs)
 
-    def test_ignore_if_no_resources_without_new_isheet(
-            self, context, registry, pool_sheet):
+    def test_ignore_if_no_resources_to_migrate(
+            self, context, mock_catalogs, search_result, query):
         from adhocracy_core.interfaces import IResource
-        pool_sheet.get.return_value = {'elements': []}
-        self.call_fut(context, IResource, ISheet, ISheetB)
-        pool_sheet.get.assert_called_with({'interfaces': (ISheetB, IResource),
-                                           'depth': 0,
-                                           'only_visible': False,
-                                           })
+        mock_catalogs.search.return_value = search_result
+        self.call_fut(context, IResource, ISheetB)
 
-    def test_add_new_isheet(self, context, registry, pool_sheet):
+    def test_add_new_isheet(self, context, mock_catalogs, search_result, query):
         from adhocracy_core.interfaces import IResource
-        pool_sheet.get.return_value = {'elements': [context]}
-        self.call_fut(context, IResource, ISheetA, ISheetB)
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
+        self.call_fut(context, IResource, ISheetA)
         assert ISheetA.providedBy(context)
+        search_query = query._replace(interfaces=(IResource))
+        assert mock_catalogs.search.call_args[0][0] == search_query
 
-    def test_remove_old_isheet(self, context, registry, pool_sheet):
+    def test_remove_old_isheet(self, context, mock_catalogs, search_result):
         from adhocracy_core.interfaces import IResource
-        pool_sheet.get.return_value = {'elements': [context]}
-        self.call_fut(context, IResource, ISheetA, ISheetB,
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
+        self.call_fut(context, IResource, ISheetA,
+                      isheet_old=ISheetB,
                       remove_isheet_old=True)
         assert not ISheetB.providedBy(context)
 
-    def test_copy_field_to_new_sheet(self, context, registry, pool_sheet,
-                                     a_sheet, b_sheet):
+    def test_copy_field_to_new_sheet(self, context, registry, mock_catalogs,
+                                     search_result, a_sheet, b_sheet):
         from adhocracy_core.interfaces import IResource
-        pool_sheet.get.return_value = {'elements': [context]}
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
         b_sheet.get.return_value = {'field_b': 'value'}
         self.call_fut(context, IResource, ISheetA, ISheetB,
                       fields_mapping=[('field_a', 'field_b')])
         a_sheet.set.assert_called_with({'field_a': 'value'})
 
-    def test_remove_old_field_values(self, context, registry, pool_sheet,
-                                     a_sheet, b_sheet):
+    def test_remove_old_field_values(self, context, registry,  mock_catalogs,
+                                     search_result, a_sheet, b_sheet):
         from adhocracy_core.interfaces import IResource
-        pool_sheet.get.return_value = {'elements': [context]}
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
         b_sheet.get.return_value = {'field_b': 'value'}
         self.call_fut(context, IResource, ISheetA, ISheetB,
                       fields_mapping=[('field_a', 'field_b')])
