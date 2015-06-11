@@ -6,16 +6,17 @@ setup.py.
 """
 
 import inspect
+
 import argparse
 import transaction
-
 from pyramid.paster import bootstrap
 from pyramid.traversal import find_resource
 from substanced.util import find_service
-from adhocracy_core.utils import load_json
-from adhocracy_core.resources.badge import IBadgeAssignment as BadgeRessource
-from adhocracy_core.sheets.badge import IBadgeAssignment as BadgeSheet
+
+import adhocracy_core.resources.badge.IBadgeAssignment
+import adhocracy_core.sheets.badge.IBadgeAssignment
 from adhocracy_core.sheets.description import IDescription
+from adhocracy_core.utils import load_json
 
 
 def add_badge_assignment_from_json():
@@ -40,7 +41,7 @@ def add_badge_assignment_from_json():
 
 def _create_appstructs(subject, badge, object, description):
 
-    appstructs = {BadgeSheet.__identifier__:
+    appstructs = {adhocracy_core.sheets.badge.IBadgeAssignment.__identifier__:
                   {'subject': subject,
                    'badge': badge,
                    'object': object
@@ -78,7 +79,7 @@ def _create_badge_assignment(entry, root, registry):
     service = find_service(parent, 'badge_assignments')
     appstructs = _create_appstructs(user, badge, proposal_version, description)
 
-    registry.content.create(BadgeRessource.__identifier__,
+    registry.content.create(adhocracy_core.resources.badge.IBadgeAssignment.__identifier__,
                             parent=service,
                             appstructs=appstructs)
 
