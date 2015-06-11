@@ -79,9 +79,9 @@ execute arbitrary tasks::
 Workflow Assignment
 -------------------
 
-Resources have a WorkflowAssignment sheet to assign the wanted workflow::
+Resources can have a WorkflowAssignment sheet to assign the wanted workflow::
 
-    >>> resp = app_god.get('/process').json
+    >>> resp = app_god.get('/process/').json
     >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
     >>> workflow_data['workflow']
     'sample'
@@ -103,11 +103,11 @@ this metadata can be set::
 
     >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'participate': {'description': 'new',
     ...                                                                             'start_date': '2015-05-26T12:40:49.638293+00:00'}}}}
-    >>> resp = app_god.put('/process/proposal_item', data)
+    >>> resp = app_god.put('/process', data)
     >>> resp.status_code
     200
 
-    >>> resp = app_god.get('/process/proposal_item').json
+    >>> resp = app_god.get('/process').json
     >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
     >>> workflow_data['participate']['description']
     'new'
@@ -119,18 +119,18 @@ Workflow transition to states
 We can also modify the state if the workflow has a suitable transition.
 First we check the available next states::
 
-    >>> resp = app_god.options('/process/proposal_item').json
+    >>> resp = app_god.options('/process').json
     >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.ISample']
     {'workflow_state': ['frozen']}
 
 Then we can put the wanted next state:
 
      >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'workflow_state': 'frozen'}}}
-     >>> resp = app_god.put('/process/proposal_item', data)
+     >>> resp = app_god.put('/process', data)
      >>> resp.status_code
      200
 
-    >>> resp = app_god.get('/process/proposal_item').json
+    >>> resp = app_god.get('/process').json
     >>> resp['data']['adhocracy_core.sheets.workflow.ISample']['workflow_state']
     'frozen'
 
