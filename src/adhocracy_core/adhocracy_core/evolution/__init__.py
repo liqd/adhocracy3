@@ -3,16 +3,13 @@ import logging
 from functools import wraps
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
-from pyramid.security import Allow
 from zope.interface.interfaces import IInterface
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
 from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
-from substanced.util import get_acl
 from substanced.util import find_service
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import ResourceMetadata
@@ -132,15 +129,7 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
 
 @log_migration
 def add_kiezkassen_permissions(root):
-    """Add permission to use the kiezkassen process."""
-    registry = get_current_registry()
-    acl = get_acl(root)
-    new_acl = [(Allow, 'role:contributor', 'add_kiezkassen_proposal'),
-               (Allow, 'role:creator', 'edit_kiezkassen_proposal'),
-               (Allow, 'role:admin', 'add_kiezkassen_process'),
-               (Allow, 'role:admin', 'add_process')]
-    updated_acl = acl + new_acl
-    set_acl(root, updated_acl, registry=registry)
+    """(disabled) Add permission to use the kiezkassen process."""
 
 
 @log_migration
