@@ -88,8 +88,8 @@ setup(name='adhocracy_core',
           adhocracy_core.scripts.import_resources:import_resources
       import_local_roles = \
           adhocracy_core.scripts.import_local_roles:import_local_roles
-      add_badge_assignment_from_json =\
-          adhocracy_core.scripts.manage_badges:add_badge_assignment_from_json
+      assign_badges =\
+          adhocracy_core.scripts.assign_badges:assign_badges
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,

@@ -13,17 +13,17 @@ from pyramid.paster import bootstrap
 from pyramid.traversal import find_resource
 from substanced.util import find_service
 
-import adhocracy_core.resources.badge.IBadgeAssignment
-import adhocracy_core.sheets.badge.IBadgeAssignment
+import adhocracy_core.resources.badge
+import adhocracy_core.sheets.badge
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.utils import load_json
 
 
-def add_badge_assignment_from_json():
-    """add badgeassignment.
+def assign_badges():
+    """Assign badges to proposals.
 
     usage::
-      bin/create_badge <config> <jsonfile>
+      bin/assign_badges <config> <jsonfile>
     """
     args = _create_parser()
     env = bootstrap(args.ini_file)
@@ -85,7 +85,7 @@ def _create_badge_assignment(entry, root, registry):
 
 
 def _create_parser():
-    docstring = inspect.getdoc(add_badge_assignment_from_json)
+    docstring = inspect.getdoc(assign_badges)
     parser = argparse.ArgumentParser(description=docstring)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
