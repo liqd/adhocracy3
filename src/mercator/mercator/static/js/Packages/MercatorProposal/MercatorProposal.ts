@@ -70,6 +70,7 @@ import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mer
 import SIMercatorSubResources = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMercatorSubResources");
 import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
+import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
@@ -170,6 +171,9 @@ export interface IScopeData {
 
     // 7. badges
     assignments : BadgeAssignment[];
+
+    // 8. current phase
+    currentPhase: string;
 }
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
@@ -460,6 +464,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
             data.assignments = assignments;
+        });
+
+        var processUrl = this.adhTopLevelState.get("processUrl");
+        this.adhHttp.get(processUrl).then((resource) => {
+            data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
         });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
@@ -979,6 +988,11 @@ export var listItem = (
 
                 getBadges(adhHttp, $q)(proposal).then((assignments) => {
                     scope.data.assignments = assignments;
+                });
+
+                var processUrl = adhTopLevelState.get("processUrl");
+                adhHttp.get(processUrl).then((resource) => {
+                    scope.data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
                 });
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
