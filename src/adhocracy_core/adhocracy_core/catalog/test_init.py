@@ -272,13 +272,15 @@ class TestCatalogsServiceAdhocracy:
         from adhocracy_core.interfaces import Reference
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
-        referenced = self._make_resource(registry, parent=pool)
+        referenced1 = self._make_resource(registry, parent=pool)
+        referenced2 = self._make_resource(registry, parent=pool)
+        referenced3 = self._make_resource(registry, parent=pool)
         referencing = self._make_resource(registry, parent=pool, iresource=ITag)
         sheet = get_sheet(referencing, sheets.tags.ITag)
-        sheet.set({'elements': [referenced]})
+        sheet.set({'elements': [referenced3, referenced1, referenced2]})
         reference = Reference(referencing, sheets.tags.ITag, 'elements', None)
         result = inst.search(query._replace(references=[reference]))
-        assert list(result.elements) == [referenced]
+        assert list(result.elements) == [referenced3, referenced1, referenced2]
 
     def test_search_with_sort_by(self, registry, pool, inst, query):
         child = self._make_resource(registry, parent=pool)
