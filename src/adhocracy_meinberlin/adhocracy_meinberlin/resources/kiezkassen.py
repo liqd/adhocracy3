@@ -14,6 +14,8 @@ from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.geo import ILocationReference
 from adhocracy_core.sheets.image import IImageReference
+from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.sheets.badge import IBadgeable
 import adhocracy_meinberlin.sheets.kiezkassen
 
 
@@ -25,7 +27,8 @@ class IProposalVersion(IItemVersion):
 proposal_version_meta = itemversion_meta._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
-    extended_sheets=[ITitle,
+    extended_sheets=[IBadgeable,
+                     ITitle,
                      IDescription,
                      adhocracy_meinberlin.sheets.kiezkassen.IProposal,
                      IPoint,
@@ -47,10 +50,11 @@ proposal_meta = item_meta._replace(
     after_creation=item_meta.after_creation + [
         add_commentsservice,
         add_ratesservice,
+        add_badge_assignments_service,
     ],
     item_type=IProposalVersion,
     is_implicit_addable=True,
-    permission_create = 'create_proposal',
+    permission_create='create_proposal',
 )
 
 

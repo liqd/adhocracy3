@@ -33,13 +33,15 @@ def test_create_kiezkassen(registry, context):
 
 def test_kiezkassenversion_meta():
     from .kiezkassen import proposal_version_meta as meta
+    from adhocracy_core.sheets.badge import IBadgeable
     from adhocracy_core.sheets.geo import IPoint
     from adhocracy_core.sheets.comment import ICommentable
     from adhocracy_core.sheets.rate import IRateable
     from adhocracy_core.sheets.title import ITitle
     from adhocracy_core.sheets.description import IDescription
     from adhocracy_meinberlin.sheets.kiezkassen import IProposal
-    assert meta.extended_sheets == [ITitle,
+    assert meta.extended_sheets == [IBadgeable,
+                                    ITitle,
                                     IDescription,
                                     IProposal,
                                     IPoint,

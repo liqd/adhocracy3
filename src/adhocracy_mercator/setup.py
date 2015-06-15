@@ -50,7 +50,5 @@ setup(name='adhocracy_mercator',
           adhocracy_mercator.scripts.export_users:export_users
       delete_users =\
           adhocracy_mercator.scripts.delete_users:delete_users
-      add_badge_assignment_from_json =\
-          adhocracy_mercator.scripts.manage_badges:add_badge_assignment_from_json
       """,
       )
