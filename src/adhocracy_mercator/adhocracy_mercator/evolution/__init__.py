@@ -11,6 +11,7 @@ from zope.interface import alsoProvides
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.workflows import setup_workflow
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import ITitle
 from adhocracy_mercator.sheets.mercator import IMercatorSubResources
@@ -98,6 +99,17 @@ def add_badgeable_sheet_to_proposal_versions(root):
     migrate_new_sheet(root, IMercatorProposalVersion, IBadgeable)
 
 
+@log_migration
+def reset_workflow_state_to_result(root):
+    """Reset workflow state to 'result'."""
+    registry = get_current_registry()
+    workflow = registry.content.workflows['mercator']
+    setup_workflow(workflow,
+                   root['mercator'],
+                   ['announce', 'participate', 'frozen', 'result'],
+                   registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -107,3 +119,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(change_mercator_type_to_iprocess)
     config.add_evolution_step(add_badge_assignments_services_to_proposal_items)
     config.add_evolution_step(add_badgeable_sheet_to_proposal_versions)
+    config.add_evolution_step(reset_workflow_state_to_result)
