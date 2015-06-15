@@ -1,0 +1,25 @@
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <i class="icon-speechbubbles moving-column-icon"></i>
+        <div class="moving-column-menu-nav">
+            <a
+                class="moving-column-menu-nav-button"
+                data-ng-href="{{ documentUrl | adhParentPath | adhResourceUrl }}"
+                title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+        </div>
+    </div>
+
+    <adh-comment-listing
+        data-ng-if="commentableUrl"
+        data-path="{{commentableUrl}}"
+        data-frontend-order-predicate="frontendOrderPredicate"
+        data-frontend-order-reverse="frontendOrderReverse"
+        data-ng-switch-when="body">
+    </adh-comment-listing>
+
+    <adh-report-abuse
+        data-ng-switch-when="overlays"
+        data-ng-if="overlay === 'abuse'"
+        data-url="{{ shared.abuseUrl | adhParentPath | adhResourceUrl | adhCanonicalUrl }}">
+    </adh-report-abuse>
+</div>
