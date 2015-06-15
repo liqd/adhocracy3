@@ -165,16 +165,14 @@ as metadata.  It serves as an entry to a detail view.
 
 .meinberlin-kiezkassen-proposal-list-item {
     @include clearfix;
+    color: $color-text-normal;
     display: block;
     padding: 10px / $font-size-normal * 1em;
-
-    *:not(a) {
-        color: $color-text-normal;
-        text-decoration: none;
-    }
+    text-decoration: none;
 
     &:hover, &:focus {
         @include clearfix;
+        color: $color-text-normal;
         background: $color-structure-normal;
     }
 
