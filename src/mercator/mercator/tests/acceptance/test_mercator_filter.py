@@ -72,7 +72,7 @@ def is_filtered(browser, proposals, location=None, requested_funding=None):
         proposal_list = browser.find_by_css('.moving-column-body').first.\
                                 find_by_tag('ol').first
         actual_titles = [a.text for a in
-                proposal_list.find_by_css('.mercator-proposal-list-item-title')]
+                proposal_list.find_by_css('.proposal-list-item-title')]
 
         return set(expected_titles) == set(actual_titles)
     except:

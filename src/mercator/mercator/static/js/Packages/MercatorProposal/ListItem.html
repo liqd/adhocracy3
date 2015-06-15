@@ -5,17 +5,17 @@
         'm-winner': data.assignments[0].name === 'winning',
         'm-community-award': data.assignments[0].name === 'community'
     }"
-    class="mercator-proposal-list-item {{ selectedState }}">
-    <img class="mercator-proposal-list-item-image"
+    class="proposal-list-item {{ selectedState }}">
+    <img class="proposal-list-item-image"
         data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}" alt="" />
-    <div class="mercator-proposal-list-item-body">
-        <p class="mercator-proposal-list-item-username">
+    <div class="proposal-list-item-body">
+        <p class="proposal-list-item-username">
             {{data.user_info.first_name}}<span data-ng-if="data.organization_info.name">,
                 {{data.organization_info.name}}
             </span>
         </p>
-        <h3 class="mercator-proposal-list-item-title">{{ data.title.title }} </h3>
-        <ul class="meta-list mercator-proposal-list-item-meta-list">
+        <h3 class="proposal-list-item-title">{{ data.title.title }} </h3>
+        <ul class="meta-list proposal-list-item-meta-list">
             <li class="meta-list-item meta-list-item-date">
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
@@ -23,7 +23,7 @@
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} <span class="print-only" aria-hidden="true">{{ "TR__COMMENTS_TOTAL" | translate }}</span>
             </li>
-            <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item  meta-list-item-supporters">
+            <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item meta-list-item-supporters">
                 <i class="icon-pointy-rectangle-left"></i>
                 {{ data.supporterCount }}
                 {{ "TR__SUPPORTERS" | translate }}
