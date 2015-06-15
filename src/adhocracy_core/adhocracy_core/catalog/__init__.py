@@ -87,9 +87,9 @@ class CatalogsServiceAdhocracy(CatalogsService):
         if query.references:
             index = self._get_index('reference')
             for reference in query.references:
-                referencences = index.search_with_order(reference)
-                referencences.resolver = elements.resolver
-                elements = referencences.intersect(elements)
+                referencence_elements = index.search_with_order(reference)
+                referencence_elements.resolver = elements.resolver
+                elements = referencence_elements.intersect(elements)
         return elements
 
     def _get_frequency_of(self, elements: IResultSet,
