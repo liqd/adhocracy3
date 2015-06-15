@@ -13,11 +13,11 @@ import AdhUtil = require("../Util/Util");
 
 import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+import RIDocumentProcess = require("../../Resources_/adhocracy_core/resources/document_process/IDocumentProcess");
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import RIDocumentProcess = require("../../Resources_/adhocracy_core/resources/document_process/IDocumentProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 
