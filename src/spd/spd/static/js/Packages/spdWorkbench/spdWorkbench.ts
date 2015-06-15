@@ -17,7 +17,7 @@ import RIDocument = require("../../Resources_/adhocracy_core/resources/document/
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
+import RIDocumentProcess = require("../../Resources_/adhocracy_core/resources/document_process/IDocumentProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 
@@ -119,7 +119,7 @@ export var processDetailAnnounceColumnDirective = (
 export var moduleName = "adhSPDWorkbench";
 
 export var register = (angular) => {
-    var processType = RIProcess.content_type;
+    var processType = RIDocumentProcess.content_type;
 
     angular
         .module(moduleName, [
@@ -139,16 +139,16 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIProcess, "", processType, "", {
+                .default(RIDocumentProcess, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .default(RIProcess, "create_document", processType, "", {
+                .default(RIDocumentProcess, "create_document", processType, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIProcess, "create_document", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIProcess) => {
+                .specific(RIDocumentProcess, "create_document", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIDocumentProcess) => {
                         return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                             if (!options.POST) {
                                 throw 401;
