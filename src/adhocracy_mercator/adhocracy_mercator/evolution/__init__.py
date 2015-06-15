@@ -1,22 +1,24 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
+
 from pyramid.threadlocal import get_current_registry
 from substanced.util import find_catalog  # pragma: no cover
-from adhocracy_core.evolution import migrate_new_sheet
-from adhocracy_core.evolution import migrate_new_iresource
-from adhocracy_core.evolution import log_migration
-from adhocracy_core.utils import get_sheet_field
 from substanced.util import find_service
 from zope.interface import alsoProvides
+
+from adhocracy_core.evolution import log_migration
+from adhocracy_core.evolution import migrate_new_iresource
+from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.workflows import setup_workflow
-from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
-from adhocracy_mercator.sheets.mercator import ITitle
-from adhocracy_mercator.sheets.mercator import IMercatorSubResources
-from adhocracy_mercator.sheets.mercator import IIntroduction
 from adhocracy_mercator.resources.mercator import IMercatorProposal
+from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+from adhocracy_mercator.sheets.mercator import IIntroduction
+from adhocracy_mercator.sheets.mercator import IMercatorSubResources
+from adhocracy_mercator.sheets.mercator import ITitle
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
