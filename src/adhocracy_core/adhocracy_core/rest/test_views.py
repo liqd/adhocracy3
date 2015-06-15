@@ -868,6 +868,13 @@ class TestBadgeAssignmentsRESTView:
         inst = self.make_one(context, request_)
         assert isinstance(inst, PoolRESTView)
 
+    def test_get(self, context, request_):
+        inst = self.make_one(context, request_)
+        response = inst.get()
+        assert response == {'content_type': 'adhocracy_core.interfaces.IResource',
+                            'data': {},
+                            'path': 'http://example.com/'}
+
     def test_options_ignore_if_no_postable_resources(self, context, request_):
         inst = self.make_one(context, request_)
         response = inst.options()
