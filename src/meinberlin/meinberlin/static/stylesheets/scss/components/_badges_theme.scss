@@ -16,8 +16,7 @@ Badges for labeling if a proposal has been realized or not.
 .has-badge {
     @include inline-block;
     color: $color-text-inverted;
-    font-size: $font-size-small;
-    font-variant: small-caps;
+    font-size: $font-size-smaller;
     padding: 0 5px;
     text-transform: uppercase;
 
