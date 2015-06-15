@@ -330,6 +330,8 @@ export var createDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
+                }, (errors) => {
+                    scope.errors = errors;
                 });
             };
         }
@@ -375,6 +377,8 @@ export var editDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
+                }, (errors) => {
+                    scope.errors = errors;
                 });
             };
         }
