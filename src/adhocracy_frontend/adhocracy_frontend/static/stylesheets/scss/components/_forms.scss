@@ -327,7 +327,7 @@ A generic form footer containing one CTA and a regular button
 */
 
 .form-footer {
-    @include clearfix;
+    float: left;
     width: 100%;
 
     .form-footer-button-cta {
@@ -336,5 +336,6 @@ A generic form footer containing one CTA and a regular button
 
     .form-footer-button {
         float: left;
+        margin-right: 5px;
     }
 }
