@@ -1,4 +1,10 @@
-<div class="section-jump" id="section-jump-top">
+<div
+    class="section-jump" id="section-jump-top"
+    data-ng-class="{
+        'has-badge': data.assignments.length > 0,
+        'm-winner': data.assignments[0].name === 'winning',
+        'm-community-award': data.assignments[0].name === 'community'
+    }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
     <div class="section-jump-cover">
@@ -11,7 +17,7 @@
                 <i class="icon-calendar m-definition-before" title="{{ 'TR__CREATION_DATE' | translate }}:"></i>
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
             </li>
-            <li class="meta-list-item meta-list-item-budget screen-only">
+            <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item meta-list-item-budget screen-only">
                 <i class="icon-pig" title="{{ 'TR__MERCATOR_PROPOSAL_REQUESTED' | translate }}"></i>
                 {{data.finance.requested_funding | number}} &euro;
             </li>
@@ -67,7 +73,7 @@
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
             <section ng-if="data.assignments.length > 0" class="chapter m-jury-decision" id="jury-decision">
                 <section class="jury-decision-section">
-                    <h2 class="chapter-header">Jury Decision</h2>
+                    <h2 class="chapter-header">{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
                     <p>{{ data.assignments[0].description }}</p>
                     <div class="jury-decision-section-icon">
                         <i class="icon-star"></i>

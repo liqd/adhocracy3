@@ -47,6 +47,7 @@ import RIMercatorStory = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IStoryVersion");
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
+import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
 import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
@@ -69,6 +70,7 @@ import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mer
 import SIMercatorSubResources = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMercatorSubResources");
 import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
+import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
@@ -83,6 +85,8 @@ export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
     supporterCount : number;
+    assignments : BadgeAssignment[];
+    currentPhase: string;
 
     title : {
         title : string;
@@ -166,9 +170,6 @@ export interface IScopeData {
         other_specify : string;
     };
     accept_disclaimer : string;
-
-    // 7. badges
-    assignments : BadgeAssignment[];
 }
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
@@ -297,7 +298,8 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
 export class BadgeAssignment {
     constructor(
         private title : string,
-        private description : string
+        private description : string,
+        private name : string
     ) {}
 }
 
@@ -310,7 +312,8 @@ var getBadges = (
             var description = assignment.data[SIDescription.nick].description;
             return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
                 var title = badge.data[SITitle.nick].title;
-                return new BadgeAssignment(title, description);
+                var name = badge.data[SIName.nick].name;
+                return new BadgeAssignment(title, description, name);
             });
         });
     }));
@@ -457,6 +460,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
             data.assignments = assignments;
+        });
+
+        var processUrl = this.adhTopLevelState.get("processUrl");
+        this.adhHttp.get(processUrl).then((resource) => {
+            data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
         });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
@@ -978,6 +986,11 @@ export var listItem = (
                     scope.data.assignments = assignments;
                 });
 
+                var processUrl = adhTopLevelState.get("processUrl");
+                adhHttp.get(processUrl).then((resource) => {
+                    scope.data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                });
+
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
                         scope.selectedState = "";
@@ -1134,6 +1147,8 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
+    var processType = RIProcess.content_type;
+
     angular
         .module(moduleName, [
             "duScroll",
@@ -1151,20 +1166,20 @@ export var register = (angular) => {
         ])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIMercatorProposalVersion, "", "", "", {
+                .default(RIMercatorProposalVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide"
                 })
-                .specific(RIMercatorProposalVersion, "", "", "", () => (resource : RIMercatorProposalVersion) => {
+                .specific(RIMercatorProposalVersion, "", processType, "", () => (resource : RIMercatorProposalVersion) => {
                     return {
                         proposalUrl: resource.path
                     };
                 })
-                .default(RIMercatorProposalVersion, "edit", "", "", {
+                .default(RIMercatorProposalVersion, "edit", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-hide"
                 })
-                .specific(RIMercatorProposalVersion, "edit", "", "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+                .specific(RIMercatorProposalVersion, "edit", processType, "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
                     return (resource : RIMercatorProposalVersion) => {
                         var poolPath = AdhUtil.parentPath(resource.path);
 
@@ -1179,11 +1194,11 @@ export var register = (angular) => {
                         });
                     };
                 }])
-                .default(RIMercatorProposalVersion, "comments", "", "", {
+                .default(RIMercatorProposalVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
                 })
-                .specific(RIMercatorProposalVersion, "comments", "", "", () => (resource : RIMercatorProposalVersion) => {
+                .specific(RIMercatorProposalVersion, "comments", processType, "", () => (resource : RIMercatorProposalVersion) => {
                     return {
                         proposalUrl: resource.path,
                         commentableUrl: resource.path
@@ -1192,11 +1207,11 @@ export var register = (angular) => {
 
             _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
                 adhResourceAreaProvider
-                    .default(RIMercatorProposalVersion, "comments:" + section, "", "", {
+                    .default(RIMercatorProposalVersion, "comments:" + section, processType, "", {
                         space: "content",
                         movingColumns: "is-collapse-show-show"
                     })
-                    .specific(RIMercatorProposalVersion, "comments:" + section, "", "", () =>
+                    .specific(RIMercatorProposalVersion, "comments:" + section, processType, "", () =>
                         (resource : RIMercatorProposalVersion) => {
                             return {
                                 proposalUrl: resource.path,
