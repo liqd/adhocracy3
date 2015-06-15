@@ -13,7 +13,7 @@ from adhocracy_core.resources.organisation import organisation_meta
 from adhocracy_core.resources.principal import IPrincipalsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IGroup
-from adhocracy_core.resources.document_process import IDocumentProcess
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.schema import ACM
@@ -112,7 +112,7 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     """Add example organisation and process."""
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'adhocracy'}}
-    registry.content.create(IDocumentProcess.__identifier__,
+    registry.content.create(IProcess.__identifier__,
                             parent=context,
                             appstructs=appstructs)
 
