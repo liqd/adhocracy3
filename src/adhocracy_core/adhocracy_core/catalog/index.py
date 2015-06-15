@@ -1,6 +1,7 @@
 """Custom catalog index."""
 from hypatia.interfaces import IIndex
 from hypatia.util import BaseIndexMixin
+from hypatia.util import ResultSet
 from persistent import Persistent
 from pyramid.decorator import reify
 from substanced.catalog.indexes import SDIndex
@@ -85,7 +86,22 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
     applyEq = apply
     """Read apply docsting."""
 
+    def search_with_order(self, reference: Reference) -> ResultSet:
+        """"Search target or source resources ids of `reference` with order."""
+        oids = [x for x in self._search_target_or_source_ids(reference)]
+        result = ResultSet(oids, len(oids), None)
+        return result
+
     def _search(self, reference: Reference) -> BTrees.LFBTree.TreeSet:
+        """"Search target or soruce resources of `reference` without order.
+
+        This helper function is to fullfill the IIndex interface.
+        """
+        oids = self._search_target_or_source_ids(reference)
+        result = self.family.IF.TreeSet(oids)
+        return result
+
+    def _search_target_or_source_ids(self, reference) -> [int]:
         source, isheet, isheet_field, target = reference
         if source is None and target is None:
             raise ValueError('You have to add a source or target resource')
@@ -95,8 +111,7 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
             oids = self._resource_ids(target, isheet, isheet_field, 'sources')
         else:
             oids = self._resource_ids(source, isheet, isheet_field, 'targets')
-        result = self.family.IF.TreeSet(oids)
-        return result
+        return oids
 
     def _resource_ids(self, resource, isheet=ISheet, isheet_field='',
                       orientation='') -> set:
