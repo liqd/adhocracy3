@@ -308,6 +308,14 @@ class GetTokenManagerUnitTest(unittest.TestCase):
         inst = self.call_fut(self.request)
         assert inst is None
 
+    def test_request_has_no_root(self):
+        """For pyramid scripts request.root is None and no authentication
+           is needed.
+        """
+        self.request.root = None
+        inst = self.call_fut(self.request)
+        assert inst is None
+
 
 class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
 
