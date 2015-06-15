@@ -13,11 +13,11 @@ import AdhUtil = require("../Util/Util");
 
 import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+import RIDigitalLebenProcess = require("../../Resources_/adhocracy_spd/resources/digital_leben/IProcess");
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import RIDocumentProcess = require("../../Resources_/adhocracy_core/resources/document_process/IDocumentProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 
@@ -120,7 +120,7 @@ export var processDetailAnnounceColumnDirective = (
 export var moduleName = "adhSPDWorkbench";
 
 export var register = (angular) => {
-    var processType = RIDocumentProcess.content_type;
+    var processType = RIDigitalLebenProcess.content_type;
 
     angular
         .module(moduleName, [
@@ -140,16 +140,16 @@ export var register = (angular) => {
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
-                .default(RIDocumentProcess, "", processType, "", {
+                .default(RIDigitalLebenProcess, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .default(RIDocumentProcess, "create_document", processType, "", {
+                .default(RIDigitalLebenProcess, "create_document", processType, "", {
                     space: "content",
                     movingColumns: "is-show-hide-hide"
                 })
-                .specific(RIDocumentProcess, "create_document", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIDocumentProcess) => {
+                .specific(RIDigitalLebenProcess, "create_document", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIDigitalLebenProcess) => {
                         return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                             if (!options.POST) {
                                 throw 401;
