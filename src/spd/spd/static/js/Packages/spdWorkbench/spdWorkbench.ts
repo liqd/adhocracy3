@@ -108,9 +108,10 @@ export var processDetailColumnDirective = (
 };
 
 export var processDetailAnnounceColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
 ) => {
-    var directive = processDetailColumnDirective(adhConfig);
+    var directive = processDetailColumnDirective(adhConfig, adhPermissions);
     directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/ProcessDetailAnnounceColumn.html";
     return directive;
 };
