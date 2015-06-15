@@ -1,4 +1,11 @@
 <article class="mein-berlin-kiezkassen-proposal-detail">
+    <span
+        data-ng-if="data.assignments.length > 0"
+        class="has-badge"
+        data-ng-class="{
+            'is-realized': data.assignments[0].name === 'going_to_be_realized',
+            'is-not-realized': data.assignments[0].name === 'not_realizeable'
+    }">{{ data.assignments[0].title }}</span>
     <header class="mein-berlin-kiezkassen-proposal-detail-header">
         <ul class="mein-berlin-kiezkassen-proposal-detail-meta">
             <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-item-location">
@@ -16,7 +23,7 @@
                 <adh-rate data-refers-to="{{path}}"></adh-rate>
             </li>
         </ul>
-        <h1 class="mein-berlin-kiezkassen-proposal-detail-header-title">{{ data.title }} {{ data.assignments[0].name }}</h1>
+        <h1 class="mein-berlin-kiezkassen-proposal-detail-header-title">{{ data.title }}</h1>
     </header>
 
     <section class="mein-berlin-kiezkassen-proposal-detail-body">
