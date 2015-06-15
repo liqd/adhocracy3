@@ -14,7 +14,7 @@ class TestNavigation(object):
         browser.wait_for_condition(lambda browser: column2.has_class('is-hide'))
         browser.wait_for_condition(lambda browser: column3.has_class('is-hide'))
 
-        browser.find_by_css('.mercator-proposal-list-item').first.click()
+        browser.find_by_css('.proposal-list-item').first.click()
 
         browser.wait_for_condition(lambda browser: column1.has_class('is-show'))
         browser.wait_for_condition(lambda browser: column2.has_class('is-show'))
