@@ -76,10 +76,6 @@ class CatalogsServiceAdhocracy(CatalogsService):
             for name, value in query.indexes.items():
                 index = self._get_index(name)
                 index_query &= index.eq(value)
-        if query.references:
-            index = self._get_index('reference')
-            for reference in query.references:
-                index_query &= index.eq(reference)
         if query.only_visible:
             visibility_index = self._get_index('private_visibility')
             index_query &= visibility_index.eq('visible')
@@ -87,8 +83,13 @@ class CatalogsServiceAdhocracy(CatalogsService):
             allowed_index = self._get_index('allowed')
             principals, permission = query.allows
             index_query &= allowed_index.allows(principals, permission)
-
         elements = index_query.execute(resolver=None)
+        if query.references:
+            index = self._get_index('reference')
+            for reference in query.references:
+                referencence_elements = index.search_with_order(reference)
+                referencence_elements.resolver = elements.resolver
+                elements = referencence_elements.intersect(elements)
         return elements
 
     def _get_frequency_of(self, elements: IResultSet,

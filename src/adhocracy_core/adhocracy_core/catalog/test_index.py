@@ -116,12 +116,13 @@ class TestReference:
         inst = self.make_one()
         inst.__graph__ = mock_graph
         mock_graph.get_reftypes.return_value = [(ISheet, '', SheetToSheet)]
-        mock_objectmap.sourceids.return_value = set([1])
+        oid1, oid2 = 1, 2
+        mock_objectmap.sourceids.return_value = [oid2, oid1]
         inst._objectmap = mock_objectmap
         reference = Reference(None, ISheet, '', target)
         result = inst._search(reference)
         mock_objectmap.sourceids.assert_called_with(target, SheetToSheet)
-        assert list(result) == [1]
+        assert list(result) == [oid1, oid2]  # order is not preserved
 
     def test_search_targets(self, mock_graph, mock_objectmap):
         from adhocracy_core.interfaces import ISheet
@@ -131,12 +132,45 @@ class TestReference:
         inst = self.make_one()
         inst.__graph__ = mock_graph
         mock_graph.get_reftypes.return_value = [(ISheet, '', SheetToSheet)]
-        mock_objectmap.targetids.return_value = set([1])
+        oid1, oid2 = 1, 2
+        mock_objectmap.targetids.return_value = [oid2, oid1]
         inst._objectmap = mock_objectmap
         reference = Reference(source, ISheet, '', None)
         result = inst._search(reference)
         mock_objectmap.targetids.assert_called_with(source, SheetToSheet)
-        assert list(result) == [1]
+        assert list(result) == [oid1, oid2]  # order is not preserver
+
+    def test_search_with_order_targets(self, mock_graph, mock_objectmap):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import SheetToSheet
+        source = testing.DummyResource()
+        inst = self.make_one()
+        inst.__graph__ = mock_graph
+        mock_graph.get_reftypes.return_value = [(ISheet, '', SheetToSheet)]
+        oid1, oid2 = 1, 2
+        mock_objectmap.targetids.return_value = [oid2, oid1]
+        inst._objectmap = mock_objectmap
+        reference = Reference(source, ISheet, '', None)
+        result = inst.search_with_order(reference)
+        mock_objectmap.targetids.assert_called_with(source, SheetToSheet)
+        assert list(result) == [oid2, oid1]
+
+    def test_search_with_order_sources(self, mock_graph, mock_objectmap):
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import Reference
+        from adhocracy_core.interfaces import SheetToSheet
+        target = testing.DummyResource()
+        inst = self.make_one()
+        inst.__graph__ = mock_graph
+        mock_graph.get_reftypes.return_value = [(ISheet, '', SheetToSheet)]
+        oid1, oid2 = 1, 2
+        mock_objectmap.sourceids.return_value = [oid2, oid1]
+        inst._objectmap = mock_objectmap
+        reference = Reference(None, ISheet, '', target)
+        result = inst.search_with_order(reference)
+        mock_objectmap.sourceids.assert_called_with(target, SheetToSheet)
+        assert list(result) == [oid2, oid1]
 
     def test_apply_with_valid_query(self, mock_graph, mock_objectmap):
         from adhocracy_core.interfaces import ISheet
