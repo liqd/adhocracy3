@@ -838,12 +838,10 @@ class TestItemRESTView:
 class TestBadgeAssignmentsRESTView:
 
     @fixture
-    def registry(self, mock_content_registry):
-        return mock_content_registry
-
-    @fixture
-    def request_(self, cornice_request, registry):
-        cornice_request.registry.content = registry
+    def request_(self, cornice_request, registry_with_changelog,
+                 mock_content_registry):
+        cornice_request.registry = registry_with_changelog
+        cornice_request.registry.content = mock_content_registry
         return cornice_request
 
     @fixture
@@ -861,39 +859,61 @@ class TestBadgeAssignmentsRESTView:
         monkeypatch.setattr(views, 'get_assignable_badges', mock)
         return mock
 
-    @fixture
-    def inst(self, context, request_):
+    def make_one(self, context, request_):
         from adhocracy_core.rest.views import BadgeAssignmentsRESTView
-        inst = BadgeAssignmentsRESTView(context, request_)
-        return inst
+        return BadgeAssignmentsRESTView(context, request_)
 
-    def test_create(self, inst):
+    def test_create(self, context, request_):
         from adhocracy_core.rest.views import PoolRESTView
+        inst = self.make_one(context, request_)
         assert isinstance(inst, PoolRESTView)
 
-    def test_options_ignore_if_no_postable_resources(self, inst):
+    def test_options_ignore_if_no_postable_resources(self, context, request_):
+        inst = self.make_one(context, request_)
         response = inst.options()
         assert response == {'HEAD': {}, 'OPTIONS': {}}
 
     def test_options_ignore_if_no_postable_assignments_sheets(
-            self, inst, registry, resource_meta,  mock_sheet):
+            self, request_, context, resource_meta,  mock_sheet):
+        registry = request_.registry.content
         registry.get_resources_meta_addable.return_value = [resource_meta]
         registry.get_sheets_create.return_value = [mock_sheet]
+        inst = self.make_one(context, request_)
         response = inst.options()
         assert response['POST']['request_body'][0]['data'] ==\
             {'adhocracy_core.interfaces.ISheet': {}}
 
     def test_options_add_assignable_badges(
-            self, inst, registry, resource_meta, assignment_sheet,
+            self, request_, context, resource_meta, assignment_sheet,
             mock_get_assignables):
+        registry = request_.registry.content
         registry.get_resources_meta_addable.return_value = [resource_meta]
         registry.get_sheets_create.return_value = [assignment_sheet]
         badge = testing.DummyResource()
         mock_get_assignables.return_value = [badge]
+        inst = self.make_one(context, request_)
         response = inst.options()
         assert response['POST']['request_body'][0]['data'] ==\
             {'adhocracy_core.sheets.badge.IBadgeAssignment':
                  {'badge': ['http://example.com/']}}
+
+    def test_post_valid(self, request_, context):
+        request = request_
+        request.root = context
+        child = testing.DummyResource(__provides__=IResourceX)
+        child.__parent__ = context
+        child.__name__ = 'child'
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type': IResourceX, 'data': {}}
+        inst = self.make_one(context, request_)
+        response = inst.post()
+        wanted = {'path': request.application_url + '/child/',
+                  'content_type': IResourceX.__identifier__,
+                  'updated_resources': {'changed_descendants': [],
+                                        'created': [],
+                                        'modified': [],
+                                        'removed': []}}
+        assert wanted == response
 
 
 class TestMetaApiView:
