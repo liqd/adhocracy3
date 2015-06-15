@@ -85,6 +85,8 @@ export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
     supporterCount : number;
+    assignments : BadgeAssignment[];
+    currentPhase: string;
 
     title : {
         title : string;
@@ -168,12 +170,6 @@ export interface IScopeData {
         other_specify : string;
     };
     accept_disclaimer : string;
-
-    // 7. badges
-    assignments : BadgeAssignment[];
-
-    // 8. current phase
-    currentPhase: string;
 }
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
