@@ -128,24 +128,23 @@ var bindPath = (
                             adhHttp.get(locationUrl).then((location) => {
                                 var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
                                 getBadges(adhHttp, $q)(resource).then((assignments) => {
-                                    var resourceAssignments = assignments;
                                     scope.data = {
-                                    title: titleSheet.title,
-                                    budget: mainSheet.budget,
-                                    detail: descriptionSheet.description,
-                                    creatorParticipate: mainSheet.creator_participate,
-                                    address: mainSheet.address,
-                                    rateCount: ratesPro - ratesContra,
-                                    locationText: mainSheet.location_text,
-                                    adlocationText: mainSheet.location_text,
-                                    creator: metadataSheet.creator,
-                                    creationDate: metadataSheet.item_creation_date,
-                                    commentCount: poolSheet.count,
-                                    lng: pointSheet.coordinates[0],
-                                    lat: pointSheet.coordinates[1],
-                                    polygon: polygon,
-                                    assignments: resourceAssignments
-                                };
+                                        title: titleSheet.title,
+                                        budget: mainSheet.budget,
+                                        detail: descriptionSheet.description,
+                                        creatorParticipate: mainSheet.creator_participate,
+                                        address: mainSheet.address,
+                                        rateCount: ratesPro - ratesContra,
+                                        locationText: mainSheet.location_text,
+                                        adlocationText: mainSheet.location_text,
+                                        creator: metadataSheet.creator,
+                                        creationDate: metadataSheet.item_creation_date,
+                                        commentCount: poolSheet.count,
+                                        lng: pointSheet.coordinates[0],
+                                        lat: pointSheet.coordinates[1],
+                                        polygon: polygon,
+                                        assignments: assignments
+                                    };
                                 });
                             });
                         });
