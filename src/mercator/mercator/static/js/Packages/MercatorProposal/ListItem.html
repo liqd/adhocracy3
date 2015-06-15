@@ -1,4 +1,11 @@
-<a data-ng-href="{{ path | adhResourceUrl }}" class="proposal-list-item {{ selectedState }}">
+<a
+    data-ng-href="{{ path | adhResourceUrl }}"
+    data-ng-class="{
+        'has-badge': data.assignments.length > 0,
+        'm-winner': data.assignments[0].name === 'winning',
+        'm-community-award': data.assignments[0].name === 'community'
+    }"
+    class="proposal-list-item {{ selectedState }}">
     <img class="proposal-list-item-image"
         data-ng-src="{{ data.introduction.picture | adhImageUri:'thumbnail' }}" alt="" />
     <div class="proposal-list-item-body">
@@ -7,7 +14,7 @@
                 {{data.organization_info.name}}
             </span>
         </p>
-        <h3 class="proposal-list-item-title">{{ data.title.title }} {{ data.assignments }}</h3>
+        <h3 class="proposal-list-item-title">{{ data.title.title }} </h3>
         <ul class="meta-list proposal-list-item-meta-list">
             <li class="meta-list-item meta-list-item-date">
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
@@ -16,12 +23,12 @@
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} <span class="print-only" aria-hidden="true">{{ "TR__COMMENTS_TOTAL" | translate }}</span>
             </li>
-            <li class="meta-list-item meta-list-item-supporters">
+            <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item meta-list-item-supporters">
                 <i class="icon-pointy-rectangle-left"></i>
                 {{ data.supporterCount }}
                 {{ "TR__SUPPORTERS" | translate }}
             </li>
-            <li class="meta-list-item meta-list-item-budget">
+            <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item meta-list-item-budget">
                 {{ data.finance.requested_funding | number }} &euro; <span class="print-only" aria-hidden="true">{{ "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING" | translate }}</span>
             </li>
         </ul>

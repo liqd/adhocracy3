@@ -1,16 +1,18 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging
+from functools import wraps
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
-from pyramid.security import Allow
 from zope.interface.interfaces import IInterface
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
+from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
-from substanced.util import get_acl
+from substanced.util import find_service
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import search_query
+from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.resources.pool import IBasicPool
@@ -24,7 +26,7 @@ logger = logging.getLogger(__name__)
 def migrate_new_sheet(context: IPool,
                       iresource: IInterface,
                       isheet: IInterface,
-                      isheet_old: IInterface,
+                      isheet_old: IInterface=None,
                       remove_isheet_old=False,
                       fields_mapping: [(str, str)]=[]):
     """Add new `isheet` to `iresource` resources and migrate field values.
@@ -32,18 +34,17 @@ def migrate_new_sheet(context: IPool,
     :param context: Pool to search for `iresource` resources
     :param iresource: resource type to migrate
     :param isheet: new sheet interface to add
-    :param isheet_old: old sheet interface
+    :param isheet_old: old sheet interface to migrate,
+        must not be None if `fields_mapping` or `remove_isheet_old` is set.
     :param remove_isheet_old: remove old sheet interface
     :param fields_mapping: list of (field name, old field name) to
                            migrate field values.
     """
     registry = get_current_registry(context)
-    pool = get_sheet(context, IPool, registry=registry)
-    query = {'interfaces': (isheet_old, iresource),
-             'only_visible': False,
-             'depth': 0
-             }
-    resources = pool.get(query)['elements']
+    catalogs = find_service(context, 'catalogs')
+    interfaces = isheet_old and (isheet_old, iresource) or iresource
+    query = search_query._replace(interfaces=interfaces)
+    resources = catalogs.search(query).elements
     count = len(resources)
     logger.info('Migrating {0} {1} to new sheet {2}'.format(count, iresource,
                                                             isheet))
@@ -60,6 +61,52 @@ def migrate_new_sheet(context: IPool,
             noLongerProvides(resource, isheet_old)
 
 
+def migrate_new_iresource(context: IResource,
+                          old_iresource: IInterface,
+                          new_iresource: IInterface):
+    """Migrate resources with `old_iresource` interface to `new_iresource`."""
+    meta = _get_resource_meta(context, new_iresource)
+    catalogs = find_service(context, 'catalogs')
+    resources = _search_for_interfaces(catalogs, old_iresource)
+    for resource in resources:
+        logger.info('Migrate iresource of {0}'.format(resource))
+        noLongerProvides(resource, old_iresource)
+        directlyProvides(resource, new_iresource)
+        for sheet in meta.basic_sheets + meta.extended_sheets:
+            alsoProvides(resource, sheet)
+        catalogs.reindex_index(resource, 'interfaces')
+
+
+def _get_resource_meta(context: IResource,
+                       iresource: IInterface) -> ResourceMetadata:
+    registry = get_current_registry(context)
+    meta = registry.content.resources_meta[iresource]
+    return meta
+
+
+def _search_for_interfaces(catalogs: ICatalogsService,
+                           interfaces: (IInterface)) -> [IResource]:
+    query = search_query._replace(interfaces=interfaces)
+    resources = catalogs.search(query).elements
+    return resources
+
+
+def log_migration(func):
+    """Decorator for the migration scripts.
+
+    The decorator logs the call to the evolve script.
+    """
+    logger = logging.getLogger(func.__module__)
+
+    @wraps(func)
+    def logger_decorator(*args, **kwargs):
+        logger.info('Running evolve step: ' + func.__doc__)
+        func(*args, **kwargs)
+        logger.info('Finished evolve step: ' + func.__doc__)
+
+    return logger_decorator
+
+
 def _migrate_field_values(registry: Registry, resource: IResource,
                           isheet: IInterface, isheet_old: IInterface,
                           fields_mapping=[(str, str)]):
@@ -73,34 +120,21 @@ def _migrate_field_values(registry: Registry, resource: IResource,
     sheet.set(appstruct)
 
 
+@log_migration
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
-    migrate_new_sheet(root, IBasicPool, ITitle, IPool,
-                      remove_isheet_old=False)
-    migrate_new_sheet(root, IPoolWithAssets, ITitle, IPool,
-                      remove_isheet_old=False)
+    migrate_new_sheet(root, IBasicPool, ITitle)
+    migrate_new_sheet(root, IPoolWithAssets, ITitle)
 
 
+@log_migration
 def add_kiezkassen_permissions(root):
-    """Add permission to use the kiezkassen process."""
-    logger.info('Running evolve step:' + add_kiezkassen_permissions.__doc__)
-
-    registry = get_current_registry()
-    acl = get_acl(root)
-    new_acl = [(Allow, 'role:contributor', 'add_kiezkassen_proposal'),
-               (Allow, 'role:creator', 'edit_kiezkassen_proposal'),
-               (Allow, 'role:admin', 'add_kiezkassen_process'),
-               (Allow, 'role:admin', 'add_process')]
-    updated_acl = acl + new_acl
-    set_acl(root, updated_acl, registry=registry)
-
-    logger.info('Finished evolve step:' + add_kiezkassen_permissions.__doc__)
+    """(disabled) Add permission to use the kiezkassen process."""
 
 
+@log_migration
 def upgrade_catalogs(root):
     """Upgrade catalogs."""
-    logger.info('Running evolve step:' + upgrade_catalogs.__doc__)
-
     registry = get_current_registry()
     old_catalogs = root['catalogs']
 
@@ -119,8 +153,6 @@ def upgrade_catalogs(root):
 
     catalogs.reindex_all(catalogs['system'])
     catalogs.reindex_all(catalogs['adhocracy'])
-
-    logger.info('Finished evolve step:' + upgrade_catalogs.__doc__)
 
 
 def includeme(config):  # pragma: no cover
