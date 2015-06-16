@@ -2,41 +2,49 @@ from pytest import mark
 from pytest import fixture
 
 
-def test_proposal_meta():
-    from .kiezkassen import proposal_meta
-    from .kiezkassen import IProposalVersion
-    assert proposal_meta.element_types == [IProposalVersion]
-    assert proposal_meta.item_type == IProposalVersion
-    assert proposal_meta.permission_create == 'create_proposal'
+class TestProposal:
+
+    @fixture
+    def meta(self):
+        from .kiezkassen import proposal_meta
+        return proposal_meta
+
+    def test_meta(self, meta):
+        from .kiezkassen import IProposalVersion
+        assert meta.element_types == [IProposalVersion]
+        assert meta.item_type == IProposalVersion
+        assert meta.permission_create == 'create_proposal'
+
+    @mark.usefixtures('integration')
+    def test_create_kiezkassen(self, registry, meta, context):
+        res = registry.content.create(meta.iresource.__identifier__)
+        assert meta.iresource.providedBy(res)
 
 
-@mark.usefixtures('integration')
-def test_create_kiezkassen(registry, context):
-    from adhocracy_meinberlin.resources.kiezkassen import IProposal
-    assert registry.content.create(IProposal.__identifier__)
+class TestProposalVersion:
 
+    @fixture
+    def meta(self):
+        from .kiezkassen import proposal_version_meta
+        return proposal_version_meta
 
-def test_kiezkassenversion_meta():
-    from .kiezkassen import proposal_version_meta as meta
-    from adhocracy_core.sheets.geo import IPoint
-    from adhocracy_core.sheets.comment import ICommentable
-    from adhocracy_core.sheets.rate import IRateable
-    from adhocracy_core.sheets.title import ITitle
-    from adhocracy_core.sheets.description import IDescription
-    from adhocracy_meinberlin.sheets.kiezkassen import IProposal
-    assert meta.extended_sheets == [ITitle,
-                                    IDescription,
-                                    IProposal,
-                                    IPoint,
-                                    ICommentable,
-                                    IRateable,
-                                    ]
-    assert meta.permission_create == 'edit_proposal'
+    def test_meta(self, meta):
+        import adhocracy_core.sheets
+        from adhocracy_meinberlin.sheets import kiezkassen
+        assert meta.extended_sheets == \
+               [adhocracy_core.sheets.title.ITitle,
+                adhocracy_core.sheets.description.IDescription,
+                kiezkassen.IProposal,
+                adhocracy_core.sheets.geo.IPoint,
+                adhocracy_core.sheets.comment.ICommentable,
+                adhocracy_core.sheets.rate.IRateable,
+                ]
+        assert meta.permission_create == 'edit_proposal'
 
-@mark.usefixtures('integration')
-def test_kiezkassenversion_create(registry):
-    from adhocracy_meinberlin.resources.kiezkassen import IProposalVersion
-    assert registry.content.create(IProposalVersion.__identifier__)
+    @mark.usefixtures('integration')
+    def test_create(self, meta, registry):
+        res = registry.content.create(meta.iresource.__identifier__)
+        assert meta.iresource.providedBy(res)
 
 
 class TestProcess:
