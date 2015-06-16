@@ -38,12 +38,6 @@ from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResourceSheetModified
 
 
-def append_if_not_none(lst: list, element: object):
-    """Append `element` to `lst`, unless `element` is None."""
-    if element is not None:
-        lst.append(element)
-
-
 def find_graph(context) -> object:
     """Get the Graph object in the lineage of `context` or None.
 
