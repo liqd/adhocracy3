@@ -663,17 +663,6 @@ class BadgeAssignmentsRESTView(PoolRESTView):
                 {'badge': urls}
         return cstruct
 
-    def _get_post_request_body_for_isheet(self, cstruct: dict,
-                                          isheet: IInterface) -> [dict]:
-        if 'POST' not in cstruct:
-            return []
-        sheet_bodies = []
-        for resource_info in cstruct['POST']['request_body']:
-            for sheet_name, sheet_info in resource_info['data'].items():
-                if sheet_name == isheet.__identifier__:
-                    sheet_bodies.append(sheet_info)
-        return sheet_bodies and sheet_bodies[0]
-
 
 @view_defaults(
     renderer='simplejson',
