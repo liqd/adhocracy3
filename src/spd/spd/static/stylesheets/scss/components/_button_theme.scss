@@ -16,21 +16,7 @@ input[type="button"] {
         }
     }
 
-    &.m-call-to-action-tertiary {
-        @extend .m-call-to-action-secondary;
-        background: $color-background-base-introvert;
-        border: 0;
-        color: $color-text-highlight-normal;
-        font-weight: $font-weight-extrovert;
-        text-transform: none;
-
-        &.m-add:before {
-            content: "+ ";
-        }
-
-        &:hover:not(:disabled):not(.ng-disabled),
-        &:focus:not(:disabled):not(.ng-disabled) {
-            background: $color-text-highlight-normal;
-        }
+    &.m-add:before {
+        content: "+ ";
     }
 }
