@@ -2,12 +2,12 @@
 
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
+import AdhDocument = require("../Document/Document");
 import AdhHttp = require("../Http/Http");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhProcess = require("../Process/Process");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhSPDDocument = require("../spdDocument/spdDocument");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -51,13 +51,13 @@ export var commentColumnDirective = (
     };
 };
 
-export var spdDocumentDetailColumnDirective = (
+export var documentDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/SpdDocumentDetailColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentDetailColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
@@ -66,12 +66,12 @@ export var spdDocumentDetailColumnDirective = (
     };
 };
 
-export var spdDocumentCreateColumnDirective = (
+export var documentCreateColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/SpdDocumentCreateColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
@@ -79,12 +79,12 @@ export var spdDocumentCreateColumnDirective = (
     };
 };
 
-export var spdDocumentEditColumnDirective = (
+export var documentEditColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/SpdDocumentEditColumn.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentEditColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
@@ -125,12 +125,12 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhComment.moduleName,
+            AdhDocument.moduleName,
             AdhHttp.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhProcess.moduleName,
             AdhResourceArea.moduleName,
-            AdhSPDDocument.moduleName,
             AdhTopLevelState.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
@@ -224,9 +224,9 @@ export var register = (angular) => {
         }])
         .directive("adhSpdWorkbench", ["adhConfig", "adhTopLevelState", spdWorkbenchDirective])
         .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
-        .directive("adhSpdDocumentDetailColumn", ["adhConfig", "adhPermissions", spdDocumentDetailColumnDirective])
-        .directive("adhSpdDocumentCreateColumn", ["adhConfig", spdDocumentCreateColumnDirective])
-        .directive("adhSpdDocumentEditColumn", ["adhConfig", spdDocumentEditColumnDirective])
+        .directive("adhDocumentDetailColumn", ["adhConfig", "adhPermissions", documentDetailColumnDirective])
+        .directive("adhDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective])
+        .directive("adhDocumentEditColumn", ["adhConfig", documentEditColumnDirective])
         .directive("adhSpdProcessDetailColumn", ["adhConfig", "adhPermissions", processDetailColumnDirective])
         .directive("adhSpdProcessDetailAnnounceColumn", ["adhConfig", processDetailAnnounceColumnDirective]);
 };

@@ -28,6 +28,7 @@ import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
+import AdhDocument = require("./Packages/Document/Document");
 import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventManager = require("./Packages/EventManager/EventManager");
@@ -37,7 +38,6 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
-import AdhSPDDocument = require("./Packages/spdDocument/spdDocument");
 import AdhSPDWorkbench = require("./Packages/spdWorkbench/spdWorkbench");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
@@ -91,7 +91,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
-        AdhSPDDocument.moduleName,
+        AdhDocument.moduleName,
         AdhSPDWorkbench.moduleName,
         AdhResourceArea.moduleName,
         AdhSticky.moduleName,
@@ -178,7 +178,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
-    AdhSPDDocument.register(angular);
+    AdhDocument.register(angular);
     AdhSPDWorkbench.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
