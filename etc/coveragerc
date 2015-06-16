@@ -14,9 +14,9 @@ omit =
     src/adhocracy_core/adhocracy_core/__init__.py
     src/adhocracy/adhocracy/scaffolds/__init__
     src/adhocracy_sample/adhocracy_sample/__init__.py
-    src/adhocracy_meinberlin/adhocracy_meinberlin/__init__.py
     src/adhocracy_frontend/adhocracy_frontend/__init__.py
     src/adhocracy_mercator/adhocracy_mercator/__init__.py
+    src/adhocracy_meinberlin/adhocracy_meinberlin/__init__.py
     src/adhocracy_meinberlin/adhocracy_meinberlin/scripts/*
     src/adhocracy_mercator/adhocracy_mercator/scripts/*
 
