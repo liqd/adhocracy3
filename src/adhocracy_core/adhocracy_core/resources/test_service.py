@@ -13,14 +13,6 @@ def test_service_meta():
                                  ]
     assert meta.permission_create == 'create_service'
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources')
-
 
 @mark.usefixtures('integration')
 class TestService:

@@ -49,18 +49,6 @@ def test_mercator_proposal_version_meta():
     assert meta.permission_create == 'edit_proposal'
  
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources')
-    config.include('adhocracy_mercator.sheets')
-    config.include('adhocracy_mercator.resources')
-
-
 @mark.usefixtures('integration')
 class TestIncludemeIntegration:
 

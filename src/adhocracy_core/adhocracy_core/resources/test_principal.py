@@ -97,16 +97,12 @@ def test_passwordreset_meta():
 
 
 @fixture
-def integration(config):
-    config.include('pyramid_mailer.testing')
-    config.include('pyramid_mako')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.messaging')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources')
+def integration(integration):
+    integration.include('pyramid_mailer.testing')
+    integration.include('pyramid_mako')
+    integration.include('adhocracy_core.changelog')
+    integration.include('adhocracy_core.messaging')
+    return integration
 
 
 @fixture

@@ -10,11 +10,8 @@ from adhocracy_core.interfaces import VisibilityChange
 
 
 @fixture()
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.sheets')
+def integration(integration):
+    integration.include('adhocracy_core.changelog')
 
 
 @fixture

@@ -16,16 +16,6 @@ def test_create_adhocracy_catalog_indexes():
     assert isinstance(inst.reference, Reference)
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources')
-
-
 @mark.usefixtures('integration')
 def test_create_adhocracy_catalog(pool_graph, registry):
     from substanced.catalog import Catalog

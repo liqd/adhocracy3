@@ -6,11 +6,9 @@ from pyramid import testing
 
 @fixture
 def integration(config):
-    config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_sample.sheets.sample_sheets')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_sample.sheets')
 
 
 @mark.usefixtures('integration')

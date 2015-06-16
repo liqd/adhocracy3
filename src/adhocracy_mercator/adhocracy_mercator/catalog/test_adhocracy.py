@@ -38,17 +38,6 @@ def test_create_mercator_catalog_indexes():
     assert isinstance(inst.mercator_location, Keyword)
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_mercator.catalog')
-    config.include('adhocracy_mercator.sheets.mercator')
-
-
 @mark.usefixtures('integration')
 def test_create_adhocracy_catalog(pool_graph, registry):
     from substanced.catalog import Catalog

@@ -43,7 +43,7 @@ def app_god(app_god):
 def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
-    config.include('adhocracy_meinberlin.workflows.kiezkassen')
+    config.include('adhocracy_meinberlin.workflows')
 
 
 @mark.usefixtures('integration')

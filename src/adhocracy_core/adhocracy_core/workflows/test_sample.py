@@ -8,7 +8,7 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.rest')
-    config.include('adhocracy_core.workflows.sample')
+    config.include('adhocracy_core.workflows')
 
 
 @mark.usefixtures('integration')

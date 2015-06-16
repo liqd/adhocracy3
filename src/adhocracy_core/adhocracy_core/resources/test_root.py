@@ -15,17 +15,11 @@ def test_root_meta():
 
 
 @fixture
-def integration(config):
-    config.include('pyramid_mailer.testing')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources')
-    config.include('adhocracy_core.rest')
-    config.include('adhocracy_core.messaging')
+def integration(integration):
+    integration.include('pyramid_mailer.testing')
+    integration.include('adhocracy_core.changelog')
+    integration.include('adhocracy_core.rest')
+    integration.include('adhocracy_core.messaging')
 
 
 @mark.usefixtures('integration')

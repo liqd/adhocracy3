@@ -260,4 +260,4 @@ def includeme(config):
     config.include('.document_process')
     config.include('.paragraph')
     config.include('.badge')
-
+    config.include('.service')

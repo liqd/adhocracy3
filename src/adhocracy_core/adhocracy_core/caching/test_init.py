@@ -307,7 +307,7 @@ class TestHTTPCacheStrategyWeakAssetDownloadAdapter:
         assert inst.etags == (etag_modified, etag_userid, etag_blocked)
 
 
-@fixture()
+@fixture
 def integration(config):
     config.include('adhocracy_core.caching')
 

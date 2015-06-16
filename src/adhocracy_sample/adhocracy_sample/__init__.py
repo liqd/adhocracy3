@@ -9,7 +9,7 @@ def includeme(config):
     # include adhocracy_core
     config.include('adhocracy_core')
     # include custom sheets
-    config.include('adhocracy_sample.sheets.sample_sheets')
+    config.include('adhocracy_sample.sheets')
 
 
 def main(global_config, **settings):
