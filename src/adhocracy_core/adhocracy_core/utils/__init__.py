@@ -395,8 +395,6 @@ def get_reason_if_blocked(resource: IResource) -> str:
 def list_resource_with_descendants(resource: IResource) -> Iterable:
     """List all descendants of a resource, including the resource itself."""
     system_catalog = find_catalog(resource, 'system')
-    if system_catalog is None:
-        return []  # easier testing
     path_index = system_catalog['path']
     query = path_index.eq(resource_path(resource), include_origin=True)
     return query.execute()
