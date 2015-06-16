@@ -9,14 +9,10 @@ def includeme(config):
     # include adhocracy_core
     config.include('adhocracy_core')
     # include custom resource types
-    config.include('adhocracy_core.resources.paragraph')
-    config.include('adhocracy_core.resources.document')
     config.include('.catalog')
     config.include('.workflows')
-    config.include('.sheets.mercator')
-    config.include('.resources.root')
-    config.include('.resources.mercator')
-    config.include('.resources.subscriber')
+    config.include('.sheets')
+    config.include('.resources')
     config.include('.evolution')
     config.add_translation_dirs('adhocracy_core:locale/')
 
