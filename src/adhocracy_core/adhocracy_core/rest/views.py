@@ -643,8 +643,8 @@ class BadgeAssignmentsRESTView(PoolRESTView):
          return super().get()
 
     @view_config(request_method='POST',
-                  permission='create',
-                  content_type='application/json')
+                 permission='create',
+                 content_type='application/json')
     def post(self):
         return super().post()
 
