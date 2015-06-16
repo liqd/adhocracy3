@@ -46,7 +46,6 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         del introduction._sheets[IIntroduction.__identifier__]['title']
 
 
-@log_migration
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     """(disabled) Disable add_proposal permissions."""
 
@@ -61,7 +60,6 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
                       fields_mapping=[('title', 'title')])
 
 
-@log_migration
 def evolve4_disable_voting_and_commenting(root):  # pragma: no cover
     """(disabled) Disable rate and comment permissions."""
 
