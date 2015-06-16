@@ -132,7 +132,7 @@ def add_kiezkassen_permissions(root):
 
 
 @log_migration
-def upgrade_catalogs(root):
+def upgrade_catalogs(root):  # pragma: no cover
     """Upgrade catalogs."""
     registry = get_current_registry()
     old_catalogs = root['catalogs']
