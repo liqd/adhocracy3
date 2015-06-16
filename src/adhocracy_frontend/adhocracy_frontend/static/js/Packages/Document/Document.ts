@@ -368,7 +368,8 @@ export var editDirective = (
             bindPath($q, adhHttp)(scope);
 
             scope.cancel = () => {
-                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(scope.documentVersion.path));
+                var itemPath = AdhUtil.parentPath(scope.documentVersion.path);
+                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(itemPath));
             };
 
             scope.submit = () => {
