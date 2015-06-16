@@ -141,6 +141,17 @@ class TestBadgeSheet:
         group2['badge'] = inst.context
         assert inst.get() == {'groups': [group2, group1]}
 
+    def test_get_with_groups_no_context(self, meta):
+        inst = meta.sheet_class(meta, None)
+        assert inst.get() == {'groups': []}
+
+    def test_get_with_groups_parent_not_badge_group(self, inst):
+        from adhocracy_core.resources.badge import IBadgeGroup
+        o1 = testing.DummyResource(__name__='o1')
+        group2 = testing.DummyResource(__provides__=IBadgeGroup)
+        o1['group2'] = group2
+        group2['badge'] = inst.context
+        assert inst.get() == {'groups': [group2]}
 
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
