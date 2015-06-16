@@ -23,11 +23,7 @@ def integration(config):
     config.include('adhocracy_core.graph')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.pool')
-    config.include('adhocracy_core.resources.simple')
-    config.include('adhocracy_core.resources.itemversion')
-    config.include('adhocracy_core.resources.item')
-    config.include('adhocracy_core.resources.tag')
+    config.include('adhocracy_core.resources')
 
 
 @mark.usefixtures('integration')

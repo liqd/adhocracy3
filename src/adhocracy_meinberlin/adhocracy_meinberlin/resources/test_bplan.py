@@ -7,13 +7,9 @@ def integration(config):
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.tag')
-    config.include('adhocracy_core.resources.comment')
-    config.include('adhocracy_core.resources.process')
-    config.include('adhocracy_core.resources.asset')
-    config.include('adhocracy_core.resources.badge')
-    config.include('adhocracy_meinberlin.sheets.bplan')
-    config.include('adhocracy_meinberlin.resources.bplan')
+    config.include('adhocracy_core.resources')
+    config.include('adhocracy_meinberlin.sheets')
+    config.include('adhocracy_meinberlin.resources')
 
 
 class TestProposal:

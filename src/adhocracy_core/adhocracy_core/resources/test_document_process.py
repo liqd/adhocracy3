@@ -9,10 +9,7 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.document_process')
-    config.include('adhocracy_core.resources.process')
-    config.include('adhocracy_core.resources.asset')
-    config.include('adhocracy_core.resources.badge')
+    config.include('adhocracy_core.resources')
 
 
 class TestDocumentProcess:

@@ -13,20 +13,12 @@ from adhocracy_core.utils import get_sheet_field
 
 @fixture
 def integration(config):
+    config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
-    config.include('adhocracy_core.resources.root')
-    config.include('adhocracy_core.resources.organisation')
-    config.include('adhocracy_core.resources.process')
-    config.include('adhocracy_core.resources.asset')
-    config.include('adhocracy_core.resources.badge')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.resources.pool')
-    config.include('adhocracy_core.resources.principal')
-    config.include('adhocracy_core.resources.organisation')
-    config.include('adhocracy_core.resources.geo')
-    config.include('adhocracy_core.resources.document_process')
     config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources')
 
 
 @fixture

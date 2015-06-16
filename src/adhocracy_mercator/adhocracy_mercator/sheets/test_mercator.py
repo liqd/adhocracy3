@@ -11,7 +11,7 @@ def integration(config):
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_mercator.workflows')
-    config.include('adhocracy_mercator.sheets.mercator')
+    config.include('adhocracy_mercator.sheets')
 
 
 @mark.usefixtures('integration')

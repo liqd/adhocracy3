@@ -9,11 +9,7 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.badge')
-    config.include('adhocracy_core.resources.document')
-    config.include('adhocracy_core.resources.tag')
-    config.include('adhocracy_core.resources.comment')
-    config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_core.resources')
 
 
 class TestDocument:

@@ -105,11 +105,8 @@ def integration(config):
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.changelog')
     config.include('adhocracy_core.messaging')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_core.sheets.name')
-    config.include('adhocracy_core.sheets.principal')
-    config.include('adhocracy_core.resources.principal')
-    config.include('adhocracy_core.resources.subscriber')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources')
 
 
 @fixture

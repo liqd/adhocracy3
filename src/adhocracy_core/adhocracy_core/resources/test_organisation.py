@@ -6,8 +6,8 @@ from pytest import fixture
 def integration(config):
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_core.resources.organisation')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources')
 
 
 class TestOrganisation:

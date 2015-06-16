@@ -8,8 +8,7 @@ def integration(config):
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.geo')
-    config.include('adhocracy_core.resources.geo')
+    config.include('adhocracy_core.resources')
 
 
 class TestMultiPolygon:

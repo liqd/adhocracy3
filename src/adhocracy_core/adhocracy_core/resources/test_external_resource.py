@@ -24,9 +24,7 @@ def integration(config):
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.external_resource')
-    config.include('adhocracy_core.resources.rate')
-    config.include('adhocracy_core.resources.comment')
+    config.include('adhocracy_core.resources')
 
 
 @mark.usefixtures('integration')
