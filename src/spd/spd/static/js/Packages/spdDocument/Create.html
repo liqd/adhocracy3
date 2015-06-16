@@ -13,11 +13,12 @@
 
         <!-- Title -->
         <label>
-            <span class="label-text">{{ "TR__SPD_TITLE" | translate }}</span>
             <input
                 type="text"
                 data-ng-model="data.title"
                 name="title"
+                placeholder="{{ 'TR__SPD_TITLE_PLACEHOLDER' | translate }}"
+                class="m-title"
                 minlength="3"
                 maxlength="100"
                 required="required" />
@@ -42,12 +43,11 @@
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
             <section data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
                 <label>
-                    <span class="label-text">{{ "TR__SPD_PARAGRAPH" | translate }}</span>
-
                     <textarea
                         data-msd-elastic=""
                         data-ng-model="paragraph.body"
                         name="paragraph-{{ $index }}"
+                        placeholder="{{ 'TR__SPD_PARAGRAPH_PLACEHOLDER' | translate }}"
                         required="required"></textarea>
 
                     <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm['paragraph-' + $index], 'required')">
