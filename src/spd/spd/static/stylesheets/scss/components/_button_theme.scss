@@ -3,12 +3,20 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
+    height: 36px / $font-size-normal * 1em;
+    line-height: 36px / $font-size-normal * 1em;
+
     &.m-call-to-action-secondary {
-        outline: 2px solid $color-brand-two-normal;
+        border: 2px solid $color-brand-two-normal;
 
         &:hover:not(:disabled):not(.ng-disabled),
         &:focus:not(:disabled):not(.ng-disabled) {
+            background: $color-brand-two-normal;
             color: $color-text-inverted;
         }
+    }
+
+    &.m-add:before {
+        content: "+ ";
     }
 }
