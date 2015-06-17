@@ -85,8 +85,7 @@ export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
     supporterCount : number;
-    assignments : BadgeAssignment[];
-    isCommunityAward: boolean;
+    winnerBadgeAssignment : BadgeAssignment;
     currentPhase: string;
 
     title : {
@@ -407,7 +406,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.description = data.description || <any>{};
         data.location = data.location || <any>{};
         data.finance = data.finance || <any>{};
-        data.assignments = data.assignments || [];
 
         return data;
     }
@@ -460,8 +458,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             .then((count : number) => { data.supporterCount = count; });
 
         getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
-            data.assignments = assignments;
-            data.isCommunityAward = _.some(assignments, (a) => a.name === "community");
+            var communityAssignment = _.find(assignments, (a) => a.name === "community");
+            var winningAssignment = _.find(assignments, (a) => a.name === "winning");
+
+            data.winnerBadgeAssignment = communityAssignment || winningAssignment;
         });
 
         var processUrl = this.adhTopLevelState.get("processUrl");
@@ -985,8 +985,10 @@ export var listItem = (
                 });
 
                 getBadges(adhHttp, $q)(proposal).then((assignments) => {
-                    scope.data.assignments = assignments;
-                    scope.data.isCommunityAward = _.some(assignments, (a) => a.name === "community");
+                    var communityAssignment = _.find(assignments, (a) => a.name === "community");
+                    var winningAssignment = _.find(assignments, (a) => a.name === "winning");
+
+                    scope.data.winnerBadgeAssignment = communityAssignment || winningAssignment;
                 });
 
                 var processUrl = adhTopLevelState.get("processUrl");
