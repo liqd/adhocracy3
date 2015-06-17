@@ -1,0 +1,24 @@
+[
+    {"path": "/organisation/kiezkasse/badges/",
+     "creator": "/principals/users/0000000",
+     "content_type": "adhocracy_core.resources.badge.IBadge",
+     "data": {"adhocracy_core.sheets.name.IName":
+                {"name": "not_realizeable"},
+                "adhocracy_core.sheets.title.ITitle":
+                {"title" : "Nicht realisierbar"},
+                "adhocracy_core.sheets.description.IDescription" :
+                {"description" : "Dieser Vorschlag kann nicht realisiert werden"}
+             }
+    },
+    {"path": "/organisation/kiezkasse/badges/",
+     "creator": "/principals/users/0000000",
+     "content_type": "adhocracy_core.resources.badge.IBadge",
+     "data": {"adhocracy_core.sheets.name.IName":
+                {"name": "going_to_be_realized"},
+                "adhocracy_core.sheets.title.ITitle":
+                {"title" : "Wird realisiert"},
+                "adhocracy_core.sheets.description.IDescription" :
+                {"description" : "Dieser Vorschlag wird realisiert"}
+             }
+    }
+]

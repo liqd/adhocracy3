@@ -65,6 +65,11 @@
         font-weight: $font-weight-extrovert;
         margin: 0 0 (30px / $font-size-normal * 1em);
     }
+
+    .has-badge {
+        position: relative;
+        top: -20px / $font-size-small * 1em;
+    }
 }
 
 .mein-berlin-kiezkassen-proposal-detail-detail {
@@ -165,16 +170,14 @@ as metadata.  It serves as an entry to a detail view.
 
 .meinberlin-kiezkassen-proposal-list-item {
     @include clearfix;
+    color: $color-text-normal;
     display: block;
     padding: 10px / $font-size-normal * 1em;
-
-    *:not(a) {
-        color: $color-text-normal;
-        text-decoration: none;
-    }
+    text-decoration: none;
 
     &:hover, &:focus {
         @include clearfix;
+        color: $color-text-normal;
         background: $color-structure-normal;
     }
 
@@ -182,6 +185,10 @@ as metadata.  It serves as an entry to a detail view.
         .meinberlin-kiezkassen-proposal-list-item-detail-link {
             background: $color-structure-normal;
         }
+    }
+
+    .has-badge {
+        margin-left: 20px / $font-size-small * 1em;
     }
 }
 

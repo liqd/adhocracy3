@@ -32,7 +32,8 @@ class TestProposalVersion:
         import adhocracy_core.sheets
         from adhocracy_meinberlin.sheets import kiezkassen
         assert meta.extended_sheets == \
-               [adhocracy_core.sheets.title.ITitle,
+               [adhocracy_core.sheets.badge.IBadgeable,
+                adhocracy_core.sheets.title.ITitle,
                 adhocracy_core.sheets.description.IDescription,
                 kiezkassen.IProposal,
                 adhocracy_core.sheets.geo.IPoint,

@@ -43,10 +43,10 @@ class Pool(Base, Folder):
     _autoname_last = -1
 
     def __init__(self, data=None, family=None):
+        """Counter that should increment if descendants are changed."""
         Folder.__init__(self, data=data, family=family)
         Base.__init__(self)
         self.__changed_descendants_counter__ = Length()
-        """Counter that should increment if descendants are changed."""
 
     def next_name(self, subobject, prefix='') -> str:
         """Generate name to add subobject to the folder.

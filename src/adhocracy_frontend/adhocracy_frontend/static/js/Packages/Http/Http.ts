@@ -353,7 +353,11 @@ export class Service<Content extends ResourcesBase.Resource> {
                     this.adhCache.invalidate(AdhUtil.parentPath(resource.path));
                 });
 
-                return postedResources;
+                var preliminaryPaths = _.map(resources, "path");
+                return _.sortBy(postedResources, (postedResource, index : number) => {
+                    var preliminaryPath = sortedResources[index].path;
+                    return preliminaryPaths.indexOf(preliminaryPath);
+                });
             });
         });
     }

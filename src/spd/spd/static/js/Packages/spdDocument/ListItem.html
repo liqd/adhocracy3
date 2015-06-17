@@ -1,4 +1,4 @@
-<a data-ng-href="{{ path | adhResourceUrl }}" class="proposal-list-item {{ selectedState }}">
+<a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}" class="proposal-list-item {{ selectedState }}">
     <img class="proposal-list-item-image"
         data-ng-src="{{ data.picture | adhImageUri:'thumbnail' }}" alt="" />
     <div class="proposal-list-item-body">

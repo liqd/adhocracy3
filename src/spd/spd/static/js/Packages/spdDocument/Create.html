@@ -3,8 +3,10 @@
     data-ng-submit="submit()"
     class="spd-document-form"
     name="spdDocumentForm">
+<div class="section-jump" id="section-jump-top">
+    <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
-    <div>
+    <div class="section-jump-cover">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | adhFormatError | translate }}</p>
         </div>
@@ -23,32 +25,49 @@
                 {{ "TR__SPD_ERROR_REQUIRED_TITLE" | translate }}
             </span>
         </label>
+    </div><!-- /.cover -->
 
-        <label data-ng-repeat="paragraph in data.paragraphs">
-            <span class="label-text">{{ "TR__SPD_PARAGRAPH" | translate }}</span>
+    <div class="section-jump-body">
+        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
+            <ol>
+                <li data-ng-repeat="paragraph in data.paragraphs">
+                    <a
+                        href="#section-jump-chapter-{{$index}}"
+                        data-du-smooth-scroll=""
+                        data-du-scrollspy="">{{ $index + 1}}</a>
+                </li>
+            </ol>
+        </nav>
 
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="paragraph.body"
-                name="paragraph-{{ $index }}"
-                required="required"></textarea>
+        <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
+            <section data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
+                <label>
+                    <span class="label-text">{{ "TR__SPD_PARAGRAPH" | translate }}</span>
 
-            <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm['paragraph-' + $index], 'required')">
-                {{ "TR__SPD_ERROR_REQUIRED_PARAGRAPH" | translate }}
-            </span>
-        </label>
-    </div>
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="paragraph.body"
+                        name="paragraph-{{ $index }}"
+                        required="required"></textarea>
 
-    <!-- DATA SUBMIT -->
-    <footer class="form-footer">
-        <input
-            type="submit"
-            name="submit"
-            value="{{ 'TR__PUBLISH' | translate }}"
-            class="m-call-to-action form-footer-button-cta" />
+                    <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm['paragraph-' + $index], 'required')">
+                        {{ "TR__SPD_ERROR_REQUIRED_PARAGRAPH" | translate }}
+                    </span>
+                </label>
+            </section>
+            <footer class="form-footer">
+                <a href="" class="button m-call-to-action-secondary m-add spd-document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
 
-        <a href="" class="button m-call-to-action-secondary" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
+                <input
+                    type="submit"
+                    name="submit"
+                    value="{{ 'TR__PUBLISH' | translate }}"
+                    class="m-call-to-action form-footer-button-cta spd-document-form-submit-button" />
 
-        <a data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
-    </footer>
+                <a data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
+            </footer>
+        </div><!-- /.section-jump-main -->
+    </div><!-- /.section-jump-body -->
+</div><!-- /.section-jump -->
+<!-- DATA SUBMIT -->
 </form>
