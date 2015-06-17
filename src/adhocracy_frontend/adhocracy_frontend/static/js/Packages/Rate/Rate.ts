@@ -53,8 +53,6 @@ export interface IRateScope extends angular.IScope {
     uncast() : angular.IPromise<void>;
     toggle(value : number) : angular.IPromise<void>;
 
-    allowRate : boolean;
-
     // not currently used in the UI
     auditTrail : { subject: string; rate: number }[];
     auditTrailVisible : boolean;
@@ -348,9 +346,6 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                     scope.ready = true;
                     adhDone();
                 });
-
-            var allowRate = adhConfig.custom["allow_rate"];
-            scope.allowRate = typeof allowRate === "undefined" || allowRate.toLowerCase() === "true";
         }
     };
 };
