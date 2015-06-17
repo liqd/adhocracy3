@@ -86,6 +86,7 @@ export interface IScopeData {
     commentCountTotal : number;
     supporterCount : number;
     assignments : BadgeAssignment[];
+    isCommunityAward: boolean;
     currentPhase: string;
 
     title : {
@@ -299,7 +300,7 @@ export class BadgeAssignment {
     constructor(
         private title : string,
         private description : string,
-        private name : string
+        public name : string
     ) {}
 }
 
@@ -460,6 +461,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
             data.assignments = assignments;
+            data.isCommunityAward = false;
+            for (var i = 0; i < assignments.length; i++) {
+                if (assignments[i].name === "community") {
+                    data.isCommunityAward = true;
+                    break;
+                }
+            }
         });
 
         var processUrl = this.adhTopLevelState.get("processUrl");
@@ -984,6 +992,13 @@ export var listItem = (
 
                 getBadges(adhHttp, $q)(proposal).then((assignments) => {
                     scope.data.assignments = assignments;
+                    scope.data.isCommunityAward = false;
+                    for (var i = 0; i < assignments.length; i++) {
+                        if (assignments[i].name === "community") {
+                            scope.data.isCommunityAward = true;
+                            break;
+                        }
+                    }
                 });
 
                 var processUrl = adhTopLevelState.get("processUrl");

@@ -2,8 +2,8 @@
     class="section-jump" id="section-jump-top"
     data-ng-class="{
         'has-badge': data.assignments.length > 0,
-        'm-winner': data.assignments[0].name === 'winning',
-        'm-community-award': data.assignments[0].name === 'community'
+        'm-winner': !data.isCommunityAward,
+        'm-community-award': data.isCommunityAward
     }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
