@@ -1,5 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import AdhAbuse = require("../Abuse/Abuse");
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
@@ -124,6 +125,7 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhAbuse.moduleName,
             AdhComment.moduleName,
             AdhHttp.moduleName,
             AdhMovingColumns.moduleName,
