@@ -44,7 +44,6 @@ var pkgLocation = "/Rate";
 
 export interface IRateScope extends angular.IScope {
     refersTo : string;
-    disabled : boolean;
     myRate : number;
     rates(rate : number) : number;
     optionsPostPool : AdhHttp.IOptions;
@@ -203,8 +202,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + template,
         scope: {
-            refersTo: "@",
-            disabled: "="
+            refersTo: "@"
         },
         link: (scope : IRateScope) : void => {
             var myRateResource : RIRateVersion;
