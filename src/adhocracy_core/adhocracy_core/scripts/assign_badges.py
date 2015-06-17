@@ -13,9 +13,8 @@ from pyramid.paster import bootstrap
 from pyramid.traversal import find_resource
 from substanced.util import find_service
 
-import adhocracy_core.resources.badge
-import adhocracy_core.sheets.badge
-from adhocracy_core.sheets.description import IDescription
+from adhocracy_core import resources
+from adhocracy_core import sheets
 from adhocracy_core.utils import load_json
 
 
@@ -64,17 +63,18 @@ def _create_badge_assignment(entry, root, registry):
     service = find_service(parent, 'badge_assignments')
     appstructs = _create_appstructs(user, badge, proposal_version, description)
 
-    registry.content.create(adhocracy_core.resources.badge.IBadgeAssignment.__identifier__,
+    registry.content.create(resources.badge.IBadgeAssignment.__identifier__,
                             parent=service,
                             appstructs=appstructs)
 
 
 def _create_appstructs(subject, badge, object, description):
-    appstructs = {adhocracy_core.sheets.badge.IBadgeAssignment.__identifier__:
+    appstructs = {sheets.badge.IBadgeAssignment.__identifier__:
                   {'subject': subject,
                    'badge': badge,
                    'object': object
-                   }, IDescription.__identifier__:
+                   },
+                  sheets.description.IDescription.__identifier__:
                   {'description': description}
                   }
     return appstructs
