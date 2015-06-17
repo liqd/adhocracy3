@@ -125,7 +125,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 resourceUrl: "/principals/users/"
             })
             .space("content", {
-                resourceUrl: "/spd/"
+                resourceUrl: "/digital_leben/"
             });
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
