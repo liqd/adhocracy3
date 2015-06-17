@@ -3,9 +3,9 @@ from pytest import mark
 
 
 @fixture
-def integration(config, pool_with_catalogs):
-    config.include('pyramid_mailer.testing')
-    config.include('adhocracy_spd')
+def integration(integration):
+    integration.include('pyramid_mailer.testing')
+    return integration
 
 
 def test_root_meta():

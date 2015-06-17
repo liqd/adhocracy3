@@ -164,7 +164,7 @@ def pool_graph(integration):
 
 @fixture
 def pool_with_catalogs(integration, pool_graph):
-    """Return pool wit graph and catalog for integration/functional tests."""
+    """Return pool with graph and catalog for integration/functional tests."""
     from substanced.interfaces import MODE_IMMEDIATE
     from adhocracy_core.resources.root import _add_catalog_service
     context = pool_graph
