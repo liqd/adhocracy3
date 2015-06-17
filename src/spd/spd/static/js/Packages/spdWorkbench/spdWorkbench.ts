@@ -192,7 +192,7 @@ export var register = (angular) => {
                     () => (item : RIParagraph, version : RIParagraphVersion) => {
                         return {
                             commentableUrl: version.path,
-                            documentUrl: version.data[SIParagraph.nick].documents[0]
+                            documentUrl: _.last(_.sortBy(version.data[SIParagraph.nick].documents))
                         };
                     }])
                 .defaultVersionable(RIComment, RICommentVersion, "", processType, "", {
@@ -216,7 +216,7 @@ export var register = (angular) => {
                         return getCommentableUrl(version).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
-                                documentUrl: commentable.path
+                                documentUrl: _.last(_.sortBy(commentable.data[SIParagraph.nick].documents))
                             };
                         });
                     };
