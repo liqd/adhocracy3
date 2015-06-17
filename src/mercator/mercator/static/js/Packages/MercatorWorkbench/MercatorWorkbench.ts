@@ -141,34 +141,36 @@ export var mercatorProposalListingColumnDirective = (
             adhHttp.get(processUrl).then((resource) => {
                 var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
 
-                scope.shared.facets = [{
-                    key: "mercator_location",
-                    name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
-                    items: [
-                        {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
-                        {key: "online", name: "TR__ONLINE"},
-                        {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
-                    ]
-                }, {
-                    key: "mercator_requested_funding",
-                    name: "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING",
-                    items: [
-                        {key: "5000", name: "0 - 5000 €"},
-                        {key: "10000", name: "5000 - 10000 €"},
-                        {key: "20000", name: "10000 - 20000 €"},
-                        {key: "50000", name: "20000 - 50000 €"}
-                    ]
-                }];
-
-                if (currentPhase === "result") {
-                    scope.shared.facets.push({
-                        key: "badge",
-                        name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
+                if (typeof scope.shared.facets === "undefined") {
+                    scope.shared.facets = [{
+                        key: "mercator_location",
+                        name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
                         items: [
-                            {key: "winning", name: "TR__MERCATOR_BADGE_WINNERS", enabled: true},
-                            {key: "community", name: "TR__MERCATOR_BADGE_COMMUNITY_AWARD"}
+                            {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
+                            {key: "online", name: "TR__ONLINE"},
+                            {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
                         ]
-                    });
+                    }, {
+                        key: "mercator_requested_funding",
+                        name: "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING",
+                        items: [
+                            {key: "5000", name: "0 - 5000 €"},
+                            {key: "10000", name: "5000 - 10000 €"},
+                            {key: "20000", name: "10000 - 20000 €"},
+                            {key: "50000", name: "20000 - 50000 €"}
+                        ]
+                    }];
+
+                    if (currentPhase === "result") {
+                        scope.shared.facets.push({
+                            key: "badge",
+                            name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
+                            items: [
+                                {key: "winning", name: "TR__MERCATOR_BADGE_WINNERS", enabled: true},
+                                {key: "community", name: "TR__MERCATOR_BADGE_COMMUNITY_AWARD"}
+                            ]
+                        });
+                    }
                 }
 
                 scope.shared.sort = "item_creation_date";
@@ -177,6 +179,8 @@ export var mercatorProposalListingColumnDirective = (
                     scope.shared.sort = sort;
                 };
                 scope.initialLimit = 50;
+
+                scope.ready = true;
             });
         }
     };
