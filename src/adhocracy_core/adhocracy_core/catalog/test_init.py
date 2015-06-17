@@ -43,9 +43,9 @@ def test_add_directives(registry):
 
 
 @mark.usefixtures('integration')
-def test_index_resource(pool_graph_catalog,):
+def test_index_resource(pool_with_catalogs,):
     from substanced.util import find_service
-    pool = pool_graph_catalog
+    pool = pool_with_catalogs
     pool.add('child', testing.DummyResource())
     name_index = find_service(pool, 'catalogs', 'system', 'name')
     assert 'child' in [x for x in name_index.unique_values()]

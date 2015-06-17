@@ -59,8 +59,8 @@ def test_create_adhocracy_catalog(pool_graph, registry):
 class TestMercatorLocationIndex:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def test_index_location_default(self, context):
         from .adhocracy import index_location
@@ -96,8 +96,8 @@ class TestMercatorLocationIndex:
 class TestMercatorRequestedFundingIndex:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def test_index_requested_funding_default(self, context):
         from .adhocracy import index_requested_funding
@@ -157,8 +157,8 @@ class TestMercatorRequestedFundingIndex:
 class TestMercatorBudgetIndex:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def test_index_budget_default(self, context):
         from .adhocracy import index_budget

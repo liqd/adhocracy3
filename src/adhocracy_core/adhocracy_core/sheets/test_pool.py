@@ -163,8 +163,8 @@ class TestFilteringPoolSheet:
 class TestIntegrationPoolSheet:
 
     @fixture
-    def pool(self, pool_graph_catalog, registry):
-        pool = self._make_resource(registry, parent=pool_graph_catalog,
+    def pool(self, pool_with_catalogs, registry):
+        pool = self._make_resource(registry, parent=pool_with_catalogs,
                                    name='child')
         return pool
 

@@ -27,14 +27,14 @@ class TestRate:
         assert IRate.__identifier__ in content_types
         assert IRateVersion.__identifier__ in content_types
 
-    def test_create_rate(self, registry, pool_graph_catalog):
+    def test_create_rate(self, registry, pool_with_catalogs):
         from adhocracy_core.resources.rate import IRate
-        pool = pool_graph_catalog
+        pool = pool_with_catalogs
         assert registry.content.create(IRate.__identifier__, parent=pool)
 
-    def test_create_rateversion(self, registry, pool_graph_catalog):
+    def test_create_rateversion(self, registry, pool_with_catalogs):
         from adhocracy_core.resources.rate import IRateVersion
-        pool = pool_graph_catalog
+        pool = pool_with_catalogs
         assert registry.content.create(IRateVersion.__identifier__, parent=pool)
 
     def test_create_ratesservice(self, registry, pool):
@@ -48,9 +48,9 @@ class TestRate:
         add_ratesservice(pool, registry, {})
         assert pool['rates']
 
-    def test_search_rateversion(self, registry, pool_graph_catalog):
+    def test_search_rateversion(self, registry, pool_with_catalogs):
         from adhocracy_core.resources.rate import IRateVersion
-        pool = pool_graph_catalog
+        pool = pool_with_catalogs
         rate = registry.content.create(IRateVersion.__identifier__, parent=pool)
         rate_index = pool['catalogs']['adhocracy']['rate']
         rate_index.reindex_resource(rate)

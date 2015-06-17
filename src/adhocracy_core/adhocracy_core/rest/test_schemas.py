@@ -729,8 +729,8 @@ class TestAddGetPoolRequestExtraFields:
         return schema.bind(context=context)
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     @fixture
     def registry(self, mock_content_registry):

@@ -3,7 +3,7 @@ from pytest import mark
 
 
 @fixture
-def integration(config, pool_graph_catalog):
+def integration(config, pool_with_catalogs):
     config.include('pyramid_mailer.testing')
     config.include('adhocracy_spd')
 

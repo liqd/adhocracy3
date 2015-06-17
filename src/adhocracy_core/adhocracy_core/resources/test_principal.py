@@ -106,9 +106,9 @@ def integration(integration):
 
 
 @fixture
-def principals(pool_graph_catalog, registry):
+def principals(pool_with_catalogs, registry):
     from adhocracy_core.resources.principal import IPrincipalsService
-    context = pool_graph_catalog
+    context = pool_with_catalogs
     inst = registry.content.create(IPrincipalsService.__identifier__,
                                    parent=context)
     return inst

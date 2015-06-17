@@ -66,8 +66,8 @@ def make_forkable_itemversion(parent=None, follows=[]):
 class TestItem:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def make_one(self, context, registry, name='name'):
         from adhocracy_core.sheets.name import IName
