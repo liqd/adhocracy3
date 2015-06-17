@@ -40,9 +40,13 @@ var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) =
         // FIXME: use adhTopLevelState.redirectToCameFrom
         $location.url(adhResourceUrlFilter(resourcePath));
     };
-    scope.redirectAfterProposalSubmit = (result : {path : string }[]) => {
-        var proposalVersionPath = result.slice(-1)[0].path;
-        $location.url(adhResourceUrlFilter(proposalVersionPath));
+    scope.redirectAfterProposalSubmit = (result : any[]) => {
+        var proposalVersion = _.find(result, (r) => r.content_type === RIMercatorProposalVersion.content_type);
+        if (typeof proposalVersion !== "undefined") {
+            $location.url(adhResourceUrlFilter(proposalVersion.path));
+        } else {
+            throw 404;
+        }
     };
 };
 
