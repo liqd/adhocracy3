@@ -1,12 +1,12 @@
 <article class="mein-berlin-kiezkassen-proposal-detail">
-    <span
-        data-ng-if="data.assignments.length > 0"
-        class="has-badge"
-        data-ng-class="{
-            'is-realized': data.assignments[0].name === 'going_to_be_realized',
-            'is-not-realized': data.assignments[0].name === 'not_realizeable'
-    }">{{ data.assignments[0].title }}</span>
     <header class="mein-berlin-kiezkassen-proposal-detail-header">
+        <span
+                data-ng-if="data.assignments.length > 0"
+                class="has-badge"
+                data-ng-class="{
+                    'is-realized': data.assignments[0].name === 'going_to_be_realized',
+                    'is-not-realized': data.assignments[0].name === 'not_realizeable'
+            }">{{ data.assignments[0].title }}</span>
         <ul class="mein-berlin-kiezkassen-proposal-detail-meta">
             <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-item-location">
                 <i class="icon-pin-detail"></i> {{data.locationText}}
