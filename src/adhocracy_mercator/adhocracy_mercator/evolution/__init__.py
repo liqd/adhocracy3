@@ -1,21 +1,24 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging  # pragma: no cover
+
 from pyramid.threadlocal import get_current_registry
 from substanced.util import find_catalog  # pragma: no cover
-from adhocracy_core.evolution import migrate_new_sheet
-from adhocracy_core.evolution import migrate_new_iresource
-from adhocracy_core.evolution import log_migration
-from adhocracy_core.utils import get_sheet_field
 from substanced.util import find_service
 from zope.interface import alsoProvides
+
+from adhocracy_core.evolution import log_migration
+from adhocracy_core.evolution import migrate_new_iresource
+from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.sheets.badge import IBadgeable
-from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
-from adhocracy_mercator.sheets.mercator import ITitle
-from adhocracy_mercator.sheets.mercator import IMercatorSubResources
-from adhocracy_mercator.sheets.mercator import IIntroduction
+from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.workflows import setup_workflow
 from adhocracy_mercator.resources.mercator import IMercatorProposal
+from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
+from adhocracy_mercator.sheets.mercator import IIntroduction
+from adhocracy_mercator.sheets.mercator import IMercatorSubResources
+from adhocracy_mercator.sheets.mercator import ITitle
 
 logger = logging.getLogger(__name__)  # pragma: no cover
 
@@ -98,6 +101,17 @@ def add_badgeable_sheet_to_proposal_versions(root):
     migrate_new_sheet(root, IMercatorProposalVersion, IBadgeable)
 
 
+@log_migration
+def reset_workflow_state_to_result(root):
+    """Reset workflow state to 'result'."""
+    registry = get_current_registry()
+    workflow = registry.content.workflows['mercator']
+    setup_workflow(workflow,
+                   root['mercator'],
+                   ['announce', 'participate', 'frozen', 'result'],
+                   registry)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -107,3 +121,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(change_mercator_type_to_iprocess)
     config.add_evolution_step(add_badge_assignments_services_to_proposal_items)
     config.add_evolution_step(add_badgeable_sheet_to_proposal_versions)
+    config.add_evolution_step(reset_workflow_state_to_result)
