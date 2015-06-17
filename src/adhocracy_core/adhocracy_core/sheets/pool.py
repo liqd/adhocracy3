@@ -71,7 +71,7 @@ class PoolSheet(AnnotationRessourceSheet):
                      }
         return appstruct
 
-    def get_cstruct(self, request: Request, params: dict={}) -> dict:
+    def get_cstruct(self, request: Request, params: dict=None) -> dict:
         """Return cstruct data.
 
         Bind `request` and `self.context` to colander schema
@@ -94,8 +94,15 @@ class PoolSheet(AnnotationRessourceSheet):
         show_frequency (bool):
             add 'aggregateby` field. defaults to False.
         """
-        params['allows'] = (request.effective_principals, 'view')
-        params['only_visible'] = True
+        params = params or {}
+        filter_view_permission = self.registry.settings.get(
+            'adhocracy_filter_by_view_permission', True)
+        if filter_view_permission:
+            params['allows'] = (request.effective_principals, 'view')
+        filter_visible = self.registry.settings.get(
+            'adhocracy_filter_by_visible', True)
+        if filter_visible:
+            params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
         appstruct = self.get(params=params_query)
         if params.get('serialization_form', False) == 'omit':

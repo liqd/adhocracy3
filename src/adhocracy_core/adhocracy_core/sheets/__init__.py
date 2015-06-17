@@ -201,7 +201,7 @@ class BaseResourceSheet:
                                               appstruct,
                                               registry)
 
-    def get_cstruct(self, request: Request, params: dict={}):
+    def get_cstruct(self, request: Request, params: dict=None):
         """Return cstruct data.
 
         Bind `request` and `self.context` to colander schema
@@ -215,8 +215,15 @@ class BaseResourceSheet:
         Automatically set params are: `only_visible` and `allows` view
         permission.
         """
-        params['allows'] = (request.effective_principals, 'view')
-        params['only_visible'] = True
+        params = params or {}
+        filter_view_permission = self.registry.settings.get(
+            'adhocracy_filter_by_view_permission', True)
+        if filter_view_permission:
+            params['allows'] = (request.effective_principals, 'view')
+        filter_visible = self.registry.settings.get(
+            'adhocracy_filter_by_visible', True)
+        if filter_visible:
+            params['only_visible'] = True
         schema = self._get_schema_for_cstruct(request, params)
         appstruct = self.get(params=params)
         cstruct = schema.serialize(appstruct)
