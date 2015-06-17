@@ -237,7 +237,7 @@ def send_password_reset_mail(event):
 
 
 def send_activation_mail_or_activate_user(event):
-    """Send mail with activation link if a user is crated.
+    """Send mail with activation link if a user is created.
 
     If the setting "adhocracy.skip_registration_mail" is true, no mail is send
     but the user is activated directly.
