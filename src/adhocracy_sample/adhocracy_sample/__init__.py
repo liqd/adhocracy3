@@ -1,4 +1,4 @@
-"""Simple sample app using the Adhocracy core."""
+"""Simple sample app to extend adhocracy_core."""
 from pyramid.config import Configurator
 
 from adhocracy_core import root_factory
@@ -8,11 +8,8 @@ def includeme(config):
     """Setup sample app."""
     # include adhocracy_core
     config.include('adhocracy_core')
-    # include custom resource types
-    config.include('adhocracy_core.resources.paragraph')
-    config.include('adhocracy_core.resources.document')
     # include custom sheets
-    config.include('adhocracy_sample.sheets.sample_sheets')
+    config.include('adhocracy_sample.sheets')
 
 
 def main(global_config, **settings):

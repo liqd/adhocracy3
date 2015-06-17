@@ -250,7 +250,9 @@ def send_activation_mail_or_activate_user(event):
         return
     activation_path = _generate_activation_path()
     user.activation_path = activation_path
-    event.registry.messenger.send_registration_mail(user, activation_path)
+    messenger = getattr(event.registry, 'messenger', None)
+    if messenger is not None:  # ease testing
+        messenger.send_registration_mail(user, activation_path)
 
 
 def _generate_activation_path() -> str:

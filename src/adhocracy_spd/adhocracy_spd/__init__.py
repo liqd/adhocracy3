@@ -6,12 +6,10 @@ from adhocracy_core import root_factory
 
 def includeme(config):
     """Setup adhocracy extension."""
-    config.include('adhocracy_sample')
-    config.include('.sheets.digital_leben')
-    config.include('.workflows.digital_leben')
-    config.include('.resources.root')
-    config.include('.resources.subscriber')
-    config.include('.resources.digital_leben')
+    config.include('adhocracy_core')
+    config.include('.sheets')
+    config.include('.resources')
+    config.include('.workflows')
 
 
 def main(global_config, **settings):

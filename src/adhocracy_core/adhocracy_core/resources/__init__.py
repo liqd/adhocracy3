@@ -236,3 +236,28 @@ class ResourceFactory:
             item_creation_date = item_sheet.get()['creation_date']
             metadata['item_creation_date'] = item_creation_date
         return metadata
+
+
+def includeme(config):
+    """Include resource types and subscribers."""
+    config.include('.simple')
+    config.include('.item')
+    config.include('.itemversion')
+    config.include('.asset')
+    config.include('.pool')
+    config.include('.organisation')
+    config.include('.root')
+    config.include('.tag')
+    config.include('.comment')
+    config.include('.external_resource')
+    config.include('.principal')
+    config.include('.rate')
+    config.include('.image')
+    config.include('.subscriber')
+    config.include('.geo')
+    config.include('.process')
+    config.include('.document')
+    config.include('.document_process')
+    config.include('.paragraph')
+    config.include('.badge')
+    config.include('.service')

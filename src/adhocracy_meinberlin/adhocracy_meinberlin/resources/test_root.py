@@ -3,7 +3,7 @@ from pytest import mark
 
 
 @fixture
-def integration(config, pool_graph_catalog):
+def integration(config, pool_with_catalogs):
     config.include('pyramid_mailer.testing')
     config.include('adhocracy_meinberlin')
 
@@ -24,7 +24,7 @@ def test_root_meta():
 
 
 @mark.usefixtures('integration')
-def test_add_example_process(pool_graph_catalog, registry):
+def test_add_example_process(pool_with_catalogs, registry):
     from adhocracy_core.utils import get_sheet_field
     from adhocracy_core.resources.organisation import IOrganisation
     from adhocracy_core.resources.geo import IMultiPolygon
@@ -32,7 +32,7 @@ def test_add_example_process(pool_graph_catalog, registry):
     import adhocracy_core.sheets.geo
     from adhocracy_meinberlin import resources
     from .root import add_example_process
-    root = pool_graph_catalog
+    root = pool_with_catalogs
     add_locations_service(root, registry, {})
     add_example_process(root, registry, {})
     assert IOrganisation.providedBy(root['organisation'])

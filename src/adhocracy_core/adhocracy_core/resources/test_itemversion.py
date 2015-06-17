@@ -25,22 +25,17 @@ def test_itemversion_meta():
 
 
 @fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.itemversion')
-    config.include('adhocracy_core.resources.subscriber')
+def integration(integration):
+    integration.include('adhocracy_core.changelog')
+    return integration
 
 
 @mark.usefixtures('integration')
 class TestItemVersion:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def make_one(self, config, parent, follows=[], appstructs={}, creator=None,
                   is_batchmode=False):

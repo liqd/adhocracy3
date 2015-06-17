@@ -18,17 +18,6 @@ def test_external_resource_meta():
     assert add_commentsservice in meta.after_creation
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.external_resource')
-    config.include('adhocracy_core.resources.rate')
-    config.include('adhocracy_core.resources.comment')
-
-
 @mark.usefixtures('integration')
 class TestExternalResource:
 

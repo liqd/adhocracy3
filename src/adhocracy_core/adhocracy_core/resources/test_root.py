@@ -15,32 +15,11 @@ def test_root_meta():
 
 
 @fixture
-def integration(config):
-    config.include('pyramid_mailer.testing')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.resources.asset')
-    config.include('adhocracy_core.resources.root')
-    config.include('adhocracy_core.resources.pool')
-    config.include('adhocracy_core.resources.principal')
-    config.include('adhocracy_core.resources.subscriber')
-    config.include('adhocracy_core.resources.comment')
-    config.include('adhocracy_core.resources.organisation')
-    config.include('adhocracy_core.resources.badge')
-    config.include('adhocracy_core.resources.process')
-    config.include('adhocracy_core.resources.rate')
-    config.include('adhocracy_core.resources.item')
-    config.include('adhocracy_core.resources.paragraph')
-    config.include('adhocracy_core.resources.document')
-    config.include('adhocracy_core.resources.document_process')
-    config.include('adhocracy_core.resources.external_resource')
-    config.include('adhocracy_core.rest')
-    config.include('adhocracy_core.resources.geo')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.messaging')
+def integration(integration):
+    integration.include('pyramid_mailer.testing')
+    integration.include('adhocracy_core.changelog')
+    integration.include('adhocracy_core.rest')
+    integration.include('adhocracy_core.messaging')
 
 
 @mark.usefixtures('integration')

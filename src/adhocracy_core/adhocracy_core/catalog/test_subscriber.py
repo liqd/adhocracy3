@@ -137,13 +137,6 @@ class TestReindexResourceAndDescendants:
         assert mock_reindex.call_count == 2
 
 
-@fixture()
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-
-
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.catalog import subscriber

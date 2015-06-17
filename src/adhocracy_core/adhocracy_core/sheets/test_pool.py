@@ -8,16 +8,6 @@ from pytest import raises
 from adhocracy_core.resources.pool import IBasicPool
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.resources.pool')
-    config.include('adhocracy_core.resources.tag')
-    config.include('adhocracy_core.sheets')
-
-
 class TestPoolSchema:
 
     @fixture
@@ -173,8 +163,8 @@ class TestFilteringPoolSheet:
 class TestIntegrationPoolSheet:
 
     @fixture
-    def pool(self, pool_graph_catalog, registry):
-        pool = self._make_resource(registry, parent=pool_graph_catalog,
+    def pool(self, pool_with_catalogs, registry):
+        pool = self._make_resource(registry, parent=pool_with_catalogs,
                                    name='child')
         return pool
 

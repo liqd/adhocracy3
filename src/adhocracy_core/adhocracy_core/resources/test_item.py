@@ -62,24 +62,12 @@ def make_forkable_itemversion(parent=None, follows=[]):
         parent=parent, appstructs=appstructs)
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.itemversion')
-    config.include('adhocracy_core.resources.item')
-    config.include('adhocracy_core.resources.tag')
-    config.include('adhocracy_core.resources.subscriber')
-
-
 @mark.usefixtures('integration')
 class TestItem:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def make_one(self, context, registry, name='name'):
         from adhocracy_core.sheets.name import IName

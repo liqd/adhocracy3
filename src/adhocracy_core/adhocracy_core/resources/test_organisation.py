@@ -2,14 +2,6 @@ from pytest import mark
 from pytest import fixture
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_core.resources.organisation')
-
-
 class TestOrganisation:
 
     @fixture

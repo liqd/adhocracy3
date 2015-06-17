@@ -4,11 +4,12 @@ from pyramid import testing
 from pyramid.security import Allow
 from pyramid.security import ALL_PERMISSIONS
 
+
 @fixture
-def integration(config, pool_graph_catalog):
-    config.include('pyramid_mailer.testing')
-    config.include('adhocracy_core.workflows.sample')
-    config.include('adhocracy_mercator')
+def integration(integration):
+    integration.include('pyramid_mailer.testing')
+    integration.include('adhocracy_core.workflows')
+    integration.include('adhocracy_mercator.workflows')
 
 
 def test_root_meta():

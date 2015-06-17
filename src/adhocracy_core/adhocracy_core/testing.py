@@ -148,37 +148,44 @@ def create_event_listener(config: Configurator, ievent: IInterface) -> list:
 
 
 @fixture
-def pool_graph(config):
+def pool_graph(integration):
     """Return pool with graph for integration/functional tests."""
     from adhocracy_core.resources.pool import Pool
     from adhocracy_core.resources.root import _add_graph
     from adhocracy_core.resources.root import _add_objectmap_to_app_root
     from adhocracy_core.sheets.pool import IPool
     from zope.interface import directlyProvides
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.graph')
     pool = Pool()
     directlyProvides(pool, IPool)
     _add_objectmap_to_app_root(pool)
-    _add_graph(pool, config.registry)
+    _add_graph(pool, integration.registry)
     return pool
 
 
 @fixture
-def pool_graph_catalog(config, pool_graph):
-    """Return pool wit graph and catalog for integration/functional tests."""
+def pool_with_catalogs(integration, pool_graph):
+    """Return pool with graph and catalog for integration/functional tests."""
     from substanced.interfaces import MODE_IMMEDIATE
     from adhocracy_core.resources.root import _add_catalog_service
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.metadata')
     context = pool_graph
-    _add_catalog_service(context, config.registry)
+    _add_catalog_service(context, integration.registry)
     context['catalogs']['system']['name'].action_mode = MODE_IMMEDIATE
     context['catalogs']['system']['interfaces'].action_mode = MODE_IMMEDIATE
     context['catalogs']['adhocracy']['tag'].action_mode = MODE_IMMEDIATE
     context['catalogs']['adhocracy']['rate'].action_mode = MODE_IMMEDIATE
     return context
+
+
+@fixture
+def integration(config) -> Configurator:
+    """Include basic resource types and sheets."""
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.content')
+    config.include('adhocracy_core.graph')
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources')
+    return config
 
 
 @fixture

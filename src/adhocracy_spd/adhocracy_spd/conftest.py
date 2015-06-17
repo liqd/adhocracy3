@@ -15,3 +15,11 @@ def app(app_settings):
     add_create_test_users_subscriber(configurator)
     app = configurator.make_wsgi_app()
     return app
+
+
+@fixture
+def integration(integration):
+    """Include resource types and sheets."""
+    integration.include('adhocracy_spd.sheets')
+    integration.include('adhocracy_spd.resources')
+    return integration

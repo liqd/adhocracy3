@@ -10,8 +10,8 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
     config.include('adhocracy_core.catalog')
-    config.include('adhocracy_meinberlin.workflows.bplan')
-    config.include('adhocracy_meinberlin.sheets.bplan')
+    config.include('adhocracy_meinberlin.workflows')
+    config.include('adhocracy_meinberlin.sheets')
 
 
 class TestProposalSheet:

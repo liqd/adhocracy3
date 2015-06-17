@@ -38,17 +38,6 @@ def test_create_mercator_catalog_indexes():
     assert isinstance(inst.mercator_location, Keyword)
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_mercator.catalog')
-    config.include('adhocracy_mercator.sheets.mercator')
-
-
 @mark.usefixtures('integration')
 def test_create_adhocracy_catalog(pool_graph, registry):
     from substanced.catalog import Catalog
@@ -70,8 +59,8 @@ def test_create_adhocracy_catalog(pool_graph, registry):
 class TestMercatorLocationIndex:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def test_index_location_default(self, context):
         from .adhocracy import index_location
@@ -107,8 +96,8 @@ class TestMercatorLocationIndex:
 class TestMercatorRequestedFundingIndex:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def test_index_requested_funding_default(self, context):
         from .adhocracy import index_requested_funding
@@ -168,8 +157,8 @@ class TestMercatorRequestedFundingIndex:
 class TestMercatorBudgetIndex:
 
     @fixture
-    def context(self, pool_graph_catalog):
-        return pool_graph_catalog
+    def context(self, pool_with_catalogs):
+        return pool_with_catalogs
 
     def test_index_budget_default(self, context):
         from .adhocracy import index_budget

@@ -16,20 +16,6 @@ def test_create_adhocracy_catalog_indexes():
     assert isinstance(inst.reference, Reference)
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.resources.pool')
-    config.include('adhocracy_core.resources.simple')
-    config.include('adhocracy_core.resources.itemversion')
-    config.include('adhocracy_core.resources.item')
-    config.include('adhocracy_core.resources.tag')
-
-
 @mark.usefixtures('integration')
 def test_create_adhocracy_catalog(pool_graph, registry):
     from substanced.catalog import Catalog
@@ -57,9 +43,9 @@ def test_add_directives(registry):
 
 
 @mark.usefixtures('integration')
-def test_index_resource(pool_graph_catalog,):
+def test_index_resource(pool_with_catalogs,):
     from substanced.util import find_service
-    pool = pool_graph_catalog
+    pool = pool_with_catalogs
     pool.add('child', testing.DummyResource())
     name_index = find_service(pool, 'catalogs', 'system', 'name')
     assert 'child' in [x for x in name_index.unique_values()]

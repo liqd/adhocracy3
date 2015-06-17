@@ -4,16 +4,6 @@ from pytest import fixture
 from pytest import mark
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.graph')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_core.sheets.rate')
-
-
 def test_create_adhocracy_catalog_indexes():
     from substanced.catalog import Keyword
     from .adhocracy import AdhocracyCatalogIndexes

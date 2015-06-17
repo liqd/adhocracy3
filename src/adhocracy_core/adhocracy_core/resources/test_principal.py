@@ -97,25 +97,18 @@ def test_passwordreset_meta():
 
 
 @fixture
-def integration(config):
-    config.include('pyramid_mailer.testing')
-    config.include('pyramid_mako')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.messaging')
-    config.include('adhocracy_core.sheets.metadata')
-    config.include('adhocracy_core.sheets.name')
-    config.include('adhocracy_core.sheets.principal')
-    config.include('adhocracy_core.resources.principal')
-    config.include('adhocracy_core.resources.subscriber')
+def integration(integration):
+    integration.include('pyramid_mailer.testing')
+    integration.include('pyramid_mako')
+    integration.include('adhocracy_core.changelog')
+    integration.include('adhocracy_core.messaging')
+    return integration
 
 
 @fixture
-def principals(pool_graph_catalog, registry):
+def principals(pool_with_catalogs, registry):
     from adhocracy_core.resources.principal import IPrincipalsService
-    context = pool_graph_catalog
+    context = pool_with_catalogs
     inst = registry.content.create(IPrincipalsService.__identifier__,
                                    parent=context)
     return inst

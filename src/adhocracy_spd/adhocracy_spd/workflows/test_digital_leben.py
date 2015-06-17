@@ -8,7 +8,7 @@ from webtest import TestResponse
 def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
-    config.include('adhocracy_spd.workflows.digital_leben')
+    config.include('adhocracy_spd.workflows')
 
 
 @mark.usefixtures('integration')
