@@ -24,10 +24,12 @@ import webshim = require("polyfiller");
 import markdownit = require("markdownit");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
-import AdhConfig = require("./Packages/Config/Config");
+import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhComment = require("./Packages/Comment/Comment");
+import AdhConfig = require("./Packages/Config/Config");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
+import AdhDocument = require("./Packages/Document/Document");
 import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventManager = require("./Packages/EventManager/EventManager");
@@ -37,25 +39,23 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
-import AdhSPDDocument = require("./Packages/spdDocument/spdDocument");
-import AdhSPDWorkbench = require("./Packages/spdWorkbench/spdWorkbench");
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProcess = require("./Packages/Process/Process");
 import AdhRate = require("./Packages/Rate/Rate");
-import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 import AdhShareSocial = require("./Packages/ShareSocial/ShareSocial");
+import AdhSPDWorkbench = require("./Packages/spdWorkbench/spdWorkbench");
 import AdhSticky = require("./Packages/Sticky/Sticky");
+import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhTracking = require("./Packages/Tracking/Tracking");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
-import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
-import AdhMarkdown = require("./Packages/Markdown/Markdown");
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
 webshim.setOptions("forms-ext", {"replaceUI": true});
@@ -91,7 +91,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
-        AdhSPDDocument.moduleName,
+        AdhDocument.moduleName,
         AdhSPDWorkbench.moduleName,
         AdhResourceArea.moduleName,
         AdhSticky.moduleName,
@@ -178,7 +178,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
-    AdhSPDDocument.register(angular);
+    AdhDocument.register(angular);
     AdhSPDWorkbench.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);

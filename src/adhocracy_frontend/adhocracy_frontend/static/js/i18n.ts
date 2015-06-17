@@ -4,6 +4,7 @@
  */
 
 translateMe = [
+    "TR__ADD_DOCUMENT",
     "TR__BACK_TO_TOP",
     "TR__COMMENTS",
     "TR__COMMENTS_TOTAL",
