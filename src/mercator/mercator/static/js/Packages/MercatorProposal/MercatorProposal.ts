@@ -298,8 +298,8 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
 
 export class BadgeAssignment {
     constructor(
-        private title : string,
-        private description : string,
+        public title : string,
+        public description : string,
         public name : string
     ) {}
 }
@@ -461,13 +461,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
             data.assignments = assignments;
-            data.isCommunityAward = false;
-            for (var i = 0; i < assignments.length; i++) {
-                if (assignments[i].name === "community") {
-                    data.isCommunityAward = true;
-                    break;
-                }
-            }
+            data.isCommunityAward = _.some(assignments, (a) => a.name === "community");
         });
 
         var processUrl = this.adhTopLevelState.get("processUrl");
@@ -992,13 +986,7 @@ export var listItem = (
 
                 getBadges(adhHttp, $q)(proposal).then((assignments) => {
                     scope.data.assignments = assignments;
-                    scope.data.isCommunityAward = false;
-                    for (var i = 0; i < assignments.length; i++) {
-                        if (assignments[i].name === "community") {
-                            scope.data.isCommunityAward = true;
-                            break;
-                        }
-                    }
+                    scope.data.isCommunityAward = _.some(assignments, (a) => a.name === "community");
                 });
 
                 var processUrl = adhTopLevelState.get("processUrl");

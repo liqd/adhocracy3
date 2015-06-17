@@ -36,7 +36,7 @@
 
         <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
             <ol>
-                <li ng-if="data.assignments.length > 0"><a
+                <li data-ng-if="data.assignments.length > 0"><a
                     href="#jury-decision"
                     title="Jury Decision"
                     data-du-smooth-scroll=""
@@ -71,7 +71,7 @@
         </nav>
 
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
-            <section ng-if="data.assignments.length > 0" class="chapter m-jury-decision" id="jury-decision">
+            <section data-ng-if="data.assignments.length > 0" class="chapter m-jury-decision" id="jury-decision">
                 <section class="jury-decision-section">
                     <h2 class="chapter-header">{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
                     <p>{{ data.assignments[0].description }}</p>

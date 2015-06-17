@@ -136,27 +136,30 @@ export var mercatorProposalListingColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
             scope.contentType = RIMercatorProposalVersion.content_type;
+
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
                 var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+
                 scope.shared.facets = [{
-                key: "mercator_location",
-                name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
-                items: [
-                    {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
-                    {key: "online", name: "TR__ONLINE"},
-                    {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
-                ]
+                    key: "mercator_location",
+                    name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
+                    items: [
+                        {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
+                        {key: "online", name: "TR__ONLINE"},
+                        {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
+                    ]
                 }, {
-                key: "mercator_requested_funding",
-                name: "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING",
-                items: [
-                    {key: "5000", name: "0 - 5000 €"},
-                    {key: "10000", name: "5000 - 10000 €"},
-                    {key: "20000", name: "10000 - 20000 €"},
-                    {key: "50000", name: "20000 - 50000 €"}
-                ]
+                    key: "mercator_requested_funding",
+                    name: "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING",
+                    items: [
+                        {key: "5000", name: "0 - 5000 €"},
+                        {key: "10000", name: "5000 - 10000 €"},
+                        {key: "20000", name: "10000 - 20000 €"},
+                        {key: "50000", name: "20000 - 50000 €"}
+                    ]
                 }];
+
                 if (currentPhase === "result") {
                     scope.shared.facets.push({
                         key: "badge",
@@ -167,6 +170,7 @@ export var mercatorProposalListingColumnDirective = (
                         ]
                     });
                 }
+
                 scope.shared.sort = "item_creation_date";
                 scope.shared.reverse = true;
                 scope.shared.setSort = (sort : string) => {
