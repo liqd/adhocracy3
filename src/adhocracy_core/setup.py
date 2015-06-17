@@ -84,8 +84,12 @@ setup(name='adhocracy_core',
       start_ws_server = adhocracy_core.websockets.start_ws_server:main
       import_users = adhocracy_core.scripts.import_users:import_users
       import_groups = adhocracy_core.scripts.import_groups:import_groups
-      import_resources = adhocracy_core.scripts.import_resources:import_resources
-      import_local_roles = adhocracy_core.scripts.import_local_roles:import_local_roles
+      import_resources =\
+          adhocracy_core.scripts.import_resources:import_resources
+      import_local_roles = \
+          adhocracy_core.scripts.import_local_roles:import_local_roles
+      assign_badges =\
+          adhocracy_core.scripts.assign_badges:assign_badges
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,

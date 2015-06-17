@@ -55,11 +55,11 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
 
 def setup_workflow(workflow: AdhocracyACLWorkflow, context: IResource,
                    states: [str], registry: Registry):
-    """Reset workflow and transition to the given states."""
+    """Initialize workflow and transition to the given states."""
     request = Request.blank('/dummy')
     request.registry = registry
     request.__cached_principals__ = ['role:god']
-    workflow.reset(context)
+    workflow.initialize(context)
     for state in states:
         workflow.transition_to_state(context, request, state)
 

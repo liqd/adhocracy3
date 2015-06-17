@@ -181,6 +181,7 @@ var postEdit = (
             paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
                 text: paragraph.body
             });
+            paragraphVersion.root_versions = [oldVersion.path];
 
             paragraphItems.push(item);
             paragraphVersions.push(paragraphVersion);
@@ -197,6 +198,7 @@ var postEdit = (
                 paragraphVersion.data[SIParagraph.nick] = new SIParagraph.Sheet({
                     text: paragraph.body
                 });
+                paragraphVersion.root_versions = [oldVersion.path];
 
                 paragraphVersions.push(paragraphVersion);
                 paragraphRefs.push(paragraphVersion.path);
@@ -328,6 +330,8 @@ export var createDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
+                }, (errors) => {
+                    scope.errors = errors;
                 });
             };
         }
@@ -373,6 +377,8 @@ export var editDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
+                }, (errors) => {
+                    scope.errors = errors;
                 });
             };
         }

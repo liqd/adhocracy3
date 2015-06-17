@@ -3,6 +3,7 @@ from pyramid import testing
 from pytest import fixture
 from pytest import mark
 from pytest import raises
+from pyramid.request import Request
 
 class TestAdhocracyACLWorkflow:
 
@@ -139,9 +140,45 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_setup_workflow(registry):
-    from . import setup_workflow
-    context = testing.DummyResource()
-    sample = registry.content.workflows['sample']
-    setup_workflow(sample, context, ['participate', 'frozen'], registry)
-    assert sample.state_of(context) is 'frozen'
+class TestSetupWorkflow:
+
+    def _make_workflow(self, registry, name):
+        from . import add_workflow
+        cstruct = \
+            {'states_order': ['draft', 'announced', 'participate'],
+             'states': {'draft': {'acm': {'principals':           ['moderator'],
+                                          'permissions': [['view', 'Deny']]}},
+                        'announced': {'acl': []},
+                        'participate': {'acl': []}},
+             'transitions': {'to_announced': {'from_state': 'draft',
+                                              'to_state': 'announced',
+                                              'permission': 'do_transition',
+                                              'callback': None,
+                                              },
+                             'to_participate': {'from_state': 'announced',
+                                                'to_state': 'participate',
+                                                'permission': 'do_transition',
+                                                'callback': None,
+                             }},
+             }
+        return add_workflow(registry, cstruct, name)
+
+    def test_setup_workflow(self, registry):
+        from . import setup_workflow
+        context = testing.DummyResource()
+        sample = registry.content.workflows['sample']
+        setup_workflow(sample, context, ['participate', 'frozen'], registry)
+        assert sample.state_of(context) is 'frozen'
+
+    def test_setup_workflow_state_already_set(self, registry):
+        from . import setup_workflow
+        self._make_workflow(registry, 'test_workflow')
+        request = Request.blank('/dummy')
+        request.registry = registry
+        context = testing.DummyResource()
+        workflow = registry.content.workflows['test_workflow']
+        workflow.initialize(context)
+        workflow.transition_to_state(context, request, 'announced')
+        workflow.transition_to_state(context, request, 'participate')
+        setup_workflow(workflow, context, ['announced', 'participate'], registry)
+        assert workflow.state_of(context) is 'participate'
