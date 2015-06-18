@@ -13,6 +13,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
+import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
@@ -128,7 +129,9 @@ export var mercatorProposalEditColumnDirective = (
 
 
 export var mercatorProposalListingColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
@@ -137,37 +140,52 @@ export var mercatorProposalListingColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["platformUrl", "proposalUrl"]);
             scope.contentType = RIMercatorProposalVersion.content_type;
-            scope.shared.facets = [{
-                key: "mercator_location",
-                name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
-                items: [
-                    {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
-                    {key: "online", name: "TR__ONLINE"},
-                    {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
-                ]
-            }, {
-                key: "mercator_requested_funding",
-                name: "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING",
-                items: [
-                    {key: "5000", name: "0 - 5000 €"},
-                    {key: "10000", name: "5000 - 10000 €"},
-                    {key: "20000", name: "10000 - 20000 €"},
-                    {key: "50000", name: "20000 - 50000 €"}
-                ]
-            }, {
-                key: "badge",
-                name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
-                items: [
-                    {key: "winning", name: "TR__MERCATOR_BADGE_WINNERS"},
-                    {key: "community", name: "TR__MERCATOR_BADGE_COMMUNITY_AWARD"}
-                ]
-            }];
-            scope.shared.sort = "item_creation_date";
-            scope.shared.reverse = true;
-            scope.shared.setSort = (sort : string) => {
-                scope.shared.sort = sort;
-            };
-            scope.initialLimit = 50;
+
+            var processUrl = adhTopLevelState.get("processUrl");
+            adhHttp.get(processUrl).then((resource) => {
+                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+
+                if (typeof scope.shared.facets === "undefined") {
+                    scope.shared.facets = [{
+                        key: "mercator_location",
+                        name: "TR__MERCATOR_PROPOSAL_LOCATION_LABEL",
+                        items: [
+                            {key: "specific", name: "TR__MERCATOR_PROPOSAL_SPECIFIC"},
+                            {key: "online", name: "TR__ONLINE"},
+                            {key: "linked_to_ruhr", name: "TR__MERCATOR_PROPOSAL_LOCATION_LINKAGE_TO_RUHR"}
+                        ]
+                    }, {
+                        key: "mercator_requested_funding",
+                        name: "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING",
+                        items: [
+                            {key: "5000", name: "0 - 5000 €"},
+                            {key: "10000", name: "5000 - 10000 €"},
+                            {key: "20000", name: "10000 - 20000 €"},
+                            {key: "50000", name: "20000 - 50000 €"}
+                        ]
+                    }];
+
+                    if (currentPhase === "result") {
+                        scope.shared.facets.push({
+                            key: "badge",
+                            name: "TR__MERCATOR_BADGE_AWARDS_LABEL",
+                            items: [
+                                {key: "winning", name: "TR__MERCATOR_BADGE_WINNERS", enabled: true},
+                                {key: "community", name: "TR__MERCATOR_BADGE_COMMUNITY_AWARD"}
+                            ]
+                        });
+                    }
+                }
+
+                scope.shared.sort = "item_creation_date";
+                scope.shared.reverse = true;
+                scope.shared.setSort = (sort : string) => {
+                    scope.shared.sort = sort;
+                };
+                scope.initialLimit = 50;
+
+                scope.ready = true;
+            });
         }
     };
 };
@@ -265,5 +283,6 @@ export var register = (angular) => {
             "$window", "adhTopLevelState", "adhPermissions", "adhConfig", mercatorProposalDetailColumnDirective])
         .directive("adhMercatorProposalEditColumn", [
             "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalEditColumnDirective])
-        .directive("adhMercatorProposalListingColumn", ["adhConfig", mercatorProposalListingColumnDirective]);
+        .directive("adhMercatorProposalListingColumn",
+            ["adhConfig", "adhHttp", "adhTopLevelState", mercatorProposalListingColumnDirective]);
 };

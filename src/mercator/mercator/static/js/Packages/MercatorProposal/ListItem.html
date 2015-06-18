@@ -1,9 +1,9 @@
 <a
     data-ng-href="{{ path | adhResourceUrl }}"
     data-ng-class="{
-        'has-badge': data.assignments.length > 0,
-        'm-winner': data.assignments[0].name === 'winning',
-        'm-community-award': data.assignments[0].name === 'community'
+        'has-badge': data.winnerBadgeAssignment,
+        'm-winner': data.winnerBadgeAssignment.name === 'winning',
+        'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }"
     class="proposal-list-item {{ selectedState }}">
     <img class="proposal-list-item-image"
