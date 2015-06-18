@@ -7,6 +7,7 @@ from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
 from pyramid.registry import Registry
 from pyramid.request import Request
+from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_registry
 from substanced.util import find_service
 from zope.interface import implementer
@@ -216,12 +217,12 @@ class BaseResourceSheet:
         permission.
         """
         params = params or {}
-        filter_view_permission = self.registry.settings.get(
-            'adhocracy_filter_by_view_permission', True)
+        filter_view_permission = asbool(self.registry.settings.get(
+            'adhocracy_filter_by_view_permission', True))
         if filter_view_permission:
             params['allows'] = (request.effective_principals, 'view')
-        filter_visible = self.registry.settings.get(
-            'adhocracy_filter_by_visible', True)
+        filter_visible = asbool(self.registry.settings.get(
+            'adhocracy_filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
         schema = self._get_schema_for_cstruct(request, params)
