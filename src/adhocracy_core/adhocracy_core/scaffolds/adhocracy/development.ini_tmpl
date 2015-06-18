@@ -44,7 +44,7 @@ adhocracy.skip_registration_mail = false
 adhocracy_core.caching.http.mode = no_cache
 # URL of the Varnish cache
 #adhocracy.varnish_url =
-# performance workaround: disable filter references by view permisison
+# performance workaround: disable filter references by view permission
 #adhocracy_filter_by_view_permission = False
 # performance workaround: disable filter references by visible (not deleted or hidden)
 #adhocracy_filter_by_visible = False
