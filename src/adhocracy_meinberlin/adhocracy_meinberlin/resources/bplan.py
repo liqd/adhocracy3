@@ -59,6 +59,7 @@ process_meta = process.process_meta._replace(
                    ],
     is_implicit_addable=True,
     extended_sheets=[adhocracy_meinberlin.sheets.bplan.IWorkflowAssignment,
+                     adhocracy_meinberlin.sheets.bplan.IProcessSettings,
                      ],
 )
 

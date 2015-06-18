@@ -2,7 +2,8 @@ from unittest.mock import Mock
 from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid import testing
-
+from pytest import fixture
+from pytest import mark
 
 def test_application_created_subscriber(monkeypatch):
     import transaction
@@ -17,3 +18,102 @@ def test_application_created_subscriber(monkeypatch):
     event.app.root_factory.return_value = root
     _application_created_subscriber(event)
     assert (Allow, 'role:admin', 'create_proposal') in root.__acl__
+
+@mark.usefixtures('integration')
+class TestBplanSubmissionConfirmationEmailSubscriber:
+
+    @fixture
+    def event(self, context, mock_sheet):
+        return testing.DummyResource(object=mock_sheet, registry=Mock())
+
+    @fixture
+    def registry(self, config):
+        config.include('pyramid_mailer.testing')
+        config.include('pyramid_mako')
+        return config.registry
+
+    @fixture
+    def context(self, registry, pool_with_catalogs):
+        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core.resources.principal import IPrincipalsService
+        from adhocracy_meinberlin import resources
+        import adhocracy_core.sheets.principal
+        import adhocracy_meinberlin.sheets.bplan
+        context = pool_with_catalogs
+        registry.content.create(IPrincipalsService.__identifier__,
+                                parent=context)
+        user_appstructs = {adhocracy_core.sheets.principal.IUserExtended.__identifier__:
+                           {'email': 'officeworkername@example.org'}}
+        office_worker = registry.content.create(IUser.__identifier__,
+                                                appstructs=user_appstructs,
+                                                parent=context['principals']['users'])
+        bplan_appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                            {'name': 'bplan'},
+                            adhocracy_core.sheets.title.ITitle.__identifier__:
+                            {'title': 'Sample BPlan process'},
+                            adhocracy_meinberlin.sheets.bplan.IProcessSettings.__identifier__:
+                            {'office_worker': office_worker,
+                             'plan_number': '112233',
+                             'construction_date': '24/09/2015',
+                             'participation_end_date': '11/06/2015'}}
+        process = registry.content.create(resources.bplan.IProcess.__identifier__,
+                                          parent=context,
+                                          appstructs=bplan_appstructs)
+        return context
+
+    @fixture
+    def appstructs(self):
+        from adhocracy_meinberlin import sheets
+        return {sheets.bplan.IProposal.__identifier__:
+                {'name': 'Laura Muster',
+                 'email': 'user@example.com',
+                 'street_number': '1234',
+                 'postal_code_city': '10000, Berlin',
+                 'statement': 'BplanStatement1\nBplanStatement2'
+                }}
+
+    def make_bplan_proposal(self, context, registry, appstructs):
+        from adhocracy_core.sheets.name import IName
+        from adhocracy_meinberlin import sheets
+        from adhocracy_meinberlin import resources
+        proposal_item = registry.content.create(resources.bplan.IProposal.__identifier__,
+                                                parent=context['bplan'])
+        inst = registry.content.create(resources.bplan.IProposalVersion.__identifier__,
+                                       parent=proposal_item,
+                                       appstructs=appstructs)
+        return inst
+
+    @fixture
+    def messenger(self, registry):
+        from adhocracy_core.messaging import Messenger
+        return Messenger(registry)
+
+    def test_email_sent_to_user(self, registry, context, messenger, appstructs):
+        registry.messenger = messenger
+        self.make_bplan_proposal(context, registry, appstructs)
+        assert len(messenger.mailer.outbox) == 2
+
+        msg_user = messenger.mailer.outbox[0]
+        assert 'user@example.com' in msg_user.recipients
+        assert 'Bestätigung' in msg_user.subject
+        assert 'Vielen Dank' in msg_user.body
+        assert 'Laura Muster' in msg_user.body
+        assert 'user@example.com' in msg_user.body
+        assert '1234' in msg_user.body
+        assert '10000, Berlin' in msg_user.body
+        assert 'BplanStatement1' in msg_user.body
+        assert 'BplanStatement2' in msg_user.body
+        assert '112233' in msg_user.body
+        assert '24/09/2015' in msg_user.body
+        assert '11/06/2015' in msg_user.body
+
+        msg_officeworker = messenger.mailer.outbox[1]
+        assert 'officeworkername@example.org' in msg_officeworker.recipients
+        assert 'Bestätigung' in msg_officeworker.subject
+        assert 'Vielen Dank' in msg_officeworker.body
+        assert 'Laura Muster' in msg_officeworker.body
+        assert 'user@example.com' in msg_officeworker.body
+        assert '1234' in msg_officeworker.body
+        assert '10000, Berlin' in msg_officeworker.body
+        assert 'BplanStatement1' in msg_officeworker.body
+        assert 'BplanStatement2' in msg_officeworker.body

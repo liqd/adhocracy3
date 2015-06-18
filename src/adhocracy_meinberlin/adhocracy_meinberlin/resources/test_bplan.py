@@ -69,6 +69,7 @@ class TestProcess:
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == [
             sheets.bplan.IWorkflowAssignment,
+            sheets.bplan.IProcessSettings,
         ]
         assert meta.permission_create == 'create_process'
 

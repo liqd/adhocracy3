@@ -151,3 +151,37 @@ class TestPrivateWorkflowSheet:
         from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=meta.isheet)
         assert get_sheet(context, meta.isheet)
+
+class TestProcessSettingsSheet:
+
+    @fixture
+    def meta(self):
+        from .bplan import process_settings_meta
+        return process_settings_meta
+
+    def test_meta(self, meta):
+        from . import bplan
+        assert meta.isheet == bplan.IProcessSettings
+        assert meta.schema_class == bplan.ProcessSettingsSchema
+
+    def test_create(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy_core.interfaces import IResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+
+    @mark.usefixtures('integration')
+    def test_get_empty(self, meta, context, registry):
+        inst = meta.sheet_class(meta, context)
+        wanted =  {'office_worker': None,
+                   'plan_number': 0,
+                   'construction_date': None,
+                   'participation_end_date': None}
+        assert inst.get() == wanted
+
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)

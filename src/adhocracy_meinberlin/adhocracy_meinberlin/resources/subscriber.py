@@ -1,12 +1,75 @@
 """Initialize meinberlin ACM."""
+import transaction
 from pyramid.events import ApplicationCreated
+from pyramid.traversal import find_interface
+from pyramid.renderers import render
+
 from adhocracy_core.utils import get_root
 from adhocracy_core.authorization import add_acm
 from adhocracy_core.authorization import clean_acl
 from adhocracy_core.authorization import set_god_all_permissions
+from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.resources.root import root_acm
+from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_meinberlin.resources.root import meinberlin_acm
-import transaction
+from adhocracy_meinberlin.resources.bplan import IProposalVersion
+from adhocracy_meinberlin.resources.bplan import IProposal
+from adhocracy_meinberlin import sheets
+from adhocracy_meinberlin import resources
+
+
+def _send_bplan_submission_confirmation_email_subscriber(event):
+    if not hasattr(event.registry, 'messenger'):  # ease testing
+        return
+    messenger = event.registry.messenger
+    proposal_version = event.object
+    proposal_item = find_interface(proposal_version, IProposal)
+    if not _bplan_proposal_has_been_created(proposal_item):
+        return
+    proposal_values = _get_proposal_values(proposal_version)
+    process_settings = _get_process_settings(proposal_item)
+    templates_values = _get_templates_values(process_settings, proposal_values)
+    subject = 'B-Plan Eingabe Bestätigung'
+    messenger.send_mail(subject,
+                        [proposal_values['email']],
+                        'sysadmin@example.com',
+                        render('adhocracy_meinberlin:templates/bplan_submission_confirmation.txt.mako',
+                               templates_values))
+    messenger.send_mail(subject,
+                        [process_settings['office_worker'].email],
+                        'sysadmin@example.com',
+                        render('adhocracy_meinberlin:templates/bplan_submission_confirmation.txt.mako',
+                               templates_values))
+
+
+def _get_templates_values(process_settings, proposal_values):
+    templates_values = proposal_values.copy()
+    templates_values.update(process_settings)
+    return templates_values
+
+
+def _get_process_settings(proposal_item):
+    process = find_interface(proposal_item, resources.bplan.IProcess)
+    process_settings = get_sheet(process, sheets.bplan.IProcessSettings).get()
+    return process_settings
+
+
+def _get_proposal_values(proposal_version):
+    proposal_sheet = get_sheet(proposal_version, sheets.bplan.IProposal)
+    proposal_values = proposal_sheet.get()
+    return proposal_values
+
+
+def _bplan_proposal_has_been_created(proposal):
+    return len([version for version in proposal.values() if
+                IProposalVersion.providedBy(version)]) == 2
+
+
+def _get_office_worker_email(proposal):
+    process = find_interface(proposal, resources.bplan.IProcess)
+    office_worker = get_sheet_field(process, sheets.bplan.IProcessSettings, 'office_worker')
+    return office_worker.email
 
 
 def _application_created_subscriber(event):
@@ -23,3 +86,5 @@ def _application_created_subscriber(event):
 def includeme(config):
     """Register subscribers."""
     config.add_subscriber(_application_created_subscriber, ApplicationCreated)
+    config.add_subscriber(_send_bplan_submission_confirmation_email_subscriber,
+                          IResourceCreatedAndAdded, object_iface=IProposalVersion)
