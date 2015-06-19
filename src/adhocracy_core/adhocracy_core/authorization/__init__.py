@@ -151,8 +151,3 @@ def set_god_all_permissions(resource: IResource, registry=None) -> bool:
     old_acl = get_acl(resource)
     new_acl = [god_all_permission_ace] + old_acl
     set_acl(resource, new_acl, registry)
-
-
-def clean_acl(resource: IResource, registry=None) -> bool:
-    """Remove all ACL on the resource."""
-    set_acl(resource, [], registry)

@@ -291,11 +291,6 @@ def test_set_acl_set_resource_dirty():
     set_acl(resource, [(Deny, 'role:creator', 'edit_comment')])
     assert resource._p_changed is True
 
-def test_clean_acl():
-    from . import clean_acl
-    resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
-    clean_acl(resource)
-    assert resource.__acl__ == []
 
 def test_set_god_all_permissions():
     from pyramid.security import ALL_PERMISSIONS
