@@ -261,6 +261,11 @@ class TestResourceContentRegistry:
 
         assert permission_name in inst.permissions
 
+    def test_get_views_permissions_no_permissions(self, mock_registry):
+        mock_registry.introspector.get_category.return_value = None
+        inst = self.make_one(mock_registry)
+        assert inst._get_views_permissions() == []
+
     @fixture
     def sheet_meta_a(self, sheet_meta):
         from colander import MappingSchema
