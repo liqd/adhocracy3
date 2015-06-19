@@ -273,22 +273,6 @@ class TestSetACMSForAppRoot:
                                                 (Allow, 'role:creator', 'view'),
                                                 ]
 
-def test_add_acm(mock_registry):
-    from adhocracy_core.schema import ACM
-    from substanced.util import get_acl
-    from . import add_acm
-    from . import set_acl
-    mock_registry.content.permissions = ['view']
-    acm = ACM().deserialize(
-        {'principals':           ['creator'],
-         'permissions': [['view',  Allow        ]]})
-    resource = testing.DummyResource()
-    set_acl(resource, [(Deny, 'role:creator','view')])
-    add_acm(resource, acm, mock_registry)
-    acl = get_acl(resource)
-    assert (Allow, 'role:creator', 'view') in acl[:-1]
-    assert (Deny, 'role:creator', 'view') == acl[-1]
-
 
 def test_set_acl_set_changes_acl():
     from . import set_acl

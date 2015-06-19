@@ -140,17 +140,6 @@ def set_acms_for_app_root(app: Router, acms: (dict)=()):
     transaction.commit()
 
 
-def add_acm(resource: IResource, acm: dict, registry: Registry):
-    """Add permissions defined by an ACM to a resource.
-
-    New permissions are generated from the ACM and put in front of the
-    ACL list.
-    """
-    old_acl = get_acl(resource)
-    new_acl = acm_to_acl(acm, registry) + old_acl
-    set_acl(resource, new_acl, registry)
-
-
 def set_acl(resource: IResource, acl: list, registry=None) -> bool:
     """Set the acl and mark the resource as dirty."""
     substanced.util.set_acl(resource, acl, registry)
