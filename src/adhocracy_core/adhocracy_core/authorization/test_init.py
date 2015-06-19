@@ -3,14 +3,10 @@ from pytest import fixture
 from pytest import raises
 from pyramid.security import Allow
 from pyramid.security import Deny
-from pyramid.security import ALL_PERMISSIONS
 from unittest.mock import Mock
-from adhocracy_core.schema import ACM
-from adhocracy_core.authorization import set_acl
-from substanced.util import get_acl
 
 
-class TestRuleACLAuthorizaitonPolicy:
+class TestRuleACLAuthorizationPolicy:
 
     @fixture
     def inst(self):
@@ -220,7 +216,10 @@ def test_acm_to_acl(mock_registry):
 
 
 def test_add_acm(mock_registry):
+    from adhocracy_core.schema import ACM
+    from substanced.util import get_acl
     from . import add_acm
+    from . import set_acl
     mock_registry.content.permissions = ['view']
     acm = ACM().deserialize(
         {'principals':           ['creator'],
@@ -257,6 +256,7 @@ def test_clean_acl():
     assert resource.__acl__ == []
 
 def test_set_god_all_permissions():
+    from pyramid.security import ALL_PERMISSIONS
     from . import set_god_all_permissions
     resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
     set_god_all_permissions(resource)
