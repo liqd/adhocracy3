@@ -266,7 +266,7 @@ class TestBaseResourceSheet:
 
     def test_get_cstruct_filter_by_view_permission_disabled(self, inst,
                                                             request_):
-        inst.registry.settings['adhocracy_filter_by_view_permission'] = "False"
+        inst.registry.settings['adhocracy.filter_by_view_permission'] = "False"
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.get_cstruct(request_)
@@ -279,7 +279,7 @@ class TestBaseResourceSheet:
         assert inst.get.call_args[1]['params']['only_visible']
 
     def test_get_cstruct_filter_by_only_visible_disabled(self, inst, request_):
-        inst.registry.settings['adhocracy_filter_by_visible'] = "False"
+        inst.registry.settings['adhocracy.filter_by_visible'] = "False"
         inst.get = Mock()
         inst.get.return_value = {}
         cstruct = inst.get_cstruct(request_)

@@ -218,11 +218,11 @@ class BaseResourceSheet:
         """
         params = params or {}
         filter_view_permission = asbool(self.registry.settings.get(
-            'adhocracy_filter_by_view_permission', True))
+            'adhocracy.filter_by_view_permission', True))
         if filter_view_permission:
             params['allows'] = (request.effective_principals, 'view')
         filter_visible = asbool(self.registry.settings.get(
-            'adhocracy_filter_by_visible', True))
+            'adhocracy.filter_by_visible', True))
         if filter_visible:
             params['only_visible'] = True
         schema = self._get_schema_for_cstruct(request, params)

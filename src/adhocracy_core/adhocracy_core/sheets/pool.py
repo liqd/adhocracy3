@@ -96,11 +96,11 @@ class PoolSheet(AnnotationRessourceSheet):
         """
         params = params or {}
         filter_view_permission = self.registry.settings.get(
-            'adhocracy_filter_by_view_permission', True)
+            'adhocracy.filter_by_view_permission', True)
         if filter_view_permission:
             params['allows'] = (request.effective_principals, 'view')
         filter_visible = self.registry.settings.get(
-            'adhocracy_filter_by_visible', True)
+            'adhocracy.filter_by_visible', True)
         if filter_visible:
             params['only_visible'] = True
         params_query = remove_keys_from_dict(params, self._additional_params)
