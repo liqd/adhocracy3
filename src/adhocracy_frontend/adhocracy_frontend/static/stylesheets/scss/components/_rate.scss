@@ -14,6 +14,10 @@ The button has the is-rate-button-active state.
     <span class="like-difference">+4</span>
     <a class="like-button">Like</a>
 </div>
+<div class="like">
+    <span class="like-difference">+4</span>
+    <a class="like-button is-disabled">Like</a>
+</div>
 ```
 */
 .like {
@@ -33,6 +37,7 @@ $arrow-width: 1em;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
     color: $color-text-inverted;
+    cursor: pointer;
     text-align: center;
     text-decoration: none;
     min-width: 100px / $font-size-small * 1em;
@@ -47,6 +52,16 @@ $arrow-width: 1em;
         border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
         border-right: $arrow-width solid $color-brand-one-normal;
         border-left: 0;
+    }
+
+    &.is-disabled, &.is-disabled:hover, &.is-disabled:focus {
+        background: $color-structure-normal;
+        color: $color-structure-extrovert;
+        cursor: auto;
+
+        &:before {
+            border-right-color: $color-structure-normal;
+        }
     }
 
     &:hover:not(.is-disabled),

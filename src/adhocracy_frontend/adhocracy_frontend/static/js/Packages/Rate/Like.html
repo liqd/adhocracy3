@@ -1,14 +1,15 @@
-<div class="like" data-ng-class="{
-    'is-disabled': !optionsPostPool.POST && optionsPostPool.loggedIn
-}" data-ng-if="ready">
+<div class="like" data-ng-if="ready">
     <span class="like-difference">
         {{rates(1) | signum}}
     </span>
-    <a href="" class="like-button" data-ng-click="toggle(1)">
+    <span class="like-button" data-ng-click="toggle(1)" data-ng-class="{
+    'is-disabled': !optionsPostPool.POST && optionsPostPool.loggedIn
+}">
+    <adh-like-button></adh-like-button>
         <span data-ng-if="myRate !== 1">{{ "TR__RATE_SUPPORT" | translate }}</span>
         <span data-ng-if="myRate === 1" class="supporting">
             <span class="text-supporting">{{ "TR__RATE_SUPPORTING" | translate }}</span>
             <span class="text-unsupport">{{ "TR__RATE_UNSUPPORT" | translate }}</span>
         </span>
-    </a>
+    </span>
 </div>
