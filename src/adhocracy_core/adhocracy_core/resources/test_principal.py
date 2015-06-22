@@ -34,10 +34,15 @@ class TestPrincipalsService:
         return principals_meta
 
     def test_meta(self, meta, context):
+        from adhocracy_core import sheets
+        from . import badge
         from . import principal
         assert meta.iresource is principal.IPrincipalsService
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'principals'
+        assert meta.extended_sheets == \
+            [sheets.badge.IHasBadgesPool]
+        assert badge.add_badges_service in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry, pool):
@@ -63,10 +68,13 @@ class TestUsers:
         return users_meta
 
     def test_meta(self, meta):
+        from adhocracy_core import sheets
+        from . import badge
         from . import principal
         assert meta.iresource is principal.IUsersService
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'users'
+        assert badge.add_badge_assignments_service in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
@@ -82,6 +90,7 @@ class TestUser:
         return user_meta
 
     def test_meta(self, meta):
+        from . import badge
         from . import principal
         import adhocracy_core.sheets
         assert meta.iresource is principal.IUser
@@ -98,6 +107,7 @@ class TestUser:
                [adhocracy_core.sheets.principal.IPasswordAuthentication,
                 adhocracy_core.sheets.rate.ICanRate,
                 adhocracy_core.sheets.badge.ICanBadge,
+                adhocracy_core.sheets.badge.IBadgeable,
                ]
         assert meta.element_types == []
         assert meta.use_autonaming is True
