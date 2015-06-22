@@ -1,8 +1,8 @@
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
-    class="spd-document-form"
-    name="spdDocumentForm">
+    class="document-form"
+    name="documentForm">
 <div class="section-jump" id="section-jump-top">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
 
@@ -13,16 +13,17 @@
 
         <!-- Title -->
         <label>
-            <span class="label-text">{{ "TR__SPD_TITLE" | translate }}</span>
             <input
                 type="text"
                 data-ng-model="data.title"
                 name="title"
+                placeholder="{{ 'TR__TITLE_PLACEHOLDER' | translate }}"
+                class="m-title"
                 minlength="3"
                 maxlength="100"
                 required="required" />
-            <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm.title, 'required')">
-                {{ "TR__SPD_ERROR_REQUIRED_TITLE" | translate }}
+            <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
+                {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
             </span>
         </label>
     </div><!-- /.cover -->
@@ -42,27 +43,26 @@
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
             <section data-ng-repeat="paragraph in data.paragraphs" id="section-jump-chapter-{{$index}}">
                 <label>
-                    <span class="label-text">{{ "TR__SPD_PARAGRAPH" | translate }}</span>
-
                     <textarea
                         data-msd-elastic=""
                         data-ng-model="paragraph.body"
                         name="paragraph-{{ $index }}"
+                        placeholder="{{ 'TR__PARAGRAPH_PLACEHOLDER' | translate }}"
                         required="required"></textarea>
 
-                    <span class="input-error" data-ng-show="showError(spdDocumentForm, spdDocumentForm['paragraph-' + $index], 'required')">
-                        {{ "TR__SPD_ERROR_REQUIRED_PARAGRAPH" | translate }}
+                    <span class="input-error" data-ng-show="showError(documentForm, documentForm['paragraph-' + $index], 'required')">
+                        {{ "TR__ERROR_REQUIRED_PARAGRAPH" | translate }}
                     </span>
                 </label>
             </section>
             <footer class="form-footer">
-                <a href="" class="button m-call-to-action-secondary m-add spd-document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
+                <a href="" class="button m-call-to-action-secondary m-add document-form-add-paragraph-button" data-ng-click="addParagraph()">{{ "TR__ADD_PARAGRAPH" | translate }}</a>
 
                 <input
                     type="submit"
                     name="submit"
                     value="{{ 'TR__PUBLISH' | translate }}"
-                    class="m-call-to-action form-footer-button-cta spd-document-form-submit-button" />
+                    class="m-call-to-action form-footer-button-cta document-form-submit-button" />
 
                 <a data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
             </footer>

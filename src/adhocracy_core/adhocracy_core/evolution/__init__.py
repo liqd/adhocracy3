@@ -132,13 +132,12 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     migrate_new_sheet(root, IPoolWithAssets, ITitle)
 
 
-@log_migration
 def add_kiezkassen_permissions(root):
     """(disabled) Add permission to use the kiezkassen process."""
 
 
 @log_migration
-def upgrade_catalogs(root):
+def upgrade_catalogs(root):  # pragma: no cover
     """Upgrade catalogs."""
     registry = get_current_registry()
     old_catalogs = root['catalogs']

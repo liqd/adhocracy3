@@ -19,6 +19,7 @@ from pyramid.traversal import find_resource
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 from pyramid.threadlocal import get_current_registry
+from pyramid.router import Router
 from substanced.util import acquire
 from substanced.util import find_catalog
 from substanced.util import get_dotted_name
@@ -36,12 +37,6 @@ from adhocracy_core.interfaces import IResourceSheet
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import VisibilityChange
 from adhocracy_core.interfaces import IResourceSheetModified
-
-
-def append_if_not_none(lst: list, element: object):
-    """Append `element` to `lst`, unless `element` is None."""
-    if element is not None:
-        lst.append(element)
 
 
 def find_graph(context) -> object:
@@ -401,8 +396,6 @@ def get_reason_if_blocked(resource: IResource) -> str:
 def list_resource_with_descendants(resource: IResource) -> Iterable:
     """List all descendants of a resource, including the resource itself."""
     system_catalog = find_catalog(resource, 'system')
-    if system_catalog is None:
-        return []  # easier testing
     path_index = system_catalog['path']
     query = path_index.eq(resource_path(resource), include_origin=True)
     return query.execute()
@@ -494,7 +487,7 @@ def create_filename(directory='.', prefix='', suffix='.csv') -> str:
     return path
 
 
-def get_root(app):
+def get_root(app: Router):
     """Return the root of the application."""
     request = Request.blank('/path-is-meaningless-here')
     request.registry = app.registry

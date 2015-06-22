@@ -49,7 +49,6 @@ def evolve1_add_ititle_sheet_to_proposals(root):  # pragma: no cover
         del introduction._sheets[IIntroduction.__identifier__]['title']
 
 
-@log_migration
 def evolve2_disable_add_proposal_permission(root):  # pragma: no cover
     """(disabled) Disable add_proposal permissions."""
 
@@ -64,13 +63,12 @@ def evolve3_use_adhocracy_core_title_sheet(root):  # pragma: no cover
                       fields_mapping=[('title', 'title')])
 
 
-@log_migration
-def evolve4_disable_voting_and_commenting(root):
+def evolve4_disable_voting_and_commenting(root):  # pragma: no cover
     """(disabled) Disable rate and comment permissions."""
 
 
 @log_migration
-def change_mercator_type_to_iprocess(root):
+def change_mercator_type_to_iprocess(root):  # pragma: no cover
     """Change mercator type from IBasicPoolWithAssets to IProcess."""
     from adhocracy_mercator.resources.mercator import IProcess
     from adhocracy_core.resources.asset import IPoolWithAssets
@@ -83,7 +81,7 @@ def change_mercator_type_to_iprocess(root):
 
 
 @log_migration
-def add_badge_assignments_services_to_proposal_items(root):
+def add_badge_assignments_services_to_proposal_items(root):  # pragma: no cover
     """Add badge assignments services to proposals."""
     catalogs = find_service(root, 'catalogs')
     query = search_query._replace(interfaces=IMercatorProposal)
@@ -96,7 +94,7 @@ def add_badge_assignments_services_to_proposal_items(root):
 
 
 @log_migration
-def add_badgeable_sheet_to_proposal_versions(root):
+def add_badgeable_sheet_to_proposal_versions(root):  # pragma: no cover
     """Add badgeable sheet to proposals versions."""
     migrate_new_sheet(root, IMercatorProposalVersion, IBadgeable)
 

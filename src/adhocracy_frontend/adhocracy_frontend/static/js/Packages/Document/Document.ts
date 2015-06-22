@@ -27,7 +27,7 @@ import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
-var pkgLocation = "/spdDocument";
+var pkgLocation = "/Document";
 
 
 export interface IParagraph {
@@ -58,7 +58,7 @@ export interface IFormScope extends IScope {
     addParagraph() : void;
     submit() : angular.IPromise<any>;
     cancel() : void;
-    spdDocumentForm : any;
+    documentForm : any;
 }
 
 
@@ -325,7 +325,7 @@ export var createDirective = (
             };
 
             scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.spdDocumentForm, () => {
+                return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
@@ -368,11 +368,12 @@ export var editDirective = (
             bindPath($q, adhHttp)(scope);
 
             scope.cancel = () => {
-                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(scope.documentVersion.path));
+                var itemPath = AdhUtil.parentPath(scope.documentVersion.path);
+                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(itemPath));
             };
 
             scope.submit = () => {
-                return adhSubmitIfValid(scope, element, scope.spdDocumentForm, () => {
+                return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
@@ -385,7 +386,7 @@ export var editDirective = (
     };
 };
 
-export var moduleName = "adhSPDDocument";
+export var moduleName = "adhDocument";
 
 export var register = (angular) => {
     angular
@@ -403,14 +404,14 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("spd-document-detail");
-            adhEmbedProvider.embeddableDirectives.push("spd-document-create");
-            adhEmbedProvider.embeddableDirectives.push("spd-document-edit");
-            adhEmbedProvider.embeddableDirectives.push("spd-document-list-item");
+            adhEmbedProvider.embeddableDirectives.push("document-detail");
+            adhEmbedProvider.embeddableDirectives.push("document-create");
+            adhEmbedProvider.embeddableDirectives.push("document-edit");
+            adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhSpdDocumentDetail", [
+        .directive("adhDocumentDetail", [
             "$q", "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
-        .directive("adhSpdDocumentCreate", [
+        .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",
             "adhHttp",
@@ -420,7 +421,7 @@ export var register = (angular) => {
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
             createDirective])
-        .directive("adhSpdDocumentEdit", [
+        .directive("adhDocumentEdit", [
             "$location",
             "$q",
             "adhConfig",
@@ -431,7 +432,7 @@ export var register = (angular) => {
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
             editDirective])
-        .directive("adhSpdListing", ["adhConfig", listingDirective])
-        .directive("adhSpdDocumentListItem", [
+        .directive("adhDocumentListing", ["adhConfig", listingDirective])
+        .directive("adhDocumentListItem", [
             "$q", "adhConfig", "adhHttp", "adhTopLevelState", listItemDirective]);
 };

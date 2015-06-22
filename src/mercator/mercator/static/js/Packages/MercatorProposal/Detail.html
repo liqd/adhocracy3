@@ -1,12 +1,11 @@
 <div
     class="section-jump" id="section-jump-top"
     data-ng-class="{
-        'has-badge': data.assignments.length > 0,
-        'm-winner': data.assignments[0].name === 'winning',
-        'm-community-award': data.assignments[0].name === 'community'
+        'has-badge': data.winnerBadgeAssignment,
+        'm-winner': data.winnerBadgeAssignment.name === 'winning',
+        'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
-    <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
     <div class="section-jump-cover">
         <ul class="meta-list mercator-proposal-detail-meta-list">
             <li class="meta-list-item meta-list-item-total-comments">
@@ -32,11 +31,13 @@
         </h1>
     </div><!-- /.cover -->
 
+    <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
+
     <div class="section-jump-body">
 
         <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
             <ol>
-                <li ng-if="data.assignments.length > 0"><a
+                <li data-ng-if="data.winnerBadgeAssignment"><a
                     href="#jury-decision"
                     title="Jury Decision"
                     data-du-smooth-scroll=""
@@ -71,10 +72,10 @@
         </nav>
 
         <div class="section-jump-main chapter-wrapper" data-du-spy-context="">
-            <section ng-if="data.assignments.length > 0" class="chapter m-jury-decision" id="jury-decision">
+            <section data-ng-if="data.winnerBadgeAssignment" class="chapter m-jury-decision" id="jury-decision">
                 <section class="jury-decision-section">
                     <h2 class="chapter-header">{{ "TR__MERCATOR_JURY_STATEMENT" | translate }}</h2>
-                    <p>{{ data.assignments[0].description }}</p>
+                    <p>{{ data.winnerBadgeAssignment.description }}</p>
                     <div class="jury-decision-section-icon">
                         <i class="icon-star"></i>
                     </div>

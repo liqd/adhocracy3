@@ -309,7 +309,8 @@ class TestCatalogsServiceAdhocracy:
     def test_search_with_group_by(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import ISimple
         child = self._make_resource(registry, parent=pool, iresource=ISimple)
-        result = inst.search(query._replace(group_by='interfaces'))
+        result = inst.search(query._replace(group_by='interfaces',
+                                            resolve=True))
         assert list(result.group_by[ISimple]) == [child]
 
     def test_search_with_group_by_and_resolve_false(self, registry, pool, inst,
