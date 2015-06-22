@@ -22,6 +22,18 @@ The button has the is-rate-button-active state.
 */
 .like {
     white-space: nowrap;
+
+    &.is-disabled {
+        .like-button, .like-button:hover, .like-button:focus {
+            background: $color-structure-normal;
+            color: $color-structure-extrovert;
+            cursor: auto;
+
+            &:before {
+                border-right-color: $color-structure-normal;
+            }
+        }
+    }
 }
 
 $line-height: (24/12);
@@ -54,18 +66,7 @@ $arrow-width: 1em;
         border-left: 0;
     }
 
-    &.is-disabled, &.is-disabled:hover, &.is-disabled:focus {
-        background: $color-structure-normal;
-        color: $color-structure-extrovert;
-        cursor: auto;
-
-        &:before {
-            border-right-color: $color-structure-normal;
-        }
-    }
-
-    &:hover:not(.is-disabled),
-    &:focus:not(.is-disabled) {
+    &:hover, &:focus {
         color: $color-text-inverted;
         background-color: $color-brand-one-extrovert;
 
@@ -78,7 +79,7 @@ $arrow-width: 1em;
         display: none;
     }
 
-    &:active:not(.is-disabled),
+    &:active,
     &.is-rate-button-active {
         background: $color-function-valid;
 
@@ -88,7 +89,7 @@ $arrow-width: 1em;
 
         // :focus is sometimes set on click and then stays.
         // That's why it is skipped here.
-        &:hover:not(.is-disabled) {
+        &:hover {
             // scss-lint:disable NestingDepth
             background: $color-brand-three-normal;
 

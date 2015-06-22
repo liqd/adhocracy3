@@ -1,0 +1,14 @@
+.like {
+    &.is-disabled {
+        @extend .icon-pointy-rectangle-left;
+
+        .like-button {
+            display: none;
+        }
+
+        &:before {
+            font-size: 130%;
+            vertical-align: middle;
+        }
+    }
+}
