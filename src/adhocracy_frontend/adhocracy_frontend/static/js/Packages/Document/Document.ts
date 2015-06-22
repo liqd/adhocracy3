@@ -4,9 +4,7 @@ import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
-import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhRate = require("../Rate/Rate");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhSticky = require("../Sticky/Sticky");
@@ -224,10 +222,7 @@ export var postEdit = (
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -406,8 +401,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("document-edit");
             adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhDocumentDetail", [
-            "$q", "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
+        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", detailDirective])
         .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",
