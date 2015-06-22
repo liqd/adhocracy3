@@ -1199,6 +1199,16 @@ export var register = (angular) => {
                         });
                     };
                 }])
+                .default(RIMercatorProposalVersion, "blog", processType, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    proposalTab: "blog"
+                })
+                .specific(RIMercatorProposalVersion, "blog", processType, "", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        proposalUrl: resource.path
+                    };
+                })
                 .default(RIMercatorProposalVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
