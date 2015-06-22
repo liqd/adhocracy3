@@ -368,6 +368,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             }
         }));
         scope.$on("$destroy", this.adhTopLevelState.bind("commentableUrl", scope));
+        scope.$on("$destroy", this.adhTopLevelState.bind("proposalTab", scope));
 
         return instance;
     }

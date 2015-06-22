@@ -32,7 +32,9 @@
         </h1>
     </div><!-- /.cover -->
 
-    <div class="section-jump-body">
+    <div data-ng-if="proposalTab === 'blog'">FIXME: Blog</div>
+
+    <div class="section-jump-body" data-ng-if="proposalTab !== 'blog'">
 
         <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
             <ol>
