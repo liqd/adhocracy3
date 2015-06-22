@@ -1,6 +1,7 @@
 .like {
     &.is-disabled {
         @extend .icon-pointy-rectangle-left;
+        margin-top: 0;
 
         .like-button {
             display: none;
