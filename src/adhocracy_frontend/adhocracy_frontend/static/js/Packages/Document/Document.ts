@@ -1,15 +1,10 @@
-/* tslint:disable:variable-name */
-/// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
-
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
-import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhRate = require("../Rate/Rate");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhSticky = require("../Sticky/Sticky");
@@ -62,7 +57,7 @@ export interface IFormScope extends IScope {
 }
 
 
-var bindPath = (
+export var bindPath = (
     $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>
 ) => (
@@ -101,7 +96,7 @@ var bindPath = (
     });
 };
 
-var postCreate = (
+export var postCreate = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
@@ -149,7 +144,7 @@ var postCreate = (
         .then((result) => result[1]);
 };
 
-var postEdit = (
+export var postEdit = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
@@ -227,10 +222,7 @@ var postEdit = (
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -386,6 +378,7 @@ export var editDirective = (
     };
 };
 
+
 export var moduleName = "adhDocument";
 
 export var register = (angular) => {
@@ -409,8 +402,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("document-edit");
             adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhDocumentDetail", [
-            "$q", "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
+        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", detailDirective])
         .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",
