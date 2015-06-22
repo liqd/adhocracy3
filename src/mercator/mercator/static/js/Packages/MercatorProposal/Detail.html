@@ -32,6 +32,11 @@
         </h1>
     </div><!-- /.cover -->
 
+    <div class="mercator-proposal-tabs">
+        <a data-ng-href="{{ path | adhResourceUrl }}">{{ "TR__MERCATOR_PROPOSAL_TAB_IDEA" | translate }}</a>
+        <a data-ng-href="{{ path | adhResourceUrl:'blog' }}">{{ "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" | translate }}</a>
+    </div>
+
     <div data-ng-if="proposalTab === 'blog'">FIXME: Blog</div>
 
     <div class="section-jump-body" data-ng-if="proposalTab !== 'blog'">
