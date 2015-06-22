@@ -19,6 +19,7 @@ from pyramid.traversal import find_resource
 from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 from pyramid.threadlocal import get_current_registry
+from pyramid.router import Router
 from substanced.util import acquire
 from substanced.util import find_catalog
 from substanced.util import get_dotted_name
@@ -486,7 +487,7 @@ def create_filename(directory='.', prefix='', suffix='.csv') -> str:
     return path
 
 
-def get_root(app):
+def get_root(app: Router):
     """Return the root of the application."""
     request = Request.blank('/path-is-meaningless-here')
     request.registry = app.registry

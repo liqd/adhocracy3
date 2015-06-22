@@ -1,19 +1,14 @@
 from unittest.mock import Mock
-from pyramid.security import Allow
-from pyramid.security import Deny
 from pyramid import testing
 
 
-def test_application_created_subscriber(monkeypatch):
-    import transaction
-    from adhocracy_meinberlin.resources.subscriber import _application_created_subscriber
+def test_set_root_acms(monkeypatch):
+    from adhocracy_core.resources.root import root_acm
+    from .root import meinberlin_acm
+    from .subscriber import set_root_acms
+    mock_set_acms = Mock()
+    monkeypatch.setattr('adhocracy_meinberlin.resources.subscriber'
+                        '.set_acms_for_app_root', mock_set_acms)
     event = Mock()
-    # avoid substanced querying the real registry when the commit occurs
-    monkeypatch.setattr(transaction, 'commit', lambda: None)
-    event.app.registry.content.permissions = ['edit_proposal',
-                                              'create_proposal'
-                                              'create_process']
-    root = testing.DummyResource(__acl__=[(Allow, 'role:creator', 'view')])
-    event.app.root_factory.return_value = root
-    _application_created_subscriber(event)
-    assert (Allow, 'role:admin', 'create_proposal') in root.__acl__
+    set_root_acms(event)
+    mock_set_acms.assert_called_with(event.app, (meinberlin_acm, root_acm))
