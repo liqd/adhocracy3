@@ -22,6 +22,7 @@ import moment = require("moment");
 import webshim = require("polyfiller");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
+import AdhBlog = require("./Packages/Blog/Blog");
 import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
@@ -163,6 +164,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     // register our modules
     app.value("adhConfig", config);
     AdhAbuse.register(angular);
+    AdhBlog.register(angular);
     AdhComment.register(angular);
     AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);
     AdhDateTime.register(angular);
