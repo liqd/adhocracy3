@@ -6,7 +6,6 @@
         'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
-    <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
     <div class="section-jump-cover">
         <ul class="meta-list mercator-proposal-detail-meta-list">
             <li class="meta-list-item meta-list-item-total-comments">
@@ -32,6 +31,7 @@
         </h1>
     </div><!-- /.cover -->
 
+
     <div class="mercator-proposal-tabs">
         <a data-ng-href="{{ path | adhResourceUrl }}">{{ "TR__MERCATOR_PROPOSAL_TAB_IDEA" | translate }}</a>
         <a data-ng-href="{{ path | adhResourceUrl:'blog' }}">{{ "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" | translate }}</a>
@@ -40,6 +40,9 @@
     <div data-ng-if="proposalTab === 'blog'">FIXME: Blog</div>
 
     <div class="section-jump-body" data-ng-if="proposalTab !== 'blog'">
+    <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
+
+    <div class="section-jump-body">
 
         <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered" data-adh-sticky="">
             <ol>
