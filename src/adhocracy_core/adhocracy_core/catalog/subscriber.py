@@ -51,8 +51,6 @@ def reindex_visibility(event):
 
 def _reindex_resource_and_descendants(resource: IResource):
     catalogs = find_service(resource, 'catalogs')
-    if catalogs is None:
-        return  # ease testing
     resource_and_descendants = list_resource_with_descendants(resource)
     for res in resource_and_descendants:
         catalogs.reindex_index(res, 'private_visibility')
