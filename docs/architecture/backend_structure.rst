@@ -79,7 +79,13 @@ Extend/Customize modules
 
 * override resource/sheet metadata, see :mod:`adhocracy_sample`
 
+Naming conventions
+~~~~~~~~~~~~~~~~~~
+* Non-versionable resources are named resource.x.IX with a sheet named
+  sheet.x.IX.
 
+* Versionable resources are named resource.x.IX with
+  resource.x.IXVersion having a sheet named sheet.x.IX.
 
 Modules API and separation of responsibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
