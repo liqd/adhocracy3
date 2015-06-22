@@ -59,7 +59,7 @@ export interface IFormScope extends IScope {
 }
 
 
-var bindPath = (
+export var bindPath = (
     $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>
 ) => (
@@ -98,7 +98,7 @@ var bindPath = (
     });
 };
 
-var postCreate = (
+export var postCreate = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
@@ -146,7 +146,7 @@ var postCreate = (
         .then((result) => result[1]);
 };
 
-var postEdit = (
+export var postEdit = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
