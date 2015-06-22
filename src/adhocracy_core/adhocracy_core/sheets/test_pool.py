@@ -36,7 +36,7 @@ class TestFilteringPoolSheet:
         return pool_meta
 
     @fixture
-    def inst(self, meta, context):
+    def inst(self, meta, context, registry_with_content):
         inst = meta.sheet_class(meta, context)
         return inst
 
@@ -116,11 +116,26 @@ class TestFilteringPoolSheet:
         assert inst.get.call_args[1]['params']['allows'] == \
             (_request.effective_principals, 'view')
 
+    def test_get_cstruct_filter_by_view_permission_disabled(self, inst,
+                                                            _request):
+        inst.registry.settings['adhocracy.filter_by_view_permission'] = False
+        inst.get = Mock()
+        inst.get.return_value = {}
+        cstruct = inst.get_cstruct(_request)
+        assert 'allows' not in inst.get.call_args[1]['params']
+
     def test_get_cstruct_filter_by_only_visible(self, inst, _request):
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
         cstruct = inst.get_cstruct(_request)
         assert inst.get.call_args[1]['params']['only_visible']
+
+    def test_get_cstruct_filter_by_only_visible_disabled(self, inst, _request):
+        inst.registry.settings['adhocracy.filter_by_visible'] = False
+        inst.get = Mock()
+        inst.get.return_value = {}
+        cstruct = inst.get_cstruct(_request)
+        assert 'only_visible' not in inst.get.call_args[1]['params']
 
     def test_get_cstruct_with_serialization_content(self, inst, _request):
         inst.get = Mock()
