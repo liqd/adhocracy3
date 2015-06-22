@@ -1,6 +1,3 @@
-/* tslint:disable:variable-name */
-/// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
-
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
