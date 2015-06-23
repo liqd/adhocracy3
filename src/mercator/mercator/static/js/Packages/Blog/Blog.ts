@@ -9,6 +9,11 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 var pkgLocation = "/Blog";
 
 
+export interface IFormScope extends AdhDocument.IFormScope {
+    onSubmit() : void;
+}
+
+
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
@@ -37,9 +42,10 @@ export var createDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
-            path: "@"
+            path: "@",
+            onSubmit: "=?"
         },
-        link: (scope : AdhDocument.IFormScope, element) => {
+        link: (scope : IFormScope, element) => {
             scope.errors = [];
             scope.data = {
                 title: "",
@@ -53,7 +59,9 @@ export var createDirective = (
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return AdhDocument.postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
-                    // FIXME: update listing
+                    if (typeof scope.onSubmit !== "undefined") {
+                        scope.onSubmit();
+                    }
                 }, (errors) => {
                     scope.errors = errors;
                 });
