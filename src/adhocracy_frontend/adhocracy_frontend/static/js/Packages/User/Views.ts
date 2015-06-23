@@ -436,7 +436,8 @@ export var userProfileDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhUser : AdhUser.Service
+    adhUser : AdhUser.Service,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
@@ -463,6 +464,9 @@ export var userProfileDirective = (
                 adhHttp.resolve(scope.path)
                     .then((res) => {
                         scope.userBasic = res.data[SIUserBasic.nick];
+                        getBadges(adhHttp, $q)(res).then((assignments) => {
+                            scope.assignments = assignments;
+                        });
                     });
             }
         }
@@ -609,7 +613,7 @@ export var register = (angular) => {
         .directive("adhListUsers", ["adhCredentials", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", [
-            "adhConfig", "adhCredentials", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
+            "adhConfig", "adhCredentials", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", "$q", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
         .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", passwordResetDirective])
         .directive("adhCreatePasswordReset", [
