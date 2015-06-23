@@ -1,30 +1,29 @@
 /*doc
 ---
-title: badges
-name: badges
-category: Type
+title: Badges MeinBerlin
+name: badge-meinberlin
+parent: badge
 ---
 
-Badges for labeling if a proposal has been realized or not.
+Badge modifiers for labeling if a proposal has been realized or not.
 
 ```html_example
-<span class="has-badge is-realized">Is Realized</span>
-<span class="has-badge is-not-realized">Is Not Realized</span>
+<span class="badge m-is-realized">Is Realized</span>
+<span class="badge m-is-not-realized">Is Not Realized</span>
 ```
 
 */
-.has-badge {
-    @include inline-block;
-    color: $color-text-inverted;
-    font-size: $font-size-smaller;
-    padding: 0 5px;
-    text-transform: uppercase;
 
-    &.is-realized {
+.badge {
+    &.m-is-realized, &.m-is-not-realized {
+        color: $color-text-inverted;
+    }
+
+    &.m-is-realized {
         background-color: $color-brand-two-normal;
     }
 
-    &.is-not-realized {
+    &.m-is-not-realized {
         background-color: $color-text-introvert;
     }
 }
