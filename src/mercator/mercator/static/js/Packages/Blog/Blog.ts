@@ -13,18 +13,15 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 var pkgLocation = "/Blog";
 
 
-export interface IScope extends AdhDocument.IScope {
-    hide() : void;
-    edit() : void;
-    onChange? : () => void;
-}
-
 export var detailDirective = (
     $q : angular.IQService,
     $window : angular.IWindowService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service
+    adhPermissions : AdhPermissions.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhShowError,
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
@@ -32,7 +29,13 @@ export var detailDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : IScope) => {
+        link: (scope, element) => {
+            var unbind : Function;
+
+            scope.errors = [];
+            scope.showError = adhShowError;
+            scope.mode = "display";
+
             adhPermissions.bindScope(scope, () => scope.path);
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.path), "itemOptions");
 
@@ -48,7 +51,27 @@ export var detailDirective = (
                 }
             };
 
-            AdhDocument.bindPath($q, adhHttp)(scope);
+            scope.edit = () => {
+                scope.mode = "edit";
+                unbind();
+            };
+
+            scope.cancel = () => {
+                scope.mode = "display";
+                unbind = AdhDocument.bindPath($q, adhHttp)(scope);
+            };
+
+            scope.submit = () => {
+                return adhSubmitIfValid(scope, element, scope.documentForm, () => {
+                    return AdhDocument.postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
+                }).then((documentVersion : RIDocumentVersion) => {
+                    if (typeof scope.onChange !== "undefined") {
+                        scope.onChange();
+                    }
+                });
+            };
+
+            unbind = AdhDocument.bindPath($q, adhHttp)(scope);
         }
     };
 };
@@ -102,7 +125,16 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
             adhEmbedProvider.embeddableDirectives.push("blog-post-create");
         }])
-        .directive("adhBlogPost", ["$q", "$window", "adhConfig", "adhHttp", "adhPermissions", detailDirective])
+        .directive("adhBlogPost", [
+            "$q",
+            "$window",
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhPreliminaryNames",
+            "adhShowError",
+            "adhSubmitIfValid",
+            detailDirective])
         .directive("adhBlogPostCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective]);
 };
