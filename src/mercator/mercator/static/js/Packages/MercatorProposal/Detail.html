@@ -21,10 +21,10 @@
                 {{data.finance.requested_funding | number}} &euro;
             </li>
             <li class="meta-list-item meta-list-item-rate">
-                <adh-like data-refers-to="{{path}}"></adh-like>
+                <adh-like data-refers-to="{{path}}" data-disabled="data.currentPhase != 'participate'"></adh-like>
             </li>
         </ul>
-        <h1 class="section-jump-cover-header screen-only">{{ data.title }}
+        <h1 class="section-jump-cover-header screen-only">{{ data.title }} {{ data.currentPhase }}
             <a class="mercator-proposal-cover-show-comments" data-ng-href="{{ path | adhResourceUrl:'comments' }}">
                 <i class="icon-speechbubble-document"></i> {{ data.commentCount }}
             </a>

@@ -1,5 +1,5 @@
 <div class="like" data-ng-if="ready" data-ng-class="{
-    'is-disabled': !optionsPostPool.POST && optionsPostPool.loggedIn
+    'is-disabled': (!optionsPostPool.POST && optionsPostPool.loggedIn) || disabled
 }">
     <span class="like-difference">
         {{rates(1) | signum}}
