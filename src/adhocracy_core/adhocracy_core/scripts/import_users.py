@@ -17,6 +17,7 @@ from substanced.util import find_service
 import adhocracy_core.sheets.principal
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.principal import IPermissions
@@ -57,7 +58,11 @@ def _import_users(context: IResource, registry: Registry, filename: str):
             _update_user(user, user_info, groups)
         else:
             print('Creating user {}'.format(user_info['name']))
-            _create_user(user_info, users, registry, groups)
+            user = _create_user(user_info, users, registry, groups)
+            send_invitation = user_info.get('send_invitation_mail', False)
+            if send_invitation:
+                print('Sending invitation mail to user {}'.format(user.name))
+                _send_invitation_mail(user, registry)
     transaction.commit()
 
 
@@ -81,7 +86,7 @@ def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
 
 
 def _create_user(user_info: dict, users: IResource, registry: Registry,
-                 groups: IResource):
+                 groups: IResource) -> IUser:
     groups = _get_groups(user_info['groups'], groups)
     appstruct = {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
@@ -97,6 +102,18 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
                                    appstruct,
                                    registry=registry)
     user.activate()
+    return user
+
+
+def _send_invitation_mail(user: IUser, registry: Registry):
+    resets = find_service(user, 'principals', 'resets')
+    reset = registry.content.create(IPasswordReset.__identifier__,
+                                    parent=resets,
+                                    creator=user,
+                                    send_event=False,
+                                    )
+    registry.messenger.send_invitation_mail(user, reset)
+    return user
 
 
 def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
