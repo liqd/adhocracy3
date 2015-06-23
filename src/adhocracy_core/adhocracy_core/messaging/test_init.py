@@ -23,7 +23,7 @@ def request_(registry):
 
 
 @mark.usefixtures('integration')
-class TestSendMail():
+class TestSendMail:
 
     def test_send_mail_with_body_and_html(self, registry, request_):
         mailer = registry.messenger.mailer
@@ -65,7 +65,7 @@ class TestSendMail():
                                          html='<p>Bäh!</p>')
 
 
-class TestSendMailToQueue():
+class TestSendMailToQueue:
 
     def test_send_mail_to_queue(self, config, registry, request_):
         config.include('pyramid_mailer.testing')
@@ -99,7 +99,7 @@ def mock_get_sheet_field(context, sheet, field_name, registry):
 
 
 @mark.usefixtures('integration')
-class TestSendAbuseComplaint():
+class TestSendAbuseComplaint:
 
     def test_send_abuse_complaint_with_user(self, monkeypatch, registry,
                                             request_):
@@ -134,7 +134,7 @@ class TestSendAbuseComplaint():
 
 
 @mark.usefixtures('integration')
-class TestSendMessageToUser():
+class TestSendMessageToUser:
 
     def test_send_message_to_user(self, monkeypatch, registry, request_):
         from adhocracy_core import messaging

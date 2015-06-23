@@ -11,10 +11,21 @@ import json
 @mark.usefixtures('integration')
 class TestImportUsers:
 
-    def test_import_users_create(self, registry):
-        from adhocracy_core.scripts.import_users import _import_users
+    def _get_user_locator(self, context, registry):
+        request = Request.blank('/dummy')
+        locator = registry.getMultiAdapter((context, request), IUserLocator)
+        return locator
 
-        (self._tempfd, filename) = mkstemp()
+    @fixture
+    def context(self, registry):
+        return registry.content.create(IRootPool.__identifier__)
+
+    def call_fut(self, root, registry, filename):
+        from adhocracy_core.scripts.import_users import _import_users
+        return _import_users(root, registry, filename)
+
+    def test_create(self, context, registry):
+        self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
                 {'name': 'Alice', 'email': 'alice@example.org',
@@ -23,17 +34,17 @@ class TestImportUsers:
                 {'name': 'Bob', 'email': 'bob@example.org',
                  'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
             ]))
+        locator = self._get_user_locator(context, registry)
 
-        root = registry.content.create(IRootPool.__identifier__)
-        locator = self._get_user_locator(root, registry)
-        _import_users(root, registry, filename)
+        self.call_fut(context, registry, filename)
 
-        assert locator.get_user_by_login('Alice') is not None
-        assert locator.get_user_by_login('Bob') is not None
+        alice = locator.get_user_by_login('Alice')
+        assert alice.active
+        bob = locator.get_user_by_login('Bob')
+        assert bob.active
 
-    def test_import_users_update(self, registry):
-        from adhocracy_core.scripts.import_users import _import_users
-        (self._tempfd, filename) = mkstemp()
+    def test_update(self, context, registry):
+        self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
                 {'name': 'Alice', 'email': 'alice@example.org',
@@ -42,9 +53,8 @@ class TestImportUsers:
                 {'name': 'Bob', 'email': 'bob@example.org',
                  'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
             ]))
-        root = registry.content.create(IRootPool.__identifier__)
-        locator = self._get_user_locator(root, registry)
-        _import_users(root, registry, filename)
+        locator = self._get_user_locator(context, registry)
+        self.call_fut(context, registry, filename)
         alice = locator.get_user_by_login('Alice')
         old_password = alice.password
         with open(filename, 'w') as f:
@@ -52,7 +62,9 @@ class TestImportUsers:
                 {'name': 'Alice', 'email': 'alice@example.org',
                  'initial-password': 'newpassword', 'roles': ['reader'],
                  'groups': ['gods']}]))
-        _import_users(root, registry, filename)
+
+        self.call_fut(context, registry, filename)
+
         alice = locator.get_user_by_login('Alice')
         new_password = alice.password
         assert alice.roles == ['reader']
@@ -62,7 +74,4 @@ class TestImportUsers:
         if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
 
-    def _get_user_locator(self, context, registry):
-        request = Request.blank('/dummy')
-        locator = registry.getMultiAdapter((context, request), IUserLocator)
-        return locator
+

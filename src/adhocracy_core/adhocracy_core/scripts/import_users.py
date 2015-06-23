@@ -7,19 +7,19 @@ import argparse
 import inspect
 import json
 
-import adhocracy_core.sheets.principal
 import transaction
-from adhocracy_core.interfaces import IResource
-from adhocracy_core.resources.principal import IUser
-from adhocracy_core.sheets.principal import IPermissions
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from pyramid.request import Request
 from substanced.interfaces import IUserLocator
 from substanced.util import find_service
+
+import adhocracy_core.sheets.principal
+from adhocracy_core.interfaces import IResource
+from adhocracy_core.resources.principal import IUser
 from adhocracy_core.utils import get_sheet
-# from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.principal import IPermissions
 
 
 def import_users():  # pragma: no cover
@@ -59,7 +59,6 @@ def _import_users(context: IResource, registry: Registry, filename: str):
             print('Creating user {}'.format(user_info['name']))
             _create_user(user_info, users, registry, groups)
     transaction.commit()
-    # TODO update some catalogs?
 
 
 def _load_users_info(filename: str) -> [dict]:
@@ -74,8 +73,6 @@ def _update_user(user: IUser, user_info: dict, groups: IResource):
     permissions_sheet = get_sheet(user, IPermissions)
     permissions_sheet.set({'roles': user_info['roles'],
                            'groups': user_groups})
-    # password_sheet = get_sheet(user, IPasswordAuthentication)
-    # password_sheet.set({'password': user_info['password']})
 
 
 def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
