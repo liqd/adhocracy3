@@ -7,13 +7,21 @@ import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUtil = require("../Util/Util");
 
+import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 
 var pkgLocation = "/Blog";
 
 
+export interface IScope extends AdhDocument.IScope {
+    hide() : void;
+    edit() : void;
+    onChange? : () => void;
+}
+
 export var detailDirective = (
     $q : angular.IQService,
+    $window : angular.IWindowService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service
@@ -24,9 +32,21 @@ export var detailDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : AdhDocument.IScope) => {
+        link: (scope : IScope) => {
             adhPermissions.bindScope(scope, () => scope.path);
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.path), "itemOptions");
+
+            scope.hide = () => {
+                if ($window.confirm("Do you really want to delete this?")) {
+                    var itemPath = AdhUtil.parentPath(scope.path);
+                    adhHttp.hide(itemPath, RIDocument.content_type)
+                        .then(() => {
+                            if (typeof scope.onChange !== "undefined") {
+                                scope.onChange();
+                            }
+                        });
+                }
+            };
 
             AdhDocument.bindPath($q, adhHttp)(scope);
         }
@@ -84,7 +104,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
             adhEmbedProvider.embeddableDirectives.push("blog-post-create");
         }])
-        .directive("adhBlogPost", ["$q", "adhConfig", "adhHttp", "adhPermissions", detailDirective])
+        .directive("adhBlogPost", ["$q", "$window", "adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhBlogPostCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective]);
 };
