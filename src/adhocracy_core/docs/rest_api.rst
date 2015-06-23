@@ -580,7 +580,7 @@ Fetch the first Document version, it is empty ::
 
     >>> resp = testapp.get(pvrs0_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.document.IDocument'])
-    {'elements': [], 'title': ''}
+    {'elements': []}
 
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
     {'followed_by': [], 'follows': []}
@@ -589,7 +589,6 @@ Create a new version of the proposal that follows the first version ::
 
     >>> pvrs = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...         'data': {'adhocracy_core.sheets.document.IDocument': {
-    ...                     'title': 'kommunismus jetzt!',
     ...                     'elements': []},
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs0_path]}},
