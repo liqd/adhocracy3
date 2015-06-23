@@ -63,7 +63,7 @@ def update_modification_date_modified_by(event):
 def add_default_group_to_user(event):
     """Add default group to user if no group is set."""
     group = _get_default_group(event.object)
-    if group is None:  # ease testing
+    if group is None:
         return
     user_groups = _get_user_groups(event.object, event.registry)
     if user_groups:
@@ -73,6 +73,8 @@ def add_default_group_to_user(event):
 
 def _get_default_group(context) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
+    if groups is None:  # ease testing
+        return None
     default_group = groups.get('authenticated', None)
     return default_group
 
