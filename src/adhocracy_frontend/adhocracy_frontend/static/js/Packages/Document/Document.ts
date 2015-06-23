@@ -67,10 +67,10 @@ export var bindPath = (
 ) => (
     scope : IScope,
     pathKey : string = "path"
-) => {
+) : Function => {
     var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
 
-    scope.$watch(pathKey, (path : string) => {
+    return scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
