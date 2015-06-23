@@ -1,6 +1,7 @@
 """Send messages to Principals."""
 from collections.abc import Sequence
 from logging import getLogger
+from urllib.request import quote
 
 from pyramid.registry import Registry
 from pyramid.renderers import render
@@ -182,6 +183,31 @@ class Messenger:
         self.send_mail(subject=subject,
                        recipients=[user.email],
                        body=body_txt,
+                       request=request,
+                       )
+
+    def send_password_reset_mail(self, user=IUser, password_reset=IResource,
+                                 request: Request=None):
+        """Send email with link to reset the user password."""
+        reset_path = resource_path(password_reset)
+        reset_path_quoted = quote(reset_path, safe='')
+        reset_url = '{0}/password_reset/?path={1}'.format(self.frontend_url,
+                                                          reset_path_quoted)
+        mapping = {'reset_url': reset_url,
+                   'name': user.name,
+                   'site_name': self.site_name,
+                   }
+        subject = _('mail_reset_password_subject',
+                    mapping=mapping,
+                    default='${site_name}: Reset Password / Password neu'
+                            ' setzen')
+        body = _('mail_reset_password_body_txt',
+                 mapping=mapping,
+                 default='${reset_url}'
+                 )
+        self.send_mail(subject=subject,
+                       recipients=[user.email],
+                       body=body,
                        request=request,
                        )
 
