@@ -8,22 +8,22 @@ category: Type
 Badge modifiers for labeling if a proposal has been realized or not.
 
 ```html_example
-<span class="badge is-realized">Is Realized</span>
-<span class="badge is-not-realized">Is Not Realized</span>
+<span class="badge m-is-realized">Is Realized</span>
+<span class="badge m-is-not-realized">Is Not Realized</span>
 ```
 
 */
 
 .badge {
-    &.is-realized, &.is-not-realized {
+    &.m-is-realized, &.m-is-not-realized {
         color: $color-text-inverted;
     }
 
-    &.is-realized {
+    &.m-is-realized {
         background-color: $color-brand-two-normal;
     }
 
-    &.is-not-realized {
+    &.m-is-not-realized {
         background-color: $color-text-introvert;
     }
 }
