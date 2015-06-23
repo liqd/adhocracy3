@@ -13,12 +13,11 @@ Badges for labeling if a proposal has been realized or not.
 ```
 
 */
+
 .has-badge {
-    @include inline-block;
-    color: $color-text-inverted;
-    font-size: $font-size-smaller;
-    padding: 0 5px;
-    text-transform: uppercase;
+    &.is-realized, &.is-not-realized {
+        color: $color-text-inverted;
+    }
 
     &.is-realized {
         background-color: $color-brand-two-normal;

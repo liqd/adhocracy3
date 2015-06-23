@@ -1,0 +1,8 @@
+.has-badge {
+    @include inline-block;
+    background: $color-structure-normal;
+    color: $color-text-normal;
+    font-size: $font-size-smaller;
+    padding: 0 5px;
+    text-transform: uppercase;
+}
