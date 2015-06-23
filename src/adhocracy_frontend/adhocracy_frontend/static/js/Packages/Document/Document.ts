@@ -18,6 +18,7 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
@@ -40,6 +41,9 @@ export interface IScope extends angular.IScope {
         paragraphs? : IParagraph[];
         commentCountTotal? : number;
         picture? : string;
+        creator? : string;
+        creationDate? : string;
+        modificationDate? : string;
     };
     selectedState? : string;
     resource: any;
@@ -88,7 +92,10 @@ export var bindPath = (
                         title: documentVersion.data[SIDocument.nick].title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
-                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount"))
+                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
+                        creationDate: documentVersion.data[SIMetadata.nick].creation_date,
+                        creator: documentVersion.data[SIMetadata.nick].creator
                     };
                 });
             });
