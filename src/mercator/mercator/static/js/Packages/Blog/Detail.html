@@ -4,4 +4,9 @@
     <section data-ng-repeat="paragraph in data.paragraphs">
         <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
     </section>
+
+    <div class="meta">
+        {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+        <adh-time data-datetime="data.creationDate"></adh-time>
+    </div>
 </article>
