@@ -17,11 +17,10 @@ import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
+import markdownit = require("markdownit");
 import modernizr = require("modernizr");
 import moment = require("moment");
 import webshim = require("polyfiller");
-
-import markdownit = require("markdownit");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
 import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
