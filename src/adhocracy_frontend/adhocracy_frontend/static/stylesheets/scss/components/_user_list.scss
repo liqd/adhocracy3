@@ -44,7 +44,7 @@ A user list item within a listing widget
         color: $color-text-normal;
         font-size: $font-size-large;
 
-        + .has-badge {
+        + .badge {
             margin-left: 10px / $font-size-small * 1em;
         }
     }

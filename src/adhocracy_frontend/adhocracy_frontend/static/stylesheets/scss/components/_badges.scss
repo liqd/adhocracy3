@@ -1,6 +1,6 @@
 /*doc
 ---
-title: badges
+title: Badges
 name: badges
 category: Type
 ---
@@ -8,12 +8,12 @@ category: Type
 Badges for labeling things
 
 ```html_example
-I am a normal user <span class="has-badge">Normal User</span>
+I am a normal user <span class="badge">Normal User</span>
 ```
 
 */
 
-.has-badge {
+.badge {
     @include inline-block;
     background: $color-structure-normal;
     color: $color-text-normal;
