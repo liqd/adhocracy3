@@ -3,7 +3,9 @@ import AdhDocument = require("../Document/Document");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhMarkdown = require("../Markdown/Markdown");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhUtil = require("../Util/Util");
 
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 
@@ -13,7 +15,8 @@ var pkgLocation = "/Blog";
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
@@ -22,6 +25,9 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : AdhDocument.IScope) => {
+            adhPermissions.bindScope(scope, () => scope.path);
+            adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.path), "itemOptions");
+
             AdhDocument.bindPath($q, adhHttp)(scope);
         }
     };
@@ -71,13 +77,14 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
-            AdhMarkdown.moduleName
+            AdhMarkdown.moduleName,
+            AdhPermissions.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
             adhEmbedProvider.embeddableDirectives.push("blog-post-create");
         }])
-        .directive("adhBlogPost", ["$q", "adhConfig", "adhHttp", detailDirective])
+        .directive("adhBlogPost", ["$q", "adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhBlogPostCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective]);
 };
