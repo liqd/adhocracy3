@@ -3,6 +3,10 @@
     data-ng-submit="submit()"
     class="document-form"
     name="documentForm">
+    <div class="form-error" data-ng-repeat="error in errors track by $index">
+        <p>{{ error | adhFormatError | translate }}</p>
+    </div>
+
     <label>
         <select
             data-ng-model="data.title"
