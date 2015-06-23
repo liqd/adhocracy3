@@ -17,6 +17,7 @@ import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
+import markdownit = require("markdownit");
 import modernizr = require("modernizr");
 import moment = require("moment");
 import webshim = require("polyfiller");
@@ -36,6 +37,7 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
 import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
@@ -158,6 +160,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     }]);
 
     app.value("angular", angular);
+    app.value("markdownit", markdownit);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
 
@@ -177,6 +180,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
+    AdhMarkdown.register(angular);
     AdhMercatorProposal.register(angular);
     AdhMercatorWorkbench.register(angular);
     AdhMovingColumns.register(angular);
