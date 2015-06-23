@@ -23,6 +23,7 @@ env:
   matrix:
     - BUILDOUT_TARGET=meinberlin
     - BUILDOUT_TARGET=mercator
+    - BUILDOUT_TARGET=spd
   global:
     # SAUCE_USERNAME
     - secure: ovz89AOVSOa0HefNp4Wbl1t5jV6nTJqQhf99klH/FAEtQRsZe5oklzi0zpDUXa1zIF18pGFLt0Bv8Nct7njp0N2fH8oItP7jmHpGwhHE8EQTWdvMq7KK3UX30JdXrFsyHTxnW8nGlNdTRcww/zn7KjwUTbja+4Y0RsCBB5HdA+w=
