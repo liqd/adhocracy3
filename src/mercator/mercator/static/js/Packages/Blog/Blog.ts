@@ -2,6 +2,7 @@ import AdhConfig = require("../Config/Config");
 import AdhDocument = require("../Document/Document");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
+import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
@@ -69,7 +70,8 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEmbed.moduleName,
-            AdhHttp.moduleName
+            AdhHttp.moduleName,
+            AdhMarkdown.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
