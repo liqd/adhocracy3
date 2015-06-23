@@ -10,6 +10,12 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhCredentials = require("./Credentials");
 import AdhUser = require("./User");
 
+import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
+import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
+import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
+import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
+import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
@@ -352,6 +358,29 @@ export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : Ad
     };
 };
 
+export class BadgeAssignment {
+    constructor(
+        private title : string,
+        private description : string,
+        private name : string
+    ) {}
+}
+
+var getBadges = (
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (user : RIUser) : angular.IPromise<BadgeAssignment[]> => {
+    return $q.all(_.map(user.data[SIBadgeable.nick].assignments, (assignmentPath : string) => {
+        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
+            var description = assignment.data[SIDescription.nick].description;
+            return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
+                var title = badge.data[SITitle.nick].title;
+                var name = badge.data[SIName.nick].name;
+                return new BadgeAssignment(title, description, name);
+            });
+        });
+    }));
+};
 
 export var userListDirective = (adhCredentials : AdhCredentials.Service, adhConfig : AdhConfig.IService) => {
     return {
@@ -376,12 +405,15 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             path: "@",
             me: "=?"
         },
-        controller: ["adhHttp", "$scope", "adhTopLevelState", (adhHttp : AdhHttp.Service<any>, $scope,
-            adhTopLevelState : AdhTopLevelState.Service) => {
+        controller: ["adhHttp", "$scope", "$q", "adhTopLevelState", (adhHttp : AdhHttp.Service<any>, $scope,
+             $q : angular.IQService, adhTopLevelState : AdhTopLevelState.Service) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
+                        getBadges(adhHttp, $q)(res).then((assignments) => {
+                            $scope.assignments = assignments;
+                        });
                     });
             }
             $scope.$on("$destroy", adhTopLevelState.on("userUrl", (userUrl) => {
