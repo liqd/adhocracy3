@@ -300,18 +300,23 @@ class TestUserLocatorAdapter:
         assert verifyObject(IRolesUserLocator, inst)
 
     def test_get_user_by_email_user_exists(self, context, request, inst):
-        user = testing.DummyResource(email='test@test.de')
+        from .principal import IUser
+        user = testing.DummyResource(email='test@test.de', __provides__=IUser)
         context['principals']['users']['User1'] = user
         assert inst.get_user_by_email('test@test.de') is user
 
     def test_get_user_by_email_user_not_exists(self, context, request, inst):
-        user = testing.DummyResource(email='')
+        from .principal import IUser
+        user = testing.DummyResource(email='', __provides__=IUser)
         context['principals']['users']['User1'] = user
         assert inst.get_user_by_email('wrong@test.de') is None
 
     def test_get_user_by_login_user_exists(self, context, request, inst):
-        user = testing.DummyResource(name='login name')
+        from .principal import IUser
+        user = testing.DummyResource(name='login name', __provides__=IUser)
         context['principals']['users']['User1'] = user
+        other = testing.DummyResource()
+        context['principals']['users']['other'] = other
         assert inst.get_user_by_login('login name') is user
 
     def test_get_user_by_login_user_not_exists(self, context, request, inst):

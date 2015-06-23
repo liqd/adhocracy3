@@ -43,6 +43,10 @@ A user list item within a listing widget
     .user-list-item-name {
         color: $color-text-normal;
         font-size: $font-size-large;
+
+        + .badge {
+            margin-left: 10px / $font-size-small * 1em;
+        }
     }
 
     .user-list-item-button {

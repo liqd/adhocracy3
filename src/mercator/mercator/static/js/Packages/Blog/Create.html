@@ -3,16 +3,22 @@
     data-ng-submit="submit()"
     class="document-form"
     name="documentForm">
+    <div class="form-error" data-ng-repeat="error in errors track by $index">
+        <p>{{ error | adhFormatError | translate }}</p>
+    </div>
+
     <label>
-        <input
-            type="text"
+        <select
             data-ng-model="data.title"
             name="title"
-            placeholder="{{ 'TR__TITLE_PLACEHOLDER' | translate }}"
             class="m-title"
-            minlength="3"
-            maxlength="100"
-            required="required" />
+            required="required">
+            <!-- FIXME: dummy options -->
+            <option value="challenge">challenge</option>
+            <option value="highlight">highlight</option>
+            <option value="team story">team story</option>
+            <option value="other title">other title</option>
+        </select>
         <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
             {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
         </span>

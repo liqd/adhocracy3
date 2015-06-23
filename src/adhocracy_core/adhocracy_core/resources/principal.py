@@ -255,10 +255,16 @@ class UserLocatorAdapter(object):
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
         # TODO use catalog for all get_user_by_ methods
-        users = find_service(self.context, 'principals', 'users')
-        for user in users.values():
+        users = self._get_users()
+        for user in users:
             if user.name == login:
                 return user
+
+    def _get_users(self) -> [IUser]:
+        users = find_service(self.context, 'principals', 'users')
+        for user in users.values():
+            if IUser.providedBy(user):
+                yield user
 
     def get_user_by_userid(self, userid: str) -> IUser:
         """Find user by :term:`userid` or return None."""
@@ -275,8 +281,8 @@ class UserLocatorAdapter(object):
 
     def get_user_by_email(self, email: str) -> IUser:
         """Find user per email or return None."""
-        users = find_service(self.context, 'principals', 'users')
-        for user in users.values():
+        users = self._get_users()
+        for user in users:
             if user.email == email:
                 return user
 
