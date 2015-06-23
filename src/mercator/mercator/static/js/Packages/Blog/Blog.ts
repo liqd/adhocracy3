@@ -81,8 +81,6 @@ export var createDirective = (
                     return AdhDocument.postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
                     // FIXME: update listing
-                }, (errors) => {
-                    scope.errors = errors;
                 });
             };
         }
