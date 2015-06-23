@@ -20,6 +20,8 @@ from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.service import service_meta
 from adhocracy_core.resources.base import Base
+from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
@@ -64,10 +66,11 @@ def create_initial_content_for_principals(context: IPool, registry: Registry,
 principals_meta = service_meta._replace(
     iresource=IPrincipalsService,
     content_name='principals',
-    after_creation=[create_initial_content_for_principals] +
-    service_meta.after_creation,
+    after_creation=[create_initial_content_for_principals,
+                    add_badges_service] + service_meta.after_creation,
     element_types=[],  # we don't want the frontend to post resources here
     permission_create='create_service',
+    extended_sheets=[adhocracy_core.sheets.badge.IHasBadgesPool],
 )
 
 
@@ -137,6 +140,7 @@ user_meta = pool_meta._replace(
     extended_sheets=[adhocracy_core.sheets.principal.IPasswordAuthentication,
                      adhocracy_core.sheets.rate.ICanRate,
                      adhocracy_core.sheets.badge.ICanBadge,
+                     adhocracy_core.sheets.badge.IBadgeable,
                      ],
     element_types=[],  # we don't want the frontend to post resources here
     use_autonaming=True,
@@ -154,6 +158,7 @@ users_meta = service_meta._replace(
     content_name='users',
     element_types=[IUser],
     permission_create='create_service',
+    after_creation=[add_badge_assignments_service],
 )
 
 
