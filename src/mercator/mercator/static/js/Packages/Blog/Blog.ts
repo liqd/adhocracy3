@@ -2,6 +2,7 @@ import AdhConfig = require("../Config/Config");
 import AdhDocument = require("../Document/Document");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
+import AdhListing = require("../Listing/Listing");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
@@ -70,6 +71,19 @@ export var createDirective = (
     };
 };
 
+export var listingDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.contentType = RIDocumentVersion.content_type;
+        }
+    };
+};
+
 
 export var moduleName = "adhBlog";
 
@@ -77,12 +91,15 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEmbed.moduleName,
-            AdhHttp.moduleName
+            AdhHttp.moduleName,
+            AdhListing.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
             adhEmbedProvider.embeddableDirectives.push("blog-post-create");
+            adhEmbedProvider.embeddableDirectives.push("blog");
         }])
+        .directive("adhBlog", ["adhConfig", listingDirective])
         .directive("adhBlogPost", ["$q", "adhConfig", "adhHttp", detailDirective])
         .directive("adhBlogPostCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective]);
