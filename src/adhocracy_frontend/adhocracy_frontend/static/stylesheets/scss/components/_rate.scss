@@ -27,7 +27,6 @@ The button has the is-rate-button-active state.
         .like-button, .like-button:hover, .like-button:focus {
             background: $color-structure-normal;
             color: $color-structure-extrovert;
-            cursor: auto;
 
             &:before {
                 border-right-color: $color-structure-normal;
@@ -176,5 +175,3 @@ the `is-disabled` state.
         }
     }
 }
-
-
