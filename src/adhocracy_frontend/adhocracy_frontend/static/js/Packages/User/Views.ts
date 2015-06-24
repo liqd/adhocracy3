@@ -387,7 +387,7 @@ export var userListDirective = (adhCredentials : AdhCredentials.Service, adhConf
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html",
         link: (scope) => {
-            scope.contentType = "adhocracy_core.resources.principal.IUser";
+            scope.contentType = RIUser.content_type;
             scope.credentials = adhCredentials;
             scope.initialLimit = 50;
             scope.frontendOrderPredicate = (id) => id;
