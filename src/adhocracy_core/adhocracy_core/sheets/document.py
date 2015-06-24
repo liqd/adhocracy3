@@ -38,7 +38,6 @@ class DocumentSchema(colander.MappingSchema):
 
     """Document sheet data structure.
 
-    `title`: one line title
     `elements`: structural subelements like sections
     """
 
