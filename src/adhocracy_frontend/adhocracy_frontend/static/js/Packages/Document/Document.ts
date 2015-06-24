@@ -20,6 +20,7 @@ import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/p
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/Document";
@@ -85,7 +86,7 @@ export var bindPath = (
                     scope.paragraphVersions = paragraphVersions;
 
                     scope.data = {
-                        title: documentVersion.data[SIDocument.nick].title,
+                        title: documentVersion.data[SITitle.nick].title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
                         commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount"))
@@ -135,9 +136,11 @@ export var postCreate = (
         follows: [doc.first_version_path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        title: scope.data.title,
         description: "",
         elements: <string[]>_.map(paragraphVersions, "path")
+    });
+    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
     });
 
     return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
@@ -209,9 +212,11 @@ export var postEdit = (
         follows: [oldVersion.path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        title: scope.data.title,
         description: "",
         elements: paragraphRefs
+    });
+    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
     });
 
     return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))

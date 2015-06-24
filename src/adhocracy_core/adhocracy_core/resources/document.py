@@ -29,6 +29,7 @@ document_version_meta = itemversion_meta._replace(
                      adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.rate.IRateable,
                      adhocracy_core.sheets.image.IImageReference,
+                     adhocracy_core.sheets.title.ITitle,
                      ],
     permission_create='edit_proposal',
 )

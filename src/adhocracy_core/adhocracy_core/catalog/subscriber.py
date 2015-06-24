@@ -25,7 +25,7 @@ def reindex_tag(event):
     catalogs.reindex_index(event.object, 'tag')
 
 
-def reindex_rate(event):
+def reindex_rates(event):
     """Reindex the rates index if a rate backreference is modified."""
     catalogs = find_service(event.object, 'catalogs')
     catalogs.reindex_index(event.object, 'rates')
@@ -64,7 +64,7 @@ def includeme(config):
     config.add_subscriber(reindex_visibility,
                           IResourceSheetModified,
                           event_isheet=IMetadata)
-    config.add_subscriber(reindex_rate,
+    config.add_subscriber(reindex_rates,
                           ISheetBackReferenceModified,
                           event_isheet=IRateable)
     config.add_subscriber(reindex_badge,
