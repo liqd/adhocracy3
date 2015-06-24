@@ -73,8 +73,6 @@ def add_default_group_to_user(event):
 
 def _get_default_group(context) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
-    if groups is None:  # ease testing
-        return None
     default_group = groups.get('authenticated', None)
     return default_group
 

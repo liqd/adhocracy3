@@ -132,7 +132,7 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     migrate_new_sheet(root, IPoolWithAssets, ITitle)
 
 
-def add_kiezkassen_permissions(root):
+def add_kiezkassen_permissions(root):  # pragma: no cover
     """(disabled) Add permission to use the kiezkassen process."""
 
 

@@ -290,7 +290,7 @@ class UserLocatorAdapter(object):
         """Find user per activation path or return None."""
         users = self._get_users()
         for user in users:
-            if user.activation_path == activation_path:
+            if user.activation_path == activation_path:  # pragma: no branch
                 return user
 
     def get_groupids(self, userid: str) -> list:

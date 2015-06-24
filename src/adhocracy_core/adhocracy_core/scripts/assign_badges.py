@@ -79,7 +79,7 @@ def create_badge_assignment(user: IUser,
                    'badge': badge,
                    'object': badgeable
                    }}
-    if description != '':
+    if description != '':  # pragma: no branch
         appstructs[sheets.description.IDescription.__identifier__] =\
             {'description': description}
     assignments = find_service(badgeable, 'badge_assignments')
