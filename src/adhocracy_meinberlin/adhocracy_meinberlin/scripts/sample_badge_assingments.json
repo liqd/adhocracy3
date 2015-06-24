@@ -1,14 +1,12 @@
 [
     {"user": "/principals/users/0000000",
      "badge": "/organisation/kiezkasse/badges/not_realizeable/",
-     "proposalversion": "/organisation/kiezkasse/Test/VERSION_0000001/",
-     "proposalitem": "/organisation/kiezkasse/Test/",
+     "badgeable": "/organisation/kiezkasse/Test/VERSION_0000001/",
      "description" : ""
     },
     {"user": "/principals/users/0000000",
      "badge": "/organisation/kiezkasse/badges/going_to_be_realized/",
-     "proposalversion": "/organisation/kiezkasse/Test2/VERSION_0000001/",
-     "proposalitem": "/organisation/kiezkasse/Test2/",
+     "badgeable": "/organisation/kiezkasse/Test2/VERSION_0000001/",
      "description" : ""
     }
 ]
