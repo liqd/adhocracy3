@@ -288,8 +288,8 @@ class UserLocatorAdapter(object):
 
     def get_user_by_activation_path(self, activation_path: str) -> IUser:
         """Find user per activation path or return None."""
-        users = find_service(self.context, 'principals', 'users')
-        for user in users.values():
+        users = self._get_users()
+        for user in users:
             if user.activation_path == activation_path:
                 return user
 

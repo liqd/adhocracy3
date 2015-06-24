@@ -325,8 +325,12 @@ class TestUserLocatorAdapter:
         assert inst.get_user_by_login('wrong login name') is None
 
     def test_get_user_by_activation_path_user_exists(self, context, request, inst):
-        user = testing.DummyResource(activation_path='/activate/foo')
+        from .principal import IUser
+        user = testing.DummyResource(activation_path='/activate/foo',
+                                     __provides__=IUser)
         context['principals']['users']['User1'] = user
+        other = testing.DummyResource()
+        context['principals']['users']['other'] = other
         assert inst.get_user_by_activation_path('/activate/foo') is user
         
     def test_get_user_by_activation_path_user_not_exists(self, context, request, inst):
