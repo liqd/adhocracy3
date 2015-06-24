@@ -7,19 +7,20 @@ import argparse
 import inspect
 import json
 
-import adhocracy_core.sheets.principal
 import transaction
-from adhocracy_core.interfaces import IResource
-from adhocracy_core.resources.principal import IUser
-from adhocracy_core.sheets.principal import IPermissions
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from pyramid.request import Request
 from substanced.interfaces import IUserLocator
 from substanced.util import find_service
+
+from adhocracy_core.interfaces import IResource
+from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.principal import IPasswordReset
+from adhocracy_core.resources.badge import IBadge
 from adhocracy_core.utils import get_sheet
-# from adhocracy_core.sheets.principal import IPasswordAuthentication
-from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core import sheets
+from adhocracy_core.scripts.assign_badges import create_badge_assignment
 
 
 def import_users():  # pragma: no cover
@@ -57,9 +58,17 @@ def _import_users(context: IResource, registry: Registry, filename: str):
             _update_user(user, user_info, groups)
         else:
             print('Creating user {}'.format(user_info['name']))
-            _create_user(user_info, users, registry, groups)
+            user = _create_user(user_info, users, registry, groups)
+            send_invitation = user_info.get('send_invitation_mail', False)
+            if send_invitation:
+                print('Sending invitation mail to user {}'.format(user.name))
+                _send_invitation_mail(user, registry)
+            badge_names = user_info.get('badges', [])
+            if badge_names:
+                print('Assign badge for user {}'.format(user.name))
+                badges = _create_badges(user, badge_names, registry)
+                _assign_badges(user, badges, registry)
     transaction.commit()
-    # TODO update some catalogs?
 
 
 def _load_users_info(filename: str) -> [dict]:
@@ -68,14 +77,12 @@ def _load_users_info(filename: str) -> [dict]:
 
 
 def _update_user(user: IUser, user_info: dict, groups: IResource):
-    userextended_sheet = get_sheet(user, IUserExtended)
+    userextended_sheet = get_sheet(user, sheets.principal.IUserExtended)
     userextended_sheet.set({'email': user_info['email']})
     user_groups = _get_groups(user_info['groups'], groups)
-    permissions_sheet = get_sheet(user, IPermissions)
+    permissions_sheet = get_sheet(user, sheets.principal.IPermissions)
     permissions_sheet.set({'roles': user_info['roles'],
                            'groups': user_groups})
-    # password_sheet = get_sheet(user, IPasswordAuthentication)
-    # password_sheet.set({'password': user_info['password']})
 
 
 def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
@@ -84,15 +91,15 @@ def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
 
 
 def _create_user(user_info: dict, users: IResource, registry: Registry,
-                 groups: IResource):
+                 groups: IResource) -> IUser:
     groups = _get_groups(user_info['groups'], groups)
-    appstruct = {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
+    appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
-                 adhocracy_core.sheets.principal.IUserExtended.__identifier__:
+                 sheets.principal.IUserExtended.__identifier__:
                  {'email': user_info['email']},
-                 adhocracy_core.sheets.principal.IPermissions.__identifier__:
+                 sheets.principal.IPermissions.__identifier__:
                  {'roles': user_info['roles'], 'groups': groups},
-                 adhocracy_core.sheets.principal.IPasswordAuthentication.
+                 sheets.principal.IPasswordAuthentication.
                  __identifier__: {'password': user_info['initial-password']},
                  }
     user = registry.content.create(IUser.__identifier__,
@@ -100,9 +107,41 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
                                    appstruct,
                                    registry=registry)
     user.activate()
+    return user
+
+
+def _send_invitation_mail(user: IUser, registry: Registry):
+    resets = find_service(user, 'principals', 'resets')
+    reset = registry.content.create(IPasswordReset.__identifier__,
+                                    parent=resets,
+                                    creator=user,
+                                    send_event=False,
+                                    )
+    registry.messenger.send_invitation_mail(user, reset)
+    return user
 
 
 def _get_user_locator(context: IResource, registry: Registry) -> IUserLocator:
     request = Request.blank('/dummy')
     locator = registry.getMultiAdapter((context, request), IUserLocator)
     return locator
+
+
+def _create_badges(user: IUser, badge_names: [str],
+                   registry: Registry) -> [IBadge]:
+    badges_service = find_service(user, 'badges')
+    badges = []
+    for name in badge_names:
+        badge = badges_service.get(name, None)
+        if badge is None:
+            appstructs = {sheets.name.IName.__identifier__: {'name': name}}
+            badge = registry.content.create(IBadge.__identifier__,
+                                            parent=badges_service,
+                                            appstructs=appstructs)
+        badges.append(badge)
+    return badges
+
+
+def _assign_badges(user: IUser, badges: [IBadge], registry: Registry):
+    for badge in badges:
+        create_badge_assignment(user, badge, user, '', registry)

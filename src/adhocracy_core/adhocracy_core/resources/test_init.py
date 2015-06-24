@@ -349,6 +349,16 @@ class TestResourceFactory:
         assert events[0].object == resource
         assert events[0].parent == pool
 
+    def test_notify_new_resource_created_and_added_ignore_if_not_send_event(
+            self, resource_meta, config, pool):
+        events = create_event_listener(config, IResourceCreatedAndAdded)
+        meta = resource_meta._replace(iresource=IResource, use_autonaming=True)
+        user = testing.DummyResource()
+
+        self.make_one(meta)(parent=pool, creator=user, send_event=False)
+
+        assert len(events) == 0
+
     def test_notify_new_resource_created_and_added_without_parent(
         self, resource_meta, config, pool):
         events = create_event_listener(config, IResourceCreatedAndAdded)
