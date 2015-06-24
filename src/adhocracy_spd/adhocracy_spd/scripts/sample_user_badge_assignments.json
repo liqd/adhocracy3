@@ -1,0 +1,8 @@
+[
+    {
+     "user":"/principals/users/0000000/",
+     "badge": "/principals/badges/bob_Badge/",
+     "badgeable": "/principals/users/0000002/",
+     "description" : ""
+    }
+]
