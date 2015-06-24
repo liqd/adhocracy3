@@ -32,7 +32,7 @@ def assign_badges():  # pragma: no cover
     env = bootstrap(args.ini_file)
     root = env['root']
     registry = env['registry']
-    _import_assignments(root, registry, args.filename)
+    _import_assignments(root, registry, args.jsonfile)
     transaction.commit()
     env['closer']()
 
