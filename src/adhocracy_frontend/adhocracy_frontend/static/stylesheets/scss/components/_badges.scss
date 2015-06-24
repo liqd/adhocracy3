@@ -1,0 +1,23 @@
+/*doc
+---
+title: Badges
+name: badge
+category: Type
+---
+
+Badges for labeling things
+
+```html_example
+I am a normal user <span class="badge">Normal User</span>
+```
+
+*/
+
+.badge {
+    @include inline-block;
+    background: $color-structure-normal;
+    color: $color-text-normal;
+    font-size: $font-size-smaller;
+    padding: 3px 5px 2px;
+    text-transform: uppercase;
+}

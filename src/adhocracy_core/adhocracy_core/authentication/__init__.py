@@ -98,7 +98,8 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
 
     :returns: :class:'adhocracy_core.interfaces.ITokenManager or None.
     """
-    if getattr(request, 'root', None) is None:  # ease testing
+    # allow to run pyramid scripts without authentication
+    if getattr(request, 'root', None) is None:
         return None
     try:
         return ITokenManger(request.root)

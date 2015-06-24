@@ -1,10 +1,12 @@
-.meta-list-item {
-    &:last-child {
-        float: right;
-        margin-right: 0;
+.m-phase-participate {
+    .meta-list-item {
+        &:last-child {
+            float: right;
+            margin-right: 0;
 
-        @media print {
-            float: none;
+            @media print {
+                float: none;
+            }
         }
     }
 }

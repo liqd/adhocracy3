@@ -3,14 +3,10 @@ from pytest import fixture
 from pytest import raises
 from pyramid.security import Allow
 from pyramid.security import Deny
-from pyramid.security import ALL_PERMISSIONS
 from unittest.mock import Mock
-from adhocracy_core.schema import ACM
-from adhocracy_core.authorization import set_acl
-from substanced.util import get_acl
 
 
-class TestRuleACLAuthorizaitonPolicy:
+class TestRuleACLAuthorizationPolicy:
 
     @fixture
     def inst(self):
@@ -219,18 +215,63 @@ def test_acm_to_acl(mock_registry):
     assert (None,  'role:annotator', 'edit') not in acl
 
 
-def test_add_acm(mock_registry):
-    from . import add_acm
-    mock_registry.content.permissions = ['view']
-    acm = ACM().deserialize(
+class TestSetACMSForAppRoot:
+
+    def call_fut(self, app, acms=()):
+        from . import set_acms_for_app_root
+        return set_acms_for_app_root(app, acms)
+
+    @fixture
+    def mock_commit(self, monkeypatch) -> Mock:
+        mock = Mock()
+        monkeypatch.setattr('transaction.commit', mock)
+        return mock
+
+    @fixture
+    def mock_set_acl(self, monkeypatch) -> Mock:
+        mock = Mock()
+        monkeypatch.setattr('adhocracy_core.authorization.set_acl', mock)
+        return mock
+
+    @fixture
+    def root(self):
+        return testing.DummyResource(__acl__=[])
+
+
+    @fixture
+    def app(self, root) -> Mock:
+        app = Mock()
+        app.root_factory.return_value = root
+        return app
+
+    def test_implicit_set_god_permissions(self, mock_commit, mock_set_acl, app,
+                                          root):
+        from . import god_all_permission_ace
+        self.call_fut(app)
+        mock_set_acl.assert_called_with(root, [god_all_permission_ace],
+                                        app.registry)
+        assert mock_commit.called
+
+    def test_ignore_if_acl_not_changed(self, mock_commit, mock_set_acl, app,
+                                       root):
+        from . import god_all_permission_ace
+        root.__acl__ = [god_all_permission_ace]
+        self.call_fut(app)
+        assert not mock_set_acl.called
+        assert not mock_commit.called
+
+    def test_set_acms(self, mock_commit, mock_set_acl, app, root):
+        from pyramid.security import Allow
+        from adhocracy_core.schema import ACM
+        from . import god_all_permission_ace
+        acm = ACM().deserialize(
         {'principals':           ['creator'],
          'permissions': [['view',  Allow        ]]})
-    resource = testing.DummyResource()
-    set_acl(resource, [(Deny, 'role:creator','view')])
-    add_acm(resource, acm, mock_registry)
-    acl = get_acl(resource)
-    assert (Allow, 'role:creator', 'view') in acl[:-1]
-    assert (Deny, 'role:creator', 'view') == acl[-1]
+        acms = (acm,)
+        self.call_fut(app, acms)
+        assert mock_set_acl.call_args[0][1] == [god_all_permission_ace,
+                                                (Allow, 'role:creator', 'view'),
+                                                ]
 
 
 def test_set_acl_set_changes_acl():
@@ -250,13 +291,9 @@ def test_set_acl_set_resource_dirty():
     set_acl(resource, [(Deny, 'role:creator', 'edit_comment')])
     assert resource._p_changed is True
 
-def test_clean_acl():
-    from . import clean_acl
-    resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
-    clean_acl(resource)
-    assert resource.__acl__ == []
 
 def test_set_god_all_permissions():
+    from pyramid.security import ALL_PERMISSIONS
     from . import set_god_all_permissions
     resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
     set_god_all_permissions(resource)

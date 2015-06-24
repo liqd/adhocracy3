@@ -8,6 +8,8 @@ def includeme(config):
     """Setup adhocracy extension."""
     # include adhocracy_core
     config.include('adhocracy_core')
+    # add translations 
+    config.add_translation_dirs('adhocracy_core:locale/')
 
 
 def main(global_config, **settings):

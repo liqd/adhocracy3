@@ -1,14 +1,10 @@
 """Initialize meinberlin ACM."""
-import transaction
 from pyramid.events import ApplicationCreated
 from pyramid.traversal import find_interface
 from pyramid.renderers import render
 
-from adhocracy_core.utils import get_root
-from adhocracy_core.authorization import add_acm
-from adhocracy_core.authorization import clean_acl
-from adhocracy_core.authorization import set_god_all_permissions
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.resources.root import root_acm
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
@@ -72,19 +68,13 @@ def _get_office_worker_email(proposal):
     return office_worker.email
 
 
-def _application_created_subscriber(event):
-    """Called when the Pyramid application is started."""
-    app = event.app
-    root = get_root(app)
-    clean_acl(root, app.registry)
-    add_acm(root, root_acm, app.registry)
-    add_acm(root, meinberlin_acm, app.registry)
-    set_god_all_permissions(root, app.registry)
-    transaction.commit()
+def set_root_acms(event):
+    """Set :term:`acm`s for root if the Pyramid application starts."""
+    set_acms_for_app_root(event.app, (meinberlin_acm, root_acm))
 
 
 def includeme(config):
     """Register subscribers."""
-    config.add_subscriber(_application_created_subscriber, ApplicationCreated)
+    config.add_subscriber(set_root_acms, ApplicationCreated)
     config.add_subscriber(_send_bplan_submission_confirmation_email_subscriber,
                           IResourceCreatedAndAdded, object_iface=IProposalVersion)

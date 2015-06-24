@@ -1,0 +1,7 @@
+<article class="blog-post">
+    <h1>{{ data.title }}</h1>
+
+    <section data-ng-repeat="paragraph in data.paragraphs">
+        <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
+    </section>
+</article>

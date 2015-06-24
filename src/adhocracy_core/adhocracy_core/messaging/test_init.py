@@ -23,7 +23,7 @@ def request_(registry):
 
 
 @mark.usefixtures('integration')
-class TestSendMail():
+class TestSendMail:
 
     def test_send_mail_with_body_and_html(self, registry, request_):
         mailer = registry.messenger.mailer
@@ -65,7 +65,7 @@ class TestSendMail():
                                          html='<p>Bäh!</p>')
 
 
-class TestSendMailToQueue():
+class TestSendMailToQueue:
 
     def test_send_mail_to_queue(self, config, registry, request_):
         config.include('pyramid_mailer.testing')
@@ -99,7 +99,7 @@ def mock_get_sheet_field(context, sheet, field_name, registry):
 
 
 @mark.usefixtures('integration')
-class TestSendAbuseComplaint():
+class TestSendAbuseComplaint:
 
     def test_send_abuse_complaint_with_user(self, monkeypatch, registry,
                                             request_):
@@ -134,7 +134,7 @@ class TestSendAbuseComplaint():
 
 
 @mark.usefixtures('integration')
-class TestSendMessageToUser():
+class TestSendMessageToUser:
 
     def test_send_message_to_user(self, monkeypatch, registry, request_):
         from adhocracy_core import messaging
@@ -187,3 +187,67 @@ class TestSendRegistrationMail:
         msg.sender = 'support@unconfigured.domain'
         text = str(msg.to_message())
         assert '/activate/91X' in text
+
+
+class TestSendPasswordResetMail:
+
+    @fixture
+    def registry(self, config):
+        config.include('pyramid_mailer.testing')
+        config.registry.settings['adhocracy.site_name'] = 'sitename'
+        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        return config.registry
+
+    @fixture
+    def inst(self, registry):
+        from . import Messenger
+        return Messenger(registry)
+
+    def test_send_password_reset_mail(self, inst, request_):
+        inst.send_mail = Mock()
+        user = testing.DummyResource(name='Anna', email='anna@example.org')
+        reset = testing.DummyResource(__name__='/reset')
+        inst.send_password_reset_mail(user, reset, request=request_)
+        assert inst.send_mail.call_args[1]['recipients'] == ['anna@example.org']
+        assert inst.send_mail.call_args[1]['subject'] ==\
+               'mail_reset_password_subject'
+        assert inst.send_mail.call_args[1]['body'] == \
+               'mail_reset_password_body_txt'
+        assert inst.send_mail.call_args[1]['body'].mapping ==\
+            {'name': 'Anna',
+             'site_name': 'sitename',
+             'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
+        assert inst.send_mail.call_args[1]['request'] == request_
+
+
+class TestSendInvitationMail:
+
+    @fixture
+    def registry(self, config):
+        config.include('pyramid_mailer.testing')
+        config.registry.settings['adhocracy.site_name'] = 'sitename'
+        config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
+        return config.registry
+
+    @fixture
+    def inst(self, registry):
+        from . import Messenger
+        return Messenger(registry)
+
+    def test_send_password_reset_mail(self, inst, request_):
+        inst.send_mail = Mock()
+        user = testing.DummyResource(name='Anna', email='anna@example.org')
+        reset = testing.DummyResource(__name__='/reset')
+        inst.send_invitation_mail(user, reset, request=request_)
+        assert inst.send_mail.call_args[1]['recipients'] == ['anna@example.org']
+        assert inst.send_mail.call_args[1]['subject'] ==\
+               'mail_invitation_subject'
+        assert inst.send_mail.call_args[1]['body'] == \
+               'mail_invitation_body_txt'
+        assert inst.send_mail.call_args[1]['body'].mapping ==\
+            {'name': 'Anna',
+             'site_name': 'sitename',
+             'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
+        assert inst.send_mail.call_args[1]['request'] == request_
+
+

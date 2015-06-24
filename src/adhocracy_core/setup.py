@@ -90,6 +90,8 @@ setup(name='adhocracy_core',
           adhocracy_core.scripts.import_local_roles:import_local_roles
       assign_badges =\
           adhocracy_core.scripts.assign_badges:assign_badges
+      set_workflow_state =\
+          adhocracy_core.scripts.set_workflow_state:set_workflow_state
       [pyramid.scaffold]
       adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,

@@ -4,7 +4,12 @@
     data-ng-if="path"
     class="user-profile-info">
 
-    <h1 data-itemprop="name" class="user-profile-info-name"><span class="user-profile-info-name-text">{{userBasic.name}}</span></h1>
+    <h1 data-itemprop="name" class="user-profile-info-name">
+        <span class="user-profile-info-name-text">{{userBasic.name}}</span>
+        <span data-ng-repeat="assignment in assignments">
+            <span class="badge">{{ assignment.title }}</span>
+        </span>
+    </h1>
     <a href="" data-ng-click="showMessaging()" class="user-profile-info-button">
         <i class="icon-mail user-profile-info-icon user-profile-info-icon-inactive"></i>
         <i class="icon-mail-filled user-profile-info-icon user-profile-info-icon-active"></i>

@@ -10,6 +10,7 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.tags import TagElementsReference
+from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.versions import IVersionable
@@ -33,6 +34,7 @@ class AdhocracyCatalogIndexes:
     tag = catalog.Keyword()
     private_visibility = catalog.Keyword()  # visible / deleted / hidden
     badge = catalog.Keyword()
+    title = catalog.Field()
     rate = catalog.Field()
     rates = catalog.Field()
     creator = catalog.Field()
@@ -71,6 +73,12 @@ def index_visibility(resource, default) -> [str]:
     if not result:
         result.append('visible')
     return result
+
+
+def index_title(resource, default) -> str:
+    """Return the value of field name ` title`."""
+    title = get_sheet_field(resource, ITitle, 'title')
+    return title
 
 
 def index_rate(resource, default) -> int:
@@ -143,6 +151,11 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='item_creation_date',
                          context=IMetadata,
+                         )
+    config.add_indexview(index_title,
+                         catalog_name='adhocracy',
+                         index_name='title',
+                         context=ITitle,
                          )
     config.add_indexview(index_rate,
                          catalog_name='adhocracy',

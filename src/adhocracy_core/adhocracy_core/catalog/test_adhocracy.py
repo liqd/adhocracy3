@@ -30,6 +30,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'item_creation_date' in catalogs['adhocracy']
     assert 'private_visibility' in catalogs['adhocracy']
     assert 'badge' in catalogs['adhocracy']
+    assert 'title' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -249,4 +250,29 @@ def test_includeme_register_index_badge(registry):
     assert registry.adapters.lookup((IBadgeable,), IIndexView,
                                     name='adhocracy|badge')
 
+
+class TestIndexTitle:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def mock_sheet(self, mock_sheet, registry):
+        from adhocracy_core.sheets.title import ITitle
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=ITitle)
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def test_return_title(self, context, mock_sheet):
+        from .adhocracy import index_title
+        mock_sheet.get.return_value = {'title': 'Title'}
+        assert index_title(context, 'default') == 'Title'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.title import ITitle
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((ITitle,), IIndexView,
+                                        name='adhocracy|title')
 

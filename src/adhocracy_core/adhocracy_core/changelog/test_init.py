@@ -44,3 +44,15 @@ def test_clear_modification_date(registry, request_):
     clear_modification_date_callback(request_)
     date_after = get_modification_date(registry)
     assert date_before is not date_after
+
+def test_create_changelog():
+    from adhocracy_core.changelog import create_changelog
+    from collections import defaultdict
+    assert type(create_changelog()) is defaultdict
+
+def test_create_changelog_mapping():
+    from adhocracy_core.changelog import create_changelog
+    from adhocracy_core.changelog import changelog_meta
+    from collections import defaultdict
+    changelog = create_changelog()
+    assert changelog['/'] == changelog_meta

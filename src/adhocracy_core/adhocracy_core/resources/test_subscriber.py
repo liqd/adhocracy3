@@ -465,8 +465,6 @@ class TestSendPasswordResetMail:
     @fixture
     def registry(self, registry, mock_messenger):
         registry.messenger = mock_messenger
-        registry.settings['adhocracy.site_name'] = 'sitename'
-        registry.settings['adhocracy.frontend_url'] = 'http://front.end'
         return registry
 
     @fixture
@@ -479,23 +477,14 @@ class TestSendPasswordResetMail:
         from .subscriber import send_password_reset_mail
         return send_password_reset_mail(event)
 
-    def test_call(self, event, mock_sheet, registry):
-        user = testing.DummyResource(name='user name',
-                                     email='test@test.de')
+    def test_call(self, event, mock_sheet, registry, mock_messenger):
+        user = testing.DummyResource()
         mock_sheet.get.return_value = {'creator': user}
         registry.content.get_sheet.return_value = mock_sheet
         event.object.__name__ = '/reset'
         self.call_fut(event)
-        send_mail = registry.messenger.send_mail
-        assert send_mail.call_args[1]['recipients'] == ['test@test.de']
-        assert send_mail.call_args[1]['subject'] ==\
-               'mail_reset_password_subject'
-        assert send_mail.call_args[1]['body'] == \
-               'mail_reset_password_body_txt'
-        assert send_mail.call_args[1]['body'].mapping ==\
-            {'name': 'user name',
-             'site_name': 'sitename',
-             'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
+        mock_messenger.send_password_reset_mail.assert_called_with(user,
+                                                                   event.object)
 
 
 class TestSendAcitvationMail:
