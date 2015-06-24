@@ -330,34 +330,6 @@ export var indicatorDirective = (
     };
 };
 
-
-export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
-        scope: {
-            path: "@",
-            name: "@?"
-        },
-        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service<any>, $translate, $scope) => {
-            if ($scope.path) {
-                adhHttp.resolve($scope.path)
-                    .then((res) => {
-                        $scope.userBasic = res.data[SIUserBasic.nick];
-                        $scope.noLink = !adhResourceArea.has(RIUser.content_type);
-                    });
-            } else {
-                $translate("TR__GUEST").then((translated) => {
-                    $scope.userBasic = {
-                        name: translated
-                    };
-                });
-                $scope.noLink = true;
-            }
-        }]
-    };
-};
-
 export class BadgeAssignment {
     constructor(
         private title : string,
@@ -380,6 +352,37 @@ var getBadges = (
             });
         });
     }));
+};
+
+export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
+        scope: {
+            path: "@",
+            name: "@?"
+        },
+        controller: ["adhHttp", "$translate", "$q", "$scope",
+                     (adhHttp : AdhHttp.Service<any>, $translate, $q : angular.IQService, $scope) => {
+            if ($scope.path) {
+                adhHttp.resolve($scope.path)
+                    .then((res) => {
+                        $scope.userBasic = res.data[SIUserBasic.nick];
+                        $scope.noLink = !adhResourceArea.has(RIUser.content_type);
+                        getBadges(adhHttp, $q)(res).then((assignments) => {
+                            $scope.assignments = assignments;
+                        });
+                    });
+            } else {
+                $translate("TR__GUEST").then((translated) => {
+                    $scope.userBasic = {
+                        name: translated
+                    };
+                });
+                $scope.noLink = true;
+            }
+        }]
+    };
 };
 
 export var userListDirective = (adhCredentials : AdhCredentials.Service, adhConfig : AdhConfig.IService) => {
