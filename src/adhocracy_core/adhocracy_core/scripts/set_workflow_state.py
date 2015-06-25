@@ -37,7 +37,6 @@ def set_workflow_state():  # pragma: no cover
     _set_workflow_state(env['root'],
                         env['registry'],
                         args.resource_path,
-                        args.workflow_name,
                         args.state)
     env['closer']()
 
