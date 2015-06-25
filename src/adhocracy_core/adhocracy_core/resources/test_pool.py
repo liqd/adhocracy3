@@ -70,7 +70,17 @@ class TestPoolClass:
         inst = self._makeOne()
         assert inst.next_name(context, prefix='prefix')\
             == 'prefix' + '0'.zfill(7)
-        assert inst.next_name(context) == '1'.zfill(7)
+        assert inst.next_name(context) == '0'.zfill(7)
+
+    def test_next_name_incrementation_per_prefix(self, context):
+        inst = self._makeOne()
+        assert inst.next_name(context, prefix='prefix')\
+            == 'prefix' + '0'.zfill(7)
+        assert inst.next_name(context, prefix='prefix') == 'prefix' + '1'.zfill(7)
+        assert inst.next_name(context, prefix='otherprefix')\
+            == 'otherprefix' + '0'.zfill(7)
+        assert inst.next_name(context, prefix='otherprefix') == 'otherprefix' + '1'.zfill(7)
+
 
     def test_add(self, context):
         inst = self._makeOne()
