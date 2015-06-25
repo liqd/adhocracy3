@@ -57,17 +57,18 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
 
 
 def setup_workflow(context: IResource, states: [str], registry: Registry):
-    """Initialize workflow and transition to the given states."""
+    """Initialize workflow associated to the resource and transition to the given states."""
     request = Request.blank('/dummy')
     request.registry = registry
     request.__cached_principals__ = ['role:god']
-    workflow = _get_workflow(context, registry)
+    workflow = get_workflow(context, registry)
     workflow.initialize(context)
     for state in states:
         workflow.transition_to_state(context, request, state)
 
 
-def _get_workflow(context, registry):
+def get_workflow(context, registry):
+    """Return the workflow for the given context."""
     isheet = get_matching_isheet(context, IWorkflowAssignment)
     workflow = get_sheet_field(context, isheet, 'workflow')
     workflow_name = workflow.type

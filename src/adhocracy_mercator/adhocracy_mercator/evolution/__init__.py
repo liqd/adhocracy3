@@ -103,9 +103,7 @@ def add_badgeable_sheet_to_proposal_versions(root):  # pragma: no cover
 def reset_workflow_state_to_result(root):
     """Reset workflow state to 'result'."""
     registry = get_current_registry()
-    workflow = registry.content.workflows['mercator']
-    setup_workflow(workflow,
-                   root['mercator'],
+    setup_workflow(root['mercator'],
                    ['announce', 'participate', 'frozen', 'result'],
                    registry)
 
