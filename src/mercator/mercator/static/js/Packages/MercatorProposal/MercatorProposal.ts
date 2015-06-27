@@ -1237,9 +1237,8 @@ export var register = (angular) => {
             "$window",
             "$location",
             "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, adhGetBadges, flowFactory, moment, $window, $location, $q) => {
-                var widget = new DetailWidget(
-                    adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, adhGetBadges, flowFactory, moment, $window, $location, $q);
+            (...args) => {
+                var widget = AdhUtil.construct(DetailWidget, args);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalCreate", [
@@ -1254,31 +1253,8 @@ export var register = (angular) => {
             "$window",
             "$location",
             "$q",
-            (
-                adhConfig,
-                adhHttp,
-                adhPreliminaryNames,
-                adhTopLevelState,
-                adhGetBadges,
-                $timeout,
-                flowFactory,
-                moment,
-                $window,
-                $location,
-                $q
-            ) => {
-                var widget = new CreateWidget(
-                    adhConfig,
-                    adhHttp,
-                    adhPreliminaryNames,
-                    adhTopLevelState,
-                    adhGetBadges,
-                    $timeout,
-                    flowFactory,
-                    moment,
-                    $window,
-                    $location,
-                    $q);
+            (...args) => {
+                var widget = AdhUtil.construct(CreateWidget, args);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
