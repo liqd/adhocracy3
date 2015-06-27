@@ -1,26 +1,4 @@
 [
-  {
-    "name": "user0",
-    "email": "test@test.de",
-    "initial-password": "secret",
-    "roles": [],
-    "groups": ["gods"],
-    "bages": ["god"],
-    "send_invitation_mail": true,
-    "subject_tmpl_invitation_mail": "adhocracy_core:templates/invite_subject_sample.txt.mako",
-    "body_tmpl_invitation_mail": "adhocracy_core:templates/invite_body_sample.txt.mako"
-  },
-  {"name": "user1",
-    "email": "teste1@test.de",
-    "initial-password": "secret",
-    "roles": [],
-    "groups": [],
-    "send_invitation_mail": true
-  },
-  {"name": "user2",
-    "email": "teste2@test.de",
-    "initial-password": "secret",
-    "roles": [],
-    "groups": []
-  }
+  {"name": "Alice", "roles": ["contributor"], "groups": ["gods"]},
+  {"name": "Bob", "roles": [], "groups": []}
 ]
