@@ -18,6 +18,7 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
@@ -89,7 +90,8 @@ export var bindPath = (
                         title: documentVersion.data[SITitle.nick].title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
-                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount"))
+                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        picture: documentVersion.data[SIImageReference.nick].picture
                     };
                 });
             });
