@@ -1,0 +1,105 @@
+#
+# English translations for PACKAGE package
+# This file is distributed under the same license as the PACKAGE package.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2015-06-27 13:11+0200\n"
+"PO-Revision-Date: 2015-05-26 21:25+0200\n"
+"Last-Translator: Joscha <joka@jokasis.de>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.10\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Default: [${site_name} Abuse Complaint
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:116
+msgid "mail_abuse_complaint_subject"
+msgstr "[${site_name} Missbrauchs-Beschwerde"
+
+#. Default: [${site_name}] Message from ${sender_name}: ${title}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:146
+msgid "mail_sent_message_to_user_subject"
+msgstr "[Debatte - #digitalLEBEN] Nachricht von ${sender_name}: ${title} "
+
+#. Default: ${text}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:150
+msgid "mail_sent_message_to_user_body_txt"
+msgstr ""
+"Die folgende Nachricht wurde Ihnen gesendet von ${sender_name}:\n"
+"\n"
+"${text}\n"
+"\n"
+"—\n"
+"Viele Grüße,\n"
+"Das #digitalLEBEN-Team\n"
+"\n"
+"Klicken Sie hier, um auf ${sender_name}’s Profil zu gelangen:\n"
+"${sender_url}"
+
+#. Default: ${site_name}: Account Verification / Aktivierung Ihres
+#. Nutzerkontos
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:179
+msgid "mail_account_verification_subject"
+msgstr "Diskussion - #digitalLEBEN: Aktivierung Ihres Nutzerkontos"
+
+#. Default: ${activation_path}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:183
+msgid "mail_account_verification_body_txt"
+msgstr ""
+"Hallo ${user_name},\n"
+"\n"
+"vielen Dank für Ihre Registrierung für die Programmdebatte.\n"
+"\n"
+"Diese E-Mail dient der Validierung Ihrer Identität. Bitte\n"
+"nutzen Sie den folgenden Link um das Nutzerkonto zu aktivieren.\n"
+"\n"
+"${frontend_url}${activation_path}\n"
+"\n"
+"Wir wünschen Ihnen viel Spaß und Inspiration!\n"
+"\n"
+"Das #digitalLEBEN-Team"
+
+#. Default: ${site_name}: Reset Password / Password neu setzen
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:199
+msgid "mail_reset_password_subject"
+msgstr "Debatte - #digitalLEBEN:  Password neu setzen"
+
+#. Default: ${reset_url}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:203
+msgid "mail_reset_password_body_txt"
+msgstr ""
+"Hallo ${user_name},\n"
+"\n"
+"nutze Sie bitte den folgenden Link um Ihr Passwort neu zu setzen.\n"
+"\n"
+"${reset_url}\n"
+"\n"
+"Das #digitalLEBEN-Team"
+
+#. Default: ${site_name}: Reset Password / Password neu setzen
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:232
+#, fuzzy
+msgid "mail_invitation_subject"
+msgstr "Einladung zur Debatte um das Digitale Programm."
+
+#. Default: ${reset_url}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:239
+#, fuzzy
+msgid "mail_invitation_body_txt"
+msgstr ""
+"Hallo,\n"
+"\n"
+"hiermit laden wir Sie ein, bei der Debatte um unser Digitales Programm teilzunehmen.\n"
+"\n"
+"Diese E-Mail dient der Validierung Ihrer Identität. Bitte\n"
+"nutzen Sie den folgenden Link um das Nutzerkonto zu aktivieren.\n"
+"\n"
+"${frontend_url}${activation_path}\n"
+"\n"
+"Wir wünschen Ihnen viel Spaß und Inspiration!\n"
+"\n"
+"Das #digitalLEBEN-Team"
