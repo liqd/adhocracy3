@@ -13,7 +13,7 @@ Die Debatte findet über die Software Adhocracy statt. Es wurde bereits ein Acco
 
 Bevor Sie an der Diskussion teilnehmen können, müssen Sie noch unter folgendem Link Ihren Account aktivieren:
 
-    ${activation_url}
+    ${reset_url}
 
 Die Debatte zum Thema „Digitale Infrastruktur“ ist unter folgendem Link zu finden:
 
@@ -22,4 +22,4 @@ Die Debatte zum Thema „Digitale Infrastruktur“ ist unter folgendem Link zu f
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 
 
-P.S. Sie erhalten diese Mail von Liquid Democracy e.V.. Dies ist der Dienstleister für die Onlinedebatte #DigitalLEBEN. Dies ist eine einmalige Mail. Liquid Democracy e.V. löscht Ihre Mailadresse, wenn Sie sich nicht auf der Plattform anmeldest.
+P.S. Sie erhalten diese Mail von Liquid Democracy e.V.. Dies ist der Dienstleister für die Onlinedebatte #DigitalLEBEN. Dies ist eine einmalige Mail. Liquid Democracy e.V. löscht Ihre Mailadresse, wenn Sie sich nicht auf der Plattform anmelden.

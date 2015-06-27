@@ -13,7 +13,7 @@ Die Debatte findet über die Software Adhocracy statt. Es wurde bereits ein Acco
 
 Bevor Sie an der Diskussion teilnehmen können, müssen Sie noch unter folgendem Link Ihren Account aktivieren:
 
-    ${activation_url}
+    ${reset_url}
 
 Die Debatte zum Thema „Digitale Arbeit“ ist unter folgendem Link zu finden:
 

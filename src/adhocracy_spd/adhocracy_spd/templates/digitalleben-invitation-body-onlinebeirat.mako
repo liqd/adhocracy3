@@ -1,21 +1,21 @@
-Hallo!
+Hallo ${user_name}!
 
 wir starten heute die Onlinedebatte zum digitalen Grundsatzprogramm der SPD auf der Grundlage des Papiers aus dem Programmbeirat. Wir laden ab heute alle interessierten und engagierten Menschen ein, sich an der Debatte zu beteiligen.
 
 Mit dieser Mail schicken wir Dir die Einladung Dich auf Digitalleben.spd.de/Debatte zu registrieren und als Experte in der Debatte aufzutreten. Du musst nichts weiter tun als diesen Link zu klicken:
 
-    ${activation_url}
+    ${reset_url}
 
 Dein Nutzerprofil wird dann mit folgenden Nutzerdaten erstellt und mit einem Badge versehen, das Dich als Experte auf der Plattform auszeichnet.
 
-	Registrierte Email: ${email}
+    Registrierte Email: ${email}
     Benutzername: ${user_name}
 
 Deine Meinung und Deine Sachkenntnis ist für die Debatte besonders wichtig. Wir möchten Dich bitten immer mal wieder auf der Plattform vorbeizuschauen, um unsere Positionen auf der Plattform zu vertreten oder um Meinungen der NutzerInnen mit Deinen Kommentaren einzuordnen. Das Team hinter der Onlinedebatte steht Dir jederzeit für Fragen zur Verfügung. Schreib einfach eine Mail an onlinebeteiligung@spd.de.
 
 Auf eine offene und gute Debatte!
 
-Viele Grüßevom
+Viele Grüße vom
 Digitalleben-Team
 
 
