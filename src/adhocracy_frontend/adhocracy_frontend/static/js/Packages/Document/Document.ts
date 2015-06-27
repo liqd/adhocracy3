@@ -220,6 +220,8 @@ export var postEdit = (
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
+    // FIXME: workaround for a backend bug
+    documentVersion.data[SIImageReference.nick] = oldVersion.data[SIImageReference.nick];
 
     return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[0]);

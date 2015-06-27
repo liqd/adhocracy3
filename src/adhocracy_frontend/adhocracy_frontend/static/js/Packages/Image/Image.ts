@@ -70,14 +70,10 @@ export var addImage = (
     imagePath : string
 ) => {
     return adhHttp.get(resourcePath).then((version) => {
-        var newVersion = {
-            content_type: version.content_type,
-            data: {}
-        };
-        newVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
+        version.data[SIImageReference.nick] = new SIImageReference.Sheet({
             picture: imagePath
         });
-        return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
+        return adhHttp.postNewVersionNoFork(resourcePath, version);
     });
 };
 
