@@ -431,7 +431,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         countSupporters(this.adhHttp, mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
             .then((count : number) => { data.supporterCount = count; });
 
-        this.adhGetBadges(mercatorProposalVersion).then((assignments) => {
+        this.adhGetBadges(<any>mercatorProposalVersion).then((assignments : AdhBadge.IBadge[]) => {
             var communityAssignment = _.find(assignments, (a) => a.name === "community");
             var winningAssignment = _.find(assignments, (a) => a.name === "winning");
 
