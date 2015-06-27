@@ -18,10 +18,16 @@ export interface IBadge {
     name : string;
 }
 
+export interface IGetBadges {
+    (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadge[]>;
+}
+
 export var getBadgesFactory = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
-) => (resource : SIBadgeable.HasSheet) : angular.IPromise<IBadge[]> => {
+) : IGetBadges => (
+    resource : SIBadgeable.HasSheet
+) : angular.IPromise<IBadge[]> => {
     var assignmentPaths = resource.data[SIBadgeable.nick].assignments;
 
     var getBadge = (assignmentPath : string) => {

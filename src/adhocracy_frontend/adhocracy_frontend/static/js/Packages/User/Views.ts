@@ -325,7 +325,11 @@ export var indicatorDirective = (
     };
 };
 
-export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service, adhGetBadges) => {
+export var metaDirective = (
+    adhConfig : AdhConfig.IService,
+    adhResourceArea : AdhResourceArea.Service,
+    adhGetBadges : AdhBadge.IGetBadges
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
@@ -378,8 +382,12 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             path: "@",
             me: "=?"
         },
-        controller: ["adhHttp", "$scope", "adhTopLevelState", "adhGetBadges", (adhHttp : AdhHttp.Service<any>, $scope,
-             adhTopLevelState : AdhTopLevelState.Service, adhGetBadges) => {
+        controller: ["adhHttp", "$scope", "adhTopLevelState", "adhGetBadges", (
+            adhHttp : AdhHttp.Service<any>,
+            $scope,
+            adhTopLevelState : AdhTopLevelState.Service,
+            adhGetBadges : AdhBadge.IGetBadges
+        ) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
@@ -410,7 +418,7 @@ export var userProfileDirective = (
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhUser : AdhUser.Service,
-    adhGetBadges
+    adhGetBadges : AdhBadge.IGetBadges
 ) => {
     return {
         restrict: "E",
