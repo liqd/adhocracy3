@@ -21,6 +21,8 @@ var pkgLocation = "/Image";
  *
  * NOTE: this uses several HTML5 APIs so you need to check for
  * compability before using it.
+ *
+ * FIXME: This should be exptended to cover a broader range of use cases.
  */
 export var uploadImageFactory = (
     adhHttp : AdhHttp.Service<any>
