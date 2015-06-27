@@ -227,6 +227,7 @@ class Messenger:
         mapping = {'reset_url': self._build_reset_url(password_reset),
                    'user_name': user.name,
                    'site_name': self.site_name,
+                   'email': user.email,
                    }
         if subject_tmpl is None:
             subject = _('mail_invitation_subject',
