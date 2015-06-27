@@ -231,14 +231,14 @@ class Messenger:
         if subject_tmpl is None:
             subject = _('mail_invitation_subject',
                         mapping=mapping,
-                        default='${site_name}: Reset Password / Password neu'
-                                ' setzen')
+                        default='Invitation to join ${site_name}')
         else:
             subject = render(subject_tmpl, mapping)
         if body_tmpl is None:
             body = _('mail_invitation_body_txt',
                      mapping=mapping,
-                     default='${reset_url}'
+                     default='Please click ${reset_url} to join'
+                             ' and reset your password.'
                      )
         else:
             body = render(body_tmpl, mapping)
