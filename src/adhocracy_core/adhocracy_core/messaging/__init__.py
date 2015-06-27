@@ -211,20 +211,37 @@ class Messenger:
                        )
 
     def send_invitation_mail(self, user=IUser, password_reset=IResource,
-                             request: Request=None):
-        """Send invitation email with link to reset the user password."""
+                             request: Request=None,
+                             subject_tmpl: str=None,
+                             body_tmpl: str=None,
+                             ):
+        """Send invitation email with link to reset the user password.
+
+        :param:`subject_tmpl`: pyramid asset pointing to a mako
+                               template file. If not set the translation
+                               message is used for the mail subject.
+        :param:`body_tmpl`: pyramid asset pointing to a mako
+                           template file. If not set the translation message
+                           is used for the mail body.
+        """
         mapping = {'reset_url': self._build_reset_url(password_reset),
-                   'name': user.name,
+                   'user_name': user.name,
                    'site_name': self.site_name,
                    }
-        subject = _('mail_invitation_subject',
-                    mapping=mapping,
-                    default='${site_name}: Reset Password / Password neu'
-                            ' setzen')
-        body = _('mail_invitation_body_txt',
-                 mapping=mapping,
-                 default='${reset_url}'
-                 )
+        if subject_tmpl is None:
+            subject = _('mail_invitation_subject',
+                        mapping=mapping,
+                        default='${site_name}: Reset Password / Password neu'
+                                ' setzen')
+        else:
+            subject = render(subject_tmpl, mapping)
+        if body_tmpl is None:
+            body = _('mail_invitation_body_txt',
+                     mapping=mapping,
+                     default='${reset_url}'
+                     )
+        else:
+            body = render(body_tmpl, mapping)
         self.send_mail(subject=subject,
                        recipients=[user.email],
                        body=body,
