@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
@@ -72,10 +74,11 @@ export var addImage = (
     imagePath : string
 ) => {
     return adhHttp.get(resourcePath).then((version) => {
-        version.data[SIImageReference.nick] = new SIImageReference.Sheet({
+        var newVersion = _.clone(version);
+        newVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
             picture: imagePath
         });
-        return adhHttp.postNewVersionNoFork(resourcePath, version);
+        return adhHttp.postNewVersionNoFork(resourcePath, newVersion);
     });
 };
 
