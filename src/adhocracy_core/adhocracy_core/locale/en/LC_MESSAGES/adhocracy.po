@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-06-27 13:11+0200\n"
+"POT-Creation-Date: 2015-06-27 14:35+0200\n"
 "PO-Revision-Date: 2015-05-26 21:25+0200\n"
 "Last-Translator: Joscha <joka@jokasis.de>\n"
 "Language-Team: English\n"
@@ -129,14 +129,14 @@ msgstr ""
 "\n"
 "Dein \"${site_name}\"-Team"
 
-#. Default: ${site_name}: Reset Password / Password neu setzen
+#. Default: Invitation to join ${site_name}
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:232
 #, fuzzy
 msgid "mail_invitation_subject"
 msgstr "mail_account_verification_subject"
 
-#. Default: ${reset_url}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:239
+#. Default: Please click ${reset_url} to join and reset your password.
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:238
 #, fuzzy
 msgid "mail_invitation_body_txt"
 msgstr ""
