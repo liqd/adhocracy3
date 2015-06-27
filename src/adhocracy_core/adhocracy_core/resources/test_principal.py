@@ -272,6 +272,18 @@ class TestPasswordReset:
         reset.reset_password('new_password')
         assert reset.__parent__ is None
 
+    @mark.usefixtures('integration')
+    def test_activate_after_reset_password(self, registry, principals):
+        from . import principal
+        user = registry.content.create(principal.IUser.__identifier__,
+                                       parent=principals['users'],
+                                       appstructs={})
+        reset = registry.content.create(principal.IPasswordReset.__identifier__,
+                                        parent=principals['resets'],
+                                        creator=user)
+        reset.reset_password('new_password')
+        assert user.active
+
 
 class TestUserLocatorAdapter:
 
