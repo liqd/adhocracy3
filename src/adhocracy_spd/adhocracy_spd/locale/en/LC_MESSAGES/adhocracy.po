@@ -18,7 +18,7 @@ msgstr ""
 #. Default: [${site_name} Abuse Complaint
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:116
 msgid "mail_abuse_complaint_subject"
-msgstr "[${site_name} Missbrauchs-Beschwerde"
+msgstr "[${site_name}] Missbrauchs-Beschwerde"
 
 #. Default: [${site_name}] Message from ${sender_name}: ${title}
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:146
@@ -74,7 +74,7 @@ msgid "mail_reset_password_body_txt"
 msgstr ""
 "Hallo ${user_name},\n"
 "\n"
-"nutze Sie bitte den folgenden Link um Ihr Passwort neu zu setzen.\n"
+"nutzen Sie bitte den folgenden Link um Ihr Passwort neu zu setzen.\n"
 "\n"
 "${reset_url}\n"
 "\n"
