@@ -93,6 +93,7 @@ class TestImportUsers:
         assert len(mock_messenger.send_invitation_mail.call_args_list) == 1
         mock_messenger.send_invitation_mail.assert_called_with(
             alice, reset, subject_tmpl=None, body_tmpl=None)
+        assert not alice.active
 
     def test_create_and_create_and_assign_badge(self, context, registry,
                                                 mock_messenger):

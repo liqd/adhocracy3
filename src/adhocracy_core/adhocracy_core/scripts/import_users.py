@@ -46,7 +46,6 @@ def import_users():  # pragma: no cover
 
 
 def _import_users(context: IResource, registry: Registry, filename: str):
-    registry.settings['adhocracy.skip_registration_mail'] = True
     users_info = _load_users_info(filename)
     users = find_service(context, 'principals', 'users')
     groups = find_service(context, 'principals', 'groups')
@@ -58,8 +57,10 @@ def _import_users(context: IResource, registry: Registry, filename: str):
             _update_user(user, user_info, groups)
         else:
             print('Creating user {}'.format(user_info['name']))
-            user = _create_user(user_info, users, registry, groups)
             send_invitation = user_info.get('send_invitation_mail', False)
+            activate = not send_invitation
+            user = _create_user(user_info, users, registry, groups,
+                                activate=activate)
             if send_invitation:
                 print('Sending invitation mail to user {}'.format(user.name))
                 _send_invitation_mail(user, user_info, registry)
@@ -91,7 +92,7 @@ def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
 
 
 def _create_user(user_info: dict, users: IResource, registry: Registry,
-                 groups: IResource) -> IUser:
+                 groups: IResource, activate=True) -> IUser:
     groups = _get_groups(user_info['groups'], groups)
     appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
@@ -105,8 +106,10 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
     user = registry.content.create(IUser.__identifier__,
                                    users,
                                    appstruct,
-                                   registry=registry)
-    user.activate()
+                                   registry=registry,
+                                   send_event=False)
+    if activate:
+        user.activate()
     return user
 
 
