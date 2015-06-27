@@ -214,7 +214,7 @@ class TestSendPasswordResetMail:
         assert inst.send_mail.call_args[1]['body'] == \
                'mail_reset_password_body_txt'
         assert inst.send_mail.call_args[1]['body'].mapping ==\
-            {'name': 'Anna',
+            {'user_name': 'Anna',
              'site_name': 'sitename',
              'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
         assert inst.send_mail.call_args[1]['request'] == request_
@@ -234,7 +234,7 @@ class TestSendInvitationMail:
         from . import Messenger
         return Messenger(registry)
 
-    def test_send_password_reset_mail(self, inst, request_):
+    def test_send_mail_with_password_reset_link(self, inst, request_):
         inst.send_mail = Mock()
         user = testing.DummyResource(name='Anna', email='anna@example.org')
         reset = testing.DummyResource(__name__='/reset')
@@ -245,7 +245,7 @@ class TestSendInvitationMail:
         assert inst.send_mail.call_args[1]['body'] == \
                'mail_invitation_body_txt'
         assert inst.send_mail.call_args[1]['body'].mapping ==\
-            {'name': 'Anna',
+            {'user_name': 'Anna',
              'site_name': 'sitename',
              'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
         assert inst.send_mail.call_args[1]['request'] == request_

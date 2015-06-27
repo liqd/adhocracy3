@@ -107,15 +107,17 @@ class Messenger:
         if user is not None:
             user_name = self._get_user_name(user)
             user_url = self._get_user_url(user)
-        kwargs = {'url': url,
-                  'remark': remark,
-                  'user_name': user_name,
-                  'user_url': user_url}
+        mapping = {'url': url,
+                   'remark': remark,
+                   'user_name': user_name,
+                   'user_url': user_url,
+                   'site_name': self.site_name,
+                   }
         subject = _('mail_abuse_complaint_subject',
-                    mapping={'site_name': self.site_name},
+                    mapping=mapping,
                     default='[${site_name} Abuse Complaint')
         body = render('adhocracy_core:templates/abuse_complaint.txt.mako',
-                      kwargs)
+                      mapping)
         # FIXME For security reasons, we should check that the url starts
         # with one of the prefixes where frontends are supposed to be running
         self.send_mail(subject=subject,
@@ -169,16 +171,17 @@ class Messenger:
     def send_registration_mail(self, user: IUser, activation_path: str,
                                request: Request=None):
         """Send a registration mail to validate the email of a user account."""
+        mapping = {'activation_path': activation_path,
+                   'frontend_url': self.frontend_url,
+                   'user_name': user.name,
+                   'site_name': self.site_name,
+                   }
         subject = _('mail_account_verification_subject',
-                    mapping={'site_name': self.site_name},
+                    mapping=mapping,
                     default='${site_name}: Account Verification / '
                             'Aktivierung Deines Nutzerkontos')
         body_txt = _('mail_account_verification_body_txt',
-                     mapping={'activation_path': activation_path,
-                              'frontend_url': self.frontend_url,
-                              'name': user.name,
-                              'site_name': self.site_name,
-                              },
+                     mapping=mapping,
                      default='${activation_path}')
         self.send_mail(subject=subject,
                        recipients=[user.email],
@@ -190,7 +193,7 @@ class Messenger:
                                  request: Request=None):
         """Send email with link to reset the user password."""
         mapping = {'reset_url': self._build_reset_url(password_reset),
-                   'name': user.name,
+                   'user_name': user.name,
                    'site_name': self.site_name,
                    }
         subject = _('mail_reset_password_subject',
