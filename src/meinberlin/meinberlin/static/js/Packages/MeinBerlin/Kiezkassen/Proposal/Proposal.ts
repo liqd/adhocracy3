@@ -48,7 +48,7 @@ export interface IScope extends angular.IScope {
         lng : number;
         lat : number;
         polygon: number[][];
-        assignments : BadgeAssignment[];
+        assignments : AdhBadge.IBadge[];
     };
     selectedState? : string;
     resource: RIProposalVersion;

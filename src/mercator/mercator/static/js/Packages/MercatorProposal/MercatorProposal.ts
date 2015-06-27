@@ -82,7 +82,7 @@ export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
     supporterCount : number;
-    winnerBadgeAssignment : BadgeAssignment;
+    winnerBadgeAssignment : AdhBadge.IBadge;
     currentPhase: string;
 
     title : {
