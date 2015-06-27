@@ -12,7 +12,7 @@ import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/
 var pkgLocation = "/Image";
 
 /**
- * upload mercator proposal image file.  this function can potentially
+ * upload image file.  this function can potentially
  * be more general; for now it just handles the Flow object and
  * promises the path of the image resource as a string.
  *
