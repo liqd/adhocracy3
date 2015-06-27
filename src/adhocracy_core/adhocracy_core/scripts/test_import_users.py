@@ -13,6 +13,7 @@ class TestImportUsers:
 
     def _get_user_locator(self, context, registry):
         request = Request.blank('/dummy')
+        request.registry = registry
         locator = registry.getMultiAdapter((context, request), IUserLocator)
         return locator
 
@@ -25,6 +26,7 @@ class TestImportUsers:
         return _import_users(root, registry, filename)
 
     def test_create(self, context, registry):
+        from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -38,10 +40,18 @@ class TestImportUsers:
 
         self.call_fut(context, registry, filename)
 
+        god_group = context['principals']['groups']['gods']
         alice = locator.get_user_by_login('Alice')
         assert alice.active
+        alice = locator.get_user_by_login('Alice')
+        alice_user_id = resource_path(alice)
+        groups = locator.get_groups(alice_user_id)
+        assert groups == [god_group]
         bob = locator.get_user_by_login('Bob')
-        assert bob.active
+        default_group = context['principals']['groups']['authenticated']
+        bob_user_id = resource_path(bob)
+        groups = locator.get_groups(bob_user_id)
+        assert groups == [default_group]
 
     def test_update(self, context, registry):
         self._tempfd, filename = mkstemp()

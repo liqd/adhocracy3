@@ -18,6 +18,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadge
+from adhocracy_core.resources.subscriber import _get_default_group
 from adhocracy_core.utils import get_sheet
 from adhocracy_core import sheets
 from adhocracy_core.scripts.assign_badges import create_badge_assignment
@@ -94,12 +95,16 @@ def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
 def _create_user(user_info: dict, users: IResource, registry: Registry,
                  groups: IResource, activate=True) -> IUser:
     groups = _get_groups(user_info['groups'], groups)
+    if groups == []:
+        default = _get_default_group(users)
+        groups = [default]
     appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
                  sheets.principal.IUserExtended.__identifier__:
                  {'email': user_info['email']},
                  sheets.principal.IPermissions.__identifier__:
-                 {'roles': user_info['roles'], 'groups': groups},
+                 {'roles': user_info['roles'],
+                  'groups': groups},
                  sheets.principal.IPasswordAuthentication.
                  __identifier__: {'password': user_info['initial-password']},
                  }
