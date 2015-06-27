@@ -70,7 +70,7 @@ class TestImportUsers:
         assert alice.roles == ['reader']
         assert new_password == old_password
 
-    def test_create_and_send_password_reset_mail(self, context, registry,
+    def test_create_and_send_invitation_mail(self, context, registry,
                                                  mock_messenger):
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
@@ -91,9 +91,11 @@ class TestImportUsers:
         reset = context['principals']['resets'].values()[0]
         assert not mock_messenger.send_password_reset_mail.called
         assert len(mock_messenger.send_invitation_mail.call_args_list) == 1
-        mock_messenger.send_invitation_mail.assert_called_with(alice, reset)
+        mock_messenger.send_invitation_mail.assert_called_with(
+            alice, reset, subject_tmpl=None, body_tmpl=None)
 
-    def test_create_and_create_assign_badge(self, context, registry, mock_messenger):
+    def test_create_and_create_and_assign_badge(self, context, registry,
+                                                mock_messenger):
         from adhocracy_core import sheets
         from adhocracy_core.utils import get_sheet
         from adhocracy_core.utils import get_sheet_field
@@ -128,6 +130,56 @@ class TestImportUsers:
         assert assignment_sheet.get() == {'object': bob,
                                           'badge': badge,
                                           'subject': bob}
+
+    def test_create_and_send_invitation_mail_with_custom_subject(
+            self, context, registry, mock_messenger):
+        registry.messenger = mock_messenger
+        self._tempfd, filename = mkstemp()
+        subject_tmpl = 'adhocracy_core:scripts/subject_invite_sample.txt.mako'
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice',
+                 'email': 'alice@example.org',
+                 'initial-password': '',
+                 'roles': [],
+                 'groups': [],
+                 'badges': ['Onlinebeirat'],
+                 'send_invitation_mail': True,
+                 'subject_tmpl_invitation_mail': subject_tmpl}
+            ]))
+        locator = self._get_user_locator(context, registry)
+
+        self.call_fut(context, registry, filename)
+
+        alice = locator.get_user_by_login('Alice')
+        reset = context['principals']['resets'].values()[0]
+        mock_messenger.send_invitation_mail.assert_called_with(
+            alice, reset, subject_tmpl=subject_tmpl, body_tmpl=None)
+
+    def test_create_and_send_invitation_mail_with_custom_body(
+            self, context, registry, mock_messenger):
+        registry.messenger = mock_messenger
+        self._tempfd, filename = mkstemp()
+        body_tmpl = 'adhocracy_core:scripts/body_invite_sample.txt.mako'
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice',
+                 'email': 'alice@example.org',
+                 'initial-password': '',
+                 'roles': [],
+                 'groups': [],
+                 'badges': ['Onlinebeirat'],
+                 'send_invitation_mail': True,
+                 'body_tmpl_invitation_mail': body_tmpl}
+            ]))
+        locator = self._get_user_locator(context, registry)
+
+        self.call_fut(context, registry, filename)
+
+        alice = locator.get_user_by_login('Alice')
+        reset = context['principals']['resets'].values()[0]
+        mock_messenger.send_invitation_mail.assert_called_with(
+            alice, reset, subject_tmpl=None, body_tmpl=body_tmpl)
 
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):

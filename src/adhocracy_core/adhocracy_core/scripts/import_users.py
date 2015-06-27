@@ -62,7 +62,7 @@ def _import_users(context: IResource, registry: Registry, filename: str):
             send_invitation = user_info.get('send_invitation_mail', False)
             if send_invitation:
                 print('Sending invitation mail to user {}'.format(user.name))
-                _send_invitation_mail(user, registry)
+                _send_invitation_mail(user, user_info, registry)
             badge_names = user_info.get('badges', [])
             if badge_names:
                 print('Assign badge for user {}'.format(user.name))
@@ -110,14 +110,19 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
     return user
 
 
-def _send_invitation_mail(user: IUser, registry: Registry):
+def _send_invitation_mail(user: IUser, user_info: dict, registry: Registry):
     resets = find_service(user, 'principals', 'resets')
     reset = registry.content.create(IPasswordReset.__identifier__,
                                     parent=resets,
                                     creator=user,
                                     send_event=False,
                                     )
-    registry.messenger.send_invitation_mail(user, reset)
+    subject_tmpl = user_info.get('subject_tmpl_invitation_mail', None)
+    body_tmpl = user_info.get('body_tmpl_invitation_mail', None)
+    registry.messenger.send_invitation_mail(user, reset,
+                                            subject_tmpl=subject_tmpl,
+                                            body_tmpl=body_tmpl,
+                                            )
     return user
 
 
