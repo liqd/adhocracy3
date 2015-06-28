@@ -227,13 +227,14 @@ export var passwordResetDirective = (
             scope.showError = adhShowError;
             scope.success = false;
             scope.siteName = adhConfig.site_name;
+            scope.embedOnly = (adhConfig.custom["embed_only"].toLowerCase() === "true");
 
             scope.input = {
                 password: "",
                 passwordRepeat: ""
             };
 
-            scope.cancel = () => {
+            scope.goBack = scope.cancel = () => {
                  adhTopLevelState.redirectToCameFrom("/");
             };
 
