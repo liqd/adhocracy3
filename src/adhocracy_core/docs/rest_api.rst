@@ -1469,7 +1469,7 @@ versions of all documents::
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/kommunismus/PARAGRAPH_0000000/VERSION_0000001/',
-     'http://localhost/Documents/kommunismus/PARAGRAPH_0000001/VERSION_0000002/',
+     'http://localhost/Documents/kommunismus/PARAGRAPH_0000001/VERSION_0000001/',
      'http://localhost/Documents/kommunismus/PARAGRAPH_0000002/VERSION_0000001/']
 
 *<custom>* filter: depending on the backend configuration there are additional
