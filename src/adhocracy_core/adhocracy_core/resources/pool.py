@@ -4,6 +4,7 @@ from substanced.util import find_service
 from substanced.interfaces import IFolder
 from zope.interface import implementer
 from zope.deprecation import deprecated
+from persistent.mapping import PersistentMapping
 
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.pool
@@ -46,7 +47,7 @@ class Pool(Base, Folder):
         Folder.__init__(self, data=data, family=family)
         Base.__init__(self)
         self.__changed_descendants_counter__ = Length()
-        self._autoname_lasts = {}
+        self._autoname_lasts = PersistentMapping()
 
     def next_name(self, subobject, prefix='') -> str:
         """Generate name to add subobject to the folder.
