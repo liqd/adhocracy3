@@ -44,7 +44,7 @@ folgendem Link Ihren Account aktivieren:
 Die Debatte zum Thema „Digitale Infrastruktur“ ist unter folgendem Link
 zu finden:
 
-    http://spdlink.de/onlinedebatte-infrastruktur
+    http://spdlink.de/debatte-infrastruktur-umwelt
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 

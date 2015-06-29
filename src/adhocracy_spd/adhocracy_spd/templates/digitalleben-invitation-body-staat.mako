@@ -42,7 +42,7 @@ folgendem Link Ihren Account aktivieren:
 Die Debatte zum Thema „Digitaler Staat“ ist unter folgendem Link zu
 finden:
 
-    http://spdlink.de/onlinedebatte-gesellschaft
+    http://spdlink.de/debatte-staat-gesellschaft
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 

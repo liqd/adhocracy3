@@ -42,7 +42,7 @@ folgendem Link Ihren Account aktivieren:
 Die Debatte zum Thema „Digitale Wirtschaft“ ist unter folgendem Link zu
 finden:
 
-    http://spdlink.de/onlinedebatte-wirtschaft
+    http://spdlink.de/debatte-wirtschaft
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 

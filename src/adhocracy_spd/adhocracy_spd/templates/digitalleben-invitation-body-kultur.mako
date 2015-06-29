@@ -43,7 +43,7 @@ folgendem Link Ihren Account aktivieren:
 Die Debatte zum Thema „Kultur, Medien und Öffentlichkeit in der
 digitalen Welt“ ist unter folgendem Link zu finden:
 
-    http://spdlink.de/onlinedebatte-kulturmedien
+    http://spdlink.de/debatte-kultur-medien
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 

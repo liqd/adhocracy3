@@ -45,7 +45,7 @@ folgendem Link Ihren Account aktivieren:
 Die Debatte zum Thema „europäische und globale Datenpolitik“ ist unter
 folgendem Link zu finden:
 
-    Kurzlink: http://spdlink.de/onlinedebatte-Daten
+    http://spdlink.de/debatte-europaeische-datenpolitik
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 

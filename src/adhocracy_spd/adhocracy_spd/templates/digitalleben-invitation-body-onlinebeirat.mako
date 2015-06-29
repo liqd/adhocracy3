@@ -21,6 +21,11 @@ auszeichnet.
     Benutzername: ${user_name}
 
 
+Die Debatte ist unter folgendem Link zu finden:
+
+     https://digitalleben.spd.de/debatte
+
+
 Deine Meinung und Deine Sachkenntnis ist für die Debatte besonders
 wichtig. Wir möchten Dich bitten immer mal wieder auf der Plattform
 vorbeizuschauen, um unsere Positionen auf der Plattform zu vertreten

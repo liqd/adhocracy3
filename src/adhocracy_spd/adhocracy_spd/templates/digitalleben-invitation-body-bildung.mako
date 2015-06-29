@@ -50,7 +50,7 @@ folgendem Link Ihren Account aktivieren:
 Die Debatte zum Thema „Digitale Bildung, Familie, Generationen,
 Gleichstellung und Teilhabe“ ist unter folgendem Link zu finden:
 
-    Kurzlink: http://spdlink.de/onlinedebatte-bildung
+    http://spdlink.de/debatte-bildung
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 

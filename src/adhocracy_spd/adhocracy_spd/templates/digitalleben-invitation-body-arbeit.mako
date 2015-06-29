@@ -43,7 +43,7 @@ folgendem Link Ihren Account aktivieren:
 Die Debatte zum Thema „Digitale Arbeit“ ist unter folgendem Link zu
 finden:
 
-    http://spdlink.de/onlinedebatte-arbeit
+    http://spdlink.de/debatte-arbeit
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 
