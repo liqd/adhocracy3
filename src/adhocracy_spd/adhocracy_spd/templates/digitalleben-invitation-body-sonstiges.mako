@@ -17,7 +17,7 @@ Bevor Sie an der Diskussion teilnehmen können, müssen Sie noch unter folgendem
 
 Die Debatte ist unter folgendem Link zu finden:
 
-     https://digitalleben.spd.de/adhocracy-live
+     https://digitalleben.spd.de/debatte
 
 Vielen Dank für Ihr Engagement und Ihre Unterstützung.
 
