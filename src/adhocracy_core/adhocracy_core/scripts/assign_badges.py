@@ -11,10 +11,14 @@ import argparse
 import transaction
 from pyramid.paster import bootstrap
 from pyramid.traversal import find_resource
+from pyramid.registry import Registry
 from substanced.util import find_service
 
-from adhocracy_core import resources
+from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.badge import IBadge
+from adhocracy_core.resources.badge import IBadgeAssignment
 from adhocracy_core import sheets
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.utils import load_json
 
 
@@ -28,12 +32,7 @@ def assign_badges():  # pragma: no cover
     env = bootstrap(args.ini_file)
     root = env['root']
     registry = env['registry']
-
-    entries = load_json(args.jsonfile)
-
-    for entry in entries:
-        _create_badge_assignment(entry, root, registry)
-
+    _import_assignments(root, registry, args.jsonfile)
     transaction.commit()
     env['closer']()
 
@@ -50,40 +49,41 @@ def _parse_args():  # pragma: no cover
     return parser.parse_args()
 
 
-def _create_badge_assignment(entry, root, registry):
-
-    user = entry['user']
-    badge = entry['badge']
-    proposalversion = entry['proposalversion']
-    proposalitem = entry['proposalitem']
-    user, badge, proposal_version, parent = _get_resources(
-        root, user, badge, proposalversion, proposalitem)
-
-    description = entry['description']
-    service = find_service(parent, 'badge_assignments')
-    appstructs = _create_appstructs(user, badge, proposal_version, description)
-
-    registry.content.create(resources.badge.IBadgeAssignment.__identifier__,
-                            parent=service,
-                            appstructs=appstructs)
+def _import_assignments(root: IResource, registry: Registry, filename: str):
+    entries = load_json(filename)
+    for entry in entries:
+        user, badge, badgeable = _find_resources(root, entry)
+        description = entry['description']
+        create_badge_assignment(user, badge, badgeable, description, registry)
 
 
-def _create_appstructs(subject, badge, object, description):
-    appstructs = {sheets.badge.IBadgeAssignment.__identifier__:
-                  {'subject': subject,
-                   'badge': badge,
-                   'object': object
-                   },
-                  sheets.description.IDescription.__identifier__:
-                  {'description': description}
-                  }
-    return appstructs
-
-
-def _get_resources(root, userpath, badgepath, proposalversionpath,
-                   proposalitempath):
+def _find_resources(root,
+                    entry: dict) -> (IUser, IBadge, sheets.badge.IBadgeable):
+    userpath = entry.get('user')
     user = find_resource(root, userpath)
+    badgepath = entry.get('badge')
     badge = find_resource(root, badgepath)
-    proposal_version = find_resource(root, proposalversionpath)
-    proposal_item = find_resource(root, proposalitempath)
-    return user, badge, proposal_version, proposal_item
+    badgeablepath = entry.get('badgeable')
+    badgeable = find_resource(root, badgeablepath)
+    return user, badge, badgeable
+
+
+def create_badge_assignment(user: IUser,
+                            badge: IBadge,
+                            badgeable: sheets.badge.IBadgeable,
+                            description: str,
+                            registry: Registry) -> IBadgeAssignment:
+    """Create badge assignment."""
+    appstructs = {sheets.badge.IBadgeAssignment.__identifier__:
+                  {'subject': user,
+                   'badge': badge,
+                   'object': badgeable
+                   }}
+    if description != '':  # pragma: no branch
+        appstructs[sheets.description.IDescription.__identifier__] =\
+            {'description': description}
+    assignments = find_service(badgeable, 'badge_assignments')
+    assignmnet = registry.content.create(IBadgeAssignment.__identifier__,
+                                         parent=assignments,
+                                         appstructs=appstructs)
+    return assignmnet

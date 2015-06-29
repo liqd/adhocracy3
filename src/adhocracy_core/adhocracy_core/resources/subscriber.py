@@ -1,12 +1,10 @@
 """Autoupdate resources."""
 from base64 import b64encode
-from urllib.request import quote
 from collections import Sequence
 from logging import getLogger
 from os import urandom
 
 from pyramid.registry import Registry
-from pyramid.traversal import resource_path
 from pyramid.request import Request
 from pyramid.settings import asbool
 from pyramid.i18n import TranslationStringFactory
@@ -63,7 +61,7 @@ def update_modification_date_modified_by(event):
 def add_default_group_to_user(event):
     """Add default group to user if no group is set."""
     group = _get_default_group(event.object)
-    if group is None:  # ease testing
+    if group is None:
         return
     user_groups = _get_user_groups(event.object, event.registry)
     if user_groups:
@@ -213,27 +211,9 @@ def autoupdate_non_versionable_has_new_version(event):
 
 def send_password_reset_mail(event):
     """Send mail with reset password link if a reset resource is created."""
-    site_name = event.registry.settings.get('adhocracy.site_name', '')
     user = get_sheet_field(event.object, IMetadata, 'creator')
-    frontend_url = event.registry.settings.get('adhocracy.frontend_url', '')
-    path = resource_path(event.object)
-    path_quoted = quote(path, safe='')
-    mapping = {'reset_url': '{0}/password_reset/?path={1}'.format(frontend_url,
-                                                                  path_quoted),
-               'name': user.name,
-               'site_name': site_name,
-               }
-    subject = _('mail_reset_password_subject',
-                mapping=mapping,
-                default='${site_name}: Reset Password / Password neu setzen')
-    body = _('mail_reset_password_body_txt',
-             mapping=mapping,
-             default='${reset_url}',
-             )
-    event.registry.messenger.send_mail(subject=subject,
-                                       recipients=[user.email],
-                                       body=body,
-                                       )
+    password_reset = event.object
+    event.registry.messenger.send_password_reset_mail(user, password_reset)
 
 
 def send_activation_mail_or_activate_user(event):

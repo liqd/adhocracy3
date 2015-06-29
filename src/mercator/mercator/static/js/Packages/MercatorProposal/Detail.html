@@ -1,13 +1,13 @@
 <div
     class="section-jump" id="section-jump-top"
     data-ng-class="{
-        'has-badge': data.winnerBadgeAssignment,
+        'has-rosette': data.winnerBadgeAssignment,
         'm-winner': data.winnerBadgeAssignment.name === 'winning',
         'm-community-award': data.winnerBadgeAssignment.name === 'community'
     }">
     <h2 class="print-only section-jump-cover-header" data-aria-hidden="true">{{ data.title }}</h2>
     <div class="section-jump-cover">
-        <ul class="meta-list mercator-proposal-detail-meta-list">
+        <ul class="meta-list mercator-proposal-detail-meta-list m-phase-{{data.currentPhase}}">
             <li class="meta-list-item meta-list-item-total-comments">
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} {{ "TR__COMMENTS_TOTAL" | translate }}
@@ -21,7 +21,7 @@
                 {{data.finance.requested_funding | number}} &euro;
             </li>
             <li class="meta-list-item meta-list-item-rate">
-                <adh-like data-refers-to="{{path}}"></adh-like>
+                <adh-like data-refers-to="{{path}}" data-disabled="data.currentPhase != 'participate'"></adh-like>
             </li>
         </ul>
         <h1 class="section-jump-cover-header screen-only">{{ data.title }}

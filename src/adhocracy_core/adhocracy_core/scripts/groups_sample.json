@@ -1,4 +1,4 @@
 [
-    {"name": "moderators-xyz", "roles": ["reader"]},
-    {"name": "reviewers-xyz", "roles": ["annotator"]}
+  {"name": "Alice", "roles": ["contributor"], "groups": ["gods"]},
+  {"name": "Bob", "roles": [], "groups": []}
 ]

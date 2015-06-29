@@ -15,8 +15,13 @@ from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.badge import IHasBadgesPool
+from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.resources.badge import add_badges_service
+from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.principal import IUser
 from adhocracy_core.catalog import ICatalogsService
 
 
@@ -127,7 +132,7 @@ def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     migrate_new_sheet(root, IPoolWithAssets, ITitle)
 
 
-def add_kiezkassen_permissions(root):
+def add_kiezkassen_permissions(root):  # pragma: no cover
     """(disabled) Add permission to use the kiezkassen process."""
 
 
@@ -150,8 +155,22 @@ def upgrade_catalogs(root):  # pragma: no cover
     root.move('old_system_catalog', catalogs, 'system')
     root.move('old_adhocracy_catalog', catalogs, 'adhocracy')
 
-    catalogs.reindex_all(catalogs['system'])
-    catalogs.reindex_all(catalogs['adhocracy'])
+
+@log_migration
+def make_users_badgeable(root):  # pragma: no cover
+    """Add badge services and make user badgeable."""
+    registry = get_current_registry(root)
+    principals = find_service(root, 'principals')
+    if not IHasBadgesPool.providedBy(principals):
+        logger.info('Add badges service to {0}'.format(principals))
+        add_badges_service(principals, registry, {})
+        alsoProvides(principals, IHasBadgesPool)
+    users = find_service(root, 'principals', 'users')
+    assignments = find_service(users, 'badge_assignments')
+    if assignments is None:
+        logger.info('Add badge assignments service to {0}'.format(users))
+        add_badge_assignments_service(users, registry, {})
+    migrate_new_sheet(root, IUser, IBadgeable)
 
 
 def includeme(config):  # pragma: no cover
@@ -161,3 +180,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(upgrade_catalogs)
     config.add_evolution_step(evolve1_add_title_sheet_to_pools)
     config.add_evolution_step(add_kiezkassen_permissions)
+    config.add_evolution_step(make_users_badgeable)

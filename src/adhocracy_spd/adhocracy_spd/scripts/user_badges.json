@@ -1,0 +1,13 @@
+[
+    {"path": "/principals/badges",
+    "creator": "/principals/users/0000000",
+     "content_type": "adhocracy_core.resources.badge.IBadge",
+     "data": {"adhocracy_core.sheets.name.IName":
+                {"name": "bob_Badge"},
+                "adhocracy_core.sheets.title.ITitle":
+                {"title" : "Bobs Badge"},
+                "adhocracy_core.sheets.description.IDescription" :
+                {"description" : "This is a user badge for bob"}
+             }
+    }
+]

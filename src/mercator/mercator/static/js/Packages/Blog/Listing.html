@@ -1,0 +1,18 @@
+<div class="blog">
+    <adh-listing
+        data-path="{{path}}"
+        data-content-type="{{contentType}}"
+        data-empty-text="{{ 'TR__BLOG_EMPTY_TEXT' | translate }}">
+        <div data-ng-switch="transclusionId">
+            <adh-blog-post-create
+                data-ng-switch-when="create-form-id"
+                data-on-submit="update"
+                data-path="{{poolPath}}">
+            </adh-blog-post-create>
+            <adh-blog-post
+                data-ng-switch-when="element-id"
+                data-path="{{element}}">
+            </adh-blog-post>
+        </div>
+    </adh-listing>
+</div>

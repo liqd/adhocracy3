@@ -8,7 +8,6 @@ from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Text
-from adhocracy_core.schema import SingleLine
 
 
 class IDocument(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -39,11 +38,9 @@ class DocumentSchema(colander.MappingSchema):
 
     """Document sheet data structure.
 
-    `title`: one line title
     `elements`: structural subelements like sections
     """
 
-    title = SingleLine()
     elements = UniqueReferences(reftype=DocumentElementsReference)
 
 

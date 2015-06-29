@@ -156,3 +156,44 @@ TODO add validators for subject (assignable?)
 TODO add options to make badges from one group exclusive
 
 
+User Badges
+~~~~~~~~~~~~
+
+Badges can be assigned to users the same way as process content.
+The principals pool gives us the badges pool::
+
+    >>> resp = initiator.get('/principals').json
+    >>> badges_pool = resp['data']['adhocracy_core.sheets.badge.IHasBadgesPool']['badges_pool']
+
+There the admin can create badges::
+
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadge',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'userbadge'},
+    ...                  },
+    ...         }
+    >>> resp = admin.post(badges_pool, prop).json
+    >>> badge = resp['path']
+
+The user gives us the badge assignment post pool::
+
+    >>> user_with_badge = initiator.header['X-User-Path']
+    >>> resp = initiator.get(user_with_badge).json
+    >>> post_pool = resp['data']['adhocracy_core.sheets.badge.IBadgeable']['post_pool']
+
+
+to create badge assignments::
+
+    >>> user = admin.header['X-User-Path']
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
+    ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
+    ...                      {'subject': user,
+    ...                       'badge': badge,
+    ...                       'object': user_with_badge}
+    ...          }}
+    >>> resp = admin.post(post_pool, prop).json
+
+Now the badged content shows the back reference targeting the badge assignment::
+
+    >>> resp = participant.get(user_with_badge).json
+    >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
+    [.../users/badge_assignments/0000000/']

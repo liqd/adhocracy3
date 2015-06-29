@@ -10,6 +10,12 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhCredentials = require("./Credentials");
 import AdhUser = require("./User");
 
+import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
+import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
+import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
+import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
+import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
@@ -221,13 +227,14 @@ export var passwordResetDirective = (
             scope.showError = adhShowError;
             scope.success = false;
             scope.siteName = adhConfig.site_name;
+            scope.embedOnly = (adhConfig.custom["embed_only"].toLowerCase() === "true");
 
             scope.input = {
                 password: "",
                 passwordRepeat: ""
             };
 
-            scope.cancel = () => {
+            scope.goBack = scope.cancel = () => {
                  adhTopLevelState.redirectToCameFrom("/");
             };
 
@@ -324,6 +331,29 @@ export var indicatorDirective = (
     };
 };
 
+export class BadgeAssignment {
+    constructor(
+        private title : string,
+        private description : string,
+        private name : string
+    ) {}
+}
+
+var getBadges = (
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (user : RIUser) : angular.IPromise<BadgeAssignment[]> => {
+    return $q.all(_.map(user.data[SIBadgeable.nick].assignments, (assignmentPath : string) => {
+        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
+            var description = assignment.data[SIDescription.nick].description;
+            return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
+                var title = badge.data[SITitle.nick].title;
+                var name = badge.data[SIName.nick].name;
+                return new BadgeAssignment(title, description, name);
+            });
+        });
+    }));
+};
 
 export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : AdhResourceArea.Service) => {
     return {
@@ -333,12 +363,16 @@ export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : Ad
             path: "@",
             name: "@?"
         },
-        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service<any>, $translate, $scope) => {
+        controller: ["adhHttp", "$translate", "$q", "$scope",
+                     (adhHttp : AdhHttp.Service<any>, $translate, $q : angular.IQService, $scope) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
                         $scope.noLink = !adhResourceArea.has(RIUser.content_type);
+                        getBadges(adhHttp, $q)(res).then((assignments) => {
+                            $scope.assignments = assignments;
+                        });
                     });
             } else {
                 $translate("TR__GUEST").then((translated) => {
@@ -352,12 +386,12 @@ export var metaDirective = (adhConfig : AdhConfig.IService, adhResourceArea : Ad
     };
 };
 
-
 export var userListDirective = (adhCredentials : AdhCredentials.Service, adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/UserList.html",
         link: (scope) => {
+            scope.contentType = RIUser.content_type;
             scope.credentials = adhCredentials;
             scope.initialLimit = 50;
             scope.frontendOrderPredicate = (id) => id;
@@ -375,12 +409,15 @@ export var userListItemDirective = (adhConfig : AdhConfig.IService) => {
             path: "@",
             me: "=?"
         },
-        controller: ["adhHttp", "$scope", "adhTopLevelState", (adhHttp : AdhHttp.Service<any>, $scope,
-            adhTopLevelState : AdhTopLevelState.Service) => {
+        controller: ["adhHttp", "$scope", "$q", "adhTopLevelState", (adhHttp : AdhHttp.Service<any>, $scope,
+             $q : angular.IQService, adhTopLevelState : AdhTopLevelState.Service) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
                         $scope.userBasic = res.data[SIUserBasic.nick];
+                        getBadges(adhHttp, $q)(res).then((assignments) => {
+                            $scope.assignments = assignments;
+                        });
                     });
             }
             $scope.$on("$destroy", adhTopLevelState.on("userUrl", (userUrl) => {
@@ -403,7 +440,8 @@ export var userProfileDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhUser : AdhUser.Service
+    adhUser : AdhUser.Service,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
@@ -430,6 +468,9 @@ export var userProfileDirective = (
                 adhHttp.resolve(scope.path)
                     .then((res) => {
                         scope.userBasic = res.data[SIUserBasic.nick];
+                        getBadges(adhHttp, $q)(res).then((assignments) => {
+                            scope.assignments = assignments;
+                        });
                     });
             }
         }
@@ -576,7 +617,7 @@ export var register = (angular) => {
         .directive("adhListUsers", ["adhCredentials", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", [
-            "adhConfig", "adhCredentials", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", userProfileDirective])
+            "adhConfig", "adhCredentials", "adhHttp", "adhPermissions", "adhTopLevelState", "adhUser", "$q", userProfileDirective])
         .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
         .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", passwordResetDirective])
         .directive("adhCreatePasswordReset", [

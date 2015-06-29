@@ -1,15 +1,10 @@
-/* tslint:disable:variable-name */
-/// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
-
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
-import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhRate = require("../Rate/Rate");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhSticky = require("../Sticky/Sticky");
@@ -23,8 +18,10 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/Document";
@@ -62,7 +59,7 @@ export interface IFormScope extends IScope {
 }
 
 
-var bindPath = (
+export var bindPath = (
     $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>
 ) => (
@@ -90,10 +87,11 @@ var bindPath = (
                     scope.paragraphVersions = paragraphVersions;
 
                     scope.data = {
-                        title: documentVersion.data[SIDocument.nick].title,
+                        title: documentVersion.data[SITitle.nick].title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
-                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount"))
+                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        picture: documentVersion.data[SIImageReference.nick].picture
                     };
                 });
             });
@@ -101,7 +99,7 @@ var bindPath = (
     });
 };
 
-var postCreate = (
+export var postCreate = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
@@ -140,16 +138,18 @@ var postCreate = (
         follows: [doc.first_version_path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        title: scope.data.title,
         description: "",
         elements: <string[]>_.map(paragraphVersions, "path")
+    });
+    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
     });
 
     return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[1]);
 };
 
-var postEdit = (
+export var postEdit = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
@@ -214,10 +214,14 @@ var postEdit = (
         follows: [oldVersion.path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        title: scope.data.title,
         description: "",
         elements: paragraphRefs
     });
+    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
+    });
+    // FIXME: workaround for a backend bug
+    documentVersion.data[SIImageReference.nick] = oldVersion.data[SIImageReference.nick];
 
     return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[0]);
@@ -227,10 +231,7 @@ var postEdit = (
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>,
-    adhPermissions : AdhPermissions.Service,
-    adhRate : AdhRate.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -386,6 +387,7 @@ export var editDirective = (
     };
 };
 
+
 export var moduleName = "adhDocument";
 
 export var register = (angular) => {
@@ -409,8 +411,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("document-edit");
             adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhDocumentDetail", [
-            "$q", "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", detailDirective])
+        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", detailDirective])
         .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",
