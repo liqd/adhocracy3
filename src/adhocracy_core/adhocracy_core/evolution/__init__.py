@@ -9,6 +9,7 @@ from zope.interface import noLongerProvides
 from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
 from substanced.util import find_service
+from substanced.interfaces import IFolder
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
@@ -125,6 +126,13 @@ def _migrate_field_values(registry: Registry, resource: IResource,
     sheet.set(appstruct)
 
 
+def _get_autonaming_prefixes(registry: Registry) -> [str]:
+    """Return all autonaming_prefixes defined in the resources metadata."""
+    meta = registry.content.resources_meta.values()
+    prefixes = [m.autonaming_prefix for m in meta if m.use_autonaming]
+    return list(set(prefixes))
+
+
 @log_migration
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
@@ -173,6 +181,22 @@ def make_users_badgeable(root):  # pragma: no cover
     migrate_new_sheet(root, IUser, IBadgeable)
 
 
+@log_migration
+def change_pools_autonaming_scheme(root):  # pragma: no cover
+    """Change pool autonaming scheme."""
+    registry = get_current_registry(root)
+    prefixes = _get_autonaming_prefixes(registry)
+    catalogs = find_service(root, 'catalogs')
+    pools = _search_for_interfaces(catalogs, (IPool, IFolder))
+    count = len(pools)
+    for index, pool in enumerate(pools):
+        logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count, pool))
+        if hasattr(pool, '_autoname_last'):
+            pool._autoname_lasts = {prefix: pool._autoname_last
+                                    for prefix in prefixes}
+            del pool._autoname_last
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -181,3 +205,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(evolve1_add_title_sheet_to_pools)
     config.add_evolution_step(add_kiezkassen_permissions)
     config.add_evolution_step(make_users_badgeable)
+    config.add_evolution_step(change_pools_autonaming_scheme)
