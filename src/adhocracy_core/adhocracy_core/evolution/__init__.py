@@ -180,8 +180,8 @@ def hide_password_resets(root):  # pragma: no cover
     from adhocracy_core.resources.principal import deny_view_permission
     registry = get_current_registry(root)
     resets = find_service(root, 'principals', 'resets')
-    not_hidden = getattr(resets, 'hidden', False)
-    if not_hidden:
+    hidden = getattr(resets, 'hidden', False)
+    if not hidden:
         logger.info('Deny view permission for {0}'.format(resets))
         deny_view_permission(resets, registry, {})
 
