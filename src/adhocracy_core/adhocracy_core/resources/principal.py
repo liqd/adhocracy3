@@ -255,7 +255,6 @@ passwordresets_meta = service_meta._replace(
     content_name='resets',
     element_types=[IPasswordReset],
     permission_create='create_service',
-    permission_view='manage_password_reset',
     after_creation=(hide, deny_view_permission),
 )
 
