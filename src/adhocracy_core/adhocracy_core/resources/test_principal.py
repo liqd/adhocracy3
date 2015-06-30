@@ -212,7 +212,6 @@ class TestPasswordResets:
         from . import principal
         assert meta.iresource is principal.IPasswordResetsService
         assert meta.permission_create == 'create_service'
-        assert meta.permission_view == "manage_password_reset"
         assert meta.content_name == 'resets'
 
 
@@ -234,7 +233,6 @@ class TestPasswordReset:
         import adhocracy_core.sheets
         assert meta.iresource is principal.IPasswordReset
         assert meta.permission_create == 'create_password_reset'
-        assert meta.permission_view == 'manage_password_reset'
         assert meta.use_autonaming_random
         assert meta.basic_sheets == [adhocracy_core.sheets.metadata.IMetadata]
 
