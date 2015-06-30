@@ -239,7 +239,6 @@ passwordreset_meta = resource_meta._replace(
     iresource=IPasswordReset,
     content_class=PasswordReset,
     permission_create='create_password_reset',
-    permission_view='manage_password_reset',
     basic_sheets=[adhocracy_core.sheets.metadata.IMetadata],
     use_autonaming_random=True,
     after_creation=(hide,),

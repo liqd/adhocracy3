@@ -234,7 +234,8 @@ class Messenger:
                         mapping=mapping,
                         default='Invitation to join ${site_name}')
         else:
-            subject = render(subject_tmpl, mapping)
+            # remove potential newline, as it causes invalid headers
+            subject = render(subject_tmpl, mapping).rstrip()
         if body_tmpl is None:
             body = _('mail_invitation_body_txt',
                      mapping=mapping,
