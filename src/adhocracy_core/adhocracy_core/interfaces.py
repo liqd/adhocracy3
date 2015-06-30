@@ -162,7 +162,6 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                                    'iresource',
                                    'content_class',
                                    'permission_create',
-                                   'permission_view',
                                    'permission_edit',
                                    'is_implicit_addable',
                                    'basic_sheets',
@@ -190,9 +189,6 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
         Class to create content objects
     permission_create:
         Permission to create and add this resource to the object hierarchy.
-    permission_view:
-        Permission to view resource sheet data (some sheets may have additional
-        permissions)
     permission_edit:
         Permission to edit resource sheet data (some sheets may have additional
         permissions)
