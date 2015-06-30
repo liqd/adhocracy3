@@ -43,7 +43,7 @@ class TestImportUsers:
         bob = locator.get_user_by_login('Bob')
         assert bob.active
 
-    def test_update(self, context, registry):
+    def test_update_same_name(self, context, registry):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -59,7 +59,7 @@ class TestImportUsers:
         old_password = alice.password
         with open(filename, 'w') as f:
             f.write(json.dumps([
-                {'name': 'Alice', 'email': 'alice@example.org',
+                {'name': 'Alice', 'email': 'alice.new@example.org',
                  'initial-password': 'newpassword', 'roles': ['reader'],
                  'groups': ['gods']}]))
 
@@ -68,6 +68,7 @@ class TestImportUsers:
         alice = locator.get_user_by_login('Alice')
         new_password = alice.password
         assert alice.roles == ['reader']
+        assert alice.email == 'alice.new@example.org'
         assert new_password == old_password
 
     def test_create_and_send_password_reset_mail(self, context, registry,
