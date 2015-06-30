@@ -10,6 +10,7 @@ from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import implementer
 
+from adhocracy_core.authorization import set_acl
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IResource
@@ -200,6 +201,19 @@ groups_meta = service_meta._replace(
 )
 
 
+def deny_view_permission(context: IResource, registry: Registry,
+                         options: dict):
+    """Remove view permission for everyone for `context`."""
+    acl = [('deny', 'system.Everyone', 'view')]
+    set_acl(context, acl, registry=registry)
+
+
+def hide(context: IResource, registry: Registry, options: dict):
+    """Hide `context`."""
+    metadata = get_sheet(context, IMetadata)
+    metadata.set({'hidden': True})
+
+
 class IPasswordReset(IResource):
 
     """ Resource to do one user password reset. """
@@ -227,6 +241,7 @@ passwordreset_meta = resource_meta._replace(
     permission_create='create_password_reset',
     basic_sheets=[adhocracy_core.sheets.metadata.IMetadata],
     use_autonaming_random=True,
+    after_creation=(hide,),
 )
 
 
@@ -240,6 +255,8 @@ passwordresets_meta = service_meta._replace(
     content_name='resets',
     element_types=[IPasswordReset],
     permission_create='create_service',
+    permission_view='manage_password_reset',
+    after_creation=(hide, deny_view_permission),
 )
 
 

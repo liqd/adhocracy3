@@ -214,11 +214,24 @@ class TestPasswordResets:
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'resets'
 
-
     @mark.usefixtures('integration')
-    def test_create_and_add_group(self, meta, registry):
+    def test_create(self, meta, registry):
         resource = registry.content.create(meta.iresource.__identifier__)
         assert meta.iresource.providedBy(resource)
+
+    @mark.usefixtures('integration')
+    def test_remove_view_permission(self, meta, registry):
+        from adhocracy_core.authorization import get_acl
+        resource = registry.content.create(meta.iresource.__identifier__)
+        acl = get_acl(resource)
+        assert acl == [('deny', 'system.Everyone', 'view')]
+
+    @mark.usefixtures('integration')
+    def test_hide(self, meta, registry):
+        """Even if view permission is not checked, we don't want to expose
+        password resets to the client. So in addition we hide them."""
+        resource = registry.content.create(meta.iresource.__identifier__)
+        assert resource.hidden
 
 
 class TestPasswordReset:
@@ -281,6 +294,13 @@ class TestPasswordReset:
                                         creator=user)
         reset.reset_password('new_password')
         assert user.active
+
+    @mark.usefixtures('integration')
+    def test_hide(self, meta, registry):
+        """Even if view permission is not checked, we don't want to expose
+        password resets to the client. So in addition we hide them."""
+        resource = registry.content.create(meta.iresource.__identifier__)
+        assert resource.hidden
 
 
 class TestUserLocatorAdapter:
