@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-06-23 15:11+0200\n"
+"POT-Creation-Date: 2015-06-27 14:35+0200\n"
 "PO-Revision-Date: 2015-05-26 21:25+0200\n"
 "Last-Translator: Joscha <joka@jokasis.de>\n"
 "Language-Team: English\n"
@@ -16,17 +16,17 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Default: [${site_name} Abuse Complaint
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:114
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:116
 msgid "mail_abuse_complaint_subject"
 msgstr "mail_abuse_complaint_subject"
 
 #. Default: [${site_name}] Message from ${sender_name}: ${title}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:144
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:146
 msgid "mail_sent_message_to_user_subject"
 msgstr "mail_sent_message_to_user_subject"
 
 #. Default: ${text}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:148
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:150
 msgid "mail_sent_message_to_user_body_txt"
 msgstr ""
 "(Deutsche Version weiter unten)\n"
@@ -55,12 +55,12 @@ msgstr ""
 
 #. Default: ${site_name}: Account Verification / Aktivierung Deines
 #. Nutzerkontos
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:172
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:179
 msgid "mail_account_verification_subject"
 msgstr "mail_account_verification_subject"
 
 #. Default: ${activation_path}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:176
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:183
 msgid "mail_account_verification_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -68,7 +68,7 @@ msgstr ""
 "Für die deutsche Version, siehe unten.\n"
 "\n"
 "\n"
-"Dear ${name},\n"
+"Dear ${user_name},\n"
 "\n"
 "Thank you for registering on ${site_name}.\n"
 "\n"
@@ -84,7 +84,7 @@ msgstr ""
 "\n"
 "----------------------------------------------------------\n"
 "\n"
-"Hallo ${name},\n"
+"Hallo ${user_name},\n"
 "\n"
 "vielen Dank für Deine Registrierung auf ${site_name}.\n"
 "\n"
@@ -98,12 +98,12 @@ msgstr ""
 "Dein \"${site_name}\"-Team"
 
 #. Default: ${site_name}: Reset Password / Password neu setzen
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:197
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:199
 msgid "mail_reset_password_subject"
 msgstr "mail_reset_password_subject"
 
 #. Default: ${reset_url}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:201
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:203
 msgid "mail_reset_password_body_txt"
 msgstr ""
 "Automatically generated Email. / Automatisch generierte E-Mail.\n"
@@ -111,7 +111,7 @@ msgstr ""
 "Für die deutsche Version, siehe unten.\n"
 "\n"
 "\n"
-"Dear ${name},\n"
+"Dear ${user_name},\n"
 "\n"
 "please use the link below to reset your password.\n"
 "\n"
@@ -121,7 +121,7 @@ msgstr ""
 "\n"
 "----------------------------------------------------------\n"
 "\n"
-"Hallo ${name},\n"
+"Hallo ${user_name},\n"
 "\n"
 "nutze den folgenden Link um Dein Passwort neu zu setzen.\n"
 "\n"
@@ -129,14 +129,14 @@ msgstr ""
 "\n"
 "Dein \"${site_name}\"-Team"
 
-#. Default: ${site_name}: Reset Password / Password neu setzen
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:218
+#. Default: Invitation to join ${site_name}
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:232
 #, fuzzy
 msgid "mail_invitation_subject"
 msgstr "mail_account_verification_subject"
 
-#. Default: ${reset_url}
-#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:222
+#. Default: Please click ${reset_url} to join and reset your password.
+#: src/adhocracy_core/adhocracy_core/messaging/__init__.py:238
 #, fuzzy
 msgid "mail_invitation_body_txt"
 msgstr ""
@@ -145,7 +145,7 @@ msgstr ""
 "Für die deutsche Version, siehe unten.\n"
 "\n"
 "\n"
-"Dear ${name},\n"
+"Dear ${user_name},\n"
 "\n"
 "Thank you for registering on ${site_name}.\n"
 "\n"
@@ -161,7 +161,7 @@ msgstr ""
 "\n"
 "----------------------------------------------------------\n"
 "\n"
-"Hallo ${name},\n"
+"Hallo ${user_name},\n"
 "\n"
 "vielen Dank für Deine Registrierung auf ${site_name}.\n"
 "\n"
