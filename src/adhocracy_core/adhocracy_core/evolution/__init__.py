@@ -173,6 +173,22 @@ def make_users_badgeable(root):  # pragma: no cover
     migrate_new_sheet(root, IUser, IBadgeable)
 
 
+@log_migration
+def hide_password_resets(root):  # pragma: no cover
+    """Add hide all password reset objects."""
+    from adhocracy_core.resources.principal import hide
+    from adhocracy_core.resources.principal import deny_view_permission
+    registry = get_current_registry(root)
+    resets = find_service(root, 'principals', 'resets')
+    hidden = getattr(resets, 'hidden', False)
+    if not hidden:
+        logger.info('Deny view permission for {0}'.format(resets))
+        deny_view_permission(resets, registry, {})
+
+        logger.info('Hide {0}'.format(resets))
+        hide(resets, registry, {})
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -181,3 +197,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(evolve1_add_title_sheet_to_pools)
     config.add_evolution_step(add_kiezkassen_permissions)
     config.add_evolution_step(make_users_badgeable)
+    config.add_evolution_step(hide_password_resets)
