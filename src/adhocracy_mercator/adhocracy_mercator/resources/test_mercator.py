@@ -33,7 +33,7 @@ class TestMercatorProposal:
         assert add_ratesservice in meta.after_creation
         assert add_commentsservice in meta.after_creation
         assert add_logbook_service in meta.after_creation
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'create_mercator_proposal'
 
     @mark.usefixtures('integration')
     def test_create(self, pool, meta, registry):
@@ -60,7 +60,7 @@ class TestProposalVersion:
         from adhocracy_core.sheets.logbook import IHasLogbookPool
         from adhocracy_mercator.resources import mercator
         assert meta.iresource == mercator.IMercatorProposalVersion
-        assert meta.permission_create == 'edit_proposal'
+        assert meta.permission_create == 'edit_mercator_proposal'
         assert IHasLogbookPool in meta.extended_sheets
 
     @mark.usefixtures('integration')
