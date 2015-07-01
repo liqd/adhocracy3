@@ -51,7 +51,7 @@ def _import_users(context: IResource, registry: Registry, filename: str):
     users = find_service(context, 'principals', 'users')
     groups = find_service(context, 'principals', 'groups')
     for user_info in users_info:
-        (user_by_name, user_by_email) = _locate_user(user_info, context, registry)
+        user_by_name, user_by_email = _locate_user(user_info, context, registry)
         if user_by_name or user_by_email:
             print('Updating user {} ({})'.format(user_info['name'], user_info['email']))
             _update_user(user_by_name, user_by_email, user_info, groups)
