@@ -213,11 +213,10 @@ class TestResourceContentRegistry:
         effective_principals = ['authenticated']
         mock_authpolicy.effective_principals.return_value = effective_principals
         mock_authpolicy.permits.return_value = True
-        result = inst.get_resources_meta_addable(item, request_)
+        assert inst.get_resources_meta_addable(item, request_) == [version_meta]
         mock_authpolicy.permits.assert_called_once_with(item,
                                                         effective_principals,
                                                         'create_xyz')
-        assert result == [version_meta]
 
     def test_get_resources_meta_addable_only_first_version_exists_no_permission(
             self, inst, item, config, request_, resource_meta, mock_authpolicy):
@@ -234,11 +233,10 @@ class TestResourceContentRegistry:
         effective_principals = ['authenticated']
         mock_authpolicy.effective_principals.return_value = effective_principals
         mock_authpolicy.permits.return_value = False
-        result = inst.get_resources_meta_addable(item, request_)
+        assert inst.get_resources_meta_addable(item, request_) == []
         mock_authpolicy.permits.assert_called_once_with(item,
                                                         effective_principals,
                                                         'create_xyz')
-        assert result == []
 
     def test_permissions_resource_permission_create_defined(
             self, inst, resource_meta, mock_registry):
