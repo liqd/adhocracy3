@@ -4,6 +4,7 @@ from substanced.util import find_service
 from substanced.interfaces import IFolder
 from zope.interface import implementer
 from zope.deprecation import deprecated
+from persistent.mapping import PersistentMapping
 
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.pool
@@ -40,29 +41,28 @@ class Pool(Base, Folder):
     # work
 
     _autoname_length = 7
-    _autoname_last = -1
 
     def __init__(self, data=None, family=None):
         """Counter that should increment if descendants are changed."""
         Folder.__init__(self, data=data, family=family)
         Base.__init__(self)
         self.__changed_descendants_counter__ = Length()
+        self._autoname_lasts = PersistentMapping()
 
     def next_name(self, subobject, prefix='') -> str:
         """Generate name to add subobject to the folder.
 
         This method does:
 
-            - increment the last generated name
+            - increment the last generated name associated to the prefix.
             - zero-filling the left hand side of the result with 7 zeros.
             - add prefix to the left hand side if any
 
         If the generated Name exists add timestamp to the right side.
 
         """
-        intifiable = self._autoname_last + 1
-        name = prefix + self._zfill(intifiable)
-        self._autoname_last = intifiable
+        number = self._get_next_number(prefix)
+        name = prefix + self._zfill(number)
         if name in self.data:
             timestamp = now().isoformat()
             name += '_' + timestamp
@@ -79,6 +79,15 @@ class Pool(Base, Folder):
 
     def _zfill(self, name):
         return str(int(name)).zfill(self._autoname_length)
+
+    def _get_next_number(self, prefix):
+        if prefix in self._autoname_lasts:
+            number = self._autoname_lasts[prefix]
+        else:
+            number = 0
+            self._autoname_lasts[prefix] = number
+        self._autoname_lasts[prefix] += 1
+        return number
 
     def find_service(self, service_name, *sub_service_names):
         """Return  the :term:`service` for the given context."""
