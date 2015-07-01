@@ -41,6 +41,8 @@ mercator_meta = {
                            'permissions':
                               [['create_mercator_proposal',             None,          None,        None,      'Allow'],  # noqa
                                ['edit_mercator_proposal',               None,          None,        None,      'Allow'],  # noqa
+                               ['create_proposal',                      None,          None,       'Allow',    'Allow'],  # noqa
+                               ['edit_proposal',                        None,          None,       'Allow',    'Allow'],  # noqa
                                ]},
                    },
     },

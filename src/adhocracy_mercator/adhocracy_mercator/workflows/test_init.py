@@ -63,11 +63,27 @@ def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
     resp = app_user.post_resource(path, iresource, sheets_cstruct)
     return resp
 
+
 def _post_proposal_version(app_user, path='/') -> TestResponse:
     from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
     iresource = IMercatorProposalVersion
     resp = app_user.post_resource(path, iresource, {})
     return resp
+
+
+def _post_document_item(app_user, path='/',  name='') -> TestResponse:
+    from adhocracy_core.resources.document import IDocument
+    from adhocracy_core.sheets.name import IName
+    sheets_cstruct = {IName.__identifier__: {'name': name}}
+    resp = app_user.post_resource(path, IDocument, sheets_cstruct)
+    return resp
+
+
+def _post_document_version(app_user, path='/') -> TestResponse:
+    from adhocracy_core.resources.document import IDocumentVersion
+    resp = app_user.post_resource(path, IDocumentVersion, {})
+    return resp
+
 
 def _batch_post_full_sample_proposal(app_user) -> TestResponse:
     subrequests = _create_proposal()
@@ -162,4 +178,16 @@ class TestMercatorWorkflow:
     def test_result_participant_cannot_edit_proposal(self, app_participant):
         postable_types =  app_participant.get_postable_types('/proposal1')
         assert postable_types == []
+
+    def test_result_participant_can_create_logbook_documents(self,
+                                                             app_participant):
+        resp = _post_document_item(app_participant, path='/proposal1/logbook', name='document1')
+        resp = _post_document_version(app_participant, path='/proposal1/logbook/document1')
+        assert resp.status_code == 200
+
+    def test_result_participate_cannot_edit_other_users_logbook(self,
+                                                                app_participant):
+        postable_types = app_participant.get_postable_types('/proposal_other')
+        assert postable_types == []
+
 

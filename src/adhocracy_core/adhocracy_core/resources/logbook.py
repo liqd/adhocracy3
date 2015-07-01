@@ -22,8 +22,10 @@ logbook_service_meta = service_meta._replace(
 
 def add_logbook_service(context: IPool, registry: Registry, options: dict):
     """Add `logbook` service to context."""
+    creator = options.get('creator')
     registry.content.create(ILogbookService.__identifier__,
-                            parent=context)
+                            parent=context,
+                            creator=creator)
 
 
 def includeme(config):
