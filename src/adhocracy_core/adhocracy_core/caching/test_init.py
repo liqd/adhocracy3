@@ -471,7 +471,7 @@ class TestPurgeVarnishAfterCommitHook:
         purge_varnish_after_commit_hook(True, registry_for_varnish, request_)
         mock_requests.request.assert_called_once_with(
             'PURGE', 'http://localhost/', headers={'X-Purge-Host': 'host',
-                                                   'X-Purge-Regex': '/?$'})
+                                                   'X-Purge-Regex': '/?\??.*$'})
 
     def test_change_descendants_in_changelog(
             self, monkeypatch, registry_for_varnish, changelog_meta, context,
@@ -483,7 +483,7 @@ class TestPurgeVarnishAfterCommitHook:
                                            changed_descendants=True)
         purge_varnish_after_commit_hook(True, registry_for_varnish, request_)
         assert mock_requests.request.call_args[1]['headers']['X-Purge-Regex']\
-            == '/?\?.*$'
+            == '/?\??.*$'
 
     def test_non_empty_changelog_but_unchanged_resource(
             self, monkeypatch, registry_for_varnish, changelog_meta, context,

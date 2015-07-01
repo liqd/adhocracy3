@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-06-23 15:11+0200\n"
+"POT-Creation-Date: 2015-06-27 14:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,47 +17,47 @@ msgstr ""
 "Generated-By: Lingua 3.10\n"
 
 #. Default: [${site_name} Abuse Complaint
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:114
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:116
 msgid "mail_abuse_complaint_subject"
 msgstr ""
 
 #. Default: [${site_name}] Message from ${sender_name}: ${title}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:144
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:146
 msgid "mail_sent_message_to_user_subject"
 msgstr ""
 
 #. Default: ${text}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:148
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:150
 msgid "mail_sent_message_to_user_body_txt"
 msgstr ""
 
 #. Default: ${site_name}: Account Verification / Aktivierung Deines
 #. Nutzerkontos
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:172
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:179
 msgid "mail_account_verification_subject"
 msgstr ""
 
 #. Default: ${activation_path}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:176
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:183
 msgid "mail_account_verification_body_txt"
 msgstr ""
 
 #. Default: ${site_name}: Reset Password / Password neu setzen
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:197
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:199
 msgid "mail_reset_password_subject"
 msgstr ""
 
 #. Default: ${reset_url}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:201
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:203
 msgid "mail_reset_password_body_txt"
 msgstr ""
 
-#. Default: ${site_name}: Reset Password / Password neu setzen
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:218
+#. Default: Invitation to join ${site_name}
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:232
 msgid "mail_invitation_subject"
 msgstr ""
 
-#. Default: ${reset_url}
-#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:222
+#. Default: Please click ${reset_url} to join and reset your password.
+#: ././src/adhocracy_core/adhocracy_core/messaging/__init__.py:238
 msgid "mail_invitation_body_txt"
 msgstr ""

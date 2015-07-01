@@ -212,14 +212,26 @@ class TestPasswordResets:
         from . import principal
         assert meta.iresource is principal.IPasswordResetsService
         assert meta.permission_create == 'create_service'
-        assert meta.permission_view == "manage_password_reset"
         assert meta.content_name == 'resets'
 
-
     @mark.usefixtures('integration')
-    def test_create_and_add_group(self, meta, registry):
+    def test_create(self, meta, registry):
         resource = registry.content.create(meta.iresource.__identifier__)
         assert meta.iresource.providedBy(resource)
+
+    @mark.usefixtures('integration')
+    def test_remove_view_permission(self, meta, registry):
+        from adhocracy_core.authorization import get_acl
+        resource = registry.content.create(meta.iresource.__identifier__)
+        acl = get_acl(resource)
+        assert acl == [('deny', 'system.Everyone', 'view')]
+
+    @mark.usefixtures('integration')
+    def test_hide(self, meta, registry):
+        """Even if view permission is not checked, we don't want to expose
+        password resets to the client. So in addition we hide them."""
+        resource = registry.content.create(meta.iresource.__identifier__)
+        assert resource.hidden
 
 
 class TestPasswordReset:
@@ -234,7 +246,6 @@ class TestPasswordReset:
         import adhocracy_core.sheets
         assert meta.iresource is principal.IPasswordReset
         assert meta.permission_create == 'create_password_reset'
-        assert meta.permission_view == 'manage_password_reset'
         assert meta.use_autonaming_random
         assert meta.basic_sheets == [adhocracy_core.sheets.metadata.IMetadata]
 
@@ -271,6 +282,25 @@ class TestPasswordReset:
                                         creator=user)
         reset.reset_password('new_password')
         assert reset.__parent__ is None
+
+    @mark.usefixtures('integration')
+    def test_activate_after_reset_password(self, registry, principals):
+        from . import principal
+        user = registry.content.create(principal.IUser.__identifier__,
+                                       parent=principals['users'],
+                                       appstructs={})
+        reset = registry.content.create(principal.IPasswordReset.__identifier__,
+                                        parent=principals['resets'],
+                                        creator=user)
+        reset.reset_password('new_password')
+        assert user.active
+
+    @mark.usefixtures('integration')
+    def test_hide(self, meta, registry):
+        """Even if view permission is not checked, we don't want to expose
+        password resets to the client. So in addition we hide them."""
+        resource = registry.content.create(meta.iresource.__identifier__)
+        assert resource.hidden
 
 
 class TestUserLocatorAdapter:

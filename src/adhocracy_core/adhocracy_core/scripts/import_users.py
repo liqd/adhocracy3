@@ -18,6 +18,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadge
+from adhocracy_core.resources.subscriber import _get_default_group
 from adhocracy_core.utils import get_sheet
 from adhocracy_core import sheets
 from adhocracy_core.scripts.assign_badges import create_badge_assignment
@@ -46,7 +47,6 @@ def import_users():  # pragma: no cover
 
 
 def _import_users(context: IResource, registry: Registry, filename: str):
-    registry.settings['adhocracy.skip_registration_mail'] = True
     users_info = _load_users_info(filename)
     users = find_service(context, 'principals', 'users')
     groups = find_service(context, 'principals', 'groups')
@@ -58,11 +58,13 @@ def _import_users(context: IResource, registry: Registry, filename: str):
             _update_user(user, user_info, groups)
         else:
             print('Creating user {}'.format(user_info['name']))
-            user = _create_user(user_info, users, registry, groups)
             send_invitation = user_info.get('send_invitation_mail', False)
+            activate = not send_invitation
+            user = _create_user(user_info, users, registry, groups,
+                                activate=activate)
             if send_invitation:
                 print('Sending invitation mail to user {}'.format(user.name))
-                _send_invitation_mail(user, registry)
+                _send_invitation_mail(user, user_info, registry)
             badge_names = user_info.get('badges', [])
             if badge_names:
                 print('Assign badge for user {}'.format(user.name))
@@ -91,33 +93,44 @@ def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
 
 
 def _create_user(user_info: dict, users: IResource, registry: Registry,
-                 groups: IResource) -> IUser:
+                 groups: IResource, activate=True) -> IUser:
     groups = _get_groups(user_info['groups'], groups)
+    if groups == []:
+        default = _get_default_group(users)
+        groups = [default]
     appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
                  sheets.principal.IUserExtended.__identifier__:
                  {'email': user_info['email']},
                  sheets.principal.IPermissions.__identifier__:
-                 {'roles': user_info['roles'], 'groups': groups},
+                 {'roles': user_info['roles'],
+                  'groups': groups},
                  sheets.principal.IPasswordAuthentication.
                  __identifier__: {'password': user_info['initial-password']},
                  }
     user = registry.content.create(IUser.__identifier__,
                                    users,
                                    appstruct,
-                                   registry=registry)
-    user.activate()
+                                   registry=registry,
+                                   send_event=False)
+    if activate:
+        user.activate()
     return user
 
 
-def _send_invitation_mail(user: IUser, registry: Registry):
+def _send_invitation_mail(user: IUser, user_info: dict, registry: Registry):
     resets = find_service(user, 'principals', 'resets')
     reset = registry.content.create(IPasswordReset.__identifier__,
                                     parent=resets,
                                     creator=user,
                                     send_event=False,
                                     )
-    registry.messenger.send_invitation_mail(user, reset)
+    subject_tmpl = user_info.get('subject_tmpl_invitation_mail', None)
+    body_tmpl = user_info.get('body_tmpl_invitation_mail', None)
+    registry.messenger.send_invitation_mail(user, reset,
+                                            subject_tmpl=subject_tmpl,
+                                            body_tmpl=body_tmpl,
+                                            )
     return user
 
 
