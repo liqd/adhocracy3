@@ -209,15 +209,6 @@ class TestResourceContentRegistry:
         inst.resources_meta[ISimple] = simple_meta
         assert 'create_simple' in inst.permissions
 
-    def test_permissions_resource_permission_view_defined(
-            self, inst, resource_meta, mock_registry):
-        simple_meta = resource_meta._replace(
-            iresource=ISimple,
-            permission_view='view_simple')
-        inst.registry = mock_registry
-        inst.resources_meta[ISimple] = simple_meta
-        assert 'view_simple' in inst.permissions
-
     def test_permissions_sheet_permission_view_defined(
             self, inst, sheet_meta, mock_registry):
         sheet_meta = sheet_meta._replace(permission_view='view_p')

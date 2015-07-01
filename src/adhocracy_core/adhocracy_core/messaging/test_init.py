@@ -248,6 +248,7 @@ class TestSendInvitationMail:
         assert inst.send_mail.call_args[1]['body'].mapping ==\
             {'user_name': 'Anna',
              'site_name': 'sitename',
+             'email': 'anna@example.org',
              'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
         assert inst.send_mail.call_args[1]['request'] == request_
 

@@ -396,6 +396,8 @@ def get_reason_if_blocked(resource: IResource) -> str:
 def list_resource_with_descendants(resource: IResource) -> Iterable:
     """List all descendants of a resource, including the resource itself."""
     system_catalog = find_catalog(resource, 'system')
+    if system_catalog is None:  # ease testing
+        return []
     path_index = system_catalog['path']
     query = path_index.eq(resource_path(resource), include_origin=True)
     return query.execute()
@@ -433,8 +435,8 @@ def extract_events_from_changelog_metadata(meta: ChangelogMetadata) -> list:
 
 def get_visibility_change(event: IResourceSheetModified) -> VisibilityChange:
     """Return changed visbility for `event.object`."""
-    is_deleted = event.new_appstruct['deleted']
-    is_hidden = event.new_appstruct['hidden']
+    is_deleted = event.new_appstruct.get('deleted', False)
+    is_hidden = event.new_appstruct.get('hidden', False)
     was_deleted = event.old_appstruct['deleted']
     was_hidden = event.old_appstruct['hidden']
     was_visible = not (was_hidden or was_deleted)
