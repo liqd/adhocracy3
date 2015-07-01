@@ -112,6 +112,7 @@ class TestMercatorWorkflow:
 
     def test_participate_participant_can_create_proposal(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/', name='proposal1')
+        resp = _post_proposal_version(app_participant, path='/proposal1')
         assert resp.status_code == 200
 
     def test_participate_can_edit_proposal(self, app_participant):
@@ -138,11 +139,27 @@ class TestMercatorWorkflow:
         postable_types = app_participant.get_postable_types('/proposal_other')
         assert postable_types == []
 
+    def test_change_state_to_frozen(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/', 'frozen')
         assert resp.status_code == 200
 
-    def test_god_creator_is_set(self, app_god):
-        """Regression test issue #362"""
-        from adhocracy_core.sheets.metadata import IMetadata
-        resp = app_god.get('/god1')
-        creator = resp.json['data'][IMetadata.__identifier__]['creator']
-        assert '0000000' in creator
+    def test_frozen_participant_cannot_create_proposal_item(self, app_participant):
+        from adhocracy_mercator.resources.mercator import IMercatorProposal
+        assert IMercatorProposal not in app_participant.get_postable_types('/')
+
+    def test_frozen_participant_cannot_edit_proposal(self, app_participant):
+        postable_types =  app_participant.get_postable_types('/proposal1')
+        assert postable_types == []
+
+    def test_change_state_to_result(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/', 'result')
+        assert resp.status_code == 200
+
+    def test_result_participant_cannot_create_proposal_item(self, app_participant):
+        from adhocracy_mercator.resources.mercator import IMercatorProposal
+        assert IMercatorProposal not in app_participant.get_postable_types('/')
+
+    def test_result_participant_cannot_edit_proposal(self, app_participant):
+        postable_types =  app_participant.get_postable_types('/proposal1')
+        assert postable_types == []
+

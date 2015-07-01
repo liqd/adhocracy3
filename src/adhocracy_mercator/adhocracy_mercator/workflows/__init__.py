@@ -37,6 +37,10 @@ mercator_meta = {
                    },
         'result': {'title': 'Result',
                    'description': '',
+                   'permissions':
+                              [['create_proposal',             None,          None,        None,      'Allow'],  # noqa
+                               ['edit_proposal',               None,          None,        None,      'Allow'],  # noqa
+                               ],
                    },
     },
     'transitions': {
