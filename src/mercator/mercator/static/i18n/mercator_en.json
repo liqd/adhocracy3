@@ -66,6 +66,8 @@
     "TR__MERCATOR_PROPOSAL_STEPS_LABEL": "How do you want to get there?",
     "TR__MERCATOR_PROPOSAL_STORY_ANNOTATION": "What is motivating you to act? Tell us about the ‘big dream’ behind your idea. Please also refer to your specific target group. (max. 800 characters)",
     "TR__MERCATOR_PROPOSAL_STORY_LABEL": "What is the story behind your idea?",
+    "TR__MERCATOR_PROPOSAL_TAB_IDEA" : "Idea",
+    "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" : "Journey",
     "TR__MERCATOR_PROPOSAL_TEASER_ANNOTATION": "You have one sentence to make others curious about your idea. How would you describe it? What is your teaser? (max. 300 characters)",
     "TR__MERCATOR_PROPOSAL_TEASER_LABEL": "Teaser or chat phrase",
     "TR__MERCATOR_PROPOSAL_TITLE_ANNOTATION": "Give your idea a meaningful title (max. 100 characters)",
