@@ -87,6 +87,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "duScroll",
         "flow",
         "angular-data.DSCacheFactory",
+        AdhBlog.moduleName,
         AdhComment.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
