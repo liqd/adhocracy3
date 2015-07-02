@@ -31,7 +31,7 @@
         </h1>
     </div><!-- /.cover -->
 
-    <div data-ng-if="data.winnerBadgeAssignment" class="blog-tabs">
+    <div data-ng-if="data.winnerBadgeAssignment && data.currentPhase === 'result'" class="blog-tabs">
         <a
             class="blog-tab"
             data-ng-class="{'is-active': proposalTab !== 'blog'}"
