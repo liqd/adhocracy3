@@ -83,7 +83,6 @@ itemversion_meta = resource_meta._replace(
     iresource=IItemVersion,
     content_class=Base,
     permission_create='create_tag',
-    permission_view='view',
     is_implicit_addable=False,
     basic_sheets=[adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.versions.IVersionable,

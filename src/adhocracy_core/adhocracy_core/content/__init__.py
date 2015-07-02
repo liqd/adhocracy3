@@ -123,8 +123,7 @@ class ResourceContentRegistry(ContentRegistry):
         return {'hide', 'edit_group', 'do_transition'}
 
     def _get_resource_permissions(self, resource_meta):
-        return [p for p in [resource_meta.permission_create,
-                            resource_meta.permission_view]
+        return [p for p in [resource_meta.permission_create]
                 if p != '']
 
     def _get_sheet_permissions(self, sheet_meta, perms):
