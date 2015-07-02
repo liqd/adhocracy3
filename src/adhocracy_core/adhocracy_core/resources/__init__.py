@@ -265,3 +265,4 @@ def includeme(config):
     config.include('.paragraph')
     config.include('.badge')
     config.include('.service')
+    config.include('.logbook')
