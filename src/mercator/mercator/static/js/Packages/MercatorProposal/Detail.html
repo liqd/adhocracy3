@@ -42,7 +42,10 @@
             data-ng-href="{{ path | adhResourceUrl:'blog' }}">{{ "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" | translate }}</a>
     </div>
 
-    <div data-ng-if="proposalTab === 'blog'">FIXME: Blog</div>
+    <div data-ng-if="proposalTab === 'blog'">FIXME: Blog
+        <adh-blog-post-create><adh-blog-post-create>
+        <adh-blog></adh-blog>
+    </div>
 
     <div class="section-jump-body" data-ng-if="proposalTab !== 'blog'">
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
