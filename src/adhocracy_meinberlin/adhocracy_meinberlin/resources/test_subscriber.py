@@ -28,12 +28,10 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         return config.registry
 
     @fixture
-    def context(self, registry, pool_with_catalogs):
+    def process_settings_appstruct(self, registry, pool_with_catalogs):
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.resources.principal import IPrincipalsService
-        from adhocracy_meinberlin import resources
         import adhocracy_core.sheets.principal
-        import adhocracy_meinberlin.sheets.bplan
         context = pool_with_catalogs
         registry.content.create(IPrincipalsService.__identifier__,
                                 parent=context)
@@ -42,19 +40,51 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         office_worker = registry.content.create(IUser.__identifier__,
                                                 appstructs=user_appstructs,
                                                 parent=context['principals']['users'])
+        return {'office_worker': office_worker,
+                'plan_number': '112233',
+                'construction_date': '24/09/2015',
+                'participation_end_date': '11/06/2015'}
+
+
+    @fixture
+    def process_settings_no_office_worker_appstruct(self, registry, pool_with_catalogs):
+        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core.resources.principal import IPrincipalsService
+        import adhocracy_core.sheets.principal
+        context = pool_with_catalogs
+        registry.content.create(IPrincipalsService.__identifier__,
+                                parent=context)
+        user_appstructs = {adhocracy_core.sheets.principal.IUserExtended.__identifier__:
+                           {'email': 'officeworkername@example.org'}}
+        return {'office_worker': None,
+                'plan_number': '112233',
+                'construction_date': '24/09/2015',
+                'participation_end_date': '11/06/2015'}
+
+    def _make_process(self, registry, context, process_settings_appstruct):
+        from adhocracy_meinberlin import resources
+        import adhocracy_meinberlin.sheets.bplan
+        import adhocracy_core.sheets.name
         bplan_appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                             {'name': 'bplan'},
                             adhocracy_core.sheets.title.ITitle.__identifier__:
                             {'title': 'Sample BPlan process'},
                             adhocracy_meinberlin.sheets.bplan.IProcessSettings.__identifier__:
-                            {'office_worker': office_worker,
-                             'plan_number': '112233',
-                             'construction_date': '24/09/2015',
-                             'participation_end_date': '11/06/2015'}}
+                            process_settings_appstruct}
         process = registry.content.create(resources.bplan.IProcess.__identifier__,
                                           parent=context,
                                           appstructs=bplan_appstructs)
         return context
+
+    @fixture
+    def context(self, registry, pool_with_catalogs, process_settings_appstruct):
+        return self._make_process(registry, pool_with_catalogs, process_settings_appstruct)
+
+    @fixture
+    def context_no_office_worker(self, registry, pool_with_catalogs,
+                                 process_settings_no_office_worker_appstruct):
+        return self._make_process(registry, pool_with_catalogs,
+                                  process_settings_no_office_worker_appstruct)
 
     @fixture
     def appstructs(self):
@@ -112,3 +142,12 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         assert '10000, Berlin' in msg_officeworker.body
         assert 'BplanStatement1' in msg_officeworker.body
         assert 'BplanStatement2' in msg_officeworker.body
+
+    def test_do_not_send_email_if_office_work_not_defined(self,
+                                                          registry,
+                                                          context_no_office_worker,
+                                                          messenger,
+                                                          appstructs):
+        registry.messenger = messenger
+        self.make_bplan_proposal(context_no_office_worker, registry, appstructs)
+        assert len(messenger.mailer.outbox) == 0

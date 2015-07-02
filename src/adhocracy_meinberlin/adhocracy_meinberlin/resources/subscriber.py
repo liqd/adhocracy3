@@ -25,8 +25,7 @@ def _send_bplan_submission_confirmation_email_subscriber(event):
         return
     proposal_values = _get_proposal_values(proposal_version)
     process_settings = _get_process_settings(proposal_item)
-    if process_settings['plan_number'] == 0:
-        # ease testing
+    if process_settings['plan_number'] == 0 or process_settings['office_worker'] is None:
         return
     templates_values = _get_templates_values(process_settings, proposal_values)
     subject = 'B-Plan Eingabe Bestätigung'
