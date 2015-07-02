@@ -1,0 +1,20 @@
+<form name="imageUpload" data-ng-submit="submit()" data-ng-if="$flow.support">
+    <span class="label-text">{{ "TR__IMAGE_UPLOAD" | translate }}</span>
+    <div
+        data-flow-init=""
+        data-flow-object="$flow">
+        <span
+            class="button m-call-to-action-secondary"
+            data-flow-btn=""
+            data-flow-attrs="{accept:'image/*'}">
+            <span data-ng-if="$flow.files.length > 0">{{ "TR__IMAGE_CHANGE" | translate }}</span>
+            <span data-ng-if="!$flow.files.length || $flow.files.length === 0">{{ "TR__IMAGE_CHOOSE" | translate }}</span>
+        </span>
+        <div data-ng-repeat="file in $flow.files">
+            <img data-flow-img="file" height="120" alt="{{ 'TR__IMAGE_SELECTED' | translate }}" /><br/>{{file.name}}
+        </div>
+        <div class="form-footer">
+            <input type="submit" />
+        </div>
+    </div>
+</form>

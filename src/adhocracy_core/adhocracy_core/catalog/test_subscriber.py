@@ -34,8 +34,8 @@ def test_reindex_tagged_with_removed_and_added_elements(event, catalog):
 
 
 def test_reindex_rate_index(event, catalog):
-    from .subscriber import reindex_rate
-    reindex_rate(event)
+    from .subscriber import reindex_rates
+    reindex_rates(event)
     catalog.reindex_index.assert_called_with(event.object, 'rates')
 
 
@@ -143,7 +143,7 @@ def test_register_subscriber(registry):
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
     assert subscriber.reindex_tag.__name__ in handlers
     assert subscriber.reindex_visibility.__name__ in handlers
-    assert subscriber.reindex_rate.__name__ in handlers
+    assert subscriber.reindex_rates.__name__ in handlers
     assert subscriber.reindex_badge.__name__ in handlers
 
 

@@ -649,12 +649,6 @@ def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
     """
     context = kw.get('context')
     post_pool = _get_post_pool(context, node.iresource_or_service_name)
-    if post_pool is None:
-        context_path = resource_path(context)
-        post_pool_type = str(node.iresource_or_service_name)
-        msg = 'Cannot find post_pool with interface or service name {}'\
-              ' for context {}.'.format(post_pool_type, context_path)
-        raise RuntimeConfigurationError(msg)
     return post_pool
 
 

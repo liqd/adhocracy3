@@ -4,6 +4,7 @@ import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPermissions = require("../Permissions/Permissions");
+import AdhListing = require("../Listing/Listing");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUtil = require("../Util/Util");
 
@@ -11,6 +12,11 @@ import RIDocument = require("../../Resources_/adhocracy_core/resources/document/
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 
 var pkgLocation = "/Blog";
+
+
+export interface IFormScope extends AdhDocument.IFormScope {
+    onSubmit() : void;
+}
 
 
 export var detailDirective = (
@@ -87,9 +93,10 @@ export var createDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
-            path: "@"
+            path: "@",
+            onSubmit: "=?"
         },
-        link: (scope : AdhDocument.IFormScope, element) => {
+        link: (scope : IFormScope, element) => {
             scope.errors = [];
             scope.data = {
                 title: "",
@@ -103,9 +110,27 @@ export var createDirective = (
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return AdhDocument.postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
-                    // FIXME: update listing
+
+                    if (typeof scope.onSubmit !== "undefined") {
+                        scope.onSubmit();
+                    }
+                }, (errors) => {
+                    scope.errors = errors;
                 });
             };
+        }
+    };
+};
+
+export var listingDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope) => {
+            scope.contentType = RIDocumentVersion.content_type;
         }
     };
 };
@@ -119,11 +144,13 @@ export var register = (angular) => {
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhMarkdown.moduleName,
-            AdhPermissions.moduleName
+            AdhPermissions.moduleName,
+            AdhListing.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
             adhEmbedProvider.embeddableDirectives.push("blog-post-create");
+            adhEmbedProvider.embeddableDirectives.push("blog");
         }])
         .directive("adhBlogPost", [
             "$q",
@@ -135,6 +162,7 @@ export var register = (angular) => {
             "adhShowError",
             "adhSubmitIfValid",
             detailDirective])
+        .directive("adhBlog", ["adhConfig", listingDirective])
         .directive("adhBlogPostCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective]);
 };

@@ -262,7 +262,10 @@ export var submitIfValid = (
                 // FIXME this also happens in resourceWidgets. Should not do any harm though.
                 scope.errors = errors;
 
-                container.scrollTopAnimated(0);
+                if (container.length > 0) {
+                    container.scrollTopAnimated(0);
+                }
+
                 throw errors;
             });
     } else {

@@ -2,10 +2,10 @@
     <header class="mein-berlin-kiezkassen-proposal-detail-header">
         <span
                 data-ng-if="data.assignments.length > 0"
-                class="has-badge"
+                class="badge"
                 data-ng-class="{
-                    'is-realized': data.assignments[0].name === 'going_to_be_realized',
-                    'is-not-realized': data.assignments[0].name === 'not_realizeable'
+                    'm-is-realized': data.assignments[0].name === 'going_to_be_realized',
+                    'm-is-not-realized': data.assignments[0].name === 'not_realizeable'
             }">{{ data.assignments[0].title }}</span>
         <ul class="mein-berlin-kiezkassen-proposal-detail-meta">
             <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-item-location">

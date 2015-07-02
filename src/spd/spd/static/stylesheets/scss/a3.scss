@@ -19,8 +19,10 @@
 @import "general/variables_doc";
 
 @import "layout";
+@import "layout_theme";
 
 @import "components/type";
+@import "components/badges";
 @import "components/forms";
 @import "components/forms_theme";
 @import "components/button";
@@ -45,12 +47,14 @@
 @import "components/space_switch";
 @import "components/user_list";
 @import "components/user_profile";
+@import "components/user_profile_theme";
 @import "components/rate";
 @import "components/facets";
 @import "components/unsupported_browser";
 @import "components/busy";
 @import "components/error_pages";
 @import "components/standalone_wrapper";
+@import "components/standalone_wrapper_theme";
 @import "components/proposal_list";
 @import "components/document";
 

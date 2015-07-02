@@ -10,6 +10,8 @@ def includeme(config):
     config.include('.sheets')
     config.include('.resources')
     config.include('.workflows')
+    config.add_translation_dirs('adhocracy_core:locale/',
+                                'adhocracy_spd:locale/')
 
 
 def main(global_config, **settings):
