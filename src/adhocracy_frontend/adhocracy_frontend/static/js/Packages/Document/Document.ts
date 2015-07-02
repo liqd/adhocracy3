@@ -18,6 +18,7 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
@@ -42,6 +43,9 @@ export interface IScope extends angular.IScope {
         paragraphs? : IParagraph[];
         commentCountTotal? : number;
         picture? : string;
+        creator? : string;
+        creationDate? : string;
+        modificationDate? : string;
     };
     selectedState? : string;
     resource: any;
@@ -65,10 +69,10 @@ export var bindPath = (
 ) => (
     scope : IScope,
     pathKey : string = "path"
-) => {
+) : Function => {
     var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
 
-    scope.$watch(pathKey, (path : string) => {
+    return scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
@@ -91,6 +95,9 @@ export var bindPath = (
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
                         commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
+                        creationDate: documentVersion.data[SIMetadata.nick].creation_date,
+                        creator: documentVersion.data[SIMetadata.nick].creator,
                         picture: documentVersion.data[SIImageReference.nick].picture
                     };
                 });
@@ -331,8 +338,6 @@ export var createDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
-                }, (errors) => {
-                    scope.errors = errors;
                 });
             };
         }
@@ -379,8 +384,6 @@ export var editDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
-                }, (errors) => {
-                    scope.errors = errors;
                 });
             };
         }
