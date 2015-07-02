@@ -12,7 +12,7 @@ ${plan_number}
 
 Auslegungsdatum
 
-${construction_date}
+${announcement_date}
 
 Name
 

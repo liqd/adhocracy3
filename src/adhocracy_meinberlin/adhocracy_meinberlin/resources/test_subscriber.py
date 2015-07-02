@@ -42,7 +42,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                                                 parent=context['principals']['users'])
         return {'office_worker': office_worker,
                 'plan_number': '112233',
-                'construction_date': '24/09/2015',
+                'announcement_date': '24/09/2015',
                 'participation_end_date': '11/06/2015'}
 
 
@@ -58,7 +58,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                            {'email': 'officeworkername@example.org'}}
         return {'office_worker': None,
                 'plan_number': '112233',
-                'construction_date': '24/09/2015',
+                'announcement_date': '24/09/2015',
                 'participation_end_date': '11/06/2015'}
 
     def _make_process(self, registry, context, process_settings_appstruct):

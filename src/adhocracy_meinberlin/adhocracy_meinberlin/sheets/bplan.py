@@ -95,7 +95,7 @@ class ProcessSettingsSchema(colander.MappingSchema):
 
     office_worker = Reference(reftype=OfficeWorkerUserReference)
     plan_number = Integer()
-    construction_date = DateTime(default=None)
+    announcement_date = DateTime(default=None)
     participation_end_date = DateTime(default=None)
 
 process_settings_meta = sheet_meta._replace(
