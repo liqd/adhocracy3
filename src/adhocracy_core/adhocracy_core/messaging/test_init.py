@@ -214,7 +214,7 @@ class TestSendPasswordResetMail:
         assert inst.send_mail.call_args[1]['body'] == \
                'mail_reset_password_body_txt'
         assert inst.send_mail.call_args[1]['body'].mapping ==\
-            {'name': 'Anna',
+            {'user_name': 'Anna',
              'site_name': 'sitename',
              'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
         assert inst.send_mail.call_args[1]['request'] == request_
@@ -224,6 +224,7 @@ class TestSendInvitationMail:
 
     @fixture
     def registry(self, config):
+        config.include('pyramid_mako')
         config.include('pyramid_mailer.testing')
         config.registry.settings['adhocracy.site_name'] = 'sitename'
         config.registry.settings['adhocracy.frontend_url'] = 'http://front.end'
@@ -234,7 +235,7 @@ class TestSendInvitationMail:
         from . import Messenger
         return Messenger(registry)
 
-    def test_send_password_reset_mail(self, inst, request_):
+    def test_send_mail_with_password_reset_link(self, inst, request_):
         inst.send_mail = Mock()
         user = testing.DummyResource(name='Anna', email='anna@example.org')
         reset = testing.DummyResource(__name__='/reset')
@@ -245,9 +246,26 @@ class TestSendInvitationMail:
         assert inst.send_mail.call_args[1]['body'] == \
                'mail_invitation_body_txt'
         assert inst.send_mail.call_args[1]['body'].mapping ==\
-            {'name': 'Anna',
+            {'user_name': 'Anna',
              'site_name': 'sitename',
+             'email': 'anna@example.org',
              'reset_url': 'http://front.end/password_reset/?path=%252Freset'}
         assert inst.send_mail.call_args[1]['request'] == request_
 
+    def test_render_custom_subject(self, inst, request_):
+        inst.send_mail = Mock()
+        user = testing.DummyResource(name='Anna', email='anna@example.org')
+        reset = testing.DummyResource(__name__='/reset')
+        inst.send_invitation_mail(user, reset, request=request_,
+                                  subject_tmpl='adhocracy_core:templates/invite_subject_sample.txt.mako')
+        assert inst.send_mail.call_args[1]['subject'] == 'Welcome Anna to sitename.'
 
+    def test_render_custom_body(self, inst, request_):
+        inst.send_mail = Mock()
+        user = testing.DummyResource(name='Anna', email='anna@example.org')
+        reset = testing.DummyResource(__name__='/reset')
+        inst.send_invitation_mail(user, reset, request=request_,
+                                  body_tmpl='adhocracy_core:templates/invite_body_sample.txt.mako')
+        assert inst.send_mail.call_args[1]['body'] ==\
+               'Hi Anna,\n'\
+               'please reset your password here http://front.end/password_reset/?path=%252Freset to join sitename.'

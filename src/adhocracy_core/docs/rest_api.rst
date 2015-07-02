@@ -580,7 +580,7 @@ Fetch the first Document version, it is empty ::
 
     >>> resp = testapp.get(pvrs0_path)
     >>> pprint(resp.json['data']['adhocracy_core.sheets.document.IDocument'])
-    {'elements': [], 'title': ''}
+    {'elements': []}
 
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
     {'followed_by': [], 'follows': []}
@@ -589,7 +589,6 @@ Create a new version of the proposal that follows the first version ::
 
     >>> pvrs = {'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
     ...         'data': {'adhocracy_core.sheets.document.IDocument': {
-    ...                     'title': 'kommunismus jetzt!',
     ...                     'elements': []},
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs0_path]}},
@@ -694,10 +693,10 @@ version is automatically created along with the updated Section version::
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
     {'elements': ['.../Documents/kommunismus/VERSION_0000000/',
                   '.../Documents/kommunismus/VERSION_0000001/',
-                  '.../Documents/kommunismus/VERSION_0000004/',
-                  '.../Documents/kommunismus/VERSION_0000005/']}
+                  '.../Documents/kommunismus/VERSION_0000002/',
+                  '.../Documents/kommunismus/VERSION_0000003/']}
 
-    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000005')
+    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000003')
     >>> pvrs3_path = resp.json['path']
 
     >>> s2vrs1_path = resp.json['path']
@@ -743,17 +742,17 @@ a new version is automatically created only for pvrs3, not for pvrs2::
     >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
     {'elements': ['.../Documents/kommunismus/VERSION_0000000/',
                   '.../Documents/kommunismus/VERSION_0000001/',
-                  '.../Documents/kommunismus/VERSION_0000004/',
-                  '.../Documents/kommunismus/VERSION_0000005/',
-                  '.../Documents/kommunismus/VERSION_0000006/']}
+                  '.../Documents/kommunismus/VERSION_0000002/',
+                  '.../Documents/kommunismus/VERSION_0000003/',
+                  '.../Documents/kommunismus/VERSION_0000004/']}
 
-    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000005')
+    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000003')
     >>> pvrs4_path = resp.json['path']
-    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000005')
+    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000003')
     >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     1
 
-    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000006')
+    >>> resp = testapp.get(rest_url + '/Documents/kommunismus/VERSION_0000004')
     >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     0
 
@@ -786,7 +785,7 @@ that aren't 'followed_by' any later version::
     {'content_type': 'adhocracy_core.interfaces.ITag',
      'data': {...
               'adhocracy_core.sheets.name.IName': {'name': 'LAST'},
-              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../Documents/kommunismus/VERSION_0000006/']}},
+              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../Documents/kommunismus/VERSION_0000004/']}},
      'path': '.../Documents/kommunismus/LAST/'}
 
 FIXME: the elements listing in the ITags interface is not very helpful, the
@@ -1205,7 +1204,7 @@ requests (only GET etc.), all of its sub-entries will be empty. ::
     >>> updated_resources = batch_resp['updated_resources']
     >>> 'http://localhost/Documents/' in updated_resources['changed_descendants']
     True
-    >>> 'http://localhost/Documents/kommunismus/PARAGRAPH_0000007/' in updated_resources['created']
+    >>> 'http://localhost/Documents/kommunismus/PARAGRAPH_0000002/' in updated_resources['created']
     True
 
 Lets inspect some of the responses. The 'code' field contains the HTTP status
@@ -1217,17 +1216,17 @@ omitted::
     3
     >>> pprint(batch_resp['responses'][0])
     {'body': {'content_type': 'adhocracy_core.resources.paragraph.IParagraph',
-              'first_version_path': '.../Documents/kommunismus/PARAGRAPH_0000007/VERSION_0000000/',
-              'path': '.../Documents/kommunismus/PARAGRAPH_0000007/'},
+              'first_version_path': '.../Documents/kommunismus/PARAGRAPH_0000002/VERSION_0000000/',
+              'path': '.../Documents/kommunismus/PARAGRAPH_0000002/'},
      'code': 200}
     >>> pprint(batch_resp['responses'][1])
     {'body': {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
-              'path': '.../Documents/kommunismus/PARAGRAPH_0000007/VERSION_0000001/'},
+              'path': '.../Documents/kommunismus/PARAGRAPH_0000002/VERSION_0000001/'},
      'code': 200}
     >>> pprint(batch_resp['responses'][2])
     {'body': {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
               'data': {...},
-              'path': '.../Documents/kommunismus/PARAGRAPH_0000007/VERSION_0000001/'},
+              'path': '.../Documents/kommunismus/PARAGRAPH_0000002/VERSION_0000001/'},
      'code': 200}
      >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['text']
      'sein blick ist vom vorüberziehn der stäbchen'
@@ -1245,9 +1244,9 @@ created paragraph version as its only successor ::
 
 The LAST tag should point to the version we created within the batch request::
 
-    >>> resp_data = testapp.get(rest_url + "/Documents/kommunismus/PARAGRAPH_0000007/LAST").json
+    >>> resp_data = testapp.get(rest_url + "/Documents/kommunismus/PARAGRAPH_0000002/LAST").json
     >>> resp_data['data']['adhocracy_core.sheets.tags.ITag']['elements']
-    ['.../Documents/kommunismus/PARAGRAPH_0000007/VERSION_0000001/']
+    ['.../Documents/kommunismus/PARAGRAPH_0000002/VERSION_0000001/']
 
 All creation and modification dates are equal for one batch request:
 
@@ -1323,9 +1322,9 @@ of a specific content type::
     >>> resp_data = testapp.get('/Documents/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/kommunismus/PARAGRAPH_0000002/',
-     'http://localhost/Documents/kommunismus/PARAGRAPH_0000003/',
-     'http://localhost/Documents/kommunismus/PARAGRAPH_0000007/']
+    ['http://localhost/Documents/kommunismus/PARAGRAPH_0000000/',
+     'http://localhost/Documents/kommunismus/PARAGRAPH_0000001/',
+     'http://localhost/Documents/kommunismus/PARAGRAPH_0000002/']
 
 Or only children that implement a specific sheet::
 
@@ -1469,9 +1468,9 @@ versions of all documents::
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/kommunismus/PARAGRAPH_0000002/VERSION_0000001/',
-     'http://localhost/Documents/kommunismus/PARAGRAPH_0000003/VERSION_0000001/',
-     'http://localhost/Documents/kommunismus/PARAGRAPH_0000007/VERSION_0000001/']
+    ['http://localhost/Documents/kommunismus/PARAGRAPH_0000000/VERSION_0000001/',
+     'http://localhost/Documents/kommunismus/PARAGRAPH_0000001/VERSION_0000001/',
+     'http://localhost/Documents/kommunismus/PARAGRAPH_0000002/VERSION_0000001/']
 
 *<custom>* filter: depending on the backend configuration there are additional
 custom filters:

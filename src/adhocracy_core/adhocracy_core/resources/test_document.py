@@ -44,6 +44,7 @@ class TestDocumentVersion:
                                         sheets.badge.IBadgeable,
                                         sheets.rate.IRateable,
                                         sheets.image.IImageReference,
+                                        sheets.title.ITitle,
                                         ]
         assert meta.permission_create == 'edit_proposal'
 

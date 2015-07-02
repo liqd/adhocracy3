@@ -25,7 +25,7 @@ def reindex_tag(event):
     catalogs.reindex_index(event.object, 'tag')
 
 
-def reindex_rate(event):
+def reindex_rates(event):
     """Reindex the rates index if a rate backreference is modified."""
     catalogs = find_service(event.object, 'catalogs')
     catalogs.reindex_index(event.object, 'rates')
@@ -51,6 +51,8 @@ def reindex_visibility(event):
 
 def _reindex_resource_and_descendants(resource: IResource):
     catalogs = find_service(resource, 'catalogs')
+    if catalogs is None:  # ease testing
+        return
     resource_and_descendants = list_resource_with_descendants(resource)
     for res in resource_and_descendants:
         catalogs.reindex_index(res, 'private_visibility')
@@ -64,7 +66,7 @@ def includeme(config):
     config.add_subscriber(reindex_visibility,
                           IResourceSheetModified,
                           event_isheet=IMetadata)
-    config.add_subscriber(reindex_rate,
+    config.add_subscriber(reindex_rates,
                           ISheetBackReferenceModified,
                           event_isheet=IRateable)
     config.add_subscriber(reindex_badge,

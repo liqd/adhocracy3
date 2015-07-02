@@ -222,3 +222,20 @@ class TestLogMigrationDecorator:
             pass
 
         assert f.__name__ is 'f'
+
+def test_get_autonaming_prefixes(resource_meta, registry_with_content):
+    class ISimple(IResource):
+        pass
+
+    from adhocracy_core.content import ResourceContentRegistry
+    from . import _get_autonaming_prefixes
+
+    inst = ResourceContentRegistry(registry_with_content)
+    resource_meta = resource_meta._replace(use_autonaming=True,
+                                           autonaming_prefix='VERSION_')
+    simple_meta = resource_meta._replace(use_autonaming=True,
+                                         autonaming_prefix='')
+    inst.resources_meta = {IResource: resource_meta,
+                           ISimple: simple_meta}
+    registry_with_content.content = inst
+    assert _get_autonaming_prefixes(registry_with_content) == ['', 'VERSION_']

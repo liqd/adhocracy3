@@ -30,8 +30,7 @@ class TestDocumentSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'title': '',
-                              'elements': []}
+        assert inst.get() == {'elements': []}
 
     @mark.usefixtures('integration')
     def test_includeme_register_document_sheet(self, meta):
