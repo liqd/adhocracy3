@@ -72,6 +72,7 @@ import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
 import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import SILogbook = require("../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
@@ -87,6 +88,7 @@ export interface IScopeData {
     supporterCount : number;
     winnerBadgeAssignment : BadgeAssignment;
     currentPhase: string;
+    logbook_pool: any;
 
     title : {
         title : string;
@@ -436,6 +438,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.createtime = mercatorProposalVersion.data[SIMetaData.nick].item_creation_date;
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
         data.title = mercatorProposalVersion.data[SITitle.nick].title;
+        data.logbook_pool = mercatorProposalVersion.data[SILogbook.nick].logbook_pool;
 
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
         if (typeof heardFrom !== "undefined") {
