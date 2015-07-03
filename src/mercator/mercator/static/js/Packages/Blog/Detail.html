@@ -12,7 +12,7 @@
         </section>
 
         <div class="meta">
-            {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+            {{ "TR__BY" | translate }} <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta>
             <adh-time data-datetime="data.creationDate"></adh-time>
         </div>
     </div>
