@@ -32,7 +32,7 @@
                 data-ng-model="data.title"
                 name="title"
                 placeholder="{{ 'TR__TITLE_PLACEHOLDER' | translate }}"
-                class="m-title"
+                class="blog-post-edit-title"
                 minlength="3"
                 maxlength="100"
                 required="required" />
@@ -46,6 +46,7 @@
                 data-msd-elastic=""
                 data-ng-model="data.paragraphs[0].body"
                 name="paragraph-0"
+                class="paragraph"
                 placeholder="{{ 'TR__PARAGRAPH_PLACEHOLDER' | translate }}"
                 required="required"></textarea>
 
@@ -55,7 +56,7 @@
         </label>
 
         <footer class="form-footer">
-            <a href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+            <a href="" data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
             <input
                 type="submit"
                 name="submit"

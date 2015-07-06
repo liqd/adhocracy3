@@ -39,12 +39,14 @@
         background: $color-background-base-introvert;
         padding: 1em;
 
-        .title, .paragraph {
+        .title, .paragraph, .blog-post-edit-title {
             margin-bottom: 10px / $font-size-normal * 1em;
         }
 
         .paragraph {
             background: $color-background-base;
+            font-size: $font-size-small;
+            line-height: 1.5;
         }
 
         &.ng-hide-add.ng-hide-add-active,
@@ -70,6 +72,15 @@
 
 .blog-post {
     margin-bottom: 30px / $font-size-normal * 1em;
+
+    .document-form {
+        padding: 0 0 0 8px;
+        background: transparent;
+
+        .paragraph {
+            background-color: $color-background-base-introvert;
+        }
+    }
 }
 
 .blog-post-header {
