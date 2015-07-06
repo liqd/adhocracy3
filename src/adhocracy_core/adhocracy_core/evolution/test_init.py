@@ -238,4 +238,5 @@ def test_get_autonaming_prefixes(resource_meta, registry_with_content):
     inst.resources_meta = {IResource: resource_meta,
                            ISimple: simple_meta}
     registry_with_content.content = inst
-    assert _get_autonaming_prefixes(registry_with_content) == ['', 'VERSION_']
+    result = _get_autonaming_prefixes(registry_with_content)
+    assert sorted(result) == ['', 'VERSION_']
