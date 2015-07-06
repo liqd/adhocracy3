@@ -42,7 +42,7 @@
             data-ng-href="{{ path | adhResourceUrl:'blog' }}">{{ "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" | translate }}</a>
     </div>
 
-    <div data-ng-if="proposalTab === 'blog'">
+    <div data-ng-if="proposalTab === 'blog'" class="blog">
         <adh-blog data-ng-if="data.logbook_pool" data-path="{{ data.logbook_pool }}"></adh-blog>
     </div>
 
