@@ -8,13 +8,15 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import search_query
+from adhocracy_core.schema import PostPool
+from adhocracy_core.schema import Reference
+from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import create_post_pool_validator
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
+from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.pool import IPool
-from adhocracy_core.schema import UniqueReferences
-from adhocracy_core.schema import Reference
-from adhocracy_core.schema import PostPool
-from adhocracy_core.schema import create_post_pool_validator
+from adhocracy_core.utils import get_sheet_field
 
 
 class IBadge(ISheet):
@@ -160,6 +162,27 @@ badgeable_meta = sheet_meta._replace(
 )
 
 
+def create_unique_badge_assignment_validator(child_node: Reference, kw: dict) -> callable:
+    """Create validator to check `kw['context']` the badge is unique in :term:`post_pool`.
+
+    :param:`child_node` Reference to a sheet with :term:`post_pool` field.
+    :param:`kw`: dictionary with keys `context` and `registry`.
+    """
+    context = kw['context']
+
+    def validator(node, value):
+        new_badge = node.get_value(value, child_node.name)
+        new_badge_name = get_sheet_field(new_badge, IName, 'name')
+        pool = find_service(context, 'badge_assignments')
+        for badge_assignment in pool.values():
+            badge = get_sheet_field(badge_assignment, IBadgeAssignment, 'badge')
+            badge_name = get_sheet_field(badge, IName, 'name')
+            if new_badge_name == badge_name:
+                raise colander.Invalid(child_node, 'Badge already assigned')
+
+    return validator
+
+
 class BadgeAssignmentSchema(colander.MappingSchema):
 
     """Badge sheet data structure."""
@@ -172,7 +195,8 @@ class BadgeAssignmentSchema(colander.MappingSchema):
     def validator(self, kw: dict) -> callable:
         """Validate the :term:`post_pool` for the object reference."""
         object_validator = create_post_pool_validator(self['object'], kw)
-        return colander.All(object_validator)
+        badge_assignment_validator = create_unique_badge_assignment_validator(self['badge'], kw)
+        return colander.All(object_validator, badge_assignment_validator)
 
 
 badge_assignment_meta = sheet_meta._replace(
