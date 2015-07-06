@@ -1,0 +1,25 @@
+/*doc
+---
+title: Badge modfiers
+name: badge-modifiers
+category: Type
+---
+
+Proposal modifiers for badges
+
+```html_example
+<span class="badge m-winner">Winner</span>
+<span class="badge m-community-award">Community Award</span>
+```
+*/
+
+.badge {
+    &.m-winner {
+        background: $color-brand-one-normal;
+    }
+
+    &.m-community-award {
+        background: $color-brand-two-normal;
+        color: $color-text-inverted;
+    }
+}

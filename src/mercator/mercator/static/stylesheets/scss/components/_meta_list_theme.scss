@@ -31,3 +31,13 @@
         }
     }
 }
+
+.meta-list-item-badge {
+    float: right;
+}
+
+.mercator-proposal-detail-meta-list {
+    .meta-list-item-badge {
+        padding-right: 5em;
+    }
+}
