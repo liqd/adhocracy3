@@ -100,16 +100,48 @@ export var createDirective = (
             scope.errors = [];
             scope.data = {
                 title: "",
+                titles: [
+                    {
+                        value: "challenge",
+                        title: "Challenge"
+                    },
+                    {
+                        value: "highlight",
+                        title: "Highlight"
+                    },
+                    {
+                        value: "team story",
+                        title: "Team Story"
+                    },
+                    {
+                        value: "other title",
+                        title: "Other Title"
+                    }
+                ],
                 paragraphs: [{
                     body: ""
                 }]
             };
             scope.showError = adhShowError;
+            scope.showCreateForm = false;
+
+            scope.toggleCreateForm = () => {
+                scope.showCreateForm = true;
+            };
+
+            scope.cancel = () => {
+                scope.data.paragraphs[0].body = "";
+                scope.data.title = "";
+                scope.documentForm.$setPristine();
+                scope.showCreateForm = false;
+            };
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return AdhDocument.postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
+
+                    scope.cancel();
 
                     if (typeof scope.onSubmit !== "undefined") {
                         scope.onSubmit();
