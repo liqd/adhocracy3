@@ -31,12 +31,12 @@ Create participation process structure/content to get started::
     >>> resp = admin.post('/organisation', prop)
 
     >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal'}}}
+    ...         'data': {}}
     >>> resp = participant.post('/organisation/process', prop).json
     >>> proposal_version = resp['first_version_path']
 
     >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'proposal2'}}}
+    ...         'data': {}}
     >>> resp = participant.post('/organisation/process', prop).json
     >>> proposal2_version = resp['first_version_path']
 
@@ -121,7 +121,7 @@ Now the badged content shows the back reference targeting the badge assignment::
 
     >>> resp = participant.get(proposal_version).json
     >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
-    [...organisation/process/proposal/badge_assignments/0000000/']
+    [...0/badge_assignments/0000000/']
 
 We can also use the filtering pool api to search for content with specific badge names::
 
@@ -129,7 +129,7 @@ We can also use the filtering pool api to search for content with specific badge
     ...         'depth': 'all'}
     >>> resp = initiator.get('/organisation/process', params=prop).json
     >>> resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
-    ['.../proposal/VERSION_0000000/']
+    ['...0/VERSION_0000000/']
 
 
 PostPool and Assignable validation
@@ -149,7 +149,7 @@ If we use the wrong post_pool we get an error::
     ...          }}
     >>> resp = initiator.post(wrong_post_pool, prop).json
     >>> resp
-    {...'You can only add references inside .../proposal/badge_assignments...
+    {...'You can only add references inside ...0/badge_assignments...
 
 
 TODO add validators for subject (assignable?)
