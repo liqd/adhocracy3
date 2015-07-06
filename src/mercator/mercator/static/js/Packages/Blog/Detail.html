@@ -1,19 +1,22 @@
 <article class="blog-post">
     <div data-ng-if="mode === 'display'">
-        <h1>{{ data.title }}</h1>
 
-        <div class="actions">
-            <a href="" data-ng-if="itemOptions.POST" data-ng-click="edit()">{{ "TR__EDIT" | translate }}</a>
-            <a href="" data-ng-if="options.hide" data-ng-click="hide()">{{ "TR__DELETE" | translate }}</a>
-        </div>
+        <header class="blog-post-header">
+            <h1 class="blog-post-title">{{ data.title }}</h1>
 
-        <section data-ng-repeat="paragraph in data.paragraphs">
+            <div class="blog-post-actions">
+                <a href="" data-ng-if="itemOptions.POST" data-ng-click="edit()" class="blog-post-actions-item"><i class="icon-pencil"></i> {{ "TR__EDIT" | translate }}</a>
+                <a href="" data-ng-if="options.hide" data-ng-click="hide()" class="blog-post-actions-item"><i class="icon-trash"></i> {{ "TR__DELETE" | translate }}</a>
+            </div>
+        </header>
+
+        <section data-ng-repeat="paragraph in data.paragraphs" class="blog-post-paragraph">
             <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
         </section>
 
-        <div class="meta">
-            {{ "TR__BY" | translate }} <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta>
-            <adh-time data-datetime="data.creationDate"></adh-time>
+        <div class="meta blog-post-meta">
+            {{ "TR__BY" | translate }} <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta>.
+            <adh-time data-datetime="data.creationDate" class="blog-post-meta-time"></adh-time>
         </div>
     </div>
 
