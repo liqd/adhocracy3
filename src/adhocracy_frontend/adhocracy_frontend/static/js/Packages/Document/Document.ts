@@ -40,6 +40,10 @@ export interface IScope extends angular.IScope {
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
+        titles? : {
+            value? : string;
+            title? : string;
+        };
         paragraphs? : IParagraph[];
         commentCountTotal? : number;
         picture? : string;
@@ -49,6 +53,9 @@ export interface IScope extends angular.IScope {
     };
     selectedState? : string;
     resource: any;
+
+    toggleCreateForm() : void;
+    showCreateForm? : boolean;
 
     documentVersion? : RIDocumentVersion;
     paragraphVersions? : RIParagraphVersion[];
