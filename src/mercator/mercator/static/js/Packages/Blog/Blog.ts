@@ -8,8 +8,18 @@ import AdhListing = require("../Listing/Listing");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUtil = require("../Util/Util");
 
+import AdhCommentAdapter = require("../Comment/Adapter");
+
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
+import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
+
+import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
+
 
 var pkgLocation = "/Blog";
 
@@ -17,6 +27,69 @@ var pkgLocation = "/Blog";
 export interface IFormScope extends AdhDocument.IFormScope {
     onSubmit() : void;
 }
+
+
+export var bindPath = (
+    $q : angular.IQService,
+    adhHttp : AdhHttp.Service<any>
+) => (
+    scope : any,
+    pathKey : string = "path"
+) : Function => {
+    var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
+
+    return scope.$watch(pathKey, (path : string) => {
+        if (path) {
+            adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
+                var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
+                var paragraphPromises = _.map(paragraphPaths, (path) => adhHttp.get(path));
+
+                return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
+                    var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
+                        return {
+                            body: paragraphVersion.data[SIParagraph.nick].text,
+                            commentCount: commentableAdapter.totalCount(paragraphVersion),
+                            path: paragraphVersion.path
+                        };
+                    });
+
+                    scope.documentVersion = documentVersion;
+                    scope.paragraphVersions = paragraphVersions;
+
+                    scope.data = {
+                        title: documentVersion.data[SITitle.nick].title,
+                        titles: [
+                            {
+                                value: "challenge",
+                                title: "Challenge"
+                            },
+                            {
+                                value: "highlight",
+                                title: "Highlight"
+                            },
+                            {
+                                value: "team story",
+                                title: "Team Story"
+                            },
+                            {
+                                value: "other title",
+                                title: "Other Title"
+                            }
+                        ],
+                        paragraphs: paragraphs,
+                        // FIXME: DefinitelyTyped
+                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
+                        creationDate: documentVersion.data[SIMetadata.nick].creation_date,
+                        creator: documentVersion.data[SIMetadata.nick].creator,
+                        picture: documentVersion.data[SIImageReference.nick].picture
+                    };
+                });
+            });
+        }
+    });
+};
+
 
 
 export var detailDirective = (
@@ -77,7 +150,7 @@ export var detailDirective = (
                 });
             };
 
-            unbind = AdhDocument.bindPath($q, adhHttp)(scope);
+            unbind = bindPath($q, adhHttp)(scope);
         }
     };
 };

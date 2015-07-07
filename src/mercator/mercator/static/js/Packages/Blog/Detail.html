@@ -27,19 +27,25 @@
         class="document-form"
         name="documentForm">
         <label>
-            <input
-                type="text"
-                data-ng-model="data.title"
-                name="title"
-                placeholder="{{ 'TR__TITLE_PLACEHOLDER' | translate }}"
-                class="blog-post-edit-title"
-                minlength="3"
-                maxlength="100"
-                required="required" />
-            <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
-                {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
-            </span>
-        </label>
+
+        <select
+            data-ng-model="data.title"
+            name="titles"
+            class="title"
+            required="required">
+            <!-- FIXME: dummy options -->
+            <option value="" data-selected="selected">Choose a title for your entry</option>
+            <option value="{{title.value}}" data-ng-repeat="title in data.titles">{{title.title}}</option>
+        </select>
+        <input
+            type="hidden"
+            data-ng-model="data.title"
+            name="title"
+            data-ng-required="false">
+        <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
+            {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
+        </span>
+    </label>
 
         <label>
             <textarea
