@@ -18,8 +18,11 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/Document";
@@ -40,6 +43,9 @@ export interface IScope extends angular.IScope {
         paragraphs? : IParagraph[];
         commentCountTotal? : number;
         picture? : string;
+        creator? : string;
+        creationDate? : string;
+        modificationDate? : string;
     };
     selectedState? : string;
     resource: any;
@@ -63,10 +69,10 @@ export var bindPath = (
 ) => (
     scope : IScope,
     pathKey : string = "path"
-) => {
+) : Function => {
     var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
 
-    scope.$watch(pathKey, (path : string) => {
+    return scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
@@ -85,10 +91,14 @@ export var bindPath = (
                     scope.paragraphVersions = paragraphVersions;
 
                     scope.data = {
-                        title: documentVersion.data[SIDocument.nick].title,
+                        title: documentVersion.data[SITitle.nick].title,
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
-                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount"))
+                        commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
+                        creationDate: documentVersion.data[SIMetadata.nick].creation_date,
+                        creator: documentVersion.data[SIMetadata.nick].creator,
+                        picture: documentVersion.data[SIImageReference.nick].picture
                     };
                 });
             });
@@ -135,9 +145,11 @@ export var postCreate = (
         follows: [doc.first_version_path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        title: scope.data.title,
         description: "",
         elements: <string[]>_.map(paragraphVersions, "path")
+    });
+    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
     });
 
     return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
@@ -209,10 +221,14 @@ export var postEdit = (
         follows: [oldVersion.path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        title: scope.data.title,
         description: "",
         elements: paragraphRefs
     });
+    documentVersion.data[SITitle.nick] = new SITitle.Sheet({
+        title: scope.data.title
+    });
+    // FIXME: workaround for a backend bug
+    documentVersion.data[SIImageReference.nick] = oldVersion.data[SIImageReference.nick];
 
     return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[0]);
@@ -322,8 +338,6 @@ export var createDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
-                }, (errors) => {
-                    scope.errors = errors;
                 });
             };
         }
@@ -370,8 +384,6 @@ export var editDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
-                }, (errors) => {
-                    scope.errors = errors;
                 });
             };
         }

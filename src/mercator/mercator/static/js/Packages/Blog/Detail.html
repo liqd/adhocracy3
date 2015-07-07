@@ -1,7 +1,63 @@
 <article class="blog-post">
-    <h1>{{ data.title }}</h1>
+    <div data-ng-if="mode === 'display'">
+        <h1>{{ data.title }}</h1>
 
-    <section data-ng-repeat="paragraph in data.paragraphs">
-        <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
-    </section>
+        <div class="actions">
+            <a href="" data-ng-if="itemOptions.POST" data-ng-click="edit()">{{ "TR__EDIT" | translate }}</a>
+            <a href="" data-ng-if="options.hide" data-ng-click="hide()">{{ "TR__DELETE" | translate }}</a>
+        </div>
+
+        <section data-ng-repeat="paragraph in data.paragraphs">
+            <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
+        </section>
+
+        <div class="meta">
+            {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+            <adh-time data-datetime="data.creationDate"></adh-time>
+        </div>
+    </div>
+
+    <form
+        data-ng-if="mode === 'edit'"
+        novalidate="novalidate"
+        data-ng-submit="submit()"
+        class="document-form"
+        name="documentForm">
+        <label>
+            <input
+                type="text"
+                data-ng-model="data.title"
+                name="title"
+                placeholder="{{ 'TR__TITLE_PLACEHOLDER' | translate }}"
+                class="m-title"
+                minlength="3"
+                maxlength="100"
+                required="required" />
+            <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
+                {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
+            </span>
+        </label>
+
+        <label>
+            <textarea
+                data-msd-elastic=""
+                data-ng-model="data.paragraphs[0].body"
+                name="paragraph-0"
+                placeholder="{{ 'TR__PARAGRAPH_PLACEHOLDER' | translate }}"
+                required="required"></textarea>
+
+            <span class="input-error" data-ng-show="showError(documentForm, documentForm['paragraph-0'], 'required')">
+                {{ "TR__ERROR_REQUIRED_PARAGRAPH" | translate }}
+            </span>
+        </label>
+
+        <footer class="form-footer">
+            <a href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+            <input
+                type="submit"
+                name="submit"
+                value="{{ 'TR__PUBLISH' | translate }}"
+                class="m-call-to-action form-footer-button-cta" />
+        </footer>
+    </form>
 </article>

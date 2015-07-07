@@ -31,8 +31,6 @@ resource_meta = ResourceMetadata(content_name='',
                                  iresource=None,
                                  content_class=None,
                                  permission_create='',
-                                 permission_view='',
-                                 permission_edit='',
                                  is_implicit_addable=False,
                                  basic_sheets=[],
                                  extended_sheets=[],
@@ -128,6 +126,7 @@ class ResourceFactory:
                  creator=None,
                  registry=None,
                  request=None,
+                 send_event=True,
                  **kwargs
                  ):
         """Triggered when a ResourceFactory instance is called.
@@ -151,6 +150,9 @@ class ResourceFactory:
                 called. Default is None.
             request (Request or None): passed to
                 :class:`adhocracy_core.interfaces.IResourceSheetModified'events
+            send_event (bool): send
+                :class:`adhocracy_core.interfaces.IResourceCreatedAndAdded`
+                event. Default is True.
             **kwargs: Arbitary keyword arguments. Will be passed along with
                        'creator' to the `after_creation` hook as 3rd argument
                       `options`.
@@ -214,8 +216,10 @@ class ResourceFactory:
                 kwargs['creator'] = creator
                 call(resource, registry, options=kwargs)
 
-        self._notify_new_resource_created_and_added(resource, registry,
-                                                    creator)
+        if send_event:
+            self._notify_new_resource_created_and_added(resource,
+                                                        registry,
+                                                        creator)
 
         return resource
 
@@ -261,3 +265,4 @@ def includeme(config):
     config.include('.paragraph')
     config.include('.badge')
     config.include('.service')
+    config.include('.logbook')

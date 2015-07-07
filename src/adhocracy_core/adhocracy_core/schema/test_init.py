@@ -871,6 +871,31 @@ class TestISOCountryCode:
             inst.deserialize('1A')
 
 
+class TestDeferredGetPostPool:
+
+    def call_fut(self, node, kw):
+        from . import deferred_get_post_pool
+        return deferred_get_post_pool(node, kw)
+
+    def test_post_pool_by_service_name(self, pool, node, service):
+        pool['service'] = service
+        node.iresource_or_service_name = 'service'
+        post_pool = self.call_fut(node, {'context': pool})
+        assert post_pool == service
+
+    def test_post_pool_by_interface(self, pool, node):
+        from adhocracy_core.interfaces import IPool
+        node.iresource_or_service_name = IPool
+        post_pool = self.call_fut(node, {'context': pool})
+        assert post_pool == pool
+
+    def test_raise_if_no_post_pool_found(self, context, node):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        node.iresource_or_service_name = 'service'
+        with raises(RuntimeConfigurationError):
+            self.call_fut(node, {'context': context})
+
+
 class TestCreatePostPoolValidator:
 
     def call_fut(self, node, kw):
@@ -910,6 +935,16 @@ class TestCreatePostPoolValidator:
         request = testing.DummyRequest()
         request.root = context
         return request
+
+    def test_raise_if_missing_post_pool_reference(
+            self, node, back_reference_sheet, context, registry):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        back_reference_sheet.schema.children.clear()
+        registry.content.get_sheet.return_value = back_reference_sheet
+        kw = {'registry': registry, 'context': context}
+        validator = self.call_fut(node['reference'], kw)
+        with raises(RuntimeConfigurationError):
+            validator(node, {'reference': context['right']['child']})
 
     def test_raise_if_wrong_post_pool(
             self, node, back_reference_sheet, context, registry):

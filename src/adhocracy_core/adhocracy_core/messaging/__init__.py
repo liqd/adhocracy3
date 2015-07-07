@@ -1,6 +1,7 @@
 """Send messages to Principals."""
 from collections.abc import Sequence
 from logging import getLogger
+from urllib.request import quote
 
 from pyramid.registry import Registry
 from pyramid.renderers import render
@@ -106,15 +107,17 @@ class Messenger:
         if user is not None:
             user_name = self._get_user_name(user)
             user_url = self._get_user_url(user)
-        kwargs = {'url': url,
-                  'remark': remark,
-                  'user_name': user_name,
-                  'user_url': user_url}
+        mapping = {'url': url,
+                   'remark': remark,
+                   'user_name': user_name,
+                   'user_url': user_url,
+                   'site_name': self.site_name,
+                   }
         subject = _('mail_abuse_complaint_subject',
-                    mapping={'site_name': self.site_name},
+                    mapping=mapping,
                     default='[${site_name} Abuse Complaint')
         body = render('adhocracy_core:templates/abuse_complaint.txt.mako',
-                      kwargs)
+                      mapping)
         # FIXME For security reasons, we should check that the url starts
         # with one of the prefixes where frontends are supposed to be running
         self.send_mail(subject=subject,
@@ -168,22 +171,91 @@ class Messenger:
     def send_registration_mail(self, user: IUser, activation_path: str,
                                request: Request=None):
         """Send a registration mail to validate the email of a user account."""
+        mapping = {'activation_path': activation_path,
+                   'frontend_url': self.frontend_url,
+                   'user_name': user.name,
+                   'site_name': self.site_name,
+                   }
         subject = _('mail_account_verification_subject',
-                    mapping={'site_name': self.site_name},
+                    mapping=mapping,
                     default='${site_name}: Account Verification / '
                             'Aktivierung Deines Nutzerkontos')
         body_txt = _('mail_account_verification_body_txt',
-                     mapping={'activation_path': activation_path,
-                              'frontend_url': self.frontend_url,
-                              'name': user.name,
-                              'site_name': self.site_name,
-                              },
+                     mapping=mapping,
                      default='${activation_path}')
         self.send_mail(subject=subject,
                        recipients=[user.email],
                        body=body_txt,
                        request=request,
                        )
+
+    def send_password_reset_mail(self, user=IUser, password_reset=IResource,
+                                 request: Request=None):
+        """Send email with link to reset the user password."""
+        mapping = {'reset_url': self._build_reset_url(password_reset),
+                   'user_name': user.name,
+                   'site_name': self.site_name,
+                   }
+        subject = _('mail_reset_password_subject',
+                    mapping=mapping,
+                    default='${site_name}: Reset Password / Password neu'
+                            ' setzen')
+        body = _('mail_reset_password_body_txt',
+                 mapping=mapping,
+                 default='${reset_url}'
+                 )
+        self.send_mail(subject=subject,
+                       recipients=[user.email],
+                       body=body,
+                       request=request,
+                       )
+
+    def send_invitation_mail(self, user=IUser, password_reset=IResource,
+                             request: Request=None,
+                             subject_tmpl: str=None,
+                             body_tmpl: str=None,
+                             ):
+        """Send invitation email with link to reset the user password.
+
+        :param:`subject_tmpl`: pyramid asset pointing to a mako
+                               template file. If not set the translation
+                               message is used for the mail subject.
+        :param:`body_tmpl`: pyramid asset pointing to a mako
+                           template file. If not set the translation message
+                           is used for the mail body.
+        """
+        mapping = {'reset_url': self._build_reset_url(password_reset),
+                   'user_name': user.name,
+                   'site_name': self.site_name,
+                   'email': user.email,
+                   }
+        if subject_tmpl is None:
+            subject = _('mail_invitation_subject',
+                        mapping=mapping,
+                        default='Invitation to join ${site_name}')
+        else:
+            # remove potential newline, as it causes invalid headers
+            subject = render(subject_tmpl, mapping).rstrip()
+        if body_tmpl is None:
+            body = _('mail_invitation_body_txt',
+                     mapping=mapping,
+                     default='Please click ${reset_url} to join'
+                             ' and reset your password.'
+                     )
+        else:
+            body = render(body_tmpl, mapping)
+        self.send_mail(subject=subject,
+                       recipients=[user.email],
+                       body=body,
+                       request=request,
+                       )
+
+    def _build_reset_url(self, reset: IResource) -> str:
+        reset_path = resource_path(reset)
+        reset_path_quoted = quote(reset_path, safe='')
+        reset_url = '{0}/password_reset/?path={1}'.format(self.frontend_url,
+                                                          reset_path_quoted)
+        return reset_url
 
 
 def includeme(config):
