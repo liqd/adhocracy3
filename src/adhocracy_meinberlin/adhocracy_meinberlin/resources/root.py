@@ -54,6 +54,14 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     registry.content.create(resources.bplan.IProcess.__identifier__,
                             parent=context['organisation'],
                             appstructs=appstructs)
+    # sample alexanderplatz
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'alexanderplatz'},
+                  adhocracy_core.sheets.title.ITitle.__identifier__:
+                  {'title': 'Sample Alexanderplatz participation process'}}
+    registry.content.create(resources.alexanderplatz.IProcess.__identifier__,
+                            parent=context['organisation'],
+                            appstructs=appstructs)
 
 
 meinberlin_acm = ACM().deserialize(
