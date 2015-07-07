@@ -11,7 +11,10 @@ from adhocracy_core.evolution import migrate_new_iresource
 from adhocracy_core.evolution import migrate_new_sheet
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.logbook import add_logbook_service
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.logbook import IHasLogbookPool
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.workflows import setup_workflow
 from adhocracy_mercator.resources.mercator import IMercatorProposal
@@ -110,6 +113,26 @@ def reset_workflow_state_to_result(root):  # pragma: no cover
                    registry)
 
 
+@log_migration
+def add_logbook_service_to_proposal_items(root):  # pragma: no cover
+    """Add logbook service to proposals."""
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=IMercatorProposal)
+    proposals = catalogs.search(query).elements
+    registry = get_current_registry(root)
+    for proposal in proposals:
+        if find_service(proposal, 'logbook') is None:
+            logger.info('add logbook service to {0}'.format(proposal))
+            creator = get_sheet_field(proposal, IMetadata, 'creator')
+            add_logbook_service(proposal, registry, {'creator': creator})
+
+
+@log_migration
+def add_haslogbookpool_sheet_to_proposal_versions(root):  # pragma: no cover
+    """Add IHasLogbookPool sheet to proposals versions."""
+    migrate_new_sheet(root, IMercatorProposalVersion, IHasLogbookPool)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -120,3 +143,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_badge_assignments_services_to_proposal_items)
     config.add_evolution_step(add_badgeable_sheet_to_proposal_versions)
     config.add_evolution_step(reset_workflow_state_to_result)
+    config.add_evolution_step(add_logbook_service_to_proposal_items)
+    config.add_evolution_step(add_haslogbookpool_sheet_to_proposal_versions)
