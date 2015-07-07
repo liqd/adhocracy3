@@ -4,6 +4,7 @@
 import _ = require("lodash");
 
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhBadge = require("../Badge/Badge");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
@@ -19,7 +20,6 @@ import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorDescription = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescription");
 import RIMercatorDescriptionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IDescriptionVersion");
@@ -49,10 +49,7 @@ import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
 import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
-import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
-import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
 import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
 import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
@@ -85,7 +82,7 @@ export interface IScopeData {
     commentCount : number;
     commentCountTotal : number;
     supporterCount : number;
-    winnerBadgeAssignment : BadgeAssignment;
+    winnerBadgeAssignment : AdhBadge.IBadge;
     currentPhase: string;
 
     title : {
@@ -295,36 +292,13 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
         });
 };
 
-export class BadgeAssignment {
-    constructor(
-        public title : string,
-        public description : string,
-        public name : string
-    ) {}
-}
-
-var getBadges = (
-    adhHttp : AdhHttp.Service<any>,
-    $q : angular.IQService
-) => (proposal : ResourcesBase.Resource) : angular.IPromise<BadgeAssignment[]> => {
-    return $q.all(_.map(proposal.data[SIBadgeable.nick].assignments, (assignmentPath : string) => {
-        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
-            var description = assignment.data[SIDescription.nick].description;
-            return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
-                var title = badge.data[SITitle.nick].title;
-                var name = badge.data[SIName.nick].name;
-                return new BadgeAssignment(title, description, name);
-            });
-        });
-    }));
-};
-
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
         public adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
+        private adhGetBadges : AdhBadge.IGetBadges,
         private flowFactory,
         private moment : moment.MomentStatic,
         private $window : Window,
@@ -457,7 +431,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         countSupporters(this.adhHttp, mercatorProposalVersion.data[SILikeable.nick].post_pool, mercatorProposalVersion.path)
             .then((count : number) => { data.supporterCount = count; });
 
-        getBadges(this.adhHttp, this.$q)(mercatorProposalVersion).then((assignments) => {
+        this.adhGetBadges(<any>mercatorProposalVersion).then((assignments : AdhBadge.IBadge[]) => {
             var communityAssignment = _.find(assignments, (a) => a.name === "community");
             var winningAssignment = _.find(assignments, (a) => a.name === "winning");
 
@@ -845,6 +819,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
+        adhGetBadges : AdhBadge.IGetBadges,
         private $timeout : angular.ITimeoutService,
         flowFactory,
         moment : moment.MomentStatic,
@@ -852,7 +827,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         $location : angular.ILocationService,
         $q : angular.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, adhGetBadges, flowFactory, moment, $window, $location, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 
@@ -893,13 +868,14 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
+        adhGetBadges : AdhBadge.IGetBadges,
         flowFactory,
         moment : moment.MomentStatic,
         $window,
         $location,
         $q : angular.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, adhGetBadges, flowFactory, moment, $window, $location, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 }
@@ -947,7 +923,8 @@ export var listItem = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhGetBadges : AdhBadge.IGetBadges
 ) => {
     return {
         restrict: "E",
@@ -984,7 +961,7 @@ export var listItem = (
                     };
                 });
 
-                getBadges(adhHttp, $q)(proposal).then((assignments) => {
+                adhGetBadges(proposal).then((assignments) => {
                     var communityAssignment = _.find(assignments, (a) => a.name === "community");
                     var winningAssignment = _.find(assignments, (a) => a.name === "winning");
 
@@ -1159,6 +1136,7 @@ export var register = (angular) => {
             "duScroll",
             "ngMessages",
             AdhAngularHelpers.moduleName,
+            AdhBadge.moduleName,
             AdhHttp.moduleName,
             AdhImage.moduleName,
             AdhInject.moduleName,
@@ -1247,12 +1225,20 @@ export var register = (angular) => {
             };
         }])
         // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercatorProposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", listItem])
-        .directive("adhMercatorProposalDetailView",
-            ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "flowFactory", "moment", "$window", "$location", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q) => {
-                var widget = new DetailWidget(
-                    adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, flowFactory, moment, $window, $location, $q);
+        .directive("adhMercatorProposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", listItem])
+        .directive("adhMercatorProposalDetailView", [
+            "adhConfig",
+            "adhHttp",
+            "adhPreliminaryNames",
+            "adhTopLevelState",
+            "adhGetBadges",
+            "flowFactory",
+            "moment",
+            "$window",
+            "$location",
+            "$q",
+            (...args) => {
+                var widget = AdhUtil.construct(DetailWidget, args);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalCreate", [
@@ -1260,15 +1246,15 @@ export var register = (angular) => {
             "adhHttp",
             "adhPreliminaryNames",
             "adhTopLevelState",
+            "adhGetBadges",
             "$timeout",
             "flowFactory",
             "moment",
             "$window",
             "$location",
             "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $window, $location, $q) => {
-                var widget = new CreateWidget(
-                    adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $timeout, flowFactory, moment, $window, $location, $q);
+            (...args) => {
+                var widget = AdhUtil.construct(CreateWidget, args);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
