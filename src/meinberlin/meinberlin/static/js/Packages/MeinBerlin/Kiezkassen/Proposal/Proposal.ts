@@ -1,7 +1,7 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
-import AdhBadge = require("../Badge/Badge");
+import AdhBadge = require("../../../Badge/Badge");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
@@ -62,7 +62,7 @@ var bindPath = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBades
+    adhGetBadges : AdhBadge.IGetBadges
 ) => (
     scope : IScope,
     pathKey : string = "path"
