@@ -948,7 +948,8 @@ def validate_login_email(context, request: Request):
     email = request.validated['email']
     locator = request.registry.getMultiAdapter((context, request),
                                                IUserLocator)
-    user = locator.get_user_by_email(email)
+    normalized_email = email.lower()
+    user = locator.get_user_by_email(normalized_email)
     if user is None:
         _add_no_such_user_or_wrong_password_error(request)
     else:
