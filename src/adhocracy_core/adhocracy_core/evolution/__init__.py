@@ -18,6 +18,7 @@ from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import add_badges_service
@@ -213,6 +214,19 @@ def hide_password_resets(root):  # pragma: no cover
         hide(resets, registry, {})
 
 
+@log_migration
+def lower_case_users_emails(root):  # pragma: no cover
+    """Lower case users email."""
+    users = find_service(root, 'principals', 'users')
+    for user in users.values():
+        if not IUserExtended.providedBy(user):
+            return
+        sheet = get_sheet(user, IUserExtended)
+        sheet.set({'email': user.email.lower()})
+        # force update. Not working otherwise even if the sheet is set?!
+        user._p_changed = True
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -223,3 +237,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(make_users_badgeable)
     config.add_evolution_step(change_pools_autonaming_scheme)
     config.add_evolution_step(hide_password_resets)
+    config.add_evolution_step(lower_case_users_emails)
