@@ -9,11 +9,14 @@ from substanced.workflow import WorkflowError
 from substanced.workflow import IWorkflow
 from zope.interface import implementer
 
+from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
 from adhocracy_core.interfaces import IResource
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.utils import get_sheet_field
+from adhocracy_core.utils import get_matching_isheet
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
-from adhocracy_core.authorization import acm_to_acl
 
 
 @implementer(IAdhocracyWorkflow)
@@ -53,15 +56,24 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
     _add_workflow_to_registry(registry, appstruct, workflow, name)
 
 
-def setup_workflow(workflow: AdhocracyACLWorkflow, context: IResource,
-                   states: [str], registry: Registry):
-    """Initialize workflow and transition to the given states."""
+def setup_workflow(context: IResource, states: [str], registry: Registry):
+    """Initialize workflow associated to the resource and transition to the given states."""
     request = Request.blank('/dummy')
     request.registry = registry
     request.__cached_principals__ = ['role:god']
+    workflow = get_workflow(context, registry)
     workflow.initialize(context)
     for state in states:
         workflow.transition_to_state(context, request, state)
+
+
+def get_workflow(context, registry):
+    """Return the workflow for the given context."""
+    isheet = get_matching_isheet(context, IWorkflowAssignment)
+    workflow = get_sheet_field(context, isheet, 'workflow')
+    workflow_name = workflow.type
+    workflow = registry.content.workflows[workflow_name]
+    return workflow
 
 
 def _validate_workflow_cstruct(cstruct: dict) -> dict:

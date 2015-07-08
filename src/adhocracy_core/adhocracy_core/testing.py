@@ -121,7 +121,7 @@ def register_sheet(context, mock_sheet, registry, isheet=None) -> Mock:
     """Register `mock_sheet` for `context`. You can ony use this only once.
 
     If you need to register multiple mock_sheets in you test add side effects:
-    `registry.content.get_sheet.side_effects = [sheet1, sheet2]`.
+    `registry.content.get_sheet.side_effect = [sheet1, sheet2]`.
     You can also set single sheets directly:
     `registry.content.get_sheet.return_value = sheet1
     """

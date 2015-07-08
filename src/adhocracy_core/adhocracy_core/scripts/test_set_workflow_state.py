@@ -39,19 +39,23 @@ class TestSetupWorkflow:
         import adhocracy_core.scripts.set_workflow_state
         setup_workflow_mock = Mock(spec=adhocracy_core.workflows.setup_workflow)
         transaction_mock = Mock()
+        self._make_workflow(registry, 'test_workflow')
+        workflow = registry.content.workflows['test_workflow']
+        get_workflow_mock = Mock(return_value=workflow)
         monkeypatch.setattr(adhocracy_core.scripts.set_workflow_state,
                             'setup_workflow',
                             setup_workflow_mock)
         monkeypatch.setattr(adhocracy_core.scripts.set_workflow_state,
                             'transaction',
                             transaction_mock)
+        monkeypatch.setattr(adhocracy_core.scripts.set_workflow_state,
+                            'get_workflow',
+                            get_workflow_mock)
         from .set_workflow_state import _set_workflow_state
-        self._make_workflow(registry, 'test_workflow')
         process = testing.DummyResource()
         context['organisation'] = process
-        _set_workflow_state(context, registry, '/organisation', 'test_workflow', 'participate')
-        setup_workflow_mock.assert_called_with(registry.content.workflows['test_workflow'],
-                                               process,
+        _set_workflow_state(context, registry, '/organisation', 'participate')
+        setup_workflow_mock.assert_called_with(process,
                                                ['announced', 'participate'],
                                                registry)
         assert transaction_mock.commit.called

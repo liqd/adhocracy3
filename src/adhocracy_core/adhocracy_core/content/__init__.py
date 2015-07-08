@@ -58,21 +58,28 @@ class ResourceContentRegistry(ContentRegistry):
         addables = self.resources_meta_addable[iresource]
         addables_allowed = []
         for resource_meta in addables:
-            permission = resource_meta.permission_create
-            ignore_permission = self._only_first_version_exists(context,
-                                                                resource_meta)
-            if ignore_permission:
-                # FIXME this is a work around to allow the bplan workfow
-                # to disable edit permission but allow create permision for
-                # proposals. This might cause security issues if you don't
-                # create the version 0 and 1 in one batch request!
-                addables_allowed.append(resource_meta)
-            elif request.has_permission(permission, context):
+            if self._can_add_resource(request, resource_meta, context):
                 addables_allowed.append(resource_meta)
         return addables_allowed
 
-    def _only_first_version_exists(self, context: object,
-                                   meta: ResourceMetadata) -> bool:
+    def _can_add_resource(self, request, resource_meta, context):
+        allowed = False
+        if self._only_version_zero_exists(context, resource_meta):
+            allowed = self._can_add_version_one(request, context)
+        else:
+            permission = resource_meta.permission_create
+            allowed = request.has_permission(permission, context)
+        return allowed
+
+    def _can_add_version_one(self, request, context):
+        iresource = get_iresource(context)
+        # since there is only version zero, the permission of
+        # the item is checked instead of the one from the itemversion
+        permission = self.resources_meta[iresource].permission_create
+        return request.has_permission(permission, context)
+
+    def _only_version_zero_exists(self, context: object, meta:
+                                  ResourceMetadata) -> bool:
         only_first_version = False
         is_item_version = meta.iresource.isOrExtends(IItemVersion)
         has_item_parent = IItem.providedBy(context)
