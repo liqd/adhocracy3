@@ -32,6 +32,7 @@ export interface IParagraph {
     body : string;
     commentCount? : number;
     path? : string;
+    selectedState? : string;
 }
 
 export interface IScope extends angular.IScope {
@@ -62,10 +63,24 @@ export interface IFormScope extends IScope {
     documentForm : any;
 }
 
+export var highlightSelectedParagraph = (
+    commentableUrl : string,
+    scope : IScope) => {
+    if (scope.data) {
+        _.forEach(scope.data.paragraphs, (paragraph) => {
+            if (paragraph.path === commentableUrl) {
+                paragraph.selectedState = "is-selected";
+            } else {
+                paragraph.selectedState = "is-not-selected";
+            }
+        });
+    }
+};
 
 export var bindPath = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState? : AdhTopLevelState.Service
 ) => (
     scope : IScope,
     pathKey : string = "path"
@@ -77,7 +92,6 @@ export var bindPath = (
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
                 var paragraphPromises = _.map(paragraphPaths, (path) => adhHttp.get(path));
-
                 return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
                     var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
                         return {
@@ -100,6 +114,12 @@ export var bindPath = (
                         creator: documentVersion.data[SIMetadata.nick].creator,
                         picture: documentVersion.data[SIImageReference.nick].picture
                     };
+
+                    // FIXME: This probably isn't the right place for this also topLevelState
+                    // had to be included in this function just for this
+                    if (adhTopLevelState) {
+                        highlightSelectedParagraph(adhTopLevelState.get("commentableUrl"), scope);
+                    }
                 });
             });
         }
@@ -234,11 +254,11 @@ export var postEdit = (
         .then((result) => result[0]);
 };
 
-
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
@@ -247,7 +267,10 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp)(scope);
+            bindPath($q, adhHttp, adhTopLevelState)(scope);
+            scope.$on("$destroy", adhTopLevelState.on("commentableUrl", (commentableUrl) => {
+                highlightSelectedParagraph(adhTopLevelState.get("commentableUrl"), scope);
+            }));
         }
     };
 };
@@ -414,7 +437,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("document-edit");
             adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", detailDirective])
+        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", detailDirective])
         .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",
