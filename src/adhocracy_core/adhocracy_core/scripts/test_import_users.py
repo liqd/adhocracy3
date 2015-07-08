@@ -53,6 +53,23 @@ class TestImportUsers:
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
 
+    def test_create_email_not_lower_case(self, context, registry):
+        from pyramid.traversal import resource_path
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'aLiCE@example.org',
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
+                 'groups': ['gods']}
+            ]))
+        locator = self._get_user_locator(context, registry)
+
+        self.call_fut(context, registry, filename)
+
+        alice = locator.get_user_by_login('Alice')
+        assert alice.active
+        assert alice.email == 'alice@example.org'
+
     def test_update_same_name(self, context, registry):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:

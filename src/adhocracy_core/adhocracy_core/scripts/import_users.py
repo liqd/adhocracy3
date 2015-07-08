@@ -48,6 +48,7 @@ def import_users():  # pragma: no cover
 
 def _import_users(context: IResource, registry: Registry, filename: str):
     users_info = _load_users_info(filename)
+    users_info = [_normalize_user_info(u) for u in users_info]
     users = find_service(context, 'principals', 'users')
     groups = find_service(context, 'principals', 'groups')
     for user_info in users_info:
@@ -75,6 +76,11 @@ def _import_users(context: IResource, registry: Registry, filename: str):
 def _load_users_info(filename: str) -> [dict]:
     with open(filename, 'r') as f:
         return json.load(f)
+
+
+def _normalize_user_info(user_info: dict):
+    user_info['email'] = user_info['email'].lower()
+    return user_info
 
 
 def _locate_user(user_info, context, registry):
