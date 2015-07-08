@@ -640,7 +640,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
     @view_config(request_method='GET',
                  permission='view')
     def get(self) -> dict:
-         return super().get()
+        return super().get()
 
     @view_config(request_method='POST',
                  permission='create',
