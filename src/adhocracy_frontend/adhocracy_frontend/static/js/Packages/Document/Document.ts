@@ -92,6 +92,7 @@ export var bindPath = (
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
                 var paragraphPromises = _.map(paragraphPaths, (path) => adhHttp.get(path));
+
                 return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
                     var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
                         return {
