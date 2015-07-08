@@ -34,8 +34,8 @@
             class="title"
             required="required">
             <!-- FIXME: dummy options -->
-            <option value="" data-selected="selected">Choose a title for your entry</option>
-            <option value="{{title.value}}" data-ng-repeat="title in data.titles">{{title.title}}</option>
+            <option value="data.title" data-selected="selected">{{ data.title | uppercase }}</option>
+            <option data-ng-show="title.value !== data.title" value="{{title.value}}" data-ng-repeat="title in data.titles">{{title.title | uppercase}}</option>
         </select>
         <input
             type="hidden"
