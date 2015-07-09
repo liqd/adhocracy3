@@ -6,7 +6,7 @@ from substanced.interfaces import IUserLocator
 from tempfile import mkstemp
 import os
 import json
-
+import pytest
 
 @mark.usefixtures('integration')
 class TestImportUsers:
@@ -53,7 +53,7 @@ class TestImportUsers:
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
 
-    def test_update(self, context, registry):
+    def test_update_same_name(self, context, registry):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -69,7 +69,7 @@ class TestImportUsers:
         old_password = alice.password
         with open(filename, 'w') as f:
             f.write(json.dumps([
-                {'name': 'Alice', 'email': 'alice@example.org',
+                {'name': 'Alice', 'email': 'alice.new@example.org',
                  'initial-password': 'newpassword', 'roles': ['reader'],
                  'groups': ['gods']}]))
 
@@ -78,10 +78,86 @@ class TestImportUsers:
         alice = locator.get_user_by_login('Alice')
         new_password = alice.password
         assert alice.roles == ['reader']
+        assert alice.email == 'alice.new@example.org'
         assert new_password == old_password
 
-    def test_create_and_send_invitation_mail(self, context, registry,
-                                                 mock_messenger):
+    def test_update_new_name(self, context, registry):
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'alice@example.org',
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
+                 'groups': ['gods']},
+                {'name': 'Bob', 'email': 'bob@example.org',
+                 'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
+            ]))
+        locator = self._get_user_locator(context, registry)
+        self.call_fut(context, registry, filename)
+        alice = locator.get_user_by_login('Alice')
+        old_password = alice.password
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice New', 'email': 'alice@example.org',
+                 'initial-password': 'newpassword', 'roles': ['reader'],
+                 'groups': ['gods']}]))
+
+        self.call_fut(context, registry, filename)
+        old_alice = locator.get_user_by_login('Alice')
+        assert old_alice is None
+
+        alice = locator.get_user_by_login('Alice New')
+        new_password = alice.password
+        assert alice.roles == ['reader']
+        assert alice.email == 'alice@example.org'
+        assert new_password == old_password
+
+    def test_update_already_existing_name(self, context, registry):
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'alice@example.org',
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
+                 'groups': ['gods']},
+                {'name': 'Bob', 'email': 'bob@example.org',
+                 'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
+            ]))
+        locator = self._get_user_locator(context, registry)
+        self.call_fut(context, registry, filename)
+        alice = locator.get_user_by_login('Alice')
+        old_password = alice.password
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Bob', 'email': 'alice@example.org',
+                 'initial-password': 'newpassword', 'roles': ['reader'],
+                 'groups': ['gods']}]))
+
+        with pytest.raises(ValueError):
+            self.call_fut(context, registry, filename)
+
+    def test_update_already_existing_email(self, context, registry):
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'alice@example.org',
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
+                 'groups': ['gods']},
+                {'name': 'Bob', 'email': 'bob@example.org',
+                 'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
+            ]))
+        locator = self._get_user_locator(context, registry)
+        self.call_fut(context, registry, filename)
+        alice = locator.get_user_by_login('Alice')
+        old_password = alice.password
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'bob@example.org',
+                 'initial-password': 'newpassword', 'roles': ['reader'],
+                 'groups': ['gods']}]))
+
+        with pytest.raises(ValueError):
+            self.call_fut(context, registry, filename)
+
+    def test_create_and_send_invitation_mail(self, context, registry, mock_messenger):
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
