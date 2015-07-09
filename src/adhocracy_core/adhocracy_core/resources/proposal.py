@@ -38,15 +38,14 @@ proposal_meta = item_meta._replace(
     content_name='Proposal',
     iresource=IProposal,
     element_types=[IProposalVersion],
-    after_creation=item_meta.after_creation + [
-        add_commentsservice,
-        add_ratesservice,
-        add_badge_assignments_service,
-    ],
     item_type=IProposalVersion,
     is_implicit_addable=True,
     permission_create='create_proposal',
-)
+)._add(after_creation=[
+    add_commentsservice,
+    add_ratesservice,
+    add_badge_assignments_service,
+])
 
 
 def includeme(config):
