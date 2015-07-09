@@ -132,8 +132,6 @@ userbasic_meta = sheet_meta._replace(
     permission_create='create_user',
 )
 
-lower_case_email = lambda e: e.lower()
-
 
 class UserExtendedSchema(colander.MappingSchema):
 
@@ -145,8 +143,7 @@ class UserExtendedSchema(colander.MappingSchema):
     `tzname`: time zone
     """
 
-    email = Email(validator=deferred_validate_user_email,
-                  preparer=lower_case_email)
+    email = Email(validator=deferred_validate_user_email,)
     tzname = TimeZoneName()
 
 
