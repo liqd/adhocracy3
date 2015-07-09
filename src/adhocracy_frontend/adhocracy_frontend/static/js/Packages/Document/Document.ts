@@ -68,7 +68,9 @@ export var highlightSelectedParagraph = (
     scope : IScope) => {
     if (scope.data) {
         _.forEach(scope.data.paragraphs, (paragraph) => {
-            if (paragraph.path === commentableUrl) {
+            if (!commentableUrl) {
+                paragraph.selectedState = "";
+            } else if (paragraph.path === commentableUrl) {
                 paragraph.selectedState = "is-selected";
             } else {
                 paragraph.selectedState = "is-not-selected";
