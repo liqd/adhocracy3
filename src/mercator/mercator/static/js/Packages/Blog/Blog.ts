@@ -137,7 +137,7 @@ export var detailDirective = (
 
             scope.cancel = () => {
                 scope.mode = "display";
-                unbind = AdhDocument.bindPath($q, adhHttp)(scope);
+                unbind = bindPath($q, adhHttp)(scope);
             };
 
             scope.submit = () => {
