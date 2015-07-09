@@ -1,5 +1,6 @@
 import AdhMeinBerlinKiezkassen = require("./Kiezkassen/Kiezkassen");
 import AdhMeinBerlinBplaene = require("./Bplaene/Bplaene");
+import AdhMeinBerlinAlexanderplatz = require("./Alexanderplatz/Alexanderplatz");
 
 
 export var moduleName = "adhMeinBerlin";
@@ -11,6 +12,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhMeinBerlinKiezkassen.moduleName,
-            AdhMeinBerlinBplaene.moduleName
+            AdhMeinBerlinBplaene.moduleName,
+            AdhMeinBerlinAlexanderplatz.moduleName
         ]);
 };
