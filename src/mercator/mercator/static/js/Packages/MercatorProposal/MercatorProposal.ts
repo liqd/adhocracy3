@@ -17,6 +17,8 @@ import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
+import AdhPermissions = require("../Permissions/Permissions");
+import AdhCredentials = require("../User/Credentials");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -995,12 +997,18 @@ export var listItem = (
 };
 
 
-export var addButton = (adhConfig : AdhConfig.IService) => {
+export var addButton = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service, adhPermissions : AdhPermissions.Service, adhCredentials : AdhCredentials.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
         link: (scope) => {
-            scope.showAddButton = (adhConfig.custom["show_add_button"].toLowerCase() === "true");
+            var processUrl = adhTopLevelState.get("processUrl");
+            adhHttp.get(processUrl).then((resource) => {
+                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                scope.participate = ( !adhCredentials.loggedIn && currentPhase === "participate");
+            });
+            adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "postOptions");
         }
     };
 };
@@ -1259,7 +1267,14 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
-        .directive("adhMercatorProposalAddButton", ["adhConfig", addButton])
+        .directive("adhMercatorProposalAddButton", [
+            "adhConfig",
+            "adhHttp",
+            "adhTopLevelState",
+            "adhPermissions",
+            "adhCredentials",
+            addButton
+            ])
         .controller("mercatorProposalFormController", [
             "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", mercatorProposalFormController]);
 };
