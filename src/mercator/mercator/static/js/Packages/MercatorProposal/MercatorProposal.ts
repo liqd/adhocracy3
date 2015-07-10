@@ -997,8 +997,13 @@ export var listItem = (
 };
 
 
-export var addButton = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service, adhPermissions : AdhPermissions.Service, adhCredentials : AdhCredentials.Service) => {
+export var addButton = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhCredentials : AdhCredentials.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
@@ -1006,9 +1011,9 @@ export var addButton = (adhConfig : AdhConfig.IService, adhHttp : AdhHttp.Servic
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
                 var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
-                scope.participate = ( !adhCredentials.loggedIn && currentPhase === "participate");
+                scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && currentPhase === "participate");
             });
-            adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "postOptions");
+            adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "poolOptions");
         }
     };
 };
