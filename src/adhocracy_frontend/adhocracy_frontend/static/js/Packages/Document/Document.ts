@@ -258,7 +258,10 @@ export var postEdit = (
         title: scope.data.title
     });
     // FIXME: workaround for a backend bug
-    documentVersion.data[SIImageReference.nick] = oldVersion.data[SIImageReference.nick];
+    var oldImageReferenceSheet = oldVersion.data[SIImageReference.nick];
+    if (oldImageReferenceSheet.picture) {
+        documentVersion.data[SIImageReference.nick] = oldImageReferenceSheet;
+    }
 
     return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[0]);
