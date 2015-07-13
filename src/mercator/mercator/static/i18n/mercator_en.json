@@ -1,7 +1,10 @@
 {
     "TR__5_BP_OR_MAX_CHARS_800": "5 bullet points or 800 characters Max.",
     "TR__ADVOCATE_EUROPE": "Advocate Europe",
+    "TR__BLOG_EMPTY_TEXT": "",
+    "TR__BY": "",
     "TR__COLLEAGUE": "colleague",
+    "TR__DESCRIPTION": "",
     "TR__DISCLAIMER": "disclaimer",
     "TR__ERROR_MAX_EURO_50000": "Not more than 50,000€ are allowed",
     "TR__ERROR_REQUIRED_MERCATOR_PROPOSAL_FINANCE_GRANTED": "Please select one",
