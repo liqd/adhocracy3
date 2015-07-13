@@ -206,7 +206,7 @@ def autoupdate_non_versionable_has_new_version(event):
     if not sheet.meta.editable:
         return
     appstruct = _get_updated_appstruct(event, sheet)
-    sheet.set(appstruct, registry=event.registry)
+    sheet.set(appstruct)
 
 
 def send_password_reset_mail(event):
