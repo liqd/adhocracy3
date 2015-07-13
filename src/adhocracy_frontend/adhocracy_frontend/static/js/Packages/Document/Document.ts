@@ -20,7 +20,6 @@ import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/p
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
-import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
@@ -138,9 +137,6 @@ export var postCreate = (
 ) : angular.IPromise<RIDocumentVersion> => {
     var doc = new RIDocument({preliminaryNames: adhPreliminaryNames});
     doc.parent = poolPath;
-    doc.data[SIName.nick] = new SIName.Sheet({
-        name: AdhUtil.normalizeName(scope.data.title)
-    });
 
     var paragraphItems = [];
     var paragraphVersions = [];

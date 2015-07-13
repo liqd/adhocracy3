@@ -70,11 +70,9 @@ def test_initiate_and_transition_to_announce(registry, context):
     assert workflow.state_of(context) is 'result'
 
 
-def _post_proposal_item(app_user, name='', path='') -> TestResponse:
+def _post_proposal_item(app_user, path='') -> TestResponse:
     from adhocracy_meinberlin.resources.kiezkassen import IProposal
-    from adhocracy_core.sheets.name import IName
-    sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post_resource(path, IProposal, sheets_cstruct)
+    resp = app_user.post_resource(path, IProposal, {})
     return resp
 
 
@@ -118,20 +116,19 @@ class TestKiezkassenWorkflow:
         assert resp.status_code == 200
 
     def test_participate_participant_creates_proposal(self, app_participant):
-        resp = _post_proposal_item(app_participant, path='/kiezkasse',
-                                   name='proposal')
+        resp = _post_proposal_item(app_participant, path='/kiezkasse')
         assert resp.status_code == 200
 
     def test_participate_participant_can_comment_proposal(self,
                                                           app_participant):
         from adhocracy_core.resources.comment import IComment
         assert IComment in app_participant.get_postable_types(
-            '/kiezkasse/proposal/comments')
+            '/kiezkasse/proposal_0000000/comments')
 
     def test_participate_participant_can_rate_proposal(self, app_participant):
         from adhocracy_core.resources.rate import IRate
         assert IRate in app_participant.get_postable_types(
-            '/kiezkasse/proposal/rates')
+            '/kiezkasse/proposal_0000000/rates')
 
     def test_change_state_to_frozen(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/kiezkasse', 'frozen')
@@ -145,13 +142,13 @@ class TestKiezkassenWorkflow:
                                                               app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment not in app_participant2.get_postable_types(
-            '/kiezkasse/proposal/comments')
+            '/kiezkasse/proposal_0000000/comments')
 
     def test_frozen_participant_cannot_rate_other_proposal(self,
                                                            app_participant2):
         from adhocracy_core.resources.rate import IRate
         assert IRate not in app_participant2.get_postable_types(
-            '/kiezkasse/proposal/rates')
+            '/kiezkasse/proposal_0000000/rates')
 
     def test_change_state_to_result(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/kiezkasse', 'result')

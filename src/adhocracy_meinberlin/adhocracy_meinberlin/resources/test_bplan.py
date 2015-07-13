@@ -17,14 +17,9 @@ class TestProposal:
         assert meta.element_types == [resources.bplan.IProposalVersion]
         assert meta.item_type == resources.bplan.IProposalVersion
         assert meta.permission_create == 'create_proposal'
-        assert meta.basic_sheets == [adhocracy_core.sheets.tags.ITags,
-                                     adhocracy_core.sheets.versions.IVersions,
-                                     adhocracy_core.sheets.pool.IPool,
-                                     adhocracy_core.sheets.metadata.IMetadata,
-                                     ]
         assert meta.extended_sheets == [sheets.bplan.IPrivateWorkflowAssignment]
         assert meta.use_autonaming
-
+        assert meta.autonaming_prefix == 'proposal_'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
