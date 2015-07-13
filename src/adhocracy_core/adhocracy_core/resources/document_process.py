@@ -1,3 +1,5 @@
+"""Process resource which contain documents."""
+
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.document import IDocument
 from adhocracy_core.resources.process import IProcess
