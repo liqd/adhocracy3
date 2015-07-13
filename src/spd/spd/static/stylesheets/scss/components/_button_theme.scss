@@ -16,6 +16,11 @@ input[type="button"] {
         }
     }
 
+    &:hover:not(:disabled):not(.ng-disabled),
+    &:focus:not(:disabled):not(.ng-disabled) {
+        background: transparent;
+    }
+
     &.m-add:before {
         content: "+ ";
     }
