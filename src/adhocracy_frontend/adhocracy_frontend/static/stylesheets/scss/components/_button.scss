@@ -98,7 +98,7 @@ input[type="button"] {
 
     &:focus:not(:disabled):not(.ng-disabled),
     &:hover:not(:disabled):not(.ng-disabled) {
-        @include button-color($color-brand-two-normal, transparent);
+        @include button-color($color-brand-two-normal, $color-text-inverted);
     }
 
     &:disabled,
