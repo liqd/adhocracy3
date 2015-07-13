@@ -84,7 +84,7 @@ Check that everything is running smoothly::
 
     ./bin/supervisorctl status
 
-Set the workflow phase::
+Change the workflow state (most actions are not allowed for a normal user in the initial 'draft' state)::
 
   ./bin/set_workflow_state etc/development.ini <path-to-process> <workflow-state>
   # examples
