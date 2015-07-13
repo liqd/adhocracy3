@@ -12,8 +12,8 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
-            AdhMeinBerlinKiezkassen.moduleName,
+            AdhMeinBerlinAlexanderplatz.moduleName,
             AdhMeinBerlinBplaene.moduleName,
-            AdhMeinBerlinAlexanderplatz.moduleName
+            AdhMeinBerlinKiezkassen.moduleName
         ]);
 };
