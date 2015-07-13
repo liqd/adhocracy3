@@ -8,6 +8,7 @@ export var moduleName = "adhMeinBerlin";
 export var register = (angular) => {
     AdhMeinBerlinKiezkassen.register(angular);
     AdhMeinBerlinBplaene.register(angular);
+    AdhMeinBerlinAlexanderplatz.register(angular);
 
     angular
         .module(moduleName, [
