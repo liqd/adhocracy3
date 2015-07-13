@@ -13,24 +13,16 @@
     }
 
     .user-profile-info-button {
-        @include inline-block;
-
-        &:hover .user-profile-info-icon,
-        &:focus .user-profile-info-icon {
-            color: $color-brand-three-normal;
-        }
-
-        &:active .user-profile-info-icon {
+        &, &:active, &:hover, &:focus {
             color: $color-text-highlight-normal;
         }
 
-        &:active .user-profile-info-icon-active {
-            display: block;
+        &:active, &:hover, &:focus {
+            .user-profile-info-icon {
+                @extend .icon-mail-filled;
+            }
         }
 
-        &:active .user-profile-info-icon-inactive {
-            display: none;
-        }
     }
 
     .user-profile-info-icon {

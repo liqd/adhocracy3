@@ -123,6 +123,18 @@ Now the badged content shows the back reference targeting the badge assignment::
     >>> resp['data']['adhocracy_core.sheets.badge.IBadgeable']['assignments']
     [...0/badge_assignments/0000000/']
 
+It is not possible to assign twice the same badge::
+
+    >>> prop = {'content_type': 'adhocracy_core.resources.badge.IBadgeAssignment',
+    ...         'data': {'adhocracy_core.sheets.badge.IBadgeAssignment':
+    ...                      {'subject': user,
+    ...                       'badge': badge,
+    ...                       'object': proposal_version}
+    ...          }}
+    >>> resp = initiator.post(post_pool, prop).json
+    >>> resp['errors'][0]['description']
+    'Badge already assigned'
+
 We can also use the filtering pool api to search for content with specific badge names::
 
     >>> prop = {'badge': 'badge1',

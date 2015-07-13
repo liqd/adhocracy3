@@ -28,10 +28,8 @@ def initialize_workflow(context: IPool, registry: Registry, options: dict):
     # at this point the permissions are not setup so we need to add
     # the god's permissions
     root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
-    mercator_workflow = registry.content.workflows['mercator']
     mercator_process = root['mercator']
-    setup_workflow(mercator_workflow, mercator_process,
-                   ['announce', 'participate'], registry)
+    setup_workflow(mercator_process, ['announce', 'participate'], registry)
 
 
 mercator_acm = ACM().deserialize(
