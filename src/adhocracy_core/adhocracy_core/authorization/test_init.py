@@ -287,7 +287,9 @@ def test_set_acl_set_changes_acl():
 def test_set_acl_set_resource_dirty():
     from . import set_acl
     from pyramid.security import Deny
-    resource = testing.DummyResource()
+    from persistent.mapping import PersistentMapping
+    resource = PersistentMapping()
+    resource._p_jar = Mock()  # make _p_changed property work
     set_acl(resource, [(Deny, 'role:creator', 'edit_comment')])
     assert resource._p_changed is True
 

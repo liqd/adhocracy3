@@ -42,11 +42,11 @@ def _import_local_roles(context: IResource, registry: Registry, filename: str):
     transaction.commit()
 
 
-def _set_local_roles(local_roles_info: dict, context: IResource, registry: Registry):
+def _set_local_roles(local_roles_info: dict, context: IResource,
+                     registry: Registry):
     resource = find_resource(context, local_roles_info['path'])
     local_roles_info['roles'] = _deserialize_roles(local_roles_info['roles'])
     set_local_roles(resource, local_roles_info['roles'])
-    resource._p_changed = True
 
 
 def _deserialize_roles(roles: dict) -> dict:
