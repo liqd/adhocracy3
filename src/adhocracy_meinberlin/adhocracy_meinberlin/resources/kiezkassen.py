@@ -18,10 +18,8 @@ class IProposalVersion(IItemVersion):
 
 proposal_version_meta = proposal.proposal_version_meta._replace(
     iresource=IProposalVersion,
-    extended_sheets=proposal.proposal_version_meta.extended_sheets +
-    (adhocracy_meinberlin.sheets.kiezkassen.IProposal,
-     IPoint),
-)
+)._add(extended_sheets=(adhocracy_meinberlin.sheets.kiezkassen.IProposal,
+                        IPoint))
 
 
 class IProposal(IItem):
