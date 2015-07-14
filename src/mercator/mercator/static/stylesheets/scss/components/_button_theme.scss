@@ -3,7 +3,7 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
-    &.m-call-to-action-secondary {
+    &.button-cta-secondary {
         outline: 2px solid $color-brand-two-normal;
 
         &:hover:not(:disabled):not(.ng-disabled),

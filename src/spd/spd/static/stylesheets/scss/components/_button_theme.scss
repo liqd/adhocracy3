@@ -6,11 +6,11 @@ input[type="button"] {
     height: 36px / $font-size-normal * 1em;
     line-height: 36px / $font-size-normal * 1em;
 
-    &.m-call-to-action {
+    &.button-cta {
         background: $color-brand-two-normal;
     }
 
-    &.m-call-to-action-secondary {
+    &.button-cta-secondary {
         border: 2px solid $color-brand-two-normal;
         color: $color-brand-two-normal;
 

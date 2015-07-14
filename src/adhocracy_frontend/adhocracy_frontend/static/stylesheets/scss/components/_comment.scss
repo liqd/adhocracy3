@@ -130,7 +130,7 @@ parent: comment
     <div class="comment-children-edit-form">
         <textarea class="comment-edit-form-text"></textarea>
         <footer class="form-footer">
-            <input class="comment-create-form-button-submit m-call-to-action form-footer-button-cta" type="submit" value="Submit">
+            <input class="comment-create-form-button-submit button-cta form-footer-button-cta" type="submit" value="Submit">
             <a href="" class="button form-footer-button">CANCEL</a>
         </footer>
     </div>
@@ -260,7 +260,7 @@ parent: comment
 <form class="comment-create-form">
     <textarea class="comment-create-form-text"></textarea>
     <footer class="form-footer">
-        <input class="comment-create-form-button-submit m-call-to-action form-footer-button-cta" type="submit" value="Submit">
+        <input class="comment-create-form-button-submit button-cta form-footer-button-cta" type="submit" value="Submit">
     </footer>
 </form>
 ```

@@ -25,7 +25,7 @@ input[type="button"] {
         text-transform: capitalize;
     }
 
-    &, &.m-call-to-action {
+    &, &.button-cta {
         color: $color-text-normal;
         min-width: 1px;
         padding: 0 (30px / $font-size-normal * 1em);
@@ -41,7 +41,7 @@ input[type="button"] {
             color: $color-shadow;
         }
 
-        &.m-call-to-action {
+        &.button-cta {
             @include border-radius(1em);
             color: $color-text-inverted;
             font-size: $font-size-normal;
@@ -60,7 +60,7 @@ input[type="button"] {
             }
         }
 
-        &.m-call-to-action-secondary {
+        &.button-cta-secondary {
             color: $color-text-introvert;
 
             &:hover:not(:disabled):not(.ng-disabled),
@@ -96,7 +96,7 @@ input[type="button"] {
 /*doc
 ---
 title: Call to action button index of moving column or embed
-name: button.m-call-to-action.inside
+name: button.button-cta.inside
 parent: button
 ---
 
@@ -104,9 +104,9 @@ For Mein Berlin CTA buttons inside of the moving columns or embed context appear
 
 ```html_example
 <div class="l-center m-embed">
-<a class="button m-call-to-action">Link</a>
-<button type="button" class="m-call-to-action">Button</button>
-<input type="submit" class="m-call-to-action" value="Disabled" disabled="disabled" />
+<a class="button button-cta">Link</a>
+<button type="button" class="button-cta">Button</button>
+<input type="submit" class="button-cta" value="Disabled" disabled="disabled" />
 </div>
 ```
 
@@ -118,7 +118,7 @@ For Mein Berlin CTA buttons inside of the moving columns or embed context appear
     input[type="reset"],
     input[type="submit"],
     input[type="button"] {
-        &, &.m-call-to-action {
+        &, &.button-cta {
             @include border-radius(0);
         }
     }

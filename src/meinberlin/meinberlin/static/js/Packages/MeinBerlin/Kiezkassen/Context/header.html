@@ -5,11 +5,11 @@
     <div class="l-header-right">
         <a
             href="{{processUrl | adhResourceUrl:'create_proposal'}}"
-            class="button m-call-to-action"
+            class="button button-cta"
             data-ng-if="!(!processOptions.POST && processOptions.loggedIn)">
             {{ "TR__CREATE_PROPOSAL" | translate }}</a>
         <span
-            class="button m-call-to-action ng-disabled"
+            class="button button-cta ng-disabled"
             data-ng-if="!processOptions.POST && processOptions.loggedIn">
             {{ "TR__CREATE_PROPOSAL" | translate }}</span>
         <adh-user-indicator></adh-user-indicator>
