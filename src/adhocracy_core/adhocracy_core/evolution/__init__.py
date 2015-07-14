@@ -227,6 +227,21 @@ def lower_case_users_emails(root):  # pragma: no cover
         user._p_changed = True
 
 
+@log_migration
+def remove_name_sheet_from_items(root):  # pragma: no cover
+    """Remove name sheet from items and items subtypes."""
+    from adhocracy_core.sheets.name import IName
+    from adhocracy_core.interfaces import IItem
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, (IItem))
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count,
+                                                       resource))
+        logger.info('Remove {0} sheet'.format(IName))
+        noLongerProvides(resource, IName)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -238,3 +253,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(change_pools_autonaming_scheme)
     config.add_evolution_step(hide_password_resets)
     config.add_evolution_step(lower_case_users_emails)
+    config.add_evolution_step(remove_name_sheet_from_items)

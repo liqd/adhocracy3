@@ -14,6 +14,8 @@ class TestProposal:
         assert meta.element_types == [IProposalVersion]
         assert meta.item_type == IProposalVersion
         assert meta.permission_create == 'create_proposal'
+        assert meta.use_autonaming
+        assert meta.autonaming_prefix == 'proposal_'
 
     @mark.usefixtures('integration')
     def test_create_kiezkassen(self, registry, meta, context):
