@@ -51,8 +51,6 @@ item_basic_sheets_without_name = tuple([x for x in item_meta.basic_sheets if
                                         x != adhocracy_core.sheets.name.IName])
 
 
-=======
->>>>>>> master
 def includeme(config):
     """Add resource type to registry."""
     add_resource_type_to_registry(item_meta, config)
