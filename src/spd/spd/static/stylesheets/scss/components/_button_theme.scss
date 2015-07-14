@@ -6,19 +6,20 @@ input[type="button"] {
     height: 36px / $font-size-normal * 1em;
     line-height: 36px / $font-size-normal * 1em;
 
+    &.m-call-to-action {
+        background: $color-brand-two-normal;
+    }
+
     &.m-call-to-action-secondary {
+        background: $color-background-base;
         border: 2px solid $color-brand-two-normal;
+        color: $color-brand-two-normal;
 
         &:hover:not(:disabled):not(.ng-disabled),
         &:focus:not(:disabled):not(.ng-disabled) {
             background: $color-brand-two-normal;
             color: $color-text-inverted;
         }
-    }
-
-    &:hover:not(:disabled):not(.ng-disabled),
-    &:focus:not(:disabled):not(.ng-disabled) {
-        background: transparent;
     }
 
     &.m-add:before {

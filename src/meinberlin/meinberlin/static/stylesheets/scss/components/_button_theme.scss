@@ -43,6 +43,7 @@ input[type="button"] {
 
         &.m-call-to-action,
         &.m-call-to-action-secondary {
+            color: $color-text-inverted;
             height: 24px / $font-size-normal * 1em;
             line-height: 24px / $font-size-normal * 1em;
             font-size: $font-size-normal;
