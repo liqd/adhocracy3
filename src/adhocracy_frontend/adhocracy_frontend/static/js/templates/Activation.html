@@ -1,8 +1,14 @@
 <div class="standalone-wrapper">
     <div data-ng-if="ready">
-        <div data-ng-if="success">
+        <div data-ng-if="success && embedOnly">
             <h1 class="standalone-wrapper-title">{{ "TR__ACTIVATION_SUCCESS_TITLE" | translate }}</h1>
             <p>{{ "TR__ACTIVATION_CLOSE_THIS_TAB_AND_PROCEED" | translate:{siteName: siteName} }}</p>
+        </div>
+        <div data-ng-if="success && !embedOnly">
+            <h1 class="standalone-wrapper-title">{{ "TR__REGISTRATION_THANKS_FOR_REGISTERING" | translate:{siteName: siteName, userName: user.data.name} }}</h1>
+            <p data-adh-html-translate="TR__REGISTRATION_PROCEED" data-translate-values="{siteName: siteName}" data-translate-templates="{
+                link: '&lt;a href=&quot;&quot; data-ng-click=&quot;goBack()&quot;&gt;{{ content }}&lt;/a&gt;'
+            }"></p>
         </div>
         <div data-ng-if="!success">
             <h1 class="standalone-wrapper-title">{{ "TR__ACTIVATION_ERROR_TITLE" | translate }}</h1>
