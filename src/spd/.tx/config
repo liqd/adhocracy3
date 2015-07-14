@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[adhocracy3mercator.spd]
+file_filter = spd/static/i18n/spd_<lang>.json
+source_file = spd/static/i18n/spd_en.json
+source_lang = en
+type = KEYVALUEJSON

@@ -140,18 +140,10 @@ For example, lets upload a little picture and create a proposal version that
 references it. But first we have to create a proposal::
 
     >>> prop_data = {'content_type': 'adhocracy_core.resources.document.IDocument',
-    ...              'data': {
-    ...                  'adhocracy_core.sheets.name.IName': {
-    ...                      'name': 'kommunismus'}
-    ...                      }
-    ...             }
+    ...              'data': {}}
     >>> resp = testapp.post_json(proposal_pool_path, prop_data, headers=god_header)
     >>> prop_path = resp.json["path"]
-    >>> prop_path
-    'http://localhost/process/kommunismus/'
     >>> prop_v0_path = resp.json['first_version_path']
-    >>> prop_v0_path
-    'http://localhost/process/kommunismus/VERSION_0000000/'
 
 Now we can upload a sample picture::
 
@@ -255,14 +247,14 @@ Lets post a new proposal version that refers to the image::
     >>> resp = testapp.post_json(prop_path, vers_data, headers=god_header)
     >>> prop_v1_path = resp.json["path"]
     >>> prop_v1_path
-    'http://localhost/process/kommunismus/VERSION_0000001/'
+    '...0/VERSION_0000001/'
 
 If we re-download the image metadata, we see that it is now attached to the
 proposal version::
 
     >>> resp_data = testapp.get(pic_path).json
     >>> resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']['attached_to']
-    ['http://localhost/process/kommunismus/VERSION_0000001/']
+    [...0/VERSION_0000001/']
 
 
 Replacing Assets
@@ -318,7 +310,7 @@ changed accordingly::
 
     >>> resp_data = testapp.get(pic_path).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.image.IImageMetadata'])
-    {'attached_to': ['http://localhost/process/kommunismus/VERSION_0000001/'],
+    {'attached_to': ['...0/VERSION_0000001/'],
      'filename': 'python2.jpg',
      'mime_type': 'image/jpeg',
      'size': '112107'}

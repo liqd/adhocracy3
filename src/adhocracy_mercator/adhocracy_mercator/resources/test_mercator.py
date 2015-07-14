@@ -34,18 +34,14 @@ class TestMercatorProposal:
         assert add_commentsservice in meta.after_creation
         assert add_logbook_service in meta.after_creation
         assert meta.permission_create == 'create_mercator_proposal'
+        assert meta.use_autonaming
+        assert meta.autonaming_prefix == 'proposal_'
 
     @mark.usefixtures('integration')
     def test_create(self, pool, meta, registry):
-        from adhocracy_core.sheets.name import IName
-        appstructs = {
-            IName.__identifier__ : {
-                'name': 'dummy_proposal'
-            }
-        }
         res = registry.content.create(meta.iresource.__identifier__,
                                       parent=pool,
-                                      appstructs=appstructs)
+                                      )
         assert meta.iresource.providedBy(res)
 
 

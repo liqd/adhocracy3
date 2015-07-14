@@ -49,6 +49,7 @@ document_meta = item_meta._replace(
     item_type=IDocumentVersion,
     permission_create='create_proposal',
     is_implicit_addable=True,
+    autonaming_prefix='document_',
 )._add(after_creation=(
     add_commentsservice,
     add_ratesservice,

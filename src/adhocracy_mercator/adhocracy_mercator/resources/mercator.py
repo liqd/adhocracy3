@@ -47,6 +47,7 @@ organization_info_meta = item_meta._replace(
                    ),
     item_type=IOrganizationInfoVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='info_',
 )._add(after_creation=(add_commentsservice,))
 
 
@@ -93,7 +94,12 @@ introduction_meta = item_meta._replace(
                    ),
     item_type=IIntroductionVersion,
     permission_create='edit_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,))
+=======
+    autonaming_prefix='introduction_',
+)
+>>>>>>> master
 
 
 class IDescriptionVersion(IItemVersion):
@@ -123,7 +129,12 @@ description_meta = item_meta._replace(
                    ),
     item_type=IDescriptionVersion,
     permission_create='edit_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,))
+=======
+    autonaming_prefix='description_',
+)
+>>>>>>> master
 
 
 class ILocationVersion(IItemVersion):
@@ -153,7 +164,12 @@ location_meta = item_meta._replace(
                    ),
     item_type=ILocationVersion,
     permission_create='edit_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,))
+=======
+    autonaming_prefix='location_',
+)
+>>>>>>> master
 
 
 class IStoryVersion(IItemVersion):
@@ -183,7 +199,12 @@ story_meta = item_meta._replace(
                    ),
     item_type=IStoryVersion,
     permission_create='edit_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,))
+=======
+    autonaming_prefix='story_',
+)
+>>>>>>> master
 
 
 class IOutcomeVersion(IItemVersion):
@@ -213,7 +234,12 @@ outcome_meta = item_meta._replace(
                    ),
     item_type=IOutcomeVersion,
     permission_create='edit_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,))
+=======
+    autonaming_prefix='outcome_',
+)
+>>>>>>> master
 
 
 class IStepsVersion(IItemVersion):
@@ -243,7 +269,12 @@ steps_meta = item_meta._replace(
                    ),
     item_type=IStepsVersion,
     permission_create='edit_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,))
+=======
+    autonaming_prefix='step_',
+)
+>>>>>>> master
 
 
 class IValueVersion(IItemVersion):
@@ -273,7 +304,12 @@ value_meta = item_meta._replace(
                    ],
     item_type=IValueVersion,
     permission_create='edit_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,))
+=======
+    autonaming_prefix='value_',
+)
+>>>>>>> master
 
 
 class IPartnersVersion(IItemVersion):
@@ -411,10 +447,16 @@ mercator_proposal_meta = item_meta._replace(
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
     permission_create='create_mercator_proposal',
+<<<<<<< HEAD
 )._add(after_creation=(add_commentsservice,
                        add_ratesservice,
                        add_badge_assignments_service,
                        add_logbook_service))
+=======
+    autonaming_prefix='proposal_',
+
+)
+>>>>>>> master
 
 
 class IProcess(process.IProcess):

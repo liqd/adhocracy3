@@ -17,6 +17,8 @@ import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
+import AdhPermissions = require("../Permissions/Permissions");
+import AdhCredentials = require("../User/Credentials");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -69,7 +71,6 @@ import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
 import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
@@ -114,7 +115,6 @@ export interface IScopeData {
         teaser : string;
         picture : string;
         commentCount : number;
-        nickInstance : number;
     };
 
     // 3. in detail
@@ -699,9 +699,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
             var mercatorProposal = new RIMercatorProposal({preliminaryNames: this.adhPreliminaryNames});
             mercatorProposal.parent = instance.scope.poolPath;
-            mercatorProposal.data[SIName.nick] = new SIName.Sheet({
-                name: AdhUtil.normalizeName(data.title + <any>data.introduction.nickInstance)
-            });
 
             var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames: this.adhPreliminaryNames});
             mercatorProposalVersion.parent = mercatorProposal.path;
@@ -732,9 +729,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
                 var item = new itemClass({preliminaryNames: this.adhPreliminaryNames});
                 item.parent = mercatorProposal.path;
-                item.data[SIName.nick] = new SIName.Sheet({
-                    name: AdhUtil.normalizeName(subresourceKey)
-                });
 
                 var version = new versionClass({preliminaryNames: this.adhPreliminaryNames});
                 version.parent = item.path;
@@ -995,12 +989,23 @@ export var listItem = (
 };
 
 
-export var addButton = (adhConfig : AdhConfig.IService) => {
+export var addButton = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
+    adhCredentials : AdhCredentials.Service
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
         link: (scope) => {
-            scope.showAddButton = (adhConfig.custom["show_add_button"].toLowerCase() === "true");
+            var processUrl = adhTopLevelState.get("processUrl");
+            adhHttp.get(processUrl).then((resource) => {
+                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && currentPhase === "participate");
+            });
+            adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "poolOptions");
         }
     };
 };
@@ -1104,23 +1109,7 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
         }
 
         return adhSubmitIfValid($scope, $element, $scope.mercatorProposalForm, () => {
-            // append a random number to the nick to allow duplicate titles
-            $scope.data.introduction.nickInstance = $scope.data.introduction.nickInstance ||
-                Math.floor((Math.random() * 10000) + 1);
-
-            return $scope.submit()
-                .catch((errors) => {
-                    if (errors && _.every(errors, { "name": "data.adhocracy_core.sheets.name.IName.name" })) {
-                        $scope.data.introduction.nickInstance++;
-                        if (callCount < 10) {
-                            return $scope.submitIfValid(callCount + 1);
-                        } else {
-                            throw "maximum number of post attempts reached!";
-                        }
-                    } else {
-                        throw errors;
-                    }
-                });
+            return $scope.submit();
         });
     };
 };
@@ -1259,7 +1248,14 @@ export var register = (angular) => {
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
-        .directive("adhMercatorProposalAddButton", ["adhConfig", addButton])
+        .directive("adhMercatorProposalAddButton", [
+            "adhConfig",
+            "adhHttp",
+            "adhTopLevelState",
+            "adhPermissions",
+            "adhCredentials",
+            addButton
+            ])
         .controller("mercatorProposalFormController", [
             "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", mercatorProposalFormController]);
 };

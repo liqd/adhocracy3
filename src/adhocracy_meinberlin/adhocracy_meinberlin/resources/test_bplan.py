@@ -24,7 +24,7 @@ class TestProposal:
                                      )
         assert meta.extended_sheets == (sheets.bplan.IPrivateWorkflowAssignment,)
         assert meta.use_autonaming
-
+        assert meta.autonaming_prefix == 'proposal_'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

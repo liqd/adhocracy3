@@ -9,7 +9,6 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.service import service_meta
-from adhocracy_core.resources.item import item_basic_sheets_without_name
 
 from adhocracy_core.sheets.rate import IRate
 
@@ -33,7 +32,6 @@ class IRate(IItem):
 
 rate_meta = item_meta._replace(
     iresource=IRate,
-    basic_sheets=item_basic_sheets_without_name,
     element_types=(IRateVersion,),
     item_type=IRateVersion,
     use_autonaming=True,

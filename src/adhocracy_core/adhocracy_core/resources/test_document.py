@@ -22,6 +22,8 @@ class TestDocument:
         assert meta.permission_create == 'create_proposal'
         assert resources.comment.add_commentsservice in meta.after_creation
         assert resources.rate.add_ratesservice in meta.after_creation
+        assert meta.use_autonaming
+        assert meta.autonaming_prefix == 'document_'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
