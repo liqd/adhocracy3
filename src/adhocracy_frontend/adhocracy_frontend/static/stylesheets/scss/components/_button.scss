@@ -75,7 +75,6 @@ input[type="reset"],
 input[type="submit"],
 input[type="button"] {
     @include button-base;
-    $button-height: 24px / $font-size-normal;
     background: transparent;
     border: 0;
     color: $color-text-highlight-introvert;

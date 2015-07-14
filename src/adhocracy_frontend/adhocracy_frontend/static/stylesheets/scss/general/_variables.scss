@@ -62,6 +62,7 @@ $padding-medium: 1em;
 
 //Other
 $section-jump-navigation-width: 2em;
+$button-height: 24px / $font-size-normal;
 
 @mixin font-tracking($value) {
     @if $value == narrow {
