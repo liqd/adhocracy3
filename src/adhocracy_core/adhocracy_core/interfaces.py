@@ -221,7 +221,7 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     """
 
     def _add(self, **kw):
-        """Add elements to the value identified by key."""
+        """Concat elements to the value identified by key."""
         last_modified = self
         for key, value in kw.items():
             new_value = getattr(last_modified, key) + value
