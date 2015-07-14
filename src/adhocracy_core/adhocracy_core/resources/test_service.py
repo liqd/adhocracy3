@@ -8,9 +8,9 @@ def test_service_meta():
     import adhocracy_core.sheets
     assert meta.content_name == 'service'
     assert meta.iresource == IBasicService
-    assert meta.basic_sheets == [adhocracy_core.sheets.pool.IPool,
+    assert meta.basic_sheets == (adhocracy_core.sheets.pool.IPool,
                                  adhocracy_core.sheets.metadata.IMetadata,
-                                 ]
+                                 )
     assert meta.permission_create == 'create_service'
 
 

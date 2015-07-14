@@ -22,9 +22,9 @@ class ICommentVersion(IItemVersion):
 commentversion_meta = itemversion_meta._replace(
     content_name='CommentVersion',
     iresource=ICommentVersion,
-    extended_sheets=[adhocracy_core.sheets.comment.IComment,
+    extended_sheets=(adhocracy_core.sheets.comment.IComment,
                      adhocracy_core.sheets.comment.ICommentable,
-                     adhocracy_core.sheets.rate.IRateable],
+                     adhocracy_core.sheets.rate.IRateable),
     permission_create='edit_comment',
 )
 
@@ -37,8 +37,8 @@ class IComment(IItem):
 comment_meta = item_meta._replace(
     content_name='Comment',
     iresource=IComment,
-    element_types=[ICommentVersion,
-                   ],
+    element_types=(ICommentVersion,
+                   ),
     item_type=ICommentVersion,
     use_autonaming=True,
     autonaming_prefix='comment_',
@@ -54,7 +54,7 @@ class ICommentsService(IServicePool):
 comments_meta = service_meta._replace(
     iresource=ICommentsService,
     content_name='comments',
-    element_types=[IComment],
+    element_types=(IComment,),
 )
 
 

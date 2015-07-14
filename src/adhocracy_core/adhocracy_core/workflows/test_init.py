@@ -177,7 +177,7 @@ class TestSetupWorkflow:
     def meta_process(self):
         from adhocracy_core.resources.process import process_meta
         meta = process_meta._replace(iresource=self.IProcess,
-                                     extended_sheets=[self.IWorkflowExample])
+                                     extended_sheets=(self.IWorkflowExample,))
         return meta
 
     @fixture

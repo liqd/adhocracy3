@@ -15,9 +15,9 @@ class TestBadge:
         from adhocracy_core import resources
         from adhocracy_core import sheets
         assert meta.iresource is resources.badge.IBadge
-        assert meta.extended_sheets == [sheets.description.IDescription,
+        assert meta.extended_sheets == (sheets.description.IDescription,
                                         sheets.badge.IBadge,
-                                        ]
+                                        )
         assert meta.permission_create == 'create_badge'
 
     @mark.usefixtures('integration')
@@ -35,12 +35,12 @@ class TestBadgeGroup:
         from adhocracy_core import resources
         from adhocracy_core import sheets
         assert meta.iresource is resources.badge.IBadgeGroup
-        assert meta.extended_sheets == [sheets.description.IDescription,
-                                        ]
+        assert meta.extended_sheets == (sheets.description.IDescription,
+                                        )
         assert meta.permission_create == 'create_badge_group'
-        assert meta.element_types == [resources.badge.IBadge,
+        assert meta.element_types == (resources.badge.IBadge,
                                       meta.iresource,
-                                      ]
+                                      )
 
     @mark.usefixtures('integration')
     def test_create(self, context, registry, meta):
@@ -59,9 +59,9 @@ class TestBadgesService:
         from adhocracy_core import resources
         assert meta.iresource is resources.badge.IBadgesService
         assert meta.iresource.extends(IServicePool)
-        assert meta.element_types == [resources.badge.IBadge,
+        assert meta.element_types == (resources.badge.IBadge,
                                       resources.badge.IBadgeGroup,
-                                      ]
+                                      )
         assert meta.content_name == 'badges'
         assert meta.permission_create == 'create_service'
 
@@ -88,10 +88,10 @@ class TestBadgeAssignment:
         from adhocracy_core import resources
         from adhocracy_core import sheets
         assert meta.iresource is resources.badge.IBadgeAssignment
-        assert meta.basic_sheets == [sheets.metadata.IMetadata,
+        assert meta.basic_sheets == (sheets.metadata.IMetadata,
                                      sheets.badge.IBadgeAssignment,
                                      sheets.description.IDescription
-                                    ]
+                                    )
         assert meta.permission_create == 'create_badge_assignment'
         assert meta.use_autonaming
         assert meta.autonaming_prefix == ''
@@ -113,7 +113,7 @@ class TestBadgeAssignmentsService:
         from adhocracy_core import resources
         assert meta.iresource is resources.badge.IBadgeAssignmentsService
         assert meta.iresource.extends(IServicePool)
-        assert meta.element_types == [resources.badge.IBadgeAssignment]
+        assert meta.element_types == (resources.badge.IBadgeAssignment,)
         assert meta.content_name == 'badge_assignments'
         assert meta.permission_create == 'create_service'
 

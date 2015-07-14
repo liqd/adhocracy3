@@ -11,7 +11,7 @@ class TestProposal:
 
     def test_meta(self, meta):
         from .proposal import IProposalVersion
-        assert meta.element_types == [IProposalVersion]
+        assert meta.element_types == (IProposalVersion,)
         assert meta.item_type == IProposalVersion
         assert meta.permission_create == 'create_proposal'
 
@@ -30,12 +30,12 @@ class TestProposalVersion:
     def test_meta(self, meta):
         import adhocracy_core.sheets
         assert meta.extended_sheets == \
-               [adhocracy_core.sheets.badge.IBadgeable,
+               (adhocracy_core.sheets.badge.IBadgeable,
                 adhocracy_core.sheets.title.ITitle,
                 adhocracy_core.sheets.description.IDescription,
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
-                ]
+                )
         assert meta.permission_create == 'edit_proposal'
 
     @mark.usefixtures('integration')

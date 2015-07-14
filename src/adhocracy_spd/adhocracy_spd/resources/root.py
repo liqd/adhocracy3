@@ -25,10 +25,10 @@ spd_acm = ACM().deserialize(
 
 
 spd_root_meta = root_meta._replace(
-    after_creation=[create_initial_content_for_app_root,
+    after_creation=(create_initial_content_for_app_root,
                     add_spd_process,
                     add_example_process,
-                    ])
+                    ))
 
 
 def includeme(config):

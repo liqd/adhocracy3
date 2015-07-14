@@ -13,8 +13,8 @@ class IDocumentProcess(IProcess):
 
 document_process_meta = process_meta._replace(
     iresource=IDocumentProcess,
-    element_types=[IDocument,
-                   ],
+    element_types=(IDocument,
+                   ),
     is_implicit_addable=True,
 )
 

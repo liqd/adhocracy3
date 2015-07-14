@@ -17,7 +17,7 @@ class IProposalVersion(proposal.IProposalVersion):
 
 proposal_version_meta = proposal.proposal_version_meta._replace(
     iresource=IProposalVersion,
-)._add(extended_sheets=[IPoint])
+)._add(extended_sheets=(IPoint,))
 
 
 class IProposal(proposal.IProposal):
@@ -26,7 +26,7 @@ class IProposal(proposal.IProposal):
 
 proposal_meta = proposal.proposal_meta._replace(
     iresource=IProposal,
-    element_types=[IProposalVersion],
+    element_types=(IProposalVersion,),
     item_type=IProposalVersion,
 )
 
@@ -39,7 +39,7 @@ class IDocumentVersion(document.IDocumentVersion):
 document_version_meta = document.document_version_meta._replace(
     iresource=IDocumentVersion,
 )._add(
-    extended_sheets=[IPoint]
+    extended_sheets=(IPoint,)
 )
 
 
@@ -50,9 +50,9 @@ class IDocument(document.IDocument):
 
 document_meta = document.document_meta._replace(
     iresource=IDocument,
-    element_types=[ITag,
+    element_types=(ITag,
                    IParagraph,
-                   IDocumentVersion]
+                   IDocumentVersion)
 )
 
 
@@ -62,8 +62,8 @@ class IProcess(IDocumentProcess):
 
 process_meta = document_process_meta._replace(
     iresource=IProcess,
-    element_types=[IProposal,
-                   IDocument]
+    element_types=(IProposal,
+                   IDocument)
 )
 
 

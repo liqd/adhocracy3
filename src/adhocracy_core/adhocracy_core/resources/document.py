@@ -24,13 +24,13 @@ class IDocumentVersion(IItemVersion):
 
 document_version_meta = itemversion_meta._replace(
     iresource=IDocumentVersion,
-    extended_sheets=[adhocracy_core.sheets.document.IDocument,
+    extended_sheets=(adhocracy_core.sheets.document.IDocument,
                      adhocracy_core.sheets.comment.ICommentable,
                      adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.rate.IRateable,
                      adhocracy_core.sheets.image.IImageReference,
                      adhocracy_core.sheets.title.ITitle,
-                     ],
+                     ),
     permission_create='edit_proposal',
 )
 
@@ -42,18 +42,18 @@ class IDocument(IItem):
 
 document_meta = item_meta._replace(
     iresource=IDocument,
-    element_types=[ITag,
+    element_types=(ITag,
                    IParagraph,
                    IDocumentVersion,
-                   ],
+                   ),
     item_type=IDocumentVersion,
     permission_create='create_proposal',
     is_implicit_addable=True,
-)._add(after_creation=[
+)._add(after_creation=(
     add_commentsservice,
     add_ratesservice,
     add_badge_assignments_service,
-])
+))
 
 
 def includeme(config):

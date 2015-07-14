@@ -14,9 +14,9 @@ organisation_meta = pool_meta._replace(
     iresource=IOrganisation,
     permission_create='create_organisation',
     is_implicit_addable=True,
-    element_types=[IProcess,
+    element_types=(IProcess,
                    IOrganisation,
-                   ],
+                   ),
 )
 
 

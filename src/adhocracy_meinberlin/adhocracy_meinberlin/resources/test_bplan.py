@@ -14,15 +14,15 @@ class TestProposal:
         from adhocracy_meinberlin import resources
         from adhocracy_meinberlin import sheets
         assert meta.iresource == resources.bplan.IProposal
-        assert meta.element_types == [resources.bplan.IProposalVersion]
+        assert meta.element_types == (resources.bplan.IProposalVersion,)
         assert meta.item_type == resources.bplan.IProposalVersion
         assert meta.permission_create == 'create_proposal'
-        assert meta.basic_sheets == [adhocracy_core.sheets.tags.ITags,
+        assert meta.basic_sheets == (adhocracy_core.sheets.tags.ITags,
                                      adhocracy_core.sheets.versions.IVersions,
                                      adhocracy_core.sheets.pool.IPool,
                                      adhocracy_core.sheets.metadata.IMetadata,
-                                     ]
-        assert meta.extended_sheets == [sheets.bplan.IPrivateWorkflowAssignment]
+                                     )
+        assert meta.extended_sheets == (sheets.bplan.IPrivateWorkflowAssignment,)
         assert meta.use_autonaming
 
 
@@ -43,8 +43,8 @@ class TestProposalVersion:
         from adhocracy_meinberlin import resources
         assert meta.iresource == resources.bplan.IProposalVersion
         assert meta.extended_sheets == \
-               [sheets.bplan.IProposal,
-               ]
+               (sheets.bplan.IProposal,
+               )
         assert meta.permission_create == 'edit_proposal'
 
     @mark.usefixtures('integration')
@@ -67,9 +67,9 @@ class TestProcess:
         assert resources.bplan.IProcess.isOrExtends(IProcess)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
-        assert meta.extended_sheets == [
+        assert meta.extended_sheets == (
             sheets.bplan.IWorkflowAssignment,
-        ]
+        )
         assert meta.permission_create == 'create_process'
 
     @mark.usefixtures('integration')

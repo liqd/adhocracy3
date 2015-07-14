@@ -17,8 +17,8 @@ class TestMultiPolygon:
         assert meta.iresource is IMultiPolygon
         assert IMultiPolygon.isOrExtends(ISimple)
         assert meta.permission_create == 'create_multipolygon'
-        assert meta.extended_sheets == [adhocracy_core.sheets.geo.IMultiPolygon,
-                                        ]
+        assert meta.extended_sheets == (adhocracy_core.sheets.geo.IMultiPolygon,
+                                        )
 
     @mark.usefixtures('integration')
     def test_create(self, pool, registry, meta):

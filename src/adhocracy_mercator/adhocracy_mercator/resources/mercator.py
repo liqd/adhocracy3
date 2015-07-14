@@ -28,9 +28,9 @@ class IOrganizationInfoVersion(IItemVersion):
 organization_info_version_meta = itemversion_meta._replace(
     content_name='OrganizationInfoVersion',
     iresource=IOrganizationInfoVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IOrganizationInfo,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -43,11 +43,11 @@ class IOrganizationInfo(IItem):
 organization_info_meta = item_meta._replace(
     content_name='OrganizationInfo',
     iresource=IOrganizationInfo,
-    element_types=[IOrganizationInfoVersion,
-                   ],
+    element_types=(IOrganizationInfoVersion,
+                   ),
     item_type=IOrganizationInfoVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IIntroImage(IAsset):
@@ -60,7 +60,7 @@ intro_image_meta = asset_meta._replace(
     iresource=IIntroImage,
     is_implicit_addable=True,
     # replace IAssetMetadata sheet by IIntroImageMetadata
-    basic_sheets=list(
+    basic_sheets=tuple(
         set(asset_meta.basic_sheets) - {IAssetMetadata, }
         | {adhocracy_mercator.sheets.mercator.IIntroImageMetadata, }),
 )
@@ -74,9 +74,9 @@ class IIntroductionVersion(IItemVersion):
 introduction_version_meta = itemversion_meta._replace(
     content_name='IntroductionVersion',
     iresource=IIntroductionVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IIntroduction,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -89,11 +89,11 @@ class IIntroduction(IItem):
 introduction_meta = item_meta._replace(
     content_name='Introduction',
     iresource=IIntroduction,
-    element_types=[IIntroductionVersion,
-                   ],
+    element_types=(IIntroductionVersion,
+                   ),
     item_type=IIntroductionVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IDescriptionVersion(IItemVersion):
@@ -104,9 +104,9 @@ class IDescriptionVersion(IItemVersion):
 description_version_meta = itemversion_meta._replace(
     content_name='DescriptionVersion',
     iresource=IDescriptionVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IDescription,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -119,11 +119,11 @@ class IDescription(IItem):
 description_meta = item_meta._replace(
     content_name='Description',
     iresource=IDescription,
-    element_types=[IDescriptionVersion,
-                   ],
+    element_types=(IDescriptionVersion,
+                   ),
     item_type=IDescriptionVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class ILocationVersion(IItemVersion):
@@ -134,9 +134,9 @@ class ILocationVersion(IItemVersion):
 location_version_meta = itemversion_meta._replace(
     content_name='LocationVersion',
     iresource=ILocationVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.ILocation,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -149,11 +149,11 @@ class ILocation(IItem):
 location_meta = item_meta._replace(
     content_name='Location',
     iresource=ILocation,
-    element_types=[ILocationVersion,
-                   ],
+    element_types=(ILocationVersion,
+                   ),
     item_type=ILocationVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IStoryVersion(IItemVersion):
@@ -164,9 +164,9 @@ class IStoryVersion(IItemVersion):
 story_version_meta = itemversion_meta._replace(
     content_name='StoryVersion',
     iresource=IStoryVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IStory,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -179,11 +179,11 @@ class IStory(IItem):
 story_meta = item_meta._replace(
     content_name='Story',
     iresource=IStory,
-    element_types=[IStoryVersion,
-                   ],
+    element_types=(IStoryVersion,
+                   ),
     item_type=IStoryVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IOutcomeVersion(IItemVersion):
@@ -194,9 +194,9 @@ class IOutcomeVersion(IItemVersion):
 outcome_version_meta = itemversion_meta._replace(
     content_name='OutcomeVersion',
     iresource=IOutcomeVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IOutcome,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -209,11 +209,11 @@ class IOutcome(IItem):
 outcome_meta = item_meta._replace(
     content_name='Outcome',
     iresource=IOutcome,
-    element_types=[IOutcomeVersion,
-                   ],
+    element_types=(IOutcomeVersion,
+                   ),
     item_type=IOutcomeVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IStepsVersion(IItemVersion):
@@ -224,9 +224,9 @@ class IStepsVersion(IItemVersion):
 steps_version_meta = itemversion_meta._replace(
     content_name='StepsVersion',
     iresource=IStepsVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.ISteps,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -239,11 +239,11 @@ class ISteps(IItem):
 steps_meta = item_meta._replace(
     content_name='Steps',
     iresource=ISteps,
-    element_types=[IStepsVersion,
-                   ],
+    element_types=(IStepsVersion,
+                   ),
     item_type=IStepsVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IValueVersion(IItemVersion):
@@ -254,9 +254,9 @@ class IValueVersion(IItemVersion):
 value_version_meta = itemversion_meta._replace(
     content_name='ValueVersion',
     iresource=IValueVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IValue,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -273,7 +273,7 @@ value_meta = item_meta._replace(
                    ],
     item_type=IValueVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IPartnersVersion(IItemVersion):
@@ -284,9 +284,9 @@ class IPartnersVersion(IItemVersion):
 partners_version_meta = itemversion_meta._replace(
     content_name='PartnersVersion',
     iresource=IPartnersVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IPartners,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -299,11 +299,11 @@ class IPartners(IItem):
 partners_meta = item_meta._replace(
     content_name='Partners',
     iresource=IPartners,
-    element_types=[IPartnersVersion,
-                   ],
+    element_types=(IPartnersVersion,
+                   ),
     item_type=IPartnersVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IFinanceVersion(IItemVersion):
@@ -314,9 +314,9 @@ class IFinanceVersion(IItemVersion):
 finance_version_meta = itemversion_meta._replace(
     content_name='FinanceVersion',
     iresource=IFinanceVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IFinance,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -329,11 +329,11 @@ class IFinance(IItem):
 finance_meta = item_meta._replace(
     content_name='Finance',
     iresource=IFinance,
-    element_types=[IFinanceVersion,
-                   ],
+    element_types=(IFinanceVersion,
+                   ),
     item_type=IFinanceVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IExperienceVersion(IItemVersion):
@@ -344,9 +344,9 @@ class IExperienceVersion(IItemVersion):
 experience_version_meta = itemversion_meta._replace(
     content_name='ExperienceVersion',
     iresource=IExperienceVersion,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_mercator.sheets.mercator.IExperience,
-        ICommentable],
+        ICommentable),
     permission_create='edit_mercator_proposal',
 )
 
@@ -359,11 +359,11 @@ class IExperience(IItem):
 experience_meta = item_meta._replace(
     content_name='Experience',
     iresource=IExperience,
-    element_types=[IExperienceVersion,
-                   ],
+    element_types=(IExperienceVersion,
+                   ),
     item_type=IExperienceVersion,
     permission_create='edit_mercator_proposal',
-)._add(after_creation=[add_commentsservice])
+)._add(after_creation=(add_commentsservice,))
 
 
 class IMercatorProposalVersion(IItemVersion):
@@ -374,7 +374,7 @@ class IMercatorProposalVersion(IItemVersion):
 mercator_proposal_version_meta = itemversion_meta._replace(
     content_name='MercatorProposalVersion',
     iresource=IMercatorProposalVersion,
-    extended_sheets=[adhocracy_core.sheets.badge.IBadgeable,
+    extended_sheets=(adhocracy_core.sheets.badge.IBadgeable,
                      adhocracy_core.sheets.title.ITitle,
                      adhocracy_mercator.sheets.mercator.IUserInfo,
                      adhocracy_mercator.sheets.mercator.IHeardFrom,
@@ -382,7 +382,7 @@ mercator_proposal_version_meta = itemversion_meta._replace(
                      ICommentable,
                      ILikeable,
                      IHasLogbookPool,
-                     ],
+                     ),
     permission_create='edit_mercator_proposal',
 )
 
@@ -395,7 +395,7 @@ class IMercatorProposal(IItem):
 mercator_proposal_meta = item_meta._replace(
     content_name='MercatorProposal',
     iresource=IMercatorProposal,
-    element_types=[IMercatorProposalVersion,
+    element_types=(IMercatorProposalVersion,
                    IOrganizationInfo,
                    IIntroduction,
                    IDescription,
@@ -407,14 +407,14 @@ mercator_proposal_meta = item_meta._replace(
                    IPartners,
                    IFinance,
                    IExperience,
-                   ],
+                   ),
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
     permission_create='create_mercator_proposal',
-)._add(after_creation=[add_commentsservice,
+)._add(after_creation=(add_commentsservice,
                        add_ratesservice,
                        add_badge_assignments_service,
-                       add_logbook_service])
+                       add_logbook_service))
 
 
 class IProcess(process.IProcess):
@@ -424,12 +424,12 @@ class IProcess(process.IProcess):
 
 process_meta = process.process_meta._replace(
     iresource=IProcess,
-    element_types=[IMercatorProposal,
-                   ],
+    element_types=(IMercatorProposal,
+                   ),
     is_implicit_addable=True,
-    extended_sheets=[
-        adhocracy_mercator.sheets.mercator.IWorkflowAssignment
-    ]
+    extended_sheets=(
+        adhocracy_mercator.sheets.mercator.IWorkflowAssignment,
+    )
 )
 
 

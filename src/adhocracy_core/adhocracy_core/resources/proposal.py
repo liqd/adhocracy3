@@ -21,11 +21,11 @@ class IProposalVersion(IItemVersion):
 proposal_version_meta = itemversion_meta._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
-    extended_sheets=[IBadgeable,
+    extended_sheets=(IBadgeable,
                      ITitle,
                      IDescription,
                      ICommentable,
-                     IRateable],
+                     IRateable),
     permission_create='edit_proposal',
 )
 
@@ -37,15 +37,15 @@ class IProposal(IItem):
 proposal_meta = item_meta._replace(
     content_name='Proposal',
     iresource=IProposal,
-    element_types=[IProposalVersion],
+    element_types=(IProposalVersion,),
     item_type=IProposalVersion,
     is_implicit_addable=True,
     permission_create='create_proposal',
-)._add(after_creation=[
+)._add(after_creation=(
     add_commentsservice,
     add_ratesservice,
     add_badge_assignments_service,
-])
+))
 
 
 def includeme(config):

@@ -32,7 +32,7 @@ def test_assets_service_meta():
     from adhocracy_core.resources.asset import IAsset
     meta = assets_service_meta
     assert meta.iresource is IAssetsService
-    assert meta.element_types == [IAsset]
+    assert meta.element_types == (IAsset,)
 
 
 def test_pool_with_assets_meta():

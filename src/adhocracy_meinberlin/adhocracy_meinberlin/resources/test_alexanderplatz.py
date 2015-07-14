@@ -10,7 +10,7 @@ class TestProposal:
 
     def test_meta(self, meta):
         from .alexanderplatz import IProposalVersion
-        assert meta.element_types == [IProposalVersion]
+        assert meta.element_types == (IProposalVersion,)
         assert meta.item_type == IProposalVersion
         assert meta.permission_create == 'create_proposal'
 
@@ -30,13 +30,13 @@ class TestProposalVersion:
     def test_meta(self, meta):
         import adhocracy_core.sheets
         assert meta.extended_sheets == \
-               [adhocracy_core.sheets.badge.IBadgeable,
+               (adhocracy_core.sheets.badge.IBadgeable,
                 adhocracy_core.sheets.title.ITitle,
                 adhocracy_core.sheets.description.IDescription,
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
                 adhocracy_core.sheets.geo.IPoint,
-                ]
+                )
         assert meta.permission_create == 'edit_proposal'
 
     @mark.usefixtures('integration')
@@ -57,10 +57,10 @@ class TestDocument:
         from .alexanderplatz import IDocument
         from .alexanderplatz import IDocumentVersion
         assert meta.iresource == IDocument
-        assert meta.element_types == [ITag,
+        assert meta.element_types == (ITag,
                                       resources.paragraph.IParagraph,
                                       IDocumentVersion
-                                      ]
+                                      )
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
@@ -78,14 +78,14 @@ class TestDocumentVersion:
         from adhocracy_core import sheets
         from .alexanderplatz import IDocumentVersion
         assert meta.iresource == IDocumentVersion
-        assert meta.extended_sheets == [sheets.document.IDocument,
+        assert meta.extended_sheets == (sheets.document.IDocument,
                                         sheets.comment.ICommentable,
                                         sheets.badge.IBadgeable,
                                         sheets.rate.IRateable,
                                         sheets.image.IImageReference,
                                         sheets.title.ITitle,
                                         sheets.geo.IPoint
-                                        ]
+                                        )
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

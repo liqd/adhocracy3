@@ -19,8 +19,8 @@ class IProposalVersion(IItemVersion):
 proposal_version_meta = proposal.proposal_version_meta._replace(
     iresource=IProposalVersion,
     extended_sheets=proposal.proposal_version_meta.extended_sheets +
-    [adhocracy_meinberlin.sheets.kiezkassen.IProposal,
-     IPoint],
+    (adhocracy_meinberlin.sheets.kiezkassen.IProposal,
+     IPoint),
 )
 
 
@@ -31,7 +31,7 @@ class IProposal(IItem):
 
 proposal_meta = proposal.proposal_meta._replace(
     iresource=IProposal,
-    element_types=[IProposalVersion],
+    element_types=(IProposalVersion,),
     item_type=IProposalVersion,
 )
 
@@ -43,15 +43,15 @@ class IProcess(process.IProcess):
 
 process_meta = process.process_meta._replace(
     iresource=IProcess,
-    element_types=[IProposal,
-                   ],
+    element_types=(IProposal,
+                   ),
     is_implicit_addable=True,
-    extended_sheets=[
+    extended_sheets=(
         IDescription,
         adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
         ILocationReference,
         IImageReference,
-    ],
+    ),
 )
 
 

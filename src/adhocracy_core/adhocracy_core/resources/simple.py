@@ -12,11 +12,11 @@ simple_meta = resource_meta._replace(
     content_class=Base,
     permission_create='create_simple',
     is_implicit_addable=False,
-    basic_sheets=[adhocracy_core.sheets.name.IName,
+    basic_sheets=(adhocracy_core.sheets.name.IName,
                   adhocracy_core.sheets.title.ITitle,
                   adhocracy_core.sheets.metadata.IMetadata,
-                  ],
-    extended_sheets=[],
+                  ),
+    extended_sheets=(),
 )
 
 

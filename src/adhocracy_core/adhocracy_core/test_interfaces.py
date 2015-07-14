@@ -62,13 +62,13 @@ class TestResourceMetadata:
                                 content_class=None,
                                 permission_create='',
                                 is_implicit_addable=False,
-                                basic_sheets=[],
-                                extended_sheets=[self.ISampleSheetA],
-                                after_creation=[],
+                                basic_sheets=(),
+                                extended_sheets=(self.ISampleSheetA,),
+                                after_creation=(),
                                 use_autonaming=False,
                                 autonaming_prefix='',
                                 use_autonaming_random=False,
-                                element_types=[],
+                                element_types=(),
                                 item_type=False,
         )
         return meta
@@ -78,7 +78,7 @@ class TestResourceMetadata:
 
     def test_add(self):
         meta = self.make_one()
-        new_meta = meta._add(extended_sheets=[self.ISampleSheetB],
-                             after_creation=[self.after_creation_sample])
-        assert new_meta.extended_sheets == [self.ISampleSheetA, self.ISampleSheetB]
-        assert new_meta.after_creation == [self.after_creation_sample]
+        new_meta = meta._add(extended_sheets=(self.ISampleSheetB,),
+                             after_creation=(self.after_creation_sample,))
+        assert new_meta.extended_sheets == (self.ISampleSheetA, self.ISampleSheetB)
+        assert new_meta.after_creation == (self.after_creation_sample,)

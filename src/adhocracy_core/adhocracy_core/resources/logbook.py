@@ -16,7 +16,7 @@ class ILogbookService(IServicePool):
 logbook_service_meta = service_meta._replace(
     iresource=ILogbookService,
     content_name='logbook',
-    element_types=[IDocument],
+    element_types=(IDocument,),
 )
 
 

@@ -21,11 +21,11 @@ class IExternalResource(IBasicPool):
 external_resource_meta = pool_meta._replace(
     content_name='ExternalResource',
     iresource=IExternalResource,
-    element_types=[IComment],
+    element_types=(IComment,),
     is_implicit_addable=True,
     permission_create='create_external',
-    extended_sheets=[adhocracy_core.sheets.comment.ICommentable],
-)._add(after_creation=[add_commentsservice, add_ratesservice])
+    extended_sheets=(adhocracy_core.sheets.comment.ICommentable,),
+)._add(after_creation=(add_commentsservice, add_ratesservice))
 
 
 def includeme(config):

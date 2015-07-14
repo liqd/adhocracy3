@@ -32,7 +32,7 @@ class IAssetDownload(ISimple):
 asset_download_meta = simple_meta._replace(
     content_name='AssetDownload',
     iresource=IAssetDownload,
-    basic_sheets=[IName, IAssetData],
+    basic_sheets=(IName, IAssetData),
 )
 
 
@@ -130,15 +130,15 @@ def _create_asset_download(context: IAsset, name: str, registry: Registry,
 asset_meta = pool_meta._replace(
     content_name='Asset',
     iresource=IAsset,
-    basic_sheets=[
+    basic_sheets=(
         adhocracy_core.sheets.metadata.IMetadata,
         adhocracy_core.sheets.asset.IAssetData,
         adhocracy_core.sheets.title.ITitle,
-    ],
-    extended_sheets=[
+    ),
+    extended_sheets=(
         # all subtypes need to provide an IAssetMetadata sheet
         adhocracy_core.sheets.asset.IAssetMetadata,
-    ],
+    ),
     use_autonaming=True,
     permission_create='create_asset',
     after_creation=[validate_and_complete_asset],
@@ -153,7 +153,7 @@ class IAssetsService(IServicePool):
 assets_service_meta = service_meta._replace(
     iresource=IAssetsService,
     content_name='assets',
-    element_types=[IAsset],
+    element_types=(IAsset,),
 )
 
 
@@ -172,9 +172,9 @@ def add_assets_service(context: IPool, registry: Registry, options: dict):
 
 pool_with_assets_meta = pool_meta._replace(
     iresource=IPoolWithAssets,
-    after_creation=[add_assets_service],
+    after_creation=(add_assets_service,),
     is_implicit_addable=True,
-)._add(basic_sheets=[adhocracy_core.sheets.asset.IHasAssetPool])
+)._add(basic_sheets=(adhocracy_core.sheets.asset.IHasAssetPool,))
 
 
 def includeme(config):

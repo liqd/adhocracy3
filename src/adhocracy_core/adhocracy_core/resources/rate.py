@@ -21,7 +21,7 @@ class IRateVersion(IItemVersion):
 
 rateversion_meta = itemversion_meta._replace(
     iresource=IRateVersion,
-    extended_sheets=[IRate],
+    extended_sheets=(IRate,),
     permission_create='edit_rate',
 )
 
@@ -34,7 +34,7 @@ class IRate(IItem):
 rate_meta = item_meta._replace(
     iresource=IRate,
     basic_sheets=item_basic_sheets_without_name,
-    element_types=[IRateVersion],
+    element_types=(IRateVersion,),
     item_type=IRateVersion,
     use_autonaming=True,
     autonaming_prefix='rate_',
@@ -50,7 +50,7 @@ class IRatesService(IServicePool):
 rates_meta = service_meta._replace(
     iresource=IRatesService,
     content_name='rates',
-    element_types=[IRate],
+    element_types=(IRate,),
 )
 
 

@@ -26,7 +26,7 @@ class TestResourceContentRegistry:
 
     @fixture
     def resource_meta(self, resource_meta):
-        return resource_meta._replace(basic_sheets=[ISheet])
+        return resource_meta._replace(basic_sheets=(ISheet,))
 
     @fixture
     def sheet_meta(self, sheet_meta, mock_sheet):
@@ -168,7 +168,7 @@ class TestResourceContentRegistry:
     def test_resources_meta_addable_with_addables(self, inst, resource_meta):
         simple_meta = deepcopy(resource_meta)._replace(iresource=ISimple)
         inst.resources_meta[ISimple] = simple_meta
-        resource_meta = resource_meta._replace(element_types= [ISimple])
+        resource_meta = resource_meta._replace(element_types= (ISimple,))
         inst.resources_meta[IResource] = resource_meta
         assert inst.resources_meta_addable[IResource] == [simple_meta]
 
@@ -179,7 +179,7 @@ class TestResourceContentRegistry:
         simples_meta = deepcopy(resource_meta)._replace(iresource=ISimpleS,
                                                         is_implicit_addable=True)
         inst.resources_meta[ISimpleS] = simples_meta
-        resource_meta = resource_meta._replace(element_types= [ISimple])
+        resource_meta = resource_meta._replace(element_types=(ISimple,))
         inst.resources_meta[IResource] = resource_meta
         assert simple_meta in inst.resources_meta_addable[IResource]
         assert simples_meta in inst.resources_meta_addable[IResource]

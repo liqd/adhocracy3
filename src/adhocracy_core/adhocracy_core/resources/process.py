@@ -17,13 +17,13 @@ class IProcess(IPool):
 process_meta = pool_meta._replace(
     iresource=IProcess,
     # Every process should have a workflow assignment sheet
-    extended_sheets=[ISample],
+    extended_sheets=(ISample,),
     permission_create='create_process',
-    after_creation=[add_assets_service,
+    after_creation=(add_assets_service,
                     add_badges_service,
-                    ],
-)._add(basic_sheets=[IHasAssetPool,
-                     IHasBadgesPool])
+                    ),
+)._add(basic_sheets=(IHasAssetPool,
+                     IHasBadgesPool))
 
 
 def includeme(config):

@@ -14,10 +14,10 @@ class TestDocument:
         from adhocracy_core import resources
         from adhocracy_core.interfaces import ITag
         assert meta.iresource == resources.document.IDocument
-        assert meta.element_types == [ITag,
+        assert meta.element_types == (ITag,
                                       resources.paragraph.IParagraph,
                                       resources.document.IDocumentVersion,
-                                      ]
+                                      )
         assert meta.item_type == resources.document.IDocumentVersion
         assert meta.permission_create == 'create_proposal'
         assert resources.comment.add_commentsservice in meta.after_creation
@@ -39,13 +39,13 @@ class TestDocumentVersion:
         from adhocracy_core import resources
         from adhocracy_core import sheets
         assert meta.iresource == resources.document.IDocumentVersion
-        assert meta.extended_sheets == [sheets.document.IDocument,
+        assert meta.extended_sheets == (sheets.document.IDocument,
                                         sheets.comment.ICommentable,
                                         sheets.badge.IBadgeable,
                                         sheets.rate.IRateable,
                                         sheets.image.IImageReference,
                                         sheets.title.ITitle,
-                                        ]
+                                        )
         assert meta.permission_create == 'edit_proposal'
 
     @mark.usefixtures('integration')

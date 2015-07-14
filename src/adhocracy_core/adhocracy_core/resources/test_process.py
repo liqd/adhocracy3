@@ -21,7 +21,7 @@ class TestProcess:
         assert meta.permission_create == 'create_process'
         assert sheets.asset.IHasAssetPool in meta.basic_sheets
         assert sheets.badge.IHasBadgesPool in meta.basic_sheets
-        assert meta.extended_sheets == [sheets.workflow.ISample]
+        assert meta.extended_sheets == (sheets.workflow.ISample,)
         assert add_assets_service in meta.after_creation
         assert add_badges_service in meta.after_creation
 

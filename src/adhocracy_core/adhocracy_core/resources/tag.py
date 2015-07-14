@@ -13,11 +13,11 @@ tag_meta = resource_meta._replace(
     content_class=Base,
     permission_create='create_tag',
     is_implicit_addable=False,
-    basic_sheets=[adhocracy_core.sheets.name.IName,
+    basic_sheets=(adhocracy_core.sheets.name.IName,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.tags.ITag,
-                  ],
-    extended_sheets=[],
+                  ),
+    extended_sheets=(),
 )
 
 
