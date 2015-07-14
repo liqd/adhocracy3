@@ -97,9 +97,9 @@ describe("user password reset", function() {
 
             shared.parseEmail(mailpath, function(mail) {
                 // console.log('email=', mail);
-                expect(mail.subject).toContain("Reset Password");
+                expect(mail.subject).toContain("Passwor");
                 expect(mail.to[0].address).toContain("participant");
-                resetUrl = mail.text.split("\n\n")[4];
+                resetUrl = _.find(mail.text.split("\n"), function(line) {return _.startsWith(line, "http");});
             });
         });
 
