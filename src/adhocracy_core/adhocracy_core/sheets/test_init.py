@@ -115,30 +115,30 @@ class TestBaseResourceSheet:
         with raises(ValueError):
             inst.get({'WRONG': 100})
 
-    def test_set_valid(self, inst):
+    def test_set(self, inst):
         assert inst.set({'count': 11}) is True
         assert inst.get() == {'count': 11}
 
-    def test_set_valid_empty(self, inst):
+    def test_set_empty(self, inst):
         assert inst.set({}) is False
         assert inst.get() == {'count': 0}
 
-    def test_set_valid_omit_str(self, inst):
+    def test_set_omit_str(self, inst):
         assert inst.set({'count': 11}, omit='count') is False
 
-    def test_set_valid_omit_tuple(self, inst):
+    def test_set_omit_tuple(self, inst):
         assert inst.set({'count': 11}, omit=('count',)) is False
 
-    def test_set_valid_omit_wrong_key(self, inst):
+    def test_set_omit_wrong_key(self, inst):
         assert inst.set({'count': 11}, omit=('wrongkey',)) is True
 
-    def test_set_valid_omit_readonly(self, inst):
+    def test_set_omit_readonly(self, inst):
         inst.schema['count'].readonly = True
         inst.set({'count': 11})
         assert inst.get() == {'count': 0}
 
-    def test_set_valid_references(self, inst, context, mock_graph,
-                                  mock_node_unique_references, registry):
+    def test_set_references(self, inst, context, mock_graph,
+                            mock_node_unique_references, registry):
         from adhocracy_core.interfaces import ISheet
         node = mock_node_unique_references
         inst.schema.children.append(node)
@@ -186,8 +186,8 @@ class TestBaseResourceSheet:
         assert not sheet_catalogs.search.called
         assert appstruct['references'] == []
 
-    def test_set_valid_reference(self, inst, context, mock_graph,
-                                 mock_node_single_reference, registry):
+    def test_set_reference(self, inst, context, mock_graph,
+                           mock_node_single_reference, registry):
         from adhocracy_core.interfaces import ISheet
         node = mock_node_single_reference
         inst.schema.children.append(node)
@@ -197,8 +197,8 @@ class TestBaseResourceSheet:
         graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
         assert graph_set_args == (context, ISheet, {'reference': target}, registry)
 
-    def test_get_valid_reference(self, inst, context, sheet_catalogs,
-                                 mock_node_single_reference):
+    def test_get_reference(self, inst, context, sheet_catalogs,
+                           mock_node_single_reference):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import search_result
         from adhocracy_core.interfaces import search_query
@@ -218,8 +218,8 @@ class TestBaseResourceSheet:
         sheet_catalogs.search.call_args[0] == query
         assert appstruct['reference'] == target
 
-    def test_get_valid_back_reference(self, inst, context, sheet_catalogs,
-                                      mock_node_single_reference):
+    def test_get_back_reference(self, inst, context, sheet_catalogs,
+                                mock_node_single_reference):
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import search_result
         from adhocracy_core.interfaces import Reference
@@ -285,12 +285,12 @@ class TestBaseResourceSheet:
         cstruct = inst.get_cstruct(request_)
         assert 'only_visible' not in inst.get.call_args[1]['params']
 
-    def test_delete_field_values_ignore_if_wrong_field(self, inst):
+    def test_delete_field_values(self, inst):
         inst._data['count'] = 2
         inst.delete_field_values(['count'])
         assert 'count' not in inst._data
 
-    def test_delete_field_values(self, inst):
+    def test_delete_field_values_ignore_if_wrong_field(self, inst):
         inst._data['count'] = 2
         inst.delete_field_values(['wrong'])
         assert 'count' in inst._data
@@ -318,7 +318,7 @@ class TestAnnotationRessourceSheet:
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 
-    def test_set_valid_with_other_sheet_name_conflicts(self, inst, sheet_meta,
+    def test_set_with_other_sheet_name_conflicts(self, inst, sheet_meta,
                                                        context):
         from adhocracy_core.interfaces import ISheet
 
@@ -340,7 +340,7 @@ class TestAnnotationRessourceSheet:
         assert inst.get() == {'count': 1}
         assert inst_b.get() == {'count': 2}
 
-    def test_set_valid_with_subtype_and_name_conflicts(self, inst,  sheet_meta,
+    def test_set_with_subtype_and_name_conflicts(self, inst,  sheet_meta,
                                                        context):
         class ISheetB(sheet_meta.isheet):
             pass
