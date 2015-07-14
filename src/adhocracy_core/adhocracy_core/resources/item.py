@@ -1,6 +1,4 @@
 """Basic Pool for specific Itemversions typically to create process content."""
-from copy import copy
-
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
@@ -33,8 +31,7 @@ def create_initial_content_for_item(context, registry, options):
 
 item_meta = pool_meta._replace(
     iresource=IItem,
-    basic_sheets=[adhocracy_core.sheets.name.IName,
-                  adhocracy_core.sheets.tags.ITags,
+    basic_sheets=[adhocracy_core.sheets.tags.ITags,
                   adhocracy_core.sheets.versions.IVersions,
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
@@ -45,11 +42,9 @@ item_meta = pool_meta._replace(
     after_creation=[create_initial_content_for_item],
     item_type=IItemVersion,
     permission_create='create_item',
+    use_autonaming=True,
+    autonaming_prefix='item_'
 )
-
-
-item_basic_sheets_without_name = copy(item_meta.basic_sheets)
-item_basic_sheets_without_name.remove(adhocracy_core.sheets.name.IName)
 
 
 def includeme(config):

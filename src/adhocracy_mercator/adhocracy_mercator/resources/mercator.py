@@ -50,6 +50,7 @@ organization_info_meta = item_meta._replace(
     ],
     item_type=IOrganizationInfoVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='info_',
 )
 
 
@@ -99,6 +100,7 @@ introduction_meta = item_meta._replace(
     ],
     item_type=IIntroductionVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='introduction_',
 )
 
 
@@ -132,6 +134,7 @@ description_meta = item_meta._replace(
     ],
     item_type=IDescriptionVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='description_',
 )
 
 
@@ -165,6 +168,7 @@ location_meta = item_meta._replace(
     ],
     item_type=ILocationVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='location_',
 )
 
 
@@ -198,6 +202,7 @@ story_meta = item_meta._replace(
     ],
     item_type=IStoryVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='story_',
 )
 
 
@@ -231,6 +236,7 @@ outcome_meta = item_meta._replace(
     ],
     item_type=IOutcomeVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='outcome_',
 )
 
 
@@ -264,6 +270,7 @@ steps_meta = item_meta._replace(
     ],
     item_type=IStepsVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='step_',
 )
 
 
@@ -297,6 +304,7 @@ value_meta = item_meta._replace(
     ],
     item_type=IValueVersion,
     permission_create='edit_mercator_proposal',
+    autonaming_prefix='value_',
 )
 
 
@@ -450,6 +458,8 @@ mercator_proposal_meta = item_meta._replace(
     item_type=IMercatorProposalVersion,
     is_implicit_addable=True,
     permission_create='create_mercator_proposal',
+    autonaming_prefix='proposal_',
+
 )
 
 

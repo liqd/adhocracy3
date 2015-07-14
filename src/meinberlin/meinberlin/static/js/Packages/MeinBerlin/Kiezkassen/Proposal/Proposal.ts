@@ -17,7 +17,6 @@ import RICommentVersion = require("../../../../Resources_/adhocracy_core/resourc
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIMetadata = require("../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
 import SIPool = require("../../../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
@@ -161,9 +160,6 @@ var postCreate = (
 ) => {
     var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
     proposal.parent = poolPath;
-    proposal.data[SIName.nick] = new SIName.Sheet({
-        name: AdhUtil.normalizeName(scope.data.title)
-    });
 
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = proposal.path;

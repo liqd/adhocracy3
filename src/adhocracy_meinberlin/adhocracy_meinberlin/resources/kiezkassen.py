@@ -55,6 +55,8 @@ proposal_meta = item_meta._replace(
     item_type=IProposalVersion,
     is_implicit_addable=True,
     permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='proposal_',
 )
 
 

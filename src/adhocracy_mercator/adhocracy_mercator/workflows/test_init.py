@@ -55,12 +55,9 @@ def app_initiator(app_initiator):
     app_initiator.base_path = '/mercator'
     return app_initiator
 
-def _post_proposal_item(app_user, path='/',  name='') -> TestResponse:
+def _post_proposal_item(app_user, path='/') -> TestResponse:
     from adhocracy_mercator.resources.mercator import IMercatorProposal
-    from adhocracy_core.sheets.name import IName
-    iresource = IMercatorProposal
-    sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post_resource(path, iresource, sheets_cstruct)
+    resp = app_user.post_resource(path, IMercatorProposal,   {})
     return resp
 
 
@@ -71,11 +68,9 @@ def _post_proposal_version(app_user, path='/') -> TestResponse:
     return resp
 
 
-def _post_document_item(app_user, path='/',  name='') -> TestResponse:
+def _post_document_item(app_user, path='/') -> TestResponse:
     from adhocracy_core.resources.document import IDocument
-    from adhocracy_core.sheets.name import IName
-    sheets_cstruct = {IName.__identifier__: {'name': name}}
-    resp = app_user.post_resource(path, IDocument, sheets_cstruct)
+    resp = app_user.post_resource(path, IDocument, {})
     return resp
 
 
@@ -127,14 +122,14 @@ class TestMercatorWorkflow:
         assert resp.status_code == 200
 
     def test_participate_participant_can_create_proposal(self, app_participant):
-        resp = _post_proposal_item(app_participant, path='/', name='proposal1')
-        resp = _post_proposal_version(app_participant, path='/proposal1')
+        resp = _post_proposal_item(app_participant, path='/')
+        resp = _post_proposal_version(app_participant, path='/proposal_0000000')
         assert resp.status_code == 200
 
     def test_participate_can_edit_proposal(self, app_participant):
         from adhocracy_mercator.resources import mercator
         possible_types = mercator.mercator_proposal_meta.element_types
-        postable_types = app_participant.get_postable_types('/proposal1')
+        postable_types = app_participant.get_postable_types('/proposal_0000000')
         assert set(postable_types) == set(possible_types)
 
     def test_participate_can_create_and_update_proposal_per_batch(self, app_participant):
@@ -144,15 +139,16 @@ class TestMercatorWorkflow:
 
         Fix regression issue #697
         """
-        app_participant.batch(create_proposal_batch)
-        app_participant.batch(update_proposal_batch)
-        assert app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
-        assert "VERSION_0000002" in  app_participant.get('/proposal2/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
+        resp = app_participant.batch(create_proposal_batch)
+        resp = app_participant.batch(update_proposal_batch)
+        assert app_participant.get('/proposal_0000001/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
+        assert "VERSION_0000002" in app_participant.get('/proposal_0000001/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
 
     def test_participate_cannot_edit_other_users_proposal(self, app_participant, app_god):
-        _post_proposal_item(app_god, path='/', name='proposal_other')
-        _post_proposal_version(app_god, path='/proposal_other')
-        postable_types = app_participant.get_postable_types('/proposal_other')
+        resp = _post_proposal_item(app_god, path='/')
+        proposal = resp.json['path']
+        _post_proposal_version(app_god, path=proposal)
+        postable_types = app_participant.get_postable_types(proposal)
         assert postable_types == []
 
     def test_change_state_to_frozen(self, app_initiator):
@@ -164,7 +160,7 @@ class TestMercatorWorkflow:
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
     def test_frozen_participant_cannot_edit_proposal(self, app_participant):
-        postable_types =  app_participant.get_postable_types('/proposal1')
+        postable_types =  app_participant.get_postable_types('/proposal_0000000')
         assert postable_types == []
 
     def test_change_state_to_result(self, app_initiator):
@@ -176,18 +172,22 @@ class TestMercatorWorkflow:
         assert IMercatorProposal not in app_participant.get_postable_types('/')
 
     def test_result_participant_cannot_edit_proposal(self, app_participant):
-        postable_types =  app_participant.get_postable_types('/proposal1')
+        postable_types =  app_participant.get_postable_types('/proposal_0000000')
         assert postable_types == []
 
     def test_result_participant_can_create_logbook_documents(self,
                                                              app_participant):
-        resp = _post_document_item(app_participant, path='/proposal1/logbook', name='document1')
-        resp = _post_document_version(app_participant, path='/proposal1/logbook/document1')
+        resp = _post_document_item(app_participant, path='/proposal_0000000/logbook')
+        resp = _post_document_version(app_participant, path='/proposal_0000000/logbook/document_0000000')
         assert resp.status_code == 200
 
     def test_result_participate_cannot_edit_other_users_logbook(self,
+                                                                app_god,
                                                                 app_participant):
-        postable_types = app_participant.get_postable_types('/proposal_other')
+        resp = _post_proposal_item(app_god, path='/')
+        proposal = resp.json['path']
+        resp = _post_proposal_version(app_god, path=proposal)
+        postable_types = app_participant.get_postable_types( proposal + 'logbook')
         assert postable_types == []
 
 
