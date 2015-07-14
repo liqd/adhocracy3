@@ -27,6 +27,10 @@ adhocracy.abuse_handler_mail = abuse_handler@unconfigured.domain
 adhocracy.message_user_subject = [{site_name}] Message from {sender_name}: {title}
 adhocracy.skip_registration_mail = true
 
+# Canonical frontend base URL. If this is an embedding URL, it should end with
+# #!. This is used for the creation of activation links.
+adhocracy.frontend_url = http://localhost:9090
+
 [server:main]
 use = egg:gunicorn#main
 host = localhost
