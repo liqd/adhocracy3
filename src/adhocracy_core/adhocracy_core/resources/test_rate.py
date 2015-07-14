@@ -5,13 +5,13 @@ from pytest import fixture
 def test_rateversion_meta():
     from .rate import rateversion_meta
     from adhocracy_core.sheets.rate import IRate
-    assert rateversion_meta.extended_sheets == [IRate]
+    assert rateversion_meta.extended_sheets == (IRate,)
 
 
 def test_rate_meta():
     from .rate import rate_meta
     from .rate import IRateVersion
-    assert rate_meta.element_types == [IRateVersion]
+    assert rate_meta.element_types == (IRateVersion,)
     assert rate_meta.item_type == IRateVersion
     assert rate_meta.use_autonaming
     assert rate_meta.autonaming_prefix == 'rate_'

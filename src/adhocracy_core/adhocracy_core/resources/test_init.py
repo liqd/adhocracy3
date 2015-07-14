@@ -100,8 +100,8 @@ class TestResourceFactory:
         assert not hasattr(inst, '__oid__')
 
     def test_call_with_isheets(self, resource_meta):
-        meta = resource_meta._replace(basic_sheets=[ISheetY],
-                                      extended_sheets=[ISheetX])
+        meta = resource_meta._replace(basic_sheets=(ISheetY,),
+                                      extended_sheets=(ISheetX,))
         inst = self.make_one(meta)()
         assert ISheetX.providedBy(inst)
         assert ISheetY.providedBy(inst)
@@ -111,7 +111,7 @@ class TestResourceFactory:
             context._options = options
             context._registry = registry
         meta = resource_meta._replace(iresource=IResource,
-                                      after_creation=[dummy_after_create])
+                                      after_creation=(dummy_after_create,))
 
         inst = self.make_one(meta)(creator=None, kwarg1=True)
 
@@ -124,7 +124,7 @@ class TestResourceFactory:
             context._registry = registry
 
         meta = resource_meta._replace(iresource=IResource,
-                                      after_creation=[dummy_after_create])
+                                      after_creation=(dummy_after_create,))
 
         inst = self.make_one(meta)(run_after_create=False)
 
@@ -143,7 +143,7 @@ class TestResourceFactory:
     def test_call_with_creatable_appstructs_data(self, resource_meta, registry,
                                                  mock_sheet):
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[ISheetY])
+                                      basic_sheets=(ISheetY,))
         register_sheet(None, mock_sheet, registry, ISheetY)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
 
@@ -155,7 +155,7 @@ class TestResourceFactory:
     def test_call_with_not_creatable_appstructs_data(self, resource_meta,
                                                      registry, mock_sheet):
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[ISheetY])
+                                      basic_sheets=(ISheetY,))
         register_sheet(None, mock_sheet, registry, ISheetY)
         mock_sheet.meta = sheet_meta._replace(creatable=False)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
@@ -168,7 +168,7 @@ class TestResourceFactory:
             self, resource_meta, registry, pool, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[IName])
+                                      basic_sheets=(IName,))
         register_sheet(None, mock_sheet, registry, IName)
         mock_sheet.set.return_value = False
         appstructs = {IName.__identifier__: {'name': 'child'}}
@@ -187,7 +187,7 @@ class TestResourceFactory:
                                                  pool, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[IName])
+                                      basic_sheets=(IName,))
         appstructs = {IName.__identifier__: {'name': 'name'}}
         register_sheet(None, mock_sheet, registry, IName)
         inst = self.make_one(meta)(parent=pool, appstructs=appstructs)
@@ -200,7 +200,7 @@ class TestResourceFactory:
             self, resource_meta, registry, pool, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[IName])
+                                      basic_sheets=(IName,))
         appstructs = {IName.__identifier__: {'name': 'name'}}
         register_sheet(None, mock_sheet, registry, IName)
         pool['name'] = testing.DummyResource()
@@ -212,7 +212,7 @@ class TestResourceFactory:
                                                   registry, mock_sheet):
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[IName])
+                                      basic_sheets=(IName,))
         appstructs = {'adhocracy_core.sheets.name.IName': {'name': ''}}
         register_sheet(None, mock_sheet, registry, IName)
 
@@ -258,7 +258,7 @@ class TestResourceFactory:
             self, resource_meta, registry, mock_sheet, mock_mod_date):
         from adhocracy_core.sheets.metadata import IMetadata
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[IMetadata])
+                                      basic_sheets=(IMetadata,))
         register_sheet(None, mock_sheet, registry, IMetadata)
 
         self.make_one(meta)()
@@ -277,7 +277,7 @@ class TestResourceFactory:
         from adhocracy_core.sheets.metadata import IMetadata
         from adhocracy_core.interfaces import IItemVersion
         meta = resource_meta._replace(iresource=IItemVersion,
-                                      basic_sheets=[IMetadata])
+                                      basic_sheets=(IMetadata,))
         register_sheet(None, mock_sheet, registry, IMetadata)
 
         self.make_one(meta)()
@@ -292,7 +292,7 @@ class TestResourceFactory:
         from adhocracy_core.interfaces import IItemVersion
         from adhocracy_core.sheets.name import IName
         meta = resource_meta._replace(iresource=IItemVersion,
-                                      basic_sheets=[IMetadata, IName])
+                                      basic_sheets=(IMetadata, IName))
         registry.content.get_sheet.side_effect = [mock_sheet, mock_sheet,
                                                   mock_sheet, mock_sheet]
         item_creation_date = datetime.today()
@@ -308,7 +308,7 @@ class TestResourceFactory:
         from adhocracy_core.sheets.metadata import IMetadata
         from pyramid.traversal import resource_path
         meta = resource_meta._replace(iresource=IResource,
-                                      basic_sheets=[IMetadata])
+                                      basic_sheets=(IMetadata,))
         register_sheet(None, mock_sheet, registry, IMetadata)
         authenticated_user = testing.DummyResource()
 
@@ -326,7 +326,7 @@ class TestResourceFactory:
         from adhocracy_core.sheets.metadata import IMetadata
         from pyramid.traversal import resource_path
         meta = resource_meta._replace(iresource=IUser,
-                                      basic_sheets=[IMetadata])
+                                      basic_sheets=(IMetadata,))
         register_sheet(None, mock_sheet, registry, IMetadata)
         authenticated_user = object()
 

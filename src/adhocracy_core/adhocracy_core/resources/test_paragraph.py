@@ -10,9 +10,9 @@ def test_paragraphversion_meta():
     meta = paragraphversion_meta
     assert meta.iresource is IParagraphVersion
     assert meta.permission_create == 'edit_proposal'
-    assert meta.extended_sheets == [sheets.document.IParagraph,
+    assert meta.extended_sheets == (sheets.document.IParagraph,
                                     sheets.comment.ICommentable,
-                                    ]
+                                    )
 
 
 def test_paragraph_meta():
@@ -25,13 +25,13 @@ def test_paragraph_meta():
     from adhocracy_core import sheets
     meta = paragraph_meta
     assert meta.iresource is IParagraph
-    assert meta.element_types == [ITag, IParagraphVersion]
+    assert meta.element_types == (ITag, IParagraphVersion)
     assert meta.item_type == IParagraphVersion
-    assert meta.basic_sheets == [sheets.tags.ITags,
+    assert meta.basic_sheets == (sheets.tags.ITags,
                                  sheets.versions.IVersions,
                                  sheets.pool.IPool,
                                  sheets.metadata.IMetadata,
-                                 ]
+                                 )
     assert meta.permission_create == 'edit_proposal'
     assert meta.use_autonaming
     assert meta.autonaming_prefix == 'PARAGRAPH_'

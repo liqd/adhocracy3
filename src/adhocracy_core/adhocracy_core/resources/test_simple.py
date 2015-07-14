@@ -9,10 +9,10 @@ def test_simple_meta():
     from .simple import ISimple
     meta = simple_meta
     assert meta.iresource is ISimple
-    assert meta.basic_sheets == [adhocracy_core.sheets.name.IName,
+    assert meta.basic_sheets == (adhocracy_core.sheets.name.IName,
                                  adhocracy_core.sheets.title.ITitle,
                                  adhocracy_core.sheets.metadata.IMetadata,
-                                 ]
+                                 )
     assert meta.permission_create == 'create_simple'
 
 

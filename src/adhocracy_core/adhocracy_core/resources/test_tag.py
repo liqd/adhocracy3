@@ -9,10 +9,10 @@ def test_tag_meta():
     import adhocracy_core.sheets
     meta = tag_meta
     assert meta.iresource is ITag
-    assert meta.basic_sheets==[adhocracy_core.sheets.name.IName,
+    assert meta.basic_sheets==(adhocracy_core.sheets.name.IName,
                                adhocracy_core.sheets.metadata.IMetadata,
                                adhocracy_core.sheets.tags.ITag,
-                               ]
+                               )
     assert meta.permission_create == 'create_tag'
 
 

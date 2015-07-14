@@ -15,7 +15,7 @@ class TestMercatorProposal:
         from adhocracy_core.resources.rate import add_ratesservice
         from adhocracy_core.resources.logbook import add_logbook_service
         assert meta.iresource == mercator.IMercatorProposal
-        assert meta.element_types == [mercator.IMercatorProposalVersion,
+        assert meta.element_types == (mercator.IMercatorProposalVersion,
                                       mercator.IOrganizationInfo,
                                       mercator.IIntroduction,
                                       mercator.IDescription,
@@ -27,7 +27,7 @@ class TestMercatorProposal:
                                       mercator.IPartners,
                                       mercator.IFinance,
                                       mercator.IExperience,
-                                      ]
+                                      )
         assert meta.is_implicit_addable
         assert meta.item_type == mercator.IMercatorProposalVersion
         assert add_ratesservice in meta.after_creation
@@ -83,10 +83,10 @@ class TestProcess:
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
-        assert meta.extended_sheets == [
-            adhocracy_mercator.sheets.mercator.IWorkflowAssignment
-        ]
-        assert meta.element_types == [IMercatorProposal]
+        assert meta.extended_sheets == (
+            adhocracy_mercator.sheets.mercator.IWorkflowAssignment,
+        )
+        assert meta.element_types == (IMercatorProposal,)
         assert add_assets_service in meta.after_creation
 
 
