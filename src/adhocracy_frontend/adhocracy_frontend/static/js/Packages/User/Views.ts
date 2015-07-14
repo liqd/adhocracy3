@@ -138,7 +138,7 @@ export var activateArea = (
     $scope.success = false;
     $scope.ready = false;
     $scope.siteName = adhConfig.site_name;
-    $scope.embedOnly = adhConfig.custom["embed_only"].toLowerCase() === "true";
+    $scope.embedOnly = adhConfig.custom["embed_only"] && adhConfig.custom["embed_only"].toLowerCase() === "true";
     $scope.user = adhUser;
 
     $scope.goBack = () => {
@@ -279,7 +279,7 @@ export var passwordResetDirective = (
             scope.showError = adhShowError;
             scope.success = false;
             scope.siteName = adhConfig.site_name;
-            scope.embedOnly = (adhConfig.custom["embed_only"].toLowerCase() === "true");
+            scope.embedOnly = adhConfig.custom["embed_only"] && adhConfig.custom["embed_only"].toLowerCase() === "true";
 
             scope.input = {
                 password: "",
