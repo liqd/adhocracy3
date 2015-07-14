@@ -116,4 +116,9 @@ input[type="button"] {
             background-color: $color-brand-two-introvert;
         }
     }
+
+    &.m-call-to-action-secondary {
+        background-color: transparent;
+        color: $color-text-highlight-normal;
+    }
 }
