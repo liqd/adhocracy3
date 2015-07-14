@@ -361,6 +361,85 @@ class TestAnnotationRessourceSheet:
         assert inst_b.get() == {'count': 2}
 
 
+class TestAttributeResourceSheet:
+
+    @fixture
+    def sheet_meta(self, sheet_meta):
+        from . import AttributeResourceSheet
+        return sheet_meta._replace(sheet_class=AttributeResourceSheet)
+
+    @fixture
+    def inst(self, sheet_meta, context):
+        from . import AttributeResourceSheet
+        return AttributeResourceSheet(sheet_meta, context)
+
+    def test_create(self, inst, context, sheet_meta):
+        from . import BaseResourceSheet
+        from adhocracy_core.interfaces import IResourceSheet
+        from zope.interface.verify import verifyObject
+        assert isinstance(inst, BaseResourceSheet)
+        assert inst.context == context
+        assert inst.meta == sheet_meta
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+
+    def test_set(self, inst, context):
+        inst.set({'count': 1})
+        assert inst.get() == {'count': 1}
+        assert context.count == 1
+
+    def test_set_and_add_dirty_flag_for_persistent_context(self, inst):
+        from persistent.mapping import PersistentMapping
+        import ipdb;ipdb.set_trace()
+        inst.context = PersistentMapping()
+        inst.context._p_jar = Mock()
+        inst.set({'count': 2})
+        assert inst.context._p_changed is True
+
+    def test_set_with_other_sheet_name_conflicts(self, inst, sheet_meta,
+                                                       context):
+        """Different sheets with equalt field names override each other.
+           This should never happen.
+        """
+        from adhocracy_core.interfaces import ISheet
+
+        class ISheetB(ISheet):
+            pass
+
+        class SheetBSchema(sheet_meta.schema_class):
+            count = colander.SchemaNode(colander.Int(),
+                missing=colander.drop,
+                default=0)
+
+        sheet_b_meta = sheet_meta._replace(isheet=ISheetB,
+                                           schema_class=SheetBSchema)
+        inst_b = sheet_meta.sheet_class(sheet_b_meta, context)
+
+        inst.set({'count': 1})
+        inst_b.set({'count': 2})
+
+        assert inst.get() == {'count': 2}
+        assert inst_b.get() == {'count': 2}
+
+    def test_delete_field_values_ignore_if_wrong_field(self, inst, context):
+        context.count = 2
+        inst.delete_field_values(['wrong'])
+        assert hasattr(context, 'count')
+
+    def test_delete_field_values(self, inst, context):
+        context.count = 2
+        inst.delete_field_values(['count'])
+        assert not hasattr(context, 'count')
+
+    def test_delete_field_and_add_dirty_flag_for_persistent_context(self, inst):
+        from persistent.mapping import PersistentMapping
+        inst.context = PersistentMapping()
+        inst.context._p_jar = Mock()
+        inst.context.count = 2
+        inst.delete_field_values(['count'])
+        assert inst.context._p_changed
+
+
 class TestAddSheetToRegistry:
 
     @fixture

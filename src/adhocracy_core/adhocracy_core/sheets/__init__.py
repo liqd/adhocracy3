@@ -280,6 +280,18 @@ class AttributeResourceSheet(BaseResourceSheet):
     def _data(self):
         return self.context.__dict__
 
+    def _store_data(self, appstruct):
+        """Might be overridden in subclasses."""
+        for key in self._fields['data']:
+            if key in appstruct:
+                setattr(self.context, key, appstruct[key])
+
+    def delete_field_values(self, fields: [str]):
+        """Delete value for every field name in `fields`."""
+        for key in fields:
+            if hasattr(self.context, key):
+                delattr(self.context, key)
+
 
 sheet_meta = SheetMetadata(isheet=ISheet,
                            sheet_class=AnnotationRessourceSheet,
