@@ -1,7 +1,7 @@
 """Interfaces for plugable dependencies, basic metadata structures."""
 from collections import Iterable
-from collections import namedtuple
 from enum import Enum
+import collections
 
 from pyramid.interfaces import ILocation
 from pyramid.interfaces import IAuthorizationPolicy
@@ -18,6 +18,26 @@ from substanced.interfaces import ReferenceClass
 from substanced.interfaces import IUserLocator
 from substanced.interfaces import IService
 from substanced.interfaces import IWorkflow
+
+
+def namedtuple(typename, field_names, verbose=False, rename=False):
+    """Like collections.namedtuple but with more functionalities.
+
+    Provide an _add method which concatenate elements to the value
+    identified by the key.
+
+    """
+    def add(self, **kw):
+        """Concat elements to the value identified by key."""
+        last_modified = self
+        for key, value in kw.items():
+            new_value = getattr(last_modified, key) + value
+            last_modified = last_modified._replace(**{key: new_value})
+        return last_modified
+
+    inst = collections.namedtuple(typename, field_names, verbose, rename)
+    setattr(inst, '_add', add)
+    return inst
 
 
 class ISheet(Interface):
@@ -219,14 +239,6 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     item_type:
         Set addable content types, class heritage is honored
     """
-
-    def _add(self, **kw):
-        """Concat elements to the value identified by key."""
-        last_modified = self
-        for key, value in kw.items():
-            new_value = getattr(last_modified, key) + value
-            last_modified = last_modified._replace(**{key: new_value})
-        return last_modified
 
 
 class IResource(ILocation):

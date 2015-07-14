@@ -82,3 +82,36 @@ class TestResourceMetadata:
                              after_creation=(self.after_creation_sample,))
         assert new_meta.extended_sheets == (self.ISampleSheetA, self.ISampleSheetB)
         assert new_meta.after_creation == (self.after_creation_sample,)
+
+class TestNamedTuple:
+
+    class ISample:
+        pass
+
+    class ISampleSheetA:
+        pass
+
+    class ISampleSheetB:
+        pass
+
+    def call_fut(self, typename, field_names, verbose=False, rename=False):
+        from .interfaces import namedtuple
+        return namedtuple(typename, field_names, verbose, rename)
+
+    def make_one(self):
+        meta_class = self.call_fut('ResourceMetadata', ['extended_sheets',
+                                                        'after_creation'])
+        meta = meta_class(extended_sheets=(self.ISampleSheetA,),
+                          after_creation=())
+        return meta
+
+
+    def test_namedtuple(self):
+        def after_creation_sample(self):
+            pass
+
+        meta = self.make_one()
+        new_meta = meta._add(extended_sheets=(self.ISampleSheetB,),
+                             after_creation=(after_creation_sample,))
+        assert new_meta.extended_sheets == (self.ISampleSheetA, self.ISampleSheetB)
+        assert new_meta.after_creation == (after_creation_sample,)
