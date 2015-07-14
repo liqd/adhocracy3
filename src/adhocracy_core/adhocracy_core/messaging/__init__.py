@@ -198,7 +198,7 @@ class Messenger:
                    }
         subject = _('mail_reset_password_subject',
                     mapping=mapping,
-                    default='${site_name}: Reset Password / Password neu'
+                    default='${site_name}: Reset Password / Passwort neu'
                             ' setzen')
         body = _('mail_reset_password_body_txt',
                  mapping=mapping,
