@@ -390,7 +390,6 @@ class TestAttributeResourceSheet:
 
     def test_set_and_add_dirty_flag_for_persistent_context(self, inst):
         from persistent.mapping import PersistentMapping
-        import ipdb;ipdb.set_trace()
         inst.context = PersistentMapping()
         inst.context._p_jar = Mock()
         inst.set({'count': 2})
