@@ -41,16 +41,10 @@ input[type="button"] {
             color: $color-shadow;
         }
 
-        &.m-call-to-action,
-        &.m-call-to-action-secondary {
-            color: $color-text-inverted;
-            height: 24px / $font-size-normal * 1em;
-            line-height: 24px / $font-size-normal * 1em;
-            font-size: $font-size-normal;
-        }
-
         &.m-call-to-action {
             @include border-radius(1em);
+            color: $color-text-inverted;
+            font-size: $font-size-normal;
             font-weight: $font-weight-extrovert;
 
             &:hover:not(:disabled):not(.ng-disabled),
@@ -72,6 +66,7 @@ input[type="button"] {
             &:hover:not(:disabled):not(.ng-disabled),
             &:focus:not(:disabled):not(.ng-disabled) {
                 background: transparent;
+                color: $color-text-normal;
                 text-decoration: underline;
             }
         }
@@ -97,6 +92,25 @@ input[type="button"] {
         }
     }
 }
+
+/*doc
+---
+title: Call to action button index of moving column or embed
+name: button.m-call-to-action.inside
+parent: button
+---
+
+For Mein Berlin CTA buttons inside of the moving columns or embed contexr appear square
+
+```html_example
+<div class="l-center m-embed">
+<a class="button m-call-to-action">Link</a>
+<button type="button" class="m-call-to-action">Button</button>
+<input type="submit" class="m-call-to-action" value="Disabled" disabled="disabled" />
+</div>
+```
+
+*/
 
 .moving-column-body, .l-center.m-embed {
     button,
