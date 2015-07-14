@@ -138,6 +138,12 @@ export var activateArea = (
     $scope.success = false;
     $scope.ready = false;
     $scope.siteName = adhConfig.site_name;
+    $scope.embedOnly = adhConfig.custom["embed_only"].toLowerCase() === "true";
+    $scope.user = adhUser;
+
+    $scope.goBack = () => {
+         $location.url("/");
+    };
 
     var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
