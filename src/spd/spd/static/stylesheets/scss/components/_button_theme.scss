@@ -1,27 +1,13 @@
-.button,
-button,
-input[type="reset"],
-input[type="submit"],
-input[type="button"] {
-    height: 36px / $font-size-normal * 1em;
-    line-height: 36px / $font-size-normal * 1em;
+.button-cta {
+    background: $color-brand-two-normal;
+}
 
-    &.button-cta {
+.button-cta-secondary {
+    border-color: $color-brand-two-normal;
+    color: $color-brand-two-normal;
+
+    &:hover:enabled,
+    &:focus:enabled {
         background: $color-brand-two-normal;
-    }
-
-    &.button-cta-secondary {
-        border: 2px solid $color-brand-two-normal;
-        color: $color-brand-two-normal;
-
-        &:hover:not(:disabled):not(.ng-disabled),
-        &:focus:not(:disabled):not(.ng-disabled) {
-            background: $color-brand-two-normal;
-            color: $color-text-inverted;
-        }
-    }
-
-    &.m-add:before {
-        content: "+ ";
     }
 }

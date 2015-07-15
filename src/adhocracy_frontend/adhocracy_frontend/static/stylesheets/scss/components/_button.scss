@@ -46,7 +46,7 @@ It may have the following states:
 
 /*doc
 ---
-title: button-cta modifier
+title: button-cta
 name: button.button-cta
 parent: button
 ---
@@ -63,7 +63,7 @@ A highlighted button. Each page should have one CTA at maxiumum.
 
 /*doc
 ---
-title: button-cta-secondary modifier
+title: button-cta-secondary
 name: button.button-cta-secondary
 parent: button
 ---
@@ -76,7 +76,6 @@ be used instead.
 <button type="button" class="button-cta-secondary">Button</button>
 <input type="submit" class="button-cta-secondary" value="Disabled" disabled="disabled" />
 ```
-
 */
 
 .button {
@@ -114,4 +113,26 @@ be used instead.
     background-color: transparent;
     border: 2px solid $color-text-highlight-normal;
     color: $color-text-highlight-normal;
+}
+
+/*doc
+---
+title: button-m-add modifier
+name: button.m-add
+parent: button
+---
+
+Add a + sign to a button
+
+```html_example
+<button type="button" class="button-cta-secondary m-add">Add Paragraph</button>
+```
+*/
+
+.button-cta,
+.button-cta-secondary,
+.button {
+    &.m-add:before {
+        content: "+ ";
+    }
 }
