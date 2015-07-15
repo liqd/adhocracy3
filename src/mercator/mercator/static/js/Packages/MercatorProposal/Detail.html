@@ -48,11 +48,11 @@
             data-ng-href="{{ path | adhResourceUrl:'blog' }}">{{ "TR__MERCATOR_PROPOSAL_TAB_JOURNEY" | translate }}</a>
     </div>
 
-    <div data-ng-if="proposalTab === 'blog'" class="blog">
+    <div data-ng-if="showBlogTabs() && proposalTab === 'blog'" class="blog">
         <adh-blog data-ng-if="data.logbook_pool" data-path="{{ data.logbook_pool }}"></adh-blog>
     </div>
 
-    <div class="section-jump-body" data-ng-if="proposalTab !== 'blog'">
+    <div class="section-jump-body" data-ng-if="!showBlogTabs() || proposalTab !== 'blog'">
     <img class="mercator-proposal-detail-view-image" data-ng-src="{{ data.introduction.picture | adhImageUri }}" alt="" />
 
     <div class="section-jump-body">
