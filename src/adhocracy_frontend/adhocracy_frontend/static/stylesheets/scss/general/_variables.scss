@@ -59,12 +59,12 @@ $annotation-width: 34%;
 
 //Buttons
 $button-height: 24px / $font-size-normal;
-$button-text-color: $color-text-highlight-introvert;
-$button-text-hover-color: $color-text-highlight-normal;
-$button-cta-text-color: $color-text-inverted;
-$button-cta-base-color: $color-text-highlight-normal;
-$button-cta-hover-background-color: $color-brand-two-extrovert;
-$button-cta-active-background-color: $color-brand-two-introvert;
+$color-button-text: $color-text-highlight-introvert;
+$color-button-text-hover: $color-text-highlight-normal;
+$color-button-cta-text: $color-text-inverted;
+$color-button-cta-base: $color-text-highlight-normal;
+$color-button-cta-hover-background: $color-brand-two-extrovert;
+$color-button-cta-active-background: $color-brand-two-introvert;
 
 //Padding
 $padding-small: 0.5em;

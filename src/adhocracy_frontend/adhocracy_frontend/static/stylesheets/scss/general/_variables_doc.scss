@@ -147,8 +147,42 @@ category: Variables
         <td><code>color-background-base-introvert</code></td>
         <td></td>
     </tr>
+    <tr>
+        <td colspan="3"><strong>Button colors</strong></td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-button-text"></div></td>
+        <td><code>color-button-text</code></td>
+        <td>Button text color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-button-text-hover"></div></td>
+        <td><code>color-button-text-hover</code></td>
+        <td>Button text hover color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-button-cta-text"></div></td>
+        <td><code>color-button-cta-text</code></td>
+        <td>Call-to-action (CTA) button text color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-button-cta-base"></div></td>
+        <td><code>color-button-cta-base</code></td>
+        <td>CTA face and CTA secondary border and text color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-button-cta-hover-background"></div></td>
+        <td><code>color-button-cta-hover-background</code></td>
+        <td>CTA face hover color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-button-cta-active-background"></div></td>
+        <td><code>color-button-cta-active-background</code></td>
+        <td>CTA face active color</td>
+    </tr>
 </table>
 */
+
 .example-color {
     @include inline-block;
     height: 3em;
@@ -188,6 +222,12 @@ category: Variables
 .color-structure-extrovert {background-color: $color-structure-extrovert;}
 .color-structure-border {background-color: $color-structure-border;}
 
+.color-button-text {background-color: $color-button-text;}
+.color-button-text-hover {background-color: $color-button-text-hover;}
+.color-button-cta-text {background-color: $color-button-cta-text;}
+.color-button-cta-base {background-color: $color-button-cta-base;}
+.color-button-cta-hover-background {background-color: $color-button-cta-hover-background;}
+.color-button-cta-active-background {background-color: $color-button-cta-active-background;}
 
 // some static contrast checks for a11y
 @include check-contrast($color-text-normal, $color-background-base);

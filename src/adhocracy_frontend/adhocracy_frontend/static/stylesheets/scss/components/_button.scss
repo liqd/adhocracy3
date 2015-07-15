@@ -81,42 +81,42 @@ be used instead.
 .button {
     @include button-base;
     background: transparent;
-    color: $button-text-color;
+    color: $color-button-text;
     text-transform: uppercase;
 
     &:hover:enabled,
     &:focus:enabled {
-        color: $button-text-hover-color;
+        color: $color-button-text-hover;
     }
 }
 
 .button-cta,
 .button-cta-secondary {
     @include button-base;
-    background: $button-cta-base-color;
-    color: $button-cta-text-color;
+    background: $color-button-cta-base;
+    color: $color-button-cta-text;
     padding: 0 1em;
     min-width: 110px / $font-size-normal * 1em;
 
     &:hover:enabled,
     &:focus:enabled {
-        background: $button-cta-hover-background-color;
-        color: $button-cta-text-color;
+        background: $color-button-cta-hover-background;
+        color: $color-button-cta-text;
     }
 
     &:active:enabled {
-        background-color: $button-cta-active-background-color;
+        background-color: $color-button-cta-active-background;
     }
 }
 
 .button-cta-secondary {
     background-color: transparent;
-    border: 2px solid $button-cta-base-color;
-    color: $button-cta-base-color;
+    border: 2px solid $color-button-cta-base;
+    color: $color-button-cta-base;
 
     &:hover:enabled,
     &:focus:enabled {
-        background-color: $button-cta-base-color;
+        background-color: $color-button-cta-base;
     }
 }
 
