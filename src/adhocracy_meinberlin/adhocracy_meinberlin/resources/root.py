@@ -58,7 +58,10 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'alexanderplatz'},
                   adhocracy_core.sheets.title.ITitle.__identifier__:
-                  {'title': 'Sample Alexanderplatz participation process'}}
+                  {'title': 'Sample Alexanderplatz participation process'},
+                  # temporary use treptow polygon until we have the polygon for alexanderplatz
+                  adhocracy_core.sheets.geo.ILocationReference.__identifier__:
+                  {'location': kiezregion}}
     registry.content.create(resources.alexanderplatz.IProcess.__identifier__,
                             parent=context['organisation'],
                             appstructs=appstructs)
