@@ -88,6 +88,10 @@ export class Service {
     }
 
     private enableToken(token : string, userPath : string) : void {
+        if (this.token !== token) {
+            this.adhCache.invalidateAll();
+        }
+
         this.token = token;
         this.userPath = userPath;
         this.loggedIn = true;
