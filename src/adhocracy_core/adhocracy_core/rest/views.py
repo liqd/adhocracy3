@@ -4,18 +4,17 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
 from logging import getLogger
-import json
 
 from colander import Invalid
 from colander import MappingSchema
 from colander import SchemaNode
 from colander import SequenceSchema
-from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
 from substanced.util import find_service
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -128,7 +127,7 @@ def validate_request_data(context: ILocation, request: Request,
                              The should append errors to `request.errors` and
                              validated data to `request.validated`.
 
-    :raises _JSONError: HTTP 400 for bad request data.
+    :raises HTTPBadRequest: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
     schema_with_binding = schema.bind(context=context,
@@ -142,7 +141,9 @@ def validate_request_data(context: ILocation, request: Request,
     validate_body_or_querystring(body, qs, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
-    _raise_if_errors(request)
+    if request.errors:
+        request.validated = {}
+        raise HTTPBadRequest()
 
 
 def validate_user_headers(headers: dict, request: Request):
@@ -230,50 +231,6 @@ def _validate_extra_validators(validators: list, context, request: Request):
         return
     for val in validators:
         val(context, request)
-
-
-def _raise_if_errors(request: Request):
-    """Raise :class:`cornice.errors._JSONError` and log if request.errors."""
-    if not request.errors:
-        return
-    logger.warning('Found %i validation errors in request: <%s>',
-                   len(request.errors), _show_request_body(request))
-    for error in request.errors:
-        logger.warning('  %s', error)
-    request.validated = {}
-    raise json_error(request.errors)
-
-
-def _show_request_body(request: Request) -> str:
-    """
-    Show the request body.
-
-    In case of multipart/form-data requests (file upload), only the 120
-    first characters of the body are shown.
-
-    In case of JSON requests with a "password" field at the top level,
-    the contents of the password field will be hidden.
-    """
-    result = request.body
-    if request.content_type == 'multipart/form-data' and len(result) > 120:
-        result = '{}...'.format(result[:120])
-    elif request.content_type == 'application/json':
-        json_data = ''
-        try:
-            json_data = request.json_body
-        except ValueError:
-            pass  # Not even valid JSON, so we cannot hide anything
-        if not isinstance(json_data, dict):
-            pass
-        possible_password_data = json_data
-        if 'data' in json_data:
-            possible_password_data = json_data['data'].get(
-                IPasswordAuthentication.__identifier__, {})
-        if 'password' in possible_password_data:
-            loggable_data = possible_password_data.copy()
-            loggable_data['password'] = '<hidden>'
-            result = json.dumps(loggable_data)
-    return result
 
 
 class RESTView:

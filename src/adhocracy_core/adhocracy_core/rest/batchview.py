@@ -4,6 +4,7 @@ from json import loads
 from logging import getLogger
 
 from cornice.util import _JSONError
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPException
 from pyramid.request import Request
 from pyramid.view import view_config
@@ -14,6 +15,7 @@ from adhocracy_core.rest.schemas import POSTBatchRequestSchema
 from adhocracy_core.rest.schemas import UpdatedResourcesSchema
 from adhocracy_core.rest.views import RESTView
 from adhocracy_core.utils import set_batchmode
+from adhocracy_core.rest.exceptions import handle_error_400_bad_request
 
 
 logger = getLogger(__name__)
@@ -176,6 +178,10 @@ class BatchView(RESTView):
             subresponse = self.request.invoke_subrequest(subrequest)
             code = subresponse.status_code
             body = subresponse.json
+        except HTTPBadRequest as err:
+            json_err = handle_error_400_bad_request(err, subrequest)
+            code = json_err.status_code
+            body = self._try_to_decode_json(json_err.body)
         except HTTPException as err:
             code = err.status_code
             body = self._try_to_decode_json(err.body)

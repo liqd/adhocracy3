@@ -130,10 +130,10 @@ class TestValidateRequest:
         assert myrequest.validated == {'count': 1}
 
     def test_non_valid_with_schema_wrong_data(self, context, myrequest):
-        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPBadRequest
         myrequest.body = '{"count": "wrong_value"}'
         myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
+        with pytest.raises(HTTPBadRequest):
             self.make_one(context, myrequest, schema=CountSchema())
         assert myrequest.errors == [{'location': 'body',
                                    'name': 'count',
@@ -141,11 +141,11 @@ class TestValidateRequest:
 
     def test_non_valid_with_schema_wrong_data_cleanup(self, context,
                                                       myrequest):
-        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPBadRequest
         myrequest.validated = {'secret_data': 'buh'}
         myrequest.body = '{"count": "wrong_value"}'
         myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
+        with pytest.raises(HTTPBadRequest):
             self.make_one(context, myrequest, schema=CountSchema())
         assert myrequest.validated == {}
 
@@ -157,12 +157,12 @@ class TestValidateRequest:
 
     def test_valid_with_extra_validator_and_wrong_schema_data(self, context,
                                                               myrequest):
-        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPBadRequest
         def validator1(context, myrequest):
             myrequest._validator_called = True
         myrequest.body = '{"count": "wrong"}'
         myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
+        with pytest.raises(HTTPBadRequest):
             self.make_one(context, myrequest, schema=CountSchema(),
                            extra_validators=[validator1])
         assert hasattr(myrequest, '_validator_called') is False
@@ -199,10 +199,10 @@ class TestValidateRequest:
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.Integer())
 
-        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPBadRequest
         myrequest.body = '[1, 2, "three"]'
         myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
+        with pytest.raises(HTTPBadRequest):
             self.make_one(context, myrequest, schema=TestListSchema())
         assert myrequest.validated == {}
 
@@ -224,10 +224,10 @@ class TestValidateRequest:
 
     def test_invalid_user_headers_but_no_authenticated_user(self, context,
                                                             myrequest):
-        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPBadRequest
         myrequest.headers['X-User-Path'] = 2
         myrequest.headers['X-User-Token'] = 3
-        with pytest.raises(_JSONError):
+        with pytest.raises(HTTPBadRequest):
             self.make_one(context, myrequest)
         assert myrequest.validated == {}
 
@@ -1580,30 +1580,6 @@ class TestAssetDownloadRESTView:
         assert inst.get() == mock_response
 
 
-class TestShowRequestBody:
-
-    def test_normal(self, cornice_request):
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.body = "hello"
-        assert _show_request_body(cornice_request) == "hello"
-
-    def test_long_multipart_formdata_body_is_abbreviated(self,
-                                                         cornice_request):
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.content_type = 'multipart/form-data'
-        cornice_request.body = "hello" * 30
-        result = _show_request_body(cornice_request)
-        assert len(result) < len(cornice_request.body)
-        assert result.endswith('...')
-
-    def test_password_is_hidden(self, cornice_request):
-        import json
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.body = json.dumps({'name': 'foo', 'password': 'bar'})
-        result = _show_request_body(cornice_request)
-        assert '"<hidden>"' in result
-        assert 'bar' not in result
-
     def test_authentication_sheet_password_is_hidden(self, cornice_request):
         import json
         from adhocracy_core.rest.views import _show_request_body
@@ -1614,15 +1590,6 @@ class TestShowRequestBody:
         result = _show_request_body(cornice_request)
         assert '"<hidden>"' in result
         assert 'bar' not in result
-
-    def test_other_content_type(self, cornice_request):
-        """Just the request body is returned in case of other content types."""
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.content_type = 'text/plain'
-        cornice_request.body = 'password: foofoo'
-        result = _show_request_body(cornice_request)
-        assert result == cornice_request.body
-
 
 class TestCreatePasswordResetView:
 

@@ -4,8 +4,8 @@ import colander
 
 
 @fixture
-def request_():
-    return testing.DummyRequest()
+def request_(cornice_request):
+    return cornice_request
 
 
 class TestHandleError400ColanderInvalid:
@@ -162,3 +162,68 @@ class TestHandleError410:
         inst = self.make_one(error, request_)
         assert inst.json_body['modification_date'].endswith('00:00')
         assert inst.json_body['modified_by'].endswith('user/')
+
+
+class TestHandleError400:
+
+    @fixture
+    def error(self):
+        from pyramid.httpexceptions import HTTPBadRequest
+        return HTTPBadRequest()
+
+    def make_one(self, error, request):
+        from .exceptions import handle_error_400_bad_request
+        return handle_error_400_bad_request(error, request)
+
+    def test_return_json_error_with_error_listing(self, error, request_):
+        request_.errors = [{'location': 'body'}]
+        inst = self.make_one(error, request_)
+        assert inst.content_type == 'application/json'
+        assert b'"errors": [{"location": "body"}]' in inst.body
+        assert b'"status": "error"' in inst.body
+        assert inst.status_code == 400
+
+    def test_log_request_body(self, error, request_):
+        from testfixtures import LogCapture
+        request_.body = "{'data': 'stuff'}"
+        with LogCapture() as log:
+            self.make_one(error, request_)
+            log_message = str(log)
+            assert "{'data': 'stuff'}" in log_message
+
+    def test_log_abbreviated_request_body_for_formdata(self, error, request_):
+        from testfixtures import LogCapture
+        request_.content_type = 'multipart/form-data'
+        request_.body = "hello" * 60
+        with LogCapture() as log:
+            self.make_one(error, request_)
+            log_message = str(log)
+            assert len(log_message) < len(request_.body)
+            assert log_message.endswith('...>')
+
+    def test_log_but_hide_login_password_if_login_error(self, error, request_):
+        import json
+        from testfixtures import LogCapture
+        from .views import POSTLoginUsernameRequestSchema
+        appstruct = POSTLoginUsernameRequestSchema().serialize(
+            {'password': 'secret', 'name': 'name'})
+        request_.body = json.dumps(appstruct)
+        with LogCapture() as log:
+            self.make_one(error, request_)
+            log_message = str(log)
+            assert 'secret' not in log_message
+            assert '<hidden>' in log_message
+
+    def test_log_but_hide_login_password_if_user_creation_error(self, error,
+                                                                request_):
+        import json
+        from testfixtures import LogCapture
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
+        appstruct = {'data': {IPasswordAuthentication.__identifier__:
+                                  {'password': 'secret'}}}
+        request_.body = json.dumps(appstruct)
+        with LogCapture() as log:
+            self.make_one(error, request_)
+            log_message = str(log)
+            assert 'secret' not in log_message
+            assert '<hidden>' in log_message

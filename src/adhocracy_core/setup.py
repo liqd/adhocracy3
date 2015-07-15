@@ -41,6 +41,7 @@ test_requires = [
     'python-coveralls',
     'babel',
     'lingua',
+    'testfixtures',
 ]
 
 debug_requires = [

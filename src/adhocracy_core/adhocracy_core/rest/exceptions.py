@@ -9,12 +9,14 @@ from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
 from pyramid.traversal import resource_path
 from pyramid.httpexceptions import HTTPGone
+from pyramid.httpexceptions import HTTPBadRequest
 
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import exception_to_str
 from adhocracy_core.utils import log_compatible_datetime
 from adhocracy_core.utils import named_object
 from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
 
 
@@ -35,6 +37,53 @@ def handle_error_400_colander_invalid(error, request):
 
 def _build_error_dict(location, name, description):
     return {'location': location, 'name': name, 'description': description}
+
+
+@view_config(
+    context=HTTPBadRequest,
+    permission=NO_PERMISSION_REQUIRED,
+)
+def handle_error_400_bad_request(error, request):
+    """Return 400 JSON error with filtered error messages."""
+    errors = getattr(request, 'errors', [])  # ease testing
+    body = _get_filtered_request_body(request)
+    logger.warning('Found %i validation errors in request: <%s>',
+                   len(errors), body)
+    for error_data in errors:
+        logger.warning('  %s', error_data)
+    return _JSONError(errors, 400)
+
+
+def _get_filtered_request_body(request) -> str:
+    """
+    Filter secret or to long parts of the request body.
+
+    In case of multipart/form-data requests (file upload), only the 120
+    first characters of the body are shown.
+
+    In case of JSON requests with a "password" field,
+    the contents of the password field will be hidden.
+    """
+    result = request.body
+    if request.content_type == 'multipart/form-data' and len(result) > 120:
+        result = '{}...'.format(result[:120])
+    elif request.content_type == 'application/json':
+        json_data = ''
+        try:
+            json_data = request.json_body
+        except ValueError:
+            pass  # Not even valid JSON, so we cannot filter anything
+        if not isinstance(json_data, dict):
+            pass
+        possible_password_data = json_data
+        if 'data' in json_data:
+            possible_password_data = json_data['data'].get(
+                IPasswordAuthentication.__identifier__, {})
+        if 'password' in possible_password_data:
+            loggable_data = possible_password_data.copy()
+            loggable_data['password'] = '<hidden>'
+            result = json.dumps(loggable_data)
+    return result
 
 
 @view_config(

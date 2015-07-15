@@ -176,6 +176,17 @@ class TestBatchView:
             assert err.status_code == 401
             assert '"code": 401' in err.text
 
+    def test_post_subrequest_with_http_400_exception(self, context, request,
+                                                     mock_invoke_subrequest):
+        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPBadRequest
+        request.body = self._make_json_with_subrequest_cstructs()
+        mock_invoke_subrequest.side_effect = HTTPBadRequest()
+        mock_invoke_subrequest.return_value.errors = [{'location': 'body'}]
+        inst = self.make_one(context, request)
+        with raises(_JSONError) as err:
+            inst.post()
+
     def test_post_subrequest_with_other_exception(self, context, request, mock_invoke_subrequest):
         request.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.side_effect = RuntimeError('Bad luck')
