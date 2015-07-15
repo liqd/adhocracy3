@@ -64,6 +64,7 @@ from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
@@ -73,7 +74,6 @@ from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import unflatten_multipart_request
 from adhocracy_core.resources.root import IRootPool
-from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
 
@@ -265,8 +265,12 @@ def _show_request_body(request: Request) -> str:
             pass  # Not even valid JSON, so we cannot hide anything
         if not isinstance(json_data, dict):
             pass
-        elif 'password' in json_data:
-            loggable_data = json_data.copy()
+        possible_password_data = json_data
+        if 'data' in json_data:
+            possible_password_data = json_data['data'].get(
+                IPasswordAuthentication.__identifier__, {})
+        if 'password' in possible_password_data:
+            loggable_data = possible_password_data.copy()
             loggable_data['password'] = '<hidden>'
             result = json.dumps(loggable_data)
     return result
