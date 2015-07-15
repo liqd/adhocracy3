@@ -1,11 +1,11 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
-2015-6-8: Created.
+2015-7-6: Created.
 -->
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Mon Jun  8 17:02:43 2015
+Created by FontForge 20120731 at Mon Jul  6 16:44:16 2015
  By Caroline Clifford,,,
 Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
 </metadata>
@@ -22,7 +22,7 @@ Created by Caroline Clifford,,, with FontForge 2.0 (http://fontforge.sf.net)
     bbox="-0.75 -65 515 449"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+F100-F120"
+    unicode-range="U+F100-F121"
   />
     <missing-glyph />
     <glyph glyph-name="uniF103" unicode="&#xf103;" horiz-adv-x="511" 
@@ -87,6 +87,10 @@ l222 176c2 2 5 2 7 2c6 0 11 -4 11 -10c0 -3 -2 -7 -4 -9l-229 -181c-2 -1 -5 -2 -7 
 d="M22 373v-357h310c15 0 31 7 40 19l114 138c10 12 10 31 0 44l-113 137c-9 11 -25 19 -40 19h-311zM0 394h332c22 0 43 -10 57 -26l113 -137c17 -22 17 -52 0 -71l-113 -138c-13 -16 -35 -26 -57 -26h-332v398z" />
     <glyph glyph-name="uniF117" unicode="&#xf117;" horiz-adv-x="511" 
 d="M188 -3c-6 0 -12 2 -16 6l-163 135c-10 9 -12 25 -3 35s26 12 36 3l142 -119l281 322c9 11 26 12 36 3c11 -9 12 -25 3 -35l-296 -342c-4 -5 -11 -8 -18 -9c0 1 -1 1 -2 1z" />
+    <glyph glyph-name="uniF121" unicode="&#xf121;" 
+d="M493 395c11 0 19 -11 19 -22s-8 -21 -19 -21h-45v-397c0 -11 -14 -19 -25 -19h-337c-11 0 -22 8 -22 19v397h-45c-11 0 -19 10 -19 21s8 22 19 22h130v34c0 11 7 19 18 19h179c11 0 17 -8 17 -19v-34h130zM192 416v-21h139v21h-139zM405 -21v373h-298v-373h298zM160 313
+c11 0 21 -9 21 -21v-248c0 -11 -10 -19 -21 -19s-21 8 -21 19v249c0 11 10 20 21 20zM256 313c11 0 21 -9 21 -21v-248c0 -11 -10 -19 -21 -19s-21 8 -21 19v249c0 11 10 20 21 20zM352 313c11 0 21 -9 21 -21v-248c0 -11 -10 -19 -21 -19s-21 8 -21 19v249
+c0 11 10 20 21 20z" />
     <glyph glyph-name="uniF119" unicode="&#xf119;" horiz-adv-x="450" 
 d="M226 128h-5c-29 0 -54 10 -73 29c-44 46 -53 130 -50 195c5 84 96 96 127 96h-5h5c31 0 125 -12 127 -96c2 -65 -11 -149 -55 -195c-17 -16 -42 -29 -71 -29zM226 417c-44 0 -94 -15 -96 -65c-2 -84 15 -144 41 -173c12 -15 29 -19 48 -19h5c19 0 36 7 48 19
 c27 29 50 89 48 173c0 50 -50 65 -94 65zM450 -64h-450v17c0 121 108 144 211 144h8h5c36 0 224 12 224 -144v-17h2zM34 -30h385c-12 111 -163 96 -192 96h-15c-38 0 -166 12 -178 -96z" />

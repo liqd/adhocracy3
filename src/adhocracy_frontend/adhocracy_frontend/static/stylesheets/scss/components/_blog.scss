@@ -1,0 +1,166 @@
+.blog-tabs {
+    border: 2px solid $color-structure-normal;
+    border-width: 2px 0 3px;
+    clear: left;
+    font-size: $font-size-small;
+    line-height: 30px / $font-size-small * 1em;
+    overflow: hidden;
+    text-transform: uppercase;
+}
+
+.blog-tab {
+    background: $color-background-base-introvert;
+    color: $color-text-introvert;
+    text-align: center;
+    float: left;
+    text-decoration: none;
+    width: 50%;
+
+    &:first-child {
+        border-right: 2px solid $color-structure-normal;
+    }
+
+    &:last-child {
+        border-left: 2px solid $color-structure-normal;
+    }
+
+    &:hover, &:focus, &:active, &.is-active {
+        background: $color-background-base;
+    }
+
+    &:active, &.is-active {
+        color: $color-text-highlight-normal;
+    }
+}
+
+.blog {
+    .document-form {
+        @include opacity(1);
+        background: $color-background-base-introvert;
+        padding: 1em;
+
+        .title, .paragraph, .blog-post-edit-title {
+            margin-bottom: 10px / $font-size-normal * 1em;
+        }
+
+        .paragraph {
+            background: $color-background-base;
+            font-size: $font-size-small;
+            line-height: 1.5;
+        }
+
+        &.ng-hide-add.ng-hide-add-active,
+        &.ng-hide-remove.ng-hide-remove-active {
+            transition: 0.5s linear all;
+        }
+
+        &.ng-hide {
+            @include opacity(0);
+        }
+    }
+
+    .listing-create-form {
+        background: transparent;
+        padding: 0;
+    }
+
+    .listing-elements {
+        border-left: 1px solid $color-brand-one-normal;
+        margin: 20px / $font-size-normal * 1em;
+    }
+}
+
+.blog-post {
+    margin-bottom: 30px / $font-size-normal * 1em;
+
+    .document-form {
+        padding: 0 0 0 8px;
+        background: transparent;
+
+        .paragraph {
+            background-color: $color-background-base-introvert;
+        }
+    }
+}
+
+.blog-post-header {
+    overflow: hidden;
+    padding-left: 8px;
+}
+
+.blog-post-title {
+    background: $color-brand-one-normal;
+    float: left;
+    font-size: $font-size-smaller;
+    line-height: 15px / $font-size-smaller * 1em;
+    font-weight: $font-weight-normal;
+    margin: 0;
+    text-transform: uppercase;
+    padding: 0 20px / $font-size-small * 1em;
+    position: relative;
+
+    &:before {
+        border-top: 7.5px / $font-size-smaller * 1em solid transparent;
+        border-right: 8px solid $color-brand-one-normal;
+        border-bottom: 7.5px / $font-size-smaller * 1em solid transparent;
+        content: "";
+        height: 0;
+        left: -8px;
+        position: absolute;
+        top: 0;
+        width: 0;
+    }
+}
+
+.blog-post-meta {
+    color: $color-text-introvert;
+    font-size: $font-size-small;
+    margin-left: 8px;
+
+    a {
+        text-decoration: none;
+    }
+}
+
+.blog-post-meta-time {
+    font-style: italic;
+}
+
+.blog-post-actions {
+    float: right;
+    font-size: $font-size-small;
+    line-height: 15px / $font-size-small * 1em;
+}
+
+.blog-post-actions-item {
+    color: $color-text-introvert;
+    margin-left: 14px / $font-size-small * 1em;
+    text-decoration: none;
+
+    &:hover {
+        color: $color-text-highlight-extrovert;
+    }
+}
+
+.blog-post-paragraph {
+    padding: 10px 8px;
+    font-size: $font-size-small;
+
+    p {
+        line-height: 1.5;
+
+        &:last-child {
+            margin: 0;
+        }
+    }
+
+    h1, h2, h3, h4, h5 {
+        font-weight: $font-weight-extrovert;
+        margin: 0 0 0.5em;
+    }
+}
+
+.show-create-form-button {
+    float: right;
+    margin: (20px / $font-size-normal * 1em) (20px / $font-size-normal * 1em) 0;
+}

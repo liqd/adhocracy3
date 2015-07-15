@@ -50,6 +50,9 @@ export interface IScope extends angular.IScope {
     selectedState? : string;
     resource: any;
 
+    toggleCreateForm() : void;
+    showCreateForm? : boolean;
+
     documentVersion? : RIDocumentVersion;
     paragraphVersions? : RIParagraphVersion[];
 }

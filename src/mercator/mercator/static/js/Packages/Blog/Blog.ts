@@ -14,9 +14,45 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 var pkgLocation = "/Blog";
 
 
-export interface IFormScope extends AdhDocument.IFormScope {
+export interface IScope extends AdhDocument.IScope {
+    titles : {
+        value : string;
+        title : string;
+    }[];
+}
+
+export interface IFormScope extends IScope, AdhDocument.IFormScope {
     onSubmit() : void;
 }
+
+export var bindPath = (
+    $q : angular.IQService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    var fn = AdhDocument.bindPath($q, adhHttp);
+
+    return (
+        scope : IScope,
+        pathKey : string = "path"
+    ) : Function => {
+        scope.titles = [
+            {
+                value: "challenge",
+                title: "Challenge"
+            },
+            {
+                value: "highlight",
+                title: "Highlight"
+            },
+            {
+                value: "team story",
+                title: "Team Story"
+            }
+        ];
+
+        return fn(scope, pathKey);
+    };
+};
 
 
 export var detailDirective = (
@@ -64,7 +100,7 @@ export var detailDirective = (
 
             scope.cancel = () => {
                 scope.mode = "display";
-                unbind = AdhDocument.bindPath($q, adhHttp)(scope);
+                unbind = bindPath($q, adhHttp)(scope);
             };
 
             scope.submit = () => {
@@ -77,7 +113,7 @@ export var detailDirective = (
                 });
             };
 
-            unbind = AdhDocument.bindPath($q, adhHttp)(scope);
+            unbind = bindPath($q, adhHttp)(scope);
         }
     };
 };
@@ -98,6 +134,20 @@ export var createDirective = (
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
+            scope.titles = [
+                {
+                    value: "challenge",
+                    title: "Challenge"
+                },
+                {
+                    value: "highlight",
+                    title: "Highlight"
+                },
+                {
+                    value: "team story",
+                    title: "Team Story"
+                }
+            ];
             scope.data = {
                 title: "",
                 paragraphs: [{
@@ -105,11 +155,25 @@ export var createDirective = (
                 }]
             };
             scope.showError = adhShowError;
+            scope.showCreateForm = false;
+
+            scope.toggleCreateForm = () => {
+                scope.showCreateForm = true;
+            };
+
+            scope.cancel = () => {
+                scope.data.paragraphs[0].body = "";
+                scope.data.title = "";
+                scope.documentForm.$setPristine();
+                scope.showCreateForm = false;
+            };
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return AdhDocument.postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
+
+                    scope.cancel();
 
                     if (typeof scope.onSubmit !== "undefined") {
                         scope.onSubmit();

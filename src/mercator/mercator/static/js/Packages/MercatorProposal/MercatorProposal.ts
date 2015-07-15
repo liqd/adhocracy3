@@ -71,6 +71,7 @@ import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
 import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import SILogbook = require("../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
@@ -85,6 +86,7 @@ export interface IScopeData {
     supporterCount : number;
     winnerBadgeAssignment : AdhBadge.IBadge;
     currentPhase: string;
+    logbookPoolPath: string;
 
     title : {
         title : string;
@@ -179,6 +181,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     $flow? : Flow;
     create : boolean;
     financialPlanTemplate : string;
+    showBlogTabs : () => boolean;
 }
 
 export interface IControllerScope extends IScope {
@@ -342,6 +345,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             }
         }));
         scope.$on("$destroy", this.adhTopLevelState.bind("commentableUrl", scope));
+        scope.$on("$destroy", this.adhTopLevelState.bind("proposalTab", scope));
 
         return instance;
     }
@@ -403,12 +407,17 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             }
         };
 
+        instance.scope.showBlogTabs = () => {
+            return instance.scope.data.winnerBadgeAssignment && instance.scope.data.currentPhase === "result";
+        };
+
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
         data.user_info.createtime = mercatorProposalVersion.data[SIMetaData.nick].item_creation_date;
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
         data.title = mercatorProposalVersion.data[SITitle.nick].title;
+        data.logbookPoolPath = mercatorProposalVersion.data[SILogbook.nick].logbook_pool;
 
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
         if (typeof heardFrom !== "undefined") {
@@ -1166,6 +1175,16 @@ export var register = (angular) => {
                         });
                     };
                 }])
+                .default(RIMercatorProposalVersion, "blog", processType, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    proposalTab: "blog"
+                })
+                .specific(RIMercatorProposalVersion, "blog", processType, "", () => (resource : RIMercatorProposalVersion) => {
+                    return {
+                        proposalUrl: resource.path
+                    };
+                })
                 .default(RIMercatorProposalVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show"
