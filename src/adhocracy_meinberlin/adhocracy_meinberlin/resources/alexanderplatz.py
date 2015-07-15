@@ -8,6 +8,7 @@ from adhocracy_core.resources.document_process import IDocumentProcess
 from adhocracy_core.resources.document_process import document_process_meta
 from adhocracy_core.resources.paragraph import IParagraph
 from adhocracy_core.sheets.geo import IPoint
+from adhocracy_core.sheets import workflow
 
 
 class IProposalVersion(proposal.IProposalVersion):
@@ -63,7 +64,8 @@ class IProcess(IDocumentProcess):
 process_meta = document_process_meta._replace(
     iresource=IProcess,
     element_types=(IProposal,
-                   IDocument)
+                   IDocument),
+    extended_sheets=(workflow.IStandard,)
 )
 
 
