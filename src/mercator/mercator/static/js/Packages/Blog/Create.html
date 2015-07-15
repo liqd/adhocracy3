@@ -1,6 +1,12 @@
+<a  href=""
+    data-ng-click="toggleCreateForm()"
+    data-ng-show="!showCreateForm"
+    class="button show-create-form-button m-call-to-action">{{ "TR__BLOG_NEW_ENTRY" | translate }}</a>
+
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
+    data-ng-show="showCreateForm"
     class="document-form"
     name="documentForm">
     <div class="form-error" data-ng-repeat="error in errors track by $index">
@@ -10,15 +16,18 @@
     <label>
         <select
             data-ng-model="data.title"
-            name="title"
-            class="m-title"
+            name="titles"
+            class="title"
             required="required">
             <!-- FIXME: dummy options -->
-            <option value="challenge">challenge</option>
-            <option value="highlight">highlight</option>
-            <option value="team story">team story</option>
-            <option value="other title">other title</option>
+            <option value="" data-selected="selected">{{ "TR__MERCATOR_LOGBOOK_SELECT" | translate | uppercase }}</option>
+            <option value="{{title.value}}" data-ng-repeat="title in titles">{{title.title | uppercase }}</option>
         </select>
+        <input
+            type="hidden"
+            data-ng-model="data.title"
+            name="title"
+            data-ng-required="false">
         <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
             {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
         </span>
@@ -29,6 +38,7 @@
             data-msd-elastic=""
             data-ng-model="data.paragraphs[0].body"
             name="paragraph-0"
+            class="paragraph"
             placeholder="{{ 'TR__PARAGRAPH_PLACEHOLDER' | translate }}"
             required="required"></textarea>
 
@@ -38,6 +48,8 @@
     </label>
 
     <footer class="form-footer">
+        <a href="" data-ng-click="cancel()" class="button form-footer-button">
+            {{ "TR__CANCEL" | translate }}</a>
         <input
             type="submit"
             name="submit"

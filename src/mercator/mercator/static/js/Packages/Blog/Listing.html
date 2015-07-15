@@ -2,6 +2,8 @@
     <adh-listing
         data-path="{{path}}"
         data-content-type="{{contentType}}"
+        data-sort="'item_creation_date'"
+        data-reverse="true"
         data-empty-text="{{ 'TR__BLOG_EMPTY_TEXT' | translate }}">
         <div data-ng-switch="transclusionId">
             <adh-blog-post-create

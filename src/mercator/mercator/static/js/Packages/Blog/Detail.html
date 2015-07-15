@@ -1,48 +1,58 @@
 <article class="blog-post">
     <div data-ng-if="mode === 'display'">
-        <h1>{{ data.title }}</h1>
 
-        <div class="actions">
-            <a href="" data-ng-if="itemOptions.POST" data-ng-click="edit()">{{ "TR__EDIT" | translate }}</a>
-            <a href="" data-ng-if="options.hide" data-ng-click="hide()">{{ "TR__DELETE" | translate }}</a>
-        </div>
+        <header class="blog-post-header">
+            <h1 class="blog-post-title">{{ data.title }}</h1>
 
-        <section data-ng-repeat="paragraph in data.paragraphs">
+            <div class="blog-post-actions">
+                <a href="" data-ng-if="itemOptions.POST" data-ng-click="edit()" class="blog-post-actions-item"><i class="icon-pencil"></i> {{ "TR__EDIT" | translate }}</a>
+                <a href="" data-ng-if="options.hide" data-ng-click="hide()" class="blog-post-actions-item"><i class="icon-trash"></i> {{ "TR__DELETE" | translate }}</a>
+            </div>
+        </header>
+
+        <section data-ng-repeat="paragraph in data.paragraphs" class="blog-post-paragraph">
             <adh-parse-markdown data-parsetext="paragraph.body"></adh-parse-markdown>
         </section>
 
-        <div class="meta">
-            {{ "TR__BY" | translate }} <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
-            <adh-time data-datetime="data.creationDate"></adh-time>
+        <div class="meta blog-post-meta">
+            {{ "TR__BY" | translate }} <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta>.
+            <adh-time data-datetime="data.creationDate" class="blog-post-meta-time"></adh-time>
         </div>
     </div>
 
     <form
-        data-ng-if="mode === 'edit'"
+        data-ng-show="mode === 'edit'"
         novalidate="novalidate"
         data-ng-submit="submit()"
         class="document-form"
         name="documentForm">
         <label>
-            <input
-                type="text"
-                data-ng-model="data.title"
-                name="title"
-                placeholder="{{ 'TR__TITLE_PLACEHOLDER' | translate }}"
-                class="m-title"
-                minlength="3"
-                maxlength="100"
-                required="required" />
-            <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
-                {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
-            </span>
-        </label>
+
+        <select
+            data-ng-model="data.title"
+            name="titles"
+            class="title"
+            required="required">
+            <!-- FIXME: dummy options -->
+            <option value="data.title" data-selected="selected">{{ data.title | uppercase }}</option>
+            <option data-ng-show="title.value !== data.title" value="{{title.value}}" data-ng-repeat="title in titles">{{title.title | uppercase}}</option>
+        </select>
+        <input
+            type="hidden"
+            data-ng-model="data.title"
+            name="title"
+            data-ng-required="false">
+        <span class="input-error" data-ng-show="showError(documentForm, documentForm.title, 'required')">
+            {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
+        </span>
+    </label>
 
         <label>
             <textarea
                 data-msd-elastic=""
                 data-ng-model="data.paragraphs[0].body"
                 name="paragraph-0"
+                class="paragraph"
                 placeholder="{{ 'TR__PARAGRAPH_PLACEHOLDER' | translate }}"
                 required="required"></textarea>
 
@@ -52,7 +62,7 @@
         </label>
 
         <footer class="form-footer">
-            <a href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
+            <a href="" data-ng-click="cancel()" class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
             <input
                 type="submit"
                 name="submit"

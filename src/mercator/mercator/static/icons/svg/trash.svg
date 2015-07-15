@@ -1,0 +1,20 @@
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg2985" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<metadata id="metadata2990">
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<dc:format>image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+				<dc:title/>
+			</cc:Work>
+		</rdf:RDF>
+	</metadata>
+	<g id="layer1">
+		<g id="g3206" fill="#666">
+			<path id="path3208" d="M46.2,5h-12.2v-3.2c0-1-0.6-1.8-1.6-1.8h-16.7c-1,0-1.7,0.8-1.7,1.8v3.2h-12.2c-1,0-1.8,1-1.8,2s0.8,2,1.8,2h4.2v37.2c0,1,1.1,1.8,2.1,1.8h31.6c1,0,2.3-0.8,2.3-1.8v-37.2h4.2c1,0,1.8-1,1.8-2s-0.8-2-1.8-2zm-28.2-2h13v2h-13v-2zm20,41h-28v-35h28v35z"/>
+			<path id="path3210" d="m15,12.7c-1,0-2,0.8-2,1.8v23.4c0,1,1,1.8,2,1.8s2-0.8,2-1.8v-23.3c0-1.1-1-1.9-2-1.9z"/>
+			<path id="path3212" d="m24,12.7c-1,0-2,0.8-2,1.8v23.4c0,1,1,1.8,2,1.8s2-0.8,2-1.8v-23.3c0-1.1-1-1.9-2-1.9z"/>
+			<path id="path3214" d="m33,12.7c-1,0-2,0.8-2,1.8v23.4c0,1,1,1.8,2,1.8s2-0.8,2-1.8v-23.3c0-1.1-1-1.9-2-1.9z"/>
+		</g>
+	</g>
+</svg>
