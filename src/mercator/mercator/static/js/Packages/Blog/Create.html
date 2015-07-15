@@ -21,7 +21,7 @@
             required="required">
             <!-- FIXME: dummy options -->
             <option value="" data-selected="selected">{{ "TR__MERCATOR_LOGBOOK_SELECT" | translate | uppercase }}</option>
-            <option value="{{title.value}}" data-ng-repeat="title in data.titles">{{title.title | uppercase }}</option>
+            <option value="{{title.value}}" data-ng-repeat="title in titles">{{title.title | uppercase }}</option>
         </select>
         <input
             type="hidden"

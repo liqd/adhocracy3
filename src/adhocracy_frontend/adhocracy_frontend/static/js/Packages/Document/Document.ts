@@ -40,10 +40,6 @@ export interface IScope extends angular.IScope {
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
-        titles? : {
-            value? : string;
-            title? : string;
-        };
         paragraphs? : IParagraph[];
         commentCountTotal? : number;
         picture? : string;

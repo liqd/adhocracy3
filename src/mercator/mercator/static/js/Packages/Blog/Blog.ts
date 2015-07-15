@@ -24,19 +24,40 @@ import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/
 var pkgLocation = "/Blog";
 
 
-export interface IFormScope extends AdhDocument.IFormScope {
-    onSubmit() : void;
+export interface IScope extends AdhDocument.IScope {
+    titles : {
+        value : string;
+        title : string;
+    }[];
 }
 
+export interface IFormScope extends IScope, AdhDocument.IFormScope {
+    onSubmit() : void;
+}
 
 export var bindPath = (
     $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>
 ) => (
-    scope : any,
+    scope : IScope,
     pathKey : string = "path"
 ) : Function => {
     var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
+
+    scope.titles = [
+        {
+            value: "challenge",
+            title: "Challenge"
+        },
+        {
+            value: "highlight",
+            title: "Highlight"
+        },
+        {
+            value: "team story",
+            title: "Team Story"
+        }
+    ];
 
     return scope.$watch(pathKey, (path : string) => {
         if (path) {
@@ -58,20 +79,6 @@ export var bindPath = (
 
                     scope.data = {
                         title: documentVersion.data[SITitle.nick].title,
-                        titles: [
-                            {
-                                value: "challenge",
-                                title: "Challenge"
-                            },
-                            {
-                                value: "highlight",
-                                title: "Highlight"
-                            },
-                            {
-                                value: "team story",
-                                title: "Team Story"
-                            }
-                        ],
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
                         commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
@@ -167,22 +174,22 @@ export var createDirective = (
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
+            scope.titles = [
+                {
+                    value: "challenge",
+                    title: "Challenge"
+                },
+                {
+                    value: "highlight",
+                    title: "Highlight"
+                },
+                {
+                    value: "team story",
+                    title: "Team Story"
+                }
+            ];
             scope.data = {
                 title: "",
-                titles: [
-                    {
-                        value: "challenge",
-                        title: "Challenge"
-                    },
-                    {
-                        value: "highlight",
-                        title: "Highlight"
-                    },
-                    {
-                        value: "team story",
-                        title: "Team Story"
-                    }
-                ],
                 paragraphs: [{
                     body: ""
                 }]
