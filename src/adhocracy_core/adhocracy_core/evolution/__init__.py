@@ -121,9 +121,11 @@ def _migrate_field_values(registry: Registry, resource: IResource,
     old_sheet = get_sheet(resource, isheet_old, registry=registry)
     appstruct = {}
     for field, old_field in fields_mapping:
-        logger.info('Migrate value for field {0}'.format(field))
-        appstruct[field] = old_sheet.get()[old_field]
-        old_sheet.delete_field_values([old_field])
+        old_appstruct = old_sheet.get()
+        if old_field in old_appstruct:
+            logger.info('Migrate value for field {0}'.format(field))
+            appstruct[field] = old_appstruct[old_field]
+            old_sheet.delete_field_values([old_field])
     sheet.set(appstruct)
 
 
@@ -223,8 +225,6 @@ def lower_case_users_emails(root):  # pragma: no cover
             return
         sheet = get_sheet(user, IUserExtended)
         sheet.set({'email': user.email.lower()})
-        # force update. Not working otherwise even if the sheet is set?!
-        user._p_changed = True
 
 
 @log_migration
