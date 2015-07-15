@@ -38,9 +38,10 @@ class TestWorkflowSheet:
         digital_leben_workflow = registry.content.get_workflow('digital_leben')
         inst = meta.sheet_class(meta, context)
         wanted =  {'draft': {},
-                   'frozen': {},
                    'participate': {},
+                   'evaluate': {},
                    'result': {},
+                   'closed': {},
                    'workflow': digital_leben_workflow,
                    'workflow_state': None}
         assert inst.get() == wanted
