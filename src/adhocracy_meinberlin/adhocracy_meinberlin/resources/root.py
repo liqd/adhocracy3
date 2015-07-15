@@ -68,7 +68,7 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
 
 
 meinberlin_acm = ACM().deserialize(
-    {'principals': ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
+    {'principals': ['anonymous', 'participant', 'moderator', 'creator', 'initiator', 'admin'],  # noqa
      'permissions': []})
 
 
