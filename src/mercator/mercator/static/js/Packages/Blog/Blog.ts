@@ -70,10 +70,6 @@ export var bindPath = (
                             {
                                 value: "team story",
                                 title: "Team Story"
-                            },
-                            {
-                                value: "other title",
-                                title: "Other Title"
                             }
                         ],
                         paragraphs: paragraphs,
@@ -185,10 +181,6 @@ export var createDirective = (
                     {
                         value: "team story",
                         title: "Team Story"
-                    },
-                    {
-                        value: "other title",
-                        title: "Other Title"
                     }
                 ],
                 paragraphs: [{
