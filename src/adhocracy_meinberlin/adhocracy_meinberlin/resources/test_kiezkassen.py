@@ -11,9 +11,11 @@ class TestProposal:
 
     def test_meta(self, meta):
         from .kiezkassen import IProposalVersion
-        assert meta.element_types == [IProposalVersion]
+        assert meta.element_types == (IProposalVersion,)
         assert meta.item_type == IProposalVersion
         assert meta.permission_create == 'create_proposal'
+        assert meta.use_autonaming
+        assert meta.autonaming_prefix == 'proposal_'
 
     @mark.usefixtures('integration')
     def test_create_kiezkassen(self, registry, meta, context):
@@ -32,14 +34,14 @@ class TestProposalVersion:
         import adhocracy_core.sheets
         from adhocracy_meinberlin.sheets import kiezkassen
         assert meta.extended_sheets == \
-               [adhocracy_core.sheets.badge.IBadgeable,
+               (adhocracy_core.sheets.badge.IBadgeable,
                 adhocracy_core.sheets.title.ITitle,
                 adhocracy_core.sheets.description.IDescription,
-                kiezkassen.IProposal,
-                adhocracy_core.sheets.geo.IPoint,
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
-                ]
+                kiezkassen.IProposal,
+                adhocracy_core.sheets.geo.IPoint,
+                )
         assert meta.permission_create == 'edit_proposal'
 
     @mark.usefixtures('integration')
@@ -66,12 +68,12 @@ class TestProcess:
         assert IProcess.isOrExtends(adhocracy_core.resources.process.IProcess)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
-        assert meta.extended_sheets == [
+        assert meta.extended_sheets == (
             adhocracy_core.sheets.description.IDescription,
             adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
             adhocracy_core.sheets.geo.ILocationReference,
             adhocracy_core.sheets.image.IImageReference,
-        ]
+        )
         assert add_assets_service in meta.after_creation
         assert meta.permission_create == 'create_process'
 

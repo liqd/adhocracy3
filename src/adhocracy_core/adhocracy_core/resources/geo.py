@@ -24,9 +24,9 @@ multipolygon_meta = simple_meta._replace(
     iresource=IMultiPolygon,
     permission_create='create_multipolygon',
     is_implicit_addable=False,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_core.sheets.geo.IMultiPolygon,
-    ],
+    ),
 )
 
 

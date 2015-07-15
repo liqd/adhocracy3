@@ -14,8 +14,8 @@ class TestDocumentProcess:
         from adhocracy_core import resources
         assert meta.iresource == resources.document_process.IDocumentProcess
         assert meta.iresource.isOrExtends(resources.process.IProcess)
-        assert meta.element_types == [resources.document.IDocument,
-                                      ]
+        assert meta.element_types == (resources.document.IDocument,
+                                      )
         assert meta.is_implicit_addable is True
 
     @mark.usefixtures('integration')

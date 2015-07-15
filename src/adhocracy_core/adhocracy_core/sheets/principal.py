@@ -143,7 +143,7 @@ class UserExtendedSchema(colander.MappingSchema):
     `tzname`: time zone
     """
 
-    email = Email(validator=deferred_validate_user_email)
+    email = Email(validator=deferred_validate_user_email,)
     tzname = TimeZoneName()
 
 

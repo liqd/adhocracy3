@@ -140,7 +140,7 @@ class TestChangeIResource:
     @fixture
     def registry(self, registry_with_content, resource_meta):
         registry = registry_with_content
-        resource_meta_a = resource_meta._replace(basic_sheets=[ISheetA])
+        resource_meta_a = resource_meta._replace(basic_sheets=(ISheetA,))
         registry.content.resources_meta[IResourceA] = resource_meta_a
         return registry
 

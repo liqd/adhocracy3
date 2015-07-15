@@ -70,10 +70,10 @@ meinberlin_acm = ACM().deserialize(
 
 
 meinberlin_root_meta = root_meta._replace(
-    after_creation=[create_initial_content_for_app_root,
+    after_creation=(create_initial_content_for_app_root,
                     add_example_process,
                     adhocracy_core.resources.root.add_example_process
-                    ])
+                    ))
 
 
 def includeme(config):

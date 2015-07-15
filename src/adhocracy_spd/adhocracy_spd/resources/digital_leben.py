@@ -11,9 +11,9 @@ class IProcess(document_process.IDocumentProcess):
 
 process_meta = document_process.document_process_meta._replace(
     iresource=IProcess,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_spd.sheets.digital_leben.IWorkflowAssignment,
-    ],
+    ),
 )
 
 

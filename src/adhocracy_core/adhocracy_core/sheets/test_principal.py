@@ -125,6 +125,11 @@ class TestUserExtendedSchemaSchema:
         assert inst.deserialize(
             {'email': 'test@test.de'}) == {'email': 'test@test.de'}
 
+    def test_deserialize_email_upper_case(self):
+        inst = self.make_one()
+        assert inst.deserialize(
+            {'email': 'teST@test.de'}) == {'email': 'test@test.de'}
+
     def test_email_has_deferred_validator(self):
         inst = self.make_one()
         assert isinstance(inst['email'].validator, colander.deferred)

@@ -18,6 +18,57 @@ import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/I
 var pkgLocation = "/User";
 
 
+/**
+ * register / password reset flow
+ * ------------------------------
+ *
+ * Register and password reset require that a user reacts to an email.  The flow is
+ * initiated by visiting a page.  After that, a mail containing a link is sent to
+ * the user.  When the user clicks the link, a new tab is opened in which the flow
+ * can be completed.
+ *
+ * There are several issues related to this flow:
+ *
+ * -   After the flow is completed, we would like to offer a way back to the
+ *     location where it was initiated.  As this information is not dragged along,
+ *     we can only save it as `cameFrom` in the initial tab.  If that information
+ *     is not available (e.g. because the initial tab has been closed) we fall back
+ *     to a fixed location.
+ *
+ * -   Having two open tabs in the end could confuse users.
+ *
+ * -   The user might have closed the initial tab in the meantime or react to
+ *     the mail on a different device.  If password reset is (mis)used for
+ *     inviting new users, that initial tab will never have existed in the first
+ *     place.
+ *
+ * -   If the flow is completed successfully, we would like to notify the initial
+ *     tab.  That might be prohibited by security policies (3rd party cookie).
+ *
+ * -   If `cameFrom` is not available we need to redirect to a fixed location. It
+ *     is not clear what this would be if there is no central platform but many
+ *     independent embedded instances of adhocracy.
+ *
+ * -   We could drag along the `cameFrom` information. In that case, we should also
+ *     drag along the information on where it was embedded. On the other hand, we
+ *     should not pass any sensitive information to the embedding page (e.g.
+ *     password reset token).
+ *
+ * There are basically two options to implement this:
+ *
+ * -   Prompt the user to close the second tab and continue using the first one.
+ *     This way they end up with a single tab that contains the `cameFrom`
+ *     information, but are lost if the initial tab does not exist.
+ *
+ * -   Let the user use the second tab.  They then might have two open tabs and
+ *     have lost the `cameFrom` information but are not lost completely.
+ *
+ * Currently, both options are implemented. The first version is avoided because
+ * of the risk of dead ends.  However, if there is no central platform
+ * (`custom.embed_only` config) the first version is used.
+ */
+
+
 export interface IScopeLogin extends angular.IScope {
     user : AdhUser.Service;
     loginForm : angular.IFormController;
@@ -87,6 +138,12 @@ export var activateArea = (
     $scope.success = false;
     $scope.ready = false;
     $scope.siteName = adhConfig.site_name;
+    $scope.embedOnly = adhConfig.custom["embed_only"] && adhConfig.custom["embed_only"].toLowerCase() === "true";
+    $scope.user = adhUser;
+
+    $scope.goBack = () => {
+         $location.url("/");
+    };
 
     var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
@@ -222,7 +279,7 @@ export var passwordResetDirective = (
             scope.showError = adhShowError;
             scope.success = false;
             scope.siteName = adhConfig.site_name;
-            scope.embedOnly = (adhConfig.custom["embed_only"].toLowerCase() === "true");
+            scope.embedOnly = adhConfig.custom["embed_only"] && adhConfig.custom["embed_only"].toLowerCase() === "true";
 
             scope.input = {
                 password: "",

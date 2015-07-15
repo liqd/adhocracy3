@@ -40,7 +40,7 @@ Create participation process structure by god (sysadmin)
 Create participation process content by participant::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.document.IDocument',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'prop'}}}
+    ...         'data': {}}
     >>> resp = participant.post('/organisation/process', prop).json
     >>> participant_proposal = resp['path']
     >>> participant_proposal_comments = resp['path'] + 'comments'
@@ -53,15 +53,15 @@ Create participation process content by participant::
 Create content annotations by participant::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.comment.IComment',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'com'}}}
-    >>> resp = participant.post('/organisation/process/prop/comments', prop).json
+    ...         'data': {}}
+    >>> resp = participant.post(participant_proposal_comments, prop).json
     >>> participant_comment = resp['path']
     >>> prop = {'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
     ...         'data': {'adhocracy_core.sheets.comment.IComment': {'comment': 'com'}}}
     >>> resp = participant.post(participant_comment, prop)
 
     >>> prop = {'content_type': 'adhocracy_core.resources.rate.IRate', 'data': {}}
-    >>> resp = participant.post('/organisation/process/prop/rates', prop).json
+    >>> resp = participant.post(participant_proposal_rates, prop).json
     >>> participant_rate = resp['path']
 
 
@@ -77,12 +77,12 @@ Can read resources and normal sheets::
 
 Cannot create comments annotations for participation process content::
 
-    >>> 'POST' in anonymous.options('/organisation/process/prop/comments').json
+    >>> 'POST' in anonymous.options(participant_proposal_comments).json
     False
 
 Cannot create rate annotations for participation process content::
 
-    >>> 'POST' in anonymous.options('/organisation/process/prop/rates').json
+    >>> 'POST' in anonymous.options(participant_proposal_rates).json
     False
 
 Cannot edit annotations for participation process content::
@@ -122,13 +122,13 @@ Can read resources and normal sheets::
 
 Can create comments annotations for participation process content::
 
-   >>> resp = participant.options('/organisation/process/prop/comments').json
+   >>> resp = participant.options(participant_proposal_comments).json
    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.comment.IComment']
 
 Can create rate annotations for participation process content::
 
-   >>> resp = participant.options('/organisation/process/prop/rates').json
+   >>> resp = participant.options(participant_proposal_rates).json
    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.rate.IRate']
 
@@ -148,11 +148,12 @@ Can create process content::
     >>> resp = participant.options('/organisation/process').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.resources.document.IDocument',
-     'adhocracy_core.resources.external_resource.IExternalResource']
+     'adhocracy_core.resources.external_resource.IExternalResource',
+     'adhocracy_core.resources.proposal.IProposal']
 
 Can edit his own process content::
 
-    >>> resp = participant.options('/organisation/process/prop').json
+    >>> resp = participant.options(participant_proposal).json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.resources.document.IDocumentVersion',
      'adhocracy_core.resources.paragraph.IParagraph']
@@ -160,7 +161,7 @@ Can edit his own process content::
 
 Cannot edit process content::
 
-    >>> 'POST' in participant2.options('/organisation/process/prop').json
+    >>> 'POST' in participant2.options(participant_proposal).json
     False
 
 Cannot create process structure::
@@ -178,13 +179,13 @@ Moderator
 
 Can create comments annotations for participation process content::
 
-   >>> resp = moderator.options('/organisation/process/prop/comments').json
+   >>> resp = moderator.options(participant_proposal_comments).json
    >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
    ['adhocracy_core.resources.comment.IComment']
 
 Cannot create rate annotations for participation process content::
 
-    >>> 'POST' in moderator.options('/organisation/process/prop/rates').json
+    >>> 'POST' in moderator.options(participant_proposal_rates).json
     False
 
 Cannot edit annotations for participation process content::
@@ -203,7 +204,7 @@ Cannot edit process content::
     False
 
 Can hide and delete process content
-    >>> resp = moderator.options('/organisation/process/prop').json
+    >>> resp = moderator.options(participant_proposal).json
     >>> sorted(resp['PUT']['request_body']['data']
     ...                  ['adhocracy_core.sheets.metadata.IMetadata'])
     ['deleted', 'hidden']
@@ -243,7 +244,7 @@ Admin
 
 Cannot create rate annotations for participation process content::
 
-    >>> 'POST' in admin.options('/organisation/process/prop/rates').json
+    >>> 'POST' in admin.options(participant_proposal_rates).json
     False
 
 Cannot edit annotations for participation process content::

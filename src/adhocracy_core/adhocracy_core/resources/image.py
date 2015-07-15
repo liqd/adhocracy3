@@ -14,7 +14,7 @@ class IImage(IAsset):
 image_meta = asset_meta._replace(
     iresource=IImage,
     is_implicit_addable=True,
-    extended_sheets=[IImageMetadata],
+    extended_sheets=(IImageMetadata,),
 )
 
 

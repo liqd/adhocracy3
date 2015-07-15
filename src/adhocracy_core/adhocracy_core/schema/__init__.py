@@ -152,9 +152,16 @@ class Email(AdhocracySchemaNode):
     Example value: test@test.de
     """
 
+    @staticmethod
+    def _lower_case_email(email):
+        if email is colander.null:
+            return email
+        return email.lower()
+
     schema_type = colander.String
     default = ''
     missing = colander.drop
+    preparer = _lower_case_email
     validator = colander.Email()
 
 

@@ -143,7 +143,6 @@ def set_acms_for_app_root(app: Router, acms: (dict)=()):
 def set_acl(resource: IResource, acl: list, registry=None) -> bool:
     """Set the acl and mark the resource as dirty."""
     substanced.util.set_acl(resource, acl, registry)
-    resource._p_changed = True
 
 
 def set_god_all_permissions(resource: IResource, registry=None) -> bool:

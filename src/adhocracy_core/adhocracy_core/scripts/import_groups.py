@@ -62,8 +62,6 @@ def _update_group(group_info: dict, groups: IResource):
     group = groups[group_info['name']]
     group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
     group_sheet.set({'roles': group_info['roles']})
-    # mark resource as dirty otherwise commit does nothing?!
-    group._p_changed = True
 
 
 def _create_group(group_info: dict, registry: Registry, groups: IResource):

@@ -19,6 +19,11 @@ def change_german_salutation():
     usage::
 
         bin/change_german_salutation jsonfile
+
+    The result will be saved to a separate file. If the input file is
+    ``some/path/file.json`` the output will be saved to
+    ``some/path/file_new.json``.
+
     """
     usage = 'usage: %prog config_file'
     parser = optparse.OptionParser(

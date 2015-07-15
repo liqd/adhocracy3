@@ -17,9 +17,9 @@ def test_itemversion_meta():
     import adhocracy_core.sheets
     meta = itemversion_meta
     assert meta.iresource == IItemVersion
-    assert meta.basic_sheets == [adhocracy_core.sheets.metadata.IMetadata,
+    assert meta.basic_sheets == (adhocracy_core.sheets.metadata.IMetadata,
                                  adhocracy_core.sheets.versions.IVersionable,
-                                 ]
+                                 )
     assert notify_new_itemversion_created in meta.after_creation
     assert meta.use_autonaming
 
@@ -98,7 +98,7 @@ class TestItemVersion:
         from adhocracy_core.utils import get_sheet
         config.include('adhocracy_core.sheets.document')
         config.include('adhocracy_core.sheets.versions')
-        metadata = itemversion_meta._replace(extended_sheets=[IDocument])
+        metadata = itemversion_meta._replace(extended_sheets=(IDocument,))
         add_resource_type_to_registry(metadata, config)
         referenced_v0 = self.make_one(config, context)
         appstructs={IDocument.__identifier__: {'elements': [referenced_v0]}}

@@ -21,9 +21,9 @@ class IBasicService(IServicePool):
 service_meta = pool_meta._replace(
     content_name='service',
     iresource=IBasicService,
-    basic_sheets=[adhocracy_core.sheets.pool.IPool,
+    basic_sheets=(adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
-                  ],
+                  ),
     permission_create='create_service'
 )
 
