@@ -7,6 +7,7 @@ from adhocracy_core.resources import proposal
 from adhocracy_core.resources.document_process import IDocumentProcess
 from adhocracy_core.resources.document_process import document_process_meta
 from adhocracy_core.resources.paragraph import IParagraph
+from adhocracy_core.sheets.geo import ILocationReference
 from adhocracy_core.sheets.geo import IPoint
 
 
@@ -64,7 +65,7 @@ process_meta = document_process_meta._replace(
     iresource=IProcess,
     element_types=(IProposal,
                    IDocument)
-)
+)._add(extended_sheets=(ILocationReference,))
 
 
 def includeme(config):
