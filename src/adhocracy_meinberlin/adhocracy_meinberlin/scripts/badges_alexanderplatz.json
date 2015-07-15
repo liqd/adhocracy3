@@ -3,33 +3,44 @@
      "creator": "/principals/users/0000000",
      "content_type": "adhocracy_core.resources.badge.IBadge",
      "data": {"adhocracy_core.sheets.name.IName":
-                {"name": "historie_und_rahmenbedingungen"},
+                {"name": "verfahren"},
                 "adhocracy_core.sheets.title.ITitle":
-                {"title" : "Historie und Rahmenbedingungen"},
+                {"title" : "Das Verfahren"},
                 "adhocracy_core.sheets.description.IDescription" :
-                {"description" : "Historie und Rahmenbedingungen des Workshopverfahrens am Alexanderplatz"}
+                {"description" : ""}
              }
     },
     {"path": "/organisation/alexanderplatz/badges/",
      "creator": "/principals/users/0000000",
      "content_type": "adhocracy_core.resources.badge.IBadge",
      "data": {"adhocracy_core.sheets.name.IName":
-                {"name": "bisheriges_geschehen"},
+                {"name": "rahmenbedingungen"},
                 "adhocracy_core.sheets.title.ITitle":
-                {"title" : "Bisheriges/Künftiges Geschehen auf Grundstücken und im öffentlichen Raum"},
+                {"title" : "Rahmenbedingungen"},
                 "adhocracy_core.sheets.description.IDescription" :
-                {"description" : "Bisheriges/Künftiges Geschehen auf Grundstücken und im öffentlichen Raum des Alexanderplatzes"}
+                {"description" : ""}
              }
     },
     {"path": "/organisation/alexanderplatz/badges/",
      "creator": "/principals/users/0000000",
      "content_type": "adhocracy_core.resources.badge.IBadge",
      "data": {"adhocracy_core.sheets.name.IName":
-                {"name": "dokumentation"},
+                {"name": "historie"},
                 "adhocracy_core.sheets.title.ITitle":
-                {"title" : "Dokumentation des Workshopverfahren Alexanderplatz"},
+                {"title" : "Historie"},
                 "adhocracy_core.sheets.description.IDescription" :
-                {"description" : "Dokumentation des Workshopverfahren Alexanderplatz"}
+                {"description" : ""}
+             }
+    },
+    {"path": "/organisation/alexanderplatz/badges/",
+     "creator": "/principals/users/0000000",
+     "content_type": "adhocracy_core.resources.badge.IBadge",
+     "data": {"adhocracy_core.sheets.name.IName":
+                {"name": "gebaeude"},
+                "adhocracy_core.sheets.title.ITitle":
+                {"title" : "Die Gebäude am Alexanderplatz"},
+                "adhocracy_core.sheets.description.IDescription" :
+                {"description" : ""}
              }
     }
 ]
