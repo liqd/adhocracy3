@@ -1,7 +1,10 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import AdhConfig = require("../../../Config/Config");
+import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
 import RIDocument = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocument");
@@ -12,6 +15,23 @@ import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resourc
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProposalVersion");
 import SIParagraph = require("../../../../Resources_/adhocracy_core/sheets/document/IParagraph");
 
+var pkgLocation = "/MeinBerlin/Alexanderplatz/Workbench";
+
+
+export var workbenchDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
+        link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
@@ -21,7 +41,9 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhProcess.moduleName,
-            AdhResourceArea.moduleName
+            AdhMovingColumns.moduleName,
+            AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
@@ -99,5 +121,6 @@ export var register = (angular) => {
                             proposalUrl: version.path
                         };
                     }]);
-        }]);
+        }])
+        .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective]);
 };
