@@ -1,14 +1,23 @@
 @mixin button-base {
-    text-decoration: none;
-    overflow: hidden;
     @include inline-block;
     @include text-align(center);
-    cursor: pointer;
-    white-space: nowrap;
     border: 0;
+    cursor: pointer;
+    font-size: $font-size-normal;
+    font-weight: $font-weight-normal;
+    height: $button-height * 1em;
+    line-height: $button-height;
+    overflow: hidden;
+    padding: 0;
+    text-decoration: none;
+    white-space: nowrap;
 
     &:hover {
         text-decoration: none;
+    }
+
+    &[disabled] {
+        @include opacity(0.5);
     }
 }
 
@@ -28,10 +37,10 @@ It may have the following states:
 -   ng-disabled or :disabled
 
 ```html_example
-<a class="button">Link</a>
-<button type="button">Button</button>
-<input type="submit" value="Submit" />
-<input type="submit" value="Disabled" disabled="disabled" />
+<a class="button" href="">Link</a>
+<button type="button" class="button">Button</button>
+<input type="submit" class="button" value="Submit" />
+<input type="submit" class="button" value="Disabled" disabled="disabled" />
 ```
 */
 
@@ -45,7 +54,7 @@ parent: button
 A highlighted button. Each page should have one CTA at maxiumum.
 
 ```html_example
-<a class="button button-cta">Link</a>
+<a class="button-cta" href="">Link</a>
 <button type="button" class="button-cta">Button</button>
 <input type="submit" class="button-cta" value="Submit" />
 <input type="submit" class="button-cta" value="Disabled" disabled="disabled" />
@@ -59,65 +68,50 @@ name: button.button-cta-secondary
 parent: button
 ---
 
-If more than one CTA is required per page, `button-cta-secondary` should
+If more than one CTA is req uired per page, `button-cta-secondary` should
 be used instead.
 
 ```html_example
-<a class="button button-cta-secondary">Link</a>
+<a class="button-cta-secondary" href="">Link</a>
 <button type="button" class="button-cta-secondary">Button</button>
 <input type="submit" class="button-cta-secondary" value="Disabled" disabled="disabled" />
 ```
 
 */
-.button,
-button,
-input[type="reset"],
-input[type="submit"],
-input[type="button"] {
+
+.button {
     @include button-base;
     background: transparent;
-    border: 0;
     color: $color-text-highlight-introvert;
-    font-size: $font-size-normal;
-    font-weight: $font-weight-normal;
-    line-height: $button-height;
-    height: $button-height * 1em;
-    padding: 0;
     text-transform: uppercase;
 
-    &:focus:not(:disabled):not(.ng-disabled),
-    &:hover:not(:disabled):not(.ng-disabled) {
+    &:focus:enabled,
+    &:hover:enabled {
         color: $color-text-highlight-normal;
     }
+}
 
-    &:disabled,
-    &.ng-disabled {
-        &, &:focus, &:hover {
-            @include opacity(0.5);
-            cursor: default;
-        }
-    }
+.button-cta,
+.button-cta-secondary {
+    @include button-base;
+    background: $color-text-highlight-normal;
+    color: $color-text-inverted;
+    padding: 0 1em;
+    min-width: 110px / $font-size-normal * 1em;
 
-    &.button-cta,
-    &.button-cta-secondary {
-        background: $color-text-highlight-normal;
+    &:hover:enabled,
+    &:focus:enabled {
+        background: $color-brand-two-extrovert;
         color: $color-text-inverted;
-        padding: 0 1em;
-        min-width: 110px / $font-size-normal * 1em;
-
-        &:hover:not(:disabled):not(.ng-disabled),
-        &:focus:not(:disabled):not(.ng-disabled) {
-            background: $color-brand-two-extrovert;
-            color: $color-text-inverted;
-        }
-
-        &:active:not(:disabled):not(.ng-disabled) {
-            background-color: $color-brand-two-introvert;
-        }
     }
 
-    &.button-cta-secondary {
-        background-color: transparent;
-        color: $color-text-highlight-normal;
+    &:active:enabled {
+        background-color: $color-brand-two-introvert;
     }
+}
+
+.button-cta-secondary {
+    background-color: transparent;
+    border: 2px solid $color-text-highlight-normal;
+    color: $color-text-highlight-normal;
 }
