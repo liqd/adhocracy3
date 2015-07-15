@@ -2,6 +2,7 @@
 
 import AdhConfig = require("../../../Config/Config");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
@@ -32,6 +33,23 @@ export var workbenchDirective = (
     };
 };
 
+export var processDetailColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProcessDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
+            adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
@@ -40,6 +58,7 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhPermissions.moduleName,
             AdhProcess.moduleName,
             AdhMovingColumns.moduleName,
             AdhResourceArea.moduleName,
@@ -122,5 +141,7 @@ export var register = (angular) => {
                         };
                     }]);
         }])
-        .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective]);
+        .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
+        .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
+            "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective]);
 };
