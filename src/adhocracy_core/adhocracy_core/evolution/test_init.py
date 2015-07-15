@@ -123,6 +123,17 @@ class TestMigrateNewSheet:
                       fields_mapping=[('field_a', 'field_b')])
         a_sheet.set.assert_called_with({'field_a': 'value'})
 
+    def test_copy_field_to_new_sheet_ignore_if_field_not_exists(
+            self, context, registry, mock_catalogs, search_result, a_sheet,
+            b_sheet):
+        from adhocracy_core.interfaces import IResource
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
+        b_sheet.get.return_value = {}
+        self.call_fut(context, IResource, ISheetA, ISheetB,
+                      fields_mapping=[('field_a', 'field_b')])
+        a_sheet.set.assert_called_with({})
+
     def test_remove_old_field_values(self, context, registry,  mock_catalogs,
                                      search_result, a_sheet, b_sheet):
         from adhocracy_core.interfaces import IResource

@@ -97,7 +97,7 @@ msgstr ""
 "\n"
 "Dein \"${site_name}\"-Team"
 
-#. Default: ${site_name}: Reset Password / Password neu setzen
+#. Default: ${site_name}: Reset Password / Passwort neu setzen
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:199
 msgid "mail_reset_password_subject"
 msgstr "mail_reset_password_subject"
