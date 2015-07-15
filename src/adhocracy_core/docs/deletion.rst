@@ -146,7 +146,7 @@ Lets create some content::
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'child'}}}
     >>> resp = admin.post("/pool1", data)
     >>> data = {'content_type': 'adhocracy_core.resources.document.IDocument',
-    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'document_item'}}}
+    ...         'data': {}}
     >>> resp = participant.post("/pool1/child", data)
     >>> document_item = resp.json['path']
     >>> document_first_version = resp.json['first_version_path']
@@ -172,15 +172,15 @@ Lets check whether we have the permission to delete or hide resources.
 The person who has created a resource (creator role) has the right to delete
 it::
 
-    >>> resp = anonymous.get("/pool1/child/document_item").json
+    >>> resp = anonymous.get(document_item).json
 
-    >>> resp = participant.options("/pool1/child/document_item").json
+    >>> resp = participant.options(document_item).json
     >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata']
     {'deleted': [True, False]}
 
 But they cannot hide it -- that special right is reserved to managers::
 
-    >>> resp = moderator.options("/pool1/child/document_item").json
+    >>> resp = moderator.options(document_item).json
     >>> pprint(resp['PUT']['request_body']['data']['adhocracy_core.sheets.metadata.IMetadata'])
     {'deleted': [True, False], 'hidden': [True, False]}
 

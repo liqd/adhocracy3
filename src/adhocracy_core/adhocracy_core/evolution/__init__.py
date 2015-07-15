@@ -18,6 +18,7 @@ from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import add_badges_service
@@ -120,9 +121,11 @@ def _migrate_field_values(registry: Registry, resource: IResource,
     old_sheet = get_sheet(resource, isheet_old, registry=registry)
     appstruct = {}
     for field, old_field in fields_mapping:
-        logger.info('Migrate value for field {0}'.format(field))
-        appstruct[field] = old_sheet.get()[old_field]
-        old_sheet.delete_field_values([old_field])
+        old_appstruct = old_sheet.get()
+        if old_field in old_appstruct:
+            logger.info('Migrate value for field {0}'.format(field))
+            appstruct[field] = old_appstruct[old_field]
+            old_sheet.delete_field_values([old_field])
     sheet.set(appstruct)
 
 
@@ -213,6 +216,32 @@ def hide_password_resets(root):  # pragma: no cover
         hide(resets, registry, {})
 
 
+@log_migration
+def lower_case_users_emails(root):  # pragma: no cover
+    """Lower case users email."""
+    users = find_service(root, 'principals', 'users')
+    for user in users.values():
+        if not IUserExtended.providedBy(user):
+            return
+        sheet = get_sheet(user, IUserExtended)
+        sheet.set({'email': user.email.lower()})
+
+
+@log_migration
+def remove_name_sheet_from_items(root):  # pragma: no cover
+    """Remove name sheet from items and items subtypes."""
+    from adhocracy_core.sheets.name import IName
+    from adhocracy_core.interfaces import IItem
+    catalogs = find_service(root, 'catalogs')
+    resources = _search_for_interfaces(catalogs, (IItem))
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count,
+                                                       resource))
+        logger.info('Remove {0} sheet'.format(IName))
+        noLongerProvides(resource, IName)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -223,3 +252,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(make_users_badgeable)
     config.add_evolution_step(change_pools_autonaming_scheme)
     config.add_evolution_step(hide_password_resets)
+    config.add_evolution_step(lower_case_users_emails)
+    config.add_evolution_step(remove_name_sheet_from_items)

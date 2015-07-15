@@ -16,9 +16,9 @@ class TestDocumentProcess:
         assert meta.iresource == resources.digital_leben.IProcess
         assert meta.iresource.isOrExtends(
             adhocracy_core.resources.document_process.IDocumentProcess)
-        assert meta.extended_sheets == [
+        assert meta.extended_sheets == (
             sheets.digital_leben.IWorkflowAssignment,
-        ]
+        )
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

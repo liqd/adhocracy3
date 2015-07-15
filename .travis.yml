@@ -5,14 +5,12 @@ python:
 install:
   - "git fetch --unshallow"
   - "python bootstrap.py --setuptools-version=12.0.4"
-  - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout 2>/dev/null"
+  - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/buildout -c buildout-${BUILDOUT_TARGET}.cfg 2>/dev/null"
 script:
   - "./bin/polytester -v pyunit,pyfunc,jsunit,jsint"
   - "PATH=${TRAVIS_BUILD_DIR}/bin:${PATH} ./bin/protractor etc/protractorConfSauce.js"
 notifications:
   email: false
-after_success:
-  - "./bin/coveralls"
 cache:
   directories:
     - eggs
@@ -20,8 +18,18 @@ cache:
 addons:
   sauce_connect: true
 env:
-  global:
-  # SAUCE_USERNAME
-  - secure: ovz89AOVSOa0HefNp4Wbl1t5jV6nTJqQhf99klH/FAEtQRsZe5oklzi0zpDUXa1zIF18pGFLt0Bv8Nct7njp0N2fH8oItP7jmHpGwhHE8EQTWdvMq7KK3UX30JdXrFsyHTxnW8nGlNdTRcww/zn7KjwUTbja+4Y0RsCBB5HdA+w=
-  # SAUCE_ACCESS_KEY
-  - secure: Nt4lAAiTCqTGBj7nPu+Kov1MeFUaapI4swkyoDHsXGE2x6/aeDmOErOHrur5QrOQEOkqwsLPeeshuu4J+3+f3LdhnV0kRVkNMRryFqOM4I953jhgsw8B+p4KWT7/sqCT2ubCmyVcaLjNlDX+pdZIu2pT9LcEkF8tfg5zkDcf5Fw=
+  matrix:
+    - BUILDOUT_TARGET=meinberlin
+    - BUILDOUT_TARGET=mercator
+    - BUILDOUT_TARGET=spd
+  global: # SAUCE_USERNAME and SAUCE_ACCESS_KEY
+    - secure: ovz89AOVSOa0HefNp4Wbl1t5jV6nTJqQhf99klH/FAEtQRsZe5oklzi0zpDUXa1zIF18pGFLt0Bv8Nct7njp0N2fH8oItP7jmHpGwhHE8EQTWdvMq7KK3UX30JdXrFsyHTxnW8nGlNdTRcww/zn7KjwUTbja+4Y0RsCBB5HdA+w=
+    - secure: Nt4lAAiTCqTGBj7nPu+Kov1MeFUaapI4swkyoDHsXGE2x6/aeDmOErOHrur5QrOQEOkqwsLPeeshuu4J+3+f3LdhnV0kRVkNMRryFqOM4I953jhgsw8B+p4KWT7/sqCT2ubCmyVcaLjNlDX+pdZIu2pT9LcEkF8tfg5zkDcf5Fw=
+after_success:
+  - |
+    if [[ $TRAVIS_BRANCH =~ ^([0-9]+\.[0-9]+\.[0-9]+|master)$ && $TRAVIS_PULL_REQUEST = false ]];
+    then
+      openssl aes-256-cbc -K $encrypted_ed85436ca1fb_key -iv $encrypted_ed85436ca1fb_iv -in id_deploy.enc -out id_deploy -d;
+      ssh yves@benhabib.liqd.net -p 22036 -i id_deploy build ${TRAVIS_BRANCH} ${BUILDOUT_TARGET};
+    fi
+  - ./bin/coveralls

@@ -2,9 +2,13 @@ import AdhConfig = require("../Config/Config");
 import AdhDocument = require("../Document/Document");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
+import AdhMarkdown = require("../Markdown/Markdown");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhListing = require("../Listing/Listing");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhUtil = require("../Util/Util");
 
+import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 
 var pkgLocation = "/Blog";
@@ -17,8 +21,13 @@ export interface IFormScope extends AdhDocument.IFormScope {
 
 export var detailDirective = (
     $q : angular.IQService,
+    $window : angular.IWindowService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhShowError,
+    adhSubmitIfValid
 ) => {
     return {
         restrict: "E",
@@ -26,8 +35,49 @@ export var detailDirective = (
         scope: {
             path: "@"
         },
-        link: (scope : AdhDocument.IScope) => {
-            AdhDocument.bindPath($q, adhHttp)(scope);
+        link: (scope, element) => {
+            var unbind : Function;
+
+            scope.errors = [];
+            scope.showError = adhShowError;
+            scope.mode = "display";
+
+            adhPermissions.bindScope(scope, () => scope.path);
+            adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.path), "itemOptions");
+
+            scope.hide = () => {
+                if ($window.confirm("Do you really want to delete this?")) {
+                    var itemPath = AdhUtil.parentPath(scope.path);
+                    adhHttp.hide(itemPath, RIDocument.content_type)
+                        .then(() => {
+                            if (typeof scope.onChange !== "undefined") {
+                                scope.onChange();
+                            }
+                        });
+                }
+            };
+
+            scope.edit = () => {
+                scope.mode = "edit";
+                unbind();
+            };
+
+            scope.cancel = () => {
+                scope.mode = "display";
+                unbind = AdhDocument.bindPath($q, adhHttp)(scope);
+            };
+
+            scope.submit = () => {
+                return adhSubmitIfValid(scope, element, scope.documentForm, () => {
+                    return AdhDocument.postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
+                }).then((documentVersion : RIDocumentVersion) => {
+                    if (typeof scope.onChange !== "undefined") {
+                        scope.onChange();
+                    }
+                });
+            };
+
+            unbind = AdhDocument.bindPath($q, adhHttp)(scope);
         }
     };
 };
@@ -60,6 +110,7 @@ export var createDirective = (
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
                     return AdhDocument.postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
+
                     if (typeof scope.onSubmit !== "undefined") {
                         scope.onSubmit();
                     }
@@ -92,6 +143,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
+            AdhMarkdown.moduleName,
+            AdhPermissions.moduleName,
             AdhListing.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
@@ -99,8 +152,17 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post-create");
             adhEmbedProvider.embeddableDirectives.push("blog");
         }])
+        .directive("adhBlogPost", [
+            "$q",
+            "$window",
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhPreliminaryNames",
+            "adhShowError",
+            "adhSubmitIfValid",
+            detailDirective])
         .directive("adhBlog", ["adhConfig", listingDirective])
-        .directive("adhBlogPost", ["$q", "adhConfig", "adhHttp", detailDirective])
         .directive("adhBlogPostCreate", [
             "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective]);
 };

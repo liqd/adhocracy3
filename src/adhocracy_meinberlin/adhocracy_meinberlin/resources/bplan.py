@@ -5,7 +5,6 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources import process
-import adhocracy_core.sheets
 import adhocracy_meinberlin.sheets.bplan
 
 
@@ -17,8 +16,8 @@ class IProposalVersion(IItemVersion):
 proposal_version_meta = itemversion_meta._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
-    extended_sheets=[adhocracy_meinberlin.sheets.bplan.IProposal,
-                     ],
+    extended_sheets=(adhocracy_meinberlin.sheets.bplan.IProposal,
+                     ),
     permission_create='edit_proposal',
 )
 
@@ -31,20 +30,14 @@ class IProposal(IItem):
 proposal_meta = item_meta._replace(
     content_name='Proposal',
     iresource=IProposal,
-    element_types=[IProposalVersion],
+    element_types=(IProposalVersion,),
     item_type=IProposalVersion,
     is_implicit_addable=True,
     permission_create='create_proposal',
-    basic_sheets=[adhocracy_core.sheets.tags.ITags,
-                  adhocracy_core.sheets.versions.IVersions,
-                  adhocracy_core.sheets.pool.IPool,
-                  adhocracy_core.sheets.metadata.IMetadata,
-                  ],
-    # TODO add auto_naming for all proposals
-    extended_sheets=[
-        adhocracy_meinberlin.sheets.bplan.IPrivateWorkflowAssignment],
+    extended_sheets=(
+        adhocracy_meinberlin.sheets.bplan.IPrivateWorkflowAssignment,),
     use_autonaming=True,
-    autonaming_prefix='PROPOSAL_',
+    autonaming_prefix='proposal_',
 )
 
 
@@ -55,12 +48,12 @@ class IProcess(process.IProcess):
 
 process_meta = process.process_meta._replace(
     iresource=IProcess,
-    element_types=[IProposal,
-                   ],
+    element_types=(IProposal,
+                   ),
     is_implicit_addable=True,
-    extended_sheets=[adhocracy_meinberlin.sheets.bplan.IWorkflowAssignment,
+    extended_sheets=(adhocracy_meinberlin.sheets.bplan.IWorkflowAssignment,
                      adhocracy_meinberlin.sheets.bplan.IProcessSettings,
-                     ],
+                     ),
 )
 
 

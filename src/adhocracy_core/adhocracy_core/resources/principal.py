@@ -67,12 +67,11 @@ def create_initial_content_for_principals(context: IPool, registry: Registry,
 principals_meta = service_meta._replace(
     iresource=IPrincipalsService,
     content_name='principals',
-    after_creation=[create_initial_content_for_principals,
-                    add_badges_service] + service_meta.after_creation,
-    element_types=[],  # we don't want the frontend to post resources here
+    element_types=(),  # we don't want the frontend to post resources here
     permission_create='create_service',
-    extended_sheets=[adhocracy_core.sheets.badge.IHasBadgesPool],
-)
+    extended_sheets=(adhocracy_core.sheets.badge.IHasBadgesPool,),
+)._add(after_creation=(create_initial_content_for_principals,
+                       add_badges_service))
 
 
 class IUser(IPool):
@@ -132,18 +131,18 @@ class User(Pool):
 user_meta = pool_meta._replace(
     iresource=IUser,
     content_class=User,
-    basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
+    basic_sheets=(adhocracy_core.sheets.principal.IUserBasic,
                   adhocracy_core.sheets.principal.IUserExtended,
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,
-                  ],
-    extended_sheets=[adhocracy_core.sheets.principal.IPasswordAuthentication,
+                  ),
+    extended_sheets=(adhocracy_core.sheets.principal.IPasswordAuthentication,
                      adhocracy_core.sheets.rate.ICanRate,
                      adhocracy_core.sheets.badge.ICanBadge,
                      adhocracy_core.sheets.badge.IBadgeable,
-                     ],
-    element_types=[],  # we don't want the frontend to post resources here
+                     ),
+    element_types=(),  # we don't want the frontend to post resources here
     use_autonaming=True,
     permission_create='create_user',
 )
@@ -157,9 +156,9 @@ class IUsersService(IServicePool):
 users_meta = service_meta._replace(
     iresource=IUsersService,
     content_name='users',
-    element_types=[IUser],
+    element_types=(IUser,),
     permission_create='create_service',
-    after_creation=[add_badge_assignments_service],
+    after_creation=(add_badge_assignments_service,),
 )
 
 
@@ -181,9 +180,9 @@ class Group(Pool):
 group_meta = pool_meta._replace(
     iresource=IGroup,
     content_class=Group,
-    extended_sheets=[adhocracy_core.sheets.principal.IGroup,
-                     ],
-    element_types=[],  # we don't want the frontend to post resources here
+    extended_sheets=(adhocracy_core.sheets.principal.IGroup,
+                     ),
+    element_types=(),  # we don't want the frontend to post resources here
     permission_create='create_group',
 )
 
@@ -196,7 +195,7 @@ class IGroupsService(IServicePool):
 groups_meta = service_meta._replace(
     iresource=IGroupsService,
     content_name='groups',
-    element_types=[IGroup],
+    element_types=(IGroup,),
     permission_create='create_service',
 )
 
@@ -239,7 +238,7 @@ passwordreset_meta = resource_meta._replace(
     iresource=IPasswordReset,
     content_class=PasswordReset,
     permission_create='create_password_reset',
-    basic_sheets=[adhocracy_core.sheets.metadata.IMetadata],
+    basic_sheets=(adhocracy_core.sheets.metadata.IMetadata,),
     use_autonaming_random=True,
     after_creation=(hide,),
 )

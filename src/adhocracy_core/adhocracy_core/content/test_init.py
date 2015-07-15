@@ -26,7 +26,7 @@ class TestResourceContentRegistry:
 
     @fixture
     def resource_meta(self, resource_meta):
-        return resource_meta._replace(basic_sheets=[ISheet])
+        return resource_meta._replace(basic_sheets=(ISheet,))
 
     @fixture
     def sheet_meta(self, sheet_meta, mock_sheet):
@@ -58,6 +58,15 @@ class TestResourceContentRegistry:
         registry = Mock()
         registry.introspector.get_category.return_value = []
         return registry
+
+    @fixture
+    def mock_authpolicy(self, registry):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
+        policy = Mock()
+        registry.registerUtility(policy, IAuthenticationPolicy)
+        registry.registerUtility(policy, IAuthorizationPolicy)
+        return policy
 
     def make_one(self, registry):
         from adhocracy_core.content import ResourceContentRegistry
@@ -159,7 +168,7 @@ class TestResourceContentRegistry:
     def test_resources_meta_addable_with_addables(self, inst, resource_meta):
         simple_meta = deepcopy(resource_meta)._replace(iresource=ISimple)
         inst.resources_meta[ISimple] = simple_meta
-        resource_meta = resource_meta._replace(element_types= [ISimple])
+        resource_meta = resource_meta._replace(element_types= (ISimple,))
         inst.resources_meta[IResource] = resource_meta
         assert inst.resources_meta_addable[IResource] == [simple_meta]
 
@@ -170,7 +179,7 @@ class TestResourceContentRegistry:
         simples_meta = deepcopy(resource_meta)._replace(iresource=ISimpleS,
                                                         is_implicit_addable=True)
         inst.resources_meta[ISimpleS] = simples_meta
-        resource_meta = resource_meta._replace(element_types= [ISimple])
+        resource_meta = resource_meta._replace(element_types=(ISimple,))
         inst.resources_meta[IResource] = resource_meta
         assert simple_meta in inst.resources_meta_addable[IResource]
         assert simples_meta in inst.resources_meta_addable[IResource]
@@ -189,16 +198,45 @@ class TestResourceContentRegistry:
         config.testing_securitypolicy(userid='hank', permissive=False)
         assert inst.get_resources_meta_addable(context, request_) == []
 
-    def test_get_resources_meta_addable_no_permission_but_only_first_version_exists(
-            self, inst, item, config, request_, resource_meta):
+    def test_get_resources_meta_addable_only_first_version_exists_has_permission(
+            self, inst, item, config, request_, resource_meta, mock_authpolicy):
         from adhocracy_core.interfaces import IItem
         from adhocracy_core.interfaces import IItemVersion
         version0 = testing.DummyResource(__provides__=IItemVersion)
         item['VERSION_0000000'] = version0
-        version_meta = resource_meta._replace(iresource=IItemVersion)
+        item_meta = resource_meta._replace(iresource=IItem,
+                                           permission_create='create_xyz')
+        version_meta = resource_meta._replace(iresource=IItemVersion,
+                                               permission_create='edit_xyz')
+        inst.resources_meta = {IItem: item_meta}
         inst.resources_meta_addable = {IItem: [version_meta]}
-        config.testing_securitypolicy(userid='hank', permissive=False)
+        effective_principals = ['authenticated']
+        mock_authpolicy.effective_principals.return_value = effective_principals
+        mock_authpolicy.permits.return_value = True
         assert inst.get_resources_meta_addable(item, request_) == [version_meta]
+        mock_authpolicy.permits.assert_called_once_with(item,
+                                                        effective_principals,
+                                                        'create_xyz')
+
+    def test_get_resources_meta_addable_only_first_version_exists_no_permission(
+            self, inst, item, config, request_, resource_meta, mock_authpolicy):
+        from adhocracy_core.interfaces import IItem
+        from adhocracy_core.interfaces import IItemVersion
+        version0 = testing.DummyResource(__provides__=IItemVersion)
+        item['VERSION_0000000'] = version0
+        item_meta = resource_meta._replace(iresource=IItem,
+                                           permission_create='create_xyz')
+        version_meta = resource_meta._replace(iresource=IItemVersion,
+                                               permission_create='edit_xyz')
+        inst.resources_meta = {IItem: item_meta}
+        inst.resources_meta_addable = {IItem: [version_meta]}
+        effective_principals = ['authenticated']
+        mock_authpolicy.effective_principals.return_value = effective_principals
+        mock_authpolicy.permits.return_value = False
+        assert inst.get_resources_meta_addable(item, request_) == []
+        mock_authpolicy.permits.assert_called_once_with(item,
+                                                        effective_principals,
+                                                        'create_xyz')
 
     def test_permissions_resource_permission_create_defined(
             self, inst, resource_meta, mock_registry):

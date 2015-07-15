@@ -1,8 +1,7 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import _ = require("lodash");
-
 import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
+import AdhBadge = require("../../../Badge/Badge");
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
@@ -14,14 +13,10 @@ import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
-import RIBadgeAssignment = require("../../../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIBadgeable = require("../../../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
-import SIBadgeAssignment = require("../../../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
 import SIMetadata = require("../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
 import SIPool = require("../../../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
@@ -52,35 +47,11 @@ export interface IScope extends angular.IScope {
         lng : number;
         lat : number;
         polygon: number[][];
-        assignments : BadgeAssignment[];
+        assignments : AdhBadge.IBadge[];
     };
     selectedState? : string;
     resource: RIProposalVersion;
 }
-
-export class BadgeAssignment {
-    constructor(
-        private title : string,
-        private description : string,
-        private name : string
-    ) {}
-}
-
-var getBadges = (
-    adhHttp : AdhHttp.Service<any>,
-    $q : angular.IQService
-) => (proposal : RIProposalVersion) : angular.IPromise<BadgeAssignment[]> => {
-    return $q.all(_.map(proposal.data[SIBadgeable.nick].assignments, (assignmentPath : string) => {
-        return adhHttp.get(assignmentPath).then((assignment : RIBadgeAssignment) => {
-            var description = assignment.data[SIDescription.nick].description;
-            return adhHttp.get(assignment.data[SIBadgeAssignment.nick].badge).then((badge) => {
-                var title = badge.data[SITitle.nick].title;
-                var name = badge.data[SIName.nick].name;
-                return new BadgeAssignment(title, description, name);
-            });
-        });
-    }));
-};
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
 // They are an experiment on how adhResourceWidget can be improved.  This duplication
@@ -90,7 +61,7 @@ var bindPath = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    $q : angular.IQService
+    adhGetBadges : AdhBadge.IGetBadges
 ) => (
     scope : IScope,
     pathKey : string = "path"
@@ -127,7 +98,7 @@ var bindPath = (
                             var locationUrl = process.data[SILocationReference.nick]["location"];
                             adhHttp.get(locationUrl).then((location) => {
                                 var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                                getBadges(adhHttp, $q)(resource).then((assignments) => {
+                                adhGetBadges(resource).then((assignments) => {
                                     scope.data = {
                                         title: titleSheet.title,
                                         budget: mainSheet.budget,
@@ -189,9 +160,6 @@ var postCreate = (
 ) => {
     var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
     proposal.parent = poolPath;
-    proposal.data[SIName.nick] = new SIName.Sheet({
-        name: AdhUtil.normalizeName(scope.data.title)
-    });
 
     var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = proposal.path;
@@ -226,7 +194,7 @@ export var detailDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    $q : angular.IQService
+    adhGetBadges : AdhBadge.IGetBadges
 ) => {
     return {
         restrict: "E",
@@ -235,7 +203,7 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, $q)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
         }
     };
 };
@@ -246,7 +214,7 @@ export var listItemDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    $q : angular.IQService
+    adhGetBadges : AdhBadge.IGetBadges
 ) => {
     return {
         restrict: "E",
@@ -255,7 +223,7 @@ export var listItemDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, $q)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
@@ -275,7 +243,7 @@ export var mapListItemDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    $q : angular.IQService
+    adhGetBadges : AdhBadge.IGetBadges
 ) => {
     return {
         restrict: "E",
@@ -285,7 +253,7 @@ export var mapListItemDirective = (
             path: "@"
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, $q)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
 
             var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
                 if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
@@ -360,8 +328,8 @@ export var editDirective = (
     adhShowError,
     adhSubmitIfValid,
     adhTopLevelState : AdhTopLevelState.Service,
-    $location : angular.ILocationService,
-    $q : angular.IQService
+    adhGetBadges : AdhBadge.IGetBadges,
+    $location : angular.ILocationService
 ) => {
     return {
         restrict: "E",
@@ -373,7 +341,7 @@ export var editDirective = (
             scope.errors = [];
             scope.showError = adhShowError;
             scope.create = false;
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, $q)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
@@ -397,6 +365,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAngularHelpers.moduleName,
+            AdhBadge.moduleName,
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhMapping.moduleName,
@@ -413,11 +382,11 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list");
         }])
         .directive("adhMeinBerlinKiezkassenProposalDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "$q", detailDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", detailDirective])
         .directive("adhMeinBerlinKiezkassenProposalListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "$q", listItemDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "$q", mapListItemDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", mapListItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreate", [
             "adhConfig",
             "adhHttp",
@@ -427,7 +396,6 @@ export var register = (angular) => {
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
             "$location",
-            "$q",
             createDirective
         ])
         .directive("adhMeinBerlinKiezkassenProposalEdit", [
@@ -440,8 +408,8 @@ export var register = (angular) => {
             "adhShowError",
             "adhSubmitIfValid",
             "adhTopLevelState",
+            "adhGetBadges",
             "$location",
-            "$q",
             editDirective
         ])
         .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);

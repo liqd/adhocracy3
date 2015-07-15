@@ -960,8 +960,8 @@ class TestMetaApiView:
             [IResourceX.__identifier__]
 
     def test_get_resources_with_sheets_meta(self, request, context, resource_meta):
-        resource_meta = resource_meta._replace(basic_sheets=[ISheet],
-                                               extended_sheets=[ISheetB])
+        resource_meta = resource_meta._replace(basic_sheets=(ISheet,),
+                                               extended_sheets=(ISheetB,))
         request.registry.content.resources_meta[IResource] = resource_meta
         inst = self.make_one(request, context)
 
@@ -1146,6 +1146,7 @@ class TestValidateLoginEmail:
         cornice_request.validated['email'] = 'user@example.org'
         return cornice_request
 
+
     def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_login_email
         return validate_login_email(context, request)
@@ -1154,6 +1155,14 @@ class TestValidateLoginEmail:
         user = testing.DummyResource()
         mock_user_locator.get_user_by_email.return_value = user
         self.call_fut(context, request)
+        assert request.validated['user'] == user
+
+    def test_valid_email_with_capital_letters(self, request, context, mock_user_locator):
+        request.validated['email'] = 'usER@example.org'
+        user = testing.DummyResource()
+        mock_user_locator.get_user_by_email.return_value = user
+        self.call_fut(context, request)
+        mock_user_locator.get_user_by_email.assert_called_with('user@example.org')
         assert request.validated['user'] == user
 
     def test_invalid(self, request, context, mock_user_locator):

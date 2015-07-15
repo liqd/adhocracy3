@@ -19,26 +19,20 @@ def test_item_meta():
     import adhocracy_core.sheets
     meta = item_meta
     assert meta.iresource == IItem
-    assert meta.basic_sheets == [adhocracy_core.sheets.name.IName,
-                                 adhocracy_core.sheets.tags.ITags,
+    assert meta.basic_sheets == (adhocracy_core.sheets.tags.ITags,
                                  adhocracy_core.sheets.versions.IVersions,
                                  adhocracy_core.sheets.pool.IPool,
                                  adhocracy_core.sheets.metadata.IMetadata,
-                                 ]
-    assert meta.element_types == [
+                                 )
+    assert meta.element_types == (
         IItemVersion,
         ITag
-    ]
+    )
     assert create_initial_content_for_item in meta.after_creation
     assert meta.item_type == IItemVersion
     assert meta.permission_create == 'create_item'
-
-
-def test_item_without_name_sheet_meta():
-    from .item import item_basic_sheets_without_name
-    import adhocracy_core.sheets
-    assert adhocracy_core.sheets.name.IName\
-        not in item_basic_sheets_without_name
+    assert meta.use_autonaming
+    assert meta.autonaming_prefix == 'item_'
 
 
 def make_itemversion(parent=None, follows=[]):
@@ -55,7 +49,7 @@ def make_forkable_itemversion(parent=None, follows=[]):
     from adhocracy_core.sheets.versions import IForkableVersionable
     from adhocracy_core.resources.itemversion import itemversion_meta
     forkable_itemversion_metadata = itemversion_meta._replace(
-        extended_sheets=[IForkableVersionable]
+        extended_sheets=(IForkableVersionable,)
     )
     appstructs = {IForkableVersionable.__identifier__: {'follows': follows}}
     return ResourceFactory(forkable_itemversion_metadata)(
@@ -71,9 +65,8 @@ class TestItem:
 
     def make_one(self, context, registry, name='name'):
         from adhocracy_core.sheets.name import IName
-        appstructs = {IName.__identifier__: {'name': name}}
         inst = registry.content.create(IItem.__identifier__,
-                                       appstructs=appstructs,
+                                       appstructs={},
                                        parent=context)
         return inst
 

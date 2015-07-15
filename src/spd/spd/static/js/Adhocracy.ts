@@ -17,14 +17,14 @@ import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
+import markdownit = require("markdownit");
 import modernizr = require("modernizr");
 import moment = require("moment");
 import webshim = require("polyfiller");
 
-import markdownit = require("markdownit");
-
 import AdhAbuse = require("./Packages/Abuse/Abuse");
 import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
+import AdhBadge = require("./Packages/Badge/Badge");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhConfig = require("./Packages/Config/Config");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
@@ -167,8 +167,9 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     app.value("adhConfig", config);
     AdhMarkdown.register(angular);
     AdhAbuse.register(angular);
+    AdhBadge.register(angular);
     AdhComment.register(angular);
-    AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);
+    AdhCrossWindowMessaging.register(angular, config.trusted_domains !== []);
     AdhDateTime.register(angular);
     AdhDone.register(angular);
     AdhEmbed.register(angular);

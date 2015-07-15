@@ -9,7 +9,7 @@ def test_comment_meta():
     meta = comment_meta
     assert meta.iresource is IComment
     assert meta.item_type == ICommentVersion
-    assert meta.element_types == [ICommentVersion]
+    assert meta.element_types == (ICommentVersion,)
     assert meta.use_autonaming
     assert meta.permission_create == 'create_comment'
 
@@ -20,9 +20,9 @@ def test_commentversion_meta():
     import adhocracy_core.sheets
     meta = commentversion_meta
     assert meta.iresource is ICommentVersion
-    assert meta.extended_sheets == [adhocracy_core.sheets.comment.IComment,
+    assert meta.extended_sheets == (adhocracy_core.sheets.comment.IComment,
                                     adhocracy_core.sheets.comment.ICommentable,
-                                    adhocracy_core.sheets.rate.IRateable]
+                                    adhocracy_core.sheets.rate.IRateable)
     assert meta.permission_create == 'edit_comment'
 
 
@@ -32,7 +32,7 @@ def test_commentservice_meta():
     from .comment import IComment
     meta = comments_meta
     assert meta.iresource is ICommentsService
-    assert meta.element_types == [IComment]
+    assert meta.element_types == (IComment,)
     assert meta.content_name == 'comments'
 
 

@@ -17,14 +17,17 @@ import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
+import markdownit = require("markdownit");
 import modernizr = require("modernizr");
 import moment = require("moment");
 import webshim = require("polyfiller");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
+import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
+import AdhBadge = require("./Packages/Badge/Badge");
 import AdhBlog = require("./Packages/Blog/Blog");
-import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
+import AdhConfig = require("./Packages/Config/Config");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhDone = require("./Packages/Done/Done");
@@ -36,6 +39,7 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
 import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
@@ -43,17 +47,16 @@ import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProcess = require("./Packages/Process/Process");
 import AdhRate = require("./Packages/Rate/Rate");
-import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 import AdhShareSocial = require("./Packages/ShareSocial/ShareSocial");
 import AdhSticky = require("./Packages/Sticky/Sticky");
+import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhTracking = require("./Packages/Tracking/Tracking");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
-import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
 webshim.setOptions("forms-ext", {"replaceUI": true});
@@ -85,6 +88,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "duScroll",
         "flow",
         "angular-data.DSCacheFactory",
+        AdhBlog.moduleName,
         AdhComment.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
@@ -158,15 +162,17 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     }]);
 
     app.value("angular", angular);
+    app.value("markdownit", markdownit);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
 
     // register our modules
     app.value("adhConfig", config);
     AdhAbuse.register(angular);
+    AdhBadge.register(angular);
     AdhBlog.register(angular);
     AdhComment.register(angular);
-    AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);
+    AdhCrossWindowMessaging.register(angular, config.trusted_domains !== []);
     AdhDateTime.register(angular);
     AdhDone.register(angular);
     AdhEmbed.register(angular);
@@ -177,6 +183,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
+    AdhMarkdown.register(angular);
     AdhMercatorProposal.register(angular);
     AdhMercatorWorkbench.register(angular);
     AdhMovingColumns.register(angular);

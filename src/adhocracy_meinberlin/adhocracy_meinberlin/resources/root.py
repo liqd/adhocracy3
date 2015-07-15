@@ -20,6 +20,7 @@ POLYGON_ALT_TREPTOW = [[[[13.43965471730573, 52.489910057553196], [13.4404499013
 def add_example_process(context: IPool, registry: Registry, options: dict):
     """Add meinberlin specific example content."""
     registry = get_current_registry(context)
+    # sample locations
     locations = find_service(context, 'locations')
     appstructs = {adhocracy_core.sheets.geo.IMultiPolygon.__identifier__:
                   {'coordinates': POLYGON_ALT_TREPTOW,
@@ -29,11 +30,13 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     kiezregion = registry.content.create(IMultiPolygon.__identifier__,
                                          parent=locations,
                                          appstructs=appstructs)
+    # sample organisation
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'organisation'}}
     registry.content.create(IOrganisation.__identifier__,
                             parent=context,
                             appstructs=appstructs)
+    # sample kiezkasse
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'kiezkasse'},
                   adhocracy_core.sheets.geo.ILocationReference.__identifier__:
@@ -43,6 +46,7 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     registry.content.create(resources.kiezkassen.IProcess.__identifier__,
                             parent=context['organisation'],
                             appstructs=appstructs)
+    # sample bplan
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'bplan'},
                   adhocracy_core.sheets.title.ITitle.__identifier__:
@@ -50,7 +54,14 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     registry.content.create(resources.bplan.IProcess.__identifier__,
                             parent=context['organisation'],
                             appstructs=appstructs)
-
+    # sample alexanderplatz
+    appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': 'alexanderplatz'},
+                  adhocracy_core.sheets.title.ITitle.__identifier__:
+                  {'title': 'Sample Alexanderplatz participation process'}}
+    registry.content.create(resources.alexanderplatz.IProcess.__identifier__,
+                            parent=context['organisation'],
+                            appstructs=appstructs)
 
 
 meinberlin_acm = ACM().deserialize(
@@ -59,10 +70,10 @@ meinberlin_acm = ACM().deserialize(
 
 
 meinberlin_root_meta = root_meta._replace(
-    after_creation=[create_initial_content_for_app_root,
+    after_creation=(create_initial_content_for_app_root,
                     add_example_process,
                     adhocracy_core.resources.root.add_example_process
-                    ])
+                    ))
 
 
 def includeme(config):

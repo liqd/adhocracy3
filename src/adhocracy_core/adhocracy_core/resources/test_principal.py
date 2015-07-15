@@ -41,7 +41,7 @@ class TestPrincipalsService:
         assert meta.permission_create == 'create_service'
         assert meta.content_name == 'principals'
         assert meta.extended_sheets == \
-            [sheets.badge.IHasBadgesPool]
+            (sheets.badge.IHasBadgesPool,)
         assert badge.add_badges_service in meta.after_creation
 
     @mark.usefixtures('integration')
@@ -97,19 +97,19 @@ class TestUser:
         assert meta.content_class == principal.User  # TODO do we really need this class?
         assert meta.permission_create == 'create_user'
         assert meta.is_implicit_addable is False
-        assert meta.basic_sheets == [adhocracy_core.sheets.principal.IUserBasic,
+        assert meta.basic_sheets == (adhocracy_core.sheets.principal.IUserBasic,
                                      adhocracy_core.sheets.principal.IUserExtended,
                                      adhocracy_core.sheets.principal.IPermissions,
                                      adhocracy_core.sheets.metadata.IMetadata,
                                      adhocracy_core.sheets.pool.IPool,
-                                     ]
+                                     )
         assert meta.extended_sheets == \
-               [adhocracy_core.sheets.principal.IPasswordAuthentication,
+            (adhocracy_core.sheets.principal.IPasswordAuthentication,
                 adhocracy_core.sheets.rate.ICanRate,
                 adhocracy_core.sheets.badge.ICanBadge,
                 adhocracy_core.sheets.badge.IBadgeable,
-               ]
-        assert meta.element_types == []
+            )
+        assert meta.element_types == ()
         assert meta.use_autonaming is True
 
     @mark.usefixtures('integration')
@@ -168,7 +168,7 @@ class TestGroup:
         assert meta.content_class == principal.Group
         assert meta.permission_create == 'create_group'
         assert meta.is_implicit_addable is False
-        assert meta.element_types == []
+        assert meta.element_types == ()
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry):
@@ -247,7 +247,7 @@ class TestPasswordReset:
         assert meta.iresource is principal.IPasswordReset
         assert meta.permission_create == 'create_password_reset'
         assert meta.use_autonaming_random
-        assert meta.basic_sheets == [adhocracy_core.sheets.metadata.IMetadata]
+        assert meta.basic_sheets == (adhocracy_core.sheets.metadata.IMetadata,)
 
     @mark.usefixtures('integration')
     def test_create(self, meta, registry, pool):

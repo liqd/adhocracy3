@@ -23,10 +23,10 @@ class IBadge(ISimple):
 
 badge_meta = simple_meta._replace(
     iresource=IBadge,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_core.sheets.description.IDescription,
         adhocracy_core.sheets.badge.IBadge,
-    ],
+    ),
     permission_create='create_badge',
 )
 
@@ -38,13 +38,13 @@ class IBadgeGroup(IPool):
 
 badge_group_meta = pool_meta._replace(
     iresource=IBadgeGroup,
-    extended_sheets=[
+    extended_sheets=(
         adhocracy_core.sheets.description.IDescription,
-    ],
+    ),
     permission_create='create_badge_group',
-    element_types=[IBadge,
+    element_types=(IBadge,
                    IBadgeGroup,
-                   ],
+                   ),
 )
 
 
@@ -56,9 +56,9 @@ class IBadgesService(IServicePool):
 badges_service_meta = service_meta._replace(
     iresource=IBadgesService,
     content_name='badges',
-    element_types=[IBadge,
+    element_types=(IBadge,
                    IBadgeGroup,
-                   ],
+                   ),
 )
 
 
@@ -74,11 +74,11 @@ class IBadgeAssignment(ISimple):
 
 badge_assignment_meta = simple_meta._replace(
     iresource=IBadgeAssignment,
-    basic_sheets=[
+    basic_sheets=(
         adhocracy_core.sheets.metadata.IMetadata,
         adhocracy_core.sheets.badge.IBadgeAssignment,
         adhocracy_core.sheets.description.IDescription
-    ],
+    ),
     autonaming_prefix='',
     use_autonaming=True,
     permission_create='create_badge_assignment',
@@ -93,7 +93,7 @@ class IBadgeAssignmentsService(IServicePool):
 badge_assignments_service_meta = service_meta._replace(
     iresource=IBadgeAssignmentsService,
     content_name='badge_assignments',
-    element_types=[IBadgeAssignment],
+    element_types=(IBadgeAssignment,),
 )
 
 

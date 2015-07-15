@@ -32,13 +32,13 @@ resource_meta = ResourceMetadata(content_name='',
                                  content_class=None,
                                  permission_create='',
                                  is_implicit_addable=False,
-                                 basic_sheets=[],
-                                 extended_sheets=[],
-                                 after_creation=[],
+                                 basic_sheets=(),
+                                 extended_sheets=(),
+                                 after_creation=(),
                                  use_autonaming=False,
                                  autonaming_prefix='',
                                  use_autonaming_random=False,
-                                 element_types=[],
+                                 element_types=(),
                                  item_type=False,
                                  )
 
@@ -260,8 +260,10 @@ def includeme(config):
     config.include('.subscriber')
     config.include('.geo')
     config.include('.process')
+    config.include('.proposal')
     config.include('.document')
     config.include('.document_process')
     config.include('.paragraph')
     config.include('.badge')
     config.include('.service')
+    config.include('.logbook')

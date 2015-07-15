@@ -18,8 +18,8 @@ import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/do
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
-import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
@@ -31,6 +31,7 @@ export interface IParagraph {
     body : string;
     commentCount? : number;
     path? : string;
+    selectedState? : string;
 }
 
 export interface IScope extends angular.IScope {
@@ -42,6 +43,9 @@ export interface IScope extends angular.IScope {
         paragraphs? : IParagraph[];
         commentCountTotal? : number;
         picture? : string;
+        creator? : string;
+        creationDate? : string;
+        modificationDate? : string;
     };
     selectedState? : string;
     resource: any;
@@ -58,17 +62,33 @@ export interface IFormScope extends IScope {
     documentForm : any;
 }
 
+export var highlightSelectedParagraph = (
+    commentableUrl : string,
+    scope : IScope) => {
+    if (scope.data) {
+        _.forEach(scope.data.paragraphs, (paragraph) => {
+            if (!commentableUrl) {
+                paragraph.selectedState = "";
+            } else if (paragraph.path === commentableUrl) {
+                paragraph.selectedState = "is-selected";
+            } else {
+                paragraph.selectedState = "is-not-selected";
+            }
+        });
+    }
+};
 
 export var bindPath = (
     $q : angular.IQService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState? : AdhTopLevelState.Service
 ) => (
     scope : IScope,
     pathKey : string = "path"
-) => {
+) : Function => {
     var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
 
-    scope.$watch(pathKey, (path : string) => {
+    return scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
@@ -91,8 +111,17 @@ export var bindPath = (
                         paragraphs: paragraphs,
                         // FIXME: DefinitelyTyped
                         commentCountTotal: (<any>_).sum(_.map(paragraphs, "commentCount")),
+                        modificationDate: documentVersion.data[SIMetadata.nick].modification_date,
+                        creationDate: documentVersion.data[SIMetadata.nick].creation_date,
+                        creator: documentVersion.data[SIMetadata.nick].creator,
                         picture: documentVersion.data[SIImageReference.nick].picture
                     };
+
+                    // FIXME: This probably isn't the right place for this also topLevelState
+                    // had to be included in this function just for this
+                    if (adhTopLevelState) {
+                        highlightSelectedParagraph(adhTopLevelState.get("commentableUrl"), scope);
+                    }
                 });
             });
         }
@@ -108,9 +137,6 @@ export var postCreate = (
 ) : angular.IPromise<RIDocumentVersion> => {
     var doc = new RIDocument({preliminaryNames: adhPreliminaryNames});
     doc.parent = poolPath;
-    doc.data[SIName.nick] = new SIName.Sheet({
-        name: AdhUtil.normalizeName(scope.data.title)
-    });
 
     var paragraphItems = [];
     var paragraphVersions = [];
@@ -221,17 +247,20 @@ export var postEdit = (
         title: scope.data.title
     });
     // FIXME: workaround for a backend bug
-    documentVersion.data[SIImageReference.nick] = oldVersion.data[SIImageReference.nick];
+    var oldImageReferenceSheet = oldVersion.data[SIImageReference.nick];
+    if (oldImageReferenceSheet.picture) {
+        documentVersion.data[SIImageReference.nick] = oldImageReferenceSheet;
+    }
 
     return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[0]);
 };
 
-
 export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
@@ -240,7 +269,10 @@ export var detailDirective = (
             path: "@"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp)(scope);
+            bindPath($q, adhHttp, adhTopLevelState)(scope);
+            scope.$on("$destroy", adhTopLevelState.on("commentableUrl", (commentableUrl) => {
+                highlightSelectedParagraph(adhTopLevelState.get("commentableUrl"), scope);
+            }));
         }
     };
 };
@@ -331,8 +363,6 @@ export var createDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
-                }, (errors) => {
-                    scope.errors = errors;
                 });
             };
         }
@@ -379,8 +409,6 @@ export var editDirective = (
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
-                }, (errors) => {
-                    scope.errors = errors;
                 });
             };
         }
@@ -411,7 +439,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("document-edit");
             adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", detailDirective])
+        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", detailDirective])
         .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",

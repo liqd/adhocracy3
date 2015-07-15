@@ -187,3 +187,17 @@ export var qFilter = (promises : angular.IPromise<any>[], $q : angular.IQService
 
     return deferred.promise;
 };
+
+
+/**
+ * Apply-like functionality for constructors.
+ *
+ * https://stackoverflow.com/questions/1606797/
+ */
+export var construct = (constructor, args) => {
+    var F = function() : void {
+        constructor.apply(this, args);
+    };
+    F.prototype = constructor.prototype;
+    return new F();
+};

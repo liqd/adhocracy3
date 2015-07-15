@@ -1,0 +1,35 @@
+[
+    {"path": "/organisation/alexanderplatz/badges/",
+     "creator": "/principals/users/0000000",
+     "content_type": "adhocracy_core.resources.badge.IBadge",
+     "data": {"adhocracy_core.sheets.name.IName":
+                {"name": "historie_und_rahmenbedingungen"},
+                "adhocracy_core.sheets.title.ITitle":
+                {"title" : "Historie und Rahmenbedingungen"},
+                "adhocracy_core.sheets.description.IDescription" :
+                {"description" : "Historie und Rahmenbedingungen des Workshopverfahrens am Alexanderplatz"}
+             }
+    },
+    {"path": "/organisation/alexanderplatz/badges/",
+     "creator": "/principals/users/0000000",
+     "content_type": "adhocracy_core.resources.badge.IBadge",
+     "data": {"adhocracy_core.sheets.name.IName":
+                {"name": "bisheriges_geschehen"},
+                "adhocracy_core.sheets.title.ITitle":
+                {"title" : "Bisheriges/Künftiges Geschehen auf Grundstücken und im öffentlichen Raum"},
+                "adhocracy_core.sheets.description.IDescription" :
+                {"description" : "Bisheriges/Künftiges Geschehen auf Grundstücken und im öffentlichen Raum des Alexanderplatzes"}
+             }
+    },
+    {"path": "/organisation/alexanderplatz/badges/",
+     "creator": "/principals/users/0000000",
+     "content_type": "adhocracy_core.resources.badge.IBadge",
+     "data": {"adhocracy_core.sheets.name.IName":
+                {"name": "dokumentation"},
+                "adhocracy_core.sheets.title.ITitle":
+                {"title" : "Dokumentation des Workshopverfahren Alexanderplatz"},
+                "adhocracy_core.sheets.description.IDescription" :
+                {"description" : "Dokumentation des Workshopverfahren Alexanderplatz"}
+             }
+    }
+]

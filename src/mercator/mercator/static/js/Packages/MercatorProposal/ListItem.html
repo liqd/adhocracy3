@@ -14,7 +14,7 @@
                 {{data.organization_info.name}}
             </span>
         </p>
-        <h3 class="proposal-list-item-title">{{ data.title.title }} </h3>
+        <h3 class="proposal-list-item-title">{{ data.title.title }}</h3>
         <ul class="meta-list proposal-list-item-meta-list">
             <li class="meta-list-item meta-list-item-date">
                 <adh-time data-datetime="data.user_info.createtime" data-format="D/M/YYYY"></adh-time>
@@ -30,6 +30,12 @@
             </li>
             <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item meta-list-item-budget">
                 {{ data.finance.requested_funding | number }} &euro; <span class="print-only" aria-hidden="true">{{ "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING" | translate }}</span>
+            </li>
+            <li data-ng-if="data.winnerBadgeAssignment.name === 'winning'" class="meta-list-item meta-list-item-badge">
+                <span class="badge m-winner">{{ "TR__MERCATOR_BADGE_WINNERS" | translate }}</span>
+            </li>
+            <li data-ng-if="data.winnerBadgeAssignment.name === 'community'" class="meta-list-item meta-list-item-badge">
+                <span class="badge m-community-award">{{ "TR__MERCATOR_BADGE_COMMUNITY_AWARD" | translate }}</span>
             </li>
         </ul>
     </div>

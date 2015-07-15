@@ -2,20 +2,12 @@
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.itemversion import itemversion_meta
-from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources import process
-from adhocracy_core.resources.comment import add_commentsservice
-from adhocracy_core.resources.rate import add_ratesservice
+from adhocracy_core.resources import proposal
 from adhocracy_core.sheets.description import IDescription
 from adhocracy_core.sheets.geo import IPoint
-from adhocracy_core.sheets.rate import IRateable
-from adhocracy_core.sheets.comment import ICommentable
-from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.geo import ILocationReference
 from adhocracy_core.sheets.image import IImageReference
-from adhocracy_core.resources.badge import add_badge_assignments_service
-from adhocracy_core.sheets.badge import IBadgeable
 import adhocracy_meinberlin.sheets.kiezkassen
 
 
@@ -24,18 +16,10 @@ class IProposalVersion(IItemVersion):
     """Kiezkassen proposal version."""
 
 
-proposal_version_meta = itemversion_meta._replace(
-    content_name='ProposalVersion',
+proposal_version_meta = proposal.proposal_version_meta._replace(
     iresource=IProposalVersion,
-    extended_sheets=[IBadgeable,
-                     ITitle,
-                     IDescription,
-                     adhocracy_meinberlin.sheets.kiezkassen.IProposal,
-                     IPoint,
-                     ICommentable,
-                     IRateable],
-    permission_create='edit_proposal',
-)
+)._add(extended_sheets=(adhocracy_meinberlin.sheets.kiezkassen.IProposal,
+                        IPoint))
 
 
 class IProposal(IItem):
@@ -43,18 +27,14 @@ class IProposal(IItem):
     """Kiezkassen proposal versions pool."""
 
 
-proposal_meta = item_meta._replace(
-    content_name='Proposal',
+proposal_meta = proposal.proposal_meta._replace(
     iresource=IProposal,
-    element_types=[IProposalVersion],
-    after_creation=item_meta.after_creation + [
-        add_commentsservice,
-        add_ratesservice,
-        add_badge_assignments_service,
-    ],
+    element_types=(IProposalVersion,),
     item_type=IProposalVersion,
     is_implicit_addable=True,
     permission_create='create_proposal',
+    use_autonaming=True,
+    autonaming_prefix='proposal_',
 )
 
 
@@ -65,15 +45,15 @@ class IProcess(process.IProcess):
 
 process_meta = process.process_meta._replace(
     iresource=IProcess,
-    element_types=[IProposal,
-                   ],
+    element_types=(IProposal,
+                   ),
     is_implicit_addable=True,
-    extended_sheets=[
+    extended_sheets=(
         IDescription,
         adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
         ILocationReference,
         IImageReference,
-    ],
+    ),
 )
 
 

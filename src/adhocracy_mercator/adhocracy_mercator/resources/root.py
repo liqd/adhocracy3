@@ -28,24 +28,24 @@ def initialize_workflow(context: IPool, registry: Registry, options: dict):
     # at this point the permissions are not setup so we need to add
     # the god's permissions
     root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
-    mercator_workflow = registry.content.workflows['mercator']
     mercator_process = root['mercator']
-    setup_workflow(mercator_workflow, mercator_process,
-                   ['announce', 'participate'], registry)
+    setup_workflow(mercator_process, ['announce', 'participate'], registry)
 
 
 mercator_acm = ACM().deserialize(
     {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
      'permissions': [['view_sheet_heardfrom',          None,        None,          None,         Allow,     Allow,       Allow],  # noqa
+                     ['edit_mercator_proposal',        None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_mercator_proposal',      None,        None,          None,         None,      None,        Allow],  # noqa
                      ]})
 
 
 mercator_root_meta = root_meta._replace(
-    after_creation=[create_initial_content_for_app_root,
+    after_creation=(create_initial_content_for_app_root,
                     add_mercator_process,
                     initialize_workflow,
                     adhocracy_core.resources.root.add_example_process
-                    ])
+                    ))
 
 
 def includeme(config):

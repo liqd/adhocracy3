@@ -5,6 +5,13 @@ from pytest import mark
 from pytest import raises
 from pyramid.request import Request
 
+from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources import process
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.sheets.workflow import WorkflowAssignmentSchema
+from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.utils import get_sheet
+
 class TestAdhocracyACLWorkflow:
 
     @fixture
@@ -132,15 +139,18 @@ class TestAddWorkflow:
         assert 'msg' in err.value.__str__()
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.workflows')
-
-
 @mark.usefixtures('integration')
 class TestSetupWorkflow:
+
+    class IProcess(process.IProcess):
+        pass
+
+    class IWorkflowExample(IWorkflowAssignment):
+        pass
+
+    class WorkflowExampleAssignmentSchema(WorkflowAssignmentSchema):
+        """Some doc."""
+        workflow_name = 'test_workflow'
 
     def _make_workflow(self, registry, name):
         from . import add_workflow
@@ -163,22 +173,45 @@ class TestSetupWorkflow:
              }
         return add_workflow(registry, cstruct, name)
 
-    def test_setup_workflow(self, registry):
-        from . import setup_workflow
-        context = testing.DummyResource()
-        sample = registry.content.workflows['sample']
-        setup_workflow(sample, context, ['participate', 'frozen'], registry)
-        assert sample.state_of(context) is 'frozen'
+    @fixture
+    def meta_process(self):
+        from adhocracy_core.resources.process import process_meta
+        meta = process_meta._replace(iresource=self.IProcess,
+                                     extended_sheets=(self.IWorkflowExample,))
+        return meta
 
-    def test_setup_workflow_state_already_set(self, registry):
+    @fixture
+    def meta_workflow_example(self):
+        from adhocracy_core.sheets.workflow import workflow_meta
+        meta = workflow_meta._replace(isheet=self.IWorkflowExample,
+                                      schema_class=self.WorkflowExampleAssignmentSchema)
+        return meta
+
+    def _register_metadata(self, registry, config, meta_process, meta_workflow_example):
+        add_resource_type_to_registry(meta_process, config)
+        add_sheet_to_registry(meta_workflow_example, registry)
+
+    def test_setup_workflow(self, registry, config, meta_process, meta_workflow_example):
         from . import setup_workflow
         self._make_workflow(registry, 'test_workflow')
+        self._register_metadata(registry, config, meta_process, meta_workflow_example)
+        process = registry.content.create(self.IProcess.__identifier__)
+        setup_workflow(process, ['announced', 'participate'], registry)
+        workflow = registry.content.workflows['test_workflow']
+        assert workflow.state_of(process) is 'participate'
+
+    def test_setup_workflow_state_already_set(self, registry, config,
+                                              meta_process, meta_workflow_example):
+        from . import setup_workflow
+        self._make_workflow(registry, 'test_workflow')
+        self._register_metadata(registry, config, meta_process, meta_workflow_example)
+        process = registry.content.create(self.IProcess.__identifier__)
+        workflow = registry.content.workflows['test_workflow']
         request = Request.blank('/dummy')
         request.registry = registry
         context = testing.DummyResource()
-        workflow = registry.content.workflows['test_workflow']
         workflow.initialize(context)
         workflow.transition_to_state(context, request, 'announced')
         workflow.transition_to_state(context, request, 'participate')
-        setup_workflow(workflow, context, ['announced', 'participate'], registry)
-        assert workflow.state_of(context) is 'participate'
+        setup_workflow(process, ['announced', 'participate'], registry)
+        assert workflow.state_of(process) is 'participate'

@@ -1,3 +1,5 @@
+"""Process resource which contain documents."""
+
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.document import IDocument
 from adhocracy_core.resources.process import IProcess
@@ -11,8 +13,8 @@ class IDocumentProcess(IProcess):
 
 document_process_meta = process_meta._replace(
     iresource=IDocumentProcess,
-    element_types=[IDocument,
-                   ],
+    element_types=(IDocument,
+                   ),
     is_implicit_addable=True,
 )
 

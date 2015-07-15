@@ -63,10 +63,10 @@ msgstr ""
 "\n"
 "Das #digitalLEBEN-Team"
 
-#. Default: ${site_name}: Reset Password / Password neu setzen
+#. Default: ${site_name}: Reset Password / Passwort neu setzen
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:199
 msgid "mail_reset_password_subject"
-msgstr "Debatte - #digitalLEBEN:  Password neu setzen"
+msgstr "Debatte - #digitalLEBEN:  Passwort neu setzen"
 
 #. Default: ${reset_url}
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:203
@@ -80,7 +80,7 @@ msgstr ""
 "\n"
 "Das #digitalLEBEN-Team"
 
-#. Default: ${site_name}: Reset Password / Password neu setzen
+#. Default: ${site_name}: Reset Password / Passwort neu setzen
 #: src/adhocracy_core/adhocracy_core/messaging/__init__.py:232
 #, fuzzy
 msgid "mail_invitation_subject"

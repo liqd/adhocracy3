@@ -18,9 +18,9 @@ class IParagraphVersion(IItemVersion):
 paragraphversion_meta = itemversion_meta._replace(
     content_name='ParagraphVersion',
     iresource=IParagraphVersion,
-    extended_sheets=[adhocracy_core.sheets.document.IParagraph,
+    extended_sheets=(adhocracy_core.sheets.document.IParagraph,
                      adhocracy_core.sheets.comment.ICommentable,
-                     ],
+                     ),
     permission_create='edit_proposal',
 )
 
@@ -33,20 +33,19 @@ class IParagraph(IItem):
 paragraph_meta = item_meta._replace(
     content_name='Paragraph',
     iresource=IParagraph,
-    basic_sheets=[adhocracy_core.sheets.tags.ITags,
+    basic_sheets=(adhocracy_core.sheets.tags.ITags,
                   adhocracy_core.sheets.versions.IVersions,
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
-                  ],
-    element_types=[ITag,
+                  ),
+    element_types=(ITag,
                    IParagraphVersion,
-                   ],
+                   ),
     item_type=IParagraphVersion,
     permission_create='edit_proposal',
     use_autonaming=True,
     autonaming_prefix='PARAGRAPH_',
-    after_creation=item_meta.after_creation + [add_commentsservice]
-)
+)._add(after_creation=(add_commentsservice,))
 
 
 def includeme(config):
