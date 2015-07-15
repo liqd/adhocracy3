@@ -181,6 +181,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     $flow? : Flow;
     create : boolean;
     financialPlanTemplate : string;
+    showBlogTabs : () => boolean;
 }
 
 export interface IControllerScope extends IScope {
@@ -404,6 +405,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             } else {
                 return "is-not-selected";
             }
+        };
+
+        instance.scope.showBlogTabs = () => {
+            return instance.scope.data.winnerBadgeAssignment && instance.scope.data.currentPhase === "result";
         };
 
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
