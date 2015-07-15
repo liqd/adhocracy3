@@ -12,7 +12,6 @@
 }
 
 .button {
-    color: $color-text-normal;
     font-size: $font-size-small;
     height: 24px / $font-size-small * 1em;
     line-height: 24px / $font-size-small * 1em;
@@ -24,7 +23,6 @@
 
     &:focus:enabled,
     &:hover:enabled {
-        color: $color-text-introvert;
         text-decoration: underline;
     }
 }
@@ -33,15 +31,6 @@
     @include border-radius(1em);
     font-weight: $font-weight-extrovert;
     padding: 0 (30px / $font-size-normal * 1em);
-
-    &:hover:enabled,
-    &:focus:enabled {
-        background: $color-brand-two-introvert;
-    }
-
-    &:active:enabled {
-        background: $color-brand-two-extrovert;
-    }
 }
 
 /*doc

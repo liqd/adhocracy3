@@ -57,12 +57,21 @@ $moving-column-menu-height: 24px / $font-size-normal * 1em;
 $moving-column-border-width: 5px;
 $annotation-width: 34%;
 
+//Buttons
+$button-height: 24px / $font-size-normal;
+$button-text-color: $color-text-highlight-introvert;
+$button-text-hover-color: $color-text-highlight-normal;
+$button-cta-text-color: $color-text-inverted;
+$button-cta-base-color: $color-text-highlight-normal;
+$button-cta-hover-background-color: $color-brand-two-extrovert;
+$button-cta-active-background-color: $color-brand-two-introvert;
+
+//Padding
 $padding-small: 0.5em;
 $padding-medium: 1em;
 
 //Other
 $section-jump-navigation-width: 2em;
-$button-height: 24px / $font-size-normal;
 
 @mixin font-tracking($value) {
     @if $value == narrow {

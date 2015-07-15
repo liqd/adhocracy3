@@ -44,7 +44,10 @@ $line-height-plus: 1.4;
 $thumbnail-width: 105px;
 $thumbnail-height: 90px;
 
-//misc
-$color-shadow: black;
+//buttons
+$button-text-color: $color-text-normal;
+$button-text-hover-color: $color-text-introvert;
+$button-cta-hover-background-color: $color-brand-two-introvert;
+$button-cta-active-background-color: $color-brand-two-extrovert;
 
 $font-family-normal: Arial, Helvetica, sans-serif;
