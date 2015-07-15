@@ -525,9 +525,10 @@ class TestWorkflowSheet:
         inst = meta.sheet_class(meta, context)
         wanted =  {'announce': {},
                    'draft': {},
-                   'frozen': {},
                    'participate': {},
+                   'evaluate': {},
                    'result': {},
+                   'closed': {},
                    'workflow': mercator_workflow,
                    'workflow_state': None}
         assert inst.get() == wanted

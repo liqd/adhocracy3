@@ -28,8 +28,8 @@ def test_initiate_and_transition_to_announce(registry, context):
     assert workflow.state_of(context) is 'announce'
     workflow.transition_to_state(context, request, 'participate')
     assert workflow.state_of(context) is 'participate'
-    workflow.transition_to_state(context, request, 'frozen')
-    assert workflow.state_of(context) is 'frozen'
+    workflow.transition_to_state(context, request, 'evaluate')
+    assert workflow.state_of(context) is 'evaluate'
     workflow.transition_to_state(context, request, 'result')
     assert workflow.state_of(context) is 'result'
 
@@ -152,7 +152,7 @@ class TestMercatorWorkflow:
         assert postable_types == []
 
     def test_change_state_to_frozen(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/', 'frozen')
+        resp = _do_transition_to(app_initiator, '/', 'evaluate')
         assert resp.status_code == 200
 
     def test_frozen_participant_cannot_create_proposal_item(self, app_participant):
