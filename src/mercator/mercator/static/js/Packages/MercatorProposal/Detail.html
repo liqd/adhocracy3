@@ -49,7 +49,7 @@
     </div>
 
     <div data-ng-if="showBlogTabs() && proposalTab === 'blog'" class="blog">
-        <adh-blog data-ng-if="data.logbook_pool" data-path="{{ data.logbook_pool }}"></adh-blog>
+        <adh-blog data-ng-if="data.logbookPoolPath" data-path="{{ data.logbookPoolPath }}"></adh-blog>
     </div>
 
     <div class="section-jump-body" data-ng-if="!showBlogTabs() || proposalTab !== 'blog'">

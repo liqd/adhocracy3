@@ -86,7 +86,7 @@ export interface IScopeData {
     supporterCount : number;
     winnerBadgeAssignment : AdhBadge.IBadge;
     currentPhase: string;
-    logbook_pool: any;
+    logbookPoolPath: string;
 
     title : {
         title : string;
@@ -417,7 +417,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.createtime = mercatorProposalVersion.data[SIMetaData.nick].item_creation_date;
         data.user_info.path = mercatorProposalVersion.data[SIMetaData.nick].creator;
         data.title = mercatorProposalVersion.data[SITitle.nick].title;
-        data.logbook_pool = mercatorProposalVersion.data[SILogbook.nick].logbook_pool;
+        data.logbookPoolPath = mercatorProposalVersion.data[SILogbook.nick].logbook_pool;
 
         var heardFrom : SIMercatorHeardFrom.Sheet = mercatorProposalVersion.data[SIMercatorHeardFrom.nick];
         if (typeof heardFrom !== "undefined") {
