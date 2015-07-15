@@ -296,6 +296,57 @@ class TestSampleWorkflowAssignmentSheet:
             {'description': 'Start participating!',
              'start_date': '2015-02-14T00:00:00+00:00'}
 
+class TestStandardWorkflowAssignmentSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.workflow import standard_meta
+        return standard_meta
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.workflow import IStandard
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        from adhocracy_core.sheets.workflow import WorkflowAssignmentSheet
+        from adhocracy_core.sheets.workflow import\
+            StandardWorkflowAssignmentSchema
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, WorkflowAssignmentSheet)
+        assert inst.meta.isheet == IStandard
+        assert IStandard.isOrExtends(IWorkflowAssignment)
+        assert inst.meta.schema_class == StandardWorkflowAssignmentSchema
+        assert inst.meta.schema_class.workflow_name == 'standard'
+        assert inst.meta.readable is True
+        assert inst.meta.editable is True
+        assert inst.meta.create_mandatory is False
+
+    def test_get_empty(self, meta, context, registry, mock_workflow):
+        mock_workflow.type = 'standard'
+        mock_workflow.state_of.return_value = None
+        registry.content.get_workflow.return_value = mock_workflow
+        inst = meta.sheet_class(meta, context, registry)
+        assert inst.get()['participate'] == {}
+
+    def test_get_cstruct_empty(self, meta, context, registry, mock_workflow):
+        mock_workflow.type = 'standard'
+        registry.content.get_workflow.return_value = mock_workflow
+        inst = meta.sheet_class(meta, context, registry=registry)
+        request = testing.DummyRequest(registry=registry)
+        assert inst.get_cstruct(request)['participate'] ==\
+            {'description': 'Start participating!',
+             'start_date': '2015-02-14T00:00:00+00:00'}
+
+    @mark.usefixtures('integration')
+    def test_includeme_register_standard_sheet(self, config):
+        from adhocracy_core.sheets.workflow import IStandard
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=IStandard)
+        inst = get_sheet(context, IStandard)
+        assert inst.meta.isheet is IStandard
+
 @fixture
 def integration(config):
     config.include('adhocracy_core.content')

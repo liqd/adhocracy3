@@ -105,4 +105,5 @@ def _add_workflow_to_registry(registry: Registry, appstruct: dict,
 def includeme(config):  # pragma: no cover
     """Include workflows."""
     config.include('.sample')
+    config.include('.standard')
     config.include('.subscriber')

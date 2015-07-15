@@ -248,7 +248,32 @@ sample_meta = workflow_meta._replace(
 )
 
 
+class IStandard(IWorkflowAssignment):
+
+    """Marker interface for the standard workflow assignment sheet."""
+
+
+class StandardWorkflowAssignmentSchema(WorkflowAssignmentSchema):
+
+    """Data structure the standard workflow assignment sheet."""
+
+    workflow_name = 'standard'
+
+    draft = StateAssignment()
+    announce = StateAssignment()
+    participate = StateAssignment()
+    evaluate = StateAssignment()
+    result = StateAssignment()
+    closed = StateAssignment()
+
+standard_meta = workflow_meta._replace(
+    isheet=IStandard,
+    schema_class=StandardWorkflowAssignmentSchema,
+)
+
+
 def includeme(config):
     """Add sheet."""
     add_sheet_to_registry(sample_meta, config.registry)
+    add_sheet_to_registry(standard_meta, config.registry)
     add_sheet_to_registry(workflow_meta, config.registry)
