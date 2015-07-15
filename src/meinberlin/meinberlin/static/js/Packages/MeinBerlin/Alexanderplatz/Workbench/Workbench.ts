@@ -1,3 +1,6 @@
+/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+
+import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
@@ -17,8 +20,14 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhProcess.moduleName,
             AdhResourceArea.moduleName
         ])
+        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
+            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
+                return $q.when("<adh-mein-berlin-alexanderplatz-workbench></adh-mein-berlin-alexanderplatz-workbench>");
+            }];
+        }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
                 // documents tab
