@@ -64,8 +64,8 @@ def test_initiate_and_transition_to_announce(registry, context):
     assert workflow.state_of(context) is 'announce'
     workflow.transition_to_state(context, request, 'participate')
     assert workflow.state_of(context) is 'participate'
-    workflow.transition_to_state(context, request, 'frozen')
-    assert workflow.state_of(context) is 'frozen'
+    workflow.transition_to_state(context, request, 'evaluate')
+    assert workflow.state_of(context) is 'evaluate'
     workflow.transition_to_state(context, request, 'result')
     assert workflow.state_of(context) is 'result'
 
@@ -130,21 +130,21 @@ class TestKiezkassenWorkflow:
         assert IRate in app_participant.get_postable_types(
             '/kiezkasse/proposal_0000000/rates')
 
-    def test_change_state_to_frozen(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/kiezkasse', 'frozen')
+    def test_change_state_to_evaluate(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/kiezkasse', 'evaluate')
         assert resp.status_code == 200
 
-    def test_frozen_participant_can_view_process(self, app_participant):
+    def test_evaluate_participant_can_view_process(self, app_participant):
         resp = app_participant.get('/kiezkasse')
         assert resp.status_code == 200
 
-    def test_frozen_participant_cannot_comment_other_proposal(self,
+    def test_evaluate_participant_cannot_comment_other_proposal(self,
                                                               app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment not in app_participant2.get_postable_types(
             '/kiezkasse/proposal_0000000/comments')
 
-    def test_frozen_participant_cannot_rate_other_proposal(self,
+    def test_evaluate_participant_cannot_rate_other_proposal(self,
                                                            app_participant2):
         from adhocracy_core.resources.rate import IRate
         assert IRate not in app_participant2.get_postable_types(
