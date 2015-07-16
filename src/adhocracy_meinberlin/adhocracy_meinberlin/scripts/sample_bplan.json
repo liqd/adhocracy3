@@ -1,0 +1,17 @@
+[
+    {"path": "/organisation/",
+     "creator": "god",
+     "content_type": "adhocracy_meinberlin.resources.bplan.IProcess",
+     "data": {"adhocracy_core.sheets.name.IName":
+              {"name": "bplan2"},
+              "adhocracy_core.sheets.title.ITitle":
+              {"title": "Sample BPlan process"},
+              "adhocracy_meinberlin.sheets.bplan.IProcessSettings":
+              {"office_worker": "/principals/users/0000000",
+               "plan_number": 112233,
+               "participation_kind": "öffentliche Auslegung",
+               "participation_start_date": "2015-05-05",
+               "participation_end_date": "2015-06-03"}
+             }
+    }
+]
