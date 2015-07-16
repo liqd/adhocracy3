@@ -3,7 +3,7 @@
      "creator": "god",
      "content_type": "adhocracy_meinberlin.resources.bplan.IProcess",
      "data": {"adhocracy_core.sheets.name.IName":
-              {"name": "bplan2"},
+              {"name": "bplan20"},
               "adhocracy_core.sheets.title.ITitle":
               {"title": "Sample BPlan process"},
               "adhocracy_meinberlin.sheets.bplan.IProcessSettings":

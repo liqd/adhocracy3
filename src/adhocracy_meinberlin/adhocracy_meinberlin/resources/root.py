@@ -50,14 +50,16 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                             parent=context['organisation'],
                             appstructs=appstructs)
     # sample bplan
+    office_worker = None
     users = find_service(context, 'principals', 'users')
-    god = users.values()[0]
+    if users is not None:  # ease testing
+        office_worker = users.values()[0]
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'bplan'},
                   adhocracy_core.sheets.title.ITitle.__identifier__:
                   {'title': 'Sample BPlan process'},
                   adhocracy_meinberlin.sheets.bplan.IProcessSettings.__identifier__:
-                  {'office_worker': god,
+                  {'office_worker': office_worker,
                    'plan_number': 112233,
                    'participation_kind': 'öffentliche Auslegung',
                    'participation_start_date': datetime.date(2015, 5, 5),
