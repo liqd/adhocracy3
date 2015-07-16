@@ -28,15 +28,17 @@ def _send_bplan_submission_confirmation_email_subscriber(event):
     if process_settings['plan_number'] == 0 or process_settings['office_worker'] is None:
         return
     templates_values = _get_templates_values(process_settings, proposal_values)
-    subject = 'B-Plan Eingabe Bestätigung'
+    subject = 'Ihre Stellungnahme zum Bebauungsplan {plan_number}, ' \
+              '{participation_kind}, von {participation_start_date} - {participation_end_date}.' \
+              .format(**process_settings)
     messenger.send_mail(subject,
                         [proposal_values['email']],
-                        'sysadmin@example.com',
+                        'noreply@mein.berlin.de',
                         render('adhocracy_meinberlin:templates/bplan_submission_confirmation.txt.mako',
                                templates_values))
     messenger.send_mail(subject,
                         [process_settings['office_worker'].email],
-                        'sysadmin@example.com',
+                        'noreply@mein.berlin.de',
                         render('adhocracy_meinberlin:templates/bplan_submission_confirmation.txt.mako',
                                templates_values))
 

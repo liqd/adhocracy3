@@ -42,6 +42,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                                                 parent=context['principals']['users'])
         return {'office_worker': office_worker,
                 'plan_number': '112233',
+                'participation_kind': 'öffentliche Auslegung',
                 'participation_start_date': '05/05/2015',
                 'participation_end_date': '11/06/2015'}
 
@@ -120,7 +121,8 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
 
         msg_user = messenger.mailer.outbox[0]
         assert 'user@example.com' in msg_user.recipients
-        assert 'Bestätigung' in msg_user.subject
+        assert 'Ihre Stellungnahme zum Bebauungsplan 112233, öffentliche Auslegung' \
+            ', von 05/05/2015 - 11/06/2015.'  == msg_user.subject
         assert 'Vielen Dank' in msg_user.body
         assert 'Laura Muster' in msg_user.body
         assert 'user@example.com' in msg_user.body
@@ -134,7 +136,6 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
 
         msg_officeworker = messenger.mailer.outbox[1]
         assert 'officeworkername@example.org' in msg_officeworker.recipients
-        assert 'Bestätigung' in msg_officeworker.subject
         assert 'Vielen Dank' in msg_officeworker.body
         assert 'Laura Muster' in msg_officeworker.body
         assert 'user@example.com' in msg_officeworker.body
