@@ -52,7 +52,8 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
     # sample bplan
     office_worker = None
     users = find_service(context, 'principals', 'users')
-    if users is not None:  # ease testing
+    if users is not None:  # pragma: no cover
+        # ease testing
         office_worker = users.values()[0]
     appstructs = {adhocracy_core.sheets.name.IName.__identifier__:
                   {'name': 'bplan'},
