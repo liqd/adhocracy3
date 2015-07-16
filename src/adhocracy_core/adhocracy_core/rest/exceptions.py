@@ -80,32 +80,41 @@ def _get_filtered_request_body(request) -> str:
     """
     Filter secret or to long parts of the request body.
 
-    In case of multipart/form-data requests (file upload), only the 120
-    first characters of the body are shown.
+    In case of multipart/form-data requests (file upload),
+    only the 120 first characters of the body are shown.
 
-    In case of JSON requests with a "password" field,
-    the contents of the password field will be hidden.
+    In case of JSON request, the contents of the password field will be hidden.
     """
-    result = request.body
-    if request.content_type == 'multipart/form-data' and len(result) > 120:
-        result = '{}...'.format(result[:120])
-    elif request.content_type == 'application/json':
-        json_data = ''
-        try:
-            json_data = request.json_body
-        except ValueError:
-            pass  # Not even valid JSON, so we cannot filter anything
-        if not isinstance(json_data, dict):
-            pass
-        possible_password_data = json_data
-        if 'data' in json_data:
-            possible_password_data = json_data['data'].get(
-                IPasswordAuthentication.__identifier__, {})
-        if 'password' in possible_password_data:
-            loggable_data = possible_password_data.copy()
-            loggable_data['password'] = '<hidden>'
-            result = json.dumps(loggable_data)
-    return result
+    filtered_body = request.body
+    if request.content_type == 'multipart/form-data':
+        filtered_body = _truncate(filtered_body, 120)
+    else:
+        json_body = _get_json_body_dict(request)
+        if 'password' in json_body:
+            json_body['password'] = '<hidden>'
+        password_sheet = IPasswordAuthentication.__identifier__
+        if password_sheet in json_body.get('data', {}):
+            json_body['data'][password_sheet]['password'] = '<hidden>'
+        filtered_body = json.dumps(json_body)
+    return filtered_body
+
+
+def _truncate(text: str, max_length: int) -> str:
+        if len(text) > max_length:
+            text = '{}...'.format(text[:max_length])
+        return text
+
+
+def _get_json_body_dict(request: Request) -> dict:
+    body_json = {}
+    try:
+        body_json = request.json_body
+    except (ValueError, TypeError):
+        pass
+    if isinstance(body_json, dict):
+        return body_json
+    else:
+        return {}
 
 
 @view_config(

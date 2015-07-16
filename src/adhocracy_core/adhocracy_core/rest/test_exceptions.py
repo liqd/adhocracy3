@@ -1,5 +1,6 @@
 from pyramid import testing
 from pytest import fixture
+from testfixtures import LogCapture
 import colander
 
 
@@ -196,59 +197,79 @@ class TestHandleError400:
         from pyramid.httpexceptions import HTTPBadRequest
         return HTTPBadRequest()
 
-    def make_one(self, error, request):
+    def call_fut(self, error, request):
         from .exceptions import handle_error_400_bad_request
         return handle_error_400_bad_request(error, request)
 
     def test_return_json_error_with_error_listing(self, error, request_):
         request_.errors = [{'location': 'body'}]
-        inst = self.make_one(error, request_)
+        inst = self.call_fut(error, request_)
         assert inst.content_type == 'application/json'
         assert b'"errors": [{"location": "body"}]' in inst.body
         assert b'"status": "error"' in inst.body
         assert inst.status_code == 400
 
     def test_log_request_body(self, error, request_):
-        from testfixtures import LogCapture
         request_.body = '{"data": "stuff"}'
         with LogCapture() as log:
-            self.make_one(error, request_)
+            self.call_fut(error, request_)
             log_message = str(log)
             assert '{"data": "stuff"}' in log_message
 
-    def test_log_abbreviated_request_body_for_formdata(self, error, request_):
-        from testfixtures import LogCapture
-        request_.content_type = 'multipart/form-data'
-        request_.body = "hello" * 60
+    def test_log_ignore_if_request_body_is_not_json(
+            self, error, request_):
+        request_.body = b'wrong'
         with LogCapture() as log:
-            self.make_one(error, request_)
+            self.call_fut(error, request_)
+            log_message = str(log)
+            assert 'wrong' not in log_message
+
+    def test_log_ignore_if_request_body_is_not_json_dict(
+            self, error, request_):
+        request_.body = '["wrong"]'
+        with LogCapture() as log:
+            self.call_fut(error, request_)
+            log_message = str(log)
+            assert 'wrong' not in log_message
+
+    def test_log_abbreviated_formdata_body_if_gt_210(self, error, request_):
+        request_.content_type = 'multipart/form-data'
+        request_.body = "h" * 210
+        with LogCapture() as log:
+            self.call_fut(error, request_)
             log_message = str(log)
             assert len(log_message) < len(request_.body)
-            assert log_message.endswith('...')
+            assert log_message.endswith('h...')
 
-    def test_log_but_hide_login_password_if_login_error(self, error, request_):
+    def test_log_formdata_body(self, error, request_):
+        request_.content_type = 'multipart/form-data'
+        request_.body = "h" * 120
+        with LogCapture() as log:
+            self.call_fut(error, request_)
+            log_message = str(log)
+            assert log_message.endswith('h')
+
+    def test_log_but_hide_login_password_in_body(self, error, request_):
         import json
-        from testfixtures import LogCapture
         from .views import POSTLoginUsernameRequestSchema
         appstruct = POSTLoginUsernameRequestSchema().serialize(
             {'password': 'secret', 'name': 'name'})
         request_.body = json.dumps(appstruct)
         with LogCapture() as log:
-            self.make_one(error, request_)
+            self.call_fut(error, request_)
             log_message = str(log)
             assert 'secret' not in log_message
             assert '<hidden>' in log_message
 
-    def test_log_but_hide_login_password_if_user_creation_error(self, error,
-                                                                request_):
+    def test_log_but_hide_user_passwod_sheet_password_in_body(self, error,
+                                                              request_):
         import json
-        from testfixtures import LogCapture
         from adhocracy_core.sheets.principal import IPasswordAuthentication
         appstruct = {'data': {IPasswordAuthentication.__identifier__:
                                   {'password': 'secret'}}}
         request_.body = json.dumps(appstruct)
         with LogCapture() as log:
-            self.make_one(error, request_)
+            self.call_fut(error, request_)
             log_message = str(log)
             assert 'secret' not in log_message
             assert '<hidden>' in log_message
