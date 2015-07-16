@@ -84,6 +84,7 @@ def _get_filtered_request_body(request) -> str:
     only the 120 first characters of the body are shown.
 
     In case of JSON request, the contents of the password field will be hidden.
+    Only the 5000 first characters are shown.
     """
     filtered_body = request.body
     if request.content_type == 'multipart/form-data':
@@ -96,6 +97,7 @@ def _get_filtered_request_body(request) -> str:
         if password_sheet in json_body.get('data', {}):
             json_body['data'][password_sheet]['password'] = '<hidden>'
         filtered_body = json.dumps(json_body)
+        filtered_body = _truncate(filtered_body, 5000)
     return filtered_body
 
 

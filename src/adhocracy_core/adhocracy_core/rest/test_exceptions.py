@@ -216,6 +216,14 @@ class TestHandleError400:
             log_message = str(log)
             assert '{"data": "stuff"}' in log_message
 
+    def test_log_abbrivated_request_body_if_gt_5000(self, error, request_):
+        request_.body = '{"data": "' + 'h' * 5090 + '"}'
+        with LogCapture() as log:
+            self.call_fut(error, request_)
+            log_message = str(log)
+            assert len(log_message) < len(request_.body)
+            assert '...' in log_message
+
     def test_log_ignore_if_request_body_is_not_json(
             self, error, request_):
         request_.body = b'wrong'
