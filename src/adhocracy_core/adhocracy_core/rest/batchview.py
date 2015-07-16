@@ -1,10 +1,10 @@
 """POST batch requests processing."""
 from json import dumps
-from json import loads
 from logging import getLogger
 
 from cornice.util import _JSONError
-from pyramid.httpexceptions import HTTPBadRequest
+from adhocracy_core.rest.exceptions import handle_error_xox_exception
+from adhocracy_core.rest.exceptions import handle_error_500_exception
 from pyramid.httpexceptions import HTTPException
 from pyramid.request import Request
 from pyramid.view import view_config
@@ -15,7 +15,6 @@ from adhocracy_core.rest.schemas import POSTBatchRequestSchema
 from adhocracy_core.rest.schemas import UpdatedResourcesSchema
 from adhocracy_core.rest.views import RESTView
 from adhocracy_core.utils import set_batchmode
-from adhocracy_core.rest.exceptions import handle_error_400_bad_request
 
 
 logger = getLogger(__name__)
@@ -65,10 +64,12 @@ class BatchView(RESTView):
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
             if not item_response.was_successful():
-                err_msg = 'Exception in sub request {0} {1}: {2}'
+                err_msg = 'Exception in sub request {0} {1}: {2} {3}'
                 logger.error(err_msg.format(item['method'],
                                             item['path'],
-                                            item_response.body))
+                                            item_response.body,
+                                            item_response.code,
+                                            ))
                 err = _JSONError([], status=item_response.code)
                 err.text = dumps(self._response_list_to_json(response_list))
                 raise err
@@ -176,16 +177,26 @@ class BatchView(RESTView):
             self, subrequest: Request) -> BatchItemResponse:
         try:
             subresponse = self.request.invoke_subrequest(subrequest)
-            code = subresponse.status_code
+            status_code = subresponse.status_code
             body = subresponse.json
-        except HTTPBadRequest as err:
-            json_err = handle_error_400_bad_request(err, subrequest)
-            code = json_err.status_code
-            body = self._try_to_decode_json(json_err.body)
-        except HTTPException as err:
-            code = err.status_code
-            body = self._try_to_decode_json(err.body)
-        return BatchItemResponse(code, body)
+        except Exception as error:
+            error_view = self._get_error_view(error)
+            error_json = error_view(error, subrequest)
+            status_code = error_json.status_code
+            body = error_json.json
+        return BatchItemResponse(status_code, body)
+
+    def _get_error_view(self, error: Exception) -> callable:
+        error_view = handle_error_500_exception
+        if isinstance(error, HTTPException):
+            error_view = handle_error_xox_exception
+        instrospector = self.request.registry.introspector
+        for view in instrospector.get_category('views'):
+            context = view['introspectable']['context']
+            if context == error.__class__:
+                error_view = view['introspectable']['callable']
+                break
+        return error_view
 
     def _extend_path_map(self, path_map: dict, result_path: str,
                          result_first_version_path: str,
@@ -208,20 +219,6 @@ class BatchView(RESTView):
         value = getattr(self.request, attributename, None)
         if value is not None:
             setattr(request, attributename, value)
-
-    def _try_to_decode_json(self, body: bytes) -> dict:
-        """Try to decode `body` as a JSON object.
-
-        If that fails, we just wrap the textual content of the body in an
-        `{"error": ...}` dict. If body is empty, we just return an empty dict.
-        """
-        if not body:
-            return {}
-        text = body.decode(errors='replace')
-        try:
-            return loads(text)
-        except ValueError:
-            return {'error': text}
 
 
 def includeme(config):  # pragma: no cover

@@ -2,6 +2,7 @@
 import json
 import logging
 import colander
+from collections import namedtuple
 
 from cornice.util import _JSONError
 from pyramid.exceptions import URLDecodeError
@@ -10,6 +11,10 @@ from pyramid.view import view_config
 from pyramid.traversal import resource_path
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPException
+from pyramid.request import Request
 
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
 from adhocracy_core.utils import exception_to_str
@@ -23,6 +28,26 @@ from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
 logger = logging.getLogger(__name__)
 
 
+error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])
+
+
+@view_config(
+    context=HTTPException,
+    permission=NO_PERMISSION_REQUIRED,
+)
+def handle_error_xox_exception(error, request):
+    """Return JSON error for generic HTTPErrors.
+
+     If `error` is :class:`cornice.util._JSONError` it is
+    return without modifications.
+    """
+    if isinstance(error, _JSONError):
+        return error
+    error_dict = error_entry('url', request.method, str(error))._asdict()
+    json_error = _JSONError([error_dict], error.status_code)
+    return json_error
+
+
 @view_config(
     context=colander.Invalid,
     permission=NO_PERMISSION_REQUIRED,
@@ -31,12 +56,9 @@ def handle_error_400_colander_invalid(error, request):
     """Return 400 JSON error."""
     errors = []
     for path, description in error.asdict().items():
-        errors.append(_build_error_dict('body', path, description))
+        error_dict = error_entry('body', path, description)._asdict()
+        errors.append(error_dict)
     return _JSONError(errors, 400)
-
-
-def _build_error_dict(location, name, description):
-    return {'location': location, 'name': name, 'description': description}
 
 
 @view_config(
@@ -47,10 +69,10 @@ def handle_error_400_bad_request(error, request):
     """Return 400 JSON error with filtered error messages."""
     errors = getattr(request, 'errors', [])  # ease testing
     body = _get_filtered_request_body(request)
-    logger.warning('Found %i validation errors in request: <%s>',
-                   len(errors), body)
+    log_msg = 'Found {0} validation errors in request body: {1}'
+    logger.warning(log_msg.format(len(errors), body))
     for error_data in errors:
-        logger.warning('  %s', error_data)
+        logger.warning(' {0}'.format(error_data))
     return _JSONError(errors, 400)
 
 
@@ -120,7 +142,7 @@ def handle_error_400_url_decode_error(error, request):
 
     E.g. "/fooba%E9r/".
     """
-    error_dict = _build_error_dict('url', '', str(error))
+    error_dict = error_entry('url', '', str(error))._asdict()
     return _JSONError([error_dict], 400)
 
 
@@ -158,7 +180,31 @@ def internal_exception_to_dict(error: Exception) -> dict:
     """Convert an internal exception into a Colander-style dictionary."""
     description = '{}; time: {}'.format(exception_to_str(error),
                                         log_compatible_datetime())
-    return _build_error_dict('internal', '', description)
+    return error_entry('internal', '', description)._asdict()
+
+
+@view_config(context=HTTPForbidden,
+             permission=NO_PERMISSION_REQUIRED,
+             )
+def handle_error_403_exception(error, request):
+    """Add json body with explanation to 403 errors.
+
+    This overrides the same error handler in :mod:`cornice`.
+    """
+    error_dict = error_entry('url', request.method, str(error))._asdict()
+    return _JSONError([error_dict], 403)
+
+
+@view_config(context=HTTPNotFound,
+             permission=NO_PERMISSION_REQUIRED,
+             )
+def handle_error_404_exception(error, request):
+    """Add json body with explanation to 404 errors.
+
+    This overrides the same error handler in :mod:`cornice`.
+    """
+    error_dict = error_entry('url', request.method, str(error))._asdict()
+    return _JSONError([error_dict], 404)
 
 
 def includeme(config):  # pragma: no cover

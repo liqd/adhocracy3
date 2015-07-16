@@ -8,6 +8,31 @@ def request_(cornice_request):
     return cornice_request
 
 
+class TestHandleErrorX0X_exception:
+
+    def call_fut(self, error, request):
+        from adhocracy_core.rest.exceptions import handle_error_xox_exception
+        return handle_error_xox_exception(error, request)
+
+    def test_render_http_exception(self, request_):
+        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPClientError
+        error = HTTPClientError(status_code=400)
+        json_error = self.call_fut(error, request_)
+        assert isinstance(json_error, _JSONError)
+        assert json_error.status_code == 400
+        assert json_error.json_body == {"status": "error",
+                                        "errors": [{"description": str(error),
+                                                    "name": "GET",
+                                                    "location": "url"}]}
+
+    def test_render_http_json_exception(self, request_):
+        from cornice.util import _JSONError
+        error = _JSONError([], status=400)
+        json_error = self.call_fut(error, request_)
+        assert json_error is error
+
+
 class TestHandleError400ColanderInvalid:
 
     def make_one(self, error, request):
@@ -185,11 +210,11 @@ class TestHandleError400:
 
     def test_log_request_body(self, error, request_):
         from testfixtures import LogCapture
-        request_.body = "{'data': 'stuff'}"
+        request_.body = '{"data": "stuff"}'
         with LogCapture() as log:
             self.make_one(error, request_)
             log_message = str(log)
-            assert "{'data': 'stuff'}" in log_message
+            assert '{"data": "stuff"}' in log_message
 
     def test_log_abbreviated_request_body_for_formdata(self, error, request_):
         from testfixtures import LogCapture
@@ -199,7 +224,7 @@ class TestHandleError400:
             self.make_one(error, request_)
             log_message = str(log)
             assert len(log_message) < len(request_.body)
-            assert log_message.endswith('...>')
+            assert log_message.endswith('...')
 
     def test_log_but_hide_login_password_if_login_error(self, error, request_):
         import json
@@ -227,3 +252,41 @@ class TestHandleError400:
             log_message = str(log)
             assert 'secret' not in log_message
             assert '<hidden>' in log_message
+
+
+class TestHandleError403Exception:
+
+    def call_fut(self, error, request):
+        from adhocracy_core.rest.exceptions import handle_error_403_exception
+        return handle_error_403_exception(error, request)
+
+    def test_render_http_exception(self, request_):
+        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPClientError
+        error = HTTPClientError(status_code=403)
+        json_error = self.call_fut(error, request_)
+        assert isinstance(json_error, _JSONError)
+        assert json_error.status_code == 403
+        assert json_error.json_body == {"status": "error",
+                                        "errors": [{"description": str(error),
+                                                    "name": "GET",
+                                                    "location": "url"}]}
+
+
+class TestHandleError410Exception:
+
+    def call_fut(self, error, request):
+        from adhocracy_core.rest.exceptions import handle_error_404_exception
+        return handle_error_404_exception(error, request)
+
+    def test_render_http_exception(self, request_):
+        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPClientError
+        error = HTTPClientError(status_code=404)
+        json_error = self.call_fut(error, request_)
+        assert isinstance(json_error, _JSONError)
+        assert json_error.status_code == 404
+        assert json_error.json_body == {"status": "error",
+                                        "errors": [{"description": str(error),
+                                                    "name": "GET",
+                                                    "location": "url"}]}
