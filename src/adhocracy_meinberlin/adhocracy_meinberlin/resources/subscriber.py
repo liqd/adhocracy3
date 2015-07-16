@@ -7,7 +7,6 @@ from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.authorization import set_acms_for_app_root
 from adhocracy_core.resources.root import root_acm
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 from adhocracy_meinberlin.resources.root import meinberlin_acm
 from adhocracy_meinberlin.resources.bplan import IProposalVersion
 from adhocracy_meinberlin.resources.bplan import IProposal
