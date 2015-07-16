@@ -23,7 +23,7 @@
 
 /*doc
 ---
-title: button
+title: Button
 name: button
 category: Buttons
 ---
@@ -46,7 +46,7 @@ It may have the following states:
 
 /*doc
 ---
-title: button-cta
+title: Call-to-action button
 name: button.button-cta
 parent: button
 ---
@@ -63,12 +63,12 @@ A highlighted button. Each page should have one CTA at maxiumum.
 
 /*doc
 ---
-title: button-cta-secondary
+title: Call-to-action button secondary
 name: button.button-cta-secondary
 parent: button
 ---
 
-If more than one CTA is req uired per page, `button-cta-secondary` should
+If more than one CTA is required per page, `button-cta-secondary` should
 be used instead.
 
 ```html_example
@@ -113,6 +113,8 @@ be used instead.
     background-color: transparent;
     border: 2px solid $color-button-cta-base;
     color: $color-button-cta-base;
+    height: $button-height + 4px / $font-size-normal * 1em;
+    line-height: $button-height + 4px / $font-size-normal;
 
     &:hover:enabled,
     &:focus:enabled {
@@ -122,7 +124,7 @@ be used instead.
 
 /*doc
 ---
-title: button-m-add modifier
+title: Button add modifier
 name: button.m-add
 parent: button
 ---
