@@ -1,18 +1,11 @@
-Vielen Dank für Ihre Stellungnahme. Die Öffentlichkeitsbeteiligung ist
-am ${participation_end_date} zum Ende. Ihre Stellungnahme geht in die
+Ihre Stellungnahme zum Bebauungsplan ${plan_number}, ${participation_kind}, von ${participation_start_date} - ${participation_end_date}.
+
+Vielen Dank für Ihre Stellungnahme. Ihre Stellungnahme geht in die
 abschließende Abwägung ein. In jedem Fall informiert Sie die
 verantwortliche Stelle nach Festsetzung des Bebauungsplans schriftlich
 (per Mail oder postalisch) über das Ergebnis, sofern Sie Ihre Adresse
 gegeben haben.
 
-
-Plannummer
-
-${plan_number}
-
-Auslegungsdatum
-
-${announcement_date}
 
 Name
 

@@ -176,7 +176,8 @@ class TestProcessSettingsSheet:
         inst = meta.sheet_class(meta, context)
         wanted =  {'office_worker': None,
                    'plan_number': 0,
-                   'announcement_date': None,
+                   'participation_kind': '',
+                   'participation_start_date': None,
                    'participation_end_date': None}
         assert inst.get() == wanted
 
