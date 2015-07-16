@@ -66,12 +66,6 @@ def _bplan_proposal_has_been_created(proposal):
                 IProposalVersion.providedBy(version)]) == 2
 
 
-def _get_office_worker_email(proposal):
-    process = find_interface(proposal, resources.bplan.IProcess)
-    office_worker = get_sheet_field(process, sheets.bplan.IProcessSettings, 'office_worker')
-    return office_worker.email
-
-
 def set_root_acms(event):
     """Set :term:`acm`s for root if the Pyramid application starts."""
     set_acms_for_app_root(event.app, (meinberlin_acm, root_acm))
