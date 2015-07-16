@@ -1,7 +1,7 @@
 pyunit:
-    command: bin/coverage run bin/py.test --timeout=60 -m"not functional and not jasmine" src/adhocracy_*  && bin/coverage report && bin/coverage html 
+    command: bin/coverage run bin/py.test --timeout=60 -q -m"not functional and not jasmine" src/adhocracy_*  && bin/coverage report && bin/coverage html 
 pyfunc:
-    command: bin/py.test --timeout=60 -m"functional and not jasmine" src/adhocracy_*
+    command: bin/py.test --timeout=60 -q -m"functional and not jasmine" src/adhocracy_*
 jsunit:
     command: bin/py.test -m"jasmine" src/adhocracy_frontend/adhocracy_frontend/tests/unit/
 acceptance:

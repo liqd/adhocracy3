@@ -1,6 +1,7 @@
 from pytest import fixture
 from pytest import mark
 from tempfile import mkstemp
+from testfixtures import logcapture
 import os
 import json
 import pytest
@@ -24,6 +25,7 @@ def principals(pool_with_catalogs, registry):
 @mark.usefixtures('integration')
 class TestImportResources:
 
+    @logcapture.log_capture
     def test_import_resources(self, registry):
         from adhocracy_core.scripts.import_resources import _import_resources
 
@@ -42,6 +44,7 @@ class TestImportResources:
         assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
 
 
+    @logcapture.log_capture
     def test_import_resources_invalid_data(self, registry):
         from adhocracy_core.scripts.import_resources import _import_resources
         import colander
@@ -63,6 +66,7 @@ class TestImportResources:
             _import_resources(root, registry, filename)
 
 
+    @logcapture.log_capture
     def test_import_resources_already_exists(self, registry):
         from adhocracy_core.scripts.import_resources import _import_resources
 
@@ -82,6 +86,7 @@ class TestImportResources:
         assert IOrganisation.providedBy(root['alt-treptow'])
         assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
 
+    @logcapture.log_capture
     def test_import_resources_already_oneleveldeep(self, registry, principals):
         from adhocracy_core.scripts.import_resources import _import_resources
 
@@ -102,6 +107,7 @@ class TestImportResources:
         _import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['orga']['alt-treptow'])
 
+    @logcapture.log_capture
     def test_import_resources_set_creator(self, registry):
         from adhocracy_core.scripts.import_resources import _import_resources
 
@@ -121,6 +127,7 @@ class TestImportResources:
         god = root['principals']['users'].values()[0]
         assert get_sheet_field(root['alt-treptow'], IMetadata, 'creator') == god
 
+    @logcapture.log_capture
     def test_import_resource_create_group(self, registry):
         from adhocracy_core.scripts.import_resources import _import_resources
 
@@ -140,6 +147,7 @@ class TestImportResources:
         root = registry.content.create(IRootPool.__identifier__)
         _import_resources(root, registry, filename)
 
+    @logcapture.log_capture
     def test_get_expected_path(self):
         from adhocracy_core.scripts.import_resources import _get_expected_path
 
@@ -148,6 +156,7 @@ class TestImportResources:
                                   {"name": "alt-treptow"}}}
         assert _get_expected_path(resource_info) == '/alt-treptow'
 
+    @logcapture.log_capture
     def test_get_expected_path_no_name_noname(self):
         from adhocracy_core.scripts.import_resources import _get_expected_path
 

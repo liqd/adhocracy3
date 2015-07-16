@@ -4,6 +4,7 @@ from pyramid.request import Request
 from pytest import fixture
 from pytest import raises
 from unittest.mock import Mock
+from testfixtures import LogCapture
 
 
 class DummySubresponse:
@@ -205,7 +206,8 @@ class TestBatchView:
         mock_invoke_subrequest.side_effect = RuntimeError('Bad luck')
         inst = self.make_one(context, request_)
         with raises(_JSONError) as err:
-            inst.post()
+            with LogCapture() as log:
+                inst.post()
             assert err.status_code == 500
 
     def _make_batch_response(self, code=200, path=None, first_version_path=None):

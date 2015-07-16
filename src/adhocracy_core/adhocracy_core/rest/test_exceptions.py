@@ -100,10 +100,9 @@ class TestHandleError500Exception:
     def test_render_exception_error(self, request_):
         from cornice.util import _JSONError
         import json
-        error = Exception('arg1')
-
-        inst = self.make_one(error, request_)
-
+        with LogCapture() as log:
+            error = Exception('arg1')
+            inst = self.make_one(error, request_)
         assert isinstance(inst, _JSONError)
         assert inst.status == '500 Internal Server Error'
         message = json.loads(inst.body.decode())

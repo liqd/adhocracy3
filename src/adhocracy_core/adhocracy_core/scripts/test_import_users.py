@@ -1,5 +1,6 @@
 from pytest import fixture
 from pytest import mark
+from testfixtures import logcapture
 from adhocracy_core.resources.root import IRootPool
 from pyramid.request import Request
 from substanced.interfaces import IUserLocator
@@ -25,6 +26,7 @@ class TestImportUsers:
         from adhocracy_core.scripts.import_users import _import_users
         return _import_users(root, registry, filename)
 
+    @logcapture.log_capture
     def test_create(self, context, registry):
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
@@ -53,6 +55,7 @@ class TestImportUsers:
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
 
+    @logcapture.log_capture
     def test_create_email_not_lower_case(self, context, registry):
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
@@ -70,6 +73,7 @@ class TestImportUsers:
         assert alice.active
         assert alice.email == 'alice@example.org'
 
+    @logcapture.log_capture
     def test_update_same_name(self, context, registry):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -98,6 +102,7 @@ class TestImportUsers:
         assert alice.email == 'alice.new@example.org'
         assert new_password == old_password
 
+    @logcapture.log_capture
     def test_update_new_name(self, context, registry):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -128,6 +133,7 @@ class TestImportUsers:
         assert alice.email == 'alice@example.org'
         assert new_password == old_password
 
+    @logcapture.log_capture
     def test_update_already_existing_name(self, context, registry):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -151,6 +157,7 @@ class TestImportUsers:
         with pytest.raises(ValueError):
             self.call_fut(context, registry, filename)
 
+    @logcapture.log_capture
     def test_update_already_existing_email(self, context, registry):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -174,6 +181,7 @@ class TestImportUsers:
         with pytest.raises(ValueError):
             self.call_fut(context, registry, filename)
 
+    @logcapture.log_capture
     def test_create_and_send_invitation_mail(self, context, registry, mock_messenger):
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
@@ -198,6 +206,7 @@ class TestImportUsers:
             alice, reset, subject_tmpl=None, body_tmpl=None)
         assert not alice.active
 
+    @logcapture.log_capture
     def test_create_and_create_and_assign_badge(self, context, registry,
                                                 mock_messenger):
         from adhocracy_core import sheets
@@ -235,6 +244,7 @@ class TestImportUsers:
                                           'badge': badge,
                                           'subject': bob}
 
+    @logcapture.log_capture
     def test_create_and_send_invitation_mail_with_custom_subject(
             self, context, registry, mock_messenger):
         registry.messenger = mock_messenger
@@ -260,6 +270,7 @@ class TestImportUsers:
         mock_messenger.send_invitation_mail.assert_called_with(
             alice, reset, subject_tmpl=subject_tmpl, body_tmpl=None)
 
+    @logcapture.log_capture
     def test_create_and_send_invitation_mail_with_custom_body(
             self, context, registry, mock_messenger):
         registry.messenger = mock_messenger
