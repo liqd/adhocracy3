@@ -27,7 +27,8 @@ class ProposalSchema(colander.MappingSchema):
     street_number = SingleLine(missing=colander.required)
     postal_code_city = SingleLine(missing=colander.required)
     email = SingleLine(validator=colander.Email())
-    statement = Text(missing=colander.required)
+    statement = Text(missing=colander.required,
+                     validator=colander.Length(max=17500))
 
 
 proposal_meta = sheet_meta._replace(isheet=IProposal,
