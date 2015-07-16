@@ -29,7 +29,7 @@ def _send_bplan_submission_confirmation_email_subscriber(event):
         return
     templates_values = _get_templates_values(process_settings, proposal_values)
     subject = 'Ihre Stellungnahme zum Bebauungsplan {plan_number}, ' \
-              '{participation_kind}, von {participation_start_date} - {participation_end_date}.' \
+              '{participation_kind}, von {participation_start_date:%d/%m/%Y} - {participation_end_date:%d/%m/%Y}.' \
               .format(**process_settings)
     messenger.send_mail(subject,
                         [proposal_values['email']],

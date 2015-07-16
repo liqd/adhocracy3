@@ -1,3 +1,5 @@
+import datetime
+
 from unittest.mock import Mock
 from pyramid import testing
 from pytest import fixture
@@ -43,8 +45,8 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         return {'office_worker': office_worker,
                 'plan_number': '112233',
                 'participation_kind': 'öffentliche Auslegung',
-                'participation_start_date': '05/05/2015',
-                'participation_end_date': '11/06/2015'}
+                'participation_start_date': datetime.date(2015, 5, 5),
+                'participation_end_date': datetime.date(2015, 6, 11)}
 
 
     @fixture
@@ -59,8 +61,8 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                            {'email': 'officeworkername@example.org'}}
         return {'office_worker': None,
                 'plan_number': '112233',
-                'participation_start_date': '05/05/2015',
-                'participation_end_date': '11/06/2015'}
+                'participation_start_date': datetime.date(2015, 5, 5),
+                'participation_end_date': datetime.date(2015, 6, 11)}
 
     def _make_process(self, registry, context, process_settings_appstruct):
         from adhocracy_meinberlin import resources

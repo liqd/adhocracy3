@@ -1,4 +1,4 @@
-Ihre Stellungnahme zum Bebauungsplan ${plan_number}, ${participation_kind}, von ${participation_start_date} - ${participation_end_date}.
+Ihre Stellungnahme zum Bebauungsplan ${plan_number}, ${participation_kind}, von ${participation_start_date.strftime('%d/%m/%Y')} - ${participation_end_date.strftime('%d/%m/%Y')}.
 
 Vielen Dank für Ihre Stellungnahme. Ihre Stellungnahme geht in die
 abschließende Abwägung ein. In jedem Fall informiert Sie die
