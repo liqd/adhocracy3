@@ -243,7 +243,7 @@ class RESTView:
     and configure the pyramid view::
 
         @view_defaults(
-            renderer='simplejson',
+            renderer='json',
             context=IResource,
         )
         class MySubClass(RESTView):
@@ -314,7 +314,7 @@ def _get_schema_and_validators(view_class, request: Request) -> tuple:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IResource,
 )
 class ResourceRESTView(RESTView):
@@ -427,7 +427,7 @@ class ResourceRESTView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=ISimple,
 )
 class SimpleRESTView(ResourceRESTView):
@@ -461,7 +461,7 @@ class SimpleRESTView(ResourceRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IPool,
 )
 class PoolRESTView(SimpleRESTView):
@@ -526,7 +526,7 @@ class PoolRESTView(SimpleRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IItem,
 )
 class ItemRESTView(PoolRESTView):
@@ -595,7 +595,7 @@ class ItemRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IBadgeAssignmentsService,
 )
 class BadgeAssignmentsRESTView(PoolRESTView):
@@ -628,7 +628,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IUsersService,
 )
 class UsersRESTView(PoolRESTView):
@@ -643,7 +643,7 @@ class UsersRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IAssetsService,
 )
 class AssetsServiceRESTView(PoolRESTView):
@@ -658,7 +658,7 @@ class AssetsServiceRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IAsset,
 )
 class AssetRESTView(SimpleRESTView):
@@ -675,7 +675,7 @@ class AssetRESTView(SimpleRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IAssetDownload,
 )
 class AssetDownloadRESTView(SimpleRESTView):
@@ -709,7 +709,7 @@ class AssetDownloadRESTView(SimpleRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='meta_api'
 )
@@ -957,7 +957,7 @@ def validate_account_active(context, request: Request):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='login_username',
 )
@@ -995,7 +995,7 @@ def _login_user(request: Request) -> dict:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='login_email',
 )
@@ -1051,7 +1051,7 @@ def _activation_time_window_has_expired(user: IUser, registry) -> bool:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='activate_account',
 )
@@ -1102,7 +1102,7 @@ class ReportAbuseView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='message_user',
 )
@@ -1138,7 +1138,7 @@ class MessageUserView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='create_password_reset',
 )
@@ -1167,7 +1167,7 @@ class CreatePasswordResetView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='password_reset',
 )

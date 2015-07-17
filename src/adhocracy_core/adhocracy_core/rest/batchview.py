@@ -42,7 +42,7 @@ class BatchItemResponse:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     http_cache=0,
 )

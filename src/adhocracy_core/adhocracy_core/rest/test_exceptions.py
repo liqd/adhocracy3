@@ -226,8 +226,8 @@ class TestHandleError400:
         request_.errors = [{'location': 'body'}]
         inst = self.call_fut(error, request_)
         assert inst.content_type == 'application/json'
-        assert b'"errors": [{"location": "body"}]' in inst.body
-        assert b'"status": "error"' in inst.body
+        assert b'"errors":[{"location":"body"}]' in inst.body
+        assert b'"status":"error"' in inst.body
         assert inst.status_code == 400
 
     def test_log_request_body(self, error, request_):
