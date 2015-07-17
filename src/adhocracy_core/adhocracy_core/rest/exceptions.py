@@ -4,7 +4,6 @@ import logging
 import colander
 from collections import namedtuple
 
-from cornice.util import _JSONError
 from pyramid.exceptions import URLDecodeError
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
@@ -31,6 +30,28 @@ logger = logging.getLogger(__name__)
 error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])
 
 
+class JSONHTTPException(HTTPException):
+
+    """HTTPException with json body to describe the exception.
+
+    The body contains a dictionary with the following data structure:
+
+    * `status`: 'error'
+
+    * `errors`: [error_entry]
+    """
+
+    def __init__(self, error_entries: [error_entry],
+                 code: int=400,
+                 title: str='Bad Request'):
+        self.code = code
+        self.title = title
+        super().__init__()
+        self.content_type = 'application/json'
+        self.json_body = {'status': 'error',
+                          'errors': error_entries}
+
+
 @view_config(
     context=HTTPException,
     permission=NO_PERMISSION_REQUIRED,
@@ -38,13 +59,15 @@ error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])
 def handle_error_xox_exception(error, request):
     """Return JSON error for generic HTTPErrors.
 
-     If `error` is :class:`cornice.util._JSONError` it is
+     If `error` is :class:`JSONHTTPException` it is
     return without modifications.
     """
-    if isinstance(error, _JSONError):
+    if isinstance(error, JSONHTTPException):
         return error
     error_dict = error_entry('url', request.method, str(error))._asdict()
-    json_error = _JSONError([error_dict], error.status_code)
+    json_error = JSONHTTPException([error_dict],
+                                   code=error.code,
+                                   title=error.title)
     return json_error
 
 
@@ -59,6 +82,7 @@ def handle_error_400_colander_invalid(error, request):
         error_dict = error_entry('body', path, description)._asdict()
         errors.append(error_dict)
     return _JSONError(errors, 400)
+    return JSONHTTPException(errors, code=400, title='Bad Request')
 
 
 @view_config(
@@ -74,6 +98,7 @@ def handle_error_400_bad_request(error, request):
     for error_data in errors:
         logger.warning(' {0}'.format(error_data))
     return _JSONError(errors, 400)
+    return JSONHTTPException(errors, code=400, title='Bad Request')
 
 
 def _get_filtered_request_body(request) -> str:
@@ -154,7 +179,8 @@ def handle_error_400_url_decode_error(error, request):
     E.g. "/fooba%E9r/".
     """
     error_dict = error_entry('url', '', str(error))._asdict()
-    return _JSONError([error_dict], 400)
+    error_entries = [error_entry('url', '', str(error))]
+    return JSONHTTPException([error_dict], code=400, title='Bad Request')
 
 
 @view_config(
@@ -165,7 +191,10 @@ def handle_error_500_exception(error, request):
     """Return 500 JSON error."""
     error_dict = internal_exception_to_dict(error)
     logger.exception('internal')
-    return _JSONError([error_dict], 500)
+    description = '{}; time: {}'.format(exception_to_str(error),
+    return JSONHTTPException([error_dict],
+                             code=500,
+                             title='Internal Server Error')
 
 
 @view_config(context=HTTPGone,
@@ -203,7 +232,7 @@ def handle_error_403_exception(error, request):
     This overrides the same error handler in :mod:`cornice`.
     """
     error_dict = error_entry('url', request.method, str(error))._asdict()
-    return _JSONError([error_dict], 403)
+    return JSONHTTPException([error_dict], code=403, title='Forbidden')
 
 
 @view_config(context=HTTPNotFound,
@@ -215,7 +244,7 @@ def handle_error_404_exception(error, request):
     This overrides the same error handler in :mod:`cornice`.
     """
     error_dict = error_entry('url', request.method, str(error))._asdict()
-    return _JSONError([error_dict], 404)
+    return JSONHTTPException([error_dict], code=404, title='Not Found')
 
 
 def includeme(config):  # pragma: no cover

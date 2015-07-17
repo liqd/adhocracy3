@@ -9,6 +9,37 @@ def request_(cornice_request):
     return cornice_request
 
 
+class TestJSONHTTPException:
+
+    @fixture
+    def make_one(self, errors, **kwargs):
+        from adhocracy_core.rest.exceptions import JSONHTTPException
+        return JSONHTTPException(errors, **kwargs)
+
+    def test_create(self):
+        from pyramid.httpexceptions import HTTPException
+        error_entries = []
+        inst = self.make_one(error_entries)
+        assert isinstance(inst, HTTPException)
+        assert inst.status == '400 Bad Request'
+        assert inst.content_type == 'application/json'
+        assert inst.json_body == {'status': 'error',
+                                  'errors': []}
+
+    def test_add_code_and_title(self):
+        error_entries = []
+        inst = self.make_one(error_entries, code=402, title='Bad Bad')
+        assert inst.status == '402 Bad Bad'
+
+    def test_add_error_entries_to_json_body(self):
+        from .exceptions import error_entry
+        error_entries = [error_entry('header', 'a', 'b')]
+        inst = self.make_one(error_entries)
+        assert inst.json_body['errors'] == [{'location': 'header',
+                                             'name': 'a',
+                                             'description': 'b'}]
+
+
 class TestHandleErrorX0X_exception:
 
     def call_fut(self, error, request):
@@ -16,11 +47,9 @@ class TestHandleErrorX0X_exception:
         return handle_error_xox_exception(error, request)
 
     def test_render_http_exception(self, request_):
-        from cornice.util import _JSONError
         from pyramid.httpexceptions import HTTPClientError
         error = HTTPClientError(status_code=400)
         json_error = self.call_fut(error, request_)
-        assert isinstance(json_error, _JSONError)
         assert json_error.status_code == 400
         assert json_error.json_body == {"status": "error",
                                         "errors": [{"description": str(error),
@@ -28,8 +57,8 @@ class TestHandleErrorX0X_exception:
                                                     "location": "url"}]}
 
     def test_render_http_json_exception(self, request_):
-        from cornice.util import _JSONError
-        error = _JSONError([], status=400)
+        from .exceptions import JSONHTTPException
+        error = JSONHTTPException([], code=400)
         json_error = self.call_fut(error, request_)
         assert json_error is error
 
@@ -41,7 +70,6 @@ class TestHandleError400ColanderInvalid:
         return handle_error_400_colander_invalid(error, request)
 
     def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
         import json
         invalid0 = colander.SchemaNode(typ=colander.String(), name='parent0',
                                        msg='msg_parent')
@@ -55,7 +83,6 @@ class TestHandleError400ColanderInvalid:
 
         inst = self.make_one(error0, request_)
 
-        assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
         wanted = {'status': 'error',
                   'errors': [{'location': 'body',
@@ -71,7 +98,6 @@ class TestHandleError400URLDecodeError:
         return handle_error_400_url_decode_error(error, request)
 
     def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
         from pyramid.exceptions import URLDecodeError
         import json
         try:
@@ -82,7 +108,6 @@ class TestHandleError400URLDecodeError:
                                    err.start,err.end, err.reason)
             inst = self.make_one(error, request_)
 
-            assert isinstance(inst, _JSONError)
             assert inst.status == '400 Bad Request'
             wanted = {'status': 'error',
                       'errors': [{'location': 'url',
@@ -98,12 +123,10 @@ class TestHandleError500Exception:
         return handle_error_500_exception(error, request_)
 
     def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
         import json
         with LogCapture() as log:
             error = Exception('arg1')
             inst = self.make_one(error, request_)
-        assert isinstance(inst, _JSONError)
         assert inst.status == '500 Internal Server Error'
         message = json.loads(inst.body.decode())
         assert message['status'] == 'error'
@@ -133,7 +156,6 @@ class TestHandleAutoUpdateNoForkAllowed400Exception:
         error = testing.DummyResource(resource=resource,
                                       event=event)
         inst = self.make_one(error, request_)
-        assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
         wanted = \
             {'errors': [{'description': 'No fork allowed - The auto update tried to '
@@ -246,7 +268,7 @@ class TestHandleError400:
             self.call_fut(error, request_)
             log_message = str(log)
             assert len(log_message) < len(request_.body)
-            assert log_message.endswith('h...')
+            assert log_message.endswith('h...\n')
 
     def test_log_formdata_body(self, error, request_):
         request_.content_type = 'multipart/form-data'
@@ -254,7 +276,7 @@ class TestHandleError400:
         with LogCapture() as log:
             self.call_fut(error, request_)
             log_message = str(log)
-            assert log_message.endswith('h')
+            assert log_message.endswith('h\n')
 
     def test_log_but_hide_login_password_in_body(self, error, request_):
         import json
@@ -289,11 +311,9 @@ class TestHandleError403Exception:
         return handle_error_403_exception(error, request)
 
     def test_render_http_exception(self, request_):
-        from cornice.util import _JSONError
         from pyramid.httpexceptions import HTTPClientError
         error = HTTPClientError(status_code=403)
         json_error = self.call_fut(error, request_)
-        assert isinstance(json_error, _JSONError)
         assert json_error.status_code == 403
         assert json_error.json_body == {"status": "error",
                                         "errors": [{"description": str(error),
@@ -308,11 +328,9 @@ class TestHandleError410Exception:
         return handle_error_404_exception(error, request)
 
     def test_render_http_exception(self, request_):
-        from cornice.util import _JSONError
         from pyramid.httpexceptions import HTTPClientError
         error = HTTPClientError(status_code=404)
         json_error = self.call_fut(error, request_)
-        assert isinstance(json_error, _JSONError)
         assert json_error.status_code == 404
         assert json_error.json_body == {"status": "error",
                                         "errors": [{"description": str(error),

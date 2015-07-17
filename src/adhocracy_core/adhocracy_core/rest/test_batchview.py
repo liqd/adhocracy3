@@ -162,11 +162,11 @@ class TestBatchView:
         assert subrequest2.json ==  {'ISheet': {'ref': '/pool/item/v1'}}
 
     def test_post_failed_subrequest(self, context, request_, mock_invoke_subrequest):
-        from cornice.util import _JSONError
+        from .exceptions import JSONHTTPException
         request_.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=444)
         inst = self.make_one(context, request_)
-        with raises(_JSONError) as err:
+        with raises(JSONHTTPException) as err:
             inst.post()
             assert err.status_code == 444
             assert err.text.startswith('[{')
@@ -174,38 +174,38 @@ class TestBatchView:
 
     def test_post_subrequest_with_http_exception(
             self, context, request_, mock_invoke_subrequest, integration):
-        from cornice.util import _JSONError
         from pyramid.httpexceptions import HTTPUnauthorized
+        from .exceptions import JSONHTTPException
         request_.registry = integration.registry
         request_.body = self._make_json_with_subrequest_cstructs()
         request_.validated = request_.json_body
         mock_invoke_subrequest.side_effect = HTTPUnauthorized()
         inst = self.make_one(context, request_)
-        with raises(_JSONError) as err:
+        with raises(JSONHTTPException) as err:
             inst.post()
             assert err.status_code == 401
 
     def test_post_subrequest_with_http_400_exception(
             self, context, request_, mock_invoke_subrequest, integration):
-        from cornice.util import _JSONError
         from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import JSONHTTPException
         request_.registry = integration.registry
         request_.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.side_effect = HTTPBadRequest()
         mock_invoke_subrequest.return_value.errors = [{'location': 'body'}]
         inst = self.make_one(context, request_)
-        with raises(_JSONError) as err:
+        with raises(JSONHTTPException) as err:
             inst.post()
             assert err.status_code == 400
 
     def test_post_subrequest_with_other_exception(
             self, context, request_, mock_invoke_subrequest, integration):
-        from cornice.util import _JSONError
+        from .exceptions import JSONHTTPException
         request_.registry = integration.registry
         request_.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.side_effect = RuntimeError('Bad luck')
         inst = self.make_one(context, request_)
-        with raises(_JSONError) as err:
+        with raises(JSONHTTPException) as err:
             with LogCapture() as log:
                 inst.post()
             assert err.status_code == 500

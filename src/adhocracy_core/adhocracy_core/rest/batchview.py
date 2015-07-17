@@ -2,9 +2,9 @@
 from json import dumps
 from logging import getLogger
 
-from cornice.util import _JSONError
 from adhocracy_core.rest.exceptions import handle_error_xox_exception
 from adhocracy_core.rest.exceptions import handle_error_500_exception
+from adhocracy_core.rest.exceptions import JSONHTTPException
 from pyramid.httpexceptions import HTTPException
 from pyramid.request import Request
 from pyramid.view import view_config
@@ -70,7 +70,7 @@ class BatchView(RESTView):
                                             item_response.body,
                                             item_response.code,
                                             ))
-                err = _JSONError([], status=item_response.code)
+                err = JSONHTTPException([], code=item_response.code)
                 err.text = dumps(self._response_list_to_json(response_list))
                 raise err
         response = self._response_list_to_json(response_list)
