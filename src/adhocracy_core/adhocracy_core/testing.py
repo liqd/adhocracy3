@@ -8,7 +8,6 @@ import os
 import subprocess
 import time
 
-from cornice.util import extract_json_data
 from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.traversal import resource_path_tuple
@@ -211,7 +210,6 @@ class CorniceDummyRequest(testing.DummyRequest):
         self.validated = {}
         self.errors = []
         self.content_type = 'application/json'
-        self.deserializer = extract_json_data
 
     def authenticated_userid(self):
         return None

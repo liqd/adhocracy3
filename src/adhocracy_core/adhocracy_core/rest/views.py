@@ -9,7 +9,6 @@ from colander import Invalid
 from colander import MappingSchema
 from colander import SchemaNode
 from colander import SequenceSchema
-from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
 from substanced.util import find_service
 from pyramid.httpexceptions import HTTPMethodNotAllowed
@@ -135,11 +134,13 @@ def validate_request_data(context: ILocation, request: Request,
                                       request=request,
                                       registry=request.registry,
                                       parent_pool=parent)
-    qs, headers, body, path = extract_request_data(request)
+    body = {}
     if request.content_type == 'multipart/form-data':
         body = unflatten_multipart_request(request)
-    validate_user_headers(headers, request)
-    validate_body_or_querystring(body, qs, schema_with_binding, context,
+    if request.content_type == 'application/json':
+        body = _extract_json_body(request)
+    validate_user_headers(request)
+    validate_body_or_querystring(body, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
     if request.errors:
@@ -147,25 +148,38 @@ def validate_request_data(context: ILocation, request: Request,
         raise HTTPBadRequest()
 
 
-def validate_user_headers(headers: dict, request: Request):
+def _extract_json_body(request: Request) -> object:
+    json_body = {}
+    try:
+        json_body = request.json_body
+    except (ValueError, TypeError) as err:
+        error = error_entry('body', None,
+                            'Invalid JSON request body'.format(err))
+        request.errors.append(error)
+    return json_body
+
+
+def validate_user_headers(request: Request):
     """
     Validate the user headers.
 
     If the request has a 'X-User-Path' and/or 'X-User-Token' header, we
     ensure that the session takes belongs to the user and is not expired.
     """
+    headers = request.headers
     if 'X-User-Path' in headers or 'X-User-Token' in headers:
         if get_user(request) is None:
             error = error_entry('header', 'X-User-Token', 'Invalid user token')
             request.errors.append(error)
 
 
-def validate_body_or_querystring(body, qs, schema: MappingSchema,
+def validate_body_or_querystring(body, schema: MappingSchema,
                                  context: IResource, request: Request):
     """Validate the querystring if this is a GET request, the body otherwise.
 
     This allows using just a single schema for all kinds of requests.
     """
+    qs = request.GET
     if isinstance(schema, GETPoolRequestSchema):
         try:
             schema = add_get_pool_request_extra_fields(qs, schema, context,
