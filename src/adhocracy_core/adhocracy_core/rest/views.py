@@ -150,6 +150,8 @@ def validate_request_data(context: ILocation, request: Request,
 
 def _extract_json_body(request: Request) -> object:
     json_body = {}
+    if request.body == '':
+        request.body = '{}'
     try:
         json_body = request.json_body
     except (ValueError, TypeError) as err:

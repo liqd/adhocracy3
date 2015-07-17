@@ -162,50 +162,62 @@ class TestBatchView:
         assert subrequest2.json ==  {'ISheet': {'ref': '/pool/item/v1'}}
 
     def test_post_failed_subrequest(self, context, request_, mock_invoke_subrequest):
-        from .exceptions import JSONHTTPException
+        from .exceptions import JSONHTTPClientError
         request_.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.return_value = DummySubresponse(status_code=444)
         inst = self.make_one(context, request_)
-        with raises(JSONHTTPException) as err:
+        with raises(JSONHTTPClientError) as err:
             inst.post()
             assert err.status_code == 444
             assert err.text.startswith('[{')
             assert err.text.endswith('}]')
 
-    def test_post_subrequest_with_http_exception(
+    def test_post_subrequest_with_http_client_exception(
             self, context, request_, mock_invoke_subrequest, integration):
         from pyramid.httpexceptions import HTTPUnauthorized
-        from .exceptions import JSONHTTPException
+        from .exceptions import JSONHTTPClientError
         request_.registry = integration.registry
         request_.body = self._make_json_with_subrequest_cstructs()
         request_.validated = request_.json_body
         mock_invoke_subrequest.side_effect = HTTPUnauthorized()
         inst = self.make_one(context, request_)
-        with raises(JSONHTTPException) as err:
+        with raises(JSONHTTPClientError) as err:
             inst.post()
             assert err.status_code == 401
 
     def test_post_subrequest_with_http_400_exception(
             self, context, request_, mock_invoke_subrequest, integration):
         from pyramid.httpexceptions import HTTPBadRequest
-        from .exceptions import JSONHTTPException
+        from .exceptions import JSONHTTPClientError
         request_.registry = integration.registry
         request_.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.side_effect = HTTPBadRequest()
         mock_invoke_subrequest.return_value.errors = [{'location': 'body'}]
         inst = self.make_one(context, request_)
-        with raises(JSONHTTPException) as err:
+        with raises(JSONHTTPClientError) as err:
             inst.post()
             assert err.status_code == 400
 
-    def test_post_subrequest_with_other_exception(
+    def test_post_subrequest_with_http_redirect_exception(
             self, context, request_, mock_invoke_subrequest, integration):
-        from .exceptions import JSONHTTPException
+        from pyramid.httpexceptions import HTTPRedirection
+        from .exceptions import JSONHTTPClientError
+        request_.registry = integration.registry
+        request_.body = self._make_json_with_subrequest_cstructs()
+        mock_invoke_subrequest.side_effect = HTTPRedirection()
+        inst = self.make_one(context, request_)
+        with raises(JSONHTTPClientError) as err:
+            inst.post()
+            assert err.status_code == 301
+
+    def test_post_subrequest_with_non_http_exception(
+            self, context, request_, mock_invoke_subrequest, integration):
+        from .exceptions import JSONHTTPClientError
         request_.registry = integration.registry
         request_.body = self._make_json_with_subrequest_cstructs()
         mock_invoke_subrequest.side_effect = RuntimeError('Bad luck')
         inst = self.make_one(context, request_)
-        with raises(JSONHTTPException) as err:
+        with raises(JSONHTTPClientError) as err:
             with LogCapture() as log:
                 inst.post()
             assert err.status_code == 500

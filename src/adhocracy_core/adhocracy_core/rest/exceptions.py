@@ -10,9 +10,8 @@ from pyramid.view import view_config
 from pyramid.traversal import resource_path
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.httpexceptions import HTTPForbidden
-from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPException
+from pyramid.httpexceptions import HTTPClientError
 from pyramid.request import Request
 
 from adhocracy_core.exceptions import AutoUpdateNoForkAllowedError
@@ -30,9 +29,14 @@ logger = logging.getLogger(__name__)
 error_entry = namedtuple('ErrorEntry', ['location', 'name', 'description'])
 
 
-class JSONHTTPException(HTTPException):
+class JSONHTTPClientError(HTTPClientError):
 
     """HTTPException with json body to describe the exception.
+
+    :param:`errors`: error entries to generate the error description.
+    :param:`request`: Request causing the error to log debug information.
+    :param:`code`: http status code
+    :param:`title`: http status title
 
     The body contains a dictionary with the following data structure:
 
@@ -42,6 +46,7 @@ class JSONHTTPException(HTTPException):
     """
 
     def __init__(self, error_entries: [error_entry],
+                 request: Request=None,
                  code: int=400,
                  title: str='Bad Request'):
         self.code = code
@@ -49,25 +54,55 @@ class JSONHTTPException(HTTPException):
         super().__init__()
         self.content_type = 'application/json'
         self.json_body = {'status': 'error',
-                          'errors': error_entries}
+                          'errors': [e._asdict() for e in error_entries]}
+        body = _get_filtered_request_body(request)
+        logger.warn('Found errors in request with body: {0}\n'.format(body))
+        for error in error_entries:
+            logger.warning('Validation Error: {0}\n'.format(error._asdict()))
+
+
+@view_config(
+    context=Exception,
+    permission=NO_PERMISSION_REQUIRED,
+)
+def handle_error_500_exception(error, request):
+    """Return 500 JSON error."""
+    logger.exception('internal')
+    description = '{}; time: {}'.format(exception_to_str(error),
+                                        log_compatible_datetime())
+    error_entries = [error_entry('internal', '', description)]
+    return JSONHTTPClientError(error_entries,
+                               request=request,
+                               code=500,
+                               title='Internal Server Error')
 
 
 @view_config(
     context=HTTPException,
     permission=NO_PERMISSION_REQUIRED,
 )
-def handle_error_xox_exception(error, request):
-    """Return JSON error for generic HTTPErrors.
+def handle_error_x0x_exception(error, request):
+    """Return HTTPError."""
+    return error
 
-     If `error` is :class:`JSONHTTPException` it is
+
+@view_config(
+    context=HTTPClientError,
+    permission=NO_PERMISSION_REQUIRED,
+)
+def handle_error_40x_exception(error, request):
+    """Return JSON error for generic HTTPClientErrors.
+
+     If `error` is :class:`JSONHTTPClientError` it is
     return without modifications.
     """
-    if isinstance(error, JSONHTTPException):
+    if isinstance(error, JSONHTTPClientError):
         return error
     error_entries = [error_entry('url', request.method, str(error))]
-    json_error = JSONHTTPException(error_entries,
-                                   code=error.code,
-                                   title=error.title)
+    json_error = JSONHTTPClientError(error_entries,
+                                     request=request,
+                                     code=error.code,
+                                     title=error.title)
     return json_error
 
 
@@ -76,9 +111,9 @@ def handle_error_xox_exception(error, request):
     permission=NO_PERMISSION_REQUIRED,
 )
 def handle_error_400_colander_invalid(invalid, request):
-    """Return 400 JSON error."""
+    """Return JSON error for colander.Invalid errors."""
     errors = [error_entry('body', n, d) for n, d in invalid.asdict().items()]
-    return JSONHTTPException(errors, code=400, title='Bad Request')
+    return JSONHTTPClientError(errors, request=request)
 
 
 @view_config(
@@ -88,11 +123,7 @@ def handle_error_400_colander_invalid(invalid, request):
 def handle_error_400_bad_request(error, request):
     """Return 400 JSON error with filtered error messages."""
     error_entries = getattr(request, 'errors', [])  # ease testing
-    body = _get_filtered_request_body(request)
-    logger.warn('Found validation errors in request body: {0}\n'.format(body))
-    for error_data in error_entries:
-        logger.warning('Validation Error: {0}\n'.format(error_data))
-    return JSONHTTPException(error_entries, code=400, title='Bad Request')
+    return JSONHTTPClientError(error_entries, request=request)
 
 
 def _get_filtered_request_body(request) -> str:
@@ -105,6 +136,8 @@ def _get_filtered_request_body(request) -> str:
     In case of JSON request, the contents of the password field will be hidden.
     Only the 5000 first characters are shown.
     """
+    if request is None:
+        return ''
     filtered_body = request.body
     if request.content_type == 'multipart/form-data':
         filtered_body = _truncate(filtered_body, 120)
@@ -172,7 +205,7 @@ def handle_error_400_url_decode_error(error, request):
     E.g. "/fooba%E9r/".
     """
     error_entries = [error_entry('url', '', str(error))]
-    return JSONHTTPException(error_entries, code=400, title='Bad Request')
+    return JSONHTTPClientError(error_entries)
 
 
 @view_config(
@@ -205,7 +238,7 @@ def handle_error_410_exception(error, request):
     error.content_type = 'application/json'
     if cstruct['modification_date'] is colander.null:
         cstruct['modification_date'] = ''
-    error.text = json.dumps(cstruct)
+    error.json = cstruct
     return error
 
 

@@ -1,11 +1,13 @@
 """POST batch requests processing."""
 from json import dumps
 from logging import getLogger
-
-from adhocracy_core.rest.exceptions import handle_error_xox_exception
-from adhocracy_core.rest.exceptions import handle_error_500_exception
-from adhocracy_core.rest.exceptions import JSONHTTPException
 from pyramid.httpexceptions import HTTPException
+from pyramid.httpexceptions import HTTPClientError
+
+from adhocracy_core.rest.exceptions import handle_error_40x_exception
+from adhocracy_core.rest.exceptions import handle_error_500_exception
+from adhocracy_core.rest.exceptions import JSONHTTPClientError
+from adhocracy_core.rest.exceptions import _get_json_body_dict
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -70,7 +72,7 @@ class BatchView(RESTView):
                                             item_response.body,
                                             item_response.code,
                                             ))
-                err = JSONHTTPException([], code=item_response.code)
+                err = JSONHTTPClientError([], code=item_response.code)
                 err.text = dumps(self._response_list_to_json(response_list))
                 raise err
         response = self._response_list_to_json(response_list)
@@ -179,17 +181,20 @@ class BatchView(RESTView):
             subresponse = self.request.invoke_subrequest(subrequest)
             status_code = subresponse.status_code
             body = subresponse.json
-        except Exception as error:
-            error_view = self._get_error_view(error)
-            error_json = error_view(error, subrequest)
-            status_code = error_json.status_code
-            body = error_json.json
+        except Exception as err:
+            error_view = self._get_error_view(err)
+            error = error_view(err, subrequest)
+            status_code = error.code
+            body = _get_json_body_dict(error)
         return BatchItemResponse(status_code, body)
 
     def _get_error_view(self, error: Exception) -> callable:
-        error_view = handle_error_500_exception
         if isinstance(error, HTTPException):
-            error_view = handle_error_xox_exception
+            error_view = lambda e, r: error
+        else:
+            error_view = handle_error_500_exception
+        if isinstance(error, HTTPClientError):
+            error_view = handle_error_40x_exception
         instrospector = self.request.registry.introspector
         for view in instrospector.get_category('views'):
             context = view['introspectable']['context']

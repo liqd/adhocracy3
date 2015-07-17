@@ -309,6 +309,7 @@ class TestHTTPCacheStrategyWeakAssetDownloadAdapter:
 
 @fixture
 def integration(config):
+    config.include('adhocracy_core.rest.exceptions')
     config.include('adhocracy_core.caching')
 
 
@@ -317,10 +318,10 @@ class TestIntegrationCaching:
 
     @staticmethod
     def dummyview(context, request):
+        from adhocracy_core.rest.exceptions import JSONHTTPClientError
         from . import set_cache_header
-        from cornice.util import _JSONError
         if 'error' in request.params:
-            raise _JSONError({})
+            raise JSONHTTPClientError([])
         set_cache_header(context, request)
         return {}
 

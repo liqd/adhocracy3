@@ -13,8 +13,8 @@ class TestJSONHTTPException:
 
     @fixture
     def make_one(self, errors, **kwargs):
-        from adhocracy_core.rest.exceptions import JSONHTTPException
-        return JSONHTTPException(errors, **kwargs)
+        from adhocracy_core.rest.exceptions import JSONHTTPClientError
+        return JSONHTTPClientError(errors, **kwargs)
 
     def test_create(self):
         from pyramid.httpexceptions import HTTPException
@@ -43,10 +43,23 @@ class TestJSONHTTPException:
 class TestHandleErrorX0X_exception:
 
     def call_fut(self, error, request):
-        from adhocracy_core.rest.exceptions import handle_error_xox_exception
-        return handle_error_xox_exception(error, request)
+        from adhocracy_core.rest.exceptions import handle_error_x0x_exception
+        return handle_error_x0x_exception(error, request)
 
-    def test_render_http_exception(self, request_):
+    def test_forwart_http_exception(self, request_):
+        from pyramid.httpexceptions import HTTPException
+        error = HTTPException(status_code=204)
+        result_error = self.call_fut(error, request_)
+        assert error is result_error
+
+
+class TestHandleError40X_exception:
+
+    def call_fut(self, error, request):
+        from adhocracy_core.rest.exceptions import handle_error_40x_exception
+        return handle_error_40x_exception(error, request)
+
+    def test_render_http_client_exception(self, request_):
         from pyramid.httpexceptions import HTTPClientError
         error = HTTPClientError(status_code=400)
         json_error = self.call_fut(error, request_)
@@ -57,8 +70,8 @@ class TestHandleErrorX0X_exception:
                                                     "location": "url"}]}
 
     def test_render_http_json_exception(self, request_):
-        from .exceptions import JSONHTTPException
-        error = JSONHTTPException([], code=400)
+        from .exceptions import JSONHTTPClientError
+        error = JSONHTTPClientError([], code=400)
         json_error = self.call_fut(error, request_)
         assert json_error is error
 
@@ -145,7 +158,6 @@ class TestHandleAutoUpdateNoForkAllowed400Exception:
         return handle_error_400_auto_update_no_fork_allowed(error, request_)
 
     def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
         from adhocracy_core.interfaces import ISheet
         resource = testing.DummyResource(__name__='resource')
         event = testing.DummyResource(object=resource,
@@ -223,11 +235,13 @@ class TestHandleError400:
         return handle_error_400_bad_request(error, request)
 
     def test_return_json_error_with_error_listing(self, error, request_):
-        request_.errors = [{'location': 'body'}]
+        from .exceptions import error_entry
+        request_.errors = [error_entry('b', '', '')]
         inst = self.call_fut(error, request_)
         assert inst.content_type == 'application/json'
-        assert b'"errors":[{"location":"body"}]' in inst.body
-        assert b'"status":"error"' in inst.body
+        assert inst.json ==\
+               {"errors": [{"location":"b","name":"","description":""}],
+                "status": "error"}
         assert inst.status_code == 400
 
     def test_log_request_body(self, error, request_):
