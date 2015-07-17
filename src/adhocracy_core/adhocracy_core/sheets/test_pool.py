@@ -10,10 +10,6 @@ from adhocracy_core.resources.pool import IBasicPool
 
 class TestPoolSchema:
 
-    @fixture
-    def request(self, cornice_request):
-        return cornice_request
-
     def make_one(self):
         from .pool import PoolSchema
         return PoolSchema().bind()
@@ -26,9 +22,9 @@ class TestPoolSchema:
 class TestFilteringPoolSheet:
 
     @fixture
-    def _request(self, cornice_request, registry_with_content):
-        cornice_request.registry = registry_with_content
-        return cornice_request
+    def request_(self, request_, registry_with_content):
+        request_.registry = registry_with_content
+        return request_
 
     @fixture
     def meta(self):
@@ -95,80 +91,79 @@ class TestFilteringPoolSheet:
                              'count': 1,
                              }
 
-
-    def test_get_cstruct(self, inst, _request):
+    def test_get_cstruct(self, inst, request_):
         inst.get = Mock()
         child = testing.DummyResource()
         inst.get.return_value = {'elements': [child]}
-        cstruct = inst.get_cstruct(_request)
+        cstruct = inst.get_cstruct(request_)
         assert cstruct == {'elements': ['http://example.com/']}
 
-    def test_get_cstruct_with_params(self, inst, _request):
+    def test_get_cstruct_with_params(self, inst, request_):
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
-        cstruct = inst.get_cstruct(_request, params={'name': 'child'})
+        cstruct = inst.get_cstruct(request_, params={'name': 'child'})
         assert 'name' in inst.get.call_args[1]['params']
 
-    def test_get_cstruct_filter_by_view_permission(self, inst, _request):
+    def test_get_cstruct_filter_by_view_permission(self, inst, request_):
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
-        cstruct = inst.get_cstruct(_request)
+        cstruct = inst.get_cstruct(request_)
         assert inst.get.call_args[1]['params']['allows'] == \
-            (_request.effective_principals, 'view')
+            (request_.effective_principals, 'view')
 
     def test_get_cstruct_filter_by_view_permission_disabled(self, inst,
-                                                            _request):
+                                                            request_):
         inst.registry.settings['adhocracy.filter_by_view_permission'] = False
         inst.get = Mock()
         inst.get.return_value = {}
-        cstruct = inst.get_cstruct(_request)
+        cstruct = inst.get_cstruct(request_)
         assert 'allows' not in inst.get.call_args[1]['params']
 
-    def test_get_cstruct_filter_by_only_visible(self, inst, _request):
+    def test_get_cstruct_filter_by_only_visible(self, inst, request_):
         inst.get = Mock()
         inst.get.return_value = {'elements': []}
-        cstruct = inst.get_cstruct(_request)
+        cstruct = inst.get_cstruct(request_)
         assert inst.get.call_args[1]['params']['only_visible']
 
-    def test_get_cstruct_filter_by_only_visible_disabled(self, inst, _request):
+    def test_get_cstruct_filter_by_only_visible_disabled(self, inst, request_):
         inst.registry.settings['adhocracy.filter_by_visible'] = False
         inst.get = Mock()
         inst.get.return_value = {}
-        cstruct = inst.get_cstruct(_request)
+        cstruct = inst.get_cstruct(request_)
         assert 'only_visible' not in inst.get.call_args[1]['params']
 
-    def test_get_cstruct_with_serialization_content(self, inst, _request):
+    def test_get_cstruct_with_serialization_content(self, inst, request_):
         inst.get = Mock()
         child = testing.DummyResource()
         inst.get.return_value = {'elements': [child]}
-        cstruct = inst.get_cstruct(_request,
+        cstruct = inst.get_cstruct(request_,
                                    params={'serialization_form': 'content'})
         assert cstruct['elements'] == \
             [{'content_type': 'adhocracy_core.interfaces.IResource',
               'data': {},
               'path': 'http://example.com/'}]
 
-    def test_get_cstruct_with_serialization_omit(self, inst, _request):
+    def test_get_cstruct_with_serialization_omit(self, inst, request_):
         inst.get = Mock()
         child = testing.DummyResource()
         inst.get.return_value = {'elements': [child]}
-        cstruct = inst.get_cstruct(_request,
+        cstruct = inst.get_cstruct(request_,
                                    params={'serialization_form': 'omit'})
         assert cstruct['elements'] == []
 
-    def test_get_cstruct_with_show_count(self, inst, _request):
+    def test_get_cstruct_with_show_count(self, inst, request_):
         inst.get = Mock()
         child = testing.DummyResource()
         inst.get.return_value = {'count': 1}
-        cstruct = inst.get_cstruct(_request,
+        cstruct = inst.get_cstruct(request_,
                                    params={'show_count': True})
         assert cstruct['count'] == '1'
 
-    def test_get_cstruct_with_show_aggregate(self, inst, _request):
+    def test_get_cstruct_with_show_aggregate(self, inst, request_):
         inst.get = Mock()
         child = testing.DummyResource()
         inst.get.return_value = {'frequency_of': {'y': 1}}
-        cstruct = inst.get_cstruct(_request,
+        cstruct = inst.get_cstruct(request_,
                                    params={'show_frequency': True,
                                            'frequency_of': 'index'})
         assert cstruct['aggregateby']['index'] == {'y': 1}

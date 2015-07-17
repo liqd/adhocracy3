@@ -4,11 +4,6 @@ from testfixtures import LogCapture
 import colander
 
 
-@fixture
-def request_(cornice_request):
-    return cornice_request
-
-
 class TestJSONHTTPException:
 
     @fixture
@@ -316,37 +311,3 @@ class TestHandleError400:
             log_message = str(log)
             assert 'secret' not in log_message
             assert '<hidden>' in log_message
-
-
-class TestHandleError403Exception:
-
-    def call_fut(self, error, request):
-        from adhocracy_core.rest.exceptions import handle_error_403_exception
-        return handle_error_403_exception(error, request)
-
-    def test_render_http_exception(self, request_):
-        from pyramid.httpexceptions import HTTPClientError
-        error = HTTPClientError(status_code=403)
-        json_error = self.call_fut(error, request_)
-        assert json_error.status_code == 403
-        assert json_error.json_body == {"status": "error",
-                                        "errors": [{"description": str(error),
-                                                    "name": "GET",
-                                                    "location": "url"}]}
-
-
-class TestHandleError410Exception:
-
-    def call_fut(self, error, request):
-        from adhocracy_core.rest.exceptions import handle_error_404_exception
-        return handle_error_404_exception(error, request)
-
-    def test_render_http_exception(self, request_):
-        from pyramid.httpexceptions import HTTPClientError
-        error = HTTPClientError(status_code=404)
-        json_error = self.call_fut(error, request_)
-        assert json_error.status_code == 404
-        assert json_error.json_body == {"status": "error",
-                                        "errors": [{"description": str(error),
-                                                    "name": "GET",
-                                                    "location": "url"}]}

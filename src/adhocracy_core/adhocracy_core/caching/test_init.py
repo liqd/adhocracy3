@@ -6,11 +6,6 @@ from unittest import mock
 
 
 @fixture
-def request_():
-    return testing.DummyRequest()
-
-
-@fixture
 def mock_strategy():
     return mock.Mock()
 
@@ -327,7 +322,6 @@ class TestIntegrationCaching:
 
     @fixture
     def config(self, config):
-        config.include('cornice')
         from adhocracy_core.interfaces import IResource
         config.add_view(self.dummyview, renderer='json', request_method='GET',
                         context=IResource, name='no_strategy_registered')

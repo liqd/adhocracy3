@@ -10,13 +10,9 @@ from adhocracy_core.resources import process
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.workflow import WorkflowAssignmentSchema
 from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.utils import get_sheet
+
 
 class TestAdhocracyACLWorkflow:
-
-    @fixture
-    def request(self):
-        return testing.DummyResource()
 
     @fixture
     def inst(self):

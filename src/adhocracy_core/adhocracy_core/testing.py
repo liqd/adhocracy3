@@ -203,7 +203,7 @@ def sheet_meta() -> SheetMetadata:
                                schema_class=colander.MappingSchema)
 
 
-class CorniceDummyRequest(testing.DummyRequest):
+class DummyRequest(testing.DummyRequest):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -220,13 +220,13 @@ class CorniceDummyRequest(testing.DummyRequest):
 
 
 @fixture
-def cornice_request():
+def request_():
     """ Return dummy request with additional validation attributes.
 
     Additional Attributes:
-        `errors`, `validated`, `content_type`
+        `errors`, `validated`
     """
-    return CorniceDummyRequest()
+    return DummyRequest()
 
 
 @fixture

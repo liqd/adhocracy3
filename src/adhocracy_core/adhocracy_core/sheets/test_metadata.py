@@ -17,10 +17,6 @@ def mock_metadata_sheet(context, mock_sheet, registry_with_content):
 class TestIMetadataSchema:
 
     @fixture
-    def request_(self):
-        return testing.DummyRequest()
-
-    @fixture
     def mock_now(self, monkeypatch):
         from adhocracy_core.utils import now
         date = now()

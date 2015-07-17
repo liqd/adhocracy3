@@ -99,9 +99,9 @@ class DummyIndex:
 class TestRateSchema:
 
     @fixture
-    def schema_with_mock_ensure_rate(self, cornice_request, context):
+    def schema_with_mock_ensure_rate(self, request_, context):
         from adhocracy_core.sheets.rate import RateSchema
-        schema = RateSchema().bind(request=cornice_request, context=context)
+        schema = RateSchema().bind(request=request_, context=context)
         schema._ensure_rate_is_unique = Mock()
         return schema
 
@@ -213,21 +213,21 @@ class TestRateSchema:
         with raises(colander.Invalid):
             schema_with_mock_ensure_rate.deserialize(data)
 
-    def test_ensure_rate_is_unique_ok(self, monkeypatch, cornice_request,
+    def test_ensure_rate_is_unique_ok(self, monkeypatch, request_,
                                       context, subject):
         from adhocracy_core.sheets.rate import RateSchema
         from adhocracy_core.sheets import rate
         mock_find_catalog = Mock(return_value={'reference': DummyIndex(),
                                                'path': DummyIndex()})
         monkeypatch.setattr(rate, 'find_catalog', mock_find_catalog)
-        schema = RateSchema().bind(request=cornice_request, context=context)
+        schema = RateSchema().bind(request=request_, context=context)
         object = _make_rateable()
         node = Mock()
         value = {'subject': subject, 'object': object, 'rate': '1'}
-        result = schema._ensure_rate_is_unique(node, value, cornice_request)
+        result = schema._ensure_rate_is_unique(node, value, request_)
         assert result is None
 
-    def test_ensure_rate_is_unique_error(self, monkeypatch, cornice_request,
+    def test_ensure_rate_is_unique_error(self, monkeypatch, request_,
                                          context, subject):
         from adhocracy_core.sheets.rate import RateSchema
         from adhocracy_core.sheets import rate
@@ -236,13 +236,13 @@ class TestRateSchema:
             return_value={'reference': DummyIndex(['dummy']),
                           'path': DummyIndex()})
         monkeypatch.setattr(rate, 'find_catalog', mock_find_catalog)
-        schema = RateSchema().bind(request=cornice_request, context=context)
+        schema = RateSchema().bind(request=request_, context=context)
         object = _make_rateable()
         node = Mock()
         node.children = [named_object('object')]
         value = {'subject': subject, 'object': object, 'rate': '1'}
         with raises(colander.Invalid):
-            schema._ensure_rate_is_unique(node, value, cornice_request)
+            schema._ensure_rate_is_unique(node, value, request_)
 
 
 @mark.usefixtures('integration')

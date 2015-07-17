@@ -208,21 +208,6 @@ def handle_error_400_url_decode_error(error, request):
     return JSONHTTPClientError(error_entries)
 
 
-@view_config(
-    context=Exception,
-    permission=NO_PERMISSION_REQUIRED,
-)
-def handle_error_500_exception(error, request):
-    """Return 500 JSON error."""
-    logger.exception('internal')
-    description = '{}; time: {}'.format(exception_to_str(error),
-                                        log_compatible_datetime())
-    error_entries = [error_entry('internal', '', description)]
-    return JSONHTTPException(error_entries,
-                             code=500,
-                             title='Internal Server Error')
-
-
 @view_config(context=HTTPGone,
              permission=NO_PERMISSION_REQUIRED,
              )
@@ -240,30 +225,6 @@ def handle_error_410_exception(error, request):
         cstruct['modification_date'] = ''
     error.json = cstruct
     return error
-
-
-@view_config(context=HTTPForbidden,
-             permission=NO_PERMISSION_REQUIRED,
-             )
-def handle_error_403_exception(error, request):
-    """Add json body with explanation to 403 errors.
-
-    This overrides the same error handler in :mod:`cornice`.
-    """
-    error_dict = error_entry('url', request.method, str(error))
-    return JSONHTTPException([error_dict], code=403, title='Forbidden')
-
-
-@view_config(context=HTTPNotFound,
-             permission=NO_PERMISSION_REQUIRED,
-             )
-def handle_error_404_exception(error, request):
-    """Add json body with explanation to 404 errors.
-
-    This overrides the same error handler in :mod:`cornice`.
-    """
-    error_dict = error_entry('url', request.method, str(error))
-    return JSONHTTPException([error_dict], code=404, title='Not Found')
 
 
 def includeme(config):  # pragma: no cover

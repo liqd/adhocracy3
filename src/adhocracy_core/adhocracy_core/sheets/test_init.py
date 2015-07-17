@@ -26,10 +26,6 @@ def sheet_meta(sheet_meta):
 class TestBaseResourceSheet:
 
     @fixture
-    def request_(self):
-        return testing.DummyRequest()
-
-    @fixture
     def mock_node_unique_references(self):
         from adhocracy_core.schema import UniqueReferences
         from adhocracy_core.schema import SheetReference
