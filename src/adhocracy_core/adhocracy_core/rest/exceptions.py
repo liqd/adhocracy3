@@ -64,8 +64,8 @@ def handle_error_xox_exception(error, request):
     """
     if isinstance(error, JSONHTTPException):
         return error
-    error_dict = error_entry('url', request.method, str(error))._asdict()
-    json_error = JSONHTTPException([error_dict],
+    error_entries = [error_entry('url', request.method, str(error))]
+    json_error = JSONHTTPException(error_entries,
                                    code=error.code,
                                    title=error.title)
     return json_error
@@ -75,13 +75,9 @@ def handle_error_xox_exception(error, request):
     context=colander.Invalid,
     permission=NO_PERMISSION_REQUIRED,
 )
-def handle_error_400_colander_invalid(error, request):
+def handle_error_400_colander_invalid(invalid, request):
     """Return 400 JSON error."""
-    errors = []
-    for path, description in error.asdict().items():
-        error_dict = error_entry('body', path, description)._asdict()
-        errors.append(error_dict)
-    return _JSONError(errors, 400)
+    errors = [error_entry('body', n, d) for n, d in invalid.asdict().items()]
     return JSONHTTPException(errors, code=400, title='Bad Request')
 
 
@@ -91,14 +87,12 @@ def handle_error_400_colander_invalid(error, request):
 )
 def handle_error_400_bad_request(error, request):
     """Return 400 JSON error with filtered error messages."""
-    errors = getattr(request, 'errors', [])  # ease testing
+    error_entries = getattr(request, 'errors', [])  # ease testing
     body = _get_filtered_request_body(request)
-    log_msg = 'Found {0} validation errors in request body: {1}'
-    logger.warning(log_msg.format(len(errors), body))
-    for error_data in errors:
-        logger.warning(' {0}'.format(error_data))
-    return _JSONError(errors, 400)
-    return JSONHTTPException(errors, code=400, title='Bad Request')
+    logger.warn('Found validation errors in request body: {0}\n'.format(body))
+    for error_data in error_entries:
+        logger.warning('Validation Error: {0}\n'.format(error_data))
+    return JSONHTTPException(error_entries, code=400, title='Bad Request')
 
 
 def _get_filtered_request_body(request) -> str:
@@ -178,9 +172,8 @@ def handle_error_400_url_decode_error(error, request):
 
     E.g. "/fooba%E9r/".
     """
-    error_dict = error_entry('url', '', str(error))._asdict()
     error_entries = [error_entry('url', '', str(error))]
-    return JSONHTTPException([error_dict], code=400, title='Bad Request')
+    return JSONHTTPException(error_entries, code=400, title='Bad Request')
 
 
 @view_config(
@@ -189,10 +182,11 @@ def handle_error_400_url_decode_error(error, request):
 )
 def handle_error_500_exception(error, request):
     """Return 500 JSON error."""
-    error_dict = internal_exception_to_dict(error)
     logger.exception('internal')
     description = '{}; time: {}'.format(exception_to_str(error),
-    return JSONHTTPException([error_dict],
+                                        log_compatible_datetime())
+    error_entries = [error_entry('internal', '', description)]
+    return JSONHTTPException(error_entries,
                              code=500,
                              title='Internal Server Error')
 
@@ -216,13 +210,6 @@ def handle_error_410_exception(error, request):
     return error
 
 
-def internal_exception_to_dict(error: Exception) -> dict:
-    """Convert an internal exception into a Colander-style dictionary."""
-    description = '{}; time: {}'.format(exception_to_str(error),
-                                        log_compatible_datetime())
-    return error_entry('internal', '', description)._asdict()
-
-
 @view_config(context=HTTPForbidden,
              permission=NO_PERMISSION_REQUIRED,
              )
@@ -231,7 +218,7 @@ def handle_error_403_exception(error, request):
 
     This overrides the same error handler in :mod:`cornice`.
     """
-    error_dict = error_entry('url', request.method, str(error))._asdict()
+    error_dict = error_entry('url', request.method, str(error))
     return JSONHTTPException([error_dict], code=403, title='Forbidden')
 
 
@@ -243,7 +230,7 @@ def handle_error_404_exception(error, request):
 
     This overrides the same error handler in :mod:`cornice`.
     """
-    error_dict = error_entry('url', request.method, str(error))._asdict()
+    error_dict = error_entry('url', request.method, str(error))
     return JSONHTTPException([error_dict], code=404, title='Not Found')
 
 

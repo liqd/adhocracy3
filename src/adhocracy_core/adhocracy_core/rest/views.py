@@ -56,6 +56,7 @@ from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
+from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
@@ -103,7 +104,7 @@ def validate_post_root_versions(context, request: Request):
         if not IItemVersion.providedBy(root):
             error = 'This resource is not a valid ' \
                     'root version: {}'.format(request.resource_url(root))
-            request.errors.add('body', 'root_versions', error)
+            request.errors.append(error_entry('body', 'root_versions', error))
             continue
         valid_root_versions.append(root)
 
@@ -155,7 +156,8 @@ def validate_user_headers(headers: dict, request: Request):
     """
     if 'X-User-Path' in headers or 'X-User-Token' in headers:
         if get_user(request) is None:
-            request.errors.add('header', 'X-User-Token', 'Invalid user token')
+            error = error_entry('header', 'X-User-Token', 'Invalid user token')
+            request.errors.append(error)
 
 
 def validate_body_or_querystring(body, qs, schema: MappingSchema,
@@ -222,7 +224,7 @@ def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
 def _add_colander_invalid_error_to_request(error: Invalid, request: Request,
                                            location: str):
     for name, msg in error.asdict().items():
-        request.errors.add(location, name, msg)
+        request.errors.append(error_entry(location, name, msg))
 
 
 def _validate_extra_validators(validators: list, context, request: Request):
@@ -880,8 +882,9 @@ def _get_base_ifaces(iface: IInterface, root_iface=Interface) -> [str]:
 
 
 def _add_no_such_user_or_wrong_password_error(request: Request):
-    request.errors.add('body', 'password',
-                       'User doesn\'t exist or password is wrong')
+    error = error_entry('body', 'password',
+                        'User doesn\'t exist or password is wrong')
+    request.errors.append(error)
 
 
 def validate_login_name(context, request: Request):
@@ -949,7 +952,8 @@ def validate_account_active(context, request: Request):
     if user is None or request.errors:
         return
     if not user.active:
-        request.errors.add('body', 'name', 'User account not yet activated')
+        error = error_entry('body', 'name', 'User account not yet activated')
+        request.errors.append(error)
 
 
 @view_defaults(
@@ -1028,8 +1032,9 @@ def validate_activation_path(context, request: Request):
     user = locator.get_user_by_activation_path(path)
     registry = request.registry
     if user is None or _activation_time_window_has_expired(user, registry):
-        request.errors.add('body', 'path',
-                           'Unknown or expired activation path')
+        error = error_entry('body', 'path',
+                            'Unknown or expired activation path')
+        request.errors.append(error)
     else:
         user.activate()
         request.validated['user'] = user

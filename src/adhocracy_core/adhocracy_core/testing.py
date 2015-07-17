@@ -9,7 +9,6 @@ import subprocess
 import time
 
 from cornice.util import extract_json_data
-from cornice.errors import Errors
 from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.traversal import resource_path_tuple
@@ -210,7 +209,7 @@ class CorniceDummyRequest(testing.DummyRequest):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.validated = {}
-        self.errors = Errors(self)
+        self.errors = []
         self.content_type = 'application/json'
         deserializer = {'application/json': extract_json_data}
         self.registry.cornice_deserializers = deserializer

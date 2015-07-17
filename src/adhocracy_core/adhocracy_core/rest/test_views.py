@@ -131,13 +131,14 @@ class TestValidateRequest:
 
     def test_non_valid_with_schema_wrong_data(self, context, myrequest):
         from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
         myrequest.body = '{"count": "wrong_value"}'
         myrequest.method = 'POST'
         with pytest.raises(HTTPBadRequest):
             self.make_one(context, myrequest, schema=CountSchema())
-        assert myrequest.errors == [{'location': 'body',
-                                   'name': 'count',
-                                   'description': '"wrong_value" is not a number'}]
+        assert myrequest.errors == [error_entry('body',
+                                                'count',
+                                                '"wrong_value" is not a number')]
 
     def test_non_valid_with_schema_wrong_data_cleanup(self, context,
                                                       myrequest):
@@ -1169,7 +1170,7 @@ class TestValidateLoginEmail:
         mock_user_locator.get_user_by_email.return_value = None
         self.call_fut(context, request)
         assert 'user' not in request.validated
-        assert 'User doesn\'t exist' in request.errors[0]['description']
+        assert 'User doesn\'t exist' in request.errors[0].description
 
 
 class TestValidateLoginNameUnitTest:
@@ -1187,7 +1188,7 @@ class TestValidateLoginNameUnitTest:
     def test_invalid(self, request, context, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
         self.call_fut(context, request)
-        assert 'User doesn\'t exist' in request.errors[0]['description']
+        assert 'User doesn\'t exist' in request.errors[0].description
 
     def test_valid(self, request, context, mock_user_locator):
         user = testing.DummyResource()
@@ -1221,13 +1222,13 @@ class TestValidateLoginPasswordUnitTest:
         sheet = mock_password_sheet
         sheet.check_plaintext_password.return_value = False
         self.call_fut(context, request)
-        assert 'password is wrong' in request.errors[0]['description']
+        assert 'password is wrong' in request.errors[0].description
 
     def test_invalid_with_ValueError(self, request, context, mock_password_sheet):
         sheet = mock_password_sheet
         sheet.check_plaintext_password.side_effect = ValueError
         self.call_fut(context, request)
-        assert 'password is wrong' in request.errors[0]['description']
+        assert 'password is wrong' in request.errors[0].description
 
     def test_user_is_None(self, request, context):
         request.validated['user'] = None
@@ -1256,12 +1257,12 @@ class TestValidateAccountActiveUnitTest:
         user = testing.DummyResource(active=False)
         request.validated['user'] = user
         self.call_fut(context, request)
-        assert 'not yet activated' in request.errors[0]['description']
+        assert 'not yet activated' in request.errors[0].description
 
     def test_no_error_added_after_other_errors(self, request, context):
         user = testing.DummyResource(active=False)
         request.validated['user'] = user
-        request.errors.add('blah', 'blah', 'blah')
+        request.errors.append(('blah', 'blah', 'blah'))
         assert len(request.errors) == 1
         self.call_fut(context, request)
         assert len(request.errors) == 1
@@ -1364,8 +1365,7 @@ class TestValidateActivationPathUnitTest:
     def test_not_found(self, _request, context, mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = None
         self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0][
-            'description']
+        assert 'Unknown or expired activation path' == _request.errors[0].description
 
     def test_found_but_expired(self, _request, user_with_metadata, context,
                                mock_user_locator):
@@ -1381,8 +1381,7 @@ class TestValidateActivationPathUnitTest:
             year=2010, month=1, day=1, tzinfo=timezone.utc)
         metadata.set(appstruct, omit_readonly=False)
         self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0][
-            'description']
+        assert 'Unknown or expired activation path' == _request.errors[0].description
 
 
 class TestActivateAccountView:
