@@ -211,8 +211,7 @@ class CorniceDummyRequest(testing.DummyRequest):
         self.validated = {}
         self.errors = []
         self.content_type = 'application/json'
-        deserializer = {'application/json': extract_json_data}
-        self.registry.cornice_deserializers = deserializer
+        self.deserializer = extract_json_data
 
     def authenticated_userid(self):
         return None

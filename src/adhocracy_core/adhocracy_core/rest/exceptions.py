@@ -141,7 +141,6 @@ def _get_json_body_dict(request: Request) -> dict:
 @view_config(
     context=AutoUpdateNoForkAllowedError,
     permission=NO_PERMISSION_REQUIRED,
-    http_cache=0,
 )
 def handle_error_400_auto_update_no_fork_allowed(error, request):
     """Return 400 JSON error for the internal "No Fork allowed" error.
