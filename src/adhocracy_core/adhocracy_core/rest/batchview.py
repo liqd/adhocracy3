@@ -54,7 +54,7 @@ class BatchView(RESTView):
 
     @view_config(name='batch',
                  request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         response_list = []

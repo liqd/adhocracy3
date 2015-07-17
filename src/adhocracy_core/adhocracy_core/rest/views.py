@@ -452,7 +452,7 @@ class SimpleRESTView(ResourceRESTView):
 
     @view_config(request_method='PUT',
                  permission='edit_some',
-                 content_type='application/json')
+                 accept='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
         sheets = self.registry.get_sheets_edit(self.context, self.request)
@@ -517,7 +517,7 @@ class PoolRESTView(SimpleRESTView):
 
     @view_config(request_method='POST',
                  permission='create',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         iresource = self.request.validated['content_type']
@@ -534,7 +534,7 @@ class PoolRESTView(SimpleRESTView):
 
     @view_config(request_method='PUT',
                  permission='edit_some',
-                 content_type='application/json')
+                 accept='application/json')
     def put(self) -> dict:
         return super().put()
 
@@ -565,7 +565,7 @@ class ItemRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self):
         """Create new resource and get response data.
 
@@ -621,7 +621,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self):
         return super().post()
 
@@ -651,7 +651,7 @@ class UsersRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create_user',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self):
         return super().post()
 
@@ -666,7 +666,7 @@ class AssetsServiceRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create_asset',
-                 content_type='multipart/form-data')
+                 accept='multipart/form-data')
     def post(self):
         return super().post()
 
@@ -681,7 +681,7 @@ class AssetRESTView(SimpleRESTView):
 
     @view_config(request_method='PUT',
                  permission='create_asset',
-                 content_type='multipart/form-data')
+                 accept='multipart/form-data')
     def put(self) -> dict:
         result = super().put()
         validate_and_complete_asset(self.context, self.request.registry)
@@ -990,7 +990,7 @@ class LoginUsernameView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         return _login_user(self.request)
@@ -1028,7 +1028,7 @@ class LoginEmailView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         return _login_user(self.request)
@@ -1082,7 +1082,7 @@ class ActivateAccountView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Activate a user account and log the user in."""
         return _login_user(self.request)
@@ -1105,7 +1105,7 @@ class ReportAbuseView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Receive and process an abuse complaint."""
         messenger = self.request.registry.messenger
@@ -1139,7 +1139,7 @@ class MessageUserView(RESTView):
 
     @view_config(request_method='POST',
                  permission='message_to_user',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Send a message to another user."""
         messenger = self.request.registry.messenger
@@ -1168,7 +1168,7 @@ class CreatePasswordResetView(RESTView):
         return {'POST': {}}
 
     @view_config(request_method='POST',
-                 content_type='application/json'
+                 accept='application/json'
                  )
     def post(self) -> dict:
         """Create as password reset resource."""
@@ -1197,7 +1197,7 @@ class PasswordResetView(RESTView):
         return {'POST': {}}
 
     @view_config(request_method='POST',
-                 content_type='application/json',
+                 accept='application/json',
                  )
     def post(self) -> dict:
         """Reset password."""
