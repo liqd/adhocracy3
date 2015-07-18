@@ -1571,17 +1571,6 @@ class TestAssetDownloadRESTView:
         assert inst.get() == mock_response
 
 
-    def test_authentication_sheet_password_is_hidden(self, cornice_request):
-        import json
-        from adhocracy_core.rest.views import _show_request_body
-        from adhocracy_core.sheets.principal import IPasswordAuthentication
-        cornice_request.body = json.dumps(
-            {'data': {IPasswordAuthentication.__identifier__:
-                          {'password': 'bar'}}})
-        result = _show_request_body(cornice_request)
-        assert '"<hidden>"' in result
-        assert 'bar' not in result
-
 class TestCreatePasswordResetView:
 
     @fixture
