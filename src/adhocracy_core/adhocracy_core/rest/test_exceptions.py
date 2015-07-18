@@ -42,7 +42,7 @@ class TestJSONHTTPException:
             assert '{"data": "stuff"}' in log_message
 
     def test_log_abbrivated_request_body_if_gt_5000(self, request_):
-        request_.body = '{"data": "' + 'h' * 5090 + '"}'
+        request_.body = '{"data": "' + 'h' * 5100 + '"}'
         with LogCapture() as log:
             self.make_one([], request_)
             log_message = str(log)
@@ -63,14 +63,14 @@ class TestJSONHTTPException:
             log_message = str(log)
             assert 'wrong' not in log_message
 
-    def test_log_abbreviated_formdata_body_if_gt_210(self, request_):
+    def test_log_abbreviated_formdata_body_if_gt_230(self, request_):
         request_.content_type = 'multipart/form-data'
-        request_.body = "h" * 210
+        request_.body = "h" * 230
         with LogCapture() as log:
             self.make_one([], request_)
             log_message = str(log)
             assert len(log_message) < len(request_.body)
-            assert log_message.endswith('h...')
+            assert 'h...' in log_message
 
     def test_log_formdata_body(self, request_):
         request_.content_type = 'multipart/form-data'
@@ -78,7 +78,7 @@ class TestJSONHTTPException:
         with LogCapture() as log:
             self.make_one([], request_)
             log_message = str(log)
-            assert log_message.endswith('h')
+            assert request_.body in log_message
 
     def test_log_but_hide_login_password_in_body(self, request_):
         import json
@@ -103,6 +103,20 @@ class TestJSONHTTPException:
             log_message = str(log)
             assert 'secret' not in log_message
             assert '<hidden>' in log_message
+
+    def test_log_headers(self, request_):
+        request_.headers['X'] = 1
+        with LogCapture() as log:
+            self.make_one([], request_)
+            log_message = str(log)
+            assert "('X', 1)" in log_message
+
+    def test_log_but_hide_x_user_token_in_headers(self, request_):
+        request_.headers['X-User-Token'] = 1
+        with LogCapture() as log:
+            self.make_one([], request_)
+            log_message = str(log)
+            assert "('X-User-Token': 1)" not in log_message
 
 
 class TestHandleErrorX0XException:

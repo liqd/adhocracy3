@@ -56,10 +56,11 @@ class JSONHTTPClientError(HTTPClientError):
         self.json_body = {'status': 'error',
                           'errors': [e._asdict() for e in error_entries]}
         body = _get_filtered_request_body(request)
-        logger.warn('{0} {1} error in request with\n body: '
-                    '{2}'.format(code, title, body))
+        headers = _get_filtered_request_headers(request)
+        logger.warn('{0} {1} error in request with headers: '
+                    '{2}\nbody: {3}'.format(code, title, headers, body))
         for error in error_entries:
-            logger.warning('Validation Error: {0}\n'.format(error._asdict()))
+            logger.warning('Error: {0}\n'.format(error._asdict()))
 
 
 @view_config(
@@ -170,6 +171,14 @@ def _get_json_body_dict(request: Request) -> dict:
         return body_json
     else:
         return {}
+
+
+def _get_filtered_request_headers(request) -> []:
+    """Filter secret parts of the request headers."""
+    if request is None:
+        return ''
+    request.headers.pop('X-User-Token', None)
+    return [x for x in request.headers.items()]
 
 
 @view_config(
