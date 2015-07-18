@@ -7,7 +7,7 @@ from pyramid.httpexceptions import HTTPClientError
 from adhocracy_core.rest.exceptions import handle_error_40x_exception
 from adhocracy_core.rest.exceptions import handle_error_500_exception
 from adhocracy_core.rest.exceptions import JSONHTTPClientError
-from adhocracy_core.rest.exceptions import _get_json_body_dict
+from adhocracy_core.rest.exceptions import get_json_body
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -62,19 +62,23 @@ class BatchView(RESTView):
         response_list = []
         path_map = {}
         set_batchmode(self.request)
-        for item in self.request.validated:
+        for pos, item in enumerate(self.request.validated):
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
             if not item_response.was_successful():
-                err_msg = 'Exception in sub request {0} {1}: {2} {3}'
-                logger.error(err_msg.format(item['method'],
-                                            item['path'],
-                                            item_response.body,
-                                            item_response.code,
-                                            ))
-                err = JSONHTTPClientError([], code=item_response.code)
-                err.text = dumps(self._response_list_to_json(response_list))
-                raise err
+                error = JSONHTTPClientError([],
+                                            code=item_response.code,
+                                            request=self.request)
+                # TODO: the error response lists updated resources
+                json_body = error.json
+                response_list_json = self._response_list_to_json(response_list)
+                json_body.update(response_list_json)
+                error.text = dumps(json_body)
+                msg = 'Failing batch request item position {0} request {1} {2}'
+                logger.warn(msg.format(pos,
+                                       item['method'],
+                                       item['path']))
+                raise error
         response = self._response_list_to_json(response_list)
         return response
 
@@ -185,7 +189,7 @@ class BatchView(RESTView):
             error_view = self._get_error_view(err)
             error = error_view(err, subrequest)
             status_code = error.code
-            body = _get_json_body_dict(error)
+            body = get_json_body(error)
         return BatchItemResponse(status_code, body)
 
     def _get_error_view(self, error: Exception) -> callable:

@@ -210,6 +210,7 @@ class DummyRequest(testing.DummyRequest):
         self.validated = {}
         self.errors = []
         self.content_type = 'application/json'
+        self.text = ''
 
     def authenticated_userid(self):
         return None

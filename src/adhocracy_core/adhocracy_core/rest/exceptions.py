@@ -55,12 +55,17 @@ class JSONHTTPClientError(HTTPClientError):
         self.content_type = 'application/json'
         self.json_body = {'status': 'error',
                           'errors': [e._asdict() for e in error_entries]}
-        body = _get_filtered_request_body(request)
-        headers = _get_filtered_request_headers(request)
-        logger.warn('{0} {1} error in request with headers: '
-                    '{2}\nbody: {3}'.format(code, title, headers, body))
+        if request is None:
+            body = headers = url = method = ''
+        else:
+            body = _get_filtered_request_body(request)
+            headers = _get_filtered_request_headers(request)
+            url = request.url
+            method = request.method
+        msg = '\nException {0} in request {1} {2}.\nheaders: {3}\nbody: {4}'
+        logger.warn(msg.format(code, method, url, headers, body))
         for error in error_entries:
-            logger.warning('Error: {0}\n'.format(error._asdict()))
+            logger.warning(error)
 
 
 @view_config(
@@ -144,7 +149,9 @@ def _get_filtered_request_body(request) -> str:
     if request.content_type == 'multipart/form-data':
         filtered_body = _truncate(filtered_body, 120)
     else:
-        json_body = _get_json_body_dict(request)
+        json_body = get_json_body(request)
+        if not isinstance(json_body, dict):
+            return request.text
         if 'password' in json_body:
             json_body['password'] = '<hidden>'
         password_sheet = IPasswordAuthentication.__identifier__
@@ -161,16 +168,14 @@ def _truncate(text: str, max_length: int) -> str:
         return text
 
 
-def _get_json_body_dict(request: Request) -> dict:
+def get_json_body(request: Request) -> object:
+    """Return json body of `request`, defaults to empty dict."""
     body_json = {}
     try:
         body_json = request.json_body
     except (ValueError, TypeError):
         pass
-    if isinstance(body_json, dict):
-        return body_json
-    else:
-        return {}
+    return body_json
 
 
 def _get_filtered_request_headers(request) -> []:
