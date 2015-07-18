@@ -4,6 +4,7 @@ from logging import getLogger
 from pyramid.httpexceptions import HTTPException
 from pyramid.httpexceptions import HTTPClientError
 
+from adhocracy_core.rest.exceptions import handle_error_x0x_exception
 from adhocracy_core.rest.exceptions import handle_error_40x_exception
 from adhocracy_core.rest.exceptions import handle_error_500_exception
 from adhocracy_core.rest.exceptions import JSONHTTPClientError
@@ -194,7 +195,7 @@ class BatchView(RESTView):
 
     def _get_error_view(self, error: Exception) -> callable:
         if isinstance(error, HTTPException):
-            error_view = lambda e, r: error
+            error_view = handle_error_x0x_exception
         else:
             error_view = handle_error_500_exception
         if isinstance(error, HTTPClientError):
