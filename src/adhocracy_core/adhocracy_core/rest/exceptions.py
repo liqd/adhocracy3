@@ -56,7 +56,8 @@ class JSONHTTPClientError(HTTPClientError):
         self.json_body = {'status': 'error',
                           'errors': [e._asdict() for e in error_entries]}
         body = _get_filtered_request_body(request)
-        logger.warn('Found errors in request with body: {0}\n'.format(body))
+        logger.warn('{0} {1} error in request with\n body: '
+                    '{2}'.format(code, title, body))
         for error in error_entries:
             logger.warning('Validation Error: {0}\n'.format(error._asdict()))
 
