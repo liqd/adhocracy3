@@ -14,6 +14,7 @@ from pyramid.traversal import resource_path_tuple
 from pyramid.util import DottedNameResolver
 from pytest import fixture
 from substanced.objectmap import find_objectmap
+from testfixtures import LogCapture
 from ZODB import FileStorage
 from webtest import TestApp
 from webtest import TestResponse
@@ -218,6 +219,17 @@ class DummyRequest(testing.DummyRequest):
     @property
     def json_body(self):
         return json.loads(self.body)
+
+
+@fixture
+def log(request) -> LogCapture:
+    """Return object capturing all log messages."""
+    log = LogCapture()
+
+    def fin():
+        log.uninstall()
+    request.addfinalizer(fin)
+    return log
 
 
 @fixture

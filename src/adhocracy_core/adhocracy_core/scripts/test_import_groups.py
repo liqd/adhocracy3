@@ -1,7 +1,6 @@
 from substanced.util import find_service
 from pytest import fixture
 from pytest import mark
-from testfixtures import logcapture
 from adhocracy_core.resources.root import IRootPool
 from tempfile import mkstemp
 import os
@@ -11,8 +10,7 @@ import json
 @mark.usefixtures('integration')
 class TestImportGroups:
 
-    @logcapture.log_capture
-    def test_import_groups_create(self, registry):
+    def test_import_groups_create(self, registry, log):
         from adhocracy_core.scripts.import_groups import _import_groups
 
         (self._tempfd, filename) = mkstemp()
@@ -33,8 +31,7 @@ class TestImportGroups:
         assert reviewers is not None
         assert reviewers.roles == ['annotator']
 
-    @logcapture.log_capture
-    def test_import_groups_update(self, registry):
+    def test_import_groups_update(self, registry, log):
         from adhocracy_core.scripts.import_groups import _import_groups
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:

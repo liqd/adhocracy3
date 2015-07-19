@@ -1,6 +1,5 @@
 from pyramid import testing
 from pytest import fixture
-from testfixtures import LogCapture
 import colander
 
 
@@ -34,85 +33,74 @@ class TestJSONHTTPException:
                                              'name': 'a',
                                              'description': 'b'}]
 
-    def test_log_request_body_json_dict(self, request_):
+    def test_log_request_body_json_dict(self, request_, log):
         request_.body = '{"data": "stuff"}'
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert '{"data": "stuff"}' in str(log)
+        self.make_one([], request_)
+        assert '{"data": "stuff"}' in str(log)
 
-    def test_log_request_body_json_list(self, request_):
+    def test_log_request_body_json_list(self, request_, log):
         request_.body = '[]'
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert '[]' in str(log)
+        self.make_one([], request_)
+        assert '[]' in str(log)
 
-    def test_log_ignore_if_request_body_json_other(self, request_):
+    def test_log_ignore_if_request_body_json_other(self, request_, log):
         request_.body = b'None'
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert 'None' not in str(log)
+        self.make_one([], request_)
+        assert 'None' not in str(log)
 
-    def test_log_abbrivated_request_body_if_gt_5000(self, request_):
+    def test_log_abbrivated_request_body_if_gt_5000(self, request_, log):
         request_.body = '{"data": "' + 'h' * 5110 + '"}'
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert len(str(log)) < len(request_.body)
-            assert '...' in str(log)
+        self.make_one([], request_)
+        assert len(str(log)) < len(request_.body)
+        assert '...' in str(log)
 
-    def test_log_ignore_if_request_body_is_not_json(self, request_):
+    def test_log_ignore_if_request_body_is_not_json(self, request_, log):
         request_.body = b'wrong'
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert 'wrong' not in str(log)
+        self.make_one([], request_)
+        assert 'wrong' not in str(log)
 
-    def test_log_formdata_body(self, request_):
+    def test_log_formdata_body(self, request_, log):
         request_.content_type = 'multipart/form-data'
         request_.body = "h" * 120
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert request_.body in str(log)
+        self.make_one([], request_)
+        assert request_.body in str(log)
 
-    def test_log_abbreviated_formdata_body_if_gt_240(self, request_):
+    def test_log_abbreviated_formdata_body_if_gt_240(self, request_, log):
         request_.content_type = 'multipart/form-data'
         request_.body = "h" * 240
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert len(str(log)) < len(request_.body)
-            assert 'h...' in str(log)
+        self.make_one([], request_)
+        assert len(str(log)) < len(request_.body)
+        assert 'h...' in str(log)
 
-    def test_log_but_hide_login_password_in_body(self, request_):
+    def test_log_but_hide_login_password_in_body(self, request_, log):
         import json
         from .views import POSTLoginUsernameRequestSchema
         appstruct = POSTLoginUsernameRequestSchema().serialize(
             {'password': 'secret', 'name': 'name'})
         request_.body = json.dumps(appstruct)
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert 'secret' not in str(log)
-            assert '<hidden>' in str(log)
+        self.make_one([], request_)
+        assert 'secret' not in str(log)
+        assert '<hidden>' in str(log)
 
-    def test_log_but_hide_user_passwod_sheet_password_in_body(self, request_):
+    def test_log_but_hide_user_passwod_sheet_password_in_body(self, request_, log):
         import json
         from adhocracy_core.sheets.principal import IPasswordAuthentication
         appstruct = {'data': {IPasswordAuthentication.__identifier__:
                                   {'password': 'secret'}}}
         request_.body = json.dumps(appstruct)
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert 'secret' not in str(log)
-            assert '<hidden>' in str(log)
+        self.make_one([], request_)
+        assert 'secret' not in str(log)
+        assert '<hidden>' in str(log)
 
-    def test_log_headers(self, request_):
+    def test_log_headers(self, request_, log):
         request_.headers['X'] = 1
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert "('X', 1)" in str(log)
+        self.make_one([], request_)
+        assert "('X', 1)" in str(log)
 
-    def test_log_but_hide_x_user_token_in_headers(self, request_):
+    def test_log_but_hide_x_user_token_in_headers(self, request_, log):
         request_.headers['X-User-Token'] = 1
-        with LogCapture() as log:
-            self.make_one([], request_)
-            assert "('X-User-Token': 1)" not in str(log)
+        self.make_one([], request_)
+        assert "('X-User-Token': 1)" not in str(log)
 
 
 class TestHandleErrorX0XException:
@@ -121,7 +109,7 @@ class TestHandleErrorX0XException:
         from adhocracy_core.rest.exceptions import handle_error_x0x_exception
         return handle_error_x0x_exception(error, request)
 
-    def test_forwart_http_exception(self, request_):
+    def test_forward_http_exception(self, request_):
         from pyramid.httpexceptions import HTTPException
         error = HTTPException(status_code=204)
         result_error = self.call_fut(error, request_)
@@ -210,11 +198,10 @@ class TestHandleError500Exception:
         from adhocracy_core.rest.exceptions import handle_error_500_exception
         return handle_error_500_exception(error, request_)
 
-    def test_render_exception_error(self, request_):
+    def test_render_exception_error(self, request_, log):
         import json
-        with LogCapture() as log:
-            error = Exception('arg1')
-            inst = self.make_one(error, request_)
+        error = Exception('arg1')
+        inst = self.make_one(error, request_)
         assert inst.status == '500 Internal Server Error'
         message = json.loads(inst.body.decode())
         assert message['status'] == 'error'

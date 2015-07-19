@@ -1,7 +1,6 @@
 from pytest import fixture
 from pytest import mark
 from tempfile import mkstemp
-from testfixtures import logcapture
 import os
 import json
 import pytest
@@ -25,8 +24,7 @@ def principals(pool_with_catalogs, registry):
 @mark.usefixtures('integration')
 class TestImportResources:
 
-    @logcapture.log_capture
-    def test_import_resources(self, registry):
+    def test_import_resources(self, registry, log):
         from adhocracy_core.scripts.import_resources import _import_resources
 
         (self._tempfd, filename) = mkstemp()
@@ -44,8 +42,7 @@ class TestImportResources:
         assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
 
 
-    @logcapture.log_capture
-    def test_import_resources_invalid_data(self, registry):
+    def test_import_resources_invalid_data(self, registry, log):
         from adhocracy_core.scripts.import_resources import _import_resources
         import colander
 
@@ -66,8 +63,7 @@ class TestImportResources:
             _import_resources(root, registry, filename)
 
 
-    @logcapture.log_capture
-    def test_import_resources_already_exists(self, registry):
+    def test_import_resources_already_exists(self, registry, log):
         from adhocracy_core.scripts.import_resources import _import_resources
 
         (self._tempfd, filename) = mkstemp()
@@ -86,8 +82,8 @@ class TestImportResources:
         assert IOrganisation.providedBy(root['alt-treptow'])
         assert get_sheet_field(root['alt-treptow'], IName, 'name') == 'alt-treptow'
 
-    @logcapture.log_capture
-    def test_import_resources_already_oneleveldeep(self, registry, principals):
+    def test_import_resources_already_oneleveldeep(self, registry, principals,
+                                                   log):
         from adhocracy_core.scripts.import_resources import _import_resources
 
         (self._tempfd, filename) = mkstemp()
@@ -107,8 +103,7 @@ class TestImportResources:
         _import_resources(root, registry, filename)
         assert IOrganisation.providedBy(root['orga']['alt-treptow'])
 
-    @logcapture.log_capture
-    def test_import_resources_set_creator(self, registry):
+    def test_import_resources_set_creator(self, registry, log):
         from adhocracy_core.scripts.import_resources import _import_resources
 
         (self._tempfd, filename) = mkstemp()
@@ -127,8 +122,7 @@ class TestImportResources:
         god = root['principals']['users'].values()[0]
         assert get_sheet_field(root['alt-treptow'], IMetadata, 'creator') == god
 
-    @logcapture.log_capture
-    def test_import_resource_create_group(self, registry):
+    def test_import_resource_create_group(self, registry, log):
         from adhocracy_core.scripts.import_resources import _import_resources
 
         (self._tempfd, filename) = mkstemp()
@@ -147,8 +141,7 @@ class TestImportResources:
         root = registry.content.create(IRootPool.__identifier__)
         _import_resources(root, registry, filename)
 
-    @logcapture.log_capture
-    def test_get_expected_path(self):
+    def test_get_expected_path(self, log):
         from adhocracy_core.scripts.import_resources import _get_expected_path
 
         resource_info = {"path": "/",
@@ -156,8 +149,7 @@ class TestImportResources:
                                   {"name": "alt-treptow"}}}
         assert _get_expected_path(resource_info) == '/alt-treptow'
 
-    @logcapture.log_capture
-    def test_get_expected_path_no_name_noname(self):
+    def test_get_expected_path_no_name_noname(self, log):
         from adhocracy_core.scripts.import_resources import _get_expected_path
 
         resource_info = {"path": "/",
