@@ -143,8 +143,6 @@ def _get_filtered_request_body(request) -> str:
     In case of JSON request, the contents of the password field will be hidden.
     Only the 5000 first characters are shown.
     """
-    if request is None:
-        return ''
     filtered_body = request.body
     if request.content_type == 'multipart/form-data':
         filtered_body = _truncate(filtered_body, 120)
@@ -180,8 +178,6 @@ def get_json_body(request: Request) -> object:
 
 def _get_filtered_request_headers(request) -> []:
     """Filter secret parts of the request headers."""
-    if request is None:
-        return ''
     request.headers.pop('X-User-Token', None)
     return [x for x in request.headers.items()]
 

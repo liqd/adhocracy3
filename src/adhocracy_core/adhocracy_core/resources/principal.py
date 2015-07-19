@@ -229,7 +229,7 @@ class PasswordReset(Base):
         password_sheet = get_sheet(
             user, adhocracy_core.sheets.principal.IPasswordAuthentication)
         password_sheet.set({'password': password}, send_event=False)
-        if not user.active:
+        if not user.active:  # pragma: no cover
             user.activate()
         del self.__parent__[self.__name__]
 

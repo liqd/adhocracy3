@@ -49,29 +49,29 @@ def mock_password_sheet(registry_with_content, sheet_meta):
 
 class TestValidateRequest:
 
-    def make_one(self, context, request_, **kw):
+    def call_fut(self, context, request_, **kw):
         from adhocracy_core.rest.views import validate_request_data
         validate_request_data(context, request_, **kw)
 
     def test_valid_wrong_method_with_data(self, context, request_):
         request_.body = '{"wilddata": "1"}'
         request_.method = 'wrong_method'
-        self.make_one(context, request_)
+        self.call_fut(context, request_)
         assert request_.validated == {}
 
     def test_valid_no_schema_with_data(self, context, request_):
         request_.body = '{"wilddata": "1"}'
-        self.make_one(context, request_)
+        self.call_fut(context, request_)
         assert request_.validated == {}
 
     def test_valid_with_schema_no_data(self, context, request_):
         request_.body = ''
-        self.make_one(context, request_, schema=CountSchema())
+        self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {}
 
     def test_valid_with_schema_no_data_empty_dict(self, context, request_):
         request_.body = '{}'
-        self.make_one(context, request_, schema=CountSchema())
+        self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {}
 
     def test_valid_with_schema_no_data_and_defaults(self, context, request_):
@@ -79,13 +79,13 @@ class TestValidateRequest:
             count = colander.SchemaNode(colander.Int(),
                                         missing=1)
         request_.body = ''
-        self.make_one(context, request_, schema=DefaultDataSchema())
+        self.call_fut(context, request_, schema=DefaultDataSchema())
         assert request_.validated == {'count': 1}
 
     def test_valid_with_schema_with_data(self, context, request_):
         request_.body = '{"count": "1"}'
         request_.method = 'PUT'
-        self.make_one(context, request_, schema=CountSchema())
+        self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {'count': 1}
 
     def test_valid_with_schema_with_data_in_querystring(self, context,
@@ -93,7 +93,7 @@ class TestValidateRequest:
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int())
         request_.GET = {'count': 1}
-        self.make_one(context, request_, schema=QueryStringSchema())
+        self.call_fut(context, request_, schema=QueryStringSchema())
         assert request_.validated == {'count': 1}
 
     def test_valid_with_schema_with_extra_fields_in_querystring_discarded(
@@ -101,7 +101,7 @@ class TestValidateRequest:
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int())
         request_.GET = {'count': 1, 'extraflag': 'extra value'}
-        self.make_one(context, request_, schema=QueryStringSchema())
+        self.call_fut(context, request_, schema=QueryStringSchema())
         assert request_.validated == {'count': 1}
 
     def test_valid_with_schema_with_extra_fields_in_querystring_preserved(
@@ -114,7 +114,7 @@ class TestValidateRequest:
             count = colander.SchemaNode(colander.Int())
 
         request_.GET = {'count': 1, 'extraflag': 'extra value'}
-        self.make_one(context, request_,
+        self.call_fut(context, request_,
                        schema=PreservingQueryStringSchema())
         assert request_.validated == {'count': 1, 'extraflag': 'extra value'}
 
@@ -122,7 +122,7 @@ class TestValidateRequest:
         request_.content_type = 'multipart/form-data'
         request_.method = 'POST'
         request_.POST['count'] = '1'
-        self.make_one(context, request_, schema=CountSchema())
+        self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {'count': 1}
 
     def test_non_valid_with_schema_wrong_data(self, context, request_):
@@ -131,10 +131,21 @@ class TestValidateRequest:
         request_.body = '{"count": "wrong_value"}'
         request_.method = 'POST'
         with pytest.raises(HTTPBadRequest):
-            self.make_one(context, request_, schema=CountSchema())
+            self.call_fut(context, request_, schema=CountSchema())
         assert request_.errors == [error_entry('body',
                                                 'count',
                                                 '"wrong_value" is not a number')]
+
+    def test_non_valid_with_non_json_data(self, context, request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
+        request_.body = b'WRONG'
+        request_.method = 'POST'
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema=CountSchema())
+        assert request_.errors == [error_entry('body',
+                                                None,
+                                                'Invalid JSON request body')]
 
     def test_non_valid_with_schema_wrong_data_cleanup(self, context,
                                                       request_):
@@ -143,13 +154,13 @@ class TestValidateRequest:
         request_.body = '{"count": "wrong_value"}'
         request_.method = 'POST'
         with pytest.raises(HTTPBadRequest):
-            self.make_one(context, request_, schema=CountSchema())
+            self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {}
 
     def test_valid_with_extra_validator(self, context, request_):
         def validator1(context, request_):
             request_.validated = {"validator": "1"}
-        self.make_one(context, request_, extra_validators=[validator1])
+        self.call_fut(context, request_, extra_validators=[validator1])
         assert request_.validated == {"validator": "1"}
 
     def test_valid_with_extra_validator_and_wrong_schema_data(self, context,
@@ -160,7 +171,7 @@ class TestValidateRequest:
         request_.body = '{"count": "wrong"}'
         request_.method = 'POST'
         with pytest.raises(HTTPBadRequest):
-            self.make_one(context, request_, schema=CountSchema(),
+            self.call_fut(context, request_, schema=CountSchema(),
                            extra_validators=[validator1])
         assert hasattr(request_, '_validator_called') is False
 
@@ -170,14 +181,14 @@ class TestValidateRequest:
 
         request_.body = '["alpha", "beta", "gamma"]'
         request_.method = 'POST'
-        self.make_one(context, request_, schema=TestListSchema())
+        self.call_fut(context, request_, schema=TestListSchema())
         assert request_.validated == ['alpha', 'beta', 'gamma']
 
     def test_valid_with_sequence_schema_in_querystring(self, context,
                                                        request_):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
-        self.make_one(context, request_, schema=TestListSchema())
+        self.call_fut(context, request_, schema=TestListSchema())
         # since this doesn't make much sense, the validator is just a no-op
         assert request_.validated == {}
 
@@ -189,7 +200,7 @@ class TestValidateRequest:
         request_.body = '["alpha", "beta", "gamma"]'
         request_.method = 'POST'
         with pytest.raises(colander.Invalid):
-            self.make_one(context, request_, schema=TestListSchema())
+            self.call_fut(context, request_, schema=TestListSchema())
         assert request_.validated == {}
 
     def test_invalid_with_sequence_schema(self, context, request_):
@@ -200,14 +211,14 @@ class TestValidateRequest:
         request_.body = '[1, 2, "three"]'
         request_.method = 'POST'
         with pytest.raises(HTTPBadRequest):
-            self.make_one(context, request_, schema=TestListSchema())
+            self.call_fut(context, request_, schema=TestListSchema())
         assert request_.validated == {}
 
     def test_invalid_with_not_sequence_and_not_mapping_schema(self, context,
                                                               request_):
         schema = colander.SchemaNode(colander.Int())
         with pytest.raises(Exception):
-            self.make_one(context, request_, schema=schema)
+            self.call_fut(context, request_, schema=schema)
 
     def test_valid_user_headers_and_authenticated_user(
             self, context, request_, monkeypatch):
@@ -216,7 +227,7 @@ class TestValidateRequest:
         request_.headers['X-User-Path'] = 2
         request_.headers['X-User-Token'] = 3
         monkeypatch.setattr(views, 'get_user', Mock(return_value='user'))
-        self.make_one(context, request_)
+        self.call_fut(context, request_)
         assert request_.validated == {}
 
     def test_invalid_user_headers_but_no_authenticated_user(self, context,
@@ -225,7 +236,7 @@ class TestValidateRequest:
         request_.headers['X-User-Path'] = 2
         request_.headers['X-User-Token'] = 3
         with pytest.raises(HTTPBadRequest):
-            self.make_one(context, request_)
+            self.call_fut(context, request_)
         assert request_.validated == {}
 
 
