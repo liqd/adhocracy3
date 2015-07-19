@@ -58,7 +58,8 @@ def _import_users(context: IResource, registry: Registry, filename: str):
     users = find_service(context, 'principals', 'users')
     groups = find_service(context, 'principals', 'groups')
     for user_info in users_info:
-        user_by_name, user_by_email = _locate_user(user_info, context, registry)
+        user_by_name, user_by_email = _locate_user(user_info, context,
+                                                   registry)
         if user_by_name or user_by_email:
             logger.info('Updating user {} ({})'.format(user_info['name'],
                                                        user_info['email']))
@@ -97,15 +98,21 @@ def _locate_user(user_info, context, registry):
     return (user_by_name, user_by_email)
 
 
-def _update_user(user_by_name: IUser, user_by_email: IUser, user_info: dict, groups: IResource):
-    if user_by_name is not None and \
-       user_by_email is not None and \
-       user_by_name != user_by_email:
-        raise ValueError('Trying to update user but name or email already used for another user.\n'
-                         'Update: {} ({}). Existing users: {} ({}) and {} ({}). '
-                         .format(user_info['name'], user_info['email'],
-                                 user_by_name.name, user_by_name.email,
-                                 user_by_email.name, user_by_email.email))
+def _update_user(user_by_name: IUser,
+                 user_by_email: IUser,
+                 user_info: dict,
+                 groups: IResource):
+    if user_by_name is not None\
+            and user_by_email is not None\
+            and user_by_name != user_by_email:
+        msg = 'Trying to update user but name or email already used for anoth'\
+              'er user.\nUpdate: {} ({}). Existing users: {} ({}) and {} ({}).'
+        raise ValueError(msg.format(user_info['name'],
+                                    user_info['email'],
+                                    user_by_name.name,
+                                    user_by_name.email,
+                                    user_by_email.name,
+                                    user_by_email.email))
     user = user_by_name or user_by_email
     if user_by_name is None:
         userbasic_sheet = get_sheet(user, sheets.principal.IUserBasic)
