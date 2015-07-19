@@ -5,7 +5,9 @@ This is registered as console script 'import_groups' in setup.py.
 """
 import argparse
 import inspect
+import logging
 import json
+import sys
 
 import adhocracy_core.sheets.principal
 import transaction
@@ -15,6 +17,9 @@ from pyramid.registry import Registry
 from substanced.util import find_service
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.resources.principal import IGroup
+
+
+logger = logging.getLogger(__name__)
 
 
 def import_groups():  # pragma: no cover
@@ -35,6 +40,7 @@ def import_groups():  # pragma: no cover
                         help='file containing the groups')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     _import_groups(env['root'], env['registry'], args.filename)
     env['closer']()
 
@@ -46,10 +52,10 @@ def _import_groups(context: IResource, registry: Registry, filename: str):
         name = group_info['name']
         if name in groups.keys():
             _update_group(group_info, groups)
-            print('Updating group {}'.format(name))
+            logger.info('Updating group {}'.format(name))
         else:
             _create_group(group_info, registry, groups)
-            print('Creating group {}'.format(name))
+            logger.info('Creating group {}'.format(name))
     transaction.commit()
 
 
