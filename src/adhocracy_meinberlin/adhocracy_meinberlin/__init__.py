@@ -8,6 +8,8 @@ def includeme(config):
     """Setup adhocracy extension."""
     # include adhocracy_core
     config.include('adhocracy_core')
+    # commit to allow overriding pyramid config
+    config.commit()
     # include custom resource types
     config.include('adhocracy_meinberlin.workflows')
     config.include('adhocracy_meinberlin.resources')
