@@ -84,7 +84,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
-        "angular-data.DSCacheFactory",
         AdhComment.moduleName,
         AdhDone.moduleName,
         AdhMapping.moduleName,
