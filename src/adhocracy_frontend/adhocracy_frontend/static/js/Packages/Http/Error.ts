@@ -13,14 +13,10 @@ export interface IBackendErrorItem {
     description : string;
 }
 
-var renderBackendError = (response : angular.IHttpPromiseCallbackArg<any>) : void => {
-    console.log(response);
-};
-
 export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
-    renderBackendError(response);
+    console.log(response);
 
     var errors : IBackendErrorItem[] = response.data.errors;
     throw errors;
@@ -42,14 +38,11 @@ export var logBackendBatchError = (
             code : number;
             body? : IBackendError;
         }[];
-        /* tslint:disable:variable-name */
-        updated_resources : any;
-        /* tslint:enable:variable-name */
     }>
 ) : void => {
     "use strict";
 
-    renderBackendError(response);
+    console.log(response);
 
     var lastBatchItemResponse = response.data.responses[response.data.responses.length - 1];
 
