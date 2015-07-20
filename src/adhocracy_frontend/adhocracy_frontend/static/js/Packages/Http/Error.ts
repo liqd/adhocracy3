@@ -13,13 +13,24 @@ export interface IBackendErrorItem {
     description : string;
 }
 
+var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorItem[] => {
+    if (code === 410) {
+        return [{
+            location: "url",
+            name: "GET",
+            description: (<any>error).reason
+        }];
+    } else {
+        return error.errors;
+    }
+};
+
 export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
     console.log(response);
 
-    var errors : IBackendErrorItem[] = response.data.errors;
-    throw errors;
+    throw extractErrorItems(response.status, response.data);
 };
 
 /**
@@ -44,10 +55,8 @@ export var logBackendBatchError = (
 
     console.log(response);
 
-    var lastBatchItemResponse = response.data.responses[response.data.responses.length - 1];
-
-    var errors : IBackendErrorItem[] = lastBatchItemResponse.body.errors;
-    throw errors;
+    var lastResponse = response.data.responses[response.data.responses.length - 1];
+    throw extractErrorItems(lastResponse.code, lastResponse.body);
 };
 
 
