@@ -1,4 +1,3 @@
-/* tslint:disable:variable-name */
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>

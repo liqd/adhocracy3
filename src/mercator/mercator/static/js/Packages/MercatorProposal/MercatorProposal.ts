@@ -1,4 +1,3 @@
-/* tslint:disable:variable-name */
 /// <reference path="../../_all.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
@@ -954,9 +953,9 @@ export var listItem = (
                         picture: introduction.data[SIMercatorIntroduction.nick].picture
                     };
                 });
-                adhHttp.get(proposal.data[SIMercatorSubResources.nick].organization_info).then((organization_info) => {
+                adhHttp.get(proposal.data[SIMercatorSubResources.nick].organization_info).then((organizationInfo) => {
                     scope.data.organization_info = {
-                        name: organization_info.data[SIMercatorOrganizationInfo.nick].name
+                        name: organizationInfo.data[SIMercatorOrganizationInfo.nick].name
                     };
                 });
                 adhHttp.get(proposal.data[SIMercatorSubResources.nick].finance).then((finance) => {
