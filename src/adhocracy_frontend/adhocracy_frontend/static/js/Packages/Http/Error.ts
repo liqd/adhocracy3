@@ -14,21 +14,7 @@ export interface IBackendErrorItem {
 }
 
 var renderBackendError = (response : angular.IHttpPromiseCallbackArg<any>) : void => {
-    // get rid of unrenderable junk (good for console log extraction with web driver).
-    var sanitize = (x : any) : any => {
-        try {
-            return JSON.parse(JSON.stringify(x));
-        } catch (e) {
-            return x;
-        }
-    };
-
-    console.log("http response with error status: " + response.status);
-    console.log("request (.config):", sanitize(response.config));
-    if (typeof response.headers !== "undefined") {
-        console.log("headers (.headers()):", sanitize(response.headers()));
-    }
-    console.log("response (.data):", sanitize(response.data));
+    console.log(response);
 };
 
 export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBackendError>) : void => {
