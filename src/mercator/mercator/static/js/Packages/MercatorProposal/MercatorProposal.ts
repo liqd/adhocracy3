@@ -90,7 +90,7 @@ export interface IScopeData {
 
     title : {
         title : string;
-    }
+    };
 
     // 1. basic
     user_info : {
@@ -838,7 +838,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         var instance = super.link(scope, element, attrs, wrapper);
         instance.scope.data = <any>{};
         instance.scope.$watch("$viewContentLoaded", function() {
-            if (!Modernizr.inputtypes.number) {
+            if (!modernizr.inputtypes.number) {
                 element.find(":input[type='number']").updatePolyfill();
                 $(".has-input-buttons").removeClass( "has-input-buttons").css({"display" : "inline-block"});
             }
@@ -846,7 +846,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         // Fix for later, if we want to add a webshim datepicker
         /*var _self = this;
         instance.scope.$watch("data.organization_info.status_enum", function() {
-            if (!Modernizr.inputtypes.date) {
+            if (!modernizr.inputtypes.date) {
                 _self.$timeout(() => {
                     element.find(":input[type='date']").updatePolyfill();
                 });

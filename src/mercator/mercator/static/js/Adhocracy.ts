@@ -70,7 +70,7 @@ var loadComplete = () : void => {
 };
 
 
-export var init = (config : AdhConfig.IService, meta_api) => {
+export var init = (config : AdhConfig.IService, metaApi) => {
     "use strict";
 
     // detect wheter we are running in iframe
@@ -162,7 +162,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
 
     app.value("angular", angular);
     app.value("markdownit", markdownit);
-    app.value("Modernizr", modernizr);
+    app.value("modernizr", modernizr);
     app.value("moment", moment);
 
     // register our modules
@@ -176,7 +176,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhDone.register(angular);
     AdhEmbed.register(angular);
     AdhEventManager.register(angular);
-    AdhHttp.register(angular, config, meta_api);
+    AdhHttp.register(angular, config, metaApi);
     AdhImage.register(angular);
     AdhInject.register(angular);
     AdhListing.register(angular);

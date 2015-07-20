@@ -94,7 +94,7 @@ interface IConfig {
         host: string;
         port: number;
         path: string;
-    }
+    };
 }
 
 var config : IConfig = {
