@@ -194,6 +194,13 @@ class BatchView(RESTView):
         return BatchItemResponse(status_code, body)
 
     def _get_error_view(self, error: Exception) -> callable:
+        """Return view callable to handle exception.
+
+        The error handler in :mod:`adhocracy_core.rest.exceptions` are only
+        called at end of the request, but not for sub requests. To make
+        sure batch requests show the same error messages as normal requests
+        we try to find the right error view manually here.
+        """
         if isinstance(error, HTTPException):
             error_view = handle_error_x0x_exception
         else:

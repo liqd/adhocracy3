@@ -49,7 +49,7 @@ class TestJSONHTTPException:
         self.make_one([], request_)
         assert 'None' not in str(log)
 
-    def test_log_abbrivated_request_body_if_gt_5000(self, request_, log):
+    def test_log_abbreviated_request_body_if_gt_5000(self, request_, log):
         request_.body = '{"data": "' + 'h' * 5110 + '"}'
         self.make_one([], request_)
         assert len(str(log)) < len(request_.body)
