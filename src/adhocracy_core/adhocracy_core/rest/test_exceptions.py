@@ -40,6 +40,7 @@ class TestJSONHTTPException:
 
     def test_log_request_body_json_list(self, request_, log):
         request_.body = '[]'
+        request_.text = '[]'
         self.make_one([], request_)
         assert '[]' in str(log)
 
@@ -95,12 +96,12 @@ class TestJSONHTTPException:
     def test_log_headers(self, request_, log):
         request_.headers['X'] = 1
         self.make_one([], request_)
-        assert "('X', 1)" in str(log)
+        assert "{'X': 1}" in str(log)
 
     def test_log_but_hide_x_user_token_in_headers(self, request_, log):
         request_.headers['X-User-Token'] = 1
         self.make_one([], request_)
-        assert "('X-User-Token': 1)" not in str(log)
+        assert "{'X-User-Token': '<hidden>'}" in str(log)
 
 
 class TestHandleErrorX0XException:

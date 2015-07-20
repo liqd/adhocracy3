@@ -178,8 +178,13 @@ def get_json_body(request: Request) -> object:
 
 def _get_filtered_request_headers(request) -> []:
     """Filter secret parts of the request headers."""
-    request.headers.pop('X-User-Token', None)
-    return [x for x in request.headers.items()]
+    headers = {}
+    for key, value in request.headers.items():
+        if 'X-User-Token' in key:
+            headers['X-User-Token'] = '<hidden>'
+        else:
+            headers[key] = value
+    return headers
 
 
 @view_config(
