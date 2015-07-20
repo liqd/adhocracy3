@@ -53,17 +53,8 @@ export var logBackendBatchError = (
 
     var lastBatchItemResponse = response.data.responses[response.data.responses.length - 1];
 
-    // FIXME: work around #1019
-    if (lastBatchItemResponse.code === 403) {
-        throw [{
-            name: "forbidden",
-            location: "unknown",
-            description: "TR__ERROR_HTTP_FORBIDDEN"
-        }];
-    } else {
-        var errors : IBackendErrorItem[] = lastBatchItemResponse.body.errors;
-        throw errors;
-    }
+    var errors : IBackendErrorItem[] = lastBatchItemResponse.body.errors;
+    throw errors;
 };
 
 
