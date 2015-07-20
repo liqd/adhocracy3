@@ -113,8 +113,8 @@ be used instead.
     background-color: transparent;
     border: 2px solid $color-button-cta-base;
     color: $color-button-cta-base;
-    height: $button-height + 4px / $font-size-normal * 1em;
-    line-height: $button-height + 4px / $font-size-normal;
+    height: $button-height + (4px / $font-size-normal * 1em);
+    line-height: $button-height;
 
     &:hover:enabled,
     &:focus:enabled {
