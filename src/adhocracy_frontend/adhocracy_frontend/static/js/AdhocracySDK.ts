@@ -33,12 +33,12 @@
         var entry = document.getElementsByTagName("script")[0];
         entry.parentNode.insertBefore(script, entry);
 
-        script.onload = script.onreadystatechange = () => {
-            var rdyState = script.readyState;
-            if (!rdyState || /complete|loaded/.test(script.readyState)) {
+        script.onload = (<any>script).onreadystatechange = () => {
+            var rdyState = (<any>script).readyState;
+            if (!rdyState || /complete|loaded/.test(rdyState)) {
                 callback();
                 script.onload = null;
-                script.onreadystatechange = null;
+                (<any>script).onreadystatechange = null;
             }
         };
     };
