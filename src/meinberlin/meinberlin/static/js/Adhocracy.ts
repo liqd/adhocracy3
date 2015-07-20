@@ -148,6 +148,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 suffix: config.cachebust ? ".json?" + config.cachebust_suffix : ".json"
             }]
         });
+        $translateProvider.useSanitizeValueStrategy("escape");
         $translateProvider.preferredLanguage(config.locale);
         $translateProvider.fallbackLanguage("en");
     }]);
