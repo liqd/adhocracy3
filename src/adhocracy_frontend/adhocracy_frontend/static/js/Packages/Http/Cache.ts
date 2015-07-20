@@ -35,14 +35,14 @@ export class Service {
         private $q : angular.IQService,
         private adhConfig : AdhConfig.IService,
         private adhWebSocket : AdhWebSocket.Service,
-        private DSCacheFactory
+        private CacheFactory
     ) {
-        this.setupCache(DSCacheFactory, adhWebSocket);
+        this.setupCache(CacheFactory, adhWebSocket);
         this.nonResourceUrls = _.map(AdhHttp.nonResourcePaths, (path) => adhConfig.rest_url + "/" + path + "/");
     }
 
-    private setupCache(DSCacheFactory, adhWebSocket : AdhWebSocket.Service) : void {
-        this.cache = DSCacheFactory("httpCache", {
+    private setupCache(CacheFactory, adhWebSocket : AdhWebSocket.Service) : void {
+        this.cache = CacheFactory("httpCache", {
             capacity: 10000,  // items
             maxAge: 5 * 60 * 1000,  // milliseconds
             deleteOnExpire: "aggressive",
