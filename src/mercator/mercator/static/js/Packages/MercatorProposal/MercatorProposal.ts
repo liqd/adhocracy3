@@ -1,4 +1,5 @@
 /* tslint:disable:variable-name */
+/// <reference path="../../_all.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
 import _ = require("lodash");
@@ -826,6 +827,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         private $timeout : angular.ITimeoutService,
         flowFactory,
         moment : moment.MomentStatic,
+        private modernizr : ModernizrStatic,
         $window : Window,
         $location : angular.ILocationService,
         $q : angular.IQService
@@ -838,7 +840,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         var instance = super.link(scope, element, attrs, wrapper);
         instance.scope.data = <any>{};
         instance.scope.$watch("$viewContentLoaded", function() {
-            if (!modernizr.inputtypes.number) {
+            if (!this.modernizr.inputtypes.number) {
                 element.find(":input[type='number']").updatePolyfill();
                 $(".has-input-buttons").removeClass( "has-input-buttons").css({"display" : "inline-block"});
             }
@@ -846,7 +848,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         // Fix for later, if we want to add a webshim datepicker
         /*var _self = this;
         instance.scope.$watch("data.organization_info.status_enum", function() {
-            if (!modernizr.inputtypes.date) {
+            if (!this.modernizr.inputtypes.date) {
                 _self.$timeout(() => {
                     element.find(":input[type='date']").updatePolyfill();
                 });
@@ -1258,6 +1260,7 @@ export var register = (angular) => {
             "$timeout",
             "flowFactory",
             "moment",
+            "modernizr",
             "$window",
             "$location",
             "$q",
