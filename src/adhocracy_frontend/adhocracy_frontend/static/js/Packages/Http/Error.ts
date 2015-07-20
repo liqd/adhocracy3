@@ -22,18 +22,8 @@ export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBacken
 
     renderBackendError(response);
 
-    if (response.data.hasOwnProperty("errors")) {
-        var errors : IBackendErrorItem[] = response.data.errors;
-        throw errors;
-    } else {
-        // FIXME: the backend currently responds with errors in HTML,
-        // not in json, which provokes $http to throw an exception and
-        // whipe the response object before passing it to the error
-        // handler callback.  See #256.
-        //
-        // the following line works around that.
-        throw [{ name: "unknown", location: "unknown", description: "unknown" }];
-    }
+    var errors : IBackendErrorItem[] = response.data.errors;
+    throw errors;
 };
 
 /**
