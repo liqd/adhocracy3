@@ -248,6 +248,18 @@ export class Service<Content extends ResourcesBase.Resource> {
         return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
     }
 
+    public delete(path : string, contentType : string, config : IHttpConfig = {}) : angular.IPromise<any> {
+        var obj = {
+            content_type: contentType,
+            data: {}
+        };
+        obj.data[SIMetadata.nick] = {
+            deleted: true
+        };
+
+        return this.put(path, <any>obj, _.extend({}, config, {keepMetadata: true}));
+    }
+
     public postRaw(path : string, obj : Content, config : IHttpConfig = {}) : angular.IPromise<any> {
         var _self = this;
 
