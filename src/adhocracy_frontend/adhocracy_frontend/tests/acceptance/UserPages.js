@@ -134,7 +134,7 @@ var UserPage = function() {
         element(by.css(".user-profile-info-button")).click();
         element(by.css("input.user-message-subject")).sendKeys(subject);
         element(by.css("textarea.user-message-text")).sendKeys(content);
-        element(by.css("input.m-call-to-action")).click();
+        element(by.css("input.button-cta")).click();
     };
 };
 

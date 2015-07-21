@@ -104,7 +104,7 @@ export class ResourceWrapperController {
     /**
      * triggers a "setMode" event on eventManager
      */
-    public triggerSetMode = (mode : Mode) => {
+    public triggerSetMode(mode : Mode) {
         this.resetResourcePromises();
         this.eventManager.trigger("setMode", mode);
     }
@@ -112,7 +112,7 @@ export class ResourceWrapperController {
     /**
      * triggers a "cancel" event on eventManager
      */
-    public triggerCancel = () => {
+    public triggerCancel() {
         this.eventManager.trigger("cancel");
         this.triggerCallback("onCancel");
     }
@@ -123,7 +123,7 @@ export class ResourceWrapperController {
      * registerResourceDirective. When all promises have been resolved,
      * all promised resources will be posted to the server via deepPost.
      */
-    public triggerSubmit = () => {
+    public triggerSubmit() {
         this.eventManager.trigger("submit");
         return this.$q.all(this.resourcePromises)
             .then((resourceLists) => {
@@ -145,7 +145,7 @@ export class ResourceWrapperController {
     /**
      * triggers a "clear" event on eventManager.
      */
-    public triggerClear = () => {
+    public triggerClear() {
         this.eventManager.trigger("clear");
     }
 }
@@ -192,7 +192,7 @@ export interface IResourceWidgetScope extends angular.IScope {
 export interface IResourceWidgetInstance<R extends ResourcesBase.Resource, S extends IResourceWidgetScope> {
     scope : S;
     wrapper : ResourceWrapperController;
-    deferred : angular.IDeferred<R[]>
+    deferred : angular.IDeferred<R[]>;
 }
 
 /**

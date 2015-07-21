@@ -54,7 +54,7 @@ export interface IPostMessageService {
 }
 
 export interface IService {
-    registerMessageHandler : (name : string, callback : (IMessageData) => void) => void;
+    registerMessageHandler : (name : string, callback : (data : IMessageData) => void) => void;
     postResize : (height : number) => void;
     dummy? : boolean;
 }

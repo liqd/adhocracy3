@@ -1,4 +1,3 @@
-/* tslint:disable:variable-name */
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
@@ -588,7 +587,7 @@ export var register = (angular, config, metaApi) => {
             AdhCredentials.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhWebSocket.moduleName,
-            "angular-data.DSCacheFactory",
+            "angular-cache",
         ])
         .config(["$httpProvider", ($httpProvider) => {
             $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
@@ -597,7 +596,7 @@ export var register = (angular, config, metaApi) => {
         .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
         .service("adhHttp", [
             "$http", "$q", "$timeout", "adhCredentials", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
-        .service("adhCache", ["$q", "adhConfig", "adhWebSocket", "DSCacheFactory", AdhCache.Service])
+        .service("adhCache", ["$q", "adhConfig", "adhWebSocket", "CacheFactory", AdhCache.Service])
         .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
         .filter("adhFormatError", () => AdhError.formatError);
 };
