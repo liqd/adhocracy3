@@ -35,10 +35,11 @@ class TokenMangerAnnotationStorage:
     annotation_key = '_tokenmanager_storage'
 
     def __init__(self, context):
+        """Initialize self."""
         self.context = context
 
     @property
-    def token_to_user_id_timestamp(self):
+    def token_to_user_id_timestamp(self):  # noqa
         tokens = getattr(self.context, self.annotation_key, None)
         if tokens is None:
             tokens = PersistentDict()
@@ -169,6 +170,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
                  get_tokenmanager: callable=get_tokenmanager,
                  hashalg: str='sha512',
                  ):
+        """Initialize self."""
         self.callback = groupfinder  # callback is an inherited class attr.
         self.secret = secret
         self.timeout = timeout
@@ -176,9 +178,11 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.hashalg = hashalg
 
     def unauthenticated_userid(self, request):
+        """Return unauthenticated userid."""
         return _get_raw_x_user_headers(request)[0]
 
     def authenticated_userid(self, request):
+        """Return authenticated userid."""
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager is None:
             return None
@@ -196,7 +200,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
             raise KeyError
         return authenticated_userid
 
-    def remember(self, request, userid, **kw) -> dict:
+    def remember(self, request, userid, **kw) -> dict:  # noqa
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager:  # for testing
             token = tokenmanager.create_token(userid, secret=self.secret,
@@ -216,7 +220,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         return {'X-User-Path': url,
                 'X-User-Token': token}
 
-    def forget(self, request):
+    def forget(self, request):  # noqa
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager:
             token = _get_x_user_headers(request)[0]

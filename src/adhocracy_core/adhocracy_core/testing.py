@@ -85,14 +85,17 @@ class DummyPool(testing.DummyResource):
     """Dummy Pool based on :class:`pyramid.testing.DummyResource`."""
 
     def add(self, name, resource, **kwargs):
+        """Add resource to the pool."""
         self[name] = resource
         resource.__parent__ = self
         resource.__name__ = name
 
     def next_name(self, obj, prefix=''):
+        """Get the next name for the resource when using autonaming."""
         return prefix + '_0000000'
 
     def add_service(self, name, resource, **kwargs):
+        """Add a service to the pool."""
         from adhocracy_core.interfaces import IServicePool
         from zope.interface import alsoProvides
         alsoProvides(resource, IServicePool)
@@ -100,13 +103,17 @@ class DummyPool(testing.DummyResource):
         self.add(name, resource)
 
     def find_service(self, service_name, *sub_service_names):
+        """Return a service from the pool."""
         from substanced.util import find_service
         return find_service(self, service_name, *sub_service_names)
 
 
 class DummyPoolWithObjectMap(DummyPool):
 
+    """Dummy pool with objectmap."""
+
     def add(self, name, obj, **kwargs):
+        """Add a resource to the pool."""
         super().add(name, obj)
         objectmap = find_objectmap(self)
         obj.__oid__ = objectmap.new_objectid()
@@ -114,6 +121,7 @@ class DummyPoolWithObjectMap(DummyPool):
         objectmap.add(obj, path_tuple)
 
     def next_name(self, obj, prefix=''):
+        """Get the next name for the resource when using autonaming."""
         return prefix + '_0000000' + str(hash(obj))
 
 
@@ -769,6 +777,7 @@ class AppUser:
                  rest_url: str='http://localhost',
                  base_path: str='/',
                  header: dict=None):
+        """Initialize self."""
         self.app = TestApp(app)
         """:class:`webtest.TestApp`to send requests to the backend server."""
         self.rest_url = rest_url

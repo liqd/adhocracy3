@@ -108,6 +108,7 @@ class HTTPCacheStrategyBaseAdapter:
     """
 
     def __init__(self, context, request):
+        """Initialize self."""
         self.context = context
         """The view context."""
         self.request = request
@@ -157,33 +158,39 @@ class HTTPCacheStrategyBaseAdapter:
             self.set_vary()
 
     def set_debug_info(self, mode: HTTPCacheMode):
+        """Set debug info."""
         self.request.response.headers['X-Caching-Mode'] = mode.name
         strategy_name = self.__class__.__name__
         self.request.response.headers['X-Caching-Strategy'] = strategy_name
 
     def set_do_not_cache(self):
+        """Disable caching."""
         self.request.response.cache_control.no_cache = True
         self.request.response.expires = -1
         self.request.response.pragma = 'no-cache'
 
     def set_cache_control_without_proxy(self):
+        """Set cache control without proxy."""
         cache_control = self.request.response.cache_control
         cache_control.max_age = self.browser_max_age
         cache_control.must_revalidate = True
 
     def set_cache_control_with_proxy(self):
+        """Set cache control with proxy."""
         cache_control = self.request.response.cache_control
         cache_control.max_age = self.browser_max_age
         cache_control.s_max_age = self.proxy_max_age
         cache_control.proxy_revalidate = True
 
     def set_last_modified(self):
+        """Set last_modified attribute."""
         if not self.last_modified:
             return
         date = getattr(self.context, 'modification_date', None)
         self.request.response.last_modified = date
 
     def set_etag(self):
+        """Set etag."""
         if not self.etags:
             return
         tags = [t(self.context, self.request) for t in self.etags]
@@ -191,6 +198,7 @@ class HTTPCacheStrategyBaseAdapter:
         self.request.response.etag = etag
 
     def set_vary(self):
+        """Set vary attribute."""
         self.request.response.vary = self.vary
 
 
@@ -257,6 +265,7 @@ class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
     etags = (etag_modified, etag_userid, etag_blocked)
 
     def __init__(self, context, request):
+        """Initialize self."""
         parent = context.__parent__  # reuse parent cache header
         super().__init__(parent, request)
 

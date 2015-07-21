@@ -65,6 +65,7 @@ class Workflow(AdhocracySchemaNode):
 
     @deferred
     def default(self, kw: dict) -> IWorkflow:
+        """Return default."""
         registry = kw['registry']
         workflow = registry.content.get_workflow(self.default_workflow_name)
         return workflow
@@ -102,6 +103,7 @@ class State(AdhocracySchemaNode):
 
     @deferred
     def default(self, kw: dict) -> str:
+        """Return default value."""
         registry = kw['registry']
         context = kw['context']
         if self.workflow_name == '':
@@ -112,6 +114,7 @@ class State(AdhocracySchemaNode):
 
     @deferred
     def validator(self, kw: dict):
+        """Validator."""
         request = kw.get('request', None)
         if request is None:
             return
@@ -131,6 +134,7 @@ class StateAssignment(MappingSchema):
     missing = drop
 
     def __init__(self, *args, **kwargs):
+        """Initialize self."""
         super().__init__(*args, **kwargs)
         if 'default' not in kwargs:  # pragma: no branch
             self.default = {}
@@ -148,6 +152,7 @@ class WorkflowAssignmentSchema(MappingSchema):
     workflow_name = 'WRONG'
 
     def __init__(self, *args, **kwargs):
+        """Initialize self."""
         super().__init__(*args, **kwargs)
         self['workflow'].default_workflow_name = self.workflow_name
         self['workflow_state'].workflow_name = self.workflow_name
@@ -185,6 +190,7 @@ class WorkflowAssignmentSheet(AnnotationRessourceSheet):
     """
 
     def __init__(self, meta, context, registry=None):
+        """Initialize self."""
         super().__init__(meta, context, registry)
         error_msg = '{0} is not a sub type of {1}.'
         if not meta.isheet.isOrExtends(IWorkflowAssignment):

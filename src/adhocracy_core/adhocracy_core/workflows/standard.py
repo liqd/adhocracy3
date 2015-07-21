@@ -8,7 +8,7 @@ standard_meta = freeze({
     'states': {
         'draft': {'title': 'Draft',
                   'description': 'This phase is for internal review.',
-                  'acm': {'principals': [        'anonymous',   'participant', 'moderator', 'creator', 'initiator'],  # noqa
+                  'acm': {'principals':         ['anonymous',   'participant', 'moderator', 'creator', 'initiator'],  # noqa
                           'permissions':
                           [['view',              'Deny',        'Deny',        'Allow',     'Allow',   'Allow'],  # noqa
                            ['create_proposal',    None,          None,          None,        None,     'Allow'],  # noqa
@@ -21,7 +21,7 @@ standard_meta = freeze({
         },
         'participate': {'title': 'Participate',
                         'description': '',
-                        'acm': {'principals': [                   'participant', 'moderator', 'creator', 'initiator'],  # noqa
+                        'acm': {'principals':                    ['participant', 'moderator', 'creator', 'initiator'],  # noqa
                                 'permissions':
                                   [['create_proposal',            'Allow',        None,        None,     'Allow'],  # noqa
                                    ['edit_proposal',               None,          None,       'Allow',    None],  # noqa

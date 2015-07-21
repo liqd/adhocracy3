@@ -32,6 +32,7 @@ class ClientTracker():
     """Keeps track of the clients that want notifications."""
 
     def __init__(self):
+        """Initialize self."""
         self._clients2resource_paths = defaultdict(set)
         self._resource_paths2clients = defaultdict(set)
 
@@ -113,6 +114,7 @@ class DummyRequest:
     """
 
     def __init__(self, application_url, root):
+        """Initialize self."""
         self.application_url = application_url
         """URL prefix used to extract resource paths."""
         self.root = root
