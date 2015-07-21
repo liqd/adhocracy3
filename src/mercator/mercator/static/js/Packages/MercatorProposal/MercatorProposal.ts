@@ -448,9 +448,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         });
 
         var processUrl = this.adhTopLevelState.get("processUrl");
-        this.adhHttp.get(processUrl).then((resource) => {
-            data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
-        });
+        if (typeof processUrl !== "undefined") {
+            this.adhHttp.get(processUrl).then((resource) => {
+                data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+            });
+        }
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
         var subResourcePromises : angular.IPromise<ResourcesBase.Resource[]> = this.$q.all([
@@ -973,9 +975,11 @@ export var listItem = (
                 });
 
                 var processUrl = adhTopLevelState.get("processUrl");
-                adhHttp.get(processUrl).then((resource) => {
-                    scope.data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
-                });
+                if (typeof processUrl !== "undefined") {
+                    adhHttp.get(processUrl).then((resource) => {
+                        scope.data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                    });
+                }
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                     if (!proposalVersionUrl) {
@@ -1011,10 +1015,12 @@ export var addButton = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
         link: (scope) => {
             var processUrl = adhTopLevelState.get("processUrl");
-            adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
-                scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && currentPhase === "participate");
-            });
+            if (typeof processUrl !== "undefined") {
+                adhHttp.get(processUrl).then((resource) => {
+                    var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                    scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && currentPhase === "participate");
+                });
+            }
             adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "poolOptions");
         }
     };
