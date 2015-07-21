@@ -165,10 +165,12 @@ def _add_initial_user_and_group(context, registry):
                  password_sheet.__identifier__:
                  {'password': user_password},
                  }
-    user = registry.content.create(IUser.__identifier__, users, appstruct,
+    user = registry.content.create(IUser.__identifier__,
+                                   users,
+                                   appstruct,
                                    run_after_creation=False,
+                                   send_event=False,
                                    registry=registry)
-
     user.activate()
 
 
