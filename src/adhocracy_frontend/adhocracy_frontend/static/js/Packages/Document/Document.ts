@@ -15,12 +15,15 @@ import AdhCommentAdapter = require("../Comment/Adapter");
 
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
+import RIMapDocument = require("../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocument");
+import RIMapDocumentVersion = require("../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocumentVersion");
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -46,6 +49,9 @@ export interface IScope extends angular.IScope {
         creator? : string;
         creationDate? : string;
         modificationDate? : string;
+
+        // optional features
+        coordinates? : number[];
     };
     selectedState? : string;
     resource: any;
@@ -87,7 +93,8 @@ export var bindPath = (
     adhTopLevelState? : AdhTopLevelState.Service
 ) => (
     scope : IScope,
-    pathKey : string = "path"
+    pathKey : string = "path",
+    hasMap : boolean = false
 ) : Function => {
     var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
 
@@ -120,6 +127,10 @@ export var bindPath = (
                         picture: documentVersion.data[SIImageReference.nick].picture
                     };
 
+                    if (hasMap) {
+                        scope.data.coordinates = documentVersion.data[SIPoint.nick].coordinates;
+                    }
+
                     // FIXME: This probably isn't the right place for this also topLevelState
                     // had to be included in this function just for this
                     if (adhTopLevelState) {
@@ -136,9 +147,13 @@ export var postCreate = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IFormScope,
-    poolPath : string
+    poolPath : string,
+    hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
-    var doc = new RIDocument({preliminaryNames: adhPreliminaryNames});
+    const documentClass = hasMap ? RIMapDocument : RIDocument;
+    const documentVersionClass = hasMap ? RIMapDocumentVersion : RIDocumentVersion;
+
+    var doc = new documentClass({preliminaryNames: adhPreliminaryNames});
     doc.parent = poolPath;
 
     var paragraphItems = [];
@@ -161,7 +176,7 @@ export var postCreate = (
         paragraphVersions.push(version);
     });
 
-    var documentVersion = new RIDocumentVersion({preliminaryNames: adhPreliminaryNames});
+    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
     documentVersion.parent = doc.path;
     documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [doc.first_version_path]
@@ -173,6 +188,11 @@ export var postCreate = (
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
+    if (hasMap) {
+        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+            coordinates: scope.data.coordinates
+        });
+    }
 
     return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[1]);
@@ -184,12 +204,15 @@ export var postEdit = (
 ) => (
     scope : IFormScope,
     oldVersion : RIDocumentVersion,
-    oldParagraphVersions : RIParagraphVersion[]
+    oldParagraphVersions : RIParagraphVersion[],
+    hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
     // This function assumes that paragraphs can not be reordered or deleted
     // and that new paragraphs are always appended to the end.
 
     var documentPath = AdhUtil.parentPath(oldVersion.path);
+
+    const documentVersionClass = hasMap ? RIMapDocumentVersion : RIDocumentVersion;
 
     var paragraphItems : RIParagraph[] = [];
     var paragraphVersions : RIParagraphVersion[] = [];
@@ -237,7 +260,7 @@ export var postEdit = (
         }
     });
 
-    var documentVersion = new RIDocumentVersion({preliminaryNames: adhPreliminaryNames});
+    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
     documentVersion.parent = documentPath;
     documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
@@ -249,6 +272,11 @@ export var postEdit = (
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
+    if (hasMap) {
+        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+            coordinates: scope.data.coordinates
+        });
+    }
     // FIXME: workaround for a backend bug
     var oldImageReferenceSheet = oldVersion.data[SIImageReference.nick];
     if (oldImageReferenceSheet.picture) {
