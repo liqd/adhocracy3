@@ -70,4 +70,10 @@ export class Resource {
             return false;
         }
     }
+
+    public hasSheet(sheet : string) : boolean {
+        var _class : IResourceClass = <any>this.constructor;
+
+        return (<any>_).includes(_class.sheets, sheet);  // FIXME: DefinitelyTyped
+    }
 }
