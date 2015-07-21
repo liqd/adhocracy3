@@ -20,6 +20,9 @@ from adhocracy_core.interfaces import search_query
 
 
 class Reference(IndexFactory):
+
+    """TODO: comment."""
+
     index_type = ReferenceIndex
 
 

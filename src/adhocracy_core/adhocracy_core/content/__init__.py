@@ -27,6 +27,7 @@ class ResourceContentRegistry(ContentRegistry):
     """Extend substanced content registry to work with resources."""
 
     def __init__(self, registry):
+        """Initialize self."""
         super().__init__(registry)
         self.resources_meta = {}
         """Resources meta mapping.

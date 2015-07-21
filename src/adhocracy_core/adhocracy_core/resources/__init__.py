@@ -76,6 +76,7 @@ class ResourceFactory:
     name_identifier = IName.__identifier__
 
     def __init__(self, metadata: ResourceMetadata):
+        """Initialize self."""
         self.meta = metadata
         """:class:`ResourceMetadata`."""
 

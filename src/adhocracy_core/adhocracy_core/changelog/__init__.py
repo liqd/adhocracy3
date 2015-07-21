@@ -23,6 +23,7 @@ class Changelog(defaultdict):
     """
 
     def __init__(self, default_factory=lambda: changelog_meta):
+        """Initialize self."""
         super().__init__(default_factory)
 
 

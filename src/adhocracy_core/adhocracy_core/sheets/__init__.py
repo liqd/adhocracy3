@@ -39,6 +39,7 @@ class BaseResourceSheet:
     request = None  # just to follow the interface."""
 
     def __init__(self, meta, context, registry=None):
+        """Initialize self."""
         self.schema = meta.schema_class()
         """:class:`colander.MappingSchema` to define the data structure."""
         self.context = context
@@ -254,6 +255,7 @@ class AnnotationRessourceSheet(BaseResourceSheet):
     """Resource Sheet that stores data in dictionary annotation."""
 
     def __init__(self, meta, context, registry=None):
+        """Initialize self."""
         super().__init__(meta, context, registry)
         self._data_key = self.meta.isheet.__identifier__
 

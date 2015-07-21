@@ -144,7 +144,10 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     meta = Attribute('SheetMetadata')
     registry = Attribute('pyramid registry')
 
-    def set(appstruct, omit=(), send_event=True, request=None,
+    def set(appstruct,
+            omit=(),
+            send_event=True,
+            request=None,
             omit_readonly=True) -> bool:
         """ Store ``appstruct`` dictionary data.
 
@@ -473,6 +476,8 @@ class ILocalRolesModfied(IObjectEvent):
 
 class ITokenManger(Interface):  # pragma: no cover
 
+    """ITokenManger interface."""
+
     def create_token(userid: str) -> str:
         """ Create authentication token for :term:`userid`."""
 
@@ -698,8 +703,9 @@ class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
 
     role_prefix = Attribute('Prefix to generate the :term:`roleid`')
 
-    def permits(context, principals: list, permission: str)\
-            -> ACLPermitsResult:
+    def permits(context,
+                principals: list,
+                permission: str) -> ACLPermitsResult:
         """Check that one `principal` has the `permission` for `context`.
 
         This method extends the behavior of :func:`ACLAuthorizationPolicy`.
@@ -773,6 +779,8 @@ class IHTTPCacheStrategy(Interface):  # pragma: no cover
 
 
 class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
+
+    """IAdhocracyWorkflow interface."""
 
     def get_next_states(context, request: IRequest) -> [str]:
         """Get states you can trigger a transition to."""

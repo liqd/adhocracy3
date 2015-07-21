@@ -29,6 +29,7 @@ class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
     __name__ = None
 
     def __init__(self, discriminator=None):
+        """Initialize self."""
         self._not_indexed = self.family.IF.TreeSet()
 
     @reify

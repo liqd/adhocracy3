@@ -162,8 +162,12 @@ badgeable_meta = sheet_meta._replace(
 )
 
 
-def create_unique_badge_assignment_validator(child_node: Reference, kw: dict) -> callable:
-    """Create validator to check `kw['context']` the badge is unique in :term:`post_pool`.
+def create_unique_badge_assignment_validator(child_node: Reference,
+                                             kw: dict) -> callable:
+    """Create validator to check that a badge assignment is unique.
+
+    Badge assignments is considered unique if there is at most one for each
+    badge in :term:`post_pool`.
 
     :param:`child_node` Reference to a sheet with :term:`post_pool` field.
     :param:`kw`: dictionary with keys `context` and `registry`.
@@ -175,7 +179,9 @@ def create_unique_badge_assignment_validator(child_node: Reference, kw: dict) ->
         new_badge_name = get_sheet_field(new_badge, IName, 'name')
         pool = find_service(context, 'badge_assignments')
         for badge_assignment in pool.values():
-            badge = get_sheet_field(badge_assignment, IBadgeAssignment, 'badge')
+            badge = get_sheet_field(badge_assignment,
+                                    IBadgeAssignment,
+                                    'badge')
             badge_name = get_sheet_field(badge, IName, 'name')
             if new_badge_name == badge_name:
                 raise colander.Invalid(child_node, 'Badge already assigned')
@@ -195,7 +201,8 @@ class BadgeAssignmentSchema(colander.MappingSchema):
     def validator(self, kw: dict) -> callable:
         """Validate the :term:`post_pool` for the object reference."""
         object_validator = create_post_pool_validator(self['object'], kw)
-        badge_assignment_validator = create_unique_badge_assignment_validator(self['badge'], kw)
+        badge_assignment_validator = create_unique_badge_assignment_validator(
+            self['badge'], kw)
         return colander.All(object_validator, badge_assignment_validator)
 
 
