@@ -3,11 +3,11 @@
 import Sticky = require("sticky"); if (Sticky) { ; };
 
 
-export var createDirective = (Modernizr : ModernizrStatic) => {
+export var createDirective = (modernizr : ModernizrStatic) => {
     return {
         restrict: "A",
         link: (scope, element, attrs) => {
-            if ((<any>Modernizr).csspositionsticky) {
+            if ((<any>modernizr).csspositionsticky) {
                 element.addClass("sticky");
             } else {
                 element.stick_in_parent({
@@ -24,5 +24,5 @@ export var moduleName = "adhSticky";
 export var register = (angular) => {
     angular
         .module(moduleName, [])
-        .directive("adhSticky", ["Modernizr", createDirective]);
+        .directive("adhSticky", ["modernizr", createDirective]);
 };
