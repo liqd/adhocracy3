@@ -22,6 +22,8 @@ export class Sheet {
 export interface IResourceClass {
     /* tslint:disable:variable-name */
     content_type : string;
+    super_types : string[];
+    sheets : string[];
     /* tslint:enable:variable-name */
 }
 
@@ -58,7 +60,7 @@ export class Resource {
     }
 
     public isInstanceOf(resourceType : string) : boolean {
-        var _class = <any>this.constructor;
+        var _class : IResourceClass = <any>this.constructor;
 
         if (resourceType === this.content_type) {
             return true;
