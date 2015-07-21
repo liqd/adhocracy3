@@ -91,9 +91,9 @@ interface IConfig {
     sheetGetters : boolean;
     sheetSetters : boolean;
     httpOptions : {
-        host: string;
-        port: number;
-        path: string;
+        host : string;
+        port : number;
+        path : string;
     };
 }
 
@@ -121,14 +121,14 @@ interface FieldType {
 }
 
 
-var compileAll : (metaApi: MetaApi.IMetaApi, outPath : string) => void;
+var compileAll : (metaApi : MetaApi.IMetaApi, outPath : string) => void;
 
 var renderSheet : (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
 var mkFieldSignatures : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldSignaturesSheetCons : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldSignaturesSheetParse : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldAssignments : (fields : MetaApi.ISheetField[], tab : string) => string;
-var enabledFields : (fields : MetaApi.ISheetField[], enableFlags ?: string) => MetaApi.ISheetField[];
+var enabledFields : (fields : MetaApi.ISheetField[], enableFlags? : string) => MetaApi.ISheetField[];
 var mkSheetSetter : (modulePath : string, fields : MetaApi.ISheetField[], _selfType : string) => string;
 var mkSheetGetter : (modulePath : string, _selfType : string) => string;
 
@@ -142,7 +142,7 @@ var mkImportStatement : (modulePath : string, relativeRoot : string, metaApi : M
 var mkNick : (modulePath : string, metaApi : MetaApi.IMetaApi) => string;
 var mkSuperTypes : (modulePath : string, metaApi : MetaApi.IMetaApi) => string;
 var mkFieldType : (field : MetaApi.ISheetField) => FieldType;
-var mkFlags : (field : MetaApi.ISheetField, comment ?: boolean) => string;
+var mkFlags : (field : MetaApi.ISheetField, comment? : boolean) => string;
 var isReadableField : (field : MetaApi.ISheetField) => boolean;
 var isWriteableField : (field : MetaApi.ISheetField) => boolean;
 
@@ -476,7 +476,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     sheetI += "}\n\n";
 
     sheetI += "export interface HasSheet {\n";
-    sheetI += "    data : { \"" + modulePath + "\": Sheet }\n";
+    sheetI += "    data : { \"" + modulePath + "\" : Sheet }\n";
     sheetI += "}\n\n";
 
     hasSheetI += mkSheetSetter(sheet.nick, sheet.fields, "HasSheet");
@@ -518,7 +518,7 @@ mkFieldAssignments = (fields : MetaApi.ISheetField[], tab : string) : string => 
     }
 };
 
-enabledFields = (fields : MetaApi.ISheetField[], enableFlags ?: string) : MetaApi.ISheetField[] => {
+enabledFields = (fields : MetaApi.ISheetField[], enableFlags? : string) : MetaApi.ISheetField[] => {
     if (typeof enableFlags !== "string") {
         // if `flags` is not set, enable all fields
         return fields;
@@ -656,7 +656,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
             }
             for (x in optArgs) {
                 if (optArgs.hasOwnProperty(x)) {
-                    args.push(x + " ?: " + optArgs[x]);
+                    args.push(x + "? : " + optArgs[x]);
                 }
             }
         })();
@@ -674,7 +674,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     var mkDataDeclaration = (tab : string) : string => {
         var os : string[] = [];
 
-        os.push("public data: {");
+        os.push("public data : {");
         for (var x in resource.sheets) {
             if (resource.sheets.hasOwnProperty(x)) {
                 var name = resource.sheets[x];
@@ -946,7 +946,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     };
 };
 
-mkFlags = (field : MetaApi.ISheetField, comment ?: boolean) : string => {
+mkFlags = (field : MetaApi.ISheetField, comment? : boolean) : string => {
     var flags : string = "";
 
     if (field.hasOwnProperty("readable") && field.readable) {
