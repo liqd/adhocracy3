@@ -127,84 +127,84 @@ userinfo_meta = sheet_meta._replace(isheet=IUserInfo,
                                     schema_class=UserInfoSchema)
 
 
-class OrganizationInfoReference(SheetToSheet):
+class OrganizationInfoReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'organization_info'
     target_isheet = IOrganizationInfo
 
 
-class IntroductionReference(SheetToSheet):
+class IntroductionReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'introduction'
     target_isheet = IIntroduction
 
 
-class DescriptionReference(SheetToSheet):
+class DescriptionReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'description'
     target_isheet = IDescription
 
 
-class LocationReference(SheetToSheet):
+class LocationReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'location'
     target_isheet = ILocation
 
 
-class StoryReference(SheetToSheet):
+class StoryReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'story'
     target_isheet = IStory
 
 
-class OutcomeReference(SheetToSheet):
+class OutcomeReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'outcome'
     target_isheet = IOutcome
 
 
-class StepsReference(SheetToSheet):
+class StepsReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'steps'
     target_isheet = ISteps
 
 
-class ValueReference(SheetToSheet):
+class ValueReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'value'
     target_isheet = IValue
 
 
-class PartnersReference(SheetToSheet):
+class PartnersReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'partners'
     target_isheet = IPartners
 
 
-class FinanceReference(SheetToSheet):
+class FinanceReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'finance'
     target_isheet = IFinance
 
 
-class ExperienceReference(SheetToSheet):
+class ExperienceReference(SheetToSheet):  # noqa
 
     source_isheet = IMercatorSubResources
     source_isheet_field = 'experience'
     target_isheet = IExperience
 
 
-class MercatorSubResourcesSchema(colander.MappingSchema):
+class MercatorSubResourcesSchema(colander.MappingSchema):  # noqa
 
     organization_info = Reference(reftype=OrganizationInfoReference)
     introduction = Reference(reftype=IntroductionReference)
@@ -340,7 +340,7 @@ location_meta = sheet_meta._replace(isheet=ILocation,
                                     schema_class=LocationSchema)
 
 
-class StorySchema(colander.MappingSchema):
+class StorySchema(colander.MappingSchema):  # noqa
     story = Text(validator=colander.Length(min=1, max=800))
 
 
@@ -348,7 +348,7 @@ story_meta = sheet_meta._replace(isheet=IStory,
                                  schema_class=StorySchema)
 
 
-class OutcomeSchema(colander.MappingSchema):
+class OutcomeSchema(colander.MappingSchema):  # noqa
     outcome = Text(validator=colander.Length(min=1, max=800))
 
 
@@ -356,7 +356,7 @@ outcome_meta = sheet_meta._replace(
     isheet=IOutcome, schema_class=OutcomeSchema)
 
 
-class StepsSchema(colander.MappingSchema):
+class StepsSchema(colander.MappingSchema):  # noqa
     steps = Text(validator=colander.Length(min=1, max=800))
 
 
@@ -364,7 +364,7 @@ steps_meta = sheet_meta._replace(
     isheet=ISteps, schema_class=StepsSchema)
 
 
-class ValueSchema(colander.MappingSchema):
+class ValueSchema(colander.MappingSchema):  # noqa
     value = Text(validator=colander.Length(min=1, max=800))
 
 
@@ -372,7 +372,7 @@ values_meta = sheet_meta._replace(
     isheet=IValue, schema_class=ValueSchema)
 
 
-class PartnersSchema(colander.MappingSchema):
+class PartnersSchema(colander.MappingSchema):  # noqa
     partners = Text(validator=colander.Length(min=1, max=800))
 
 
@@ -408,7 +408,7 @@ experience_meta = sheet_meta._replace(
     schema_class=ExperienceSchema)
 
 
-class HeardFromSchema(colander.MappingSchema):
+class HeardFromSchema(colander.MappingSchema):  # noqa
 
     heard_from_colleague = Boolean()
     heard_from_website = Boolean()
