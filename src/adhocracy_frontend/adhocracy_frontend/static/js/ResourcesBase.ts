@@ -36,6 +36,7 @@ export class Resource {
     public first_version_path : string;
     public root_versions : string[];
     public static super_types : string[];
+    public static sheets : string[];
 
     constructor(public content_type : string) {
         this.data = {};
