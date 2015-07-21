@@ -1,5 +1,7 @@
 """Example workflow."""
 
+# flake8: noqa
+
 from pyrsistent import freeze
 
 from adhocracy_core.workflows import add_workflow
@@ -9,14 +11,14 @@ sample_meta = freeze({
     'states': {
         'participate': {'title': 'Participate',
                   'description': 'This phase is to participate.',
-                  'acm': {'principals':           ['participant', 'moderator', 'creator', 'initiator'],  # noqa
+                  'acm': {'principals':           ['participant', 'moderator', 'creator', 'initiator'],
                           'permissions':
-                              [['create_proposal', 'Allow',        None,        None,      None],  # noqa
-                               ['edit_proposal',    None,          None,       'Allow',    None],  # noqa
-                               ['create_comment',  'Allow',       'Allow',      None,      None],  # noqa
-                               ['edit_comment',     None,          None,       'Allow',    None],  # noqa
-                               ['create_rate',     'Allow',        None,        None,      None],  # noqa
-                               ['edit_rate',        None,          None,       'Allow',    None],  # noqa
+                              [['create_proposal', 'Allow',        None,        None,      None],
+                               ['edit_proposal',    None,          None,       'Allow',    None],
+                               ['create_comment',  'Allow',       'Allow',      None,      None],
+                               ['edit_comment',     None,          None,       'Allow',    None],
+                               ['create_rate',     'Allow',        None,        None,      None],
+                               ['edit_rate',        None,          None,       'Allow',    None],
                                ]},
                   'display_only_to_roles': [],
                   },

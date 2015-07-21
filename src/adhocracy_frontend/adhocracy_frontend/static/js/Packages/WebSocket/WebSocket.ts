@@ -192,8 +192,8 @@ export var dummyWebSocketFactory = (uri : string) => {
 /**
  * Automatically choose a IRawWebSocket implementation.
  */
-export var rawWebSocketFactoryFactory = (Modernizr : ModernizrStatic) => {
-    if (Modernizr.websockets) {
+export var rawWebSocketFactoryFactory = (modernizr : ModernizrStatic) => {
+    if (modernizr.websockets) {
         return (uri : string) => new WebSocket(uri);
     } else {
         return dummyWebSocketFactory;
@@ -208,6 +208,6 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEventManager.moduleName
         ])
-        .factory("adhRawWebSocketFactory", ["Modernizr", rawWebSocketFactoryFactory])
+        .factory("adhRawWebSocketFactory", ["modernizr", rawWebSocketFactoryFactory])
         .service("adhWebSocket", ["adhConfig", "adhEventManagerClass", "adhRawWebSocketFactory", Service]);
 };

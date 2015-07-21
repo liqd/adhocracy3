@@ -36,11 +36,11 @@ export class Resource {
     public first_version_path : string;
     public root_versions : string[];
     public static super_types : string[];
-    /* tslint:enable:variable-name */
 
     constructor(public content_type : string) {
         this.data = {};
     }
+    /* tslint:enable:variable-name */
 
     public getReferences() : string[] {
         var _self = this;

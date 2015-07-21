@@ -1,4 +1,7 @@
 """Root type to create initial object hierarchy and set global Permissions."""
+
+# flake8: noqa
+
 from pyramid.registry import Registry
 from pyramid.security import Allow
 from substanced.interfaces import IRoot
@@ -27,40 +30,40 @@ import adhocracy_core.sheets.name
 # Every role should only have the permission for the specific actions it is
 # meant to enable.
 root_acm = ACM().deserialize(
-    {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],  # noqa
+    {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
      'permissions': [  # general
-                     ['view',                          Allow,       Allow,         Allow,        Allow,     Allow,       Allow],  # noqa
-                     ['create',                        None,        Allow,         Allow,        None,      Allow,       Allow],  # noqa
-                     ['edit',                          None,        None,          None,         Allow,     None,        Allow],  # noqa
-                     ['edit_some',                     None,        Allow,         Allow,        Allow,     Allow,       Allow],  # noqa
-                     ['delete',                        None,        None,          Allow,        Allow,     None,        Allow],  # noqa
-                     ['hide',                          None,        None,          Allow,        None,      Allow,       Allow],  # noqa
-                     ['do_transition',                 None,        None,          None,         None,      Allow,       Allow],  # noqa
-                     ['message_to_user',               None,        Allow,         Allow,        None,      Allow,       Allow],  # noqa
+                     ['view',                          Allow,       Allow,         Allow,        Allow,     Allow,       Allow],
+                     ['create',                        None,        Allow,         Allow,        None,      Allow,       Allow],
+                     ['edit',                          None,        None,          None,         Allow,     None,        Allow],
+                     ['edit_some',                     None,        Allow,         Allow,        Allow,     Allow,       Allow],
+                     ['delete',                        None,        None,          Allow,        Allow,     None,        Allow],
+                     ['hide',                          None,        None,          Allow,        None,      Allow,       Allow],
+                     ['do_transition',                 None,        None,          None,         None,      Allow,       Allow],
+                     ['message_to_user',               None,        Allow,         Allow,        None,      Allow,       Allow],
                      # structure resources
-                     ['create_pool',                   None,        None,          None,         None,      None,        Allow],  # noqa
-                     ['create_organisation',           None,        None,          None,         None,      None,        Allow],  # noqa
-                     ['create_process',                None,        None,          None,         None,      Allow,       Allow],  # noqa
+                     ['create_pool',                   None,        None,          None,         None,      None,        Allow],
+                     ['create_organisation',           None,        None,          None,         None,      None,        Allow],
+                     ['create_process',                None,        None,          None,         None,      Allow,       Allow],
                      # simple content resources
-                     ['create_asset',                  None,        Allow,         None,         None,      None,        Allow],  # noqa
-                     ['create_external',               None,        Allow,         None,         None,      None,        Allow],  # noqa
-                     ['create_badge',                  None,        None,          Allow,        None,      Allow,       Allow],  # noqa
-                     ['create_badge_assignment',       None,        None,          Allow,        None,      Allow,       Allow],  # noqa
-                     ['create_badge_group',            None,        None,          Allow,        None,      Allow,       Allow],  # noqa
-                     ['assign_badge',                  None,        None,          Allow,        None,      Allow,       Allow],  # noqa
+                     ['create_asset',                  None,        Allow,         None,         None,      None,        Allow],
+                     ['create_external',               None,        Allow,         None,         None,      None,        Allow],
+                     ['create_badge',                  None,        None,          Allow,        None,      Allow,       Allow],
+                     ['create_badge_assignment',       None,        None,          Allow,        None,      Allow,       Allow],
+                     ['create_badge_group',            None,        None,          Allow,        None,      Allow,       Allow],
+                     ['assign_badge',                  None,        None,          Allow,        None,      Allow,       Allow],
                      # versioned content resources
-                     ['create_proposal',               None,        None,          None,         None,      None,        Allow],  # noqa
-                     ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],  # noqa
-                     ['create_comment',                None,        None,          None,         None,      None,        Allow],  # noqa
-                     ['edit_comment',                  None,        None,          None,         None,      None,        None],  # noqa
-                     ['create_rate',                   None,        None,          None,         None,      None,        None],  # noqa
-                     ['edit_rate',                     None,        None,          None,         None,      None,        None],  # noqa
+                     ['create_proposal',               None,        None,          None,         None,      None,        Allow],
+                     ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],
+                     ['create_comment',                None,        None,          None,         None,      None,        Allow],
+                     ['edit_comment',                  None,        None,          None,         None,      None,        None],
+                     ['create_rate',                   None,        None,          None,         None,      None,        None],
+                     ['edit_rate',                     None,        None,          None,         None,      None,        None],
                      # user, groups, permissions
-                     ['create_user',                   Allow,       None,          None,         None,      None,        Allow],  # noqa
-                     ['edit_userextended',             None,        None,          None,         Allow,     None,        Allow],  # noqa
-                     ['view_userextended',             None,        None,          None,         Allow,     None,        Allow],  # noqa
-                     ['create_edit_sheet_permissions', None,        None,          None,         None,      None,        Allow],  # noqa
-                     ['create_group',                  None,        None,          None,         None,      None,        Allow],  # noqa
+                     ['create_user',                   Allow,       None,          None,         None,      None,        Allow],
+                     ['edit_userextended',             None,        None,          None,         Allow,     None,        Allow],
+                     ['view_userextended',             None,        None,          None,         Allow,     None,        Allow],
+                     ['create_edit_sheet_permissions', None,        None,          None,         None,      None,        Allow],
+                     ['create_group',                  None,        None,          None,         None,      None,        Allow],
                      ]})
 
 

@@ -144,7 +144,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     meta = Attribute('SheetMetadata')
     registry = Attribute('pyramid registry')
 
-    def set(appstruct,  # noqa
+    def set(appstruct,
             omit=(),
             send_event=True,
             request=None,
@@ -157,7 +157,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         :param omit_readonly: do not store readonly ``appstruct`` data.
         """
 
-    def get(params: dict={}, add_back_references=True) -> dict:  # noqa
+    def get(params: dict={}, add_back_references=True) -> dict:
         """ Get ``appstruct`` dictionary data.
 
         :param params: optional parameters that can modify the appearance
@@ -166,7 +166,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         :param add_backrefs: allow to omit back references
         """
 
-    def get_cstruct(request, params: dict={}):  # noqa
+    def get_cstruct(request, params: dict={}):
         """Return cstruct data.
 
         Bind `request` and `context` (self.context) to colander schema
@@ -176,7 +176,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
         of the returned dictionary, e.g. query parameters in a GET request
         """
 
-    def delete_field_values(fields: [str]):  # noqa
+    def delete_field_values(fields: [str]):
         """Delete values for every field name in `fields`."""
 
 
@@ -265,16 +265,16 @@ class IPool(IResource):  # pragma: no cover
     def items() -> Iterable:
         """ Return (name, value) pairs of subobjects in the folder."""
 
-    def get(name: str, default=None) -> object:  # noqa
+    def get(name: str, default=None) -> object:
         """ Get subobject by name.
 
         :raises substanced.folder.FolderKeyError: if `name` is not in this pool
         """
 
-    def __contains__(name) -> bool:  # noqa
+    def __contains__(name) -> bool:
         """Check if this pool contains an subobject named by name."""
 
-    def add(name: str, other) -> str:  # noqa
+    def add(name: str, other) -> str:
         """ Add subobject other.
 
         :returns: The name used to place the subobject in the
@@ -282,7 +282,7 @@ class IPool(IResource):  # pragma: no cover
         ``self.check_name(name)``).
         """
 
-    def check_name(name: str) -> str:  # noqa
+    def check_name(name: str) -> str:
         """ Check that the passed name is valid.
 
         :returns: The name.
@@ -291,16 +291,16 @@ class IPool(IResource):  # pragma: no cover
         :raises ValueError: if 'name' contains '@@', slashes or is empty.
         """
 
-    def next_name(subobject, prefix='') -> str:  # noqa
+    def next_name(subobject, prefix='') -> str:
         """Return Name for subobject."""
 
-    def add_next(subobject, prefix='') -> str:  # noqa
+    def add_next(subobject, prefix='') -> str:
         """Add new subobject and auto generate name."""
 
-    def add_service(service_name: str, other) -> str:  # noqa
+    def add_service(service_name: str, other) -> str:
         """Add a term:`service` to this folder named `service_name`."""
 
-    def find_service(service_name: str, *sub_service_names) -> IResource:  # noqa
+    def find_service(service_name: str, *sub_service_names) -> IResource:
         """ Return a :term:`service` named by `service_name`.
 
         :param service_name: Search in this pool and his :term:`lineage` for a
@@ -350,7 +350,7 @@ class SheetReferenceClass(ReferenceClass):
     Uses class attributes "target_*" and "source_*" to set tagged values.
     """
 
-    def __init__(self, *arg, **kw):  # noqa
+    def __init__(self, *arg, **kw):
         try:
             attrs = arg[2] or {}
         except IndexError:
@@ -478,17 +478,17 @@ class ITokenManger(Interface):  # pragma: no cover
 
     """ITokenManger interface."""
 
-    def create_token(userid: str) -> str:  # noqa
+    def create_token(userid: str) -> str:
         """ Create authentication token for :term:`userid`."""
 
-    def get_user_id(token: str) -> str:  # noqa
+    def get_user_id(token: str) -> str:
         """ Get :term:`userid` for authentication token.
 
         :returns: user id for this token
         :raises KeyError: if there is no corresponding `userid`
         """
 
-    def delete_token(token: str):  # noqa
+    def delete_token(token: str):
         """ Delete authentication token."""
 
 
@@ -675,23 +675,23 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
 
     """Adapter responsible for returning a user or get info about it."""
 
-    def get_roleids(userid: str) -> list:  # noqa
+    def get_roleids(userid: str) -> list:
         """Return the roles for :term:`userid` or `None`.
 
         We return 'None' if the the user does not exists to provide a similar
         behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
         """
 
-    def get_group_roleids(userid: str) -> list:  # noqa
+    def get_group_roleids(userid: str) -> list:
         """Return the group roleids for :term:`userid` or None."""
 
-    def get_groupids(userid: str) -> list:  # noqa
+    def get_groupids(userid: str) -> list:
         """Get :term:`groupid`s for term:`userid` or return None."""
 
-    def get_groups(userid: str) -> list:  # noqa
+    def get_groups(userid: str) -> list:
         """Get :term:`group`s for term:`userid` or return None."""
 
-    def get_user_by_activation_path(activation_path: str) -> IResource:  # noqa
+    def get_user_by_activation_path(activation_path: str) -> IResource:
         """Find user per activation path or return None."""
 
 
@@ -703,7 +703,7 @@ class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
 
     role_prefix = Attribute('Prefix to generate the :term:`roleid`')
 
-    def permits(context,  # noqa
+    def permits(context,
                 principals: list,
                 permission: str) -> ACLPermitsResult:
         """Check that one `principal` has the `permission` for `context`.
@@ -771,7 +771,7 @@ class IHTTPCacheStrategy(Interface):  # pragma: no cover
 
     """Strategy to set http cache headers."""
 
-    def set_cache_headers_for_mode(mode: HTTPCacheMode):  # noqa
+    def set_cache_headers_for_mode(mode: HTTPCacheMode):
         """Set response cache headers according to :class:`HTTPCacheMode`."""
 
     def check_conditional_request():
@@ -782,5 +782,5 @@ class IAdhocracyWorkflow(IWorkflow):  # pragma: no cover
 
     """IAdhocracyWorkflow interface."""
 
-    def get_next_states(context, request: IRequest) -> [str]:  # noqa
+    def get_next_states(context, request: IRequest) -> [str]:
         """Get states you can trigger a transition to."""

@@ -15,7 +15,7 @@ export class Service {
         private adhConfig : AdhConfig.IService,
         private adhCache : AdhCache.Service,
         private adhTracking : AdhTracking.Service,
-        private Modernizr,
+        private modernizr,
         private ng : typeof angular,
         private $q : angular.IQService,
         private $http : angular.IHttpService,
@@ -34,7 +34,7 @@ export class Service {
             }
         }));
 
-        if (_self.Modernizr.localstorage) {
+        if (_self.modernizr.localstorage) {
             var sessionValue = _self.$window.localStorage.getItem("user-session");
             _self.updateSessionFromStorage(sessionValue);
 
@@ -102,7 +102,7 @@ export class Service {
     }
 
     public storeAndEnableToken(token : string, userPath : string) : void {
-        if (this.Modernizr.localstorage) {
+        if (this.modernizr.localstorage) {
             this.$window.localStorage.setItem("user-session", JSON.stringify({
                 "user-path": userPath,
                 "user-token": token
@@ -115,7 +115,7 @@ export class Service {
     }
 
     public deleteToken() : void {
-        if (this.Modernizr.localstorage) {
+        if (this.modernizr.localstorage) {
             this.$window.localStorage.removeItem("user-session");
         }
         delete this.$http.defaults.headers.common["X-User-Token"];
@@ -139,5 +139,5 @@ export var register = (angular) => {
             AdhTracking.moduleName
         ])
         .service("adhCredentials", [
-            "adhConfig", "adhCache", "adhTracking", "Modernizr", "angular", "$q", "$http", "$timeout", "$rootScope", "$window", Service]);
+            "adhConfig", "adhCache", "adhTracking", "modernizr", "angular", "$q", "$http", "$timeout", "$rootScope", "$window", Service]);
 };

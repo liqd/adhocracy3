@@ -39,7 +39,7 @@ class TokenMangerAnnotationStorage:
         self.context = context
 
     @property
-    def token_to_user_id_timestamp(self):  # noqa
+    def token_to_user_id_timestamp(self):
         tokens = getattr(self.context, self.annotation_key, None)
         if tokens is None:
             tokens = PersistentDict()
@@ -200,7 +200,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
             raise KeyError
         return authenticated_userid
 
-    def remember(self, request, userid, **kw) -> dict:  # noqa
+    def remember(self, request, userid, **kw) -> dict:
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager:  # for testing
             token = tokenmanager.create_token(userid, secret=self.secret,
@@ -220,7 +220,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         return {'X-User-Path': url,
                 'X-User-Token': token}
 
-    def forget(self, request):  # noqa
+    def forget(self, request):
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager:
             token = _get_x_user_headers(request)[0]
