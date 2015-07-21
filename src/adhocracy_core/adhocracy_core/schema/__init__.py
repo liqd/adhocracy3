@@ -293,7 +293,7 @@ def string_has_no_newlines_validator(value: str) -> bool:
 
 class SingleLine(AdhocracySchemaNode):
 
-    """ UTF-8 encoded String without line breaks.
+    r"""UTF-8 encoded String without line breaks.
 
     Disallowed characters are linebreaks like: \n, \r.
     Example value: This is a something.
