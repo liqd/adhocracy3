@@ -124,7 +124,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         msg_user = messenger.mailer.outbox[0]
         assert 'user@example.com' in msg_user.recipients
         assert 'Ihre Stellungnahme zum Bebauungsplan 112233, öffentliche Auslegung' \
-            ', von 05/05/2015 - 11/06/2015.'  == msg_user.subject
+            ' von 05/05/2015 - 11/06/2015.'  == msg_user.subject
         assert 'Vielen Dank' in msg_user.body
         assert 'Laura Muster' in msg_user.body
         assert 'user@example.com' in msg_user.body
