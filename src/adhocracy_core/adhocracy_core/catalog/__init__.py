@@ -19,7 +19,6 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.utils import normalize_to_tuple
 
 
-
 class ICatalogsService(IServicePool):
 
     """The 'catalogs' ServicePool."""
@@ -29,8 +28,8 @@ class CatalogsServiceAdhocracy(CatalogsService):
 
     def reindex_all(self, resource: IResource):
         """Reindex `resource` with all indexes."""
-        for catalog in self.values():
-            catalog.reindex_resource(resource)
+        for value in self.values():
+            value.reindex_resource(resource)
 
     def reindex_index(self, resource: IResource, index_name: str):
         """Reindex `resource` with index `index_name`.
@@ -43,7 +42,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
             raise KeyError(msg)
         index.reindex_resource(resource)
 
-    def search(self, query: SearchQuery) -> SearchResult:  # flake8: noqa
+    def search(self, query: SearchQuery) -> SearchResult:
         """Search indexes in catalogs `adhocracy` and `system`."""
         elements = self._search_elements(query)
         frequency_of = self._get_frequency_of(elements, query)
