@@ -10,12 +10,15 @@ Badge modifiers for labeling if a proposal has been realized or not.
 ```html_example
 <span class="badge m-is-realized">Is Realized</span>
 <span class="badge m-is-not-realized">Is Not Realized</span>
+<span class="badge m-info">Information</span>
 ```
 
 */
 
 .badge {
-    &.m-is-realized, &.m-is-not-realized {
+    &.m-info,
+    &.m-is-realized,
+    &.m-is-not-realized {
         color: $color-text-inverted;
     }
 
@@ -25,5 +28,18 @@ Badge modifiers for labeling if a proposal has been realized or not.
 
     &.m-is-not-realized {
         background-color: $color-text-introvert;
+    }
+
+    &.m-info {
+        padding-left: 0;
+        background-color: $color-brand-two-normal;
+
+        &:before {
+            @include inline-block;
+            content: "info";
+            padding: 0 5px / $font-size-smaller * 1em;
+            margin-right: 5px / $font-size-smaller * 1em;
+            background-color: $color-text-introvert;
+        }
     }
 }

@@ -43,7 +43,8 @@ class WorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
     draft = workflow.StateAssignment()
     announce = workflow.StateAssignment()
     participate = workflow.StateAssignment()
-    frozen = workflow.StateAssignment()
+    evaluate = workflow.StateAssignment()
+    closed = workflow.StateAssignment()
 
 
 workflow_meta = workflow.workflow_meta._replace(
