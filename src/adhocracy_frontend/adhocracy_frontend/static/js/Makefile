@@ -42,9 +42,6 @@ warn_orphan_js:
 
 test: warn_orphan_js tslint compile_tests_node test_node
 
-tslint:
-	$(A3_ROOT)/bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
-
 test_node:
 	../../../../../bin/jasmine-node .
 	@echo "NOTE: leaving commonjs modules in place."

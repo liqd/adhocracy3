@@ -12,7 +12,7 @@ Requirements:
 create virtual machine and login:
 
     (LINUX:)    wget https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
-    (OSX:)      curl https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
+    (OSX:)      curl -O https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
     vagrant up
     vagrant ssh
 
