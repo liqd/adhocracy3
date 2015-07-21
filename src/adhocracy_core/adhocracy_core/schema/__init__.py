@@ -68,7 +68,7 @@ class AdhocracySequenceNode(colander.SequenceSchema, AdhocracySchemaNode):
     """
 
     @colander.deferred
-    def default(node: colander.Schema, kw: dict) -> list:  # noqa
+    def default(node: colander.Schema, kw: dict) -> list:
         return []
 
 
@@ -288,10 +288,10 @@ class AbsolutePath(AdhocracySchemaNode):
 
 def string_has_no_newlines_validator(value: str) -> bool:
     """Check for new line characters."""
-    return False if '\n' in value or '\r' in value else True  # noqa
+    return False if '\n' in value or '\r' in value else True
 
 
-class SingleLine(AdhocracySchemaNode):  # noqa
+class SingleLine(AdhocracySchemaNode):
 
     """ UTF-8 encoded String without line breaks.
 
@@ -864,7 +864,7 @@ class ACMRow(colander.SequenceSchema):
     item = ACMCell()
 
     @colander.deferred
-    def validator(node, kw):  # noqa
+    def validator(node, kw):
         """Validator."""
         registry = kw.get('registry')
 
