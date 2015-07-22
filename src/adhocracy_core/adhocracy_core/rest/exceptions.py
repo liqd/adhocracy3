@@ -146,18 +146,21 @@ def _get_filtered_request_body(request) -> str:
     Only the 5000 first characters are shown.
     """
     filtered_body = request.body
-    if request.content_type == 'multipart/form-data':
-        filtered_body = _truncate(filtered_body, 120)
-    else:
-        json_body = get_json_body(request)
-        if not isinstance(json_body, dict):
-            return request.text
+    json_body = get_json_body(request)
+    if json_body == {}:
+        pass
+    elif isinstance(json_body, dict):
+        password_sheet = IPasswordAuthentication.__identifier__
         if 'password' in json_body:
             json_body['password'] = '<hidden>'
-        password_sheet = IPasswordAuthentication.__identifier__
         if password_sheet in json_body.get('data', {}):
             json_body['data'][password_sheet]['password'] = '<hidden>'
         filtered_body = json.dumps(json_body)
+    elif isinstance(json_body, list):
+        filtered_body = json.dumps(json_body)
+    if request.content_type == 'multipart/form-data':
+        filtered_body = _truncate(filtered_body, 120)
+    else:
         filtered_body = _truncate(filtered_body, 5000)
     return filtered_body
 
@@ -240,11 +243,14 @@ def handle_error_410_exception(error, request):
     schema = BlockExplanationResponseSchema().bind(request=request,
                                                    context=context)
     cstruct = schema.serialize(explanation)
-    error.content_type = 'application/json'
     if cstruct['modification_date'] is colander.null:
         cstruct['modification_date'] = ''
-    error.json = cstruct
-    return error
+    json_error = JSONHTTPClientError([],
+                                     request=request,
+                                     code=error.code,
+                                     title=error.title)
+    json_error.json_body = cstruct
+    return json_error
 
 
 def includeme(config):  # pragma: no cover

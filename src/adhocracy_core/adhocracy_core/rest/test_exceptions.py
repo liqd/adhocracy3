@@ -46,10 +46,10 @@ class TestJSONHTTPException:
         self.make_one([], request_)
         assert '[]' in str(log)
 
-    def test_log_ignore_if_request_body_json_other(self, request_, log):
+    def test_log_request_body_json_other(self, request_, log):
         request_.body = b'None'
         self.make_one([], request_)
-        assert 'None' not in str(log)
+        assert 'None' in str(log)
 
     def test_log_abbreviated_request_body_if_gt_5000(self, request_, log):
         request_.body = '{"data": "' + 'h' * 5110 + '"}'
@@ -57,10 +57,10 @@ class TestJSONHTTPException:
         assert len(str(log)) < len(request_.body)
         assert '...' in str(log)
 
-    def test_log_ignore_if_request_body_is_not_json(self, request_, log):
+    def test_log_request_body_is_wrong_json(self, request_, log):
         request_.body = b'wrong'
         self.make_one([], request_)
-        assert 'wrong' not in str(log)
+        assert 'wrong' in str(log)
 
     def test_log_formdata_body(self, request_, log):
         request_.content_type = 'multipart/form-data'
