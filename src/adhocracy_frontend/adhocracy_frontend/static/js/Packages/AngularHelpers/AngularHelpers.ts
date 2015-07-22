@@ -26,7 +26,7 @@ export var recursionHelper = ($compile) => {
                 /**
                  * Compiles and re-adds the contents
                  */
-                post: (scope, element) => {
+                post: function(scope, element) {
                     // Compile the contents
                     if (!compiledContents) {
                         compiledContents = $compile(contents);
@@ -91,7 +91,7 @@ export var recompileOnChange = ($compile : angular.ICompileService) => {
 
             return {
                 pre: (link && link.pre) ? link.pre : null,
-                post: (scope : angular.IScope, element, attrs) => {
+                post: function(scope : angular.IScope, element, attrs) {
                     var innerScope : angular.IScope;
 
                     if (!compiledContents) {

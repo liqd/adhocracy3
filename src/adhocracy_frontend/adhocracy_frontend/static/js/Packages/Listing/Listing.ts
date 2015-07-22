@@ -94,9 +94,9 @@ export interface ListingScope<Container> extends angular.IScope {
 export interface IFacetsScope extends angular.IScope {
     facets : IFacet[];
     update : () => angular.IPromise<void>;
-    enableItem : (IFacet, IFacetItem) => void;
-    disableItem : (IFacet, IFacetItem) => void;
-    toggleItem : (IFacet, IFacetItem, event) => void;
+    enableItem : (facet : IFacet, item : IFacetItem) => void;
+    disableItem : (facet : IFacet, item : IFacetItem) => void;
+    toggleItem : (facet : IFacet, item : IFacetItem, event) => void;
 }
 
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements

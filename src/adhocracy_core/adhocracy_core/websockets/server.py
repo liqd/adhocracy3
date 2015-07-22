@@ -32,6 +32,7 @@ class ClientTracker():
     """Keeps track of the clients that want notifications."""
 
     def __init__(self):
+        """Initialize self."""
         self._clients2resource_paths = defaultdict(set)
         self._resource_paths2clients = defaultdict(set)
 
@@ -113,6 +114,7 @@ class DummyRequest:
     """
 
     def __init__(self, application_url, root):
+        """Initialize self."""
         self.application_url = application_url
         """URL prefix used to extract resource paths."""
         self.root = root
@@ -192,7 +194,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     def onOpen(self):  # noqa
         logger.debug('WebSocket connection to %s open', self._client)
 
-    def onMessage(self, payload: bytes, is_binary: bool):    # noqa
+    def onMessage(self, payload: bytes, is_binary: bool):  # noqa
         try:
             json_object = self._parse_message(payload, is_binary)
             if self._handle_if_server_notification(json_object):

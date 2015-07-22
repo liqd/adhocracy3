@@ -1,4 +1,4 @@
-/* tslint:disable:variable-name */
+/// <reference path="../../_all.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
 import _ = require("lodash");
@@ -90,7 +90,7 @@ export interface IScopeData {
 
     title : {
         title : string;
-    }
+    };
 
     // 1. basic
     user_info : {
@@ -826,6 +826,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         private $timeout : angular.ITimeoutService,
         flowFactory,
         moment : moment.MomentStatic,
+        private modernizr : ModernizrStatic,
         $window : Window,
         $location : angular.ILocationService,
         $q : angular.IQService
@@ -838,7 +839,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         var instance = super.link(scope, element, attrs, wrapper);
         instance.scope.data = <any>{};
         instance.scope.$watch("$viewContentLoaded", function() {
-            if (!Modernizr.inputtypes.number) {
+            if (!this.modernizr.inputtypes.number) {
                 element.find(":input[type='number']").updatePolyfill();
                 $(".has-input-buttons").removeClass( "has-input-buttons").css({"display" : "inline-block"});
             }
@@ -846,7 +847,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         // Fix for later, if we want to add a webshim datepicker
         /*var _self = this;
         instance.scope.$watch("data.organization_info.status_enum", function() {
-            if (!Modernizr.inputtypes.date) {
+            if (!this.modernizr.inputtypes.date) {
                 _self.$timeout(() => {
                     element.find(":input[type='date']").updatePolyfill();
                 });
@@ -952,9 +953,9 @@ export var listItem = (
                         picture: introduction.data[SIMercatorIntroduction.nick].picture
                     };
                 });
-                adhHttp.get(proposal.data[SIMercatorSubResources.nick].organization_info).then((organization_info) => {
+                adhHttp.get(proposal.data[SIMercatorSubResources.nick].organization_info).then((organizationInfo) => {
                     scope.data.organization_info = {
-                        name: organization_info.data[SIMercatorOrganizationInfo.nick].name
+                        name: organizationInfo.data[SIMercatorOrganizationInfo.nick].name
                     };
                 });
                 adhHttp.get(proposal.data[SIMercatorSubResources.nick].finance).then((finance) => {
@@ -1258,6 +1259,7 @@ export var register = (angular) => {
             "$timeout",
             "flowFactory",
             "moment",
+            "modernizr",
             "$window",
             "$location",
             "$q",

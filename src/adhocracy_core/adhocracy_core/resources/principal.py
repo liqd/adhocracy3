@@ -109,6 +109,7 @@ class User(Pool):
     activation_path = None
 
     def __init__(self, data=None, family=None):
+        """Initialize self."""
         super().__init__(data, family)
         self.roles = []
         self.group_ids = []
@@ -173,6 +174,7 @@ class Group(Pool):
     """Group implementation with roles attribute to improve performance."""
 
     def __init__(self, data=None, family=None):
+        """Initialize self."""
         super().__init__(data, family)
         self.roles = []
 
@@ -264,6 +266,7 @@ class UserLocatorAdapter(object):
     """Provides helper methods to find users."""
 
     def __init__(self, context, request):
+        """Initialize self."""
         self.context = context
         self.request = request
 

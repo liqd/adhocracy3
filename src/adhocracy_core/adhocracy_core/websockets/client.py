@@ -146,6 +146,7 @@ class Client:
         self._ws_connection.send(message_text)
 
     def stop(self):
+        """Stop the client."""
         self._is_stopped = True
         try:
             if self._is_connected():

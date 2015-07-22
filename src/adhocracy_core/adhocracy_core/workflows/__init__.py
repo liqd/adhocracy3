@@ -57,7 +57,7 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
 
 
 def setup_workflow(context: IResource, states: [str], registry: Registry):
-    """Initialize workflow associated to the resource and transition to the given states."""
+    """Initialize workflow and transition to the given states."""
     request = Request.blank('/dummy')
     request.registry = registry
     request.__cached_principals__ = ['role:god']
@@ -83,7 +83,9 @@ def _validate_workflow_cstruct(cstruct: dict) -> dict:
     return appstruct
 
 
-def _create_workflow(registry: Registry, appstruct: dict, name: str) -> ACLWorkflow:
+def _create_workflow(registry: Registry,
+                     appstruct: dict,
+                     name: str) -> ACLWorkflow:
     initial_state = appstruct['states_order'][0]
     workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
     for name, data in appstruct['states'].items():

@@ -115,6 +115,7 @@ class AdministrativeDivisionName(SingleLine):
     """Administrative division, see :class`GermanAdministrativeDivisions`."""
 
     def validator(self, node, cstruct):
+        """Validator."""
         division_names = GermanAdministrativeDivisions.__members__.keys()
         return colander.OneOf(division_names)(node, cstruct)
 

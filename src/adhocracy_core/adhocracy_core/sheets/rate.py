@@ -45,12 +45,15 @@ class RateableRateValidator:
     _allowed_values = (1, 0, -1)
 
     def __init__(self, context):
+        """Initialize self."""
         self.context = context
 
     def validate(self, rate: int) -> bool:
+        """Validate the rate."""
         return rate in self._allowed_values
 
     def helpful_error_message(self) -> str:
+        """Return error message."""
         return 'rate must be one of {}'.format(self._allowed_values)
 
 

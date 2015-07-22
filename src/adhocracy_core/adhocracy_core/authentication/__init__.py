@@ -35,6 +35,7 @@ class TokenMangerAnnotationStorage:
     annotation_key = '_tokenmanager_storage'
 
     def __init__(self, context):
+        """Initialize self."""
         self.context = context
 
     @property
@@ -169,6 +170,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
                  get_tokenmanager: callable=get_tokenmanager,
                  hashalg: str='sha512',
                  ):
+        """Initialize self."""
         self.callback = groupfinder  # callback is an inherited class attr.
         self.secret = secret
         self.timeout = timeout
@@ -176,9 +178,11 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.hashalg = hashalg
 
     def unauthenticated_userid(self, request):
+        """Return unauthenticated userid."""
         return _get_raw_x_user_headers(request)[0]
 
     def authenticated_userid(self, request):
+        """Return authenticated userid."""
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager is None:
             return None

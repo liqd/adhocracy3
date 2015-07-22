@@ -16,10 +16,12 @@ class Base(Persistent):
     __name__ = None
 
     def __init__(self):
+        """Initialize self."""
         self.__changed_backrefs_counter__ = Length()
         """Counter that should increment if backreferences are changed."""
 
     def __repr__(self):
+        """Return representation of self."""
         iface = get_iresource(self) or self.__class__
         iface_dotted = to_dotted_name(iface)
         oid = getattr(self, '__oid__', None)

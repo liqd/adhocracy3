@@ -47,7 +47,6 @@ def import_users():  # pragma: no cover
                         help='file containing the users')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     _import_users(env['root'], env['registry'], args.filename)
     env['closer']()
 
@@ -58,7 +57,8 @@ def _import_users(context: IResource, registry: Registry, filename: str):
     users = find_service(context, 'principals', 'users')
     groups = find_service(context, 'principals', 'groups')
     for user_info in users_info:
-        user_by_name, user_by_email = _locate_user(user_info, context,
+        user_by_name, user_by_email = _locate_user(user_info,
+                                                   context,
                                                    registry)
         if user_by_name or user_by_email:
             logger.info('Updating user {} ({})'.format(user_info['name'],

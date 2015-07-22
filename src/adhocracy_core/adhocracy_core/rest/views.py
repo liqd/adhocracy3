@@ -277,6 +277,7 @@ class RESTView:
     validation_POST = (None, [])
 
     def __init__(self, context, request):
+        """Initialize self."""
         self.context = context
         """Context Resource."""
         self.request = request
@@ -300,15 +301,19 @@ class RESTView:
         return {}
 
     def get(self) -> dict:
+        """HTTP GET."""
         raise HTTPMethodNotAllowed()
 
     def put(self) -> dict:
+        """"HTTP PUT."""
         raise HTTPMethodNotAllowed()
 
     def post(self) -> dict:
+        """HTTP POST."""
         raise HTTPMethodNotAllowed()
 
     def delete(self) -> dict:
+        """HTTP delete."""
         raise HTTPMethodNotAllowed()
 
     def _build_updated_resources_dict(self) -> dict:
@@ -338,6 +343,7 @@ class ResourceRESTView(RESTView):
     """Default view for Resources, implements get and options."""
 
     def __init__(self, context, request):
+        """Initialize self."""
         super().__init__(context, request)
         self.registry = request.registry.content
         """:class:`pyramid.registry.Registry`."""
@@ -538,6 +544,7 @@ class PoolRESTView(SimpleRESTView):
                  permission='edit_some',
                  accept='application/json')
     def put(self) -> dict:
+        """HTTP PUT."""
         return super().put()
 
 
@@ -616,15 +623,19 @@ class ItemRESTView(PoolRESTView):
 )
 class BadgeAssignmentsRESTView(PoolRESTView):
 
+    """REST view for the badge assignment."""
+
     @view_config(request_method='GET',
                  permission='view')
     def get(self) -> dict:
+        """HTTP GET."""
         return super().get()
 
     @view_config(request_method='POST',
                  permission='create',
                  accept='application/json')
     def post(self):
+        """HTTP POST."""
         return super().post()
 
     @view_config(request_method='OPTIONS')
@@ -655,6 +666,7 @@ class UsersRESTView(PoolRESTView):
                  permission='create_user',
                  accept='application/json')
     def post(self):
+        """HTTP POST."""
         return super().post()
 
 
@@ -670,6 +682,7 @@ class AssetsServiceRESTView(PoolRESTView):
                  permission='create_asset',
                  accept='multipart/form-data')
     def post(self):
+        """HTTP POST."""
         return super().post()
 
 
@@ -685,6 +698,7 @@ class AssetRESTView(SimpleRESTView):
                  permission='create_asset',
                  accept='multipart/form-data')
     def put(self) -> dict:
+        """HTTP PUT."""
         result = super().put()
         validate_and_complete_asset(self.context, self.request.registry)
         return result
@@ -718,9 +732,11 @@ class AssetDownloadRESTView(SimpleRESTView):
         response.last_modified = self.request.response.last_modified
 
     def put(self) -> dict:
+        """HTTP PUT."""
         raise HTTPMethodNotAllowed()
 
     def post(self) -> dict:
+        """HTTP POST."""
         raise HTTPMethodNotAllowed()
 
 

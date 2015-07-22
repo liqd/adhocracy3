@@ -39,6 +39,7 @@ class Graph(Persistent):
 
     # TODO: add interface for graph to make it a nice droppable dependency
     def __init__(self, context):
+        """Initialize self."""
         self.context = context
 
     @property
