@@ -30,12 +30,14 @@ class BatchItemResponse:
     Attributes:
 
     :code: the status code (int)
+    :title: the status title (str)
     :body: the response body as a JSOn object (dict)
     """
 
-    def __init__(self, code: int, body: dict={}):
+    def __init__(self, code: int, title: str, body: dict={}):
         self.code = code
         self.body = body
+        self.title = title
 
     def was_successful(self):
         return self.code == 200
@@ -69,12 +71,13 @@ class BatchView(RESTView):
             if not item_response.was_successful():
                 error = JSONHTTPClientError([],
                                             code=item_response.code,
+                                            title=item_response.title,
                                             request=self.request)
                 # TODO: the error response lists updated resources
-                json_body = error.json
+                json_body = error.json_body
                 response_list_json = self._response_list_to_json(response_list)
                 json_body.update(response_list_json)
-                error.text = dumps(json_body)
+                error.json_body = json_body
                 msg = 'Failing batch request item position {0} request {1} {2}'
                 logger.warn(msg.format(pos,
                                        item['method'],
@@ -184,14 +187,13 @@ class BatchView(RESTView):
             self, subrequest: Request) -> BatchItemResponse:
         try:
             subresponse = self.request.invoke_subrequest(subrequest)
-            status_code = subresponse.status_code
-            body = subresponse.json
         except Exception as err:
             error_view = self._get_error_view(err)
-            error = error_view(err, subrequest)
-            status_code = error.code
-            body = get_json_body(error)
-        return BatchItemResponse(status_code, body)
+            subresponse = error_view(err, subrequest)
+        body = get_json_body(subresponse)
+        return BatchItemResponse(subresponse.status_code,
+                                 subresponse.status,
+                                 body)
 
     def _get_error_view(self, error: Exception) -> callable:
         """Return view callable to handle exception.

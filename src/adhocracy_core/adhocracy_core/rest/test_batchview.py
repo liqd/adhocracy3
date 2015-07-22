@@ -9,9 +9,10 @@ from testfixtures import LogCapture
 
 class DummySubresponse:
 
-    def __init__(self, status_code=200, json: dict={}):
-        self.status_code = status_code
-        self.json = json
+    def __init__(self, code=200, title='OK', json={}):
+        self.status_code = code
+        self.status = title
+        self.json_body = json
 
 
 class TestBatchItemResponse:
@@ -90,7 +91,7 @@ class TestBatchView:
         inst = self.make_one(context, request_)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
-        mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
+        mock_invoke_subrequest.return_value = DummySubresponse(code=200,
                                                                json=paths,)
         response = inst.post()
         assert response == {'responses': [{'body': paths, 'code': 200}],
@@ -116,7 +117,7 @@ class TestBatchView:
         inst = self.make_one(context, request_)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
-        mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
+        mock_invoke_subrequest.return_value = DummySubresponse(code=200,
                                                                json=paths,)
         inst.post()
         subrequest  = mock_invoke_subrequest.call_args[0][0]
@@ -135,7 +136,7 @@ class TestBatchView:
                  'first_version_path': '/pool/item/v1',
                  'updated_resources': {'created': ['/pool/item/v1']}}
         mock_invoke_subrequest.return_value = DummySubresponse(
-            status_code=200, json=response_body,)
+            code=200, json=response_body,)
         response = inst.post()
         assert response == {'responses': [{'body': {'path': '/pool/item',
                                                     'first_version_path':
@@ -153,7 +154,7 @@ class TestBatchView:
         inst = self.make_one(context, request_)
         paths = {'path': '/pool/item',
                  'first_version_path': '/pool/item/v1'}
-        mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
+        mock_invoke_subrequest.return_value = DummySubresponse(code=200,
                                                                json=paths)
 
         inst.post()
@@ -164,7 +165,8 @@ class TestBatchView:
     def test_post_failed_subrequest(self, context, request_, mock_invoke_subrequest):
         from .exceptions import JSONHTTPClientError
         request_.body = self._make_json_with_subrequest_cstructs()
-        mock_invoke_subrequest.return_value = DummySubresponse(status_code=404)
+        mock_invoke_subrequest.return_value = DummySubresponse(code=404,
+                                                               title='Not Found')
         inst = self.make_one(context, request_)
         with raises(JSONHTTPClientError) as err:
             inst.post()
@@ -205,7 +207,7 @@ class TestBatchView:
         request_.registry = integration.registry
         request_.body = self._make_json_with_subrequest_cstructs()
         error = HTTPRedirection()
-        error.code = 301
+        error.status = '301 Moved'
         mock_invoke_subrequest.side_effect = error
         inst = self.make_one(context, request_)
         with raises(JSONHTTPClientError) as err:
@@ -224,14 +226,15 @@ class TestBatchView:
                 inst.post()
         assert err.value.status_code == 500
 
-    def _make_batch_response(self, code=200, path=None, first_version_path=None):
+    def _make_batch_response(self, code=200, title='Ok', path=None,
+                             first_version_path=None):
         from adhocracy_core.rest.batchview import BatchItemResponse
         body = {}
         if path is not None:
             body['path'] = path
         if first_version_path is not None:
             body['first_version_path'] = first_version_path
-        return BatchItemResponse(code, body)
+        return BatchItemResponse(code, title, body)
 
     def test_extend_path_map_just_path(self, context, request_):
         inst = self.make_one(context, request_)
