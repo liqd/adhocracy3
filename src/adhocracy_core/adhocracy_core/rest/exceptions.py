@@ -156,8 +156,6 @@ def _get_filtered_request_body(request) -> str:
         if password_sheet in json_body.get('data', {}):
             json_body['data'][password_sheet]['password'] = '<hidden>'
         filtered_body = json.dumps(json_body)
-    elif isinstance(json_body, list):
-        filtered_body = json.dumps(json_body)
     if request.content_type == 'multipart/form-data':
         filtered_body = _truncate(filtered_body, 120)
     else:

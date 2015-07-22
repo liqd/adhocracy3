@@ -291,7 +291,7 @@ class TestHandleError410:
         from adhocracy_core.rest.exceptions import handle_error_410_exception
         return handle_error_410_exception(error, request)
 
-    def test_no_detail_no_imetadata(self, error, request_):
+    def test_no_detail_no_metadata(self, error, request_):
         inst = self.make_one(error, request_)
         assert inst.content_type == 'application/json'
         assert inst.json_body['modification_date'] == ''
