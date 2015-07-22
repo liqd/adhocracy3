@@ -105,7 +105,9 @@ def handle_error_40x_exception(error, request):
     """
     if isinstance(error, JSONHTTPClientError):
         return error
-    error_entries = [error_entry('url', request.method, str(error))]
+    error_entries = [error_entry('url',
+                                 request.method,
+                                 '{0} {1}'.format(error.status, error))]
     json_error = JSONHTTPClientError(error_entries,
                                      request=request,
                                      code=error.code,
@@ -220,7 +222,9 @@ def handle_error_400_url_decode_error(error, request):
 
     E.g. "/fooba%E9r/".
     """
-    error_entries = [error_entry('url', '', str(error))]
+    error_entries = [error_entry('url',
+                                 '',
+                                 '400 Bad Request ' + str(error))]
     return JSONHTTPClientError(error_entries)
 
 

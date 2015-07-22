@@ -1,6 +1,8 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 import colander
+
 
 
 class TestJSONHTTPException:
@@ -119,6 +121,12 @@ class TestHandleErrorX0XException:
 
 class TestHandleError40X_exception:
 
+    @fixture
+    def integration(self, config):
+        import adhocracy_core.rest
+        config.include(adhocracy_core.rest)
+        return config
+
     def call_fut(self, error, request):
         from adhocracy_core.rest.exceptions import handle_error_40x_exception
         return handle_error_40x_exception(error, request)
@@ -128,16 +136,43 @@ class TestHandleError40X_exception:
         error = HTTPClientError(status_code=400)
         json_error = self.call_fut(error, request_)
         assert json_error.status_code == 400
-        assert json_error.json_body == {"status": "error",
-                                        "errors": [{"description": str(error),
-                                                    "name": "GET",
-                                                    "location": "url"}]}
+        assert json_error.json_body == \
+               {"status": "error",
+                "errors": [{"description": "{0} {1}".format(error.status, error),
+                            "name": "GET",
+                            "location": "url"}]}
 
     def test_render_http_json_exception(self, request_):
         from .exceptions import JSONHTTPClientError
         error = JSONHTTPClientError([], code=400)
         json_error = self.call_fut(error, request_)
         assert json_error is error
+
+    def create_dummy_app(self, config, error=None):
+        def dummy_view(request):
+            if error:
+                raise error()
+            else:
+                return "{}"
+        config.add_view(dummy_view, name='dummy_view')
+        config.add_route('dummy_view', '/')
+        from webtest import TestApp
+        app = config.make_wsgi_app()
+        return TestApp(app)
+
+    @mark.usefixtures('integration')
+    def test_response_get_40X(self, integration):
+        from pyramid.httpexceptions import HTTPClientError
+        app_dummy = self.create_dummy_app(integration, error=HTTPClientError)
+        resp = app_dummy.get('/dummy_view', status=400)
+        assert '400' in resp.json['errors'][0]['description']\
+
+    @mark.usefixtures('integration')
+    def test_response_options_40X(self, integration):
+        from pyramid.httpexceptions import HTTPClientError
+        app_dummy = self.create_dummy_app(integration, error=HTTPClientError)
+        resp = app_dummy.get('/dummy_view', status=400)
+        assert '400' in resp.json['errors'][0]['description']
 
 
 class TestHandleError400ColanderInvalid:
@@ -189,7 +224,7 @@ class TestHandleError400URLDecodeError:
             wanted = {'status': 'error',
                       'errors': [{'location': 'url',
                                   'name': '',
-                                  'description': "'utf-8' codec can't decode byte 0x92 in position 0: invalid start byte"}]}
+                                  'description': "400 Bad Request 'utf-8' codec can't decode byte 0x92 in position 0: invalid start byte"}]}
             assert json.loads(inst.body.decode()) == wanted
 
 
