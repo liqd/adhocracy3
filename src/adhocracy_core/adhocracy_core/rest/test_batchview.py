@@ -337,6 +337,14 @@ class TestBatchView:
         assert subrequest.content_type != 'application/json'
         assert len(subrequest.body) == 0
 
+    def test_make_subrequest_with_wrong_script_name(self, context, request_):
+        request_.script_name = '/api'
+        inst = self.make_one(context, request_)
+        subrequest_cstrut = self._make_subrequest_cstruct(method='GET')
+        with raises(Exception) as exc:
+            subrequest = inst._make_subrequest(subrequest_cstrut)
+        assert 'does not start with' in str(exc.value)
+
     def test_resolve_preliminary_paths_str_with_replacement(self, context, request_):
         inst = self.make_one(context, request_)
         path_map = {'@newpath': '/adhocracy/new_item'}
