@@ -1,20 +1,29 @@
 @mixin button-base {
-    text-decoration: none;
-    overflow: hidden;
     @include inline-block;
     @include text-align(center);
-    cursor: pointer;
-    white-space: nowrap;
     border: 0;
+    cursor: pointer;
+    font-size: $font-size-normal;
+    font-weight: $font-weight-normal;
+    height: $button-height * 1em;
+    line-height: $button-height;
+    overflow: hidden;
+    padding: 0;
+    text-decoration: none;
+    white-space: nowrap;
 
     &:hover {
         text-decoration: none;
+    }
+
+    &[disabled] {
+        @include opacity(0.5);
     }
 }
 
 /*doc
 ---
-title: button
+title: Button
 name: button
 category: Buttons
 ---
@@ -28,97 +37,109 @@ It may have the following states:
 -   ng-disabled or :disabled
 
 ```html_example
-<a class="button">Link</a>
-<button type="button">Button</button>
-<input type="submit" value="Submit" />
-<input type="submit" value="Disabled" disabled="disabled" />
+<a class="button" href="">Link</a>
+<button type="button" class="button">Button</button>
+<input type="submit" class="button" value="Submit" />
+<input type="submit" class="button" value="Disabled" disabled="disabled" />
 ```
 */
 
 /*doc
 ---
-title: call-to-action modifier
-name: button.m-call-to-action
+title: Call-to-action button
+name: button.button-cta
 parent: button
 ---
 
 A highlighted button. Each page should have one CTA at maxiumum.
 
 ```html_example
-<a class="button m-call-to-action">Link</a>
-<button type="button" class="m-call-to-action">Button</button>
-<input type="submit" class="m-call-to-action" value="Submit" />
-<input type="submit" class="m-call-to-action" value="Disabled" disabled="disabled" />
+<a class="button-cta" href="">Link</a>
+<button type="button" class="button-cta">Button</button>
+<input type="submit" class="button-cta" value="Submit" />
+<input type="submit" class="button-cta" value="Disabled" disabled="disabled" />
 ```
 */
 
 /*doc
 ---
-title: call-to-action-secondary modifier
-name: button.m-call-to-action-secondary
+title: Call-to-action button secondary
+name: button.button-cta-secondary
 parent: button
 ---
 
-If more than one CTA is required per page, `m-call-to-action-secondary` should
+If more than one CTA is required per page, `button-cta-secondary` should
 be used instead.
 
 ```html_example
-<a class="button m-call-to-action-secondary">Link</a>
-<button type="button" class="m-call-to-action-secondary">Button</button>
-<input type="submit" class="m-call-to-action-secondary" value="Disabled" disabled="disabled" />
+<a class="button-cta-secondary" href="">Link</a>
+<button type="button" class="button-cta-secondary">Button</button>
+<input type="submit" class="button-cta-secondary" value="Disabled" disabled="disabled" />
 ```
-
 */
-.button,
-button,
-input[type="reset"],
-input[type="submit"],
-input[type="button"] {
+
+.button {
     @include button-base;
-    $button-height: 24px / $font-size-normal;
     background: transparent;
-    border: 0;
-    color: $color-text-highlight-introvert;
-    font-size: $font-size-normal;
-    font-weight: $font-weight-normal;
-    line-height: $button-height;
-    height: $button-height * 1em;
-    padding: 0;
+    color: $color-button-text;
     text-transform: uppercase;
 
-    &:focus:not(:disabled):not(.ng-disabled),
-    &:hover:not(:disabled):not(.ng-disabled) {
-        color: $color-text-highlight-normal;
+    &:hover:enabled,
+    &:focus:enabled {
+        color: $color-button-text-hover;
+    }
+}
+
+.button-cta,
+.button-cta-secondary {
+    @include button-base;
+    background: $color-button-cta-base;
+    color: $color-button-cta-text;
+    padding: 0 1em;
+    min-width: 110px / $font-size-normal * 1em;
+
+    &:hover:enabled,
+    &:focus:enabled {
+        background: $color-button-cta-hover-background;
+        color: $color-button-cta-text;
     }
 
-    &:disabled,
-    &.ng-disabled {
-        &, &:focus, &:hover {
-            @include opacity(0.5);
-            cursor: default;
-        }
+    &:active:enabled {
+        background-color: $color-button-cta-active-background;
     }
+}
 
-    &.m-call-to-action,
-    &.m-call-to-action-secondary {
-        background: $color-text-highlight-normal;
-        color: $color-text-inverted;
-        padding: 0 1em;
-        min-width: 110px / $font-size-normal * 1em;
+.button-cta-secondary {
+    background-color: transparent;
+    border: 2px solid $color-button-cta-base;
+    color: $color-button-cta-base;
+    height: $button-height + (4px / $font-size-normal * 1em);
+    line-height: $button-height;
 
-        &:hover:not(:disabled):not(.ng-disabled),
-        &:focus:not(:disabled):not(.ng-disabled) {
-            background: $color-brand-two-extrovert;
-            color: $color-text-inverted;
-        }
-
-        &:active:not(:disabled):not(.ng-disabled) {
-            background-color: $color-brand-two-introvert;
-        }
+    &:hover:enabled,
+    &:focus:enabled {
+        background-color: $color-button-cta-base;
     }
+}
 
-    &.m-call-to-action-secondary {
-        background-color: transparent;
-        color: $color-text-highlight-normal;
+/*doc
+---
+title: Button add modifier
+name: button.m-add
+parent: button
+---
+
+Add a + sign to a button
+
+```html_example
+<button type="button" class="button-cta-secondary m-add">Add Paragraph</button>
+```
+*/
+
+.button-cta,
+.button-cta-secondary,
+.button {
+    &.m-add:before {
+        content: "+ ";
     }
 }

@@ -6,6 +6,10 @@ Two boolean fields (flags) defined in the
 hide resources: *deleted* and *hidden*. Both default to false. If this sheet
 is omitted when POSTing new resources, the default values are used.
 
+The usecase for deleting is that users want to withdraw some content.
+The usecase for hiding is that moderators want to hide unapproriate
+content.  In terms of implementation, they differ only by permissions.
+
 Deleting or hiding an existing resource is only possible for updatable
 resources, i.e. *not* for Versions (which are immutable and hence don't
 allow PUT).

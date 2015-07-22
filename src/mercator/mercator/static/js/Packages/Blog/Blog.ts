@@ -81,10 +81,10 @@ export var detailDirective = (
             adhPermissions.bindScope(scope, () => scope.path);
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.path), "itemOptions");
 
-            scope.hide = () => {
+            scope.delete = () => {
                 if ($window.confirm("Do you really want to delete this?")) {
                     var itemPath = AdhUtil.parentPath(scope.path);
-                    adhHttp.hide(itemPath, RIDocument.content_type)
+                    adhHttp.delete(itemPath, RIDocument.content_type)
                         .then(() => {
                             if (typeof scope.onChange !== "undefined") {
                                 scope.onChange();

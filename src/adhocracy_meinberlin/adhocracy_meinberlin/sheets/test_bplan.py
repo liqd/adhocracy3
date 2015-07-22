@@ -106,8 +106,9 @@ class TestWorkflowSheet:
         inst = meta.sheet_class(meta, context)
         wanted =  {'announce': {},
                    'draft': {},
-                   'frozen': {},
                    'participate': {},
+                   'evaluate': {},
+                   'closed': {},
                    'workflow': bplan_workflow,
                    'workflow_state': None}
         assert inst.get() == wanted

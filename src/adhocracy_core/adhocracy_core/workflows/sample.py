@@ -1,7 +1,10 @@
 """Example workflow."""
+
+from pyrsistent import freeze
+
 from adhocracy_core.workflows import add_workflow
 
-sample_meta = {
+sample_meta = freeze({
     'states_order': ['participate', 'frozen'],
     'states': {
         'participate': {'title': 'Participate',
@@ -30,7 +33,7 @@ sample_meta = {
                       'permission': 'do_transition',
                       },
         },
-}
+})
 
 
 def includeme(config):
