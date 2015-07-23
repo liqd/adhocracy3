@@ -1,6 +1,8 @@
 <div data-adh-moving-columns="" class="moving-columns">
     <adh-moving-column>
-        <adh-mein-berlin-alexanderplatz-process-column></adh-mein-berlin-alexanderplatz-process-column>
+        <adh-mein-berlin-alexanderplatz-process-column data-ng-if="view !== 'create_document' && view !== 'create_proposal'"></adh-mein-berlin-alexanderplatz-process-column>
+        <adh-mein-berlin-alexanderplatz-document-create-column data-ng-if="view === 'create_document'"></adh-mein-berlin-alexanderplatz-document-create-column>
+        <adh-mein-berlin-alexanderplatz-proposal-create-column data-ng-if="view === 'create_proposal'"></adh-mein-berlin-alexanderplatz-proposal-create-column>
     </adh-moving-column>
     <adh-moving-column data-ng-if="tab === 'documents'">
         <adh-mein-berlin-alexanderplatz-document-column></adh-mein-berlin-alexanderplatz-document-column>
