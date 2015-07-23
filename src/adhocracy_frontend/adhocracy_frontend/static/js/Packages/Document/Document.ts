@@ -4,6 +4,7 @@ import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
+import AdhMapping = require("../Mapping/Mapping");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
@@ -339,6 +340,30 @@ export var listItemDirective = (
     };
 };
 
+export var mapListItemDirective = (
+    $q : angular.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    var directive : angular.IDirective = listItemDirective($q, adhConfig, adhHttp, adhTopLevelState);
+    var superLink = <Function>directive.link;
+
+    directive.require = "^adhMapListingInternal";
+    directive.link = (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
+        superLink(scope);
+
+        var unregister = scope.$watch("data.coordinates", (coordinates : number[]) => {
+            if (typeof coordinates[0] !== "undefined" && typeof coordinates[1] !== "undefined") {
+                scope.$on("$destroy", mapListing.registerListItem(scope.path, coordinates[0], coordinates[1]));
+                unregister();
+            }
+        });
+    };
+
+    return directive;
+};
+
 export var listingDirective = (
     adhConfig : AdhConfig.IService
 ) => {
@@ -463,6 +488,7 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhImage.moduleName,
             AdhInject.moduleName,
+            AdhMapping.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhResourceArea.moduleName,
             AdhResourceWidgets.moduleName,
@@ -499,5 +525,7 @@ export var register = (angular) => {
             editDirective])
         .directive("adhDocumentListing", ["adhConfig", listingDirective])
         .directive("adhDocumentListItem", [
-            "$q", "adhConfig", "adhHttp", "adhTopLevelState", listItemDirective]);
+            "$q", "adhConfig", "adhHttp", "adhTopLevelState", listItemDirective])
+        .directive("adhDocumentMapListItem", [
+            "$q", "adhConfig", "adhHttp", "adhTopLevelState", mapListItemDirective]);
 };
