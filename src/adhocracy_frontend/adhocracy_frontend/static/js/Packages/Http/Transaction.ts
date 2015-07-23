@@ -1,4 +1,3 @@
-/* tslint:disable:variable-name */
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
 import _ = require("lodash");

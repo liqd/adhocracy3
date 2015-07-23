@@ -37,9 +37,11 @@ class WorkflowCallback(SchemaNode):
     """
 
     def schema_type(self):
+        """Return schema type."""
         return GlobalObject(package=None)
 
     def serialize(self, appstruct=null):
+        """Serialize."""
         if appstruct in (null, None):
             return None
         return super().serialize(appstruct)

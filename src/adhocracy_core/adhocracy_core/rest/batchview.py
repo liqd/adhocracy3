@@ -30,13 +30,16 @@ class BatchItemResponse:
     """
 
     def __init__(self, code: int, body: dict={}):
+        """Initialize self."""
         self.code = code
         self.body = body
 
     def was_successful(self):
+        """Return true if batch was successful."""
         return self.code == 200
 
     def to_dict(self):
+        """Convert to dict."""
         return {'code': self.code, 'body': self.body}
 
 
@@ -194,11 +197,13 @@ class BatchView(RESTView):
             path_map[result_first_version_path] = first_version_path
 
     def copy_header_if_exists(self, header: str, request: Request):
+        """Copy header if exists."""
         value = self.request.headers.get(header, None)
         if value is not None:
             request.headers[header] = value
 
     def copy_attr_if_exists(self, attributename: str, request: Request):
+        """Copy attr if exists."""
         value = getattr(self.request, attributename, None)
         if value is not None:
             setattr(request, attributename, value)

@@ -11,11 +11,7 @@
     }
 }
 
-button,
-.button,
-input[type="reset"],
-input[type="submit"],
-input[type="button"] {
+.button {
     font-size: $font-size-small;
     height: 24px / $font-size-small * 1em;
     line-height: 24px / $font-size-small * 1em;
@@ -25,78 +21,22 @@ input[type="button"] {
         text-transform: capitalize;
     }
 
-    &, &.m-call-to-action {
-        color: $color-text-normal;
-        min-width: 1px;
-        padding: 0 (30px / $font-size-normal * 1em);
-
-        &:focus:not(:disabled):not(.ng-disabled),
-        &:hover:not(:disabled):not(.ng-disabled) {
-            background: transparent;
-            color: $color-text-normal;
-            text-decoration: underline;
-        }
-
-        &:active:not(:disabled):not(.ng-disabled) {
-            color: $color-shadow;
-        }
-
-        &.m-call-to-action {
-            @include border-radius(1em);
-            color: $color-text-inverted;
-            font-size: $font-size-normal;
-            font-weight: $font-weight-extrovert;
-
-            &:hover:not(:disabled):not(.ng-disabled),
-            &:focus:not(:disabled):not(.ng-disabled) {
-                background: $color-brand-two-introvert;
-                color: $color-text-inverted;
-                text-decoration: none;
-            }
-
-            &:active:not(:disabled):not(.ng-disabled) {
-                background: $color-brand-two-extrovert;
-                color: $color-text-inverted;
-            }
-        }
-
-        &.m-call-to-action-secondary {
-            color: $color-text-introvert;
-
-            &:hover:not(:disabled):not(.ng-disabled),
-            &:focus:not(:disabled):not(.ng-disabled) {
-                background: transparent;
-                color: $color-text-normal;
-                text-decoration: underline;
-            }
-        }
-
-        &.arrow-button {
-            background: $color-text-inverted;
-            color: $color-text-highlight-normal;
-            min-width: 100px;
-            outline: 1px solid $color-text-highlight-normal;
-            font-weight: $font-weight-extrovert;
-            text-align: center;
-
-            &:after {
-                content: ">";
-            }
-
-            &:focus:not(:disabled):not(.ng-disabled),
-            &:hover:not(:disabled):not(.ng-disabled) {
-                background: $color-text-highlight-normal;
-                color: $color-text-inverted;
-                text-decoration: none;
-            }
-        }
+    &:focus:enabled,
+    &:hover:enabled {
+        text-decoration: underline;
     }
+}
+
+.button-cta {
+    @include border-radius(1em);
+    font-weight: $font-weight-extrovert;
+    padding: 0 (30px / $font-size-normal * 1em);
 }
 
 /*doc
 ---
 title: Call to action button index of moving column or embed
-name: button.m-call-to-action.inside
+name: button.button-cta.inside
 parent: button
 ---
 
@@ -104,22 +44,16 @@ For Mein Berlin CTA buttons inside of the moving columns or embed context appear
 
 ```html_example
 <div class="l-center m-embed">
-<a class="button m-call-to-action">Link</a>
-<button type="button" class="m-call-to-action">Button</button>
-<input type="submit" class="m-call-to-action" value="Disabled" disabled="disabled" />
+<a class="button-cta" href="">Link</a>
+<button type="button" class="button-cta">Button</button>
+<input type="submit" class="button-cta" value="Disabled" disabled="disabled" />
 </div>
 ```
 
 */
 
 .moving-column-body, .l-center.m-embed {
-    button,
-    .button,
-    input[type="reset"],
-    input[type="submit"],
-    input[type="button"] {
-        &, &.m-call-to-action {
-            @include border-radius(0);
-        }
+    .button-cta {
+        @include border-radius(0);
     }
 }

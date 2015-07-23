@@ -212,7 +212,9 @@ export var register = (angular) => {
             if (params.hasOwnProperty("locale")) {
                 $translate.use(params.locale);
             }
-            adhConfig.locale = params.locale;
+            if (typeof params.locale !== "undefined") {
+                adhConfig.locale = params.locale;
+            }
         }])
         .provider("adhEmbed", Provider)
         .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective])

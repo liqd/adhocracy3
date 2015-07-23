@@ -201,6 +201,7 @@ export var loginDirective = (
                 }, (errors) => {
                     bindServerErrors(scope, errors);
                     scope.credentials.password = "";
+                    scope.loginForm.$setPristine();
                 });
             };
         }

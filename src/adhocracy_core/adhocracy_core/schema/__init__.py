@@ -244,6 +244,7 @@ class Roles(AdhocracySequenceNode):
     role = Role()
 
     def preparer(self, value: Sequence) -> list:
+        """Preparer for the roles."""
         if value is colander.null:
             return value
         value_dict = OrderedDict.fromkeys(value)
@@ -287,12 +288,12 @@ class AbsolutePath(AdhocracySchemaNode):
 
 def string_has_no_newlines_validator(value: str) -> bool:
     """Check for new line characters."""
-    return False if '\n' in value or '\r' in value else True  # noqa
+    return False if '\n' in value or '\r' in value else True
 
 
-class SingleLine(AdhocracySchemaNode):  # noqa
+class SingleLine(AdhocracySchemaNode):
 
-    """ UTF-8 encoded String without line breaks.
+    r"""UTF-8 encoded String without line breaks.
 
     Disallowed characters are linebreaks like: \n, \r.
     Example value: This is a something.
@@ -321,6 +322,7 @@ class Boolean(AdhocracySchemaNode):
     """
 
     def schema_type(self) -> colander.SchemaType:
+        """Return the schema type."""
         return colander.Boolean(true_choices=('true', '1'))
 
     default = False
@@ -328,6 +330,8 @@ class Boolean(AdhocracySchemaNode):
 
 
 class ContentType(AdhocracySchemaNode):
+
+    """ContentType schema."""
 
     schema_type = Interface
     default = deferred_content_type_default
@@ -358,6 +362,7 @@ class CurrencyAmount(AdhocracySchemaNode):
     """
 
     def schema_type(self) -> colander.SchemaType:
+        """Return schema type."""
         return colander.Decimal(quant='.01')
 
     default = decimal.Decimal(0)
@@ -393,6 +398,7 @@ class ResourceObject(colander.SchemaType):
     """
 
     def __init__(self, serialization_form='url'):
+        """Initialize self."""
         self.serialization_form = serialization_form
         """
         :param:`serialization_form`:
@@ -495,12 +501,16 @@ def deferred_path_default(node: colander.MappingSchema, kw: dict) -> str:
 
 class ResourcePathSchema(colander.MappingSchema):
 
+    """Resource Path schema."""
+
     content_type = ContentType()
 
     path = Resource(default=deferred_path_default)
 
 
 class ResourcePathAndContentSchema(ResourcePathSchema):
+
+    """Resource Path with content schema."""
 
     data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                default={})
@@ -583,6 +593,7 @@ class UniqueReferences(References):
     """
 
     def preparer(self, value: Sequence) -> list:
+        """Preparer for the schema."""
         if value is colander.null:
             return value
         value_dict = OrderedDict.fromkeys(value)
@@ -854,6 +865,7 @@ class ACMRow(colander.SequenceSchema):
 
     @colander.deferred
     def validator(node, kw):
+        """Validator."""
         registry = kw.get('registry')
 
         def validate_permission_name(node, value):

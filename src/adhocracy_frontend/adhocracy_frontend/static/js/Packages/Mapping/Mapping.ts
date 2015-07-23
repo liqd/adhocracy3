@@ -507,7 +507,7 @@ export class Listing<Container extends ResourcesBase.Resource> extends AdhListin
         directive.scope["polygon"] = "=";
 
         var originalLink = directive.link;
-        directive.link = (scope) => {
+        directive.link = function(scope) {
             originalLink.apply(undefined, arguments);
 
             // FIXME: only here for manual testing

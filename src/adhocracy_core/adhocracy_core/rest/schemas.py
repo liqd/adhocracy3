@@ -410,7 +410,7 @@ class GETPoolRequestSchema(colander.Schema):
                              missing=colander.drop,
                              validator=deferred_validate_aggregateby)
 
-    def deserialize(self, cstruct=colander.null):  # flake8: noqa
+    def deserialize(self, cstruct=colander.null):  # noqa
         """ Deserialize the :term:`cstruct` into an :term:`appstruct`.
 
         Adapt key/values to :class:`adhocracy_core.interfaces.SearchQuery`. for

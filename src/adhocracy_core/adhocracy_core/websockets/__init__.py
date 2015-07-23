@@ -6,10 +6,12 @@ class WebSocketError(Exception):
     """An error that occurs during communication with a WebSocket client."""
 
     def __init__(self, error_type: str, details: str):
+        """Initialize self."""
         self.error_type = error_type
         self.details = details
 
     def __str__(self):
+        """Return string representation."""
         return '{}: {}'.format(self.error_type, self.details)
 
 

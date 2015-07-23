@@ -32,6 +32,7 @@ class ResourceCreatedAndAdded:
     """
 
     def __init__(self, object, parent, registry, creator):
+        """Initialize self."""
         self.object = object
         self.parent = parent
         self.registry = registry
@@ -58,6 +59,7 @@ class ResourceSheetModified:
                  old_appstruct,
                  new_appstruct,
                  request: Request):
+        """Initialize self."""
         self.object = object
         self.isheet = isheet
         self.registry = registry
@@ -78,6 +80,7 @@ class ItemVersionNewVersionAdded:
     """
 
     def __init__(self, object, new_version, registry, creator):
+        """Initialize self."""
         self.object = object
         self.new_version = new_version
         self.registry = registry
@@ -117,6 +120,7 @@ class SheetReferenceNewVersion:
                  root_versions=[],
                  is_batchmode=False,
                  ):
+        """Initialize self."""
         self.object = object
         self.isheet = isheet
         self.isheet_field = isheet_field
@@ -139,6 +143,7 @@ class SheetBackReferenceRemoved:
                  reference,
                  registry,
                  ):
+        """Initialize self."""
         self.object = object
         """:class:`adhocracy_core.interfaces.IResource`"""
         self.isheet = isheet
@@ -161,6 +166,7 @@ class SheetBackReferenceAdded:
                  reference,
                  registry,
                  ):
+        """Initialize self."""
         self.object = object
         """:class:`adhocracy_core.interfaces.IResource`"""
         self.isheet = isheet
@@ -179,6 +185,7 @@ class LocalRolesModified:
 
     def __init__(self, object, new_local_roles: dict, old_local_roles: dict,
                  registry: Registry):
+        """Initialize self."""
         self.object = object
         self.new_local_roles = new_local_roles
         self.old_local_roles = old_local_roles
