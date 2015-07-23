@@ -308,7 +308,9 @@ export var getWorkflowState = (
     if (typeof processUrl !== "undefined") {
         return adhHttp.get(processUrl).then((resource) => {
             var workflowSheet = resource.data[SIMercatorWorkflow.nick];
-            return workflowSheet.workflow_state;
+            if (typeof workflowSheet !== "undefined") {
+                return workflowSheet.workflow_state;
+            }
         });
     } else {
         return $q.when(undefined);
