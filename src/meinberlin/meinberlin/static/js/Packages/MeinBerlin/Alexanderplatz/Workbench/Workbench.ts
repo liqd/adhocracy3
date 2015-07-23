@@ -51,6 +51,19 @@ export var processDetailColumnDirective = (
     };
 };
 
+export var documentDetailColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
+        }
+    };
+};
+
 export var documentCreateColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
@@ -159,5 +172,6 @@ export var register = (angular) => {
         .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective]);
 };
