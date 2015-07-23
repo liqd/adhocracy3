@@ -39,6 +39,7 @@ export interface IParagraph {
 
 export interface IScope extends angular.IScope {
     path? : string;
+    hasMap? : boolean;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
@@ -297,10 +298,11 @@ export var detailDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp, adhTopLevelState)(scope);
+            bindPath($q, adhHttp, adhTopLevelState)(scope, undefined, scope.hasMap);
             scope.$on("$destroy", adhTopLevelState.on("commentableUrl", (commentableUrl) => {
                 highlightSelectedParagraph(adhTopLevelState.get("commentableUrl"), scope);
             }));
@@ -318,10 +320,11 @@ export var listItemDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp)(scope);
+            bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
 
             scope.$on("$destroy", adhTopLevelState.on("documentUrl", (documentVersionUrl) => {
                 if (!documentVersionUrl) {
@@ -365,7 +368,8 @@ export var createDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -390,7 +394,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path, scope.hasMap);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
@@ -415,7 +419,8 @@ export var editDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -427,7 +432,7 @@ export var editDirective = (
                 });
             };
 
-            bindPath($q, adhHttp)(scope);
+            bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
 
             scope.cancel = () => {
                 var itemPath = AdhUtil.parentPath(scope.documentVersion.path);
@@ -436,7 +441,7 @@ export var editDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
+                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions, scope.hasMap);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
