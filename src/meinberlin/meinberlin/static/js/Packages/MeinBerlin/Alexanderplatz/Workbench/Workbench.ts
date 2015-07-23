@@ -1,6 +1,7 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import AdhConfig = require("../../../Config/Config");
+import AdhDocument = require("../../../Document/Document");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
@@ -50,6 +51,19 @@ export var processDetailColumnDirective = (
     };
 };
 
+export var documentCreateColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentCreateColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
@@ -58,6 +72,7 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhDocument.moduleName,
             AdhPermissions.moduleName,
             AdhProcess.moduleName,
             AdhMovingColumns.moduleName,
@@ -143,5 +158,6 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective]);
+            "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective]);
 };
