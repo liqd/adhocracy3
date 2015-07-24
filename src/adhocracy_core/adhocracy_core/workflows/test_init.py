@@ -65,8 +65,8 @@ class TestAddWorkflow:
     @fixture
     def cstruct(self) -> dict:
         """Return example workflow cstruct with required data."""
-        cstruct = freeze(\
-            {'states_order': ['draft', 'announced'],
+        cstruct = freeze(
+            {'initial_state': 'draft',
              'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []}},
@@ -88,7 +88,7 @@ class TestAddWorkflow:
         assert 'name' not in meta
         assert meta['states']
         assert meta['transitions']
-        assert meta['states_order']
+        assert meta['initial_state']
 
     def test_create_workflow_and_add_to_workflows_meta(self, registry, cstruct):
         from substanced.workflow import ACLWorkflow
@@ -157,8 +157,8 @@ class TestSetupWorkflow:
 
     def _make_workflow(self, registry, name):
         from . import add_workflow
-        cstruct = freeze(\
-            {'states_order': ['draft', 'announced', 'participate'],
+        cstruct = freeze(
+            {'initial_state': 'draft',
              'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []},

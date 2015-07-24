@@ -26,7 +26,7 @@ bplan_meta = standard_meta \
 
 
 bplan_private_meta = freeze({
-    'states_order': ['private'],
+    'initial_state': 'private',
     'states': {
         'private': {'title': 'Private',
                     'description': 'Disable view for non admins.',

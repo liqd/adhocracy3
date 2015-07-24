@@ -86,7 +86,7 @@ def _validate_workflow_cstruct(cstruct: dict) -> dict:
 def _create_workflow(registry: Registry,
                      appstruct: dict,
                      name: str) -> ACLWorkflow:
-    initial_state = appstruct['states_order'][0]
+    initial_state = appstruct['initial_state']
     workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
     for name, data in appstruct['states'].items():
         acl = acm_to_acl(data['acm'], registry)

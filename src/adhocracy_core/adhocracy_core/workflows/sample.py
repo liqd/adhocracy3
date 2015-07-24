@@ -7,7 +7,7 @@ from pyrsistent import freeze
 from adhocracy_core.workflows import add_workflow
 
 sample_meta = freeze({
-    'states_order': ['participate', 'frozen'],
+    'initial_state': 'participate',
     'states': {
         'participate': {'title': 'Participate',
                   'description': 'This phase is to participate.',

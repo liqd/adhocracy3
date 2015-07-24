@@ -59,11 +59,10 @@ a hint for the frontend if displaying this state in listing should be restricted
     >>> state['display_only_to_roles']
     []
 
-The order these states should be listet is also set, in addition this
-defines the initial workflow state (the first in the list)::
+The initial workflow state::
 
-    >>> workflow['states_order']
-    ['participate', 'frozen']
+    >>> workflow['initial_state']
+    'participate'
 
 Transition metadata determines the possible state flow and can provide a callable to
 execute arbitrary tasks::

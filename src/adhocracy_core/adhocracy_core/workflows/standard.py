@@ -6,7 +6,7 @@ from adhocracy_core.workflows import add_workflow
 from pyrsistent import freeze
 
 standard_meta = freeze({
-    'states_order': ['draft', 'announce', 'participate', 'evaluate', 'result', 'closed'],
+    'initial_state': 'draft',
     'states': {
         'draft': {'title': 'Draft',
                   'description': 'This phase is for internal review.',

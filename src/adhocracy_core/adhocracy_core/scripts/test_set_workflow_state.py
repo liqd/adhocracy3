@@ -17,7 +17,7 @@ class TestSetupWorkflow:
     def _make_workflow(self, registry, name):
         from adhocracy_core.workflows import add_workflow
         cstruct = \
-            {'states_order': ['draft', 'announced', 'participate'],
+            {'initial_state': 'draft',
              'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []},

@@ -47,7 +47,6 @@ def _set_workflow_state(root: IResource,
                         state: str):
     resource = find_resource(root, resource_path)
     workflow = get_workflow(resource, registry)
-    states = registry.content.workflows_meta[workflow.type]['states_order']
-    to_transition = states[1:states.index(state) + 1]
-    setup_workflow(resource, to_transition, registry)
+    state = registry.content.workflows_meta[workflow.type]['initial_states']
+    setup_workflow(resource, state, registry)
     transaction.commit()

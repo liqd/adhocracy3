@@ -1133,7 +1133,7 @@ class TestMetaApiView:
         request.registry.content.workflows_meta['sample'] = {'states': {},
                                                              'transitions': {}}
         workflows_meta = inst.get()['workflows']
-        assert workflows_meta == {'sample': {'states_order': [],
+        assert workflows_meta == {'sample': {'initial_state': '',
                                              'states': {},
                                              'transitions': {}}}
 
