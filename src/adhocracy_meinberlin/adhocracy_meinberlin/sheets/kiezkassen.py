@@ -1,4 +1,5 @@
 """Sheets for Mercator proposals."""
+from zope.deprecation import deprecated
 import colander
 
 from adhocracy_core.interfaces import ISheet
@@ -37,27 +38,10 @@ class IWorkflowAssignment(workflow.IWorkflowAssignment):
     """Marker interface for the kiezkassen workflow assignment sheet."""
 
 
-class WorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
-
-    """Data structure the kiezkassen workflow assignment sheet."""
-
-    workflow_name = 'kiezkassen'
-
-    draft = workflow.StateAssignment()
-    announce = workflow.StateAssignment()
-    participate = workflow.StateAssignment()
-    evaluate = workflow.StateAssignment()
-    result = workflow.StateAssignment()
-    closed = workflow.StateAssignment()
-
-
-workflow_meta = workflow.workflow_meta._replace(
-    isheet=IWorkflowAssignment,
-    schema_class=WorkflowAssignmentSchema,
-)
+deprecated('IWorkflowAssignment',
+           'Backward compatible code use IWorkflowAssignment instead')
 
 
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(proposal_meta, config.registry)
-    add_sheet_to_registry(workflow_meta, config.registry)

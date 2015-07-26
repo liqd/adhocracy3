@@ -34,10 +34,9 @@ proposal_meta = item_meta._replace(
     item_type=IProposalVersion,
     is_implicit_addable=True,
     permission_create='create_proposal',
-    extended_sheets=(
-        adhocracy_meinberlin.sheets.bplan.IPrivateWorkflowAssignment,),
     use_autonaming=True,
     autonaming_prefix='proposal_',
+    workflow_name = 'bplan_private',
 )
 
 
@@ -51,8 +50,7 @@ process_meta = process.process_meta._replace(
     element_types=(IProposal,
                    ),
     is_implicit_addable=True,
-    extended_sheets=(adhocracy_meinberlin.sheets.bplan.IWorkflowAssignment,
-                     ),
+    workflow_name = 'bplan',
 )
 
 

@@ -1,4 +1,5 @@
 """Sheets for BPlan proposals."""
+from zope.deprecation import deprecated
 import colander
 
 from adhocracy_core.interfaces import ISheet
@@ -34,23 +35,8 @@ class IWorkflowAssignment(workflow.IWorkflowAssignment):
     """Marker interface for the bplan workflow assignment sheet."""
 
 
-class WorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
-
-    """Data structure the bplan workflow assignment sheet."""
-
-    workflow_name = 'bplan'
-
-    draft = workflow.StateAssignment()
-    announce = workflow.StateAssignment()
-    participate = workflow.StateAssignment()
-    evaluate = workflow.StateAssignment()
-    closed = workflow.StateAssignment()
-
-
-workflow_meta = workflow.workflow_meta._replace(
-    isheet=IWorkflowAssignment,
-    schema_class=WorkflowAssignmentSchema,
-)
+deprecated('IWorkflowAssignment',
+           'Backward compatible code use IWorkflowAssignment instead')
 
 
 class IPrivateWorkflowAssignment(workflow.IWorkflowAssignment):
@@ -58,21 +44,10 @@ class IPrivateWorkflowAssignment(workflow.IWorkflowAssignment):
     """Marker interface for the bplan private workflow assignment sheet."""
 
 
-class PrivateWorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
-
-    """Data structure the bplan private workflow assignment sheet."""
-
-    workflow_name = 'bplan_private'
-
-
-private_workflow_meta = workflow.workflow_meta._replace(
-    isheet=IPrivateWorkflowAssignment,
-    schema_class=PrivateWorkflowAssignmentSchema,
-)
+deprecated('IPrivateWorkflowAssignment',
+           'Backward compatible code use IWorkflowAssignment instead')
 
 
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(proposal_meta, config.registry)
-    add_sheet_to_registry(workflow_meta, config.registry)
-    add_sheet_to_registry(private_workflow_meta, config.registry)
