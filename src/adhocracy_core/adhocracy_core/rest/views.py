@@ -454,7 +454,10 @@ class ResourceRESTView(RESTView):
                            if s.meta.isheet.isOrExtends(IWorkflowAssignment)]
         for sheet in workflow_sheets:
             workflow = sheet.get()['workflow']
-            states = workflow.get_next_states(self.context, self.request)
+            if workflow is None:
+                states = []
+            else:
+                states = workflow.get_next_states(self.context, self.request)
             isheet = sheet.meta.isheet
             cstruct[isheet.__identifier__] = {'workflow_state': states}
 

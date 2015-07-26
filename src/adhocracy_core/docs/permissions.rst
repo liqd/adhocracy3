@@ -226,7 +226,7 @@ Cannot create process structure organisation::
    >>> IOrganisation.__identifier__ not in postables
    True
 
-Can edit process structure organisation::
+Cannot edit process structure organisation::
 
    >>> 'PUT' in initiator.options('/organisation').json
    False
