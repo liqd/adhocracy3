@@ -29,6 +29,11 @@ class CountSchema(colander.MappingSchema):
 
 
 @fixture
+def registry(registry_with_content):
+    return registry_with_content
+
+
+@fixture
 def mock_authpolicy(registry):
     from pyramid.interfaces import IAuthenticationPolicy
     from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
@@ -38,12 +43,12 @@ def mock_authpolicy(registry):
 
 
 @fixture
-def mock_password_sheet(registry_with_content, sheet_meta):
+def mock_password_sheet(registry, sheet_meta):
     from adhocracy_core.sheets.principal import IPasswordAuthentication
     from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
     sheet = Mock(spec=PasswordAuthenticationSheet)
     sheet.meta = sheet_meta._replace(isheet=IPasswordAuthentication)
-    register_sheet(None, sheet, registry_with_content)
+    register_sheet(None, sheet, registry)
     return sheet
 
 
@@ -1199,9 +1204,9 @@ class TestValidateLoginNameUnitTest:
 class TestValidateLoginPasswordUnitTest:
 
     @fixture
-    def request(self, cornice_request, registry_with_content):
+    def request(self, cornice_request, registry):
         from adhocracy_core.sheets.principal import IPasswordAuthentication
-        cornice_request.registry = registry_with_content
+        cornice_request.registry = registry
         user = testing.DummyResource(__provides__=IPasswordAuthentication)
         cornice_request.validated['user'] = user
         cornice_request.validated['password'] = 'lalala'
@@ -1631,8 +1636,8 @@ class TestCreatePasswordResetView:
         context['resets'] = service
 
     @fixture
-    def request_(self, cornice_request, registry_with_content):
-        cornice_request.registry = registry_with_content
+    def request_(self, cornice_request, registry):
+        cornice_request.registry = registry
         cornice_request.validated['user'] = testing.DummyResource()
         return cornice_request
 
@@ -1674,8 +1679,8 @@ class TestCreatePasswordResetView:
 class TestPasswordResetView:
 
     @fixture
-    def request_(self, cornice_request, registry_with_content):
-        cornice_request.registry = registry_with_content
+    def request_(self, cornice_request, registry):
+        cornice_request.registry = registry
         return cornice_request
 
     @fixture

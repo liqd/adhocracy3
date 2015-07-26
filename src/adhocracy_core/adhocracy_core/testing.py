@@ -12,10 +12,8 @@ from cornice.util import extract_json_data
 from cornice.errors import Errors
 from pyramid.config import Configurator
 from pyramid import testing
-from pyramid.traversal import resource_path_tuple
 from pyramid.util import DottedNameResolver
 from pytest import fixture
-from substanced.objectmap import find_objectmap
 from ZODB import FileStorage
 from webtest import TestApp
 from webtest import TestResponse
@@ -106,23 +104,6 @@ class DummyPool(testing.DummyResource):
         """Return a service from the pool."""
         from substanced.util import find_service
         return find_service(self, service_name, *sub_service_names)
-
-
-class DummyPoolWithObjectMap(DummyPool):
-
-    """Dummy pool with objectmap."""
-
-    def add(self, name, obj, **kwargs):
-        """Add a resource to the pool."""
-        super().add(name, obj)
-        objectmap = find_objectmap(self)
-        obj.__oid__ = objectmap.new_objectid()
-        path_tuple = resource_path_tuple(obj)
-        objectmap.add(obj, path_tuple)
-
-    def next_name(self, obj, prefix=''):
-        """Get the next name for the resource when using autonaming."""
-        return prefix + '_0000000' + str(hash(obj))
 
 
 def register_sheet(context, mock_sheet, registry, isheet=None) -> Mock:
