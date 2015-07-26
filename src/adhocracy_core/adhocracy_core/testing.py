@@ -376,6 +376,7 @@ def mock_workflow() -> Mock:
     """Mock :class:`adhocracy_core.workflows.AdhocracyACLWorkflow`."""
     from adhocracy_core.workflows import AdhocracyACLWorkflow
     mock = Mock(spec=AdhocracyACLWorkflow)
+    mock._states = {}
     return mock
 
 

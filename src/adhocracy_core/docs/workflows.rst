@@ -19,7 +19,7 @@ Lets create some content::
 
     >>> data = {'adhocracy_core.sheets.name.IName': {'name': 'process'}}
     >>> resp = app_god.post_resource('/', IProcess, data)
-    >>> data = {'adhocracy_core.sheets.name.IName': {'name': 'proposal_item'}}
+    >>> data = {}
     >>> resp = app_god.post_resource('/process', IDocument, data)
 
 
@@ -78,10 +78,10 @@ execute arbitrary tasks::
 Workflow Assignment
 -------------------
 
-Resources can have a WorkflowAssignment sheet to assign the wanted workflow::
+Pool have a WorkflowAssignment sheet to get the registered workflow::
 
     >>> resp = app_god.get('/process/').json
-    >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
+    >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.IWorkflowAssignment']
     >>> workflow_data['workflow']
     'sample'
 
@@ -91,25 +91,27 @@ and get the current state::
     'participate'
 
 
-in addition we have custom metadata for specific workflow states::
+in addition it can have custom metadata for specific workflow states::
 
-    >>> workflow_data['participate']['start_date']
-    '2015-02-14...
-    >>> workflow_data['participate']['description']
-    'Start...
+    >>> workflow_data['state_data']
+    []
 
 this metadata can be set::
 
-    >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'participate': {'description': 'new',
-    ...                                                                             'start_date': '2015-05-26T12:40:49.638293+00:00'}}}}
+    >>> data = {'data': {'adhocracy_core.sheets.workflow.IWorkflowAssignment':  {'state_data':
+    ...                  [{'name': 'participate', 'description': 'new', 'start_date': '2015-05-26T12:40:49.638293+00:00'}]
+    ...         }}}
     >>> resp = app_god.put('/process', data)
     >>> resp.status_code
     200
 
     >>> resp = app_god.get('/process').json
-    >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.ISample']
-    >>> workflow_data['participate']['description']
-    'new'
+    >>> workflow_data = resp['data']['adhocracy_core.sheets.workflow.IWorkflowAssignment']
+    >>> pprint(workflow_data['state_data'][0])
+    {'description': 'new',
+     'name': 'participate',
+     'start_date': '2015-05-26T12:40:49.638293+00:00'}
+
 
 
 Workflow transition to states
@@ -119,18 +121,18 @@ We can also modify the state if the workflow has a suitable transition.
 First we check the available next states::
 
     >>> resp = app_god.options('/process').json
-    >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.ISample']
+    >>> resp['PUT']['request_body']['data']['adhocracy_core.sheets.workflow.IWorkflowAssignment']
     {'workflow_state': ['frozen']}
 
 Then we can put the wanted next state:
 
-     >>> data = {'data': {'adhocracy_core.sheets.workflow.ISample': {'workflow_state': 'frozen'}}}
+     >>> data = {'data': {'adhocracy_core.sheets.workflow.IWorkflowAssignment': {'workflow_state': 'frozen'}}}
      >>> resp = app_god.put('/process', data)
      >>> resp.status_code
      200
 
     >>> resp = app_god.get('/process').json
-    >>> resp['data']['adhocracy_core.sheets.workflow.ISample']['workflow_state']
+    >>> resp['data']['adhocracy_core.sheets.workflow.IWorkflowAssignment']['workflow_state']
     'frozen'
 
 NOTE: The available next states depend on the workflow transitions and user permissions.

@@ -131,9 +131,11 @@ def validate_request_data(context: ILocation, request: Request,
     :raises _JSONError: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
+    workflow = _get_workflow(context, request)
     schema_with_binding = schema.bind(context=context,
                                       request=request,
                                       registry=request.registry,
+                                      workflow=workflow,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
     if request.content_type == 'multipart/form-data':
@@ -143,6 +145,14 @@ def validate_request_data(context: ILocation, request: Request,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
     _raise_if_errors(request)
+
+
+def _get_workflow(context: IResource, request: Request):
+    if request.method == 'POST':
+        return
+    get_workflow = request.registry.content.get_workflow
+    workflow = get_workflow(context)
+    return workflow
 
 
 def validate_user_headers(headers: dict, request: Request):

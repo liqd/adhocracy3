@@ -6,7 +6,7 @@ from adhocracy_core.resources.asset import add_assets_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.sheets.asset import IHasAssetPool
 from adhocracy_core.sheets.badge import IHasBadgesPool
-from adhocracy_core.sheets.workflow import ISample
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 
 
 class IProcess(IPool):
@@ -16,12 +16,12 @@ class IProcess(IPool):
 
 process_meta = pool_meta._replace(
     iresource=IProcess,
-    # Every process should have a workflow assignment sheet
-    extended_sheets=(ISample,),
+    extended_sheets=(IWorkflowAssignment,),
     permission_create='create_process',
     after_creation=(add_assets_service,
                     add_badges_service,
                     ),
+    workflow_name='sample',
 )._add(basic_sheets=(IHasAssetPool,
                      IHasBadgesPool))
 

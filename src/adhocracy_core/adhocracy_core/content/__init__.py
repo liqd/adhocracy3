@@ -312,15 +312,21 @@ class ResourceContentRegistry(ContentRegistry):
             raise ValueError('No such field: {}'.format(dotted))
         return isheet, field, node
 
-    def get_workflow(self, name: str) -> IWorkflow:
-        """Get workflow with name `name`.
+    def get_workflow(self, context: object) -> IWorkflow:
+        """Get workflow of `context` or None.
 
         :raises RuntimeConfigurationError: if workflow is not registered
         """
+        iresource = get_iresource(context)
+        if iresource is None:
+            return None
+        name = self.resources_meta[iresource].workflow_name
+        if name == '':
+            return None
         try:
             workflow = self.workflows[name]
         except KeyError:
-            msg = 'Workflow is not registered: {0}'.format(name)
+            msg = 'Workflow name is not registered: {0}'.format(name)
             raise RuntimeConfigurationError(msg)
         return workflow
 

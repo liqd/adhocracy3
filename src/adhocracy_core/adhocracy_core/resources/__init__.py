@@ -39,6 +39,7 @@ resource_meta = ResourceMetadata(content_name='',
                                  autonaming_prefix='',
                                  use_autonaming_random=False,
                                  element_types=(),
+                                 workflow_name='',
                                  item_type=False,
                                  )
 
@@ -60,6 +61,7 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     """
     assert hasattr(config.registry, 'content')
     resources_meta = config.registry.content.resources_meta
+    # TODO validate resources_meta.workflow_name
     resources_meta[metadata.iresource] = metadata
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
