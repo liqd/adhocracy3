@@ -91,6 +91,7 @@ class TestDocumentVersion:
     def test_create(self, registry, meta):
         assert registry.content.create(meta.iresource.__identifier__)
 
+
 class TestProcess:
 
     @fixture
@@ -99,13 +100,12 @@ class TestProcess:
         return process_meta
 
     def test_meta(self, meta):
-        from adhocracy_core.resources.process import IProcess
-        from adhocracy_core.sheets import workflow
         from adhocracy_core.sheets.geo import ILocationReference
-        from adhocracy_meinberlin import sheets
         from adhocracy_meinberlin import resources
         assert meta.iresource is resources.alexanderplatz.IProcess
-        assert meta.extended_sheets == (workflow.IStandard, ILocationReference,)
+        assert meta.extended_sheets == (ILocationReference,
+                                        )
+        assert meta.workflow_name == 'standard'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

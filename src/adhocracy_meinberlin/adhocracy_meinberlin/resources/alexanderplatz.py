@@ -9,7 +9,6 @@ from adhocracy_core.resources.document_process import document_process_meta
 from adhocracy_core.resources.paragraph import IParagraph
 from adhocracy_core.sheets.geo import ILocationReference
 from adhocracy_core.sheets.geo import IPoint
-from adhocracy_core.sheets import workflow
 
 
 class IProposalVersion(proposal.IProposalVersion):
@@ -66,8 +65,9 @@ process_meta = document_process_meta._replace(
     iresource=IProcess,
     element_types=(IProposal,
                    IDocument),
-    extended_sheets=(workflow.IStandard,
-                     ILocationReference,)
+    extended_sheets=(ILocationReference,
+                     ),
+    workflow_name='standard',
 )
 
 
