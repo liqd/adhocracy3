@@ -11,8 +11,8 @@ from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.workflows import setup_workflow
 from adhocracy_core.workflows import get_workflow
+from adhocracy_core.workflows import transition_to_states
 
 
 def set_workflow_state():  # pragma: no cover
@@ -48,5 +48,5 @@ def _set_workflow_state(root: IResource,
     resource = find_resource(root, resource_path)
     workflow = get_workflow(resource, registry)
     state = registry.content.workflows_meta[workflow.type]['initial_states']
-    setup_workflow(resource, state, registry)
+    transition_to_states(resource, state, registry)
     transaction.commit()

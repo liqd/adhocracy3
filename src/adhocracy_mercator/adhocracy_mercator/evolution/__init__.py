@@ -16,7 +16,7 @@ from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.logbook import IHasLogbookPool
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.workflows import setup_workflow
+from adhocracy_core.workflows import transition_to_states
 from adhocracy_mercator.resources.mercator import IMercatorProposal
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IIntroduction
@@ -106,9 +106,9 @@ def add_badgeable_sheet_to_proposal_versions(root):  # pragma: no cover
 def reset_workflow_state_to_result(root):  # pragma: no cover
     """Reset workflow state to 'result'."""
     registry = get_current_registry()
-    setup_workflow(root['mercator'],
-                   ['announce', 'participate', 'frozen', 'result'],
-                   registry)
+    transition_to_states(root['mercator'],
+                         ['announce', 'participate', 'frozen', 'result'],
+                         registry)
 
 
 @log_migration

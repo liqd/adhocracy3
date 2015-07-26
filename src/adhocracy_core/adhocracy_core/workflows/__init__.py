@@ -12,10 +12,6 @@ from zope.interface import implementer
 from adhocracy_core.authorization import acm_to_acl
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
-from adhocracy_core.interfaces import IResource
-from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import get_matching_isheet
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
 
@@ -56,24 +52,25 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
     _add_workflow_to_registry(registry, appstruct, workflow, name)
 
 
-def setup_workflow(context: IResource, states: [str], registry: Registry):
-    """Initialize workflow and transition to the given states."""
+def transition_to_states(context, states: [str], registry: Registry):
+    """Initialize workflow if needed and do transitions to the given states.
+
+    :raises substanced.workflow.WorkflowError: if transition is missing to
+    do transitions to `states`.
+    """
     request = Request.blank('/dummy')
     request.registry = registry
     request.__cached_principals__ = ['role:god']
-    workflow = get_workflow(context, registry)
-    workflow.initialize(context)
+    workflow = registry.content.get_workflow(context)
+    # TODO: raise if workflow is None
+    if not workflow.has_state(context):
+        workflow.initialize(context)
+    current_state = workflow.state_of(context)
+    wanted_state = states and states[-1]
+    if wanted_state == current_state:
+        return
     for state in states:
         workflow.transition_to_state(context, request, state)
-
-
-def get_workflow(context, registry):
-    """Return the workflow for the given context."""
-    isheet = get_matching_isheet(context, IWorkflowAssignment)
-    workflow = get_sheet_field(context, isheet, 'workflow')
-    workflow_name = workflow.type
-    workflow = registry.content.workflows[workflow_name]
-    return workflow
 
 
 def _validate_workflow_cstruct(cstruct: dict) -> dict:
