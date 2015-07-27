@@ -4,10 +4,9 @@ This is registered as console script 'export_mercator_proposals'
 in setup.py.
 """
 
+import argparse
 import csv
 import inspect
-import optparse
-import sys
 import textwrap
 
 from pyramid.registry import Registry
@@ -54,17 +53,12 @@ def get_text_from_sheet(proposal, field, sheet):
 
 def export_proposals():
     """Export all proposals from database and write them to csv file. """
-    usage = 'usage: %prog config_file'
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=textwrap.dedent(inspect.getdoc(export_proposals))
-    )
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 1:
-        print('You must provide at least one argument')
-        return 2
+    doc = textwrap.dedent(inspect.getdoc(export_proposals))
+    parser = argparse.ArgumentParser(description=doc)
+    parser.add_argument('config')
+    args = parser.parse_args()
 
-    env = bootstrap(args[0])
+    env = bootstrap(args.config)
 
     root = env['root']
     registry = env['registry']
