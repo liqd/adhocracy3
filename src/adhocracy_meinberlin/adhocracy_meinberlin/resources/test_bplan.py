@@ -60,6 +60,7 @@ class TestProcess:
 
     def test_meta(self, meta):
         from adhocracy_core.resources.process import IProcess
+        from adhocracy_meinberlin import sheets
         from adhocracy_meinberlin import resources
         assert meta.iresource is resources.bplan.IProcess
         assert resources.bplan.IProcess.isOrExtends(IProcess)
