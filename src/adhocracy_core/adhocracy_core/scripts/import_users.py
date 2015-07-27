@@ -5,7 +5,9 @@ This is registered as console script 'import_users' in setup.py.
 """
 import argparse
 import inspect
+import logging
 import json
+import sys
 
 import transaction
 from pyramid.paster import bootstrap
@@ -22,6 +24,9 @@ from adhocracy_core.resources.subscriber import _get_default_group
 from adhocracy_core.utils import get_sheet
 from adhocracy_core import sheets
 from adhocracy_core.scripts.assign_badges import create_badge_assignment
+
+
+logger = logging.getLogger(__name__)
 
 
 def import_users():  # pragma: no cover
@@ -56,21 +61,21 @@ def _import_users(context: IResource, registry: Registry, filename: str):
                                                    context,
                                                    registry)
         if user_by_name or user_by_email:
-            print('Updating user {} ({})'.format(user_info['name'],
-                                                 user_info['email']))
+            logger.info('Updating user {} ({})'.format(user_info['name'],
+                                                       user_info['email']))
             _update_user(user_by_name, user_by_email, user_info, groups)
         else:
-            print('Creating user {}'.format(user_info['name']))
+            logger.info('Creating user {}'.format(user_info['name']))
             send_invitation = user_info.get('send_invitation_mail', False)
             activate = not send_invitation
             user = _create_user(user_info, users, registry, groups,
                                 activate=activate)
             if send_invitation:
-                print('Sending invitation mail to user {}'.format(user.name))
+                logger.info('Sending invitation mail to {}'.format(user.name))
                 _send_invitation_mail(user, user_info, registry)
             badge_names = user_info.get('badges', [])
             if badge_names:
-                print('Assign badge for user {}'.format(user.name))
+                logger.info('Assign badge for user {}'.format(user.name))
                 badges = _create_badges(user, badge_names, registry)
                 _assign_badges(user, badges, registry)
     transaction.commit()
@@ -97,15 +102,17 @@ def _update_user(user_by_name: IUser,
                  user_by_email: IUser,
                  user_info: dict,
                  groups: IResource):
-    if user_by_name is not None and \
-       user_by_email is not None and \
-       user_by_name != user_by_email:
-        raise ValueError('Trying to update user but name or email already '
-                         'used for another user.\nUpdate: {} ({}). Existing '
-                         'users: {} ({}) and {} ({}). '
-                         .format(user_info['name'], user_info['email'],
-                                 user_by_name.name, user_by_name.email,
-                                 user_by_email.name, user_by_email.email))
+    if user_by_name is not None\
+            and user_by_email is not None\
+            and user_by_name != user_by_email:
+        msg = 'Trying to update user but name or email already used for anoth'\
+              'er user.\nUpdate: {} ({}). Existing users: {} ({}) and {} ({}).'
+        raise ValueError(msg.format(user_info['name'],
+                                    user_info['email'],
+                                    user_by_name.name,
+                                    user_by_name.email,
+                                    user_by_email.name,
+                                    user_by_email.email))
     user = user_by_name or user_by_email
     if user_by_name is None:
         userbasic_sheet = get_sheet(user, sheets.principal.IUserBasic)
