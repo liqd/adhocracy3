@@ -19,19 +19,18 @@ def _send_bplan_submission_confirmation_email_subscriber(event):
         return
     messenger = event.registry.messenger
     proposal_version = event.object
-    proposal_item = find_interface(proposal_version, IProposal)
-    if not _bplan_proposal_has_been_created(proposal_item):
+    if not _is_proposal_creation_finished(proposal_version):
         return
-    proposal_values = _get_proposal_values(proposal_version)
-    process_settings = _get_process_settings(proposal_item)
+    appstruct = _get_appstruct(proposal_version)
+    process_settings = _get_process_settings(proposal_version)
     if process_settings['plan_number'] == 0 or process_settings['office_worker'] is None:
         return
-    templates_values = _get_templates_values(process_settings, proposal_values)
+    templates_values = _get_templates_values(process_settings, appstruct)
     subject = 'Ihre Stellungnahme zum Bebauungsplan {plan_number}, ' \
               '{participation_kind} von {participation_start_date:%d/%m/%Y} - {participation_end_date:%d/%m/%Y}.' \
               .format(**process_settings)
     messenger.send_mail(subject,
-                        [proposal_values['email']],
+                        [appstruct['email']],
                         'noreply@mein.berlin.de',
                         render('adhocracy_meinberlin:templates/bplan_submission_confirmation.txt.mako',
                                templates_values))
@@ -42,26 +41,27 @@ def _send_bplan_submission_confirmation_email_subscriber(event):
                                templates_values))
 
 
-def _get_templates_values(process_settings, proposal_values):
-    templates_values = proposal_values.copy()
+def _get_templates_values(process_settings, appstruct):
+    templates_values = appstruct.copy()
     templates_values.update(process_settings)
     return templates_values
 
 
-def _get_process_settings(proposal_item):
-    process = find_interface(proposal_item, resources.bplan.IProcess)
+def _get_process_settings(proposal_version):
+    process = find_interface(proposal_version, resources.bplan.IProcess)
     process_settings = get_sheet(process, sheets.bplan.IProcessSettings).get()
     return process_settings
 
 
-def _get_proposal_values(proposal_version):
+def _get_appstruct(proposal_version):
     proposal_sheet = get_sheet(proposal_version, sheets.bplan.IProposal)
-    proposal_values = proposal_sheet.get()
-    return proposal_values
+    appstruct = proposal_sheet.get()
+    return appstruct
 
 
-def _bplan_proposal_has_been_created(proposal):
-    return len([version for version in proposal.values() if
+def _is_proposal_creation_finished(proposal_version):
+    proposal_item = find_interface(proposal_version, IProposal)
+    return len([version for version in proposal_item.values() if
                 IProposalVersion.providedBy(version)]) == 2
 
 
