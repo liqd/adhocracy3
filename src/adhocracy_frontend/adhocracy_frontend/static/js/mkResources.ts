@@ -916,7 +916,8 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
         jsonType = "{start_date : string; description : string; name : string;}";
         parser = dictParser({
             start_date: null,
-            description: stringToDate
+            description: stringToDate,
+            name: null
         });
         break;
     default:
