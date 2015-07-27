@@ -27,3 +27,9 @@ def test_set_workflow_state(registry, context, transaction_mock,
     transition_to_mock.assert_called_with(context, ['announced', 'participate'],
                                           registry)
     assert transaction_mock.commit.called
+
+
+def test_set_workflow_state_with_reset(registry, context, transition_to_mock):
+    from .set_workflow_state import _set_workflow_state
+    _set_workflow_state(context, registry, '/', [], reset=True)
+    transition_to_mock.assert_called_with(context, [], registry, reset=True)

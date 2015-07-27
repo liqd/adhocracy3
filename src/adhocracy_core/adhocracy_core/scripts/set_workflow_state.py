@@ -32,19 +32,29 @@ def set_workflow_state():  # pragma: no cover
                         type=str,
                         nargs='+',
                         help='list of state name to do transition to')
+    parser.add_argument('--reset',
+                        help='reset workflow to initial state',
+                        action='store_true')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
     _set_workflow_state(env['root'],
                         env['registry'],
                         args.resource_path,
-                        args.states)
+                        args.states,
+                        args.reset,
+                        )
     env['closer']()
 
 
 def _set_workflow_state(root: IResource,
                         registry: Registry,
                         resource_path: str,
-                        states: [str]):
+                        states: [str],
+                        reset=False,
+                        ):
     resource = find_resource(root, resource_path)
-    transition_to_states(resource, states, registry)
+    if reset:
+        transition_to_states(resource, states, registry, reset=reset)
+    else:
+        transition_to_states(resource, states, registry)
     transaction.commit()

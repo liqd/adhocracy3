@@ -170,9 +170,9 @@ class TestTransitionToStates:
     def resource_meta(self, resource_meta):
         return resource_meta._replace(workflow_name='test_workflow')
 
-    def call_fut(self, *args):
+    def call_fut(self, *args, **kwargs):
         from . import transition_to_states
-        return transition_to_states(*args)
+        return transition_to_states(*args, **kwargs)
 
     def test_do_all_transitions_needed_to_set_state(self, integration, context,
                                                     resource_meta):
@@ -199,3 +199,15 @@ class TestTransitionToStates:
         self.call_fut(context, ['announced', 'participate'], registry)
 
         assert workflow.state_of(context) is 'participate'
+
+    def test_optionally_reset_to_initial_state(self, integration, context,
+                                               resource_meta):
+        registry = integration.registry
+        self._add_workflow(registry, 'test_workflow')
+        registry.content.resources_meta[resource_meta.iresource] = resource_meta
+        self.call_fut(context, ['announced', 'participate'], registry)
+
+        self.call_fut(context, [], registry, reset=True)
+        workflow = registry.content.workflows['test_workflow']
+        assert workflow.state_of(context) is 'draft'
+

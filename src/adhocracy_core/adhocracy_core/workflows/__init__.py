@@ -52,7 +52,8 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
     _add_workflow_to_registry(registry, appstruct, workflow, name)
 
 
-def transition_to_states(context, states: [str], registry: Registry):
+def transition_to_states(context, states: [str], registry: Registry,
+                         reset=False):
     """Initialize workflow if needed and do transitions to the given states.
 
     :raises substanced.workflow.WorkflowError: if transition is missing to
@@ -63,7 +64,7 @@ def transition_to_states(context, states: [str], registry: Registry):
     request.__cached_principals__ = ['role:god']
     workflow = registry.content.get_workflow(context)
     # TODO: raise if workflow is None
-    if not workflow.has_state(context):
+    if not workflow.has_state(context) or reset:
         workflow.initialize(context)
     current_state = workflow.state_of(context)
     wanted_state = states and states[-1]
