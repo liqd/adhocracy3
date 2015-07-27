@@ -69,13 +69,13 @@ import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mer
 import SIMercatorSubResources = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMercatorSubResources");
 import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
-import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SILogbook = require("../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MercatorProposal";
 
@@ -449,7 +449,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         var processUrl = this.adhTopLevelState.get("processUrl");
         this.adhHttp.get(processUrl).then((resource) => {
-            data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+            data.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
         });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
@@ -974,7 +974,7 @@ export var listItem = (
 
                 var processUrl = adhTopLevelState.get("processUrl");
                 adhHttp.get(processUrl).then((resource) => {
-                    scope.data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                    scope.data.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
                 });
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
@@ -1012,7 +1012,7 @@ export var addButton = (
         link: (scope) => {
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
                 scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && currentPhase === "participate");
             });
             adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "poolOptions");
