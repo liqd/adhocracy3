@@ -16,8 +16,8 @@ import AdhCommentAdapter = require("../Comment/Adapter");
 
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
-import RIMapDocument = require("../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocument");
-import RIMapDocumentVersion = require("../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocumentVersion");
+import RIGeoDocument = require("../../Resources_/adhocracy_core/resources/document/IGeoDocument");
+import RIGeoDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
@@ -152,8 +152,8 @@ export var postCreate = (
     poolPath : string,
     hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
-    const documentClass = hasMap ? RIMapDocument : RIDocument;
-    const documentVersionClass = hasMap ? RIMapDocumentVersion : RIDocumentVersion;
+    const documentClass = hasMap ? RIGeoDocument : RIDocument;
+    const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
     var doc = new documentClass({preliminaryNames: adhPreliminaryNames});
     doc.parent = poolPath;
@@ -214,7 +214,7 @@ export var postEdit = (
 
     var documentPath = AdhUtil.parentPath(oldVersion.path);
 
-    const documentVersionClass = hasMap ? RIMapDocumentVersion : RIDocumentVersion;
+    const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
     var paragraphItems : RIParagraph[] = [];
     var paragraphVersions : RIParagraphVersion[] = [];
