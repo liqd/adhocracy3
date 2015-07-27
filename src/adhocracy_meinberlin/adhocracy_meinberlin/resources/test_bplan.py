@@ -65,6 +65,7 @@ class TestProcess:
         assert resources.bplan.IProcess.isOrExtends(IProcess)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
+        assert meta.extended_sheets == (sheets.bplan.IProcessSettings,)
         assert meta.permission_create == 'create_process'
         assert meta.workflow_name == 'bplan'
 
