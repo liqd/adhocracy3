@@ -8,7 +8,6 @@ from pyramid.testing import DummyRequest
 from pyramid.threadlocal import get_current_request
 from substanced.workflow import IWorkflow
 from zope.interface import implementer
-from zope.deprecation import deprecated
 
 from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import ISheet
@@ -217,24 +216,6 @@ workflow_meta = sheet_meta._replace(
     sheet_class=WorkflowAssignmentSheet,
     permission_edit='do_transition'
 )
-
-
-class ISample(IWorkflowAssignment):
-
-    """Marker interface for the sample workflow assignment sheet."""
-
-
-deprecated('ISample',
-           'Backward compatible code use process IWorkflowAssignment instead')
-
-
-class IStandard(IWorkflowAssignment):
-
-    """Marker interface for the standard workflow assignment sheet."""
-
-
-deprecated('IStandard',
-           'Backward compatible code use process IWorkflowAssignment instead')
 
 
 def includeme(config):
