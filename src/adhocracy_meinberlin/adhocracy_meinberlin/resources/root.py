@@ -59,7 +59,8 @@ def add_example_process(context: IPool, registry: Registry, options: dict):
                   {'name': 'bplan'},
                   adhocracy_core.sheets.title.ITitle.__identifier__:
                   {'title': 'Sample BPlan process'},
-                  adhocracy_meinberlin.sheets.bplan.IProcessSettings.__identifier__:
+                  adhocracy_meinberlin.sheets.bplan.
+                      IProcessSettings.__identifier__:
                   {'office_worker': office_worker,
                    'plan_number': 112233,
                    'participation_kind': 'öffentliche Auslegung',
