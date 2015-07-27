@@ -4,13 +4,12 @@ The function change_german_salutation is registered in setup.py
 in setup.py.
 """
 
-import sys
-import os
-import json
-import re
 import argparse
-import textwrap
 import inspect
+import json
+import os
+import re
+import textwrap
 
 
 def change_german_salutation():

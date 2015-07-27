@@ -5,14 +5,14 @@ in setup.py.
 """
 
 
-import sys
-import os
-import json
-import re
-import unicodedata
 import argparse
-import textwrap
 import inspect
+import json
+import os
+import re
+import sys
+import textwrap
+import unicodedata
 
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry

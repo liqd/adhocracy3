@@ -4,10 +4,9 @@ This is registered as console script 'export_mercator_proposals'
 in setup.py.
 """
 
-import csv
 import argparse
+import csv
 import inspect
-import sys
 import textwrap
 
 from pyramid.registry import Registry
