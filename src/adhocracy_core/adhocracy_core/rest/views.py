@@ -4,18 +4,16 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
 from logging import getLogger
-import json
 
 from colander import Invalid
 from colander import MappingSchema
 from colander import SchemaNode
 from colander import SequenceSchema
-from cornice.util import json_error
-from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
 from substanced.util import find_service
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.httpexceptions import HTTPGone
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -57,6 +55,7 @@ from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
+from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.asset import retrieve_asset_file
@@ -104,7 +103,7 @@ def validate_post_root_versions(context, request: Request):
         if not IItemVersion.providedBy(root):
             error = 'This resource is not a valid ' \
                     'root version: {}'.format(request.resource_url(root))
-            request.errors.add('body', 'root_versions', error)
+            request.errors.append(error_entry('body', 'root_versions', error))
             continue
         valid_root_versions.append(root)
 
@@ -128,41 +127,61 @@ def validate_request_data(context: ILocation, request: Request,
                              The should append errors to `request.errors` and
                              validated data to `request.validated`.
 
-    :raises _JSONError: HTTP 400 for bad request data.
+    :raises HTTPBadRequest: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
     schema_with_binding = schema.bind(context=context,
                                       request=request,
                                       registry=request.registry,
                                       parent_pool=parent)
-    qs, headers, body, path = extract_request_data(request)
+    body = {}
     if request.content_type == 'multipart/form-data':
         body = unflatten_multipart_request(request)
-    validate_user_headers(headers, request)
-    validate_body_or_querystring(body, qs, schema_with_binding, context,
+    if request.content_type == 'application/json':
+        body = _extract_json_body(request)
+    validate_user_headers(request)
+    validate_body_or_querystring(body, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
-    _raise_if_errors(request)
+    if request.errors:
+        request.validated = {}
+        raise HTTPBadRequest()
 
 
-def validate_user_headers(headers: dict, request: Request):
+def _extract_json_body(request: Request) -> object:
+    json_body = {}
+    if request.body == '':
+        request.body = '{}'
+    try:
+        json_body = request.json_body
+    except (ValueError, TypeError) as err:
+        error = error_entry('body', None,
+                            'Invalid JSON request body'.format(err))
+        request.errors.append(error)
+    return json_body
+
+
+def validate_user_headers(request: Request):
     """
     Validate the user headers.
 
     If the request has a 'X-User-Path' and/or 'X-User-Token' header, we
     ensure that the session takes belongs to the user and is not expired.
     """
+    headers = request.headers
     if 'X-User-Path' in headers or 'X-User-Token' in headers:
         if get_user(request) is None:
-            request.errors.add('header', 'X-User-Token', 'Invalid user token')
+            error = error_entry('header', 'X-User-Token', 'Invalid user token')
+            request.errors.append(error)
 
 
-def validate_body_or_querystring(body, qs, schema: MappingSchema,
+def validate_body_or_querystring(body, schema: MappingSchema,
                                  context: IResource, request: Request):
     """Validate the querystring if this is a GET request, the body otherwise.
 
     This allows using just a single schema for all kinds of requests.
     """
+    qs = request.GET
     if isinstance(schema, GETPoolRequestSchema):
         try:
             schema = add_get_pool_request_extra_fields(qs, schema, context,
@@ -221,7 +240,7 @@ def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
 def _add_colander_invalid_error_to_request(error: Invalid, request: Request,
                                            location: str):
     for name, msg in error.asdict().items():
-        request.errors.add(location, name, msg)
+        request.errors.append(error_entry(location, name, msg))
 
 
 def _validate_extra_validators(validators: list, context, request: Request):
@@ -232,50 +251,6 @@ def _validate_extra_validators(validators: list, context, request: Request):
         val(context, request)
 
 
-def _raise_if_errors(request: Request):
-    """Raise :class:`cornice.errors._JSONError` and log if request.errors."""
-    if not request.errors:
-        return
-    logger.warning('Found %i validation errors in request: <%s>',
-                   len(request.errors), _show_request_body(request))
-    for error in request.errors:
-        logger.warning('  %s', error)
-    request.validated = {}
-    raise json_error(request.errors)
-
-
-def _show_request_body(request: Request) -> str:
-    """
-    Show the request body.
-
-    In case of multipart/form-data requests (file upload), only the 120
-    first characters of the body are shown.
-
-    In case of JSON requests with a "password" field at the top level,
-    the contents of the password field will be hidden.
-    """
-    result = request.body
-    if request.content_type == 'multipart/form-data' and len(result) > 120:
-        result = '{}...'.format(result[:120])
-    elif request.content_type == 'application/json':
-        json_data = ''
-        try:
-            json_data = request.json_body
-        except ValueError:
-            pass  # Not even valid JSON, so we cannot hide anything
-        if not isinstance(json_data, dict):
-            pass
-        possible_password_data = json_data
-        if 'data' in json_data:
-            possible_password_data = json_data['data'].get(
-                IPasswordAuthentication.__identifier__, {})
-        if 'password' in possible_password_data:
-            loggable_data = possible_password_data.copy()
-            loggable_data['password'] = '<hidden>'
-            result = json.dumps(loggable_data)
-    return result
-
-
 class RESTView:
 
     """Class stub with request data validation support.
@@ -284,7 +259,7 @@ class RESTView:
     and configure the pyramid view::
 
         @view_defaults(
-            renderer='simplejson',
+            renderer='json',
             context=IResource,
         )
         class MySubClass(RESTView):
@@ -360,7 +335,7 @@ def _get_schema_and_validators(view_class, request: Request) -> tuple:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IResource,
 )
 class ResourceRESTView(RESTView):
@@ -474,7 +449,7 @@ class ResourceRESTView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=ISimple,
 )
 class SimpleRESTView(ResourceRESTView):
@@ -485,7 +460,7 @@ class SimpleRESTView(ResourceRESTView):
 
     @view_config(request_method='PUT',
                  permission='edit_some',
-                 content_type='application/json')
+                 accept='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
         sheets = self.registry.get_sheets_edit(self.context, self.request)
@@ -508,7 +483,7 @@ class SimpleRESTView(ResourceRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IPool,
 )
 class PoolRESTView(SimpleRESTView):
@@ -550,7 +525,7 @@ class PoolRESTView(SimpleRESTView):
 
     @view_config(request_method='POST',
                  permission='create',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         iresource = self.request.validated['content_type']
@@ -567,14 +542,14 @@ class PoolRESTView(SimpleRESTView):
 
     @view_config(request_method='PUT',
                  permission='edit_some',
-                 content_type='application/json')
+                 accept='application/json')
     def put(self) -> dict:
         """HTTP PUT."""
         return super().put()
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IItem,
 )
 class ItemRESTView(PoolRESTView):
@@ -599,7 +574,7 @@ class ItemRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self):
         """Create new resource and get response data.
 
@@ -643,7 +618,7 @@ class ItemRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IBadgeAssignmentsService,
 )
 class BadgeAssignmentsRESTView(PoolRESTView):
@@ -658,7 +633,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self):
         """HTTP POST."""
         return super().post()
@@ -680,7 +655,7 @@ class BadgeAssignmentsRESTView(PoolRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IUsersService,
 )
 class UsersRESTView(PoolRESTView):
@@ -689,14 +664,14 @@ class UsersRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create_user',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self):
         """HTTP POST."""
         return super().post()
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IAssetsService,
 )
 class AssetsServiceRESTView(PoolRESTView):
@@ -705,14 +680,14 @@ class AssetsServiceRESTView(PoolRESTView):
 
     @view_config(request_method='POST',
                  permission='create_asset',
-                 content_type='multipart/form-data')
+                 accept='multipart/form-data')
     def post(self):
         """HTTP POST."""
         return super().post()
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IAsset,
 )
 class AssetRESTView(SimpleRESTView):
@@ -721,7 +696,7 @@ class AssetRESTView(SimpleRESTView):
 
     @view_config(request_method='PUT',
                  permission='create_asset',
-                 content_type='multipart/form-data')
+                 accept='multipart/form-data')
     def put(self) -> dict:
         """HTTP PUT."""
         result = super().put()
@@ -730,7 +705,7 @@ class AssetRESTView(SimpleRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IAssetDownload,
 )
 class AssetDownloadRESTView(SimpleRESTView):
@@ -766,7 +741,7 @@ class AssetDownloadRESTView(SimpleRESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='meta_api'
 )
@@ -939,8 +914,9 @@ def _get_base_ifaces(iface: IInterface, root_iface=Interface) -> [str]:
 
 
 def _add_no_such_user_or_wrong_password_error(request: Request):
-    request.errors.add('body', 'password',
-                       'User doesn\'t exist or password is wrong')
+    error = error_entry('body', 'password',
+                        'User doesn\'t exist or password is wrong')
+    request.errors.append(error)
 
 
 def validate_login_name(context, request: Request):
@@ -1008,11 +984,12 @@ def validate_account_active(context, request: Request):
     if user is None or request.errors:
         return
     if not user.active:
-        request.errors.add('body', 'name', 'User account not yet activated')
+        error = error_entry('body', 'name', 'User account not yet activated')
+        request.errors.append(error)
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='login_username',
 )
@@ -1031,7 +1008,7 @@ class LoginUsernameView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         return _login_user(self.request)
@@ -1050,7 +1027,7 @@ def _login_user(request: Request) -> dict:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='login_email',
 )
@@ -1069,7 +1046,7 @@ class LoginEmailView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         return _login_user(self.request)
@@ -1087,8 +1064,9 @@ def validate_activation_path(context, request: Request):
     user = locator.get_user_by_activation_path(path)
     registry = request.registry
     if user is None or _activation_time_window_has_expired(user, registry):
-        request.errors.add('body', 'path',
-                           'Unknown or expired activation path')
+        error = error_entry('body', 'path',
+                            'Unknown or expired activation path')
+        request.errors.append(error)
     else:
         user.activate()
         request.validated['user'] = user
@@ -1105,7 +1083,7 @@ def _activation_time_window_has_expired(user: IUser, registry) -> bool:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='activate_account',
 )
@@ -1122,7 +1100,7 @@ class ActivateAccountView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Activate a user account and log the user in."""
         return _login_user(self.request)
@@ -1145,7 +1123,7 @@ class ReportAbuseView(RESTView):
         return super().options()
 
     @view_config(request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Receive and process an abuse complaint."""
         messenger = self.request.registry.messenger
@@ -1156,7 +1134,7 @@ class ReportAbuseView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='message_user',
 )
@@ -1179,7 +1157,7 @@ class MessageUserView(RESTView):
 
     @view_config(request_method='POST',
                  permission='message_to_user',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Send a message to another user."""
         messenger = self.request.registry.messenger
@@ -1192,7 +1170,7 @@ class MessageUserView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='create_password_reset',
 )
@@ -1208,7 +1186,7 @@ class CreatePasswordResetView(RESTView):
         return {'POST': {}}
 
     @view_config(request_method='POST',
-                 content_type='application/json'
+                 accept='application/json'
                  )
     def post(self) -> dict:
         """Create as password reset resource."""
@@ -1221,7 +1199,7 @@ class CreatePasswordResetView(RESTView):
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     name='password_reset',
 )
@@ -1237,7 +1215,7 @@ class PasswordResetView(RESTView):
         return {'POST': {}}
 
     @view_config(request_method='POST',
-                 content_type='application/json',
+                 accept='application/json',
                  )
     def post(self) -> dict:
         """Reset password."""

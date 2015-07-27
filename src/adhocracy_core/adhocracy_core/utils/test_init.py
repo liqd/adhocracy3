@@ -317,39 +317,20 @@ class TestRaiseColanderStyleError:
         from . import raise_colander_style_error
         return raise_colander_style_error(*args)
 
-    @fixture
-    def integration(self, config):
-        import adhocracy_core.rest
-        config.include(adhocracy_core.rest)
-
-    @fixture
-    def dummy_view(self):
+    def test_raise_colander_error(self):
+        from colander import Invalid
         from adhocracy_core.interfaces import ISheet
+        with raises(Invalid) as err:
+            self.call_fut(ISheet, 'field_name', 'description')
+        assert err.value.asdict() == \
+             {'data.adhocracy_core.interfaces.ISheet.field_name': 'description'}
 
-        def dummy_view(request):
-            self.call_fut(ISheet, 'fieldname', 'description')
-            raise Exception()
-
-        return dummy_view
-
-    @fixture
-    def app_user(self, config, dummy_view):
-        config.add_view(dummy_view, name='dummy_view', request_method='GET')
-        config.add_route('dummy_view', '/dummy_view}')
-        from webtest import TestApp
-        app = config.make_wsgi_app()
-        return TestApp(app)
-
-    @mark.usefixtures('integration')
-    def test_raise_in_view(self, app_user):
-        # actually we are also testing
-        # adhocracy_core.rest.exceptions.handle_error_400_colander_invalid here.
-        resp = app_user.get('/dummy_view', status=400)
-        assert resp.json == \
-               {"status": "error",
-                "errors": [{"description": "description",
-                            "name": "data.adhocracy_core.interfaces.ISheet.fieldname",
-                            "location": "body"}]}
+    def test_raise_colander_error_with_isheet_is_none(self):
+        from colander import Invalid
+        with raises(Invalid) as err:
+            self.call_fut(None, 'field_name', 'description')
+        assert err.value.asdict() == \
+             {'field_name': 'description'}
 
 
 class TestGetVisibilityChange:

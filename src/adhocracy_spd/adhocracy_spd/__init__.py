@@ -7,6 +7,7 @@ from adhocracy_core import root_factory
 def includeme(config):
     """Setup adhocracy extension."""
     config.include('adhocracy_core')
+    config.commit()
     config.include('.sheets')
     config.include('.resources')
     config.include('.workflows')
