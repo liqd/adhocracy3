@@ -472,6 +472,19 @@ class TestResourceRESTView:
         assert d ==\
             {IWorkflowAssignment.__identifier__: {'workflow_state': ['draft']}}
 
+    def test_add_workflow_permissions_info_without_workflow(
+           self, request_, context, mock_sheet):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        mock_sheet.get.return_value = {'workflow': None}
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IWorkflowAssignment)
+        editable_sheets = [mock_sheet]
+        inst = self.make_one(context, request_)
+        d = {}
+        inst._add_workflow_edit_permission_info(d, editable_sheets)
+        assert d ==\
+            {IWorkflowAssignment.__identifier__: {'workflow_state': []}}
+
+
     def test_get_valid_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
 
