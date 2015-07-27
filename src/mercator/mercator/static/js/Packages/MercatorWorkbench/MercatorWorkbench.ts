@@ -52,7 +52,9 @@ var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) =
 };
 
 
-export var commentColumnDirective = (adhConfig : AdhConfig.IService) => {
+export var commentColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
@@ -278,7 +280,7 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", "adhTopLevelState", mercatorWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
+        .directive("adhMercatorCommentColumn", ["adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", [
             "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", [
