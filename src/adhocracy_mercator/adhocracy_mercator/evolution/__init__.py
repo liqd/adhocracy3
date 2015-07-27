@@ -131,6 +131,20 @@ def add_haslogbookpool_sheet_to_proposal_versions(root):  # pragma: no cover
     migrate_new_sheet(root, IMercatorProposalVersion, IHasLogbookPool)
 
 
+@log_migration
+def remove_mercator_workflow_assignment_sheet(root):  # pragma: no cover
+    """Remove deprecated sheets.mercator.IWorkflowAssignment interface."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    from adhocracy_mercator import resources
+    from adhocracy_mercator import sheets
+    migrate_new_sheet(root,
+                      resources.mercator.IProcess,
+                      IWorkflowAssignment,
+                      sheets.mercator.IWorkflowAssignment,
+                      remove_isheet_old=True,
+                      )
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -143,3 +157,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(reset_workflow_state_to_result)
     config.add_evolution_step(add_logbook_service_to_proposal_items)
     config.add_evolution_step(add_haslogbookpool_sheet_to_proposal_versions)
+    config.add_evolution_step(remove_mercator_workflow_assignment_sheet)
