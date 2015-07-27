@@ -80,7 +80,7 @@ export var commentColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["proposalUrl", "commentableUrl"]);
+            column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
         }
     };
 };
@@ -246,6 +246,7 @@ export var register = (angular) => {
                     () => (item : RIProposal, version : RIProposalVersion) => {
                         return {
                             commentableUrl: version.path,
+                            commentCloseUrl: version.path,
                             proposalUrl: version.path
                         };
                     }])
@@ -270,6 +271,7 @@ export var register = (angular) => {
                         return getCommentableUrl(version).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
+                                commentCloseUrl: commentable.path,
                                 proposalUrl: commentable.path
                             };
                         });
