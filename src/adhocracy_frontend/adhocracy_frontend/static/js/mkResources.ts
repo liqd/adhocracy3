@@ -930,7 +930,8 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
             resultType += "[]";
             jsonType += "[]";
             if (parser) {
-                parser = "(list) => _.map(list, " + parser + ")";
+                // FIXME: DefinitelyTyped
+                parser = "(list) => _.map(<any[]>list, " + parser + ")";
             }
             break;
         default:
