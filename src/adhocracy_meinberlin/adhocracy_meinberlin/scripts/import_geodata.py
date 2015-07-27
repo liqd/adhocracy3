@@ -10,7 +10,7 @@ import os
 import json
 import re
 import unicodedata
-import optparse
+import argparse
 import textwrap
 import inspect
 
@@ -37,23 +37,13 @@ GDAL_LEGACY = True
 
 
 def import_bezirke():
-    """Import Berlin districts to adhocracy meinBerlin.
+    """Import Berlin districts to adhocracy meinBerlin."""
+    doc = textwrap.dedent(inspect.getdoc(import_bezirke))
+    parser = argparse.ArgumentParser(description=doc)
+    parser.add_argument('config')
+    args = parser.parse_args()
 
-    usage::
-
-        bin/import_bezirke etc/development.ini
-    """
-    usage = 'usage: %prog config_file'
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=textwrap.dedent(inspect.getdoc(import_bezirke))
-    )
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 1:
-        print('You must provide at least one argument')
-        return 2
-
-    env = bootstrap(args[0])
+    env = bootstrap(args.config)
     root = env['root']
     registry = env['registry']
     locations = find_service(root, 'locations')
@@ -89,23 +79,13 @@ def import_bezirke():
 
 
 def import_bezirksregions():
-    """Import Berlin district-regions to adhocracy meinBerlin.
+    """Import Berlin district-regions to adhocracy meinBerlin."""
+    doc = textwrap.dedent(inspect.getdoc(import_bezirksregions))
+    parser = argparse.ArgumentParser(description=doc)
+    parser.add_argument('config')
+    args = parser.parse_args()
 
-    usage::
-
-        bin/import_bezirksregions etc/development.ini
-    """
-    usage = 'usage: %prog config_file'
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=textwrap.dedent(inspect.getdoc(import_bezirksregions))
-    )
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 1:
-        print('You must provide at least one argument')
-        return 2
-
-    env = bootstrap(args[0])
+    env = bootstrap(args.config)
     root = env['root']
     registry = env['registry']
     locations = find_service(root, 'locations')

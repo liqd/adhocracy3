@@ -1,7 +1,7 @@
 """Create Process for region."""
 
 import sys
-import optparse
+import argparse
 import textwrap
 import inspect
 
@@ -22,28 +22,20 @@ from adhocracy_core.sheets.geo import ILocationReference
 
 
 def create_process_for_region():
-    """Create sample Kiezkassen process for a given region and organisation.
+    """Create sample Kiezkassen process for a given region and organisation."""
+    doc = textwrap.dedent(inspect.getdoc(create_process_for_region))
+    parser = argparse.ArgumentParser(description=doc)
+    parser.add_argument('config')
+    parser.add_argument('region_name')
+    parser.add_argument('organisation_name')
+    args = parser.parse_args()
 
-    usage::
-
-      bin/create_process_for_region <config> <regionname> <organisationname>
-    """
-    usage = 'usage: %prog config_file region organisation'
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=textwrap.dedent(inspect.getdoc(create_process_for_region))
-    )
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 3:
-        print('You must provide at least three argument')
-        return 2
-
-    env = bootstrap(args[0])
+    env = bootstrap(args.config)
     root = env['root']
     registry = env['registry']
 
-    district = _fetch_district_by_name(root, args[1])
-    organisation = _fetch_organisation_by_name(root, args[2])
+    district = _fetch_district_by_name(root, args.region_name)
+    organisation = _fetch_organisation_by_name(root, args.organisation_name)
 
     _create_process(root, registry, organisation, district)
 

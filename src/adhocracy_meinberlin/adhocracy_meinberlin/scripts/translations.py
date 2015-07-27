@@ -8,7 +8,7 @@ import sys
 import os
 import json
 import re
-import optparse
+import argparse
 import textwrap
 import inspect
 
@@ -16,27 +16,17 @@ import inspect
 def change_german_salutation():
     """Import german translation json file and change from Du to Sie.
 
-    usage::
-
-        bin/change_german_salutation jsonfile
-
     The result will be saved to a separate file. If the input file is
     ``some/path/file.json`` the output will be saved to
     ``some/path/file_new.json``.
 
     """
-    usage = 'usage: %prog config_file'
-    parser = optparse.OptionParser(
-        usage=usage,
-        description=textwrap.dedent(inspect.getdoc(change_german_salutation))
-    )
-    options, args = parser.parse_args(sys.argv[1:])
-    if not len(args) >= 1:
-        print('You must provide at least one argument')
-        return 2
+    doc = textwrap.dedent(inspect.getdoc(change_german_salutation))
+    parser = argparse.ArgumentParser(description=doc)
+    parser.add_argument('jsonfile')
+    args = parser.parse_args()
 
-    jsonfile = args[0]
-    data = json.load(open(jsonfile, 'r'))
+    data = json.load(open(args.jsonfile, 'r'))
 
     regexlist = [
         ('Bitte entschuldige', 'Bitte entschuldigen Sie'),
@@ -81,7 +71,7 @@ def change_german_salutation():
         print('-----------------------------')
         data[entry] = line
 
-    filename = os.path.splitext(jsonfile)[0]
+    filename = os.path.splitext(args.jsonfile)[0]
     filename = filename + '_new.json'
 
     with open(filename, 'w') as f:
