@@ -52,22 +52,6 @@ var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) =
 };
 
 
-export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
-            scope.frontendOrderPredicate = (id) => id;
-            scope.frontendOrderReverse = true;
-        }
-    };
-};
-
-
 export var mercatorProposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceUrlFilter : (path : string) => string,
@@ -280,7 +264,6 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", "adhTopLevelState", mercatorWorkbenchDirective])
-        .directive("adhMercatorCommentColumn", ["adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", [
             "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", [

@@ -39,21 +39,6 @@ export var spdWorkbenchDirective = (
 };
 
 
-export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
-            scope.frontendOrderPredicate = (id) => id;
-            scope.frontendOrderReverse = true;
-        }
-    };
-};
-
 export var documentDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
@@ -231,7 +216,6 @@ export var register = (angular) => {
                 }]);
         }])
         .directive("adhSpdWorkbench", ["adhConfig", "adhTopLevelState", spdWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
         .directive("adhDocumentDetailColumn", ["adhConfig", "adhPermissions", documentDetailColumnDirective])
         .directive("adhDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective])
         .directive("adhDocumentEditColumn", ["adhConfig", documentEditColumnDirective])
