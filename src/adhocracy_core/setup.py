@@ -17,7 +17,6 @@ requires = [
     'gunicorn',
     'substanced',
     'pyramid_tm',
-    'cornice < 0.18',  # We allow sequence data but cornice only dicts (#273)
     'colander',
     'autobahn',
     'websocket-client',
@@ -42,6 +41,7 @@ test_requires = [
     'python-coveralls',
     'babel',
     'lingua',
+    'testfixtures',
 ]
 
 debug_requires = [

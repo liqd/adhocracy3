@@ -54,67 +54,63 @@ def mock_password_sheet(registry, sheet_meta):
 
 class TestValidateRequest:
 
-    @fixture
-    def myrequest(self, cornice_request):
-        return cornice_request
-
-    def make_one(self, context, myrequest, **kw):
+    def call_fut(self, context, request_, **kw):
         from adhocracy_core.rest.views import validate_request_data
-        validate_request_data(context, myrequest, **kw)
+        validate_request_data(context, request_, **kw)
 
-    def test_valid_wrong_method_with_data(self, context, myrequest):
-        myrequest.body = '{"wilddata": "1"}'
-        myrequest.method = 'wrong_method'
-        self.make_one(context, myrequest)
-        assert myrequest.validated == {}
+    def test_valid_wrong_method_with_data(self, context, request_):
+        request_.body = '{"wilddata": "1"}'
+        request_.method = 'wrong_method'
+        self.call_fut(context, request_)
+        assert request_.validated == {}
 
-    def test_valid_no_schema_with_data(self, context, myrequest):
-        myrequest.body = '{"wilddata": "1"}'
-        self.make_one(context, myrequest)
-        assert myrequest.validated == {}
+    def test_valid_no_schema_with_data(self, context, request_):
+        request_.body = '{"wilddata": "1"}'
+        self.call_fut(context, request_)
+        assert request_.validated == {}
 
-    def test_valid_with_schema_no_data(self, context, myrequest):
-        myrequest.body = ''
-        self.make_one(context, myrequest, schema=CountSchema())
-        assert myrequest.validated == {}
+    def test_valid_with_schema_no_data(self, context, request_):
+        request_.body = ''
+        self.call_fut(context, request_, schema=CountSchema())
+        assert request_.validated == {}
 
-    def test_valid_with_schema_no_data_empty_dict(self, context, myrequest):
-        myrequest.body = '{}'
-        self.make_one(context, myrequest, schema=CountSchema())
-        assert myrequest.validated == {}
+    def test_valid_with_schema_no_data_empty_dict(self, context, request_):
+        request_.body = '{}'
+        self.call_fut(context, request_, schema=CountSchema())
+        assert request_.validated == {}
 
-    def test_valid_with_schema_no_data_and_defaults(self, context, myrequest):
+    def test_valid_with_schema_no_data_and_defaults(self, context, request_):
         class DefaultDataSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int(),
                                         missing=1)
-        myrequest.body = ''
-        self.make_one(context, myrequest, schema=DefaultDataSchema())
-        assert myrequest.validated == {'count': 1}
+        request_.body = ''
+        self.call_fut(context, request_, schema=DefaultDataSchema())
+        assert request_.validated == {'count': 1}
 
-    def test_valid_with_schema_with_data(self, context, myrequest):
-        myrequest.body = '{"count": "1"}'
-        myrequest.method = 'PUT'
-        self.make_one(context, myrequest, schema=CountSchema())
-        assert myrequest.validated == {'count': 1}
+    def test_valid_with_schema_with_data(self, context, request_):
+        request_.body = '{"count": "1"}'
+        request_.method = 'PUT'
+        self.call_fut(context, request_, schema=CountSchema())
+        assert request_.validated == {'count': 1}
 
     def test_valid_with_schema_with_data_in_querystring(self, context,
-                                                        myrequest):
+                                                        request_):
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int())
-        myrequest.GET = {'count': 1}
-        self.make_one(context, myrequest, schema=QueryStringSchema())
-        assert myrequest.validated == {'count': 1}
+        request_.GET = {'count': 1}
+        self.call_fut(context, request_, schema=QueryStringSchema())
+        assert request_.validated == {'count': 1}
 
     def test_valid_with_schema_with_extra_fields_in_querystring_discarded(
-            self, context, myrequest):
+            self, context, request_):
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int())
-        myrequest.GET = {'count': 1, 'extraflag': 'extra value'}
-        self.make_one(context, myrequest, schema=QueryStringSchema())
-        assert myrequest.validated == {'count': 1}
+        request_.GET = {'count': 1, 'extraflag': 'extra value'}
+        self.call_fut(context, request_, schema=QueryStringSchema())
+        assert request_.validated == {'count': 1}
 
     def test_valid_with_schema_with_extra_fields_in_querystring_preserved(
-            self, context, myrequest):
+            self, context, request_):
 
         class PreservingQueryStringSchema(colander.MappingSchema):
             def __init__(self, *args, **kwargs):
@@ -122,217 +118,225 @@ class TestValidateRequest:
                 self.typ.unknown = 'preserve'
             count = colander.SchemaNode(colander.Int())
 
-        myrequest.GET = {'count': 1, 'extraflag': 'extra value'}
-        self.make_one(context, myrequest,
+        request_.GET = {'count': 1, 'extraflag': 'extra value'}
+        self.call_fut(context, request_,
                        schema=PreservingQueryStringSchema())
-        assert myrequest.validated == {'count': 1, 'extraflag': 'extra value'}
+        assert request_.validated == {'count': 1, 'extraflag': 'extra value'}
 
-    def test_valid_multipart_formdata(self, context, myrequest):
-        myrequest.content_type = 'multipart/form-data'
-        myrequest.method = 'POST'
-        myrequest.POST['count'] = '1'
-        self.make_one(context, myrequest, schema=CountSchema())
-        assert myrequest.validated == {'count': 1}
+    def test_valid_multipart_formdata(self, context, request_):
+        request_.content_type = 'multipart/form-data'
+        request_.method = 'POST'
+        request_.POST['count'] = '1'
+        self.call_fut(context, request_, schema=CountSchema())
+        assert request_.validated == {'count': 1}
 
-    def test_non_valid_with_schema_wrong_data(self, context, myrequest):
-        from cornice.util import _JSONError
-        myrequest.body = '{"count": "wrong_value"}'
-        myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
-            self.make_one(context, myrequest, schema=CountSchema())
-        assert myrequest.errors == [{'location': 'body',
-                                   'name': 'count',
-                                   'description': '"wrong_value" is not a number'}]
+    def test_non_valid_with_schema_wrong_data(self, context, request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
+        request_.body = '{"count": "wrong_value"}'
+        request_.method = 'POST'
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema=CountSchema())
+        assert request_.errors == [error_entry('body',
+                                                'count',
+                                                '"wrong_value" is not a number')]
+
+    def test_non_valid_with_non_json_data(self, context, request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
+        request_.body = b'WRONG'
+        request_.method = 'POST'
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema=CountSchema())
+        assert request_.errors == [error_entry('body',
+                                                None,
+                                                'Invalid JSON request body')]
 
     def test_non_valid_with_schema_wrong_data_cleanup(self, context,
-                                                      myrequest):
-        from cornice.util import _JSONError
-        myrequest.validated = {'secret_data': 'buh'}
-        myrequest.body = '{"count": "wrong_value"}'
-        myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
-            self.make_one(context, myrequest, schema=CountSchema())
-        assert myrequest.validated == {}
+                                                      request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        request_.validated = {'secret_data': 'buh'}
+        request_.body = '{"count": "wrong_value"}'
+        request_.method = 'POST'
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema=CountSchema())
+        assert request_.validated == {}
 
-    def test_valid_with_extra_validator(self, context, myrequest):
-        def validator1(context, myrequest):
-            myrequest.validated = {"validator": "1"}
-        self.make_one(context, myrequest, extra_validators=[validator1])
-        assert myrequest.validated == {"validator": "1"}
+    def test_valid_with_extra_validator(self, context, request_):
+        def validator1(context, request_):
+            request_.validated = {"validator": "1"}
+        self.call_fut(context, request_, extra_validators=[validator1])
+        assert request_.validated == {"validator": "1"}
 
     def test_valid_with_extra_validator_and_wrong_schema_data(self, context,
-                                                              myrequest):
-        from cornice.util import _JSONError
-        def validator1(context, myrequest):
-            myrequest._validator_called = True
-        myrequest.body = '{"count": "wrong"}'
-        myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
-            self.make_one(context, myrequest, schema=CountSchema(),
+                                                              request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        def validator1(context, request_):
+            request_._validator_called = True
+        request_.body = '{"count": "wrong"}'
+        request_.method = 'POST'
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema=CountSchema(),
                            extra_validators=[validator1])
-        assert hasattr(myrequest, '_validator_called') is False
+        assert hasattr(request_, '_validator_called') is False
 
-    def test_valid_with_sequence_schema(self, context, myrequest):
+    def test_valid_with_sequence_schema(self, context, request_):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
 
-        myrequest.body = '["alpha", "beta", "gamma"]'
-        myrequest.method = 'POST'
-        self.make_one(context, myrequest, schema=TestListSchema())
-        assert myrequest.validated == ['alpha', 'beta', 'gamma']
+        request_.body = '["alpha", "beta", "gamma"]'
+        request_.method = 'POST'
+        self.call_fut(context, request_, schema=TestListSchema())
+        assert request_.validated == ['alpha', 'beta', 'gamma']
 
     def test_valid_with_sequence_schema_in_querystring(self, context,
-                                                       myrequest):
+                                                       request_):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
-        self.make_one(context, myrequest, schema=TestListSchema())
+        self.call_fut(context, request_, schema=TestListSchema())
         # since this doesn't make much sense, the validator is just a no-op
-        assert myrequest.validated == {}
+        assert request_.validated == {}
 
-    def test_with_invalid_sequence_schema(self, context, myrequest):
+    def test_with_invalid_sequence_schema(self, context, request_):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.String())
             nonsense_node = colander.SchemaNode(colander.String())
 
-        myrequest.body = '["alpha", "beta", "gamma"]'
-        myrequest.method = 'POST'
+        request_.body = '["alpha", "beta", "gamma"]'
+        request_.method = 'POST'
         with pytest.raises(colander.Invalid):
-            self.make_one(context, myrequest, schema=TestListSchema())
-        assert myrequest.validated == {}
+            self.call_fut(context, request_, schema=TestListSchema())
+        assert request_.validated == {}
 
-    def test_invalid_with_sequence_schema(self, context, myrequest):
+    def test_invalid_with_sequence_schema(self, context, request_):
         class TestListSchema(colander.SequenceSchema):
             elements = colander.SchemaNode(colander.Integer())
 
-        from cornice.util import _JSONError
-        myrequest.body = '[1, 2, "three"]'
-        myrequest.method = 'POST'
-        with pytest.raises(_JSONError):
-            self.make_one(context, myrequest, schema=TestListSchema())
-        assert myrequest.validated == {}
+        from pyramid.httpexceptions import HTTPBadRequest
+        request_.body = '[1, 2, "three"]'
+        request_.method = 'POST'
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema=TestListSchema())
+        assert request_.validated == {}
 
     def test_invalid_with_not_sequence_and_not_mapping_schema(self, context,
-                                                              myrequest):
+                                                              request_):
         schema = colander.SchemaNode(colander.Int())
         with pytest.raises(Exception):
-            self.make_one(context, myrequest, schema=schema)
+            self.call_fut(context, request_, schema=schema)
 
     def test_valid_user_headers_and_authenticated_user(
-            self, context, myrequest, monkeypatch):
+            self, context, request_, monkeypatch):
         from unittest.mock import Mock
         from adhocracy_core.rest import views
-        myrequest.headers['X-User-Path'] = 2
-        myrequest.headers['X-User-Token'] = 3
+        request_.headers['X-User-Path'] = 2
+        request_.headers['X-User-Token'] = 3
         monkeypatch.setattr(views, 'get_user', Mock(return_value='user'))
-        self.make_one(context, myrequest)
-        assert myrequest.validated == {}
+        self.call_fut(context, request_)
+        assert request_.validated == {}
 
     def test_invalid_user_headers_but_no_authenticated_user(self, context,
-                                                            myrequest):
-        from cornice.util import _JSONError
-        myrequest.headers['X-User-Path'] = 2
-        myrequest.headers['X-User-Token'] = 3
-        with pytest.raises(_JSONError):
-            self.make_one(context, myrequest)
-        assert myrequest.validated == {}
+                                                            request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        request_.headers['X-User-Path'] = 2
+        request_.headers['X-User-Token'] = 3
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_)
+        assert request_.validated == {}
 
 
 class TestValidatePOSTRootVersions:
 
-    @fixture
-    def request(self, cornice_request):
-        return cornice_request
-
-    def make_one(self, context, request):
+    def make_one(self, context, request_):
         from adhocracy_core.rest.views import validate_post_root_versions
-        validate_post_root_versions(context, request)
+        validate_post_root_versions(context, request_)
 
-    def test_valid_no_value(self, request, context):
-        self.make_one(context, request)
-        assert request.errors == []
+    def test_valid_no_value(self, request_, context):
+        self.make_one(context, request_)
+        assert request_.errors == []
 
-    def test_valid_empty_value(self, request, context):
-        self.make_one(context, request)
-        request.validated = {'root_versions': []}
-        assert request.errors == []
+    def test_valid_empty_value(self, request_, context):
+        self.make_one(context, request_)
+        request_.validated = {'root_versions': []}
+        assert request_.errors == []
 
-    def test_valid_with_value(self, request, context):
+    def test_valid_with_value(self, request_, context):
         from adhocracy_core.interfaces import IItemVersion
         from adhocracy_core.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IItemVersion, ISheet))
-        request.validated = {'root_versions': [root]}
+        request_.validated = {'root_versions': [root]}
 
-        self.make_one(context, request)
+        self.make_one(context, request_)
 
-        assert request.errors == []
-        assert request.validated == {'root_versions': [root]}
+        assert request_.errors == []
+        assert request_.validated == {'root_versions': [root]}
 
-    def test_non_valid_value_has_wrong_iface(self, request, context):
+    def test_non_valid_value_has_wrong_iface(self, request_, context):
         from adhocracy_core.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IResourceX, ISheet))
-        request.validated = {'root_versions': [root]}
+        request_.validated = {'root_versions': [root]}
 
-        self.make_one(context, request)
+        self.make_one(context, request_)
 
-        assert request.errors != []
-        assert request.validated == {'root_versions': []}
+        assert request_.errors != []
+        assert request_.validated == {'root_versions': []}
 
 
 class TestRESTView:
 
     @fixture
-    def request(self, cornice_request, changelog):
-        cornice_request.registry.changelog = changelog
-        return cornice_request
+    def request_(self, request_, changelog):
+        request_.registry.changelog = changelog
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import RESTView
         return RESTView(context, request)
 
-    def test_create_valid(self, request, context):
-        inst = self.make_one(context, request)
+    def test_create_valid(self, request_, context):
+        inst = self.make_one(context, request_)
         assert inst.validation_GET == (None, [])
         assert inst.validation_HEAD == (None, [])
         assert inst.validation_OPTIONS == (None, [])
         assert inst.validation_PUT == (None, [])
         assert inst.validation_POST == (None, [])
         assert inst.context is context
-        assert inst.request is request
+        assert inst.request is request_
         assert inst.request.errors == []
         assert inst.request.validated == {}
 
-    def test__build_updated_resources_dict_empty(self, request, context):
-        inst = self.make_one(context, request)
+    def test__build_updated_resources_dict_empty(self, request_, context):
+        inst = self.make_one(context, request_)
         result = inst._build_updated_resources_dict()
         assert result == {}
 
     def test__build_updated_resources_dict_one_resource(
-            self, request, context, changelog_meta):
+            self, request_, context, changelog_meta):
         res = testing.DummyResource()
-        request.registry.changelog[res] = changelog_meta._replace(resource=res,
+        request_.registry.changelog[res] = changelog_meta._replace(resource=res,
                                                                   created=True)
-        inst = self.make_one(context, request)
+        inst = self.make_one(context, request_)
         result = inst._build_updated_resources_dict()
         assert result == {'created': [res]}
 
     def test__build_updated_resources_dict_one_resource_two_events(
-            self, request, context, changelog_meta):
+            self, request_, context, changelog_meta):
         res = testing.DummyResource()
-        request.registry.changelog[res] = changelog_meta._replace(
+        request_.registry.changelog[res] = changelog_meta._replace(
             resource=res, created=True, changed_descendants=True)
-        inst = self.make_one(context, request)
+        inst = self.make_one(context, request_)
         result = inst._build_updated_resources_dict()
         assert result == {'changed_descendants': [res], 'created': [res]}
 
     def test__build_updated_resources_dict_two_resources(
-            self, request, context, changelog_meta):
+            self, request_, context, changelog_meta):
         res1 = testing.DummyResource()
         res2 = testing.DummyResource()
-        request.registry.changelog[res1] = \
+        request_.registry.changelog[res1] = \
             changelog_meta._replace(resource=res1, created=True)
-        request.registry.changelog[res2] =\
+        request_.registry.changelog[res2] =\
             changelog_meta._replace(resource=res2, created=True)
-        inst = self.make_one(context, request)
+        inst = self.make_one(context, request_)
         result = inst._build_updated_resources_dict()
         assert list(result.keys()) == ['created']
         assert set(result['created']) == {res1, res2}
@@ -341,9 +345,9 @@ class TestRESTView:
 class TestResourceRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_content_registry):
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request_(self, request_, mock_content_registry):
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, context, request_):
         from adhocracy_core.rest.views import ResourceRESTView
@@ -491,11 +495,11 @@ class TestResourceRESTView:
 class TestSimpleRESTView:
 
     @fixture
-    def request(self, cornice_request, registry_with_changelog,
+    def request(self, request_, registry_with_changelog,
                 mock_content_registry):
-        cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+        request_.registry = registry_with_changelog
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import SimpleRESTView
@@ -548,11 +552,11 @@ class TestSimpleRESTView:
 class TestPoolRESTView:
 
     @fixture
-    def request(self, cornice_request, registry_with_changelog,
+    def request(self, request_, registry_with_changelog,
                 mock_content_registry):
-        cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+        request_.registry = registry_with_changelog
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import PoolRESTView
@@ -629,11 +633,11 @@ class TestPoolRESTView:
 class TestUsersRESTView:
 
     @fixture
-    def request(self, cornice_request, registry_with_changelog,
+    def request(self, request_, registry_with_changelog,
                 mock_content_registry):
-        cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+        request_.registry = registry_with_changelog
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import UsersRESTView
@@ -678,10 +682,10 @@ class TestUsersRESTView:
 class TestItemRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_content_registry, changelog):
-        cornice_request.registry.content = mock_content_registry
-        cornice_request.registry.changelog = changelog
-        return cornice_request
+    def request(self, request_, mock_content_registry, changelog):
+        request_.registry.content = mock_content_registry
+        request_.registry.changelog = changelog
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import ItemRESTView
@@ -843,11 +847,11 @@ class TestItemRESTView:
 class TestBadgeAssignmentsRESTView:
 
     @fixture
-    def request_(self, cornice_request, registry_with_changelog,
+    def request_(self, request_, registry_with_changelog,
                  mock_content_registry):
-        cornice_request.registry = registry_with_changelog
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+        request_.registry = registry_with_changelog
+        request_.registry.content = mock_content_registry
+        return request_
 
     @fixture
     def assignment_sheet(self, mock_sheet):
@@ -931,9 +935,9 @@ class TestBadgeAssignmentsRESTView:
 class TestMetaApiView:
 
     @fixture
-    def request(self, cornice_request,  mock_content_registry):
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request(self, request_,  mock_content_registry):
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, request, context):
         from adhocracy_core.rest.views import MetaApiView
@@ -1146,10 +1150,10 @@ class TestMetaApiView:
 class TestValidateLoginEmail:
 
     @fixture
-    def request(self, cornice_request, registry):
-        cornice_request.registry = registry
-        cornice_request.validated['email'] = 'user@example.org'
-        return cornice_request
+    def request(self, request_, registry):
+        request_.registry = registry
+        request_.validated['email'] = 'user@example.org'
+        return request_
 
 
     def call_fut(self, context, request):
@@ -1174,16 +1178,16 @@ class TestValidateLoginEmail:
         mock_user_locator.get_user_by_email.return_value = None
         self.call_fut(context, request)
         assert 'user' not in request.validated
-        assert 'User doesn\'t exist' in request.errors[0]['description']
+        assert 'User doesn\'t exist' in request.errors[0].description
 
 
 class TestValidateLoginNameUnitTest:
 
     @fixture
-    def request(self, cornice_request, registry):
-        cornice_request.registry = registry
-        cornice_request.validated['name'] = 'user'
-        return cornice_request
+    def request(self, request_, registry):
+        request_.registry = registry
+        request_.validated['name'] = 'user'
+        return request_
 
     def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_login_name
@@ -1192,7 +1196,7 @@ class TestValidateLoginNameUnitTest:
     def test_invalid(self, request, context, mock_user_locator):
         mock_user_locator.get_user_by_login.return_value = None
         self.call_fut(context, request)
-        assert 'User doesn\'t exist' in request.errors[0]['description']
+        assert 'User doesn\'t exist' in request.errors[0].description
 
     def test_valid(self, request, context, mock_user_locator):
         user = testing.DummyResource()
@@ -1204,13 +1208,13 @@ class TestValidateLoginNameUnitTest:
 class TestValidateLoginPasswordUnitTest:
 
     @fixture
-    def request(self, cornice_request, registry):
+    def request(self, request_, registry):
         from adhocracy_core.sheets.principal import IPasswordAuthentication
-        cornice_request.registry = registry
+        request_.registry = registry
         user = testing.DummyResource(__provides__=IPasswordAuthentication)
-        cornice_request.validated['user'] = user
-        cornice_request.validated['password'] = 'lalala'
-        return cornice_request
+        request_.validated['user'] = user
+        request_.validated['password'] = 'lalala'
+        return request_
 
     def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_login_password
@@ -1226,13 +1230,13 @@ class TestValidateLoginPasswordUnitTest:
         sheet = mock_password_sheet
         sheet.check_plaintext_password.return_value = False
         self.call_fut(context, request)
-        assert 'password is wrong' in request.errors[0]['description']
+        assert 'password is wrong' in request.errors[0].description
 
     def test_invalid_with_ValueError(self, request, context, mock_password_sheet):
         sheet = mock_password_sheet
         sheet.check_plaintext_password.side_effect = ValueError
         self.call_fut(context, request)
-        assert 'password is wrong' in request.errors[0]['description']
+        assert 'password is wrong' in request.errors[0].description
 
     def test_user_is_None(self, request, context):
         request.validated['user'] = None
@@ -1243,9 +1247,9 @@ class TestValidateLoginPasswordUnitTest:
 class TestValidateAccountActiveUnitTest:
 
     @fixture
-    def request(self, cornice_request, registry):
-        cornice_request.registry = registry
-        return cornice_request
+    def request(self, request_, registry):
+        request_.registry = registry
+        return request_
 
     def call_fut(self, context, request):
         from adhocracy_core.rest.views import validate_account_active
@@ -1261,12 +1265,12 @@ class TestValidateAccountActiveUnitTest:
         user = testing.DummyResource(active=False)
         request.validated['user'] = user
         self.call_fut(context, request)
-        assert 'not yet activated' in request.errors[0]['description']
+        assert 'not yet activated' in request.errors[0].description
 
     def test_no_error_added_after_other_errors(self, request, context):
         user = testing.DummyResource(active=False)
         request.validated['user'] = user
-        request.errors.add('blah', 'blah', 'blah')
+        request.errors.append(('blah', 'blah', 'blah'))
         assert len(request.errors) == 1
         self.call_fut(context, request)
         assert len(request.errors) == 1
@@ -1275,11 +1279,11 @@ class TestValidateAccountActiveUnitTest:
 class TestLoginUserName:
 
     @fixture
-    def request(self, cornice_request, registry):
-        cornice_request.registry = registry
-        cornice_request.validated['user'] = testing.DummyResource()
-        cornice_request.validated['password'] = 'lalala'
-        return cornice_request
+    def request(self, request_, registry):
+        request_.registry = registry
+        request_.validated['user'] = testing.DummyResource()
+        request_.validated['password'] = 'lalala'
+        return request_
 
     def make_one(self, request, context):
         from adhocracy_core.rest.views import LoginUsernameView
@@ -1306,10 +1310,10 @@ class TestLoginUserName:
 class TestLoginEmailView:
 
     @fixture
-    def request(self, cornice_request, registry):
-        cornice_request.registry=registry
-        cornice_request.validated['user'] = testing.DummyResource()
-        return cornice_request
+    def request(self, request_, registry):
+        request_.registry=registry
+        request_.validated['user'] = testing.DummyResource()
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import LoginEmailView
@@ -1337,10 +1341,10 @@ class TestLoginEmailView:
 class TestValidateActivationPathUnitTest:
 
     @fixture
-    def _request(self, cornice_request, registry):
-        cornice_request.registry = registry
-        cornice_request.validated['path'] = '/foo'
-        return cornice_request
+    def _request(self, request_, registry):
+        request_.registry = registry
+        request_.validated['path'] = '/foo'
+        return request_
 
     @fixture
     def user_with_metadata(self, config):
@@ -1369,8 +1373,7 @@ class TestValidateActivationPathUnitTest:
     def test_not_found(self, _request, context, mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = None
         self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0][
-            'description']
+        assert 'Unknown or expired activation path' == _request.errors[0].description
 
     def test_found_but_expired(self, _request, user_with_metadata, context,
                                mock_user_locator):
@@ -1386,17 +1389,16 @@ class TestValidateActivationPathUnitTest:
             year=2010, month=1, day=1, tzinfo=timezone.utc)
         metadata.set(appstruct, omit_readonly=False)
         self.call_fut(context, _request)
-        assert 'Unknown or expired activation path' == _request.errors[0][
-            'description']
+        assert 'Unknown or expired activation path' == _request.errors[0].description
 
 
 class TestActivateAccountView:
 
     @fixture
-    def request(self, cornice_request, registry):
-        cornice_request.registry=registry
-        cornice_request.validated['user'] = testing.DummyResource()
-        return cornice_request
+    def request(self, request_, registry):
+        request_.registry=registry
+        request_.validated['user'] = testing.DummyResource()
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import ActivateAccountView
@@ -1418,13 +1420,13 @@ class TestActivateAccountView:
 class TestReportAbuseView:
 
     @fixture
-    def request(self, cornice_request, registry):
+    def request(self, request_, registry):
         from adhocracy_core.messaging import Messenger
         registry.messenger = Mock(spec=Messenger)
-        cornice_request.registry = registry
-        cornice_request.validated['url'] = 'http://localhost/blablah'
-        cornice_request.validated['remark'] = 'Too much blah!'
-        return cornice_request
+        request_.registry = registry
+        request_.validated['url'] = 'http://localhost/blablah'
+        request_.validated['remark'] = 'Too much blah!'
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import ReportAbuseView
@@ -1443,14 +1445,14 @@ class TestReportAbuseView:
 class TestMessageUserView:
 
     @fixture
-    def request(self, cornice_request, registry):
+    def request(self, request_, registry):
         from adhocracy_core.messaging import Messenger
         registry.messenger = Mock(spec=Messenger)
-        cornice_request.registry = registry
-        cornice_request.validated['recipient'] = testing.DummyResource()
-        cornice_request.validated['title'] = 'Important Adhocracy notice'
-        cornice_request.validated['text'] = 'Surprisingly enough, all is well.'
-        return cornice_request
+        request_.registry = registry
+        request_.validated['recipient'] = testing.DummyResource()
+        request_.validated['title'] = 'Important Adhocracy notice'
+        request_.validated['text'] = 'Surprisingly enough, all is well.'
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import MessageUserView
@@ -1481,9 +1483,9 @@ class TestMessageUserView:
 class TestAssetsServiceRESTView:
 
     @fixture
-    def request(self, cornice_request, mock_content_registry):
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request(self, request_, mock_content_registry):
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, context, request):
         from adhocracy_core.rest.views import AssetsServiceRESTView
@@ -1510,9 +1512,9 @@ class TestAssetsServiceRESTView:
 class TestAssetRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_content_registry):
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request_(self, request_, mock_content_registry):
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, context, request_):
         from adhocracy_core.rest.views import AssetRESTView
@@ -1541,9 +1543,9 @@ class TestAssetRESTView:
 class TestAssetDownloadRESTView:
 
     @fixture
-    def request_(self, cornice_request, mock_content_registry):
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request_(self, request_, mock_content_registry):
+        request_.registry.content = mock_content_registry
+        return request_
 
     def make_one(self, context, request_):
         from adhocracy_core.rest.views import AssetDownloadRESTView
@@ -1585,50 +1587,6 @@ class TestAssetDownloadRESTView:
         assert inst.get() == mock_response
 
 
-class TestShowRequestBody:
-
-    def test_normal(self, cornice_request):
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.body = "hello"
-        assert _show_request_body(cornice_request) == "hello"
-
-    def test_long_multipart_formdata_body_is_abbreviated(self,
-                                                         cornice_request):
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.content_type = 'multipart/form-data'
-        cornice_request.body = "hello" * 30
-        result = _show_request_body(cornice_request)
-        assert len(result) < len(cornice_request.body)
-        assert result.endswith('...')
-
-    def test_password_is_hidden(self, cornice_request):
-        import json
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.body = json.dumps({'name': 'foo', 'password': 'bar'})
-        result = _show_request_body(cornice_request)
-        assert '"<hidden>"' in result
-        assert 'bar' not in result
-
-    def test_authentication_sheet_password_is_hidden(self, cornice_request):
-        import json
-        from adhocracy_core.rest.views import _show_request_body
-        from adhocracy_core.sheets.principal import IPasswordAuthentication
-        cornice_request.body = json.dumps(
-            {'data': {IPasswordAuthentication.__identifier__:
-                          {'password': 'bar'}}})
-        result = _show_request_body(cornice_request)
-        assert '"<hidden>"' in result
-        assert 'bar' not in result
-
-    def test_other_content_type(self, cornice_request):
-        """Just the request body is returned in case of other content types."""
-        from adhocracy_core.rest.views import _show_request_body
-        cornice_request.content_type = 'text/plain'
-        cornice_request.body = 'password: foofoo'
-        result = _show_request_body(cornice_request)
-        assert result == cornice_request.body
-
-
 class TestCreatePasswordResetView:
 
     @fixture
@@ -1636,10 +1594,10 @@ class TestCreatePasswordResetView:
         context['resets'] = service
 
     @fixture
-    def request_(self, cornice_request, registry):
-        cornice_request.registry = registry
-        cornice_request.validated['user'] = testing.DummyResource()
-        return cornice_request
+    def request_(self, request_, registry):
+        request_.registry = registry
+        request_.validated['user'] = testing.DummyResource()
+        return request_
 
     @fixture
     def mock_remember(self, monkeypatch):
@@ -1679,9 +1637,9 @@ class TestCreatePasswordResetView:
 class TestPasswordResetView:
 
     @fixture
-    def request_(self, cornice_request, registry):
-        cornice_request.registry = registry
-        return cornice_request
+    def request_(self, request_, registry):
+        request_.registry = registry
+        return request_
 
     @fixture
     def mock_remember(self, monkeypatch):
@@ -1725,7 +1683,6 @@ class TestPasswordResetView:
 
 @fixture()
 def integration(config):
-    config.include('cornice')
     config.include('adhocracy_core.rest.views')
 
 

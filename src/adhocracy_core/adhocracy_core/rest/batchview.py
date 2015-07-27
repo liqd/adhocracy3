@@ -1,10 +1,14 @@
 """POST batch requests processing."""
 from json import dumps
-from json import loads
 from logging import getLogger
-
-from cornice.util import _JSONError
 from pyramid.httpexceptions import HTTPException
+from pyramid.httpexceptions import HTTPClientError
+
+from adhocracy_core.rest.exceptions import handle_error_x0x_exception
+from adhocracy_core.rest.exceptions import handle_error_40x_exception
+from adhocracy_core.rest.exceptions import handle_error_500_exception
+from adhocracy_core.rest.exceptions import JSONHTTPClientError
+from adhocracy_core.rest.exceptions import get_json_body
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -26,13 +30,15 @@ class BatchItemResponse:
     Attributes:
 
     :code: the status code (int)
+    :title: the status title (str)
     :body: the response body as a JSOn object (dict)
     """
 
-    def __init__(self, code: int, body: dict={}):
+    def __init__(self, code: int, title: str, body: dict={}):
         """Initialize self."""
         self.code = code
         self.body = body
+        self.title = title
 
     def was_successful(self):
         """Return true if batch was successful."""
@@ -44,7 +50,7 @@ class BatchItemResponse:
 
 
 @view_defaults(
-    renderer='simplejson',
+    renderer='json',
     context=IRootPool,
     http_cache=0,
 )
@@ -56,23 +62,30 @@ class BatchView(RESTView):
 
     @view_config(name='batch',
                  request_method='POST',
-                 content_type='application/json')
+                 accept='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         response_list = []
         path_map = {}
         set_batchmode(self.request)
-        for item in self.request.validated:
+        for pos, item in enumerate(self.request.validated):
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
             if not item_response.was_successful():
-                err_msg = 'Exception in sub request {0} {1}: {2}'
-                logger.error(err_msg.format(item['method'],
-                                            item['path'],
-                                            item_response.body))
-                err = _JSONError([], status=item_response.code)
-                err.text = dumps(self._response_list_to_json(response_list))
-                raise err
+                error = JSONHTTPClientError([],
+                                            code=item_response.code,
+                                            title=item_response.title,
+                                            request=self.request)
+                # TODO: the error response lists updated resources
+                json_body = error.json_body
+                response_list_json = self._response_list_to_json(response_list)
+                json_body.update(response_list_json)
+                error.json_body = json_body
+                msg = 'Failing batch request item position {0} request {1} {2}'
+                logger.warn(msg.format(pos,
+                                       item['method'],
+                                       item['path']))
+                raise error
         response = self._response_list_to_json(response_list)
         return response
 
@@ -177,12 +190,35 @@ class BatchView(RESTView):
             self, subrequest: Request) -> BatchItemResponse:
         try:
             subresponse = self.request.invoke_subrequest(subrequest)
-            code = subresponse.status_code
-            body = subresponse.json
-        except HTTPException as err:
-            code = err.status_code
-            body = self._try_to_decode_json(err.body)
-        return BatchItemResponse(code, body)
+        except Exception as err:
+            error_view = self._get_error_view(err)
+            subresponse = error_view(err, subrequest)
+        body = get_json_body(subresponse)
+        return BatchItemResponse(subresponse.status_code,
+                                 subresponse.status,
+                                 body)
+
+    def _get_error_view(self, error: Exception) -> callable:
+        """Return view callable to handle exception.
+
+        The error handler in :mod:`adhocracy_core.rest.exceptions` are only
+        called at end of the request, but not for sub requests. To make
+        sure batch requests show the same error messages as normal requests
+        we try to find the right error view manually here.
+        """
+        if isinstance(error, HTTPException):
+            error_view = handle_error_x0x_exception
+        else:
+            error_view = handle_error_500_exception
+        if isinstance(error, HTTPClientError):
+            error_view = handle_error_40x_exception
+        instrospector = self.request.registry.introspector
+        for view in instrospector.get_category('views'):
+            context = view['introspectable']['context']
+            if context == error.__class__:
+                error_view = view['introspectable']['callable']
+                break
+        return error_view
 
     def _extend_path_map(self, path_map: dict, result_path: str,
                          result_first_version_path: str,
@@ -207,20 +243,6 @@ class BatchView(RESTView):
         value = getattr(self.request, attributename, None)
         if value is not None:
             setattr(request, attributename, value)
-
-    def _try_to_decode_json(self, body: bytes) -> dict:
-        """Try to decode `body` as a JSON object.
-
-        If that fails, we just wrap the textual content of the body in an
-        `{"error": ...}` dict. If body is empty, we just return an empty dict.
-        """
-        if not body:
-            return {}
-        text = body.decode(errors='replace')
-        try:
-            return loads(text)
-        except ValueError:
-            return {'error': text}
 
 
 def includeme(config):  # pragma: no cover

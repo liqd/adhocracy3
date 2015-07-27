@@ -25,7 +25,8 @@ class TestImportUsers:
         from adhocracy_core.scripts.import_users import _import_users
         return _import_users(root, registry, filename)
 
-    def test_create(self, context, registry):
+    
+    def test_create(self, context, registry, log):
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -53,8 +54,7 @@ class TestImportUsers:
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
 
-    def test_create_email_not_lower_case(self, context, registry):
-        from pyramid.traversal import resource_path
+    def test_create_email_not_lower_case(self, context, registry, log):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -70,7 +70,7 @@ class TestImportUsers:
         assert alice.active
         assert alice.email == 'alice@example.org'
 
-    def test_update_same_name(self, context, registry):
+    def test_update_same_name(self, context, registry, log):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -98,7 +98,7 @@ class TestImportUsers:
         assert alice.email == 'alice.new@example.org'
         assert new_password == old_password
 
-    def test_update_new_name(self, context, registry):
+    def test_update_new_name(self, context, registry, log):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -128,7 +128,7 @@ class TestImportUsers:
         assert alice.email == 'alice@example.org'
         assert new_password == old_password
 
-    def test_update_already_existing_name(self, context, registry):
+    def test_update_already_existing_name(self, context, registry, log):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([
@@ -151,7 +151,7 @@ class TestImportUsers:
         with pytest.raises(ValueError):
             self.call_fut(context, registry, filename)
 
-    def test_update_already_existing_email(self, context, registry):
+    def test_update_already_existing_email(self, context, registry, log):
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
             f.write(json.dumps([

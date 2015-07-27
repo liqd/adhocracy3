@@ -8,13 +8,12 @@ import os
 import subprocess
 import time
 
-from cornice.util import extract_json_data
-from cornice.errors import Errors
 from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.util import DottedNameResolver
 from pytest import fixture
 from ZODB import FileStorage
+from testfixtures import LogCapture
 from webtest import TestApp
 from webtest import TestResponse
 from zope.interface.interfaces import IInterface
@@ -194,15 +193,14 @@ def sheet_meta() -> SheetMetadata:
                                schema_class=colander.MappingSchema)
 
 
-class CorniceDummyRequest(testing.DummyRequest):
+class DummyRequest(testing.DummyRequest):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.validated = {}
-        self.errors = Errors(self)
+        self.errors = []
         self.content_type = 'application/json'
-        deserializer = {'application/json': extract_json_data}
-        self.registry.cornice_deserializers = deserializer
+        self.text = ''
 
     def authenticated_userid(self):
         return None
@@ -213,13 +211,24 @@ class CorniceDummyRequest(testing.DummyRequest):
 
 
 @fixture
-def cornice_request():
+def log(request) -> LogCapture:
+    """Return object capturing all log messages."""
+    log = LogCapture()
+
+    def fin():
+        log.uninstall()
+    request.addfinalizer(fin)
+    return log
+
+
+@fixture
+def request_():
     """ Return dummy request with additional validation attributes.
 
     Additional Attributes:
-        `errors`, `validated`, `content_type`
+        `errors`, `validated`
     """
-    return CorniceDummyRequest()
+    return DummyRequest()
 
 
 @fixture

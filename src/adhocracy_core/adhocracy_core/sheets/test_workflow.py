@@ -128,16 +128,18 @@ class TestWorkflowAssignmentSheet:
         from adhocracy_core.sheets.workflow import workflow_meta
         return workflow_meta
 
+    def test_meta(self, meta):
+        from . import workflow
+        assert meta.isheet == workflow.IWorkflowAssignment
+        assert meta.schema_class == workflow.WorkflowAssignmentSchema
+        assert meta.permission_edit == 'do_transition'
+
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.workflow import IWorkflowAssignment
-        from adhocracy_core.sheets.workflow import WorkflowAssignmentSheet
-        from adhocracy_core.sheets.workflow import WorkflowAssignmentSchema
+        from . import workflow
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, WorkflowAssignmentSheet)
-        assert inst.meta.isheet == IWorkflowAssignment
-        assert inst.meta.schema_class == WorkflowAssignmentSchema
+        assert isinstance(inst, workflow.WorkflowAssignmentSheet)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
 

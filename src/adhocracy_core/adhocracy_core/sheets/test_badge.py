@@ -54,6 +54,7 @@ class TestBadgeableSheet:
         context = testing.DummyResource(__provides__=meta.isheet)
         assert get_sheet(context, meta.isheet)
 
+
 class TestCreateUniqueBadgeAssignmentValidator:
 
     def call_fut(self, node, kw):
@@ -276,11 +277,6 @@ class TestGetAssignableBadges:
         pool['badges'] = mock_badges
         pool['catalogs'] = mock_catalogs
         return pool
-
-    @fixture
-    def request_(self):
-        request = testing.DummyRequest()
-        return request
 
     def call_fut(self, context, request):
         from .badge import get_assignable_badges

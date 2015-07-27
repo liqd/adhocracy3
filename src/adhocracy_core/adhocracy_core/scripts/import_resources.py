@@ -5,8 +5,10 @@ This is registered as console script 'import_resources' in setup.py.
 """
 import argparse
 import inspect
+import logging
 import json
 import os
+import sys
 import transaction
 
 from pyramid.paster import bootstrap
@@ -20,6 +22,9 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.schema import ContentType
 from adhocracy_core.sheets.name import IName
+
+
+logger = logging.getLogger(__name__)
 
 
 def import_resources():  # pragma: no cover
@@ -38,6 +43,7 @@ def import_resources():  # pragma: no cover
                         help='file containing the resources descriptions')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     _import_resources(env['root'], env['registry'], args.filename)
     env['closer']()
 
@@ -48,9 +54,9 @@ def _import_resources(root: IResource, registry: Registry, filename: str):
     for resource_info in resources_info:
         expected_path = _get_expected_path(resource_info)
         if _resource_exists(expected_path, root):
-            print('Skipping {}.'.format(expected_path))
+            logger.info('Skipping {}.'.format(expected_path))
         else:
-            print('Creating {}'.format(expected_path))
+            logger.info('Creating {}'.format(expected_path))
             _create_resource(resource_info, request, registry, root)
 
     transaction.commit()

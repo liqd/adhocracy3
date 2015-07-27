@@ -226,10 +226,10 @@ Cannot create process structure organisation::
    >>> IOrganisation.__identifier__ not in postables
    True
 
-Cannot edit process structure organisation::
+Cannot edit process structure organisation (except the workflow state):
 
-   >>> 'PUT' in initiator.options('/organisation').json
-   False
+   >>> pprint(sorted([r for r in resp['PUT']['request_body']['data']]))
+   ['adhocracy_core.sheets.workflow.IWorkflowAssignment']
 
 Can create process structure process::
 
