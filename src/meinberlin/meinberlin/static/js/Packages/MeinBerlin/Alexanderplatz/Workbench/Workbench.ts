@@ -8,8 +8,8 @@ import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
-import RIDocument = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocument");
-import RIDocumentVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocumentVersion");
+import RIGeoDocument = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocument");
+import RIGeoDocumentVersion = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
 import RIParagraph = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProposal");
@@ -82,13 +82,13 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide",
                     tab: "documents"
                 })
-                .defaultVersionable(RIDocument, RIDocumentVersion, "", processType, "", {
+                .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
                     tab: "documents"
                 })
-                .specificVersionable(RIDocument, RIDocumentVersion, "", processType, "", [
-                    () => (item : RIDocument, version : RIDocumentVersion) => {
+                .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", [
+                    () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
                         return {
                             documentUrl: version.path
                         };
