@@ -409,7 +409,6 @@ export var createDirective = (
                 }],
                 coordinates: []
             };
-            scope.polygon = [[13.43, 52.49], [13.44, 52.48], [13.44, 52.49]];
             scope.showError = adhShowError;
 
             scope.addParagraph = () => {
