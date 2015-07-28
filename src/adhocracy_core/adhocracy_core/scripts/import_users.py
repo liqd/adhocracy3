@@ -7,7 +7,6 @@ import argparse
 import inspect
 import logging
 import json
-import sys
 
 import transaction
 from pyramid.paster import bootstrap

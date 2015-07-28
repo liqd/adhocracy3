@@ -23,21 +23,25 @@ def _send_bplan_submission_confirmation_email_subscriber(event):
         return
     appstruct = _get_appstruct(proposal_version)
     process_settings = _get_process_settings(proposal_version)
-    if process_settings['plan_number'] == 0 or process_settings['office_worker'] is None:
+    if process_settings['plan_number'] == 0 or \
+            process_settings['office_worker'] is None:
         return
     templates_values = _get_templates_values(process_settings, appstruct)
     subject = 'Ihre Stellungnahme zum Bebauungsplan {plan_number}, ' \
-              '{participation_kind} von {participation_start_date:%d/%m/%Y} - {participation_end_date:%d/%m/%Y}.' \
+              '{participation_kind} von {participation_start_date:%d/%m/%Y} ' \
+              '- {participation_end_date:%d/%m/%Y}.' \
               .format(**process_settings)
     messenger.send_mail(subject,
                         [appstruct['email']],
                         'noreply@mein.berlin.de',
-                        render('adhocracy_meinberlin:templates/bplan_submission_confirmation.txt.mako',
+                        render('adhocracy_meinberlin:templates/'
+                               'bplan_submission_confirmation.txt.mako',
                                templates_values))
     messenger.send_mail(subject,
                         [process_settings['office_worker'].email],
                         'noreply@mein.berlin.de',
-                        render('adhocracy_meinberlin:templates/bplan_submission_confirmation.txt.mako',
+                        render('adhocracy_meinberlin:templates/'
+                               'bplan_submission_confirmation.txt.mako',
                                templates_values))
 
 
@@ -74,4 +78,5 @@ def includeme(config):
     """Register subscribers."""
     config.add_subscriber(set_root_acms, ApplicationCreated)
     config.add_subscriber(_send_bplan_submission_confirmation_email_subscriber,
-                          IResourceCreatedAndAdded, object_iface=IProposalVersion)
+                          IResourceCreatedAndAdded,
+                          object_iface=IProposalVersion)

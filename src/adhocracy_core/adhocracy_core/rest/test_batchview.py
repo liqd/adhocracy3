@@ -104,7 +104,8 @@ class TestBatchView:
             self, context, request_, mock_invoke_subrequest):
         from pyramid.traversal import resource_path
         from adhocracy_core.utils import is_batchmode
-        request_.body = self._make_json_with_subrequest_cstructs()
+        request_.body = self._make_json_with_subrequest_cstructs(
+            path='http://a.org/virtual/adhocracy/blah')
         request_.__cached_principals__ = [1]
         date = object()
         request_.headers['X-User-Path'] = 2
@@ -115,8 +116,8 @@ class TestBatchView:
         request_.root = context
         request_.script_name = '/virtual'
         inst = self.make_one(context, request_)
-        paths = {'path': '/pool/item',
-                 'first_version_path': '/pool/item/v1'}
+        paths = {'path': '/virtual/pool/item',
+                 'first_version_path': '/virtual/pool/item/v1'}
         mock_invoke_subrequest.return_value = DummySubresponse(code=200,
                                                                json=paths,)
         inst.post()
@@ -126,7 +127,7 @@ class TestBatchView:
         assert subrequest.headers.get('X-User-Path') == 2
         assert subrequest.headers.get('X-User-Token') == 3
         assert subrequest.script_name == '/virtual'
-        assert subrequest.path_info == 'cy/blah'
+        assert subrequest.path_info == '/adhocracy/blah'
 
     def test_post_successful_subrequest_with_updated_resources(
             self, context, request_, mock_invoke_subrequest):
@@ -335,6 +336,14 @@ class TestBatchView:
         assert subrequest.method == 'GET'
         assert subrequest.content_type != 'application/json'
         assert len(subrequest.body) == 0
+
+    def test_make_subrequest_with_wrong_script_name(self, context, request_):
+        request_.script_name = '/api'
+        inst = self.make_one(context, request_)
+        subrequest_cstrut = self._make_subrequest_cstruct(method='GET')
+        with raises(Exception) as exc:
+            subrequest = inst._make_subrequest(subrequest_cstrut)
+        assert 'does not start with' in str(exc.value)
 
     def test_resolve_preliminary_paths_str_with_replacement(self, context, request_):
         inst = self.make_one(context, request_)
