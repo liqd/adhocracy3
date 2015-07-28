@@ -128,9 +128,11 @@ export var register = (angular) => {
                 })
                 .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", [
                     () => (item : RIParagraph, version : RIParagraphVersion) => {
+                        var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
                         return {
                             commentableUrl: version.path,
-                            documentUrl: _.last(_.sortBy(version.data[SIParagraph.nick].documents))
+                            commentCloseUrl: documentUrl,
+                            documentUrl: documentUrl
                         };
                     }])
 
@@ -165,6 +167,7 @@ export var register = (angular) => {
                     () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                         return {
                             commentableUrl: version.path,
+                            commentCloseUrl: version.path,
                             proposalUrl: version.path
                         };
                     }]);

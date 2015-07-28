@@ -52,20 +52,6 @@ var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) =
 };
 
 
-export var commentColumnDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["proposalUrl", "commentableUrl"]);
-            scope.frontendOrderPredicate = (id) => id;
-            scope.frontendOrderReverse = true;
-        }
-    };
-};
-
-
 export var mercatorProposalCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceUrlFilter : (path : string) => string,
@@ -236,11 +222,13 @@ export var register = (angular) => {
 
                         if (commentable.content_type === RIMercatorProposalVersion.content_type) {
                             specifics["proposalUrl"] = specifics["commentableUrl"];
+                            specifics["commentCloseUrl"] = specifics["commentableUrl"];
                         } else {
                             var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
                             var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
                             return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
                                 specifics["proposalUrl"] = proposalUrl;
+                                specifics["commentCloseUrl"] = proposalUrl;
                             });
                         }
                     })
@@ -276,7 +264,6 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", "adhTopLevelState", mercatorWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", [
             "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", [

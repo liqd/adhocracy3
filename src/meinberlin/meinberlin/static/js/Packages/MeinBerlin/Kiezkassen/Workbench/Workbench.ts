@@ -1,6 +1,7 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import AdhAbuse = require("../../../Abuse/Abuse");
+import AdhComment = require("../../../Comment/Comment");
 import AdhConfig = require("../../../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
@@ -69,19 +70,6 @@ export var meinBerlinWorkbenchDirective = (
             });
         }
 
-    };
-};
-
-export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["proposalUrl", "commentableUrl"]);
-        }
     };
 };
 
@@ -170,6 +158,7 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhAbuse.moduleName,
+            AdhComment.moduleName,
             AdhHttp.moduleName,
             AdhMeinBerlinKiezkassenProcess.moduleName,
             AdhMeinBerlinKiezkassenProposal.moduleName,
@@ -246,6 +235,7 @@ export var register = (angular) => {
                     () => (item : RIProposal, version : RIProposalVersion) => {
                         return {
                             commentableUrl: version.path,
+                            commentCloseUrl: version.path,
                             proposalUrl: version.path
                         };
                     }])
@@ -270,6 +260,7 @@ export var register = (angular) => {
                         return getCommentableUrl(version).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
+                                commentCloseUrl: commentable.path,
                                 proposalUrl: commentable.path
                             };
                         });
@@ -282,7 +273,6 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhMeinBerlinWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalDetailColumn", ["adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreateColumn", ["adhConfig", kiezkassenProposalCreateColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalEditColumn", ["adhConfig", kiezkassenProposalEditColumnDirective])

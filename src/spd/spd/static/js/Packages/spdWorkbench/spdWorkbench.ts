@@ -39,19 +39,6 @@ export var spdWorkbenchDirective = (
 };
 
 
-export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["documentUrl", "commentableUrl"]);
-        }
-    };
-};
-
 export var documentDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
@@ -192,9 +179,11 @@ export var register = (angular) => {
                 })
                 .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", [
                     () => (item : RIParagraph, version : RIParagraphVersion) => {
+                        var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
                         return {
                             commentableUrl: version.path,
-                            documentUrl: _.last(_.sortBy(version.data[SIParagraph.nick].documents))
+                            commentCloseUrl: documentUrl,
+                            documentUrl: documentUrl
                         };
                     }])
                 .defaultVersionable(RIComment, RICommentVersion, "", processType, "", {
@@ -216,16 +205,17 @@ export var register = (angular) => {
 
                     return (item : RIComment, version : RICommentVersion) => {
                         return getCommentableUrl(version).then((commentable) => {
+                            var documentUrl = _.last(_.sortBy(commentable.data[SIParagraph.nick].documents));
                             return {
                                 commentableUrl: commentable.path,
-                                documentUrl: _.last(_.sortBy(commentable.data[SIParagraph.nick].documents))
+                                commentCloseUrl: documentUrl,
+                                documentUrl: documentUrl
                             };
                         });
                     };
                 }]);
         }])
         .directive("adhSpdWorkbench", ["adhConfig", "adhTopLevelState", spdWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
         .directive("adhDocumentDetailColumn", ["adhConfig", "adhPermissions", documentDetailColumnDirective])
         .directive("adhDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective])
         .directive("adhDocumentEditColumn", ["adhConfig", documentEditColumnDirective])

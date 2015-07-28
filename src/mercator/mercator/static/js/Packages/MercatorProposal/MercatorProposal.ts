@@ -1213,7 +1213,8 @@ export var register = (angular) => {
                 .specific(RIMercatorProposalVersion, "comments", processType, "", () => (resource : RIMercatorProposalVersion) => {
                     return {
                         proposalUrl: resource.path,
-                        commentableUrl: resource.path
+                        commentableUrl: resource.path,
+                        commentCloseUrl: resource.path
                     };
                 });
 
@@ -1227,7 +1228,8 @@ export var register = (angular) => {
                         (resource : RIMercatorProposalVersion) => {
                             return {
                                 proposalUrl: resource.path,
-                                commentableUrl: resource.data[SIMercatorSubResources.nick][section]
+                                commentableUrl: resource.data[SIMercatorSubResources.nick][section],
+                                commentCloseUrl: resource.path
                             };
                         }
                     );
