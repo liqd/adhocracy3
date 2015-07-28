@@ -112,6 +112,9 @@ following parameters are always available:
     will be appended (and constantly updated) to the host URL via ``#!``.
     This is only possible once per host page for obvious reasons.
 
+-   ``nocenter``: By default, the widget will be centered in the iframe.
+    If this option is set to ``true``, it will fill the iframe instead.
+
 -   ``initial-url`` will set the initial URL (i.e. path, query and
     anchor) for the embedded platform if widget is ``"plain"``.
 
