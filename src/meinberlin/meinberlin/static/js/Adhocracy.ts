@@ -17,6 +17,7 @@ import angularTranslateLoader = require("angularTranslateLoader");  if (angularT
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 
+import markdownit = require("markdownit");
 import modernizr = require("modernizr");
 import moment = require("moment");
 import leaflet = require("leaflet");
@@ -38,6 +39,7 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 import AdhMeinBerlin = require("./Packages/MeinBerlin/MeinBerlin");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
@@ -162,6 +164,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     app.value("angular", angular);
 
+    app.value("markdownit", markdownit);
     app.value("modernizr", modernizr);
     app.value("moment", moment);
     app.value("leaflet", leaflet);
@@ -185,6 +188,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhLocalSocket.register(angular);
     AdhMeinBerlin.register(angular);
     AdhMapping.register(angular);
+    AdhMarkdown.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
