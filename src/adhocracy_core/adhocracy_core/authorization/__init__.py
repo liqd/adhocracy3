@@ -7,6 +7,7 @@ from pyramid.security import ACLPermitsResult
 from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import lineage
 from pyramid.registry import Registry
+from pyramid.request import Request
 from pyramid.router import Router
 from zope.interface import implementer
 from substanced.util import get_acl
@@ -150,3 +151,11 @@ def set_god_all_permissions(resource: IResource, registry=None) -> bool:
     old_acl = get_acl(resource)
     new_acl = [god_all_permission_ace] + old_acl
     set_acl(resource, new_acl, registry)
+
+
+def create_fake_god_request(registry):
+    """Create a fake request issued by god."""
+    request = Request.blank('/dummy')
+    request.registry = registry
+    request.__cached_principals__ = ['role:god']
+    return request

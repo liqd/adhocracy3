@@ -3,13 +3,13 @@ from colander import Invalid
 
 from pyramid.interfaces import IRequest
 from pyramid.registry import Registry
-from pyramid.request import Request
 from substanced.workflow import ACLWorkflow
 from substanced.workflow import WorkflowError
 from substanced.workflow import IWorkflow
 from zope.interface import implementer
 
 from adhocracy_core.authorization import acm_to_acl
+from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
@@ -59,9 +59,7 @@ def transition_to_states(context, states: [str], registry: Registry,
     :raises substanced.workflow.WorkflowError: if transition is missing to
     do transitions to `states`.
     """
-    request = Request.blank('/dummy')
-    request.registry = registry
-    request.__cached_principals__ = ['role:god']
+    request = create_fake_god_request(registry)
     workflow = registry.content.get_workflow(context)
     # TODO: raise if workflow is None
     if not workflow.has_state(context) or reset:

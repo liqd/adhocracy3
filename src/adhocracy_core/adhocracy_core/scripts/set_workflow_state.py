@@ -10,8 +10,8 @@ import transaction
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
-from pyramid.request import Request
 
+from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.workflows import transition_to_states
 
@@ -61,13 +61,6 @@ def set_workflow_state():  # pragma: no cover
     env['closer']()
 
 
-def _fake_root_request(registry):
-    request = Request.blank('/dummy')
-    request.registry = registry
-    request.__cached_principals__ = ['role:god']
-    return request
-
-
 def _print_workflow_info(root: IResource,
                          registry: Registry,
                          resource_path: str):
@@ -77,7 +70,7 @@ def _print_workflow_info(root: IResource,
     print('\nname: {}\ncurrent state: {}\nnext states: {}\nall states (unordered): {}\n'
           .format(workflow.type,
                   workflow.state_of(resource),
-                  workflow.get_next_states(resource, _fake_root_request(registry)),
+                  workflow.get_next_states(resource, create_fake_god_request(registry)),
                   states))
 
 
