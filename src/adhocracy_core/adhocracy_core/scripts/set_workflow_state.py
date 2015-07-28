@@ -4,14 +4,18 @@ This is registered as console script in setup.py.
 """
 import argparse
 import inspect
+import logging
 import transaction
 
 from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.request import Request
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.workflows import transition_to_states
+
+logger = logging.getLogger(__name__)
 
 
 def set_workflow_state():  # pragma: no cover
@@ -28,26 +32,53 @@ def set_workflow_state():  # pragma: no cover
     parser.add_argument('resource_path',
                         type=str,
                         help='path of the resource')
+    parser.add_argument('--info',
+                        help='display information about the workflow',
+                        action='store_true')
     parser.add_argument('--absolute',
                         help='use an absolute path for the list of states',
                         action='store_true')
-    parser.add_argument('states',
-                        type=str,
-                        nargs='+',
-                        help='list of state name to do transition to')
     parser.add_argument('--reset',
                         help='reset workflow to initial state',
                         action='store_true')
+    parser.add_argument('states',
+                        type=str,
+                        nargs='*',
+                        help='list of state name to do transition to')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    _set_workflow_state(env['root'],
-                        env['registry'],
-                        args.resource_path,
-                        args.states,
-                        args.absolute,
-                        args.reset,
-                        )
+    if args.info:
+        _print_workflow_info(env['root'],
+                             env['registry'],
+                             args.resource_path)
+    else:
+        _set_workflow_state(env['root'],
+                            env['registry'],
+                            args.resource_path,
+                            args.states,
+                            args.absolute,
+                            args.reset,)
     env['closer']()
+
+
+def _fake_root_request(registry):
+    request = Request.blank('/dummy')
+    request.registry = registry
+    request.__cached_principals__ = ['role:god']
+    return request
+
+
+def _print_workflow_info(root: IResource,
+                         registry: Registry,
+                         resource_path: str):
+    resource = find_resource(root, resource_path)
+    workflow = registry.content.get_workflow(resource)
+    states = set(registry.content.workflows_meta[workflow.type]['states'].keys())
+    print('\nname: {}\ncurrent state: {}\nnext states: {}\nall states (unordered): {}\n'
+          .format(workflow.type,
+                  workflow.state_of(resource),
+                  workflow.get_next_states(resource, _fake_root_request(registry)),
+                  states))
 
 
 def _get_states_to_transition(resource: IResource,
