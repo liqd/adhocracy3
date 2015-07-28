@@ -107,9 +107,10 @@ Special parameters
 -   ``autoresize`` will control whether the iframe will automatically be
     resized to fit its contents.  Defaults to ``true``.  It is
     recommended to set this to ``false`` if the embedded widget contains
-    moving columns::
+    moving columns.  In that case, an explicit height may be provided
+    instead::
 
-        <div class="adhocracy_marker" data-widget="plain" data-autoresize="false"></div>
+        <div class="adhocracy_marker" data-widget="plain" data-autoresize="false" style="height: 400px"></div>
 
 -   ``locale`` can be used to set a locale.
 
