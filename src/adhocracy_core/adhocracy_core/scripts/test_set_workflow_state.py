@@ -33,3 +33,16 @@ def test_set_workflow_state_with_reset(registry, context, transition_to_mock):
     from .set_workflow_state import _set_workflow_state
     _set_workflow_state(context, registry, '/', [], reset=True)
     transition_to_mock.assert_called_with(context, [], registry, reset=True)
+
+def test_set_workflow_state_with_absolute(registry_with_content, context, transition_to_mock):
+    registry = registry_with_content
+    workflow_mock = Mock()
+    state_of_mock = Mock(side_effect=['draft', 'participate'])
+    workflow_mock.state_of = state_of_mock
+    registry.content.get_workflow.return_value = workflow_mock
+    from .set_workflow_state import _set_workflow_state
+    _set_workflow_state(context, registry, '/', ['announced', 'participate'], absolute=True)
+    transition_to_mock.assert_called_with(context, ['announced', 'participate'], registry)
+
+    _set_workflow_state(context, registry, '/', ['announced', 'participate', 'result'], absolute=True)
+    transition_to_mock.assert_called_with(context, ['result'], registry)

@@ -28,6 +28,9 @@ def set_workflow_state():  # pragma: no cover
     parser.add_argument('resource_path',
                         type=str,
                         help='path of the resource')
+    parser.add_argument('--absolute',
+                        help='use an absolute path for the list of states',
+                        action='store_true')
     parser.add_argument('states',
                         type=str,
                         nargs='+',
@@ -41,20 +44,41 @@ def set_workflow_state():  # pragma: no cover
                         env['registry'],
                         args.resource_path,
                         args.states,
+                        args.absolute,
                         args.reset,
                         )
     env['closer']()
+
+
+def _get_states_to_transition(resource: IResource,
+                              registry: Registry,
+                              states: [str],
+                              absolute,
+                              reset) -> [str]:
+    if not absolute or reset:
+        return states
+    workflow = registry.content.get_workflow(resource)
+    state = workflow.state_of(resource)
+    if state in states:
+        return states[states.index(state) + 1:]
+    return states
 
 
 def _set_workflow_state(root: IResource,
                         registry: Registry,
                         resource_path: str,
                         states: [str],
+                        absolute=False,
                         reset=False,
                         ):
     resource = find_resource(root, resource_path)
+    states_to_transition = _get_states_to_transition(resource,
+                                                     registry,
+                                                     states,
+                                                     absolute,
+                                                     reset)
     if reset:
-        transition_to_states(resource, states, registry, reset=reset)
+        transition_to_states(resource, states_to_transition, registry, reset=reset)
     else:
-        transition_to_states(resource, states, registry)
+        transition_to_states(resource, states_to_transition, registry)
     transaction.commit()
