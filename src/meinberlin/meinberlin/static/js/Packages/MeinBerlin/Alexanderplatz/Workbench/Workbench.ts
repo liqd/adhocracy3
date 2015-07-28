@@ -11,10 +11,10 @@ import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
 import RIGeoDocument = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocument");
 import RIGeoDocumentVersion = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
+import RIGeoProposal = require("../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
+import RIGeoProposalVersion = require("../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
 import RIParagraph = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProposal");
-import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProposalVersion");
 import SIParagraph = require("../../../../Resources_/adhocracy_core/sheets/document/IParagraph");
 
 var pkgLocation = "/MeinBerlin/Alexanderplatz/Workbench";
@@ -145,24 +145,24 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide",
                     tab: "proposals"
                 })
-                .defaultVersionable(RIProposal, RIProposalVersion, "", processType, "", {
+                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
                     tab: "proposals"
                 })
-                .specificVersionable(RIProposal, RIProposalVersion, "", processType, "", [
-                    () => (item : RIProposal, version : RIProposalVersion) => {
+                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", [
+                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                         return {
                             proposalUrl: version.path
                         };
                     }])
-                .defaultVersionable(RIProposal, RIProposalVersion, "comments", processType, "", {
+                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show",
                     tab: "proposals"
                 })
-                .specificVersionable(RIProposal, RIProposalVersion, "comments", processType, "", [
-                    () => (item : RIProposal, version : RIProposalVersion) => {
+                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", [
+                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                         return {
                             commentableUrl: version.path,
                             proposalUrl: version.path

@@ -42,3 +42,45 @@ class TestProposalVersion:
     def test_create(self, meta, registry):
         res = registry.content.create(meta.iresource.__identifier__)
         assert meta.iresource.providedBy(res)
+
+class TestGeoProposal:
+
+    @fixture
+    def meta(self):
+        from .proposal import geo_proposal_meta
+        return geo_proposal_meta
+
+    def test_meta(self, meta):
+        from .proposal import IGeoProposalVersion
+        assert meta.element_types == (IGeoProposalVersion,)
+        assert meta.permission_create == 'create_proposal'
+
+    @mark.usefixtures('integration')
+    def test_create(self, registry, meta, context):
+        res = registry.content.create(meta.iresource.__identifier__)
+        assert meta.iresource.providedBy(res)
+
+
+class TestGeoProposalVersion:
+
+    @fixture
+    def meta(self):
+        from .proposal import geo_proposal_version_meta
+        return geo_proposal_version_meta
+
+    def test_meta(self, meta):
+        import adhocracy_core.sheets
+        assert meta.extended_sheets == \
+               (adhocracy_core.sheets.badge.IBadgeable,
+                adhocracy_core.sheets.title.ITitle,
+                adhocracy_core.sheets.description.IDescription,
+                adhocracy_core.sheets.comment.ICommentable,
+                adhocracy_core.sheets.rate.IRateable,
+                adhocracy_core.sheets.geo.IPoint,
+                )
+        assert meta.permission_create == 'edit_proposal'
+
+    @mark.usefixtures('integration')
+    def test_create(self, meta, registry):
+        res = registry.content.create(meta.iresource.__identifier__)
+        assert meta.iresource.providedBy(res)
