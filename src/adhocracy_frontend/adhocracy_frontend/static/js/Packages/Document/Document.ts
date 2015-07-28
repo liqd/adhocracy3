@@ -5,6 +5,7 @@ import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
 import AdhMapping = require("../Mapping/Mapping");
+import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
@@ -490,6 +491,7 @@ export var register = (angular) => {
             AdhImage.moduleName,
             AdhInject.moduleName,
             AdhMapping.moduleName,
+            AdhMarkdown.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhResourceArea.moduleName,
             AdhResourceWidgets.moduleName,

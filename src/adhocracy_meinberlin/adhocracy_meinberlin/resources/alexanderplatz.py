@@ -1,6 +1,7 @@
 """Alexanderplatz process resources."""
 
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources.proposal import IGeoProposal
 from adhocracy_core.resources import proposal
 from adhocracy_core.resources.document import IGeoDocument
 from adhocracy_core.resources.document_process import IDocumentProcess
@@ -37,7 +38,7 @@ class IProcess(IDocumentProcess):
 
 process_meta = document_process_meta._replace(
     iresource=IProcess,
-    element_types=(IProposal,
+    element_types=(IGeoProposal,
                    IGeoDocument),
     extended_sheets=(workflow.IStandard,
                      ILocationReference,)
@@ -46,6 +47,4 @@ process_meta = document_process_meta._replace(
 
 def includeme(config):
     """Add resource type to content."""
-    add_resource_type_to_registry(proposal_meta, config)
-    add_resource_type_to_registry(proposal_version_meta, config)
     add_resource_type_to_registry(process_meta, config)

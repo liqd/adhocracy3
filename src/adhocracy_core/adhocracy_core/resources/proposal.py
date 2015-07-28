@@ -10,6 +10,7 @@ from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.comment import ICommentable
 from adhocracy_core.sheets.description import IDescription
+from adhocracy_core.sheets.geo import IPoint
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.title import ITitle
 
@@ -48,7 +49,29 @@ proposal_meta = item_meta._replace(
 ))
 
 
+class IGeoProposalVersion(IProposalVersion):
+
+    """Geolocalisable proposal version."""
+
+
+geo_proposal_version_meta = proposal_version_meta._replace(
+    iresource=IGeoProposalVersion,
+)._add(extended_sheets=(IPoint,))
+
+
+class IGeoProposal(IProposal):
+
+    """Geolocalisable proposal versions pool."""
+
+geo_proposal_meta = proposal_meta._replace(
+    iresource=IGeoProposal,
+    element_types=(IGeoProposalVersion,),
+)
+
+
 def includeme(config):
     """Add resources type to content."""
     add_resource_type_to_registry(proposal_meta, config)
     add_resource_type_to_registry(proposal_version_meta, config)
+    add_resource_type_to_registry(geo_proposal_meta, config)
+    add_resource_type_to_registry(geo_proposal_version_meta, config)
