@@ -9,6 +9,7 @@ from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.paragraph import IParagraph
 from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.sheets.geo import IPoint
 
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.badge
@@ -57,7 +58,34 @@ document_meta = item_meta._replace(
 ))
 
 
+class IGeoDocumentVersion(IDocumentVersion):
+
+    """Versionable document with geo-location."""
+
+
+geo_document_version_meta = document_version_meta._replace(
+    iresource=IGeoDocumentVersion,
+)._add(
+    extended_sheets=(IPoint,)
+)
+
+
+class IGeoDocument(IDocument):
+
+    """Geolocalisable document."""
+
+
+geo_document_meta = document_meta._replace(
+    iresource=IGeoDocument,
+    element_types=(ITag,
+                   IParagraph,
+                   IGeoDocumentVersion)
+)
+
+
 def includeme(config):
     """Add resource type to registry."""
     add_resource_type_to_registry(document_version_meta, config)
     add_resource_type_to_registry(document_meta, config)
+    add_resource_type_to_registry(geo_document_version_meta, config)
+    add_resource_type_to_registry(geo_document_meta, config)
