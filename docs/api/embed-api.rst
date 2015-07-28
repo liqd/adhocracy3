@@ -37,21 +37,6 @@ Canonical URL
     <https://tools.ietf.org/html/rfc6596>`_.
 
 
-General notes
--------------
-
--   Accout activation (after registration) and password reset require
-    that the backend sends a URL to the user via email.  So the backend
-    needs to know canonical URLs for that.
-
--   If a feature is not available in an embedded widget, all aspects of
-    that widget that rely on that feature need to be modified.  For
-    example, whenever a user is referenced, we include a link to their
-    profile page.  If profile pages are not available in an embedded
-    widget, these links either need to be removed or point to the
-    platform instead.
-
-
 Embed-API
 ---------
 
@@ -68,7 +53,7 @@ carefully written to not interfere with the hosts own JavaScript code.
 
 - Bootstraps everything, initializes widgets
 - Selects Adhocracy version to be used
-- Opens `adhocracy` namespace
+- Creates ``window.adhocracy`` namespace
 - Resizes widgets on the fly
 
 Example::
@@ -80,7 +65,13 @@ Example::
         });
     </script>
 
-One or more markers can appear anywhere in the document::
+
+Widget markers
+++++++++++++++
+
+In order to embed actual widgets, you need to add one or more markers
+anywhere in the document.  Each marker must define a widget and
+optionally one or more parameters::
 
     <div class="adhocracy_marker"
          data-widget="document-workbench">
@@ -91,28 +82,16 @@ One or more markers can appear anywhere in the document::
          data-ref="..." data-viewmode="display">
     </div>
 
+.. NOTE::
 
-Widget markers
-++++++++++++++
-
-A widget is defined by
-
-- One embeddable angular directive (presentation)
-- Optionally a locale
-- Multiple directive parameters
-
-Constraints:
-
-- Syntax should exist for both HTML5 (`data`- parameters) and HTML4
+   Syntax should exist for both HTML5 (`data`- parameters) and HTML4
 
 
-Example (current HTML5 syntax)::
+Parameters
+~~~~~~~~~~
 
-    <div class="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
-
-
-Special parameters
-~~~~~~~~~~~~~~~~~~
+The available parameters depend on the respective widget.  However, the
+following parameters are always available:
 
 -   the special widget ``"plain"`` will embed the full platform instead
     of a single widget::
@@ -122,9 +101,10 @@ Special parameters
 -   ``autoresize`` will control whether the iframe will automatically be
     resized to fit its contents.  Defaults to ``true``.  It is
     recommended to set this to ``false`` if the embedded widget contains
-    moving columns::
+    moving columns.  In that case, an explicit height may be provided
+    instead::
 
-        <div class="adhocracy_marker" data-widget="plain" data-autoresize="false"></div>
+        <div class="adhocracy_marker" data-widget="plain" data-autoresize="false" style="height: 400px"></div>
 
 -   ``locale`` can be used to set a locale.
 
@@ -212,3 +192,18 @@ In your directive you can now for example use this like this::
             // more code
         };
     };
+
+
+General notes
+-------------
+
+-   Accout activation (after registration) and password reset require
+    that the backend sends a URL to the user via email.  So the backend
+    needs to know canonical URLs for that.
+
+-   If a feature is not available in an embedded widget, all aspects of
+    that widget that rely on that feature need to be modified.  For
+    example, whenever a user is referenced, we include a link to their
+    profile page.  If profile pages are not available in an embedded
+    widget, these links either need to be removed or point to the
+    platform instead.
