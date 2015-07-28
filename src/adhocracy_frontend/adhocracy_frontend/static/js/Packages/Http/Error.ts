@@ -13,41 +13,24 @@ export interface IBackendErrorItem {
     description : string;
 }
 
-var renderBackendError = (response : angular.IHttpPromiseCallbackArg<any>) : void => {
-    // get rid of unrenderable junk (good for console log extraction with web driver).
-    var sanitize = (x : any) : any => {
-        try {
-            return JSON.parse(JSON.stringify(x));
-        } catch (e) {
-            return x;
-        }
-    };
-
-    console.log("http response with error status: " + response.status);
-    console.log("request (.config):", sanitize(response.config));
-    if (typeof response.headers !== "undefined") {
-        console.log("headers (.headers()):", sanitize(response.headers()));
+var extractErrorItems = (code : number, error : IBackendError) : IBackendErrorItem[] => {
+    if (code === 410) {
+        return [{
+            location: "url",
+            name: "GET",
+            description: (<any>error).reason
+        }];
+    } else {
+        return error.errors;
     }
-    console.log("response (.data):", sanitize(response.data));
 };
 
 export var logBackendError = (response : angular.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
-    renderBackendError(response);
+    console.log(response);
 
-    if (response.data.hasOwnProperty("errors")) {
-        var errors : IBackendErrorItem[] = response.data.errors;
-        throw errors;
-    } else {
-        // FIXME: the backend currently responds with errors in HTML,
-        // not in json, which provokes $http to throw an exception and
-        // whipe the response object before passing it to the error
-        // handler callback.  See #256.
-        //
-        // the following line works around that.
-        throw [{ name: "unknown", location: "unknown", description: "unknown" }];
-    }
+    throw extractErrorItems(response.status, response.data);
 };
 
 /**
@@ -66,28 +49,14 @@ export var logBackendBatchError = (
             code : number;
             body? : IBackendError;
         }[];
-        /* tslint:disable:variable-name */
-        updated_resources : any;
-        /* tslint:enable:variable-name */
     }>
 ) : void => {
     "use strict";
 
-    renderBackendError(response);
+    console.log(response);
 
-    var lastBatchItemResponse = response.data.responses[response.data.responses.length - 1];
-
-    // FIXME: work around #1019
-    if (lastBatchItemResponse.code === 403) {
-        throw [{
-            name: "forbidden",
-            location: "unknown",
-            description: "TR__ERROR_HTTP_FORBIDDEN"
-        }];
-    } else {
-        var errors : IBackendErrorItem[] = lastBatchItemResponse.body.errors;
-        throw errors;
-    }
+    var lastResponse = response.data.responses[response.data.responses.length - 1];
+    throw extractErrorItems(lastResponse.code, lastResponse.body);
 };
 
 

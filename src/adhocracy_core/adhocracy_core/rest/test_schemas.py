@@ -143,33 +143,33 @@ class TestPOSTResourceRequestSchema:
 class TestDeferredValidatePostContentType:
 
     @fixture
-    def request(self, mock_content_registry, cornice_request):
-        cornice_request.body = '{}'
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request_(self, mock_content_registry, request_):
+        request_.body = '{}'
+        request_.registry.content = mock_content_registry
+        return request_
 
     def call_fut(self, node, kw):
         from adhocracy_core.rest.schemas import deferred_validate_post_content_type
         return deferred_validate_post_content_type(node, kw)
 
-    def test_without_content_types(self, node, request, context):
-        validator = self.call_fut(node, {'context': context, 'request': request})
+    def test_without_content_types(self, node, request_, context):
+        validator = self.call_fut(node, {'context': context, 'request': request_})
         assert list(validator.choices) == []
 
-    def test_with_content_types(self, node, request, context, resource_meta):
-        request.registry.content.get_resources_meta_addable.return_value = \
+    def test_with_content_types(self, node, request_, context, resource_meta):
+        request_.registry.content.get_resources_meta_addable.return_value = \
             [resource_meta]
-        validator = self.call_fut(node, {'context': context, 'request': request})
+        validator = self.call_fut(node, {'context': context, 'request': request_})
         assert list(validator.choices) == [IResource]
 
 
 class TestAddPostRequestSubSchemas:
 
     @fixture
-    def request(self, mock_content_registry, cornice_request):
-        cornice_request.body = '{}'
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request(self, mock_content_registry, request_):
+        request_.body = '{}'
+        request_.registry.content = mock_content_registry
+        return request_
 
     def call_fut(self, node, kw):
         from adhocracy_core.rest.schemas import add_post_data_subschemas
@@ -224,13 +224,13 @@ class TestAddPostRequestSubSchemas:
 class TestPOSTItemRequestSchemaUnitTest:
 
     @fixture
-    def request(self, mock_content_registry, cornice_request, context, resource_meta):
-        cornice_request.body = '{}'
+    def request(self, mock_content_registry, request_, context, resource_meta):
+        request_.body = '{}'
         mock_content_registry.get_resources_meta_addable.return_value = \
             [resource_meta]
-        cornice_request.registry.content = mock_content_registry
-        cornice_request.root = context
-        return cornice_request
+        request_.registry.content = mock_content_registry
+        request_.root = context
+        return request_
 
     def make_one(self):
         from adhocracy_core.rest.schemas import POSTItemRequestSchema
@@ -285,10 +285,10 @@ class TestPUTResourceRequestSchema:
 class TestAddPutRequestSubSchemasUnitTest:
 
     @fixture
-    def request(self, mock_content_registry, cornice_request):
-        cornice_request.body = '{}'
-        cornice_request.registry.content = mock_content_registry
-        return cornice_request
+    def request(self, mock_content_registry, request_):
+        request_.body = '{}'
+        request_.registry.content = mock_content_registry
+        return request_
 
     def call_fut(self, node, kw):
         from adhocracy_core.rest.schemas import add_put_data_subschemas
@@ -879,9 +879,9 @@ class TestPOSTCreateResetPasswordRequestSchema:
 class TestDeferredValidateResetPasswordEmail:
 
     @fixture
-    def request(self, cornice_request, registry):
-        cornice_request.registry = registry
-        return cornice_request
+    def request(self, request_, registry):
+        request_.registry = registry
+        return request_
 
     def call_fut(self, node, kw):
         from . schemas import deferred_validate_password_reset_email
@@ -953,21 +953,20 @@ class TestValidatePasswordResetPath:
         return registry_with_content
 
     @fixture
-    def request(self, cornice_request, context, registry):
-        request = cornice_request
-        request.registry = registry
-        request.root = context
-        return request
+    def request_(self, request_, context, registry):
+        request_.registry = registry
+        request_.root = context
+        return request_
 
     def call_fut(self, node, kw):
         from .schemas import validate_password_reset_path
         return validate_password_reset_path(node, kw)
 
-    def test_path_is_none(self, node, request, context):
-        validator = self.call_fut(node, {'context': context, 'request': request})
+    def test_path_is_none(self, node, request_, context):
+        validator = self.call_fut(node, {'context': context, 'request': request_})
         assert validator(node, None) is None
 
-    def test_path_is_reset_password(self, node,  request, context, registry,
+    def test_path_is_reset_password(self, node,  request_, context, registry,
                                     mock_sheet):
         from adhocracy_core.resources.principal import IPasswordReset
         from adhocracy_core.utils import now
@@ -975,28 +974,28 @@ class TestValidatePasswordResetPath:
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': now()}
         registry.content.get_sheet.return_value = mock_sheet
-        validator = self.call_fut(node, {'request': request, 'context': context})
+        validator = self.call_fut(node, {'request': request_, 'context': context})
 
         context['reset'] = testing.DummyResource(__provides__=IPasswordReset)
         validator(node, context['reset'])
 
-        assert request.validated['user'] is user
+        assert request_.validated['user'] is user
 
-    def test_path_is_not_reset_password(self, node,  request, context, registry,
+    def test_path_is_not_reset_password(self, node,  request_, context, registry,
                                         mock_sheet):
         from adhocracy_core.utils import now
         user = testing.DummyResource()
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': now()}
         registry.content.get_sheet.return_value = mock_sheet
-        validator = self.call_fut(node, {'request': request, 'context': context})
+        validator = self.call_fut(node, {'request': request_, 'context': context})
 
         context['reset'] = testing.DummyResource()
         with raises(colander.Invalid):
             validator(node, context['reset'])
 
     def test_path_is_reset_password_but_8_days_old(
-            self, node,  request, context, registry, mock_sheet):
+            self, node,  request_, context, registry, mock_sheet):
         import datetime
         from adhocracy_core.resources.principal import IPasswordReset
         from adhocracy_core.utils import now
@@ -1005,7 +1004,7 @@ class TestValidatePasswordResetPath:
         mock_sheet.get.return_value = {'creator': user,
                                        'creation_date': creation_date}
         registry.content.get_sheet.return_value = mock_sheet
-        validator = self.call_fut(node, {'request': request, 'context': context})
+        validator = self.call_fut(node, {'request': request_, 'context': context})
 
         context['reset'] = testing.DummyResource(__provides__=IPasswordReset)
         with raises(colander.Invalid):

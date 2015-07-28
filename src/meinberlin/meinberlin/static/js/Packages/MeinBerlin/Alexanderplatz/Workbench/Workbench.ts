@@ -1,6 +1,7 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import AdhConfig = require("../../../Config/Config");
+import AdhDocument = require("../../../Document/Document");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
@@ -8,8 +9,8 @@ import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
-import RIDocument = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocument");
-import RIDocumentVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocumentVersion");
+import RIGeoDocument = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocument");
+import RIGeoDocumentVersion = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
 import RIParagraph = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProposal");
@@ -50,6 +51,32 @@ export var processDetailColumnDirective = (
     };
 };
 
+export var documentDetailColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
+        }
+    };
+};
+
+export var documentCreateColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentCreateColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
@@ -58,6 +85,7 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhDocument.moduleName,
             AdhPermissions.moduleName,
             AdhProcess.moduleName,
             AdhMovingColumns.moduleName,
@@ -82,13 +110,13 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide",
                     tab: "documents"
                 })
-                .defaultVersionable(RIDocument, RIDocumentVersion, "", processType, "", {
+                .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
                     tab: "documents"
                 })
-                .specificVersionable(RIDocument, RIDocumentVersion, "", processType, "", [
-                    () => (item : RIDocument, version : RIDocumentVersion) => {
+                .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", [
+                    () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
                         return {
                             documentUrl: version.path
                         };
@@ -143,5 +171,7 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective]);
+            "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective]);
 };

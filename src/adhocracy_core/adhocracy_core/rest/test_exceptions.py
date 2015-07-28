@@ -1,11 +1,178 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 import colander
 
 
-@fixture
-def request_():
-    return testing.DummyRequest()
+
+class TestJSONHTTPException:
+
+    @fixture
+    def make_one(self, errors, request=None, **kwargs):
+        from adhocracy_core.rest.exceptions import JSONHTTPClientError
+        return JSONHTTPClientError(errors, request=request, **kwargs)
+
+    def test_create(self):
+        from pyramid.httpexceptions import HTTPException
+        error_entries = []
+        inst = self.make_one(error_entries)
+        assert isinstance(inst, HTTPException)
+        assert inst.status == '400 Bad Request'
+        assert inst.content_type == 'application/json'
+        assert inst.json_body == {'status': 'error',
+                                  'errors': []}
+
+    def test_add_code_and_title(self):
+        error_entries = []
+        inst = self.make_one(error_entries, code=402, title='Bad Bad')
+        assert inst.status == '402 Bad Bad'
+
+    def test_add_error_entries_to_json_body(self):
+        from .exceptions import error_entry
+        error_entries = [error_entry('header', 'a', 'b')]
+        inst = self.make_one(error_entries)
+        assert inst.json_body['errors'] == [{'location': 'header',
+                                             'name': 'a',
+                                             'description': 'b'}]
+
+    def test_log_request_body_json_dict(self, request_, log):
+        request_.body = '{"data": "stuff"}'
+        self.make_one([], request_)
+        assert '{"data": "stuff"}' in str(log)
+
+    def test_log_request_body_json_list(self, request_, log):
+        request_.body = '[]'
+        request_.text = '[]'
+        self.make_one([], request_)
+        assert '[]' in str(log)
+
+    def test_log_request_body_json_other(self, request_, log):
+        request_.body = b'None'
+        self.make_one([], request_)
+        assert 'None' in str(log)
+
+    def test_log_abbreviated_request_body_if_gt_5000(self, request_, log):
+        request_.body = '{"data": "' + 'h' * 5110 + '"}'
+        self.make_one([], request_)
+        assert len(str(log)) < len(request_.body)
+        assert '...' in str(log)
+
+    def test_log_request_body_is_wrong_json(self, request_, log):
+        request_.body = b'wrong'
+        self.make_one([], request_)
+        assert 'wrong' in str(log)
+
+    def test_log_formdata_body(self, request_, log):
+        request_.content_type = 'multipart/form-data'
+        request_.body = "h" * 120
+        self.make_one([], request_)
+        assert request_.body in str(log)
+
+    def test_log_abbreviated_formdata_body_if_gt_240(self, request_, log):
+        request_.content_type = 'multipart/form-data'
+        request_.body = "h" * 240
+        self.make_one([], request_)
+        assert len(str(log)) < len(request_.body)
+        assert 'h...' in str(log)
+
+    def test_log_but_hide_login_password_in_body(self, request_, log):
+        import json
+        from .views import POSTLoginUsernameRequestSchema
+        appstruct = POSTLoginUsernameRequestSchema().serialize(
+            {'password': 'secret', 'name': 'name'})
+        request_.body = json.dumps(appstruct)
+        self.make_one([], request_)
+        assert 'secret' not in str(log)
+        assert '<hidden>' in str(log)
+
+    def test_log_but_hide_user_passwod_sheet_password_in_body(self, request_, log):
+        import json
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
+        appstruct = {'data': {IPasswordAuthentication.__identifier__:
+                                  {'password': 'secret'}}}
+        request_.body = json.dumps(appstruct)
+        self.make_one([], request_)
+        assert 'secret' not in str(log)
+        assert '<hidden>' in str(log)
+
+    def test_log_headers(self, request_, log):
+        request_.headers['X'] = 1
+        self.make_one([], request_)
+        assert "{'X': 1}" in str(log)
+
+    def test_log_but_hide_x_user_token_in_headers(self, request_, log):
+        request_.headers['X-User-Token'] = 1
+        self.make_one([], request_)
+        assert "{'X-User-Token': '<hidden>'}" in str(log)
+
+
+class TestHandleErrorX0XException:
+
+    def call_fut(self, error, request):
+        from adhocracy_core.rest.exceptions import handle_error_x0x_exception
+        return handle_error_x0x_exception(error, request)
+
+    def test_forward_http_exception(self, request_):
+        from pyramid.httpexceptions import HTTPException
+        error = HTTPException(status_code=204)
+        result_error = self.call_fut(error, request_)
+        assert error is result_error
+
+
+class TestHandleError40X_exception:
+
+    @fixture
+    def integration(self, config):
+        import adhocracy_core.rest
+        config.include(adhocracy_core.rest)
+        return config
+
+    def call_fut(self, error, request):
+        from adhocracy_core.rest.exceptions import handle_error_40x_exception
+        return handle_error_40x_exception(error, request)
+
+    def test_render_http_client_exception(self, request_):
+        from pyramid.httpexceptions import HTTPClientError
+        error = HTTPClientError(status_code=400)
+        json_error = self.call_fut(error, request_)
+        assert json_error.status_code == 400
+        assert json_error.json_body == \
+               {"status": "error",
+                "errors": [{"description": "{0} {1}".format(error.status, error),
+                            "name": "GET",
+                            "location": "url"}]}
+
+    def test_render_http_json_exception(self, request_):
+        from .exceptions import JSONHTTPClientError
+        error = JSONHTTPClientError([], code=400)
+        json_error = self.call_fut(error, request_)
+        assert json_error is error
+
+    def create_dummy_app(self, config, error=None):
+        def dummy_view(request):
+            if error:
+                raise error()
+            else:
+                return "{}"
+        config.add_view(dummy_view, name='dummy_view')
+        config.add_route('dummy_view', '/')
+        from webtest import TestApp
+        app = config.make_wsgi_app()
+        return TestApp(app)
+
+    @mark.usefixtures('integration')
+    def test_response_get_40X(self, integration):
+        from pyramid.httpexceptions import HTTPClientError
+        app_dummy = self.create_dummy_app(integration, error=HTTPClientError)
+        resp = app_dummy.get('/dummy_view', status=400)
+        assert '400' in resp.json['errors'][0]['description']\
+
+    @mark.usefixtures('integration')
+    def test_response_options_40X(self, integration):
+        from pyramid.httpexceptions import HTTPClientError
+        app_dummy = self.create_dummy_app(integration, error=HTTPClientError)
+        resp = app_dummy.get('/dummy_view', status=400)
+        assert '400' in resp.json['errors'][0]['description']
 
 
 class TestHandleError400ColanderInvalid:
@@ -15,7 +182,6 @@ class TestHandleError400ColanderInvalid:
         return handle_error_400_colander_invalid(error, request)
 
     def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
         import json
         invalid0 = colander.SchemaNode(typ=colander.String(), name='parent0',
                                        msg='msg_parent')
@@ -29,7 +195,6 @@ class TestHandleError400ColanderInvalid:
 
         inst = self.make_one(error0, request_)
 
-        assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
         wanted = {'status': 'error',
                   'errors': [{'location': 'body',
@@ -45,7 +210,6 @@ class TestHandleError400URLDecodeError:
         return handle_error_400_url_decode_error(error, request)
 
     def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
         from pyramid.exceptions import URLDecodeError
         import json
         try:
@@ -56,12 +220,11 @@ class TestHandleError400URLDecodeError:
                                    err.start,err.end, err.reason)
             inst = self.make_one(error, request_)
 
-            assert isinstance(inst, _JSONError)
             assert inst.status == '400 Bad Request'
             wanted = {'status': 'error',
                       'errors': [{'location': 'url',
                                   'name': '',
-                                  'description': "'utf-8' codec can't decode byte 0x92 in position 0: invalid start byte"}]}
+                                  'description': "400 Bad Request 'utf-8' codec can't decode byte 0x92 in position 0: invalid start byte"}]}
             assert json.loads(inst.body.decode()) == wanted
 
 
@@ -71,14 +234,10 @@ class TestHandleError500Exception:
         from adhocracy_core.rest.exceptions import handle_error_500_exception
         return handle_error_500_exception(error, request_)
 
-    def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
+    def test_render_exception_error(self, request_, log):
         import json
         error = Exception('arg1')
-
         inst = self.make_one(error, request_)
-
-        assert isinstance(inst, _JSONError)
         assert inst.status == '500 Internal Server Error'
         message = json.loads(inst.body.decode())
         assert message['status'] == 'error'
@@ -97,7 +256,6 @@ class TestHandleAutoUpdateNoForkAllowed400Exception:
         return handle_error_400_auto_update_no_fork_allowed(error, request_)
 
     def test_render_exception_error(self, request_):
-        from cornice.util import _JSONError
         from adhocracy_core.interfaces import ISheet
         resource = testing.DummyResource(__name__='resource')
         event = testing.DummyResource(object=resource,
@@ -108,7 +266,6 @@ class TestHandleAutoUpdateNoForkAllowed400Exception:
         error = testing.DummyResource(resource=resource,
                                       event=event)
         inst = self.make_one(error, request_)
-        assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
         wanted = \
             {'errors': [{'description': 'No fork allowed - The auto update tried to '
@@ -134,7 +291,7 @@ class TestHandleError410:
         from adhocracy_core.rest.exceptions import handle_error_410_exception
         return handle_error_410_exception(error, request)
 
-    def test_no_detail_no_imetadata(self, error, request_):
+    def test_no_detail_no_metadata(self, error, request_):
         inst = self.make_one(error, request_)
         assert inst.content_type == 'application/json'
         assert inst.json_body['modification_date'] == ''
@@ -162,3 +319,27 @@ class TestHandleError410:
         inst = self.make_one(error, request_)
         assert inst.json_body['modification_date'].endswith('00:00')
         assert inst.json_body['modified_by'].endswith('user/')
+
+
+class TestHandleError400:
+
+    @fixture
+    def error(self):
+        from pyramid.httpexceptions import HTTPBadRequest
+        return HTTPBadRequest()
+
+    def call_fut(self, error, request):
+        from .exceptions import handle_error_400_bad_request
+        return handle_error_400_bad_request(error, request)
+
+    def test_return_json_error_with_error_listing(self, error, request_):
+        from .exceptions import error_entry
+        request_.errors = [error_entry('b', '', '')]
+        inst = self.call_fut(error, request_)
+        assert inst.content_type == 'application/json'
+        assert inst.json ==\
+               {"errors": [{"location":"b","name":"","description":""}],
+                "status": "error"}
+        assert inst.status_code == 400
+
+

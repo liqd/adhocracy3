@@ -10,7 +10,7 @@ import json
 @mark.usefixtures('integration')
 class TestImportGroups:
 
-    def test_import_groups_create(self, registry):
+    def test_import_groups_create(self, registry, log):
         from adhocracy_core.scripts.import_groups import _import_groups
 
         (self._tempfd, filename) = mkstemp()
@@ -31,7 +31,7 @@ class TestImportGroups:
         assert reviewers is not None
         assert reviewers.roles == ['annotator']
 
-    def test_import_groups_update(self, registry):
+    def test_import_groups_update(self, registry, log):
         from adhocracy_core.scripts.import_groups import _import_groups
         (self._tempfd, filename) = mkstemp()
         with open(filename, 'w') as f:

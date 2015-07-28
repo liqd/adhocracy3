@@ -6,11 +6,6 @@ from unittest import mock
 
 
 @fixture
-def request_():
-    return testing.DummyRequest()
-
-
-@fixture
 def mock_strategy():
     return mock.Mock()
 
@@ -309,6 +304,7 @@ class TestHTTPCacheStrategyWeakAssetDownloadAdapter:
 
 @fixture
 def integration(config):
+    config.include('adhocracy_core.rest.exceptions')
     config.include('adhocracy_core.caching')
 
 
@@ -317,16 +313,15 @@ class TestIntegrationCaching:
 
     @staticmethod
     def dummyview(context, request):
+        from adhocracy_core.rest.exceptions import JSONHTTPClientError
         from . import set_cache_header
-        from cornice.util import _JSONError
         if 'error' in request.params:
-            raise _JSONError({})
+            raise JSONHTTPClientError([])
         set_cache_header(context, request)
         return {}
 
     @fixture
     def config(self, config):
-        config.include('cornice')
         from adhocracy_core.interfaces import IResource
         config.add_view(self.dummyview, renderer='json', request_method='GET',
                         context=IResource, name='no_strategy_registered')

@@ -295,6 +295,29 @@ var countComments = (adhHttp : AdhHttp.Service<any>, postPoolPath : string) : an
         });
 };
 
+/**
+ * promise workflow state.
+ */
+export var getWorkflowState = (
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    $q : angular.IQService
+) => () : angular.IPromise<string> => {
+    var processUrl = adhTopLevelState.get("processUrl");
+
+    if (typeof processUrl !== "undefined") {
+        return adhHttp.get(processUrl).then((resource) => {
+            var workflowSheet = resource.data[SIMercatorWorkflow.nick];
+            if (typeof workflowSheet !== "undefined") {
+                return workflowSheet.workflow_state;
+            }
+        });
+    } else {
+        return $q.when(undefined);
+    }
+};
+
+
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
         public adhConfig : AdhConfig.IService,
@@ -447,9 +470,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             data.winnerBadgeAssignment = communityAssignment || winningAssignment;
         });
 
-        var processUrl = this.adhTopLevelState.get("processUrl");
-        this.adhHttp.get(processUrl).then((resource) => {
-            data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+        getWorkflowState(this.adhHttp, this.adhTopLevelState, this.$q)().then((workflowState) => {
+            data.currentPhase = workflowState;
         });
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
@@ -972,9 +994,8 @@ export var listItem = (
                     scope.data.winnerBadgeAssignment = communityAssignment || winningAssignment;
                 });
 
-                var processUrl = adhTopLevelState.get("processUrl");
-                adhHttp.get(processUrl).then((resource) => {
-                    scope.data.currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                getWorkflowState(adhHttp, adhTopLevelState, $q)().then((workflowState) => {
+                    scope.data.currentPhase = workflowState;
                 });
 
                 scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
@@ -1004,16 +1025,15 @@ export var addButton = (
     adhHttp : AdhHttp.Service<any>,
     adhTopLevelState : AdhTopLevelState.Service,
     adhPermissions : AdhPermissions.Service,
-    adhCredentials : AdhCredentials.Service
+    adhCredentials : AdhCredentials.Service,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/AddButton.html",
         link: (scope) => {
-            var processUrl = adhTopLevelState.get("processUrl");
-            adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
-                scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && currentPhase === "participate");
+            getWorkflowState(adhHttp, adhTopLevelState, $q)().then((workflowState) => {
+                scope.loggedOutAndParticipate = (!adhCredentials.loggedIn && workflowState === "participate");
             });
             adhPermissions.bindScope(scope, adhConfig.rest_url + adhConfig.custom["mercator_platform_path"], "poolOptions");
         }
@@ -1275,6 +1295,7 @@ export var register = (angular) => {
             "adhTopLevelState",
             "adhPermissions",
             "adhCredentials",
+            "$q",
             addButton
             ])
         .controller("mercatorProposalFormController", [
