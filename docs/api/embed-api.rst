@@ -37,21 +37,6 @@ Canonical URL
     <https://tools.ietf.org/html/rfc6596>`_.
 
 
-General notes
--------------
-
--   Accout activation (after registration) and password reset require
-    that the backend sends a URL to the user via email.  So the backend
-    needs to know canonical URLs for that.
-
--   If a feature is not available in an embedded widget, all aspects of
-    that widget that rely on that feature need to be modified.  For
-    example, whenever a user is referenced, we include a link to their
-    profile page.  If profile pages are not available in an embedded
-    widget, these links either need to be removed or point to the
-    platform instead.
-
-
 Embed-API
 ---------
 
@@ -212,3 +197,18 @@ In your directive you can now for example use this like this::
             // more code
         };
     };
+
+
+General notes
+-------------
+
+-   Accout activation (after registration) and password reset require
+    that the backend sends a URL to the user via email.  So the backend
+    needs to know canonical URLs for that.
+
+-   If a feature is not available in an embedded widget, all aspects of
+    that widget that rely on that feature need to be modified.  For
+    example, whenever a user is referenced, we include a link to their
+    profile page.  If profile pages are not available in an embedded
+    widget, these links either need to be removed or point to the
+    platform instead.
