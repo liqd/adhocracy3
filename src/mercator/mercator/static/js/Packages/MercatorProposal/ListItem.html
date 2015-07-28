@@ -23,12 +23,12 @@
                 <i class="icon-speechbubbles"></i>
                 {{ data.commentCountTotal }} <span class="print-only" aria-hidden="true">{{ "TR__COMMENTS_TOTAL" | translate }}</span>
             </li>
-            <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item meta-list-item-supporters">
+            <li data-ng-if="data.currentPhase && data.currentPhase != 'result'" class="meta-list-item meta-list-item-supporters">
                 <i class="icon-pointy-rectangle-left"></i>
                 {{ data.supporterCount }}
                 {{ "TR__SUPPORTERS" | translate }}
             </li>
-            <li data-ng-if="data.currentPhase != 'result'" class="meta-list-item meta-list-item-budget">
+            <li data-ng-if="data.currentPhase && data.currentPhase != 'result'" class="meta-list-item meta-list-item-budget">
                 {{ data.finance.requested_funding | number }} &euro; <span class="print-only" aria-hidden="true">{{ "TR__MERCATOR_PROPOSAL_REQUESTED_FUNDING" | translate }}</span>
             </li>
             <li data-ng-if="data.winnerBadgeAssignment.name === 'winning'" class="meta-list-item meta-list-item-badge">
