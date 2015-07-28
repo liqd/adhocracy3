@@ -4,7 +4,6 @@ This is registered as console script in setup.py.
 """
 import argparse
 import inspect
-import logging
 import transaction
 
 from pyramid.paster import bootstrap
@@ -14,8 +13,6 @@ from pyramid.traversal import find_resource
 from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.workflows import transition_to_states
-
-logger = logging.getLogger(__name__)
 
 
 def set_workflow_state():  # pragma: no cover
