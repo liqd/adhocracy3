@@ -1489,6 +1489,8 @@ custom filters:
   user resource url.
   Supports sorting.
 
+* *item_creation_date* the the item_creation_date value of resources with :class:`adhocracy_core.sheets.metadata.IMetadata`.
+
 * *badge* the badge names of resources with :class:`adhocracy_core.sheets.badge.IBadgeable`
   sheet.
 
