@@ -150,6 +150,7 @@ Can create process content::
     ['adhocracy_core.resources.document.IDocument',
      'adhocracy_core.resources.document.IGeoDocument',
      'adhocracy_core.resources.external_resource.IExternalResource',
+     'adhocracy_core.resources.proposal.IGeoProposal',
      'adhocracy_core.resources.proposal.IProposal']
 
 Can edit his own process content::
