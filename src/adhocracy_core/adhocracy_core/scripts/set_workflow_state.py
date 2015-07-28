@@ -11,8 +11,7 @@ from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.workflows import setup_workflow
-from adhocracy_core.workflows import get_workflow
+from adhocracy_core.workflows import transition_to_states
 
 
 def set_workflow_state():  # pragma: no cover
@@ -29,25 +28,33 @@ def set_workflow_state():  # pragma: no cover
     parser.add_argument('resource_path',
                         type=str,
                         help='path of the resource')
-    parser.add_argument('state',
+    parser.add_argument('states',
                         type=str,
-                        help='name of the state')
+                        nargs='+',
+                        help='list of state name to do transition to')
+    parser.add_argument('--reset',
+                        help='reset workflow to initial state',
+                        action='store_true')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
     _set_workflow_state(env['root'],
                         env['registry'],
                         args.resource_path,
-                        args.state)
+                        args.states,
+                        args.reset,
+                        )
     env['closer']()
 
 
 def _set_workflow_state(root: IResource,
                         registry: Registry,
                         resource_path: str,
-                        state: str):
+                        states: [str],
+                        reset=False,
+                        ):
     resource = find_resource(root, resource_path)
-    workflow = get_workflow(resource, registry)
-    states = registry.content.workflows_meta[workflow.type]['states_order']
-    to_transition = states[1:states.index(state) + 1]
-    setup_workflow(resource, to_transition, registry)
+    if reset:
+        transition_to_states(resource, states, registry, reset=reset)
+    else:
+        transition_to_states(resource, states, registry)
     transaction.commit()

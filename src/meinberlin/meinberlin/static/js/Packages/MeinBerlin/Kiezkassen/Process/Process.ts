@@ -14,8 +14,7 @@ import AdhUtil = require("../../../Util/Util");
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
 import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
-
-import SIKiezkassenWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IWorkflowAssignment");
+import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 
@@ -69,8 +68,8 @@ export var detailAnnounceDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
-                        scope.announceDescription = resource.data[SIKiezkassenWorkflow.nick].announce.description;
+                        scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                        scope.announceDescription = resource.data[SIWorkflow.nick].announce.description;
                     });
                 }
             });
@@ -91,14 +90,14 @@ export var phaseHeaderDirective = (
         link: (scope) => {
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
-                scope.phases[0].startDate = resource.data[SIKiezkassenWorkflow.nick].announce.start_date;
-                scope.phases[0].endDate = resource.data[SIKiezkassenWorkflow.nick].participate.start_date;
-                scope.phases[1].startDate = resource.data[SIKiezkassenWorkflow.nick].participate.start_date;
-                scope.phases[1].endDate = resource.data[SIKiezkassenWorkflow.nick].frozen.start_date;
-                scope.phases[2].startDate = resource.data[SIKiezkassenWorkflow.nick].frozen.start_date;
-                scope.phases[2].endDate = resource.data[SIKiezkassenWorkflow.nick].result.start_date;
-                scope.phases[3].startDate = resource.data[SIKiezkassenWorkflow.nick].result.start_date;
+                scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
+                scope.phases[0].startDate = resource.data[SIWorkflow.nick].announce.start_date;
+                scope.phases[0].endDate = resource.data[SIWorkflow.nick].participate.start_date;
+                scope.phases[1].startDate = resource.data[SIWorkflow.nick].participate.start_date;
+                scope.phases[1].endDate = resource.data[SIWorkflow.nick].frozen.start_date;
+                scope.phases[2].startDate = resource.data[SIWorkflow.nick].frozen.start_date;
+                scope.phases[2].endDate = resource.data[SIWorkflow.nick].result.start_date;
+                scope.phases[3].startDate = resource.data[SIWorkflow.nick].result.start_date;
             });
 
             scope.phases = [{
@@ -180,30 +179,30 @@ export var editDirective = (
                 process = resource;
                 scope.data.title = process.data[SITitle.nick].title;
 
-                scope.data.announce_description = process.data[SIKiezkassenWorkflow.nick].announce.description;
-                scope.data.announce_start_date = moment(process.data[SIKiezkassenWorkflow.nick].announce.start_date).format("YYYY-MM-DD");
+                scope.data.announce_description = process.data[SIWorkflow.nick].announce.description;
+                scope.data.announce_start_date = moment(process.data[SIWorkflow.nick].announce.start_date).format("YYYY-MM-DD");
 
-                scope.data.draft_description = process.data[SIKiezkassenWorkflow.nick].draft.description;
-                scope.data.draft_start_date = moment(process.data[SIKiezkassenWorkflow.nick].draft.start_date).format("YYYY-MM-DD");
+                scope.data.draft_description = process.data[SIWorkflow.nick].draft.description;
+                scope.data.draft_start_date = moment(process.data[SIWorkflow.nick].draft.start_date).format("YYYY-MM-DD");
 
-                scope.data.participate_description = process.data[SIKiezkassenWorkflow.nick].participate.description;
+                scope.data.participate_description = process.data[SIWorkflow.nick].participate.description;
                 scope.data.participate_start_date = moment(
-                                                            process.data[SIKiezkassenWorkflow.nick]
+                                                            process.data[SIWorkflow.nick]
                                                             .participate.start_date
                                                            ).format("YYYY-MM-DD");
 
-                scope.data.frozen_description = process.data[SIKiezkassenWorkflow.nick].frozen.description;
-                scope.data.frozen_start_date = moment(process.data[SIKiezkassenWorkflow.nick].frozen.start_date).format("YYYY-MM-DD");
+                scope.data.frozen_description = process.data[SIWorkflow.nick].frozen.description;
+                scope.data.frozen_start_date = moment(process.data[SIWorkflow.nick].frozen.start_date).format("YYYY-MM-DD");
 
-                scope.data.result_description = process.data[SIKiezkassenWorkflow.nick].result.description;
-                scope.data.result_start_date = moment(process.data[SIKiezkassenWorkflow.nick].result.start_date).format("YYYY-MM-DD");
+                scope.data.result_description = process.data[SIWorkflow.nick].result.description;
+                scope.data.result_start_date = moment(process.data[SIWorkflow.nick].result.start_date).format("YYYY-MM-DD");
 
-                scope.data.currentWorkflowState = process.data[SIKiezkassenWorkflow.nick].workflow_state;
+                scope.data.currentWorkflowState = process.data[SIWorkflow.nick].workflow_state;
             });
             adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
                 // extract available transitions
                 scope.data.availableWorkflowStates = AdhUtil.deepPluck(raw, [
-                    "data", "PUT", "request_body", "data", SIKiezkassenWorkflow.nick, "workflow_state"]);
+                    "data", "PUT", "request_body", "data", SIWorkflow.nick, "workflow_state"]);
             });
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.kiezkassenProcessForm, () => {
@@ -212,32 +211,32 @@ export var editDirective = (
                     process.data["adhocracy_core.sheets.image.IImageReference"] = undefined;
 
                     if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
-                        process.data[SIKiezkassenWorkflow.nick] = {
+                        process.data[SIWorkflow.nick] = {
                             workflow_state: scope.data.workflowState
                         };
                     } else {
-                        process.data[SIKiezkassenWorkflow.nick] = {};
+                        process.data[SIWorkflow.nick] = {};
                     }
 
-                    process.data[SIKiezkassenWorkflow.nick]["announce"] = {};
-                    process.data[SIKiezkassenWorkflow.nick]["announce"].description = scope.data.announce_description;
-                    process.data[SIKiezkassenWorkflow.nick]["announce"].start_date = scope.data.announce_start_date;
+                    process.data[SIWorkflow.nick]["announce"] = {};
+                    process.data[SIWorkflow.nick]["announce"].description = scope.data.announce_description;
+                    process.data[SIWorkflow.nick]["announce"].start_date = scope.data.announce_start_date;
 
-                    process.data[SIKiezkassenWorkflow.nick]["draft"] = {};
-                    process.data[SIKiezkassenWorkflow.nick]["draft"].description = scope.data.draft_description;
-                    process.data[SIKiezkassenWorkflow.nick]["draft"].start_date = scope.data.draft_start_date;
+                    process.data[SIWorkflow.nick]["draft"] = {};
+                    process.data[SIWorkflow.nick]["draft"].description = scope.data.draft_description;
+                    process.data[SIWorkflow.nick]["draft"].start_date = scope.data.draft_start_date;
 
-                    process.data[SIKiezkassenWorkflow.nick]["participate"] = {};
-                    process.data[SIKiezkassenWorkflow.nick]["participate"].description = scope.data.participate_description;
-                    process.data[SIKiezkassenWorkflow.nick]["participate"].start_date = scope.data.participate_start_date;
+                    process.data[SIWorkflow.nick]["participate"] = {};
+                    process.data[SIWorkflow.nick]["participate"].description = scope.data.participate_description;
+                    process.data[SIWorkflow.nick]["participate"].start_date = scope.data.participate_start_date;
 
-                    process.data[SIKiezkassenWorkflow.nick]["frozen"] = {};
-                    process.data[SIKiezkassenWorkflow.nick]["frozen"].description = scope.data.frozen_description;
-                    process.data[SIKiezkassenWorkflow.nick]["frozen"].start_date = scope.data.frozen_start_date;
+                    process.data[SIWorkflow.nick]["frozen"] = {};
+                    process.data[SIWorkflow.nick]["frozen"].description = scope.data.frozen_description;
+                    process.data[SIWorkflow.nick]["frozen"].start_date = scope.data.frozen_start_date;
 
-                    process.data[SIKiezkassenWorkflow.nick]["result"] = {};
-                    process.data[SIKiezkassenWorkflow.nick]["result"].description = scope.data.result_description;
-                    process.data[SIKiezkassenWorkflow.nick]["result"].start_date = scope.data.result_start_date;
+                    process.data[SIWorkflow.nick]["result"] = {};
+                    process.data[SIWorkflow.nick]["result"].description = scope.data.result_description;
+                    process.data[SIWorkflow.nick]["result"].start_date = scope.data.result_start_date;
 
                     return adhHttp.put(process.path, process);
                 });

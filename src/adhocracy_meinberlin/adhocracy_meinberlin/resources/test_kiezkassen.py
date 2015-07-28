@@ -61,7 +61,6 @@ class TestProcess:
         import adhocracy_core.resources.process
         import adhocracy_core.sheets.image
         import adhocracy_core.sheets.description
-        import adhocracy_meinberlin.sheets.kiezkassen
         from adhocracy_core.resources.asset import add_assets_service
         from .kiezkassen import IProcess
         assert meta.iresource is IProcess
@@ -70,13 +69,12 @@ class TestProcess:
         assert meta.permission_create == 'create_process'
         assert meta.extended_sheets == (
             adhocracy_core.sheets.description.IDescription,
-            adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
             adhocracy_core.sheets.geo.ILocationReference,
             adhocracy_core.sheets.image.IImageReference,
         )
         assert add_assets_service in meta.after_creation
         assert meta.permission_create == 'create_process'
-
+        assert meta.workflow_name == 'kiezkassen'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

@@ -16,7 +16,6 @@ from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.logbook import IHasLogbookPool
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.workflows import setup_workflow
 from adhocracy_mercator.resources.mercator import IMercatorProposal
 from adhocracy_mercator.resources.mercator import IMercatorProposalVersion
 from adhocracy_mercator.sheets.mercator import IIntroduction
@@ -105,10 +104,7 @@ def add_badgeable_sheet_to_proposal_versions(root):  # pragma: no cover
 @log_migration
 def reset_workflow_state_to_result(root):  # pragma: no cover
     """Reset workflow state to 'result'."""
-    registry = get_current_registry()
-    setup_workflow(root['mercator'],
-                   ['announce', 'participate', 'frozen', 'result'],
-                   registry)
+    pass  # set workflow state manually if needed
 
 
 @log_migration
@@ -131,6 +127,20 @@ def add_haslogbookpool_sheet_to_proposal_versions(root):  # pragma: no cover
     migrate_new_sheet(root, IMercatorProposalVersion, IHasLogbookPool)
 
 
+@log_migration
+def remove_mercator_workflow_assignment_sheet(root):  # pragma: no cover
+    """Remove deprecated sheets.mercator.IWorkflowAssignment interface."""
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    from adhocracy_mercator import resources
+    from adhocracy_mercator import sheets
+    migrate_new_sheet(root,
+                      resources.mercator.IProcess,
+                      IWorkflowAssignment,
+                      sheets.mercator.IWorkflowAssignment,
+                      remove_isheet_old=True,
+                      )
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_evolution_step(evolve1_add_ititle_sheet_to_proposals)
@@ -143,3 +153,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(reset_workflow_state_to_result)
     config.add_evolution_step(add_logbook_service_to_proposal_items)
     config.add_evolution_step(add_haslogbookpool_sheet_to_proposal_versions)
+    config.add_evolution_step(remove_mercator_workflow_assignment_sheet)

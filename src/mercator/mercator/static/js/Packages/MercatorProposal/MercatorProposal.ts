@@ -54,6 +54,7 @@ import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/I
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
 import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
+import SILogbook = require("../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
 import SIMercatorExperience = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExperience");
 import SIMercatorFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
@@ -69,13 +70,12 @@ import SIMercatorStory = require("../../Resources_/adhocracy_mercator/sheets/mer
 import SIMercatorSubResources = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMercatorSubResources");
 import SIMercatorUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
 import SIMercatorValue = require("../../Resources_/adhocracy_mercator/sheets/mercator/IValue");
-import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import SIMetaData = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SILogbook = require("../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MercatorProposal";
 
@@ -307,7 +307,7 @@ export var getWorkflowState = (
 
     if (typeof processUrl !== "undefined") {
         return adhHttp.get(processUrl).then((resource) => {
-            var workflowSheet = resource.data[SIMercatorWorkflow.nick];
+            var workflowSheet = resource.data[SIWorkflow.nick];
             if (typeof workflowSheet !== "undefined") {
                 return workflowSheet.workflow_state;
             }

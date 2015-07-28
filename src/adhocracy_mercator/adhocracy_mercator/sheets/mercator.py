@@ -431,23 +431,8 @@ class IWorkflowAssignment(workflow.IWorkflowAssignment):
     """Marker interface for the mercator workflow assignment sheet."""
 
 
-class WorkflowAssignmentSchema(workflow.WorkflowAssignmentSchema):
-
-    """Data structure the mercator workflow assignment sheet."""
-
-    workflow_name = 'mercator'
-
-    draft = workflow.StateAssignment()
-    announce = workflow.StateAssignment()
-    participate = workflow.StateAssignment()
-    evaluate = workflow.StateAssignment()
-    result = workflow.StateAssignment()
-    closed = workflow.StateAssignment()
-
-workflow_meta = workflow.workflow_meta._replace(
-    isheet=IWorkflowAssignment,
-    schema_class=WorkflowAssignmentSchema,
-)
+deprecated('IWorkflowAssignment',
+           'Backward compatible code use process IWorkflowAssignment instead')
 
 
 def includeme(config):
@@ -468,4 +453,3 @@ def includeme(config):
     add_sheet_to_registry(experience_meta, config.registry)
     add_sheet_to_registry(heardfrom_meta, config.registry)
     add_sheet_to_registry(intro_image_metadata_meta, config.registry)
-    add_sheet_to_registry(workflow_meta, config.registry)

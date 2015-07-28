@@ -918,12 +918,13 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     case "adhocracy_core.sheets.geo.AdministrativeDivisionName":
         resultType = "string";
         break;
-    case "adhocracy_core.sheets.workflow.StateAssignment":
-        resultType = "{start_date : string; description : string;}";
-        jsonType = "{start_date : string; description : string;}";
+    case "adhocracy_core.sheets.workflow.StateData":
+        resultType = "{start_date : string; description : string; name : string;}";
+        jsonType = "{start_date : string; description : string; name : string;}";
         parser = dictParser({
             start_date: null,
-            description: stringToDate
+            description: stringToDate,
+            name: null
         });
         break;
     default:
@@ -936,7 +937,8 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
             resultType += "[]";
             jsonType += "[]";
             if (parser) {
-                parser = "(list) => _.map(list, " + parser + ")";
+                // FIXME: DefinitelyTyped
+                parser = "(list) => _.map(<any[]>list, " + parser + ")";
             }
             break;
         default:

@@ -12,6 +12,7 @@ def test_simple_meta():
     assert meta.basic_sheets == (adhocracy_core.sheets.name.IName,
                                  adhocracy_core.sheets.title.ITitle,
                                  adhocracy_core.sheets.metadata.IMetadata,
+                                 adhocracy_core.sheets.workflow.IWorkflowAssignment,
                                  )
     assert meta.permission_create == 'create_simple'
 

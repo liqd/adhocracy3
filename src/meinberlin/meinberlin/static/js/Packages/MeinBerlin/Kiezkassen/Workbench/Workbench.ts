@@ -19,7 +19,7 @@ import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberli
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIKiezkassenWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IWorkflowAssignment");
+import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
@@ -63,7 +63,7 @@ export var meinBerlinWorkbenchDirective = (
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     adhHttp.get(processUrl).then((resource) => {
-                        scope.currentPhase = resource.data[SIKiezkassenWorkflow.nick].workflow_state;
+                        scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
                     });
                 }
             });

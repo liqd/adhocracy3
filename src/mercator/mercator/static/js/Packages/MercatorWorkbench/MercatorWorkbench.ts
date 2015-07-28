@@ -13,11 +13,11 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
-import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
+import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MercatorWorkbench";
 
@@ -143,7 +143,7 @@ export var mercatorProposalListingColumnDirective = (
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
 
                 if (typeof scope.shared.facets === "undefined") {
                     scope.shared.facets = [{

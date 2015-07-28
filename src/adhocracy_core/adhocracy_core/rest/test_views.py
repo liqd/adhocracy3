@@ -29,6 +29,11 @@ class CountSchema(colander.MappingSchema):
 
 
 @fixture
+def registry(registry_with_content):
+    return registry_with_content
+
+
+@fixture
 def mock_authpolicy(registry):
     from pyramid.interfaces import IAuthenticationPolicy
     from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
@@ -38,12 +43,12 @@ def mock_authpolicy(registry):
 
 
 @fixture
-def mock_password_sheet(registry_with_content, sheet_meta):
+def mock_password_sheet(registry, sheet_meta):
     from adhocracy_core.sheets.principal import IPasswordAuthentication
     from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
     sheet = Mock(spec=PasswordAuthenticationSheet)
     sheet.meta = sheet_meta._replace(isheet=IPasswordAuthentication)
-    register_sheet(None, sheet, registry_with_content)
+    register_sheet(None, sheet, registry)
     return sheet
 
 
@@ -466,6 +471,19 @@ class TestResourceRESTView:
         inst._add_workflow_edit_permission_info(d, editable_sheets)
         assert d ==\
             {IWorkflowAssignment.__identifier__: {'workflow_state': ['draft']}}
+
+    def test_add_workflow_permissions_info_without_workflow(
+           self, request_, context, mock_sheet):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        mock_sheet.get.return_value = {'workflow': None}
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IWorkflowAssignment)
+        editable_sheets = [mock_sheet]
+        inst = self.make_one(context, request_)
+        d = {}
+        inst._add_workflow_edit_permission_info(d, editable_sheets)
+        assert d ==\
+            {IWorkflowAssignment.__identifier__: {'workflow_state': []}}
+
 
     def test_get_valid_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
@@ -1137,7 +1155,7 @@ class TestMetaApiView:
         request.registry.content.workflows_meta['sample'] = {'states': {},
                                                              'transitions': {}}
         workflows_meta = inst.get()['workflows']
-        assert workflows_meta == {'sample': {'states_order': [],
+        assert workflows_meta == {'sample': {'initial_state': '',
                                              'states': {},
                                              'transitions': {}}}
 
@@ -1203,9 +1221,9 @@ class TestValidateLoginNameUnitTest:
 class TestValidateLoginPasswordUnitTest:
 
     @fixture
-    def request(self, request_, registry_with_content):
+    def request(self, request_, registry):
         from adhocracy_core.sheets.principal import IPasswordAuthentication
-        request_.registry = registry_with_content
+        request_.registry = registry
         user = testing.DummyResource(__provides__=IPasswordAuthentication)
         request_.validated['user'] = user
         request_.validated['password'] = 'lalala'
@@ -1589,8 +1607,8 @@ class TestCreatePasswordResetView:
         context['resets'] = service
 
     @fixture
-    def request_(self, request_, registry_with_content):
-        request_.registry = registry_with_content
+    def request_(self, request_, registry):
+        request_.registry = registry
         request_.validated['user'] = testing.DummyResource()
         return request_
 
@@ -1632,8 +1650,8 @@ class TestCreatePasswordResetView:
 class TestPasswordResetView:
 
     @fixture
-    def request_(self, request_, registry_with_content):
-        request_.registry = registry_with_content
+    def request_(self, request_, registry):
+        request_.registry = registry
         return request_
 
     @fixture
