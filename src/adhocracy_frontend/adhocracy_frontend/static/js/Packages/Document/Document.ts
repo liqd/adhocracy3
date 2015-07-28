@@ -72,6 +72,7 @@ export interface IFormScope extends IScope {
     submit() : angular.IPromise<any>;
     cancel() : void;
     documentForm : any;
+    polygon? : number[][];
 }
 
 export var highlightSelectedParagraph = (
@@ -396,7 +397,8 @@ export var createDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             path: "@",
-            hasMap: "=?"
+            hasMap: "=?",
+            polygon: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -404,8 +406,10 @@ export var createDirective = (
                 title: "",
                 paragraphs: [{
                     body: ""
-                }]
+                }],
+                coordinates: []
             };
+            scope.polygon = [[13.43, 52.49], [13.44, 52.48], [13.44, 52.49]];
             scope.showError = adhShowError;
 
             scope.addParagraph = () => {
@@ -447,7 +451,8 @@ export var editDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
             path: "@",
-            hasMap: "=?"
+            hasMap: "=?",
+            polygon: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
