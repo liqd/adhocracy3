@@ -351,11 +351,12 @@ export var mapListItemDirective = (
 
     directive.require = "^adhMapListingInternal";
     directive.link = (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
+        scope.hasMap = true;
         superLink(scope);
 
         var unregister = scope.$watch("data.coordinates", (coordinates : number[]) => {
-            if (typeof coordinates[0] !== "undefined" && typeof coordinates[1] !== "undefined") {
-                scope.$on("$destroy", mapListing.registerListItem(scope.path, coordinates[0], coordinates[1]));
+            if (typeof coordinates !== "undefined" && coordinates.length === 2) {
+                scope.$on("$destroy", mapListing.registerListItem(scope.path, coordinates[1], coordinates[0]));
                 unregister();
             }
         });
