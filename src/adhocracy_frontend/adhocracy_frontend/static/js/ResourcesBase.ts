@@ -22,6 +22,8 @@ export class Sheet {
 export interface IResourceClass {
     /* tslint:disable:variable-name */
     content_type : string;
+    super_types : string[];
+    sheets : string[];
     /* tslint:enable:variable-name */
 }
 
@@ -36,6 +38,7 @@ export class Resource {
     public first_version_path : string;
     public root_versions : string[];
     public static super_types : string[];
+    public static sheets : string[];
 
     constructor(public content_type : string) {
         this.data = {};
@@ -57,7 +60,7 @@ export class Resource {
     }
 
     public isInstanceOf(resourceType : string) : boolean {
-        var _class = <any>this.constructor;
+        var _class : IResourceClass = <any>this.constructor;
 
         if (resourceType === this.content_type) {
             return true;
@@ -66,5 +69,11 @@ export class Resource {
         } else {
             return false;
         }
+    }
+
+    public hasSheet(sheet : string) : boolean {
+        var _class : IResourceClass = <any>this.constructor;
+
+        return (<any>_).includes(_class.sheets, sheet);  // FIXME: DefinitelyTyped
     }
 }
