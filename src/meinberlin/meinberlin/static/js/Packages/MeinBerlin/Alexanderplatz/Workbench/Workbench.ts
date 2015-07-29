@@ -37,6 +37,17 @@ export var workbenchDirective = (
     };
 };
 
+export var getProcessPolygon = (
+    adhHttp : AdhHttp.Service<any>
+) => (processUrl : string) : angular.IPromise<any> => {
+    return adhHttp.get(processUrl).then((resource) => {
+        var locationUrl = resource.data[SILocationReference.nick].location;
+        return adhHttp.get(locationUrl).then((location) => {
+            return location.data[SIMultiPolygon.nick].coordinates[0][0];
+        });
+    });
+};
+
 export var processDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
@@ -54,12 +65,8 @@ export var processDetailColumnDirective = (
 
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
-                    adhHttp.get(processUrl).then((resource) => {
-                        var locationUrl = resource.data[SILocationReference.nick].location;
-                        adhHttp.get(locationUrl).then((location) => {
-                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
-                            scope.polygon = polygon;
-                        });
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
                     });
                 }
             });
@@ -92,12 +99,8 @@ export var documentCreateColumnDirective = (
             column.bindVariablesAndClear(scope, ["processUrl"]);
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
-                    adhHttp.get(processUrl).then((resource) => {
-                        var locationUrl = resource.data[SILocationReference.nick].location;
-                        adhHttp.get(locationUrl).then((location) => {
-                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
-                            scope.polygon = polygon;
-                        });
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
                     });
                 }
             });
