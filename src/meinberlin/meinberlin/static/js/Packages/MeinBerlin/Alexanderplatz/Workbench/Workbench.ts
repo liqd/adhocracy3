@@ -2,6 +2,7 @@
 
 import AdhConfig = require("../../../Config/Config");
 import AdhDocument = require("../../../Document/Document");
+import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
@@ -16,6 +17,8 @@ import RIGeoProposalVersion = require("../../../../Resources_/adhocracy_core/res
 import RIParagraph = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIParagraph = require("../../../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
+import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
 
 var pkgLocation = "/MeinBerlin/Alexanderplatz/Workbench";
 
@@ -37,7 +40,8 @@ export var workbenchDirective = (
 export var processDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -47,8 +51,18 @@ export var processDetailColumnDirective = (
             column.bindVariablesAndClear(scope, ["processUrl"]);
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
-            // FIXME: dummy data
-            scope.polygon = [[13.43, 52.49], [13.44, 52.48], [13.44, 52.49]];
+
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    adhHttp.get(processUrl).then((resource) => {
+                        var locationUrl = resource.data[SILocationReference.nick].location;
+                        adhHttp.get(locationUrl).then((location) => {
+                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                            scope.polygon = polygon;
+                        });
+                    });
+                }
+            });
         }
     };
 };
@@ -67,7 +81,8 @@ export var documentDetailColumnDirective = (
 };
 
 export var documentCreateColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -75,8 +90,17 @@ export var documentCreateColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
-            // FIXME: dummy data
-            scope.polygon = [[13.43, 52.49], [13.44, 52.48], [13.44, 52.49]];
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    adhHttp.get(processUrl).then((resource) => {
+                        var locationUrl = resource.data[SILocationReference.nick].location;
+                        adhHttp.get(locationUrl).then((location) => {
+                            var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
+                            scope.polygon = polygon;
+                        });
+                    });
+                }
+            });
         }
     };
 };
@@ -178,7 +202,7 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective])
+            "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective]);
+        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective]);
 };
