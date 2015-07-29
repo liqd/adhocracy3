@@ -29,6 +29,7 @@
 
         <div data-ng-if="tab === 'documents'">
             <adh-map-listing
+                data-ng-if="polygon"
                 data-path="{{processUrl}}"
                 data-polygon="polygon"
                 data-no-create-form="true"
