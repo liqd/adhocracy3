@@ -192,7 +192,7 @@ export var postCreate = (
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
-    if (hasMap && scope.data.coordinates && scope.data.coordinates.length === 2) {
+    if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
         documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
             coordinates: scope.data.coordinates
         });
@@ -276,7 +276,7 @@ export var postEdit = (
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
-    if (hasMap && scope.data.coordinates && scope.data.coordinates.length === 2) {
+    if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
         documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
             coordinates: scope.data.coordinates
         });
