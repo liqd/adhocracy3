@@ -37,12 +37,21 @@ standard_meta = freeze({
                      'description': '',
                      'acm': {'principals':                      ['participant', 'moderator', 'creator', 'initiator'],
                              'permissions':
-                             [['create_proposal',                 None,          None,        None,     'Allow'],
-                              ['edit_proposal',                   None,          None,        None,     'Allow'],
+                             [['create_proposal',                 None,          None,        None,      None],
+                              ['edit_proposal',                   None,          None,        None,      None],
+                              ['create_comment',                 'Allow',       'Allow',      None,     'Allow'],
+                              ['edit_comment',                    None,          None,       'Allow',    None],
                              ]}
         },
         'result': {'title': 'Result',
                    'description': '',
+                   'acm': {'principals':                        ['participant', 'moderator', 'creator', 'initiator'],
+                             'permissions':
+                             [['create_proposal',                 None,          None,        None,      None],
+                              ['edit_proposal',                   None,          None,        None,      None],
+                              ['create_comment',                  None,         'Allow',      None,     'Allow'],
+                              ['edit_comment',                    None,          None,       'Allow',    None],
+                             ]}
                    },
         'closed': {'title': 'Closed',
                    'description': '',
