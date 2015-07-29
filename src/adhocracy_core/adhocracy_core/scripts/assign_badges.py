@@ -6,6 +6,7 @@ setup.py.
 """
 
 import inspect
+import logging
 
 import argparse
 import transaction
@@ -20,6 +21,10 @@ from adhocracy_core.resources.badge import IBadgeAssignment
 from adhocracy_core import sheets
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.utils import load_json
+from adhocracy_core.utils import get_sheet
+
+
+logger = logging.getLogger(__name__)
 
 
 def assign_badges():  # pragma: no cover
@@ -74,16 +79,27 @@ def create_badge_assignment(user: IUser,
                             description: str,
                             registry: Registry) -> IBadgeAssignment:
     """Create badge assignment."""
-    appstructs = {sheets.badge.IBadgeAssignment.__identifier__:
-                  {'subject': user,
-                   'badge': badge,
-                   'object': badgeable
-                   }}
+    assignment_appstruct = {'subject': user,
+                            'badge': badge,
+                            'object': badgeable}
+    appstructs = {sheets.badge.IBadgeAssignment.__identifier__: assignment_appstruct}
     if description != '':  # pragma: no branch
         appstructs[sheets.description.IDescription.__identifier__] =\
             {'description': description}
     assignments = find_service(badgeable, 'badge_assignments')
+    if _assignment_exists(assignment_appstruct, assignments):
+        logger.warn('Assignment already exist, skipping. {}'
+                    .format(assignment_appstruct))
+        return None
     assignmnet = registry.content.create(IBadgeAssignment.__identifier__,
                                          parent=assignments,
                                          appstructs=appstructs)
     return assignmnet
+
+
+def _assignment_exists(assignment_appstruct: dict, assignments: IResource):
+    for assignment in assignments.values():
+        if assignment_appstruct == \
+           get_sheet(assignment, sheets.badge.IBadgeAssignment).get():
+            return True
+    return False
