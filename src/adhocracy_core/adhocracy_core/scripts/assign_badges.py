@@ -88,13 +88,13 @@ def create_badge_assignment(user: IUser,
             {'description': description}
     assignments = find_service(badgeable, 'badge_assignments')
     if _assignment_exists(assignment_appstruct, assignments):
-        logger.warn('Assignment already exist, skipping. {}'
+        logger.warn('Assignment already exists, skipping. {}'
                     .format(assignment_appstruct))
         return None
-    assignmnet = registry.content.create(IBadgeAssignment.__identifier__,
+    assignment = registry.content.create(IBadgeAssignment.__identifier__,
                                          parent=assignments,
                                          appstructs=appstructs)
-    return assignmnet
+    return assignment
 
 
 def _assignment_exists(assignment_appstruct: dict, assignments: IResource):
