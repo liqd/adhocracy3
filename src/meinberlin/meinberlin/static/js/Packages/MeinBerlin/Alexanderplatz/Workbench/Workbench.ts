@@ -108,6 +108,27 @@ export var documentCreateColumnDirective = (
     };
 };
 
+export var documentEditColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
