@@ -1,4 +1,5 @@
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhBadge = require("../Badge/Badge");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
@@ -39,9 +40,16 @@ export interface IParagraph {
     selectedState? : string;
 }
 
+export interface IBadge {
+    title : string;
+    description : string;
+    name : string;
+}
+
 export interface IScope extends angular.IScope {
     path? : string;
     hasMap? : boolean;
+    hasBadges?: boolean;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
@@ -55,6 +63,7 @@ export interface IScope extends angular.IScope {
 
         // optional features
         coordinates? : number[];
+        assignments?: IBadge[];
     };
     selectedState? : string;
     resource: any;
@@ -94,11 +103,13 @@ export var highlightSelectedParagraph = (
 export var bindPath = (
     $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>,
+    adhGetBadges? : AdhBadge.IGetBadges,
     adhTopLevelState? : AdhTopLevelState.Service
 ) => (
     scope : IScope,
     pathKey : string = "path",
-    hasMap : boolean = false
+    hasMap : boolean = false,
+    hasBadges : boolean = false
 ) : Function => {
     var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
 
@@ -133,6 +144,12 @@ export var bindPath = (
 
                     if (hasMap) {
                         scope.data.coordinates = documentVersion.data[SIPoint.nick].coordinates;
+                    }
+
+                    if (hasBadges) {
+                        adhGetBadges(documentVersion).then((assignments) => {
+                            scope.data.assignments = assignments;
+                        });
                     }
 
                     // FIXME: This probably isn't the right place for this also topLevelState
@@ -295,6 +312,7 @@ export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhGetBadges : AdhBadge.IGetBadges,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -302,10 +320,12 @@ export var detailDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
             path: "@",
-            hasMap: "=?"
+            hasMap: "=?",
+            hasBadges: "=?",
+            badgeclass: "=?"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp, adhTopLevelState)(scope, undefined, scope.hasMap);
+            bindPath($q, adhHttp, adhGetBadges, adhTopLevelState)(scope, undefined, scope.hasMap, scope.hasBadges);
             scope.$on("$destroy", adhTopLevelState.on("commentableUrl", (commentableUrl) => {
                 highlightSelectedParagraph(adhTopLevelState.get("commentableUrl"), scope);
             }));
@@ -317,6 +337,7 @@ export var listItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhGetBadges : AdhBadge.IGetBadges,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
@@ -324,10 +345,11 @@ export var listItemDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
             path: "@",
-            hasMap: "=?"
+            hasMap: "=?",
+            hasBadges: "=?"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
+            bindPath($q, adhHttp, adhGetBadges)(scope, undefined, scope.hasMap, scope.hasBadges);
 
             scope.$on("$destroy", adhTopLevelState.on("documentUrl", (documentVersionUrl) => {
                 if (!documentVersionUrl) {
@@ -346,9 +368,10 @@ export var mapListItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhGetBadges : AdhBadge.IGetBadges,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
-    var directive : angular.IDirective = listItemDirective($q, adhConfig, adhHttp, adhTopLevelState);
+    var directive : angular.IDirective = listItemDirective($q, adhConfig, adhHttp, adhGetBadges, adhTopLevelState);
     var superLink = <Function>directive.link;
 
     directive.require = "^adhMapListingInternal";
@@ -451,6 +474,7 @@ export var editDirective = (
         scope: {
             path: "@",
             hasMap: "=?",
+            hasBadges: "=?",
             polygon: "=?"
         },
         link: (scope : IFormScope, element) => {
@@ -508,7 +532,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("document-edit");
             adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", detailDirective])
+        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", detailDirective])
         .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",
@@ -532,7 +556,7 @@ export var register = (angular) => {
             editDirective])
         .directive("adhDocumentListing", ["adhConfig", listingDirective])
         .directive("adhDocumentListItem", [
-            "$q", "adhConfig", "adhHttp", "adhTopLevelState", listItemDirective])
+            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", listItemDirective])
         .directive("adhDocumentMapListItem", [
-            "$q", "adhConfig", "adhHttp", "adhTopLevelState", mapListItemDirective]);
+            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", mapListItemDirective]);
 };
