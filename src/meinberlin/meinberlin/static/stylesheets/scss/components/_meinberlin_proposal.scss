@@ -202,7 +202,8 @@ as metadata.  It serves as an entry to a detail view.
     @include span(4 of 12 last);
 }
 
-.meinberlin-alexanderplatz-proposal-list-item {
+.meinberlin-alexanderplatz-proposal-list-item,
+.section-jump-cover {
     .badge {
         margin-bottom: 20px / $font-size-small * 1em;
     }
