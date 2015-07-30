@@ -321,7 +321,8 @@ export var detailDirective = (
         scope: {
             path: "@",
             hasMap: "=?",
-            hasBadges: "=?"
+            hasBadges: "=?",
+            badgeclass: "=?"
         },
         link: (scope : IScope) => {
             bindPath($q, adhHttp, adhGetBadges, adhTopLevelState)(scope, undefined, scope.hasMap, scope.hasBadges);
