@@ -63,6 +63,10 @@ export var processDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
+            scope.showMap = (isShowMap) => {
+                scope.shared.isShowMap = isShowMap;
+            };
+
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
@@ -97,6 +101,27 @@ export var documentCreateColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+        }
+    };
+};
+
+export var documentEditColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
             scope.$watch("processUrl", (processUrl) => {
                 if (processUrl) {
                     getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
@@ -152,6 +177,17 @@ export var register = (angular) => {
                             documentUrl: version.path
                         };
                     }])
+                .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    tab: "documents"
+                })
+                .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", [
+                    () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+                        return {
+                            documentUrl: version.path
+                        };
+                    }])
                 .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show",
@@ -189,6 +225,17 @@ export var register = (angular) => {
                             proposalUrl: version.path
                         };
                     }])
+                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    tab: "proposals"
+                })
+                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", [
+                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+                        return {
+                            proposalUrl: version.path
+                        };
+                    }])
                 .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show",
@@ -207,5 +254,6 @@ export var register = (angular) => {
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective]);
+        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", ["adhConfig", "adhHttp", documentEditColumnDirective]);
 };
