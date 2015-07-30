@@ -16,6 +16,7 @@ import angularTranslate = require("angularTranslate");  if (angularTranslate) { 
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
 import markdownit = require("markdownit");
 import modernizr = require("modernizr");
@@ -88,8 +89,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "flow",
         AdhComment.moduleName,
         AdhDone.moduleName,
+        AdhImage.moduleName,
         AdhMapping.moduleName,
 
         AdhCrossWindowMessaging.moduleName,
