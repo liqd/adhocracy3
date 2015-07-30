@@ -56,7 +56,7 @@
                     data-empty-text="{{ 'TR__DOCUMENT_EMPTY_TEXT' | translate }}"
                     data-params="{tag: 'LAST'}"
                     data-content-type="adhocracy_core.resources.document.IGeoDocumentVersion">
-                    <adh-document-map-list-item data-path="{{item}}"></adh-document-map-list-item>
+                    <adh-document-map-list-item data-has-badges="true" data-path="{{item}}"></adh-document-map-list-item>
                 </adh-map-listing>
             </adh-wait>
 
@@ -67,7 +67,7 @@
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-params="{tag: 'LAST'}"
                 data-content-type="adhocracy_core.resources.document.IGeoDocumentVersion">
-                <adh-document-list-item data-path="{{element}}"></adh-document-list-item>
+                <adh-document-list-item data-path="{{element}}" data-has-badges="true"></adh-document-list-item>
             </adh-listing>
         </div>
     </div>
