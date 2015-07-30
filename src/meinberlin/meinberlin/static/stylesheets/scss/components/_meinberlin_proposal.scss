@@ -192,12 +192,26 @@ as metadata.  It serves as an entry to a detail view.
     }
 }
 
-.meinberlin-kiezkassen-proposal-list-item-col-left {
+.meinberlin-kiezkassen-proposal-list-item-col-left,
+.meinberlin-alexanderplatz-proposal-list-item-col-left {
     @include span(8 of 12 first);
 }
 
-.meinberlin-kiezkassen-proposal-list-item-col-right {
+.meinberlin-kiezkassen-proposal-list-item-col-right,
+.meinberlin-alexanderplatz-proposal-list-item-col-right {
     @include span(4 of 12 last);
+}
+
+.meinberlin-alexanderplatz-proposal-list-item {
+    .badge {
+        margin-bottom: 20px / $font-size-small * 1em;
+    }
+}
+
+.m-no-picture {
+    .proposal-list-item-body {
+        margin-left: 0;
+    }
 }
 
 .meinberlin-kiezkassen-proposal-list-item-title {

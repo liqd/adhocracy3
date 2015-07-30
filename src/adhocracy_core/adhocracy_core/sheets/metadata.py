@@ -62,22 +62,27 @@ class MetadataSchema(colander.MappingSchema):
     """Metadata sheet data structure.
 
     `creation_date`: Creation date of this resource. defaults to now.
-    `item_creation_date`: Equals creation date for ISimple/IPool, equals
-                          the item creation date for
-                          :class:`adhocracy_core.interfaces.IItemVersion`.
-                          This exists to ease the frontend end development.
-                          This may go away if we have a high level API
-                          to make :class:`adhocracy_core.interfaces.Item`
-                         /`IItemVersion` one `thing`.
-                         defaults to now.
+
+    `item_creation_date`: Equals creation date for ISimple/IPool,
+    equals the item creation date for
+    :class:`adhocracy_core.interfaces.IItemVersion`. This exists to
+    ease the frontend end development. This may go away if we have a
+    high level API to make :class:`adhocracy_core.interfaces.Item` /
+    `IItemVersion` one `thing`. Defaults to now.
+
     `creator`: creator (user resource) of this resource.
-    `modified_by`: the last person (user resources) who modified a resource,
-                   initally the creator
+
+    `modified_by`: the last person (user resources) who modified a
+    resource, initially the creator
+
     `modification_date`: Modification date of this resource. defaults to now.
+
     `deleted`: whether the resource is marked as deleted (only shown to those
-               that specifically ask for it)
+    that specifically ask for it)
+
     `hidden`: whether the resource is marked as hidden (only shown to those
-               that have special permissions and ask for it)
+    that have special permissions and ask for it)
+
     """
 
     creator = Reference(reftype=MetadataCreatorsReference, readonly=True)
