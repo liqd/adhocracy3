@@ -2,7 +2,10 @@
 
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
+import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
+import AdhEmbed = require("../Embed/Embed");
 
 import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
 import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
@@ -11,6 +14,7 @@ import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/ba
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 
+var pkgLocation = "/Badge";
 
 export interface IBadge {
     title : string;
@@ -46,6 +50,64 @@ export var getBadgesFactory = (
     return $q.all(_.map(assignmentPaths, getBadge));
 };
 
+export var badgeAssignmentDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService,
+    adhCredentials : AdhCredentials.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
+        scope: {
+            badgesPath: "@",
+            poolpath: "@",
+            badgeablePath: "@"
+
+        },
+        link: (scope, element) => {
+            scope.data = {
+                badge : "",
+                description:""
+            };
+
+            var getBadgePromise = (badgepath : string) => {
+                return adhHttp.get(badgepath);
+            };
+
+            var getBadge = (badge) => {
+                return {
+                    title: badge.data[SITitle.nick].title,
+                    path: badge.path
+                };
+            }
+
+            adhHttp.get(scope.badgesPath).then((badges) => {
+                var badgelist = badges["data"]["adhocracy_core.sheets.pool.IPool"]["elements"];
+                $q.all(<any>(_.map(badgelist, getBadgePromise))).then((result)=>{
+                    scope.badges = _.map(result, getBadge);
+                });
+            });
+
+            scope.submit = () => {
+                var postdata = {
+                    content_type: "adhocracy_core.resources.badge.IBadgeAssignment",
+                    data: {}
+                };
+                postdata.data[SIDescription.nick] = {
+                    description: scope.data.description
+                };
+                postdata.data[SIBadgeAssignment.nick] = {
+                    badge : scope.data.badge,
+                    object : scope.badgeablePath,
+                    subject : adhCredentials.userPath
+                }
+                return adhHttp.post(scope.poolpath, postdata);
+            };
+        }
+    };
+};
+
 
 export var moduleName = "adhBadge";
 
@@ -54,5 +116,9 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName
         ])
-        .factory("adhGetBadges", ["adhHttp", "$q", getBadgesFactory]);
+        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
+            adhEmbedProvider.embeddableDirectives.push("assign-badge");
+        }])
+        .factory("adhGetBadges", ["adhHttp", "$q", getBadgesFactory])
+        .directive("adhAssignBadge", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentDirective]);
 };
