@@ -63,11 +63,14 @@ def _print_workflow_info(root: IResource,
                          resource_path: str):
     resource = find_resource(root, resource_path)
     workflow = registry.content.get_workflow(resource)
-    states = set(registry.content.workflows_meta[workflow.type]['states'].keys())
-    print('\nname: {}\ncurrent state: {}\nnext states: {}\nall states (unordered): {}\n'
+    states = set(registry.content.workflows_meta[workflow.type]['states']
+                 .keys())
+    print('\nname: {}\ncurrent state: {}\nnext states: {}'
+          '\nall states (unordered): {}\n'
           .format(workflow.type,
                   workflow.state_of(resource),
-                  workflow.get_next_states(resource, create_fake_god_request(registry)),
+                  workflow.get_next_states(resource,
+                                           create_fake_god_request(registry)),
                   states))
 
 
@@ -99,7 +102,10 @@ def _set_workflow_state(root: IResource,
                                                      absolute,
                                                      reset)
     if reset:
-        transition_to_states(resource, states_to_transition, registry, reset=reset)
+        transition_to_states(resource,
+                             states_to_transition,
+                             registry,
+                             reset=reset)
     else:
         transition_to_states(resource, states_to_transition, registry)
     transaction.commit()
