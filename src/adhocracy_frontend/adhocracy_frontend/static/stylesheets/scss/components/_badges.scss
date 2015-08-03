@@ -8,7 +8,11 @@ category: Type
 Badges for labeling things
 
 ```html_example
-I am a normal user <span class="badge">Normal User</span>
+<p>I am a normal user <span class="badge">Normal User</span></p>
+
+<p>Two badges with whitespace in between: <span class="badge">one</span> <span class="badge">two</span></p>
+
+<p>Two badges without whitespace in between: <span class="badge">one</span><span class="badge">two</span></p>
 ```
 
 */
@@ -21,4 +25,5 @@ I am a normal user <span class="badge">Normal User</span>
     padding: 0 5px / $font-size-smaller * 1em;
     line-height: 1 + 4px / $font-size-smaller;
     text-transform: uppercase;
+    margin-right: 0.5em;
 }
