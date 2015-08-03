@@ -64,10 +64,6 @@ def transition_to_states(context, states: [str], registry: Registry,
     # TODO: raise if workflow is None
     if not workflow.has_state(context) or reset:
         workflow.initialize(context)
-    current_state = workflow.state_of(context)
-    wanted_state = states and states[-1]
-    if wanted_state == current_state:
-        return
     for state in states:
         workflow.transition_to_state(context, request, state)
 

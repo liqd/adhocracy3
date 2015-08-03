@@ -7,6 +7,8 @@ from pytest import fixture
 from pytest import mark
 from pytest import raises
 from unittest.mock import Mock
+import pytest
+from substanced.workflow import WorkflowError
 
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
@@ -184,7 +186,7 @@ class TestTransitionToStates:
         workflow = registry.content.workflows['test_workflow']
         assert workflow.state_of(context) is 'participate'
 
-    def test_ignore_if_state_already_set(self, integration, context,
+    def test_error_if_state_already_set(self, integration, context,
                                          resource_meta):
         registry = integration.registry
         self._add_workflow(registry, 'test_workflow')
@@ -196,9 +198,8 @@ class TestTransitionToStates:
         workflow.transition_to_state(context, request, 'announced')
         workflow.transition_to_state(context, request, 'participate')
 
-        self.call_fut(context, ['announced', 'participate'], registry)
-
-        assert workflow.state_of(context) is 'participate'
+        with pytest.raises(WorkflowError):
+            self.call_fut(context, ['announced', 'participate'], registry)
 
     def test_optionally_reset_to_initial_state(self, integration, context,
                                                resource_meta):
