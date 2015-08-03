@@ -1,33 +1,35 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
-import AdhBadge = require("../../../Badge/Badge");
-import AdhConfig = require("../../../Config/Config");
-import AdhEmbed = require("../../../Embed/Embed");
-import AdhHttp = require("../../../Http/Http");
-import AdhMapping = require("../../../Mapping/Mapping");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
-import AdhRate = require("../../../Rate/Rate");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../../Util/Util");
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhBadge = require("../Badge/Badge");
+import AdhConfig = require("../Config/Config");
+import AdhEmbed = require("../Embed/Embed");
+import AdhHttp = require("../Http/Http");
+import AdhMapping = require("../Mapping/Mapping");
+import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhRate = require("../Rate/Rate");
+import AdhResourceArea = require("../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUtil = require("../Util/Util");
 
-import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
-import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIMetadata = require("../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
-import SIPool = require("../../../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
-import SIRateable = require("../../../../Resources_/adhocracy_core/sheets/rate/IRateable");
-import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIDescription = require("../../../../Resources_/adhocracy_core/sheets/description/IDescription");
-import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
+import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+import RIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
+import RIKiezkassenProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
+import RIAleaxanderplatzProposal = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
+import RIAlexanderProposalVersion = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
+import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
+import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
+import SILocationReference = require("../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
+import SIMultiPolygon = require("../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
 
-var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
+var pkgLocation = "/Proposal";
 
 
 export interface IScope extends angular.IScope {
@@ -50,7 +52,8 @@ export interface IScope extends angular.IScope {
         assignments : AdhBadge.IBadge[];
     };
     selectedState? : string;
-    resource: RIProposalVersion;
+    proposaltype: string;
+    resource: any;
 }
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
@@ -76,13 +79,13 @@ var bindPath = (
                 tag: "LAST",
                 count: true
             }).then((pool) => {
-                adhHttp.get(value).then((resource : RIProposalVersion) => {
+                adhHttp.get(value).then((resource : RIKiezkassenProposalVersion) => {
 
                     scope.resource = resource;
 
                     var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
                     var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                    var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
+                    var mainSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
                     var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
                     var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
                     var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
@@ -129,15 +132,18 @@ var bindPath = (
 
 var fill = (
     scope : IScope,
-    proposalVersion : RIProposalVersion
+    proposalVersion : any
 ) : void => {
-    proposalVersion.data[SIProposal.nick] = new SIProposal.Sheet({
-        budget: scope.data.budget,
-        detail: scope.data.detail,
-        creator_participate: scope.data.creatorParticipate,
-        location_text: scope.data.locationText,
-        address: scope.data.address
-    });
+
+    if (scope.proposaltype === 'adhocracy_meinberlin_resources_kiezkassen_IProposal') {
+        proposalVersion.data[SIKiezkassenProposal.nick] = new SIKiezkassenProposal.Sheet({
+            budget: scope.data.budget,
+            detail: scope.data.detail,
+            creator_participate: scope.data.creatorParticipate,
+            location_text: scope.data.locationText,
+            address: scope.data.address
+        });
+    }
     proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
@@ -158,14 +164,23 @@ var postCreate = (
     scope : IScope,
     poolPath : string
 ) => {
-    var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
-    proposal.parent = poolPath;
 
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    if(scope.proposaltype === 'adhocracy_meinberlin_resources_kiezkassen_IProposal'){
+        var proposal = new RIKiezkassenProposal({preliminaryNames: adhPreliminaryNames});
+        proposal.parent = poolPath;
+        var proposalVersion = <any>(new RIKiezkassenProposalVersion({ preliminaryNames: adhPreliminaryNames }));
+    }
+
+    if(scope.proposaltype === 'adhocracy_core_resources_proposal_IGeoProposal'){
+        var proposal = new RIAleaxanderplatzProposal({preliminaryNames: adhPreliminaryNames});
+        proposal.parent = poolPath;
+        var proposalVersion = <any>(new RIAlexanderProposalVersion({ preliminaryNames: adhPreliminaryNames }));
+    }
+
     proposalVersion.parent = proposal.path;
-    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-        follows: [proposal.first_version_path]
-    });
+        proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+            follows: [proposal.first_version_path]
+        });
     fill(scope, proposalVersion);
 
     return adhHttp.deepPost([proposal, proposalVersion]);
@@ -176,9 +191,9 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion : RIProposalVersion
+    oldVersion : RIKiezkassenProposalVersion
 ) => {
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersion = new RIKiezkassenProposalVersion({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
@@ -287,6 +302,9 @@ export var createDirective = (
 ) => {
     return {
         restrict: "E",
+        scope: {
+            proposaltype: "@proposaltype"
+        },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element) => {
             scope.errors = [];
@@ -387,7 +405,7 @@ export var register = (angular) => {
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", mapListItemDirective])
-        .directive("adhMeinBerlinKiezkassenProposalCreate", [
+        .directive("adhMeinBerlinProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
