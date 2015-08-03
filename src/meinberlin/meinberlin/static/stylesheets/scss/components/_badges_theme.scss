@@ -33,8 +33,6 @@ Badge modifiers for labeling if a proposal has been realized or not.
     &.m-info {
         padding-left: 0;
         background-color: $color-brand-two-normal;
-        border-top: 1px solid $color-brand-two-normal;
-        line-height: 15px / $font-size-smaller * 1em;
 
         &:before {
             @include inline-block;
