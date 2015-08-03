@@ -104,11 +104,8 @@ def _set_workflow_state(root: IResource,
                                                      states,
                                                      absolute,
                                                      reset)
-    if reset:
-        transition_to_states(resource,
-                             states_to_transition,
-                             registry,
-                             reset=reset)
-    else:
-        transition_to_states(resource, states_to_transition, registry)
+    transition_to_states(resource,
+                         states_to_transition,
+                         registry,
+                         reset=reset)
     transaction.commit()

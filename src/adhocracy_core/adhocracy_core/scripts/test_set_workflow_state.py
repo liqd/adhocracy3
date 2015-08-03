@@ -32,7 +32,7 @@ def test_set_workflow_state(registry, context, transaction_mock,
     _set_workflow_state(context, registry, '/', ['announced', 'participate'])
 
     transition_to_mock.assert_called_with(context, ['announced', 'participate'],
-                                          registry)
+                                          registry, reset=False)
     assert transaction_mock.commit.called
 
 
@@ -49,7 +49,7 @@ def test_set_workflow_state_with_absolute(registry_with_content, context, transi
     registry.content.get_workflow.return_value = workflow_mock
     from .set_workflow_state import _set_workflow_state
     _set_workflow_state(context, registry, '/', ['announced', 'participate'], absolute=True)
-    transition_to_mock.assert_called_with(context, ['announced', 'participate'], registry)
+    transition_to_mock.assert_called_with(context, ['announced', 'participate'], registry, reset=False)
 
     _set_workflow_state(context, registry, '/', ['announced', 'participate', 'result'], absolute=True)
     transition_to_mock.assert_called_with(context, ['result'], registry)
