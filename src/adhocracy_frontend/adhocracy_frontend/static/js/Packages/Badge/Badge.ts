@@ -110,6 +110,8 @@ export var moduleName = "adhBadge";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhCredentials.moduleName,
+            AdhEmbed.moduleName,
             AdhHttp.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
