@@ -61,7 +61,7 @@ def test_set_workflow_state_with_absolute(registry_with_content, context, transi
     transition_to_mock.assert_called_with(context, ['announced', 'participate'], registry, reset=False)
 
     _set_workflow_state(context, registry, '/', ['announced', 'participate', 'result'], absolute=True)
-    transition_to_mock.assert_called_with(context, ['result'], registry)
+    transition_to_mock.assert_called_with(context, ['result'], registry, reset=False)
 
 def test_print_workflow_info(registry_with_content, context, print_mock):
     registry = registry_with_content
