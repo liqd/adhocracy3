@@ -134,23 +134,27 @@ class TestKiezkassenWorkflow:
         resp = _do_transition_to(app_initiator, '/kiezkasse', 'evaluate')
         assert resp.status_code == 200
 
-    def test_evaluate_participant_can_view_process(self, app_participant):
+    def test_change_state_to_result(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/kiezkasse', 'result')
+        assert resp.status_code == 200
+
+    def test_result_participant_can_view_process(self, app_participant):
         resp = app_participant.get('/kiezkasse')
         assert resp.status_code == 200
 
-    def test_evaluate_participant_cannot_comment_other_proposal(self,
+    def test_result_participant_cannot_comment_other_proposal(self,
                                                               app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment not in app_participant2.get_postable_types(
             '/kiezkasse/proposal_0000000/comments')
 
-    def test_evaluate_participant_cannot_rate_other_proposal(self,
+    def test_result_participant_cannot_rate_other_proposal(self,
                                                            app_participant2):
         from adhocracy_core.resources.rate import IRate
         assert IRate not in app_participant2.get_postable_types(
             '/kiezkasse/proposal_0000000/rates')
 
-    def test_change_state_to_result(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/kiezkasse', 'result')
+    def test_change_state_to_closed(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/kiezkasse', 'closed')
         assert resp.status_code == 200
 

@@ -98,20 +98,24 @@ class TestDigitalLebenWorkflow:
         resp = _do_transition_to(app_initiator, '/digital_leben', 'evaluate')
         assert resp.status_code == 200
 
-    def test_frozen_participant_can_view_process(self, app_participant):
+    def test_change_state_to_result(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/digital_leben', 'result')
+        assert resp.status_code == 200
+
+    def test_result_participant_can_view_process(self, app_participant):
         resp = app_participant.get('/digital_leben')
         assert resp.status_code == 200
 
-    def test_frozen_participant_cannot_comment_document(self, app_participant):
+    def test_result_participant_cannot_comment_document(self, app_participant):
         from adhocracy_core.resources.comment import IComment
         assert IComment not in app_participant.get_postable_types(
             '/digital_leben/document_0000000/comments')
 
-    def test_frozen_participant_cannot_rate_document(self, app_participant):
+    def test_result_participant_cannot_rate_document(self, app_participant):
         from adhocracy_core.resources.rate import IRate
         assert IRate not in app_participant.get_postable_types(
             '/digital_leben/document_0000000/rates')
 
-    def test_change_state_to_result(self, app_initiator):
-        resp = _do_transition_to(app_initiator, '/digital_leben', 'result')
+    def test_change_state_to_closed(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/digital_leben', 'closed')
         assert resp.status_code == 200
