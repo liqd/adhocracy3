@@ -82,7 +82,8 @@ def create_badge_assignment(user: IUser,
     assignment_appstruct = {'subject': user,
                             'badge': badge,
                             'object': badgeable}
-    appstructs = {sheets.badge.IBadgeAssignment.__identifier__: assignment_appstruct}
+    appstructs = {sheets.badge.IBadgeAssignment.__identifier__:
+                  assignment_appstruct}
     if description != '':  # pragma: no branch
         appstructs[sheets.description.IDescription.__identifier__] =\
             {'description': description}
