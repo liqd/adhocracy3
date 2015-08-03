@@ -7,11 +7,12 @@ import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
 import AdhEmbed = require("../Embed/Embed");
 
+import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
 import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
 import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
 import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
-import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 
 var pkgLocation = "/Badge";
@@ -61,18 +62,13 @@ export var badgeAssignmentDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
             badgesPath: "@",
-            poolpath: "@",
+            poolPath: "@",
             badgeablePath: "@"
-
         },
         link: (scope, element) => {
             scope.data = {
-                badge : "",
-                description:""
-            };
-
-            var getBadgePromise = (badgepath : string) => {
-                return adhHttp.get(badgepath);
+                badge: "",
+                description: ""
             };
 
             var getBadge = (badge) => {
@@ -80,18 +76,18 @@ export var badgeAssignmentDirective = (
                     title: badge.data[SITitle.nick].title,
                     path: badge.path
                 };
-            }
+            };
 
             adhHttp.get(scope.badgesPath).then((badges) => {
-                var badgelist = badges["data"]["adhocracy_core.sheets.pool.IPool"]["elements"];
-                $q.all(<any>(_.map(badgelist, getBadgePromise))).then((result)=>{
+                var badgelist : string[] = badges.data[SIPool.nick].elements;
+                $q.all(_.map(badgelist, (b) => adhHttp.get(b))).then((result) => {
                     scope.badges = _.map(result, getBadge);
                 });
             });
 
             scope.submit = () => {
                 var postdata = {
-                    content_type: "adhocracy_core.resources.badge.IBadgeAssignment",
+                    content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
                 postdata.data[SIDescription.nick] = {
@@ -101,8 +97,8 @@ export var badgeAssignmentDirective = (
                     badge : scope.data.badge,
                     object : scope.badgeablePath,
                     subject : adhCredentials.userPath
-                }
-                return adhHttp.post(scope.poolpath, postdata);
+                };
+                return adhHttp.post(scope.poolPath, postdata);
             };
         }
     };
