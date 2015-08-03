@@ -1,6 +1,6 @@
 import AdhMeinBerlinKiezkassenContext = require("./Context/Context");
 import AdhMeinBerlinKiezkassenProcess = require("./Process/Process");
-import AdhMeinBerlinKiezkassenProposal = require("./Proposal/Proposal");
+import AdhMeinBerlinKiezkassenProposal = require("../../Proposal/Proposal");
 import AdhMeinBerlinKiezkassenWorkbench = require("./Workbench/Workbench");
 
 
