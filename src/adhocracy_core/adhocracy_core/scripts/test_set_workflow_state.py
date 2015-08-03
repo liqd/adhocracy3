@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 from pytest import fixture
+import pytest
 
 
 @fixture
@@ -34,6 +35,14 @@ def test_set_workflow_state(registry, context, transaction_mock,
     transition_to_mock.assert_called_with(context, ['announced', 'participate'],
                                           registry, reset=False)
     assert transaction_mock.commit.called
+
+
+def test_set_workflow_state_duplicate_state(registry, context, transaction_mock,
+                                            transition_to_mock):
+    from .set_workflow_state import _set_workflow_state
+
+    with pytest.raises(ValueError):
+        _set_workflow_state(context, registry, '/', ['announced', 'participate', 'announced'])
 
 
 def test_set_workflow_state_with_reset(registry, context, transition_to_mock):

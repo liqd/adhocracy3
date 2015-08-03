@@ -82,6 +82,7 @@ def _get_states_to_transition(resource: IResource,
                               states: [str],
                               absolute,
                               reset) -> [str]:
+    _check_states(states)
     if not absolute or reset:
         return states
     workflow = registry.content.get_workflow(resource)
@@ -89,6 +90,12 @@ def _get_states_to_transition(resource: IResource,
     if state in states:
         return states[states.index(state) + 1:]
     return states
+
+
+def _check_states(states):
+    for state in states:
+        if states.count(state) > 1:
+            raise ValueError('Duplicate state: {}'.format(state))
 
 
 def _set_workflow_state(root: IResource,
