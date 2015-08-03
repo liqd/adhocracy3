@@ -38,11 +38,11 @@ export interface IScope extends angular.IScope {
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
-        budget : number;
+        budget? : number;
         detail : string;
-        creatorParticipate : boolean;
-        locationText : string;
-        address : string;
+        creatorParticipate? : boolean;
+        locationText? : string;
+        address? : string;
         creator : string;
         creationDate : string;
         commentCount : number;
@@ -85,7 +85,9 @@ var bindPath = (
 
                     var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
                     var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                    var mainSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                    if(scope.proposaltype === 'adhocracy_meinberlin_resources_kiezkassen_IProposal'){
+                        var mainSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                    }
                     var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
                     var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
                     var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
@@ -104,13 +106,8 @@ var bindPath = (
                                 adhGetBadges(resource).then((assignments) => {
                                     scope.data = {
                                         title: titleSheet.title,
-                                        budget: mainSheet.budget,
                                         detail: descriptionSheet.description,
-                                        creatorParticipate: mainSheet.creator_participate,
-                                        address: mainSheet.address,
                                         rateCount: ratesPro - ratesContra,
-                                        locationText: mainSheet.location_text,
-                                        adlocationText: mainSheet.location_text,
                                         creator: metadataSheet.creator,
                                         creationDate: metadataSheet.item_creation_date,
                                         commentCount: poolSheet.count,
@@ -119,6 +116,12 @@ var bindPath = (
                                         polygon: polygon,
                                         assignments: assignments
                                     };
+                                    if(mainSheet){
+                                        scope.data.budget = mainSheet.budget;
+                                        scope.data.address = mainSheet.address;
+                                        scope.data.creatorParticipate = mainSheet.creator_participate;
+                                        scope.data.locationText = mainSheet.location_text;
+                                    }
                                 });
                             });
                         });
@@ -235,7 +238,8 @@ export var listItemDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
-            path: "@"
+            path: "@",
+            proposaltype: "@proposaltype"
         },
         link: (scope : IScope) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
@@ -401,7 +405,7 @@ export var register = (angular) => {
         }])
         .directive("adhMeinBerlinKiezkassenProposalDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", detailDirective])
-        .directive("adhMeinBerlinKiezkassenProposalListItem", [
+        .directive("adhMeinBerlinProposalListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", listItemDirective])
         .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", mapListItemDirective])

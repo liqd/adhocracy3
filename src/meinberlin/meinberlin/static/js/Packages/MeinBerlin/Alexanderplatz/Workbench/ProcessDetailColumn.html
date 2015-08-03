@@ -43,6 +43,15 @@
         </ul>
 
         <div data-ng-if="tab === 'proposals'">
+            <adh-listing
+                data-path="{{processUrl}}"
+                data-no-create-form="true"
+                data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
+                data-params="{tag: 'LAST'}"
+                data-content-type="adhocracy_core.resources.proposal.IGeoProposalVersion">
+                <adh-mein-berlin-proposal-list-item data-path="{{element}}" data-proposaltype="adhocracy_core_resources_proposal_IGeoProposal">
+                </adh-mein-berlin-proposal-list-item>
+            </adh-listing>
         </div>
 
         <div data-ng-if="tab === 'documents'">
@@ -64,7 +73,7 @@
                 data-path="{{processUrl}}"
                 data-ng-show="!shared.isShowMap"
                 data-no-create-form="true"
-                data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
+                data-empty-text="{{ 'TR__DOCUMENT_EMPTY_TEXT' | translate }}"
                 data-params="{tag: 'LAST'}"
                 data-content-type="adhocracy_core.resources.document.IGeoDocumentVersion">
                 <adh-document-list-item data-path="{{element}}" data-has-badges="true"></adh-document-list-item>
