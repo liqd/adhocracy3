@@ -29,13 +29,16 @@ def set_workflow_state():  # pragma: no cover
     parser.add_argument('resource_path',
                         type=str,
                         help='path of the resource')
-    parser.add_argument('--info',
+    parser.add_argument('-i',
+                        '--info',
                         help='display information about the workflow',
                         action='store_true')
-    parser.add_argument('--absolute',
+    parser.add_argument('-a',
+                        '--absolute',
                         help='use an absolute path for the list of states',
                         action='store_true')
-    parser.add_argument('--reset',
+    parser.add_argument('-r',
+                        '--reset',
                         help='reset workflow to initial state',
                         action='store_true')
     parser.add_argument('states',
