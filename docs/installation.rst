@@ -84,12 +84,17 @@ Check that everything is running smoothly::
 
     ./bin/supervisorctl status
 
+Get information about the current workflow::
+
+  ./bin/set_workflow_state --info etc/development.ini <path-to-process>
+  # Example
+  ./bin/set_workflow_state --info etc/development.ini /mercator
+
 Change the workflow state (most actions are not allowed for a normal user in the initial 'draft' state)::
 
-  ./bin/set_workflow_state etc/development.ini <path-to-process> <workflow-state>
-  # examples
-  ./bin/set_workflow_state etc/development.ini /mercator participate
-  ./bin/set_workflow_state etc/development.ini /organisation/bplan frozen
+  ./bin/set_workflow_state etc/development.ini <path-to-process> <states-to-transition>
+  # Example
+  ./bin/set_workflow_state etc/development.ini /mercator announce participate
 
 Open the javascript front-end with your web browser::
 
