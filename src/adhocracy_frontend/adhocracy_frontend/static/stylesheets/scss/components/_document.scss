@@ -1,3 +1,47 @@
+/*doc
+---
+title: Document form
+name: document-form
+category: Widgets
+---
+
+A form for creating documents. This contains a <a href="#section-jump">section jump</a> widget
+
+```html_example
+<form class="document-form">
+<div class="section-jump" id="section-jump-top">
+    <div class="section-jump-cover">
+        <label>
+            <input type="text" placeholder="Add a title here." class="m-title">
+        </label>
+    </div>
+    <div class="section-jump-body">
+        <nav class="section-jump-navigation jump-navigation m-narrow m-unnumbered">
+            <ol>
+                <li>
+                    <a href="#section-jump-chapter-0">1</a>
+                </li>
+            </ol>
+        </nav>
+        <div class="section-jump-main chapter-wrapper">
+            <section id="section-jump-chapter-0">
+                <label>
+                    <textarea></textarea>
+                </label>
+            </section>
+            <footer class="form-footer">
+                <a href="" class="button-cta-secondary m-add document-form-add-paragraph-button">add paragraph</a>
+                <input type="submit" name="submit" value="Submit" class="button-cta form-footer-button-cta document-form-submit-button">
+                <a class="button form-footer-button">Cancel</a>
+            </footer>
+        </div>
+    </div>
+</div>
+</form>
+
+```
+*/
+
 .document-form {
     padding: 0;
 
