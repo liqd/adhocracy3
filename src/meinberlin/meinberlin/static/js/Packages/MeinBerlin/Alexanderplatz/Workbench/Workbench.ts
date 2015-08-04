@@ -116,27 +116,6 @@ export var documentCreateColumnDirective = (
     };
 };
 
-export var proposalCreateColumnDirective = (
-    adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["processUrl"]);
-            scope.$watch("processUrl", (processUrl) => {
-                if (processUrl) {
-                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
-                        scope.polygon = polygon;
-                    });
-                }
-            });
-        }
-    };
-};
-
 export var documentEditColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
@@ -158,6 +137,47 @@ export var documentEditColumnDirective = (
     };
 };
 
+export var proposalCreateColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+        }
+    };
+};
+
+export var proposalEditColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+        }
+    };
+};
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
@@ -281,5 +301,6 @@ export var register = (angular) => {
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzProposalCreateColumn", ["adhConfig", "adhHttp", proposalCreateColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", ["adhConfig", "adhHttp", documentEditColumnDirective]);
+        .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", ["adhConfig", "adhHttp", documentEditColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalEditColumn", ["adhConfig", "adhHttp", proposalEditColumnDirective]);
 };
