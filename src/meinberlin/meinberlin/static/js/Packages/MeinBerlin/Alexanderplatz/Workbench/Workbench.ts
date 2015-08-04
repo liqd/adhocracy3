@@ -65,6 +65,7 @@ export var processDetailColumnDirective = (
 
             scope.proposalType = RIGeoProposalVersion.content_type;
             scope.documentType = RIGeoDocumentVersion.content_type;
+            scope.shared.isShowMap = true;
 
             scope.showMap = (isShowMap) => {
                 scope.shared.isShowMap = isShowMap;
