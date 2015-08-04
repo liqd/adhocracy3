@@ -84,7 +84,7 @@ export interface IMapInputScope extends angular.IScope {
     dirty : boolean;
     resetCoordinates() : void;
     clearCoordinates() : void;
-    icon? : string;
+    pin? : string;
 }
 
 export var mapInput = (
@@ -101,7 +101,7 @@ export var mapInput = (
             height: "@",
             rawPolygon: "=polygon",
             zoom: "@?",
-            icon: "@?"
+            pin: "@?"
         },
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Input.html",
@@ -131,7 +131,7 @@ export var mapInput = (
                 map.setZoom(scope.zoom);
             }
 
-            var selectedItemLeafletIcon = adhMapData.getIcon(scope.icon || "item-selected");
+            var selectedItemLeafletIcon = adhMapData.getIcon(scope.pin || "item-selected");
             var marker : L.Marker;
 
             var createMarker = (latlng : L.LatLng) : void => {
@@ -240,7 +240,7 @@ export var mapDetail = (
             polygon: "=",
             height: "@",
             zoom: "@?",
-            icon: "@?"
+            pin: "@?"
         },
         restrict: "E",
         template: "<div class=\"map\"></div>",
@@ -263,7 +263,7 @@ export var mapDetail = (
 
             scope.marker = leaflet
                 .marker(leaflet.latLng(scope.lat, scope.lng))
-                .setIcon(adhMapData.getIcon(scope.icon || "item-selected"))
+                .setIcon(adhMapData.getIcon(scope.pin || "item-selected"))
                 .addTo(scope.map);
 
             scope.$watchGroup(["lat", "lng"], (newValues) => {
@@ -289,8 +289,8 @@ export interface IMapListScope extends angular.IScope {
     showZoomButton : boolean;
     resetMap() : void;
     visibleItems : number;
-    icon? : string;
-    iconSelected? : string;
+    pin? : string;
+    pinSelected? : string;
 }
 
 export class MapListingController {
@@ -310,8 +310,8 @@ export class MapListingController {
         private leaflet : typeof L
     ) {
         this.scrollContainer = this.$element.find(".map-list-scroll-container-inner");
-        this.selectedItemLeafletIcon = this.adhMapData.getIcon($scope.iconSelected || "item-selected");
-        this.itemLeafletIcon = this.adhMapData.getIcon($scope.icon || "item");
+        this.selectedItemLeafletIcon = this.adhMapData.getIcon($scope.pinSelected || "item-selected");
+        this.itemLeafletIcon = this.adhMapData.getIcon($scope.pin || "item");
         this.markers = {};
         this.scrollToItem = _.throttle((path, animate) => this._scrollToItem(path, animate), 10);
 
@@ -507,8 +507,8 @@ export var mapListingInternal = (
             rawPolygon: "=polygon",
             items: "=",
             emptyText: "@",
-            icon: "@?",
-            iconSelected: "@?"
+            pin: "@?",
+            pinSelected: "@?"
         },
         restrict: "E",
         transclude: true,
@@ -530,8 +530,8 @@ export class Listing<Container extends ResourcesBase.Resource> extends AdhListin
     public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.Service) {
         var directive = super.createDirective(adhConfig, adhWebSocket);
         directive.scope["polygon"] = "=";
-        directive.scope["icon"] = "@?";
-        directive.scope["iconSelected"] = "@?";
+        directive.scope["pin"] = "@?";
+        directive.scope["pinSelected"] = "@?";
 
         var originalLink = directive.link;
         directive.link = function(scope) {
