@@ -179,6 +179,7 @@ export var proposalEditColumnDirective = (
     };
 };
 
+
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
 export var register = (angular) => {
