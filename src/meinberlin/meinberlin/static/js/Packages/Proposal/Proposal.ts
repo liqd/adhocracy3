@@ -16,7 +16,7 @@ import AdhUtil = require("../Util/Util");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIKiezkassenProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import RIAleaxanderplatzProposal = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
+import RIAlexanderplatzProposal = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
 import RIAlexanderProposalVersion = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
 import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
@@ -175,7 +175,7 @@ var postCreate = (
     }
 
     if(scope.proposaltype === 'adhocracy_core_resources_proposal_IGeoProposal'){
-        var proposal = new RIAleaxanderplatzProposal({preliminaryNames: adhPreliminaryNames});
+        var proposal = new RIAlexanderplatzProposal({preliminaryNames: adhPreliminaryNames});
         proposal.parent = poolPath;
         var proposalVersion = <any>(new RIAlexanderProposalVersion({ preliminaryNames: adhPreliminaryNames }));
     }
