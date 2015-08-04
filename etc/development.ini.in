@@ -37,6 +37,8 @@ adhocracy.abuse_handler_mail = abuse_handler@unconfigured.domain
 adhocracy.message_user_subject = [{site_name}] Message from {sender_name}: {title}
 # If true, new user accounts are activated immediately without email verification
 adhocracy.skip_registration_mail = false
+# Allows turning off user token validation if behind a validating proxy
+adhocracy.validate_user_token = true
 # URL of the Varnish cache
 #adhocracy.varnish_url = http://127.0.0.1:8088
 
