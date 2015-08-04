@@ -9,6 +9,7 @@ import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
+import AdhUtil = require("../../../Util/Util");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
 import RIGeoDocument = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocument");
@@ -98,7 +99,7 @@ export var documentDetailColumnDirective = (
 
 export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service,
+    adhPermissions : AdhPermissions.Service
 ) => {
     return {
         restrict: "E",
