@@ -3,6 +3,7 @@
 import AdhConfig = require("../../../Config/Config");
 import AdhDocument = require("../../../Document/Document");
 import AdhHttp = require("../../../Http/Http");
+import AdhMapping = require("../../../Mapping/Mapping");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
@@ -167,9 +168,10 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhDocument.moduleName,
+            AdhMapping.moduleName,
+            AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhProcess.moduleName,
-            AdhMovingColumns.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName
         ])
@@ -274,6 +276,18 @@ export var register = (angular) => {
                             proposalUrl: version.path
                         };
                     }]);
+        }])
+        .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
+            adhMapDataProvider.icons["document"] = {
+                className: "icon-board-pin",
+                iconAnchor: [20, 39],
+                iconSize: [40, 40]
+            };
+            adhMapDataProvider.icons["document-selected"] = {
+                className: "icon-board-pin is-active",
+                iconAnchor: [20, 39],
+                iconSize: [40, 40]
+            };
         }])
         .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
