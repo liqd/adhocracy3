@@ -63,6 +63,9 @@ export var processDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
+            scope.proposalType = RIGeoProposalVersion.content_type;
+            scope.documentType = RIGeoDocumentVersion.content_type;
+
             scope.showMap = (isShowMap) => {
                 scope.shared.isShowMap = isShowMap;
             };

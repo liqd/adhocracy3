@@ -48,7 +48,7 @@
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-params="{tag: 'LAST'}"
-                data-content-type="adhocracy_core.resources.proposal.IGeoProposalVersion">
+                data-content-type="{{proposalType}}">
                 <adh-mein-berlin-proposal-list-item data-path="{{element}}">
                 </adh-mein-berlin-proposal-list-item>
             </adh-listing>
@@ -64,7 +64,7 @@
                     data-no-create-form="true"
                     data-empty-text="{{ 'TR__DOCUMENT_EMPTY_TEXT' | translate }}"
                     data-params="{tag: 'LAST'}"
-                    data-content-type="adhocracy_core.resources.document.IGeoDocumentVersion">
+                    data-content-type="{{documentType}}">
                     <adh-document-map-list-item data-has-badges="true" data-path="{{item}}"></adh-document-map-list-item>
                 </adh-map-listing>
             </adh-wait>
@@ -75,7 +75,7 @@
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__DOCUMENT_EMPTY_TEXT' | translate }}"
                 data-params="{tag: 'LAST'}"
-                data-content-type="adhocracy_core.resources.document.IGeoDocumentVersion">
+                data-content-type="{{documentType}}">
                 <adh-document-list-item data-path="{{element}}" data-has-badges="true"></adh-document-list-item>
             </adh-listing>
         </div>
