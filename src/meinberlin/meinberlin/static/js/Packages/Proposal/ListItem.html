@@ -1,7 +1,7 @@
 <!-- FIXME: may contain links in adh-user-meta -->
-<a class="meinberlin-kiezkassen-proposal-list-item {{selectedState}}" href="{{path | adhParentPath | adhResourceUrl }}">
-    <div class="meinberlin-kiezkassen-proposal-list-item-col-left">
-        <h3 class="meinberlin-kiezkassen-proposal-list-item-title">{{data.title}}</h3>
+<a class="meinberlin-proposal-list-item {{selectedState}}" href="{{path | adhParentPath | adhResourceUrl }}">
+    <div class="meinberlin-proposal-list-item-col-left">
+        <h3 class="meinberlin-proposal-list-item-title">{{data.title}}</h3>
         {{ "TR__BY" | translate }}
         <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta>
         {{ "TR__ON" | translate }}
@@ -14,17 +14,17 @@
                 'm-is-not-realized': data.assignments[0].name === 'not_realizeable'
         }">{{ data.assignments[0].title }}</span>
     </div>
-    <div class="meinberlin-kiezkassen-proposal-list-item-col-right">
-        <p class="meinberlin-kiezkassen-proposal-list-meta-item m-comments"
-            ><i class="meinberlin-kiezkassen-proposal-list-meta-item-icon icon-speechbubble-unfilled"></i
+    <div class="meinberlin-proposal-list-item-col-right">
+        <p class="meinberlin-proposal-list-meta-item m-comments"
+            ><i class="meinberlin-proposal-list-meta-item-icon icon-speechbubble-unfilled"></i
             > {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}</p>
-        <p class="meinberlin-kiezkassen-proposal-list-meta-item m-votes"
-            ><i class="meinberlin-kiezkassen-proposal-list-meta-item-icon icon-voting"></i
+        <p class="meinberlin-proposal-list-meta-item m-votes"
+            ><i class="meinberlin-proposal-list-meta-item-icon icon-voting"></i
             > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</p>
         <p
-            class="meinberlin-kiezkassen-proposal-list-meta-item m-location"
+            class="meinberlin-proposal-list-meta-item m-location"
             data-ng-if="isKiezkasse"
-            ><i class="meinberlin-kiezkassen-proposal-list-meta-item-icon icon-pin-detail"></i
+            ><i class="meinberlin-proposal-list-meta-item-icon icon-pin-detail"></i
             > {{data.locationText}}</p>
     </div>
 </a>
