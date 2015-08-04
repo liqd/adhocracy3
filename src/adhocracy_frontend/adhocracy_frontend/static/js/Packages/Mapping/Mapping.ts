@@ -21,32 +21,6 @@ import AdhMappingUtils = require("./MappingUtils");
 var pkgLocation = "/Mapping";
 
 
-export var style = {
-    fillColor: "#000",
-    color: "#000",
-    opacity: 0.5,
-    stroke: false
-};
-
-export var cssItemIcon = {
-    className: "icon-map-pin",
-    iconAnchor: [17.5, 41],
-    iconSize: [35, 42]
-};
-
-export var cssAddIcon = {
-    className: "icon-map-pin-add",
-    iconAnchor: [16.5, 41],
-    iconSize: [35, 42]
-};
-
-export var cssSelectedItemIcon = {
-    className: "icon-map-pin is-active",
-    iconAnchor: [17.5, 41],
-    iconSize: [33, 42]
-};
-
-
 var refreshAfterColumnExpandHack = (
     $timeout : angular.ITimeoutService,
     leaflet : typeof L
@@ -59,6 +33,44 @@ var refreshAfterColumnExpandHack = (
         });
     }, 500);  // FIXME: moving column transition duration
 };
+
+// FIXME DefinitelyTyped: this is basically L.DivIconOptions, but with
+// number[] instead of L.Point. Leaflet accepts both:
+// http://leafletjs.com/reference.html#point
+export interface IIcon {
+    iconSize?: number[];
+    iconAnchor?: number[];
+    popupAnchor? : number[];
+    className?: string;
+    html?: string;
+}
+
+export interface IMapData {
+    style : L.PathOptions;
+    getIcon(key : string) : L.DivIcon;
+}
+
+export class MapDataProvider {
+    public style : L.PathOptions;
+    public icons : {[key : string]: IIcon};
+    public $get : any[];
+
+    constructor() {
+        var self : MapDataProvider = this;
+
+        self.style = {};
+        self.icons = {};
+
+        self.$get = ["leaflet", (leaflet : typeof L) => {
+            return {
+                style: self.style,
+                getIcon: (key) => {
+                    return leaflet.divIcon(<any>self.icons[key]);
+                }
+            };
+        }];
+    }
+}
 
 export interface IMapInputScope extends angular.IScope {
     lat : number;
@@ -77,6 +89,7 @@ export interface IMapInputScope extends angular.IScope {
 export var mapInput = (
     adhConfig : AdhConfig.IService,
     adhSingleClickWrapper,
+    adhMapData : IMapData,
     $timeout : angular.ITimeoutService,
     leaflet : typeof L
 ) => {
@@ -103,7 +116,7 @@ export var mapInput = (
             var map = leaflet.map(mapElement[0]);
             leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), style);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.rawPolygon), adhMapData.style);
             scope.polygon.addTo(map);
 
             // limit map to polygon
@@ -116,7 +129,7 @@ export var mapInput = (
                 map.setZoom(scope.zoom);
             }
 
-            var selectedItemLeafletIcon = (<any>leaflet).divIcon(cssAddIcon);
+            var selectedItemLeafletIcon = adhMapData.getIcon("item-selected");
             var marker : L.Marker;
 
             var createMarker = (latlng : L.LatLng) : void => {
@@ -213,7 +226,11 @@ export var mapInput = (
     };
 };
 
-export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) => {
+export var mapDetail = (
+    adhMapData : IMapData,
+    leaflet : typeof L,
+    $timeout : angular.ITimeoutService
+) => {
     return {
         scope: {
             lat: "=",
@@ -233,7 +250,7 @@ export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) 
                 scrollWheelZoom: false
             });
             leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(scope.map);
-            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon), style);
+            scope.polygon = leaflet.polygon(leaflet.GeoJSON.coordsToLatLngs(scope.polygon), adhMapData.style);
             scope.polygon.addTo(scope.map);
 
             scope.map.fitBounds(scope.polygon.getBounds());
@@ -243,7 +260,7 @@ export var mapDetail = (leaflet : typeof L, $timeout : angular.ITimeoutService) 
 
             scope.marker = leaflet
                 .marker(leaflet.latLng(scope.lat, scope.lng))
-                .setIcon((<any>leaflet).divIcon(cssSelectedItemIcon))
+                .setIcon(adhMapData.getIcon("item-selected"))
                 .addTo(scope.map);
 
             scope.$watchGroup(["lat", "lng"], (newValues) => {
@@ -280,6 +297,7 @@ export class MapListingController {
     private scrollToItem;
 
     constructor(
+        private adhMapData : IMapData,
         private $scope : IMapListScope,
         private $element,
         private $attrs,
@@ -287,8 +305,8 @@ export class MapListingController {
         private leaflet : typeof L
     ) {
         this.scrollContainer = this.$element.find(".map-list-scroll-container-inner");
-        this.selectedItemLeafletIcon = (<any>leaflet).divIcon(cssSelectedItemIcon);
-        this.itemLeafletIcon = (<any>leaflet).divIcon(cssItemIcon);
+        this.selectedItemLeafletIcon = this.adhMapData.getIcon("item-selected");
+        this.itemLeafletIcon = this.adhMapData.getIcon("item");
         this.markers = {};
         this.scrollToItem = _.throttle((path, animate) => this._scrollToItem(path, animate), 10);
 
@@ -349,7 +367,7 @@ export class MapListingController {
         var map = this.leaflet.map(mapElement[0]);
         this.leaflet.tileLayer("https://maps.berlinonline.de/tile/bright/{z}/{x}/{y}.png", {maxZoom: 18}).addTo(map);
 
-        this.$scope.polygon = this.leaflet.polygon(this.leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), style);
+        this.$scope.polygon = this.leaflet.polygon(this.leaflet.GeoJSON.coordsToLatLngs(this.$scope.rawPolygon), this.adhMapData.style);
         this.$scope.polygon.addTo(map);
 
         // limit map to polygon
@@ -494,7 +512,7 @@ export var mapListingInternal = (
                 return adhConfig.pkg_path + pkgLocation + "/ListingInternalHorizontal.html";
             }
         },
-        controller: ["$scope", "$element", "$attrs", "$timeout", "leaflet", MapListingController]
+        controller: ["adhMapData", "$scope", "$element", "$attrs", "$timeout", "leaflet", MapListingController]
     };
 };
 
@@ -532,11 +550,36 @@ export var register = (angular) => {
             "adhInject",
             "duScroll"
         ])
+        .provider("adhMapData", MapDataProvider)
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
             adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-listing-internal"]);
         }])
-        .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "$timeout", "leaflet", mapInput])
-        .directive("adhMapDetail", ["leaflet", "$timeout", mapDetail])
+        .config(["adhMapDataProvider", (adhMapDataProvider : MapDataProvider) => {
+            adhMapDataProvider.style = {
+                fillColor: "#000",
+                color: "#000",
+                opacity: 0.5,
+                stroke: false
+            };
+
+            adhMapDataProvider.icons["item"] = {
+                className: "icon-map-pin",
+                iconAnchor: [17.5, 41],
+                iconSize: [35, 42]
+            };
+            adhMapDataProvider.icons["add"] = {
+                className: "icon-map-pin-add",
+                iconAnchor: [16.5, 41],
+                iconSize: [35, 42]
+            };
+            adhMapDataProvider.icons["item-selected"] = {
+                className: "icon-map-pin is-active",
+                iconAnchor: [17.5, 41],
+                iconSize: [33, 42]
+            };
+        }])
+        .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "adhMapData", "$timeout", "leaflet", mapInput])
+        .directive("adhMapDetail", ["adhMapData", "leaflet", "$timeout", mapDetail])
         .directive("adhMapListingInternal", ["adhConfig", "adhHttp", mapListingInternal])
         .directive("adhMapListing", ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
                 new Listing(new AdhListing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
