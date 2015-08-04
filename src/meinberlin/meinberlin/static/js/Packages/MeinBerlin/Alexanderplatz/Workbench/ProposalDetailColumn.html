@@ -4,10 +4,16 @@
             <i class="icon-document moving-column-icon"></i>
             {{ "TR__PROPOSAL" | translate }}
         </div>
-        <a class="moving-column-menu-button" data-ng-if="proposalItemOptions.POST" data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
+        <a
+            class="moving-column-menu-button"
+            data-ng-if="proposalItemOptions.POST"
+            data-ng-href="{{ proposalUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
 
         <div class="moving-column-menu-nav">
-            <a class="moving-column-menu-nav-button" data-ng-href="{{ processUrl | adhResourceUrl }}" title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
+            <a
+                class="moving-column-menu-nav-button"
+                data-ng-href="{{ processUrl | adhResourceUrl:'proposals' }}"
+                title="{{ 'TR__CLOSE' | translate }}"><i class="icon-x moving-column-menu-nav-icon"></i></a>
         </div>
     </div>
 
@@ -21,7 +27,7 @@
         data-ng-switch-when="body"
         data-value="{{proposalUrl}}">
         <adh-mein-berlin-proposal-detail
-            data-ng-show="proposalUrl"
+            data-ng-if="proposalUrl"
             data-path="{{proposalUrl}}">
         </adh-mein-berlin-proposal-detail>
     </adh-recompile-on-change>

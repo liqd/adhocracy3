@@ -96,7 +96,8 @@ export var documentDetailColumnDirective = (
 };
 
 export var proposalDetailColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
 ) => {
     return {
         restrict: "E",
@@ -104,6 +105,7 @@ export var proposalDetailColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+            adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
         }
     };
 };
@@ -292,7 +294,7 @@ export var register = (angular) => {
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", ["adhConfig", proposalDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", ["adhConfig", "adhPermissions", proposalDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzProposalCreateColumn", ["adhConfig", "adhHttp", proposalCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", ["adhConfig", "adhHttp", documentEditColumnDirective]);
