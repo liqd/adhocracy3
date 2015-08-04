@@ -271,7 +271,8 @@ export var mapListItemDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         require: "^adhMapListingInternal",
         scope: {
-            path: "@"
+            path: "@",
+            isKiezkasse: "="
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope, undefined, scope.isKiezkasse);
