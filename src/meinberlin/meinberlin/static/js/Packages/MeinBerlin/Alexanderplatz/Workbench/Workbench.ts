@@ -95,6 +95,19 @@ export var documentDetailColumnDirective = (
     };
 };
 
+export var proposalDetailColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        }
+    };
+};
+
 export var documentCreateColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
@@ -279,6 +292,7 @@ export var register = (angular) => {
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", ["adhConfig", proposalDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzProposalCreateColumn", ["adhConfig", "adhHttp", proposalCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", ["adhConfig", "adhHttp", documentEditColumnDirective]);
