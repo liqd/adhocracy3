@@ -1,14 +1,16 @@
 <article class="mein-berlin-proposal-detail">
     <header class="mein-berlin-proposal-detail-header">
+
         <span
-                data-ng-if="data.assignments.length > 0"
+                data-ng-if="data.assignments.length > 0 && isKiezkasse"
                 class="badge"
                 data-ng-class="{
                     'm-is-realized': data.assignments[0].name === 'going_to_be_realized',
                     'm-is-not-realized': data.assignments[0].name === 'not_realizeable'
             }">{{ data.assignments[0].title }}</span>
+
         <ul class="mein-berlin-proposal-detail-meta">
-            <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-item-location">
+            <li data-ng-if="isKiezkasse" class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-item-location">
                 <i class="icon-pin-detail"></i> {{data.locationText}}
             </li>
             <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-item-comments">
@@ -16,7 +18,7 @@
                     <i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
                 </a>
             </li>
-            <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-budget">
+            <li data-ng-if="isKiezkasse" class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-budget">
                 <i class="mein-berlin-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget}} &euro;
             </li>
             <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-participation">
