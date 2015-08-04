@@ -21,7 +21,9 @@
         <p class="meinberlin-kiezkassen-proposal-list-meta-item m-votes"
             ><i class="meinberlin-kiezkassen-proposal-list-meta-item-icon icon-voting"></i
             > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</p>
-       <p class="meinberlin-kiezkassen-proposal-list-meta-item m-location"
+        <p
+            class="meinberlin-kiezkassen-proposal-list-meta-item m-location"
+            data-ng-if="isKiezkasse"
             ><i class="meinberlin-kiezkassen-proposal-list-meta-item-icon icon-pin-detail"></i
             > {{data.locationText}}</p>
     </div>
