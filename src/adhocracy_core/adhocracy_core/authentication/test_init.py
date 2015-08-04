@@ -177,6 +177,21 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         self.request.headers = self.token_and_user_id_headers
         assert inst.authenticated_userid(self.request) == None
 
+    def test_authenticated_userid_with_token_validation_off_no_token(self):
+        tokenmanager = Mock()
+        inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
+        self.request.registry.settings['adhocracy.validate_user_token'] = False
+        self.request.headers = {'X-User-Path': self.user_url}
+        assert inst.authenticated_userid(self.request) == self.userid
+
+    def test_authenticated_userid_with_token_validation_off_wrong_token(self):
+        tokenmanager = Mock()
+        inst = self.make_one('', get_tokenmanager=lambda x: tokenmanager)
+        self.request.registry.settings['adhocracy.validate_user_token'] = False
+        self.request.headers = {'X-User-Path': self.user_url,
+                                'X-User-Token': 'whatever'}
+        assert inst.authenticated_userid(self.request) == self.userid
+
     def test_effective_principals_without_headers(self):
         from pyramid.security import Everyone
         from . import Anonymous
