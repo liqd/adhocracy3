@@ -379,10 +379,6 @@ export var editDirective = (
     };
 };
 
-export var meinBerlinProposalFormController = ($scope, $element, $window) => {
-    console.log($scope);
-};
-
 
 export var moduleName = "adhMeinBerlinKiezkassenProposal";
 
@@ -436,6 +432,5 @@ export var register = (angular) => {
             "adhGetBadges",
             "$location",
             editDirective
-        ])
-        .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
+        ]);
 };
