@@ -43,7 +43,7 @@
         </label>
 
         <!-- Requested Budget -->
-        <label data-ng-if="proposaltype == 'adhocracy_meinberlin_resources_kiezkassen_IProposal'">
+        <label data-ng-if="isKiezkasse">
             <span class="label-text">{{ "TR__MEINBERLIN_BUDGET" | translate }}</span>
             <input
                 type="number"
@@ -61,7 +61,7 @@
         </label>
 
         <!-- Engagement -->
-        <label data-ng-if="proposaltype == 'adhocracy_meinberlin_resources_kiezkassen_IProposal'" class="form-row">
+        <label data-ng-if="isKiezkasse" class="form-row">
             <input
                 type="checkbox"
                 data-ng-model="data.creatorParticipate"
@@ -75,7 +75,7 @@
 
         <!-- LOCATION RELATED INFORMATION -->
         <!-- Related Place -->
-        <label data-ng-if="proposaltype == 'adhocracy_meinberlin_resources_kiezkassen_IProposal'">
+        <label data-ng-if="isKiezkasse">
             <span class="label-text">{{ "TR__MEINBERLIN_LOCATION_TEXT" | translate }}</span>
             <input
                 type="text"
