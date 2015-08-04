@@ -53,8 +53,8 @@ export interface IScope extends angular.IScope {
         address? : string;
     };
     selectedState? : string;
-    isKiezkasse: boolean;
-    resource: any;
+    isKiezkasse : boolean;
+    resource : any;
 }
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
@@ -81,7 +81,7 @@ var bindPath = (
                 tag: "LAST",
                 count: true
             }).then((pool) => {
-                adhHttp.get(value).then((resource : RIKiezkassenProposalVersion) => {
+                adhHttp.get(value).then((resource) => {
 
                     scope.resource = resource;
 
@@ -137,7 +137,7 @@ var bindPath = (
 
 var fill = (
     scope : IScope,
-    proposalVersion : any,
+    proposalVersion,
     isKiezkasse : boolean = false
 ) : void => {
 
@@ -192,10 +192,12 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion : RIKiezkassenProposalVersion,
+    oldVersion,
     isKiezkasse : boolean = false
 ) => {
-    var proposalVersion = new RIKiezkassenProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersionClass = isKiezkasse ? RIKiezkassenProposalVersion : RIGeoProposalVersion;
+
+    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
