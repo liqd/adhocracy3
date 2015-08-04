@@ -12,7 +12,7 @@ import AdhUtil = require("../../../Util/Util");
 import AdhPermissions = require("../../../Permissions/Permissions");
 
 import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
-import AdhMeinBerlinKiezkassenProposal = require("../Proposal/Proposal");
+import AdhMeinBerlinProposal = require("../../../Proposal/Proposal");
 
 import RIComment = require("../../../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
@@ -161,7 +161,7 @@ export var register = (angular) => {
             AdhComment.moduleName,
             AdhHttp.moduleName,
             AdhMeinBerlinKiezkassenProcess.moduleName,
-            AdhMeinBerlinKiezkassenProposal.moduleName,
+            AdhMeinBerlinProposal.moduleName,
             AdhMovingColumns.moduleName,
             AdhProcess.moduleName,
             AdhResourceArea.moduleName,

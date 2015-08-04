@@ -1,10 +1,10 @@
 <form
     novalidate="novalidate"
     data-ng-submit="submit()"
-    class="mein-berlin-kiezkassen-proposal-form"
+    class="mein-berlin-proposal-form"
     name="meinBerlinProposalForm">
 
-    <div class="mein-berlin-kiezkassen-proposal-form-upper">
+    <div class="mein-berlin-proposal-form-upper">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{ error | adhFormatError | translate }}</p>
         </div>
@@ -43,7 +43,7 @@
         </label>
 
         <!-- Requested Budget -->
-        <label>
+        <label data-ng-if="isKiezkasse">
             <span class="label-text">{{ "TR__MEINBERLIN_BUDGET" | translate }}</span>
             <input
                 type="number"
@@ -61,7 +61,7 @@
         </label>
 
         <!-- Engagement -->
-        <label class="form-row">
+        <label data-ng-if="isKiezkasse" class="form-row">
             <input
                 type="checkbox"
                 data-ng-model="data.creatorParticipate"
@@ -75,7 +75,7 @@
 
         <!-- LOCATION RELATED INFORMATION -->
         <!-- Related Place -->
-        <label>
+        <label data-ng-if="isKiezkasse">
             <span class="label-text">{{ "TR__MEINBERLIN_LOCATION_TEXT" | translate }}</span>
             <input
                 type="text"
@@ -95,7 +95,7 @@
     </label>
 
     <!-- DATA SUBMIT -->
-    <footer class="form-footer mein-berlin-kiezkassen-proposal-form-footer">
+    <footer class="form-footer mein-berlin-proposal-form-footer">
         <input
             type="submit"
             name="submit"

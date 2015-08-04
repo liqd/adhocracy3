@@ -63,6 +63,9 @@ export var processDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
+            scope.proposalType = RIGeoProposalVersion.content_type;
+            scope.documentType = RIGeoDocumentVersion.content_type;
+
             scope.showMap = (isShowMap) => {
                 scope.shared.isShowMap = isShowMap;
             };
@@ -98,6 +101,27 @@ export var documentCreateColumnDirective = (
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentCreateColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+        }
+    };
+};
+
+export var proposalCreateColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl"]);
@@ -255,5 +279,6 @@ export var register = (angular) => {
             "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", ["adhConfig", documentDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalCreateColumn", ["adhConfig", "adhHttp", proposalCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", ["adhConfig", "adhHttp", documentEditColumnDirective]);
 };

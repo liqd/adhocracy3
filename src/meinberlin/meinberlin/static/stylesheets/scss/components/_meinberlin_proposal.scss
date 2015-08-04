@@ -1,4 +1,4 @@
-.mein-berlin-kiezkassen-proposal-form {
+.mein-berlin-proposal-form {
     background-color: $color-background-base-introvert;
     bottom: 0;
     padding: 0;
@@ -16,25 +16,25 @@
     }
 }
 
-.mein-berlin-kiezkassen-proposal-form-upper {
+.mein-berlin-proposal-form-upper {
     background: $color-background-base;
     padding: 1em;
 }
 
-.mein-berlin-kiezkassen-proposal-detail {
+.mein-berlin-proposal-detail {
     .rate {
         float: right;
     }
 }
 
-.mein-berlin-kiezkassen-proposal-detail-header,
-.mein-berlin-kiezkassen-proposal-detail-body {
+.mein-berlin-proposal-detail-header,
+.mein-berlin-proposal-detail-body {
     @include clearfix;
     background: $color-background-base;
     padding: 0 (10px / $font-size-normal * 1em);
 }
 
-.mein-berlin-kiezkassen-proposal-detail-body-comments {
+.mein-berlin-proposal-detail-body-comments {
     float: right;
     padding-left: 40px / $font-size-small * 1em;
     text-align: center;
@@ -51,15 +51,15 @@
     }
 }
 
-.mein-berlin-kiezkassen-proposal-detail-body-comments-icon {
+.mein-berlin-proposal-detail-body-comments-icon {
     display: block;
     font-size: 20px;
 }
 
-.mein-berlin-kiezkassen-proposal-detail-header {
+.mein-berlin-proposal-detail-header {
     padding-top: 30px / $font-size-normal * 1em;
 
-    .mein-berlin-kiezkassen-proposal-detail-header-title {
+    .mein-berlin-proposal-detail-header-title {
         color: $color-text-normal;
         font-size: $font-size-normal;
         font-weight: $font-weight-extrovert;
@@ -72,28 +72,28 @@
     }
 }
 
-.mein-berlin-kiezkassen-proposal-detail-detail {
+.mein-berlin-proposal-detail-detail {
     margin-bottom: 30px / $font-size-normal * 1em;
     padding-right: 15%;
 }
 
-.mein-berlin-kiezkassen-proposal-detail-meta-item,
-.mein-berlin-kiezkassen-proposal-detail-author {
+.mein-berlin-proposal-detail-meta-item,
+.mein-berlin-proposal-detail-author {
     color: $color-text-introvert;
     font-size: $font-size-small;
 }
 
-.mein-berlin-kiezkassen-proposal-detail-author {
+.mein-berlin-proposal-detail-author {
     margin-bottom: 30px / $font-size-small * 1em;
 }
 
-.mein-berlin-kiezkassen-proposal-detail-meta {
+.mein-berlin-proposal-detail-meta {
     @include clearfix;
     list-style-type: none;
     margin: 0 0 (40px / $font-size-normal * 1em);
     padding: 0;
 
-    .mein-berlin-kiezkassen-proposal-detail-meta-item {
+    .mein-berlin-proposal-detail-meta-item {
         @include gallery(3 of 12);
 
         &:nth-child(2) {
@@ -101,23 +101,23 @@
         }
     }
 
-    .mein-berlin-kiezkassen-proposal-detail-meta-participation {
+    .mein-berlin-proposal-detail-meta-participation {
         text-align: right;
     }
 
-    .mein-berlin-kiezkassen-proposal-detail-meta-item-icon {
+    .mein-berlin-proposal-detail-meta-item-icon {
         margin-right: 8px;
         vertical-align: middle;
     }
 
-    .mein-berlin-kiezkassen-proposal-detail-meta-item-text {
+    .mein-berlin-proposal-detail-meta-item-text {
         @include inline-block;
         margin: 0;
         text-align: left;
     }
 
-    .mein-berlin-kiezkassen-proposal-detail-meta-item-comments,
-    .mein-berlin-kiezkassen-proposal-detail-meta-item-location {
+    .mein-berlin-proposal-detail-meta-item-comments,
+    .mein-berlin-proposal-detail-meta-item-location {
         a {
             color: $color-text-highlight-introvert;
         }
@@ -128,7 +128,7 @@
 /*doc
 ---
 title: Kiezkassen Proposal List Item
-name: mein-berlin-kiezkassen-proposal-list-item
+name: mein-berlin-proposal-list-item
 category: meinberlin
 ---
 
@@ -138,8 +138,8 @@ as metadata.  It serves as an entry to a detail view.
 
 
 ```html_example
-<div class="meinberlin-kiezkassen-proposal-map-list-item">
-    <a class="meinberlin-kiezkassen-proposal-map-list-item-detail-link" href="">
+<div class="meinberlin-proposal-map-list-item">
+    <a class="meinberlin-proposal-map-list-item-detail-link" href="">
         <div class="map-list-item-col-left">
             <h3 class="map-list-item-title">The title of my proposal</h3>
             By God on 12/10/15
@@ -152,8 +152,8 @@ as metadata.  It serves as an entry to a detail view.
     </a>
 </div>
 
-<div class="meinberlin-kiezkassen-proposal-map-list-item is-selected">
-    <a class="meinberlin-kiezkassen-proposal-map-list-item-detail-link" href="">
+<div class="meinberlin-proposal-map-list-item is-selected">
+    <a class="meinberlin-proposal-map-list-item-detail-link" href="">
         <div class="map-list-item-col-left">
             <h3 class="map-list-item-title">The title of my proposal</h3>
             By God on 12/10/15
@@ -168,7 +168,7 @@ as metadata.  It serves as an entry to a detail view.
 ```
 */
 
-.meinberlin-kiezkassen-proposal-list-item {
+.meinberlin-proposal-list-item {
     @include clearfix;
     color: $color-text-normal;
     display: block;
@@ -182,7 +182,7 @@ as metadata.  It serves as an entry to a detail view.
     }
 
     &.is-selected {
-        .meinberlin-kiezkassen-proposal-list-item-detail-link {
+        .meinberlin-proposal-list-item-detail-link {
             background: $color-structure-normal;
         }
     }
@@ -192,12 +192,12 @@ as metadata.  It serves as an entry to a detail view.
     }
 }
 
-.meinberlin-kiezkassen-proposal-list-item-col-left,
+.meinberlin-proposal-list-item-col-left,
 .meinberlin-alexanderplatz-proposal-list-item-col-left {
     @include span(8 of 12 first);
 }
 
-.meinberlin-kiezkassen-proposal-list-item-col-right,
+.meinberlin-proposal-list-item-col-right,
 .meinberlin-alexanderplatz-proposal-list-item-col-right {
     @include span(4 of 12 last);
 }
@@ -215,22 +215,22 @@ as metadata.  It serves as an entry to a detail view.
     }
 }
 
-.meinberlin-kiezkassen-proposal-list-item-title {
+.meinberlin-proposal-list-item-title {
     font-size: $font-size-normal;
     margin: 0 0 (15px / $font-size-normal * 1em);
 }
 
-.meinberlin-kiezkassen-proposal-list-meta-item {
+.meinberlin-proposal-list-meta-item {
     margin-bottom: 15px / $font-size-small * 1em;
     font-size: $font-size-small;
 }
 
-.meinberlin-kiezkassen-proposal-list-meta-item-icon {
+.meinberlin-proposal-list-meta-item-icon {
     font-size: $font-size-normal;
     margin-right: 8px / $font-size-normal * 1em;
 }
 
-.mein-berlin-kiezkassen-proposal-form-footer {
+.mein-berlin-proposal-form-footer {
     .form-footer-button {
         padding-left: 10px / $font-size-normal * 1em;
     }
