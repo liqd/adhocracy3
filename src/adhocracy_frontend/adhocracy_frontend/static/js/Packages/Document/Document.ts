@@ -14,8 +14,7 @@ import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
-import AdhCommentAdapter = require("../Comment/Adapter");
-
+import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
 import RIGeoDocument = require("../../Resources_/adhocracy_core/resources/document/IGeoDocument");
@@ -27,6 +26,7 @@ import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/
 import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -111,25 +111,35 @@ export var bindPath = (
     hasMap : boolean = false,
     hasBadges : boolean = false
 ) : Function => {
-    var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
-
     return scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
-                var paragraphPromises = _.map(paragraphPaths, (path) => adhHttp.get(path));
+                var paragraphPromises = _.map(paragraphPaths, (path) => {
+                    return $q.all([
+                        adhHttp.get(path),
+                        adhHttp.get(AdhUtil.parentPath(path), {
+                            content_type: RICommentVersion.content_type,
+                            depth: "all",
+                            tag: "LAST",
+                            count: true
+                        }).then((pool) => pool.data[SIPool.nick].count)
+                    ]);
+                });
 
-                return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
-                    var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
+                return $q.all(paragraphPromises).then((argss : any[][]) => {
+                    var paragraphs = _.map(argss, (args) => {
+                        var paragraphVersion : RIParagraphVersion = args[0];
+                        var commentCount : number = args[1];
                         return {
                             body: paragraphVersion.data[SIParagraph.nick].text,
-                            commentCount: commentableAdapter.totalCount(paragraphVersion),
+                            commentCount: commentCount,
                             path: paragraphVersion.path
                         };
                     });
 
                     scope.documentVersion = documentVersion;
-                    scope.paragraphVersions = paragraphVersions;
+                    scope.paragraphVersions = _.map(argss, (args) => args[0]);
 
                     scope.data = {
                         title: documentVersion.data[SITitle.nick].title,
