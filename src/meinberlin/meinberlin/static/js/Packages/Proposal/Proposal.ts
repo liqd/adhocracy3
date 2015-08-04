@@ -13,21 +13,21 @@ import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
+import RIAlexanderplatzProposal = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
+import RIAlexanderProposalVersion = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIKiezkassenProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import RIAlexanderplatzProposal = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
-import RIAlexanderProposalVersion = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
+import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
+import SIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
+import SILocationReference = require("../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import SIMultiPolygon = require("../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
 import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
-import SILocationReference = require("../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/Proposal";
 
@@ -38,11 +38,7 @@ export interface IScope extends angular.IScope {
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
-        budget? : number;
         detail : string;
-        creatorParticipate? : boolean;
-        locationText? : string;
-        address? : string;
         creator : string;
         creationDate : string;
         commentCount : number;
@@ -50,6 +46,11 @@ export interface IScope extends angular.IScope {
         lat : number;
         polygon: number[][];
         assignments : AdhBadge.IBadge[];
+
+        budget? : number;
+        creatorParticipate? : boolean;
+        locationText? : string;
+        address? : string;
     };
     selectedState? : string;
     proposaltype: string;
@@ -85,8 +86,8 @@ var bindPath = (
 
                     var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
                     var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                    if(scope.proposaltype === 'adhocracy_meinberlin_resources_kiezkassen_IProposal'){
-                        var mainSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                    if (scope.proposaltype === "adhocracy_meinberlin_resources_kiezkassen_IProposal") {
+                        var kiezkassenSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
                     }
                     var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
                     var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
@@ -116,11 +117,11 @@ var bindPath = (
                                         polygon: polygon,
                                         assignments: assignments
                                     };
-                                    if(mainSheet){
-                                        scope.data.budget = mainSheet.budget;
-                                        scope.data.address = mainSheet.address;
-                                        scope.data.creatorParticipate = mainSheet.creator_participate;
-                                        scope.data.locationText = mainSheet.location_text;
+                                    if (typeof kiezkassenSheet !== "undefined") {
+                                        scope.data.budget = kiezkassenSheet.budget;
+                                        scope.data.address = kiezkassenSheet.address;
+                                        scope.data.creatorParticipate = kiezkassenSheet.creator_participate;
+                                        scope.data.locationText = kiezkassenSheet.location_text;
                                     }
                                 });
                             });
@@ -138,7 +139,7 @@ var fill = (
     proposalVersion : any
 ) : void => {
 
-    if (scope.proposaltype === 'adhocracy_meinberlin_resources_kiezkassen_IProposal') {
+    if (scope.proposaltype === "adhocracy_meinberlin_resources_kiezkassen_IProposal") {
         proposalVersion.data[SIKiezkassenProposal.nick] = new SIKiezkassenProposal.Sheet({
             budget: scope.data.budget,
             detail: scope.data.detail,
@@ -168,22 +169,22 @@ var postCreate = (
     poolPath : string
 ) => {
 
-    if(scope.proposaltype === 'adhocracy_meinberlin_resources_kiezkassen_IProposal'){
+    if (scope.proposaltype === "adhocracy_meinberlin_resources_kiezkassen_IProposal") {
         var proposal = new RIKiezkassenProposal({preliminaryNames: adhPreliminaryNames});
         proposal.parent = poolPath;
         var proposalVersion = <any>(new RIKiezkassenProposalVersion({ preliminaryNames: adhPreliminaryNames }));
     }
 
-    if(scope.proposaltype === 'adhocracy_core_resources_proposal_IGeoProposal'){
+    if (scope.proposaltype === "adhocracy_core_resources_proposal_IGeoProposal") {
         var proposal = new RIAlexanderplatzProposal({preliminaryNames: adhPreliminaryNames});
         proposal.parent = poolPath;
         var proposalVersion = <any>(new RIAlexanderProposalVersion({ preliminaryNames: adhPreliminaryNames }));
     }
 
     proposalVersion.parent = proposal.path;
-        proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
-            follows: [proposal.first_version_path]
-        });
+    proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
+        follows: [proposal.first_version_path]
+    });
     fill(scope, proposalVersion);
 
     return adhHttp.deepPost([proposal, proposalVersion]);
