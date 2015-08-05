@@ -106,7 +106,8 @@ export var documentDetailColumnDirective = (
 
 export var proposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
-    adhPermissions : AdhPermissions.Service
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
@@ -115,6 +116,10 @@ export var proposalDetailColumnDirective = (
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
             adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
         }
     };
 };
@@ -182,7 +187,9 @@ export var proposalCreateColumnDirective = (
 };
 
 export var proposalEditColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl
 ) => {
     return {
         restrict: "E",
@@ -190,6 +197,11 @@ export var proposalEditColumnDirective = (
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
             column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+
+            scope.cancel = () => {
+                var url = adhResourceUrl(AdhUtil.parentPath(scope.proposalUrl));
+                adhTopLevelState.goToCameFrom(url);
+            };
         }
     };
 };
@@ -361,10 +373,12 @@ export var register = (angular) => {
             "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", documentDetailColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", ["adhConfig", "adhPermissions", proposalDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", [
+            "adhConfig", "adhPermissions", "adhTopLevelState", proposalDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", ["adhConfig", "adhHttp", documentCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzProposalCreateColumn", ["adhConfig", proposalCreateColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", [
             "adhConfig", "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", documentEditColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzProposalEditColumn", ["adhConfig", proposalEditColumnDirective]);
+        .directive("adhMeinBerlinAlexanderplatzProposalEditColumn", [
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", proposalEditColumnDirective]);
 };
