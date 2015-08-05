@@ -214,6 +214,16 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide",
                     tab: "documents"
                 })
+                .specific(RIAlexanderplatzProcess, "create_document", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
+                        });
+                    }])
                 .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
@@ -231,10 +241,16 @@ export var register = (angular) => {
                     tab: "documents"
                 })
                 .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", [
-                    () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
-                        return {
-                            documentUrl: version.path
-                        };
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    documentUrl: version.path
+                                };
+                            }
+                        });
                     }])
                 .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", {
                     space: "content",
@@ -262,6 +278,16 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide",
                     tab: "proposals"
                 })
+                .specific(RIAlexanderplatzProcess, "create_proposal", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
+                        });
+                    }])
                 .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
@@ -279,10 +305,16 @@ export var register = (angular) => {
                     tab: "proposals"
                 })
                 .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", [
-                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
-                        return {
-                            proposalUrl: version.path
-                        };
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    proposalUrl: version.path
+                                };
+                            }
+                        });
                     }])
                 .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", {
                     space: "content",
