@@ -8,6 +8,7 @@
         <a
             class="moving-column-menu-button"
             data-ng-if="documentItemOptions.POST"
+            data-ng-click="setCameFrom()"
             data-ng-href="{{ documentUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
 
         <div class="moving-column-menu-nav">
