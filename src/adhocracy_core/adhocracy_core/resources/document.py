@@ -32,7 +32,7 @@ document_version_meta = itemversion_meta._replace(
                      adhocracy_core.sheets.image.IImageReference,
                      adhocracy_core.sheets.title.ITitle,
                      ),
-    permission_create='edit_proposal',
+    permission_create='edit_document',
 )
 
 
@@ -48,7 +48,7 @@ document_meta = item_meta._replace(
                    IDocumentVersion,
                    ),
     item_type=IDocumentVersion,
-    permission_create='create_proposal',
+    permission_create='create_document',
     is_implicit_addable=True,
     autonaming_prefix='document_',
 )._add(after_creation=(

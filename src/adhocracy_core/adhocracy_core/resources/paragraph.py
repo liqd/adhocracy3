@@ -21,7 +21,7 @@ paragraphversion_meta = itemversion_meta._replace(
     extended_sheets=(adhocracy_core.sheets.document.IParagraph,
                      adhocracy_core.sheets.comment.ICommentable,
                      ),
-    permission_create='edit_proposal',
+    permission_create='edit_document',
 )
 
 
@@ -42,7 +42,7 @@ paragraph_meta = item_meta._replace(
                    IParagraphVersion,
                    ),
     item_type=IParagraphVersion,
-    permission_create='edit_proposal',
+    permission_create='edit_document',
     use_autonaming=True,
     autonaming_prefix='PARAGRAPH_',
 )._add(after_creation=(add_commentsservice,))

@@ -14,7 +14,9 @@ standard_meta = freeze({
                           'permissions':
                           [['view',              'Deny',        'Deny',        'Allow',     'Allow',   'Allow'],
                            ['create_proposal',    None,          None,          None,        None,     'Allow'],
-                           ['edit_proposal',      None,          None,          None,       'Allow',   'Allow'],
+                           ['edit_proposal',      None,          None,          None,       'Allow',    None],
+                           ['create_document',    None,          None,         'Allow',      None,      None],
+                           ['edit_document',      None,          None,         'Allow',     'Allow',   'Allow'],
                           ]},
                   'display_only_to_roles': ['admin', 'initiator', 'moderator'],
                   },

@@ -27,8 +27,8 @@ mercator_meta = standard_meta \
                             'permissions':
                             [['create_mercator_proposal',        None,          None,        None,      'Allow'],
                              ['edit_mercator_proposal',          None,          None,        None,      'Allow'],
-                             ['create_proposal',                 None,          None,       'Allow',    'Allow'],
-                             ['edit_proposal',                   None,          None,       'Allow',    'Allow'],
+                             ['create_document',                 None,          None,       'Allow',    'Allow'],
+                             ['edit_document',                   None,          None,       'Allow',    'Allow'],
                             ]})
 
 
