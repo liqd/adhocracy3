@@ -298,26 +298,21 @@ export var register = () => {
                     expect(adhTopLevelState.getCameFrom()).not.toBeDefined();
                 });
 
-                describe("redirectToCameFrom", () => {
-                    it("does nothing if neither cameFrom nor default are set", () => {
-                        adhTopLevelState.redirectToCameFrom();
-                        expect(locationMock.url).not.toHaveBeenCalled();
-                    });
-
+                describe("goToCameFrom", () => {
                     it("redirects to cameFrom if cameFrom is set and default is not", () => {
                         adhTopLevelState.setCameFrom("foo");
-                        adhTopLevelState.redirectToCameFrom();
+                        adhTopLevelState.goToCameFrom("/");
                         expect(locationMock.url).toHaveBeenCalledWith("foo");
                     });
 
-                    it("redirects to cameFrom both if cameFrom and default are set", () => {
+                    it("redirects to cameFrom if both cameFrom and default are set", () => {
                         adhTopLevelState.setCameFrom("foo");
-                        adhTopLevelState.redirectToCameFrom("bar");
+                        adhTopLevelState.goToCameFrom("bar");
                         expect(locationMock.url).toHaveBeenCalledWith("foo");
                     });
 
                     it("redirects to default if default is set but cameFrom not", () => {
-                        adhTopLevelState.redirectToCameFrom("bar");
+                        adhTopLevelState.goToCameFrom("bar");
                         expect(locationMock.url).toHaveBeenCalledWith("bar");
                     });
                 });

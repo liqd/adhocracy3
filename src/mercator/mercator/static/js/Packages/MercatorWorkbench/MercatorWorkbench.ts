@@ -38,7 +38,7 @@ export var mercatorWorkbenchDirective = (
 
 var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) => {
     scope.redirectAfterProposalCancel = (resourcePath : string) => {
-        // FIXME: use adhTopLevelState.redirectToCameFrom
+        // FIXME: use adhTopLevelState.goToCameFrom
         $location.url(adhResourceUrlFilter(resourcePath));
     };
     scope.redirectAfterProposalSubmit = (result : any[]) => {
