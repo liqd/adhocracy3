@@ -12,11 +12,11 @@
         <a
             class="moving-column-menu-button"
             href="{{ processUrl | adhResourceUrl:'create_document'}}"
-            data-ng-if="tab === 'documents'">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
+            data-ng-if="processOptions.POST && tab === 'documents'">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
         <a
             class="moving-column-menu-button"
             href="{{ processUrl | adhResourceUrl:'create_proposal'}}"
-            data-ng-if="tab === 'proposals'">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
+            data-ng-if="processOptions.POST && tab === 'proposals'">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
 
         <div class="moving-column-menu-switch">
             <a
