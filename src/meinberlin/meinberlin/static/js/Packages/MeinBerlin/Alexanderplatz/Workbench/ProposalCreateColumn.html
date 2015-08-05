@@ -1,8 +1,11 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
-        <i class="icon-document moving-column-icon"></i>
+        <div class="moving-column-tab">
+            <i class="icon-document moving-column-icon"></i>
+            {{ "TR__PROPOSAL" | translate }}
+        </div>
 
-        <a href="{{ processUrl | adhResourceUrl }}">{{ "TR__CANCEL" | translate }}</a>
+        <a class="moving-column-menu-button" href="{{ processUrl | adhResourceUrl }}">{{ "TR__CANCEL" | translate }}</a>
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl:'create_proposal' }}">

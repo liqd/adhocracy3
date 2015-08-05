@@ -1,11 +1,23 @@
 <div data-ng-switch="transclusionId" class="tabset m-full-width m-button-style">
     <div data-ng-switch-when="menu">
-        <div class="moving-column-tab">
-            <i class="icon-list moving-column-icon"></i>
-
-            <a href="{{ processUrl | adhResourceUrl:'create_document'}}" data-ng-if="tab === 'documents'">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
-            <a href="{{ processUrl | adhResourceUrl:'create_proposal'}}" data-ng-if="tab === 'proposals'">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
+        <div class="moving-column-tab" data-ng-if="!shared.isShowMap">
+            <i class="icon-list-column moving-column-icon"></i>
+            {{ "TR__LIST" | translate }}
         </div>
+        <div class="moving-column-tab" data-ng-if="shared.isShowMap">
+            <i class="icon-map-filled moving-column-icon"></i>
+            {{ "TR__MAP" | translate }}
+        </div>
+
+        <a
+            class="moving-column-menu-button"
+            href="{{ processUrl | adhResourceUrl:'create_document'}}"
+            data-ng-if="processOptions.POST && tab === 'documents'">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
+        <a
+            class="moving-column-menu-button"
+            href="{{ processUrl | adhResourceUrl:'create_proposal'}}"
+            data-ng-if="processOptions.POST && tab === 'proposals'">{{ "TR__CREATE_PROPOSAL" | translate }}</a>
+
         <div class="moving-column-menu-switch">
             <a
                 class="moving-column-menu-switch-item"
@@ -21,8 +33,11 @@
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl }}">
-        <div class="moving-column-tab">
-            <i class="icon-list moving-column-icon"></i>
+        <div class="moving-column-tab" data-ng-if="!shared.isShowMap">
+            <i class="icon-list-column moving-column-icon"></i>
+        </div>
+        <div class="moving-column-tab" data-ng-if="shared.isShowMap">
+            <i class="icon-map-filled moving-column-icon"></i>
         </div>
     </a>
 

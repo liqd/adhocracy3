@@ -13,8 +13,6 @@ standard_meta = freeze({
                   'acm': {'principals':         ['anonymous',   'moderator',   'participant', 'creator', 'initiator'],
                           'permissions':
                           [['view',              'Deny',        'Allow',       'Deny',        'Allow',   'Allow'],
-                           ['create_proposal',    None,          None,          None,          None,     'Allow'],
-                           ['edit_proposal',      None,          None,          None,         'Allow',    None],
                            ['create_document',    None,         'Allow',        None,          None,      None],
                            ['edit_document',      None,         'Allow',        None,         'Allow',   'Allow'],
                           ]},
@@ -27,9 +25,9 @@ standard_meta = freeze({
                         'description': '',
                         'acm': {'principals':                    ['participant', 'moderator', 'creator', 'initiator'],
                                 'permissions':
-                                  [['create_proposal',            'Allow',        None,        None,     'Allow'],
+                                  [['create_proposal',            'Allow',        None,        None,      None],
                                    ['edit_proposal',               None,          None,       'Allow',    None],
-                                   ['create_comment',             'Allow',       'Allow',      None,     'Allow'],
+                                   ['create_comment',             'Allow',       'Allow',      None,      None],
                                    ['edit_comment',                None,          None,       'Allow',    None],
                                    ['create_rate',                'Allow',        None,        None,      None],
                                    ['edit_rate',                   None,          None,       'Allow',    None],
@@ -41,7 +39,7 @@ standard_meta = freeze({
                              'permissions':
                              [['create_proposal',                 None,          None,        None,      None],
                               ['edit_proposal',                   None,          None,        None,      None],
-                              ['create_comment',                 'Allow',       'Allow',      None,     'Allow'],
+                              ['create_comment',                 'Allow',       'Allow',      None,      None],
                               ['edit_comment',                    None,          None,       'Allow',    None],
                              ]}
         },
