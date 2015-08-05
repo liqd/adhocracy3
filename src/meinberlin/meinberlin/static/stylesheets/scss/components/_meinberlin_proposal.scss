@@ -124,6 +124,12 @@
     }
 }
 
+.mein-berlin-alexanderplatz-proposal-detail {
+    .mein-berlin-proposal-detail-meta-item {
+        @include gallery(6 of 12);
+    }
+}
+
 
 /*doc
 ---

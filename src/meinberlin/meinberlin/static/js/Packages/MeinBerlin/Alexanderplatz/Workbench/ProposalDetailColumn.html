@@ -23,12 +23,14 @@
         </div>
     </a>
 
-    <adh-recompile-on-change
-        data-ng-switch-when="body"
-        data-value="{{proposalUrl}}">
-        <adh-mein-berlin-proposal-detail
-            data-ng-if="proposalUrl"
-            data-path="{{proposalUrl}}">
-        </adh-mein-berlin-proposal-detail>
-    </adh-recompile-on-change>
+    <div class="mein-berlin-alexanderplatz-proposal-detail">
+        <adh-recompile-on-change
+            data-ng-switch-when="body"
+            data-value="{{proposalUrl}}">
+            <adh-mein-berlin-proposal-detail
+                data-ng-if="proposalUrl"
+                data-path="{{proposalUrl}}">
+            </adh-mein-berlin-proposal-detail>
+        </adh-recompile-on-change>
+    </div>
 </div>
