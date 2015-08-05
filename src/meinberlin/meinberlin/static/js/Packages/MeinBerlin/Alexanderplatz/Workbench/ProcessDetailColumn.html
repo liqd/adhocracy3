@@ -58,6 +58,13 @@
         </ul>
 
         <div data-ng-if="tab === 'proposals'">
+            <div
+                class="map-info-persistent"
+                data-ng-if="shared.isShowMap"
+                data-adh-html-translate="TR__MAP_INCOMPLETE"
+                data-translate-templates="{
+                    link: '&lt;a href=&quot;&quot; data-ng-click=&quot;showMap(false)&quot;&gt;{{ content }}&lt;/a&gt;'
+            }"></div>
             <adh-wait condition="shared.isShowMap">
                 <adh-map-listing
                     data-ng-if="polygon"
@@ -85,6 +92,13 @@
         </div>
 
         <div data-ng-if="tab === 'documents'">
+            <div
+                class="map-info-persistent"
+                data-ng-if="shared.isShowMap"
+                data-adh-html-translate="TR__MAP_INCOMPLETE"
+                data-translate-templates="{
+                    link: '&lt;a href=&quot;&quot; data-ng-click=&quot;showMap(false)&quot;&gt;{{ content }}&lt;/a&gt;'
+            }"></div>
             <adh-wait condition="shared.isShowMap">
                 <adh-map-listing
                     data-ng-if="polygon"
