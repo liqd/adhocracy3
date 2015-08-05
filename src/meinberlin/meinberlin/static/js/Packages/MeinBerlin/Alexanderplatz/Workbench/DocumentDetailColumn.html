@@ -1,6 +1,10 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
-        <i class="icon-document moving-column-icon"></i>
+        <div class="moving-column-tab">
+            <i class="icon-document moving-column-icon"></i>
+            {{ "TR__MEINBERLIN_ALEXANDERPLATZ_DOCUMENT" | translate }}
+        </div>
+
         <a class="moving-column-menu-button" data-ng-href="{{ documentUrl | adhParentPath | adhResourceUrl:'edit' }}">{{ "TR__EDIT" | translate }}</a>
 
         <div class="moving-column-menu-nav">
