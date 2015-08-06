@@ -7,6 +7,8 @@ from tempfile import mkstemp
 import os
 import json
 import pytest
+from pyramid import testing
+
 
 @mark.usefixtures('integration')
 class TestImportUsers:
@@ -25,7 +27,7 @@ class TestImportUsers:
         from adhocracy_core.scripts.import_users import _import_users
         return _import_users(root, registry, filename)
 
-    
+
     def test_create(self, context, registry, log):
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
@@ -35,10 +37,12 @@ class TestImportUsers:
                  'initial-password': 'weakpassword1', 'roles': ['contributor'],
                  'groups': ['gods']},
                 {'name': 'Bob', 'email': 'bob@example.org',
-                 'initial-password': 'weakpassword2', 'roles': [], 'groups': []}
+                 'initial-password': 'weakpassword2', 'roles': [], 'groups': ['moderators-xyz']}
             ]))
         locator = self._get_user_locator(context, registry)
 
+        moderators_xyz_group = testing.DummyResource(roles=['moderator'], name='moderators-xyz')
+        context['principals']['groups']['moderators-xyz'] = moderators_xyz_group
         self.call_fut(context, registry, filename)
 
         god_group = context['principals']['groups']['gods']
@@ -46,13 +50,12 @@ class TestImportUsers:
         assert alice.active
         alice = locator.get_user_by_login('Alice')
         alice_user_id = resource_path(alice)
-        groups = locator.get_groups(alice_user_id)
-        assert groups == [god_group]
-        bob = locator.get_user_by_login('Bob')
         default_group = context['principals']['groups']['authenticated']
+        groups = locator.get_groups(alice_user_id)
+        assert groups == [default_group, god_group]
+        bob = locator.get_user_by_login('Bob')
         bob_user_id = resource_path(bob)
-        groups = locator.get_groups(bob_user_id)
-        assert groups == [default_group]
+        bob.group_ids = ['/principals/groups/authenticated', '/principals/groups/moderators-xyz']
 
     def test_create_email_not_lower_case(self, context, registry, log):
         self._tempfd, filename = mkstemp()
@@ -288,5 +291,3 @@ class TestImportUsers:
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
-
-
