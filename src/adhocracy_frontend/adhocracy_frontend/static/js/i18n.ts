@@ -4,10 +4,10 @@
  */
 
 translateMe = [
-    "TR__ADD_DOCUMENT",
     "TR__BACK_TO_TOP",
     "TR__COMMENTS",
     "TR__COMMENTS_TOTAL",
+    "TR__CREATE_DOCUMENT",
     "TR__CREATION_DATE",
     "TR__ERROR_INVALID_DATE",
     "TR__ERROR_INVALID_URL",
@@ -33,6 +33,8 @@ translateMe = [
     "TR__IMAGE_SELECTED",
     "TR__IMAGE_UPLOAD",
     "TR__LASTNAME",
+    "TR__LIST",
+    "TR__MAP",
     "TR__MAX_CHARS_100",
     "TR__MAX_CHARS_1000",
     "TR__MAX_CHARS_300",
@@ -45,6 +47,7 @@ translateMe = [
     "TR__OTHER",
     "TR__PLEASE_SPECIFY",
     "TR__PRINT",
+    "TR__PROPOSALS",
     "TR__PUBLISH",
     "TR__RATES",
     "TR__SHARE",
