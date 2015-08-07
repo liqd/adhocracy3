@@ -114,7 +114,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         adhTopLevelStateProvider
             .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
                 $location.replace();
-                $location.path("/r/organisation/alexanderplatz/");
+                $location.path("/r/organisation/kiezkasse/");
                 return {
                     skip: true
                 };
@@ -129,7 +129,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
                 resourceUrl: "/principals/users/"
             })
             .space("content", {
-                resourceUrl: "/organisation/alexanderplatz/"
+                resourceUrl: "/organisation/kiezkasse/"
             });
     }]);
     app.config(["$compileProvider", ($compileProvider) => {
