@@ -201,12 +201,6 @@ depends on a lot of factors:
 
 .l-header-right {
     float: right;
-
-    @media (max-width: $moving-column-single-width-min) {
-        i[class*=icon-] {
-            display: none;
-        }
-    }
 }
 
 .l-center {
