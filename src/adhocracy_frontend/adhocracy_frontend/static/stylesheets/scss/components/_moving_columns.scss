@@ -154,11 +154,6 @@ The menu should always have the same state as its columns.
     }
 }
 
-%moving-column-single-width {
-    max-width: $moving-column-single-width-max;
-    min-width: $moving-column-single-width-min;
-}
-
 .moving-column-body,
 .moving-column-sidebar,
 .moving-column-overlay,
