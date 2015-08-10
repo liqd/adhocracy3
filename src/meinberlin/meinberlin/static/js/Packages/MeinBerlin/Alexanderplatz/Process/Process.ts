@@ -21,9 +21,8 @@ export var phaseHeaderDirective = (
         scope: {},
         link: (scope) => {
             var processUrl = adhTopLevelState.get("processUrl");
-            adhHttp.get(processUrl).then((resource) => {
-                scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
-            });
+
+            scope.currentPhase = adhConfig.custom["alexanderplatz_phase"];
 
             scope.phases = [{
                 name: "participate",
