@@ -225,22 +225,23 @@ export var proposalEditColumnDirective = (
     };
 };
 
-export var registerRoutes = (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-    var processType = RIAlexanderplatzProcess.content_type;
-
+export var registerRoutes = (
+    processType : string = "",
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
     adhResourceAreaProvider
         // documents tab
-        .default(RIAlexanderplatzProcess, "", processType, "", {
+        .default(RIAlexanderplatzProcess, "", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide",
             tab: "documents"
         })
-        .default(RIAlexanderplatzProcess, "create_document", processType, "", {
+        .default(RIAlexanderplatzProcess, "create_document", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide",
             tab: "documents"
         })
-        .specific(RIAlexanderplatzProcess, "create_document", processType, "", [
+        .specific(RIAlexanderplatzProcess, "create_document", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPost(RIGeoDocument.content_type)) {
@@ -250,23 +251,23 @@ export var registerRoutes = (adhResourceAreaProvider : AdhResourceArea.Provider)
                     }
                 });
             }])
-        .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", {
+        .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide",
             tab: "documents"
         })
-        .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", [
+        .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, context, [
             () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
                 return {
                     documentUrl: version.path
                 };
             }])
-        .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", {
+        .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide",
             tab: "documents"
         })
-        .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", [
+        .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
@@ -278,12 +279,12 @@ export var registerRoutes = (adhResourceAreaProvider : AdhResourceArea.Provider)
                     }
                 });
             }])
-        .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", {
+        .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, {
             space: "content",
             movingColumns: "is-collapse-show-show",
             tab: "documents"
         })
-        .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", [
+        .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, [
             () => (item : RIParagraph, version : RIParagraphVersion) => {
                 var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
                 return {
@@ -294,17 +295,17 @@ export var registerRoutes = (adhResourceAreaProvider : AdhResourceArea.Provider)
             }])
 
         // proposals tab
-        .default(RIAlexanderplatzProcess, "proposals", processType, "", {
+        .default(RIAlexanderplatzProcess, "proposals", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide",
             tab: "proposals"
         })
-        .default(RIAlexanderplatzProcess, "create_proposal", processType, "", {
+        .default(RIAlexanderplatzProcess, "create_proposal", processType, context, {
             space: "content",
             movingColumns: "is-show-hide-hide",
             tab: "proposals"
         })
-        .specific(RIAlexanderplatzProcess, "create_proposal", processType, "", [
+        .specific(RIAlexanderplatzProcess, "create_proposal", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.canPost(RIGeoProposal.content_type)) {
@@ -314,23 +315,23 @@ export var registerRoutes = (adhResourceAreaProvider : AdhResourceArea.Provider)
                     }
                 });
             }])
-        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", {
+        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide",
             tab: "proposals"
         })
-        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", [
+        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, context, [
             () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                 return {
                     proposalUrl: version.path
                 };
             }])
-        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", {
+        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, context, {
             space: "content",
             movingColumns: "is-show-show-hide",
             tab: "proposals"
         })
-        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", [
+        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, context, [
             "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                 return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
@@ -342,12 +343,12 @@ export var registerRoutes = (adhResourceAreaProvider : AdhResourceArea.Provider)
                     }
                 });
             }])
-        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", {
+        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, context, {
             space: "content",
             movingColumns: "is-collapse-show-show",
             tab: "proposals"
         })
-        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", [
+        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, context, [
             () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                 return {
                     commentableUrl: version.path,
@@ -378,7 +379,7 @@ export var register = (angular) => {
                 return $q.when("<adh-mein-berlin-alexanderplatz-workbench></adh-mein-berlin-alexanderplatz-workbench>");
             }];
         }])
-        .config(["adhResourceAreaProvider", registerRoutes])
+        .config(["adhResourceAreaProvider", registerRoutes(processType)])
         .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
             adhMapDataProvider.icons["document"] = {
                 className: "icon-board-pin",
