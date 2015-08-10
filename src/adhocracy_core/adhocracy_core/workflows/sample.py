@@ -15,6 +15,8 @@ sample_meta = freeze({
                           'permissions':
                               [['create_proposal', 'Allow',        None,        None,      None],
                                ['edit_proposal',    None,          None,       'Allow',    None],
+                               ['create_document', 'Allow',        None,        None,      None],
+                               ['edit_document',    None,          None,       'Allow',    None],
                                ['create_comment',  'Allow',       'Allow',      None,      None],
                                ['edit_comment',     None,          None,       'Allow',    None],
                                ['create_rate',     'Allow',        None,        None,      None],

@@ -11,6 +11,8 @@ digital_leben_meta =  standard_meta \
                                   'permissions':
                                   [['create_proposal',             None,          None,        None,     'Allow'],
                                    ['edit_proposal',               None,          None,       'Allow',   'Allow'],
+                                   ['create_document',             None,          None,        None,     'Allow'],
+                                   ['edit_document',               None,          None,       'Allow',   'Allow'],
                                    ['create_comment',             'Allow',       'Allow',      None,     'Allow'],
                                    ['edit_comment',                None,          None,       'Allow',    None  ],
                                    ['create_rate',                'Allow',        None,        None,      None  ],

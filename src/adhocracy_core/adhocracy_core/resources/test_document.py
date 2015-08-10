@@ -19,7 +19,7 @@ class TestDocument:
                                       resources.document.IDocumentVersion,
                                       )
         assert meta.item_type == resources.document.IDocumentVersion
-        assert meta.permission_create == 'create_proposal'
+        assert meta.permission_create == 'create_document'
         assert resources.comment.add_commentsservice in meta.after_creation
         assert resources.rate.add_ratesservice in meta.after_creation
         assert meta.use_autonaming
@@ -48,7 +48,7 @@ class TestDocumentVersion:
                                         sheets.image.IImageReference,
                                         sheets.title.ITitle,
                                         )
-        assert meta.permission_create == 'edit_proposal'
+        assert meta.permission_create == 'edit_document'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

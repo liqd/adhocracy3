@@ -26,6 +26,7 @@ def test_initate_and_transition_to_frozen(registry, context):
     workflow.initialize(context)
     assert workflow.state_of(context) is 'participate'
     assert ('Allow', 'role:participant', 'create_proposal') in get_acl(context)
+    assert ('Allow', 'role:participant', 'create_document') in get_acl(context)
     request = testing.DummyRequest()  # bypass permission check
     workflow.transition_to_state(context, request, 'frozen')
     assert workflow.state_of(context) is 'frozen'
