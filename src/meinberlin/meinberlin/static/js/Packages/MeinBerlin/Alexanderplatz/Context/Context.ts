@@ -44,7 +44,7 @@ export var headerDirective = (
 export var moduleName = "adhMeinBerlinAlexanderplatzContext";
 
 export var register = (angular) => {
-     var processType = RIAlexanderplatzProcess.content_type;
+    var processType = RIAlexanderplatzProcess.content_type;
 
     angular
         .module(moduleName, [
