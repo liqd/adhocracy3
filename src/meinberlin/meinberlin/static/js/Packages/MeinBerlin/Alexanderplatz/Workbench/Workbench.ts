@@ -65,6 +65,20 @@ export var processDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
+            adhHttp.options(scope.processUrl, {importOptions: false}).then((options: any) => {
+                if(options.data.POST){
+                    var postOptions = options.data.POST.request_body;
+                    scope.postDocumentOptions = _.any(postOptions, { 'content_type': RIGeoDocument.content_type });
+                    scope.postProposalOptions = _.any(postOptions, { 'content_type': RIGeoProposal.content_type });
+                }
+                else {
+                    scope.postDocumentOptions = false;
+                    scope.postProposalOptions = false;
+                }
+            });
+
+            console.log(scope);
+
             scope.proposalType = RIGeoProposalVersion.content_type;
             scope.documentType = RIGeoDocumentVersion.content_type;
             scope.shared.isShowMap = true;
