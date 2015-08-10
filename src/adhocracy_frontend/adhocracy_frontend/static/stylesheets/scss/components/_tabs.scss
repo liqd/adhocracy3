@@ -63,9 +63,19 @@
 .tabset-panes {
     @include single-transition(height, 0.5s);
     background: $color-background-base-introvert;
+    position: relative;
     overflow: hidden;
 }
 
 .tab-pane {
+    @include opacity(0);
+    @include transition(opacity 0.5s);
     padding: 1em;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    &.is-active {
+        @include opacity(1);
+    }
 }
