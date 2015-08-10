@@ -63,7 +63,6 @@ class TestAlexanderplatzWorkflow:
 
 @fixture
 def integration(config):
-    config.include('adhocracy_core.events')
     config.include('adhocracy_core.content')
     config.include('adhocracy_meinberlin.workflows')
 
