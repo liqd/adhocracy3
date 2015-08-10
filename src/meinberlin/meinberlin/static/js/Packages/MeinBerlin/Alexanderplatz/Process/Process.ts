@@ -1,19 +1,10 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
-/// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
-
-import _ = require("lodash");
-
 import AdhConfig = require("..././../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../../Util/Util");
 
-import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
-import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Alexanderplatz/Process";
