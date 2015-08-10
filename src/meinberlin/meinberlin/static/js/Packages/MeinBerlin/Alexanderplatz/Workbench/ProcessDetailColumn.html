@@ -13,7 +13,7 @@
             class="moving-column-menu-button"
             data-ng-click="setCameFrom()"
             href="{{ processUrl | adhResourceUrl:'create_document'}}"
-            data-ng-if="processOptions.POST && tab === 'documents'">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
+            data-ng-if="processOptions.canPost(documentItemType) && tab === 'documents'">{{ "TR__CREATE_DOCUMENT" | translate }}</a>
 
         <div class="moving-column-menu-switch">
             <a

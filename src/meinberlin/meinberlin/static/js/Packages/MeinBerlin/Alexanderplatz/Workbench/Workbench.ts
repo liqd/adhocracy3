@@ -67,6 +67,7 @@ export var processDetailColumnDirective = (
 
             scope.proposalType = RIGeoProposalVersion.content_type;
             scope.documentType = RIGeoDocumentVersion.content_type;
+            scope.documentItemType = RIGeoDocument.content_type;
             scope.shared.isShowMap = true;
 
             scope.setCameFrom = () => {
@@ -261,7 +262,7 @@ export var register = (angular) => {
                 .specific(RIAlexanderplatzProcess, "create_document", processType, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
                         return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
+                            if (!options.canPost(RIGeoDocument.content_type)) {
                                 throw 401;
                             } else {
                                 return {};
@@ -325,7 +326,7 @@ export var register = (angular) => {
                 .specific(RIAlexanderplatzProcess, "create_proposal", processType, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
                         return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
+                            if (!options.canPost(RIGeoProposal.content_type)) {
                                 throw 401;
                             } else {
                                 return {};
