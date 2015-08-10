@@ -50,18 +50,6 @@ export var getProcessPolygon = (
     });
 };
 
-export var getPostOptionForResource = (
-    adhHttp : AdhHttp.Service<any>
-) => (processUrl : string, content_type : string) : angular.IPromise<boolean> => {
-    return adhHttp.options(processUrl, {importOptions: false}).then((options: any) => {
-        if(options.data.POST){
-            var postOptions = options.data.POST.request_body;
-            return _.any(postOptions, { 'content_type': content_type });
-        }
-        return false;
-    });
-};
-
 export var processDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
@@ -77,15 +65,9 @@ export var processDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
-            getPostOptionForResource(adhHttp)(scope.processUrl, RIGeoDocument.content_type).then((hasOption) =>{
-                scope.postDocumentOptions = hasOption;
-            });
-            getPostOptionForResource(adhHttp)(scope.processUrl, RIGeoProposal.content_type).then((hasOption) =>{
-                scope.postProposalOptions = hasOption;
-            });
-
             scope.proposalType = RIGeoProposalVersion.content_type;
             scope.documentType = RIGeoDocumentVersion.content_type;
+            scope.documentItemType = RIGeoDocument.content_type;
             scope.shared.isShowMap = true;
 
             scope.setCameFrom = () => {
@@ -279,8 +261,8 @@ export var register = (angular) => {
                 })
                 .specific(RIAlexanderplatzProcess, "create_document", processType, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
-                        return getPostOptionForResource(adhHttp)(resource.path, RIGeoDocument.content_type).then((hasOption) =>{
-                            if (!hasOption) {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.canPost(RIGeoDocument.content_type)) {
                                 throw 401;
                             } else {
                                 return {};
@@ -343,8 +325,8 @@ export var register = (angular) => {
                 })
                 .specific(RIAlexanderplatzProcess, "create_proposal", processType, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
-                        return getPostOptionForResource(adhHttp)(resource.path, RIGeoProposal.content_type).then((hasOption) =>{
-                            if (!hasOption) {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.canPost(RIGeoProposal.content_type)) {
                                 throw 401;
                             } else {
                                 return {};
