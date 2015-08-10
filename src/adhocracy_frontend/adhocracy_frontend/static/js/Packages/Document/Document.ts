@@ -452,7 +452,7 @@ export var createDirective = (
 
             scope.cancel = () => {
                 var processUrl = adhTopLevelState.get("processUrl");
-                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(processUrl));
+                adhTopLevelState.goToCameFrom(adhResourceUrlFilter(processUrl));
             };
 
             scope.submit = () => {
@@ -501,7 +501,7 @@ export var editDirective = (
 
             scope.cancel = () => {
                 var itemPath = AdhUtil.parentPath(scope.documentVersion.path);
-                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(itemPath));
+                adhTopLevelState.goToCameFrom(adhResourceUrlFilter(itemPath));
             };
 
             scope.submit = () => {

@@ -5,7 +5,7 @@
             {{ "TR__MEINBERLIN_ALEXANDERPLATZ_DOCUMENT" | translate }}
         </div>
 
-        <a class="moving-column-menu-button" href="{{ processUrl | adhResourceUrl }}">{{ "TR__CANCEL" | translate }}</a>
+        <a class="moving-column-menu-button" href="" data-ng-click="cancel()">{{ "TR__CANCEL" | translate }}</a>
     </div>
 
     <a class="moving-column-expand" data-ng-switch-when="collapsed" data-ng-href="{{ processUrl | adhResourceUrl:'create_document' }}">

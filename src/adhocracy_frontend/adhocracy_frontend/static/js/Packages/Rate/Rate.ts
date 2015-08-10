@@ -293,7 +293,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
 
                 if (!scope.optionsPostPool.POST) {
                     if (!adhCredentials.loggedIn) {
-                        adhTopLevelState.redirectToLogin();
+                        adhTopLevelState.setCameFromAndGo("/login");
                     } else {
                         // FIXME
                     }

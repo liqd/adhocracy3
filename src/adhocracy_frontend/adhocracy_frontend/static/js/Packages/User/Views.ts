@@ -189,7 +189,7 @@ export var loginDirective = (
             };
 
             scope.cancel = () => {
-                 adhTopLevelState.redirectToCameFrom("/");
+                 adhTopLevelState.goToCameFrom("/");
             };
 
             scope.logIn = () => {
@@ -197,7 +197,7 @@ export var loginDirective = (
                     scope.credentials.nameOrEmail,
                     scope.credentials.password
                 ).then(() => {
-                    adhTopLevelState.redirectToCameFrom("/");
+                    adhTopLevelState.goToCameFrom("/", true);
                 }, (errors) => {
                     bindServerErrors(scope, errors);
                     scope.credentials.password = "";
@@ -247,7 +247,7 @@ export var registerDirective = (
             };
 
             scope.cancel = scope.goBack = () => {
-                 adhTopLevelState.redirectToCameFrom("/");
+                 adhTopLevelState.goToCameFrom("/");
             };
 
 
@@ -288,7 +288,7 @@ export var passwordResetDirective = (
             };
 
             scope.goBack = scope.cancel = () => {
-                 adhTopLevelState.redirectToCameFrom("/");
+                 adhTopLevelState.goToCameFrom("/");
             };
 
             scope.errors = [];
@@ -330,7 +330,7 @@ export var createPasswordResetDirective = (
             };
 
             scope.goBack = scope.cancel = () => {
-                 adhTopLevelState.redirectToCameFrom("/");
+                 adhTopLevelState.goToCameFrom("/");
             };
 
             scope.errors = [];
@@ -494,7 +494,7 @@ export var userProfileDirective = (
                 if (scope.messageOptions.POST) {
                     column.showOverlay("messaging");
                 } else if (!adhCredentials.loggedIn) {
-                    adhTopLevelState.redirectToLogin();
+                    adhTopLevelState.setCameFromAndGo("/login");
                 } else {
                     // FIXME
                 }
