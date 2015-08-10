@@ -126,7 +126,6 @@ export var register = (angular) => {
                         };
                     }])
 
-            // proposals tab
                 .default(RIAlexanderplatzProcess, "proposals", processType, "alexanderplatz", {
                     space: "content",
                     movingColumns: "is-show-hide-hide",
