@@ -54,6 +54,8 @@ root_acm = ACM().deserialize(
                      # versioned content resources
                      ['create_proposal',               None,        None,          None,         None,      None,        Allow],
                      ['edit_proposal',                 None,        None,          None,         None,      None,        Allow],
+                     ['create_document',               None,        None,          None,         None,      None,        Allow],
+                     ['edit_document',                 None,        None,          None,         None,      None,        Allow],
                      ['create_comment',                None,        None,          None,         None,      None,        Allow],
                      ['edit_comment',                  None,        None,          None,         None,      None,        None],
                      ['create_rate',                   None,        None,          None,         None,      None,        None],

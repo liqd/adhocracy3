@@ -10,9 +10,11 @@ standard_meta = freeze({
     'states': {
         'draft': {'title': 'Draft',
                   'description': 'This phase is for internal review.',
-                  'acm': {'principals':         ['anonymous',   'participant', 'moderator', 'creator', 'initiator'],
+                  'acm': {'principals':         ['anonymous',   'moderator',   'participant', 'creator', 'initiator'],
                           'permissions':
-                          [['view',              'Deny',        'Deny',        'Allow',     'Allow',   'Allow'],
+                          [['view',              'Deny',        'Allow',       'Deny',        'Allow',   'Allow'],
+                           ['create_document',    None,         'Allow',        None,          None,      None],
+                           ['edit_document',      None,         'Allow',        None,         'Allow',   'Allow'],
                           ]},
                   'display_only_to_roles': ['admin', 'initiator', 'moderator'],
                   },
