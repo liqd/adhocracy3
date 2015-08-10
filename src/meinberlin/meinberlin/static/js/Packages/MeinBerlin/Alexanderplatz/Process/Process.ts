@@ -22,7 +22,7 @@ export var phaseHeaderDirective = (
         link: (scope) => {
             var processUrl = adhTopLevelState.get("processUrl");
 
-            scope.currentPhase = adhConfig.custom["currentPhase"];
+            scope.currentPhase = adhConfig.custom["alexanderplatz_phase"];
 
             scope.phases = [{
                 name: "participate",
