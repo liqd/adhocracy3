@@ -32,7 +32,7 @@ export var phaseHeaderDirective = (
                 description: "Was bleibt wie es ist und was muss und kann geändert werden (thematisch und räumlich) " +
                     "am Masterplan für den Alexanderplatz? Die Auswertung des 1. Fachworkshops sowie Anmerkungen aus " +
                     "der Onlinebeteiligung fließen in den Bürgerworkshop am 01.09 ein. In den Workshops, in der begleitenden " +
-                    "Ausstellung am Alexanderplatz (20.08. – 06.09., Alexanderhaus - Eingang Dircksenstraße)" +
+                    "Ausstellung am Alexanderplatz (20.08. – 06.09., Alexanderhaus - Eingang Dircksenstraße) " +
                     "sowie hier online wird zusammengetragen und diskutiert.",
                 processType: "Workshopverfahren Alexanderplatz",
                 votingAvailable: true,
@@ -52,8 +52,8 @@ export var phaseHeaderDirective = (
                 shorttitle: "Phase 3",
                 title: "Der neue Masterplan wird vorgestellt.",
                 description: "Aus den Ergebnissen der Workshops, der Onlinebeteiligung sowie Anregungen aus der Ausstellung wird ein " +
-                    "neuer Masterplan zum Beschluss für das Abgeordnetenhaus entwickelt. Voraussichtlich im Frühjahr 2016 gibt es eine" +
-                    "Finissage /Abschlussausstellung.",
+                    "neuer Masterplan zum Beschluss für das Abgeordnetenhaus entwickelt. Voraussichtlich im Frühjahr 2016 gibt es eine " +
+                    "Finissage/Abschlussausstellung.",
                 processType: "Workshopverfahren Alexanderplatz",
                 votingAvailable: false,
                 commentAvailable: false
