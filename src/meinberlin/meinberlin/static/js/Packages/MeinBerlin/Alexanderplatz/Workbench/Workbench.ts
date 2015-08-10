@@ -50,6 +50,18 @@ export var getProcessPolygon = (
     });
 };
 
+export var getPostOptionForResource = (
+    adhHttp : AdhHttp.Service<any>
+) => (processUrl : string, content_type : string) : angular.IPromise<boolean> => {
+    return adhHttp.options(processUrl, {importOptions: false}).then((options: any) => {
+        if(options.data.POST){
+            var postOptions = options.data.POST.request_body;
+            return _.any(postOptions, { 'content_type': content_type });
+        }
+        return false;
+    });
+};
+
 export var processDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
@@ -65,19 +77,12 @@ export var processDetailColumnDirective = (
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
 
-            adhHttp.options(scope.processUrl, {importOptions: false}).then((options: any) => {
-                if(options.data.POST){
-                    var postOptions = options.data.POST.request_body;
-                    scope.postDocumentOptions = _.any(postOptions, { 'content_type': RIGeoDocument.content_type });
-                    scope.postProposalOptions = _.any(postOptions, { 'content_type': RIGeoProposal.content_type });
-                }
-                else {
-                    scope.postDocumentOptions = false;
-                    scope.postProposalOptions = false;
-                }
+            getPostOptionForResource(adhHttp)(scope.processUrl, RIGeoDocument.content_type).then((hasOption) =>{
+                scope.postDocumentOptions = hasOption;
             });
-
-            console.log(scope);
+            getPostOptionForResource(adhHttp)(scope.processUrl, RIGeoProposal.content_type).then((hasOption) =>{
+                scope.postProposalOptions = hasOption;
+            });
 
             scope.proposalType = RIGeoProposalVersion.content_type;
             scope.documentType = RIGeoDocumentVersion.content_type;
