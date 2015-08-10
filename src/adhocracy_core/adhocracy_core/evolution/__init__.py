@@ -200,6 +200,8 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
             pool._autoname_lasts = {prefix: pool._autoname_last
                                     for prefix in prefixes}
             del pool._autoname_last
+        elif not hasattr(pool, '_autoname_lasts'):
+            pool._autoname_lasts = {prefix: 0 for prefix in prefixes}
 
 
 @log_migration
