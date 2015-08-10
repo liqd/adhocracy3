@@ -279,8 +279,8 @@ export var register = (angular) => {
                 })
                 .specific(RIAlexanderplatzProcess, "create_document", processType, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
-                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
+                        return getPostOptionForResource(adhHttp)(resource.path, RIGeoDocument.content_type).then((hasOption) =>{
+                            if (!hasOption) {
                                 throw 401;
                             } else {
                                 return {};
@@ -343,8 +343,8 @@ export var register = (angular) => {
                 })
                 .specific(RIAlexanderplatzProcess, "create_proposal", processType, "", [
                     "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
-                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
+                        return getPostOptionForResource(adhHttp)(resource.path, RIGeoProposal.content_type).then((hasOption) =>{
+                            if (!hasOption) {
                                 throw 401;
                             } else {
                                 return {};
