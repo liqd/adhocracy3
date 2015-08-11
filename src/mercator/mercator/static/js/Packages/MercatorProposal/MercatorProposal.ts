@@ -52,7 +52,6 @@ import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/res
 import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
-import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
 import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SILogbook = require("../../Resources_/adhocracy_core/sheets/logbook/IHasLogbookPool");
 import SIMercatorDescription = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDescription");
@@ -197,56 +196,6 @@ export interface IControllerScope extends IScope {
 
 
 /**
- * upload mercator proposal image file.  this function can potentially
- * be more general; for now it just handles the Flow object and
- * promises the path of the image resource as a string.
- *
- * as the a3 asset protocol is much simpler than HTML5 file upload, we
- * compose the multi-part mime post request manually (no chunking).
- * The $flow object is just used for meta data retrieval and cleared
- * before it can upload anything.
- *
- * NOTE: this uses several HTML5 APIs so you need to check for
- * compability before using it.
- */
-export var uploadImageFile = (
-    adhHttp : AdhHttp.Service<any>,
-    poolPath : string,
-    flow : Flow
-) : angular.IPromise<string> => {
-    if (flow.files.length !== 1) {
-        throw "could not upload file: $flow.files.length !== 1";
-    }
-    var file = flow.files[0].file;
-
-    var bytes = () : any => {
-        var func;
-        if (file.mozSlice) {
-            func = "mozSlice";
-        } else if (file.webkitSlice) {
-            func = "webkitSlice";
-        } else {
-            func = "slice";
-        }
-
-        return file[func](0, file.size, file.type);
-    };
-
-    var formData = new FormData();
-    formData.append("content_type", RIMercatorIntroImage.content_type);
-    formData.append("data:" + SIMercatorIntroImageMetadata.nick + ":mime_type", file.type);
-    formData.append("data:adhocracy_core.sheets.asset.IAssetData:data", bytes());
-
-    return adhHttp.get(poolPath)
-        .then((mercatorPool) => {
-            var postPath : string = mercatorPool.data[SIHasAssetPool.nick].asset_pool;
-            return adhHttp.postRaw(postPath, formData)
-                .then((rsp) => rsp.data.path)
-                .catch(<any>AdhHttp.logBackendError);
-        });
-};
-
-/**
  * promise supporters count.
  */
 var countSupporters = (adhHttp : AdhHttp.Service<any>, postPoolPath : string, objectPath : string) : angular.IPromise<number> => {
@@ -325,6 +274,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
         private adhGetBadges : AdhBadge.IGetBadges,
+        private adhUploadImage,
         private flowFactory,
         private moment : moment.MomentStatic,
         private $window : Window,
@@ -778,7 +728,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         };
 
         if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
-            return uploadImageFile(this.adhHttp, "/mercator", instance.scope.$flow)
+            return this.adhUploadImage(
+                    "/mercator",
+                    instance.scope.$flow,
+                    RIMercatorIntroImage.content_type,
+                    SIMercatorIntroImageMetadata.nick)
                 .then(postProposal);
         } else {
             return postProposal();
@@ -825,7 +779,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         };
 
         if (instance.scope.$flow && instance.scope.$flow.support && instance.scope.$flow.files.length > 0) {
-            return uploadImageFile(this.adhHttp, "/mercator", instance.scope.$flow)
+            return this.adhUploadImage(
+                    "/mercator",
+                    instance.scope.$flow,
+                    RIMercatorIntroImage.content_type,
+                    SIMercatorIntroImageMetadata.nick)
                 .then(postProposal);
         } else {
             return postProposal();
@@ -845,6 +803,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
         adhGetBadges : AdhBadge.IGetBadges,
+        adhUploadImage,
         private $timeout : angular.ITimeoutService,
         flowFactory,
         moment : moment.MomentStatic,
@@ -853,7 +812,18 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         $location : angular.ILocationService,
         $q : angular.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, adhGetBadges, flowFactory, moment, $window, $location, $q);
+        super(
+            adhConfig,
+            adhHttp,
+            adhPreliminaryNames,
+            adhTopLevelState,
+            adhGetBadges,
+            adhUploadImage,
+            flowFactory,
+            moment,
+            $window,
+            $location,
+            $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 
@@ -895,13 +865,25 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         adhTopLevelState : AdhTopLevelState.Service,
         adhGetBadges : AdhBadge.IGetBadges,
+        adhUploadImage,
         flowFactory,
         moment : moment.MomentStatic,
         $window,
         $location,
         $q : angular.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, adhGetBadges, flowFactory, moment, $window, $location, $q);
+        super(
+            adhConfig,
+            adhHttp,
+            adhPreliminaryNames,
+            adhTopLevelState,
+            adhGetBadges,
+            adhUploadImage,
+            flowFactory,
+            moment,
+            $window,
+            $location,
+            $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 }
@@ -1263,6 +1245,7 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhGetBadges",
+            "adhUploadImage",
             "flowFactory",
             "moment",
             "$window",
@@ -1278,6 +1261,7 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhTopLevelState",
             "adhGetBadges",
+            "adhUploadImage",
             "$timeout",
             "flowFactory",
             "moment",
