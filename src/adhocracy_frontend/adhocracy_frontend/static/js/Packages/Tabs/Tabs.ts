@@ -35,7 +35,7 @@ export class TabSetController {
         if (this.$scope.fullWidth) {
             var value = this.$scope.tabs.length;
             if (value !== 0) {
-                var tabWidth = Math.floor(100 / value);
+                var tabWidth = Math.floor(100 * 10 / value) / 10;
                 this.$timeout(() => {
                     this.$element.find(".tab").css("width", tabWidth + "%");
                 });
