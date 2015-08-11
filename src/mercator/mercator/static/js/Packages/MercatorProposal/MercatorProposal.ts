@@ -6,10 +6,12 @@ import _ = require("lodash");
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhBadge = require("../Badge/Badge");
 import AdhConfig = require("../Config/Config");
+import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
 import AdhLocale = require("../Locale/Locale");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceUtil = require("../Util/ResourceUtil");
@@ -17,8 +19,6 @@ import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhCredentials = require("../User/Credentials");
 
 import ResourcesBase = require("../../ResourcesBase");
 
