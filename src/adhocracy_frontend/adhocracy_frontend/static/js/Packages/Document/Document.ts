@@ -439,7 +439,8 @@ export var createDirective = (
     adhShowError,
     adhSubmitIfValid,
     adhResourceUrlFilter,
-    adhUploadImage
+    adhUploadImage,
+    flowFactory
 ) => {
     return {
         restrict: "E",
@@ -451,6 +452,7 @@ export var createDirective = (
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
+            scope.$flow = flowFactory.create({singleFile: true});
             scope.data = {
                 title: "",
                 paragraphs: [{
@@ -569,6 +571,7 @@ export var register = (angular) => {
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
             "adhUploadImage",
+            "flowFactory",
             createDirective])
         .directive("adhDocumentEdit", [
             "$location",
