@@ -68,14 +68,10 @@
 }
 
 .tab-pane {
-    @include opacity(0);
-    @include transition(opacity 0.5s);
     padding: 1em;
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: none;
 
     &.is-active {
-        @include opacity(1);
+        display: block;
     }
 }
