@@ -225,6 +225,139 @@ export var proposalEditColumnDirective = (
     };
 };
 
+export var registerRoutes = (
+    processType : string = "",
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+    adhResourceAreaProvider
+        // documents tab
+        .default(RIAlexanderplatzProcess, "", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide",
+            tab: "documents"
+        })
+        .default(RIAlexanderplatzProcess, "create_document", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide",
+            tab: "documents"
+        })
+        .specific(RIAlexanderplatzProcess, "create_document", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.canPost(RIGeoDocument.content_type)) {
+                        throw 401;
+                    } else {
+                        return {};
+                    }
+                });
+            }])
+        .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide",
+            tab: "documents"
+        })
+        .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, context, [
+            () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+                return {
+                    documentUrl: version.path
+                };
+            }])
+        .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide",
+            tab: "documents"
+        })
+        .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+                return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {
+                            documentUrl: version.path
+                        };
+                    }
+                });
+            }])
+        .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-show",
+            tab: "documents"
+        })
+        .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, [
+            () => (item : RIParagraph, version : RIParagraphVersion) => {
+                var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
+                return {
+                    commentableUrl: version.path,
+                    commentCloseUrl: documentUrl,
+                    documentUrl: documentUrl
+                };
+            }])
+
+        // proposals tab
+        .default(RIAlexanderplatzProcess, "proposals", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide",
+            tab: "proposals"
+        })
+        .default(RIAlexanderplatzProcess, "create_proposal", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide",
+            tab: "proposals"
+        })
+        .specific(RIAlexanderplatzProcess, "create_proposal", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.canPost(RIGeoProposal.content_type)) {
+                        throw 401;
+                    } else {
+                        return {};
+                    }
+                });
+            }])
+        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide",
+            tab: "proposals"
+        })
+        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, context, [
+            () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+                return {
+                    proposalUrl: version.path
+                };
+            }])
+        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide",
+            tab: "proposals"
+        })
+        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+                return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {
+                            proposalUrl: version.path
+                        };
+                    }
+                });
+            }])
+        .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-show",
+            tab: "proposals"
+        })
+        .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, context, [
+            () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+                return {
+                    commentableUrl: version.path,
+                    commentCloseUrl: version.path,
+                    proposalUrl: version.path
+                };
+            }]);
+};
+
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
 
@@ -246,135 +379,7 @@ export var register = (angular) => {
                 return $q.when("<adh-mein-berlin-alexanderplatz-workbench></adh-mein-berlin-alexanderplatz-workbench>");
             }];
         }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                // documents tab
-                .default(RIAlexanderplatzProcess, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide",
-                    tab: "documents"
-                })
-                .default(RIAlexanderplatzProcess, "create_document", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide",
-                    tab: "documents"
-                })
-                .specific(RIAlexanderplatzProcess, "create_document", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
-                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.canPost(RIGeoDocument.content_type)) {
-                                throw 401;
-                            } else {
-                                return {};
-                            }
-                        });
-                    }])
-                .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide",
-                    tab: "documents"
-                })
-                .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", [
-                    () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
-                        return {
-                            documentUrl: version.path
-                        };
-                    }])
-                .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide",
-                    tab: "documents"
-                })
-                .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
-                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
-                                throw 401;
-                            } else {
-                                return {
-                                    documentUrl: version.path
-                                };
-                            }
-                        });
-                    }])
-                .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-show",
-                    tab: "documents"
-                })
-                .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", [
-                    () => (item : RIParagraph, version : RIParagraphVersion) => {
-                        var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
-                        return {
-                            commentableUrl: version.path,
-                            commentCloseUrl: documentUrl,
-                            documentUrl: documentUrl
-                        };
-                    }])
-
-                // proposals tab
-                .default(RIAlexanderplatzProcess, "proposals", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide",
-                    tab: "proposals"
-                })
-                .default(RIAlexanderplatzProcess, "create_proposal", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide",
-                    tab: "proposals"
-                })
-                .specific(RIAlexanderplatzProcess, "create_proposal", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
-                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.canPost(RIGeoProposal.content_type)) {
-                                throw 401;
-                            } else {
-                                return {};
-                            }
-                        });
-                    }])
-                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide",
-                    tab: "proposals"
-                })
-                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", [
-                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
-                        return {
-                            proposalUrl: version.path
-                        };
-                    }])
-                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide",
-                    tab: "proposals"
-                })
-                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
-                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
-                                throw 401;
-                            } else {
-                                return {
-                                    proposalUrl: version.path
-                                };
-                            }
-                        });
-                    }])
-                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-show",
-                    tab: "proposals"
-                })
-                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", [
-                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
-                        return {
-                            commentableUrl: version.path,
-                            commentCloseUrl: version.path,
-                            proposalUrl: version.path
-                        };
-                    }]);
-        }])
+        .config(["adhResourceAreaProvider", registerRoutes(processType)])
         .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
             adhMapDataProvider.icons["document"] = {
                 className: "icon-board-pin",

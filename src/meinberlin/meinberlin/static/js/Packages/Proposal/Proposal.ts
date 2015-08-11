@@ -339,6 +339,11 @@ export var createDirective = (
                         });
                 });
             };
+
+            scope.cancel = () => {
+                var fallback = adhResourceUrlFilter(scope.processUrl);
+                adhTopLevelState.goToCameFrom(fallback);
+            };
         }
     };
 };
@@ -368,6 +373,7 @@ export var editDirective = (
             scope.showError = adhShowError;
             scope.create = false;
             bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope, undefined, scope.isKiezkasse);
+
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
                     return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource, scope.isKiezkasse)
@@ -375,6 +381,11 @@ export var editDirective = (
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));
                     });
                 });
+            };
+
+            scope.cancel = () => {
+                var fallback = adhResourceUrlFilter(AdhUtil.parentPath(scope.path));
+                adhTopLevelState.goToCameFrom(fallback);
             };
         }
     };
