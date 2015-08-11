@@ -82,6 +82,7 @@ export interface IFormScope extends IScope {
     cancel() : void;
     documentForm : any;
     polygon? : number[][];
+    $flow? : Flow;
 }
 
 export var highlightSelectedParagraph = (
@@ -175,7 +176,8 @@ export var bindPath = (
 
 export var postCreate = (
     adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhUploadImage
 ) => (
     scope : IFormScope,
     poolPath : string,
@@ -225,8 +227,21 @@ export var postCreate = (
         });
     }
 
-    return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
-        .then((result) => result[1]);
+    var commit = () => {
+        return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
+            .then((result) => result[1]);
+    };
+
+    if (scope.$flow && scope.$flow.support && scope.$flow.files.length > 0) {
+        return adhUploadImage(poolPath, scope.$flow).then((imagePath : string) => {
+            documentVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
+                picture: imagePath
+            });
+            return commit();
+        });
+    } else {
+        return commit();
+    }
 };
 
 export var postEdit = (
@@ -423,7 +438,8 @@ export var createDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
     adhSubmitIfValid,
-    adhResourceUrlFilter
+    adhResourceUrlFilter,
+    adhUploadImage
 ) => {
     return {
         restrict: "E",
@@ -457,7 +473,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path, scope.hasMap);
+                    return postCreate(adhHttp, adhPreliminaryNames, adhUploadImage)(scope, scope.path, scope.hasMap);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
@@ -552,6 +568,7 @@ export var register = (angular) => {
             "adhShowError",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
+            "adhUploadImage",
             createDirective])
         .directive("adhDocumentEdit", [
             "$location",
