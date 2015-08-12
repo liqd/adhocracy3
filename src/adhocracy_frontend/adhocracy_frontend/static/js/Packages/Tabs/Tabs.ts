@@ -24,8 +24,6 @@ export interface ITabsetScope extends angular.IScope {
 }
 
 export class TabSetController {
-    private unregister : Function;
-
     constructor(private $scope : ITabsetScope, private $element, private $timeout : angular.ITimeoutService) {
         this.$scope.tabs = [];
         this.$element.find(".tabset-panes").css("height", 0);
@@ -55,10 +53,6 @@ export class TabSetController {
         _.forEach(this.$scope.tabs, (tab : ITabScope) => {
             tab.active = false;
         });
-
-        if (typeof this.unregister !== "undefined") {
-            this.unregister();
-        }
 
         if (typeof selectedTab !== "undefined") {
             selectedTab.active = true;
