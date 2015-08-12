@@ -16,8 +16,10 @@
         text-decoration: none;
     }
 
-    &[disabled] {
+    &.ng-disabled,
+    &:disabled {
         @include opacity(0.5);
+        cursor: default;
     }
 }
 
@@ -41,6 +43,7 @@ It may have the following states:
 <button type="button" class="button">Button</button>
 <input type="submit" class="button" value="Submit" />
 <input type="submit" class="button" value="Disabled" disabled="disabled" />
+<a class="button ng-disabled" href="">Disabled Link</a>
 ```
 */
 
@@ -58,6 +61,7 @@ A highlighted button. Each page should have one CTA at maxiumum.
 <button type="button" class="button-cta">Button</button>
 <input type="submit" class="button-cta" value="Submit" />
 <input type="submit" class="button-cta" value="Disabled" disabled="disabled" />
+<a class="button-cta ng-disabled" href="">Disabled Link</a>
 ```
 */
 
@@ -74,7 +78,9 @@ be used instead.
 ```html_example
 <a class="button-cta-secondary" href="">Link</a>
 <button type="button" class="button-cta-secondary">Button</button>
+<input type="submit" class="button-cta-secondary" value="Submit" />
 <input type="submit" class="button-cta-secondary" value="Disabled" disabled="disabled" />
+<a class="button-cta-secondary ng-disabled" href="">Disabled Link</a>
 ```
 */
 
@@ -84,41 +90,75 @@ be used instead.
     color: $color-button-text;
     text-transform: uppercase;
 
-    &:hover:enabled,
-    &:focus:enabled {
+    &:hover, &:focus {
         color: $color-button-text-hover;
+    }
+
+    &.ng-disabled,
+    &:disabled {
+        &:hover, &:focus {
+            color: $color-button-text;
+        }
     }
 }
 
 .button-cta,
 .button-cta-secondary {
     @include button-base;
-    background: $color-button-cta-base;
-    color: $color-button-cta-text;
     padding: 0 1em;
     min-width: 110px / $font-size-normal * 1em;
+}
 
-    &:hover:enabled,
-    &:focus:enabled {
+.button-cta {
+    background: $color-button-cta-base;
+    color: $color-button-cta-text;
+
+    &:hover,
+    &:focus {
         background: $color-button-cta-hover-background;
         color: $color-button-cta-text;
     }
 
-    &:active:enabled {
-        background-color: $color-button-cta-active-background;
+    &:active {
+        background: $color-button-cta-active-background;
+    }
+
+    &.ng-disabled,
+    &:disabled {
+        &:hover,
+        &:focus,
+        &:active {
+            background: $color-button-cta-base;
+            color: $color-button-cta-text;
+        }
     }
 }
 
 .button-cta-secondary {
-    background-color: transparent;
+    background: transparent;
     border: 2px solid $color-button-cta-base;
     color: $color-button-cta-base;
     height: $button-height + (4px / $font-size-normal * 1em);
     line-height: $button-height;
 
-    &:hover:enabled,
-    &:focus:enabled {
+    &:hover,
+    &:focus {
         background-color: $color-button-cta-base;
+        color: $color-button-cta-text;
+    }
+
+    &:active {
+        background: $color-button-cta-active-background;
+    }
+
+    &.ng-disabled,
+    &:disabled {
+        &:hover,
+        &:focus,
+        &:active {
+            background: transparent;
+            color: $color-button-cta-base;
+        }
     }
 }
 

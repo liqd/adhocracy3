@@ -13,6 +13,7 @@ export interface ITabScope extends angular.IScope {
     heading : string;
     classes : string;
     select() : void;
+    setActive(active : boolean) : void;
     height : number;
 }
 
@@ -24,8 +25,6 @@ export interface ITabsetScope extends angular.IScope {
 }
 
 export class TabSetController {
-    private unregister : Function;
-
     constructor(private $scope : ITabsetScope, private $element, private $timeout : angular.ITimeoutService) {
         this.$scope.tabs = [];
         this.$element.find(".tabset-panes").css("height", 0);
@@ -35,7 +34,7 @@ export class TabSetController {
         if (this.$scope.fullWidth) {
             var value = this.$scope.tabs.length;
             if (value !== 0) {
-                var tabWidth = Math.floor(100 / value);
+                var tabWidth = Math.floor(100 * 10 / value) / 10;
                 this.$timeout(() => {
                     this.$element.find(".tab").css("width", tabWidth + "%");
                 });
@@ -46,20 +45,13 @@ export class TabSetController {
     public select(selectedTab? : ITabScope) {
         _.forEach(this.$scope.tabs, (tab : ITabScope) => {
             if (tab.active && tab !== selectedTab) {
-                tab.active = false;
+                tab.setActive(false);
             }
         });
 
-        if (typeof this.unregister !== "undefined") {
-            this.unregister();
-        }
-
         if (typeof selectedTab !== "undefined") {
-            selectedTab.active = true;
-
-            this.unregister = selectedTab.$watch("height", (height) => {
-                this.$element.find(".tabset-panes").css("height", height);
-            });
+            selectedTab.setActive(true);
+            this.$element.find(".tabset-panes").css("height", selectedTab.height);
         } else {
             this.$element.find(".tabset-panes").css("height", 0);
         }
@@ -124,12 +116,18 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
             var paneElement = element.find(".tab-pane");
+
             scope.height = 0;
-            scope.$watch(() => paneElement.outerHeight(), (value : number) => {
-                if (value !== 0 && paneElement.height() !== 0) {
-                    scope.height = value;
+
+            scope.setActive = (active : boolean) => {
+                scope.active = active;
+                if (active) {
+                    paneElement.removeClass("ng-hide");
+                    scope.height = paneElement.outerHeight();
+                } else {
+                    paneElement.addClass("ng-hide");
                 }
-            });
+            };
 
             scope.select = () => {
                 if (scope.active) {
@@ -141,9 +139,7 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
 
             tabsetCtrl.addTab(scope);
 
-            if (scope.active) {
-                tabsetCtrl.select(scope);
-            }
+            scope.setActive(scope.active);
 
             scope.$on("$destroy", () => {
                 tabsetCtrl.removeTab(scope);

@@ -212,10 +212,10 @@ class TestImportUsers:
             f.write(json.dumps([
                 {'name': 'Alice', 'email': 'alice@example.org',
                  'initial-password': '', 'roles': [],
-                 'groups': ['gods'], 'badges': ['expert']},
+                 'groups': ['gods'], 'badges': ['Expert']},
                 {'name': 'Bob', 'email': 'bob@example.org',
                  'initial-password': 'weak', 'roles': [],
-                 'groups': [], 'badges': ['expert']},
+                 'groups': [], 'badges': ['Expert']},
             ]))
         locator = self._get_user_locator(context, registry)
 
@@ -237,6 +237,8 @@ class TestImportUsers:
         assert assignment_sheet.get() == {'object': bob,
                                           'badge': badge,
                                           'subject': bob}
+        title = get_sheet_field(badge, sheets.title.ITitle, 'title')
+        assert title == 'Expert'
 
     def test_create_and_send_invitation_mail_with_custom_subject(
             self, context, registry, mock_messenger):

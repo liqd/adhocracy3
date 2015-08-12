@@ -181,14 +181,22 @@ def _create_badges(user: IUser, badge_names: [str],
     badges_service = find_service(user, 'badges')
     badges = []
     for name in badge_names:
-        badge = badges_service.get(name, None)
+        normalized_name = _normalize_badge_name(name)
+        badge = badges_service.get(normalized_name, None)
         if badge is None:
-            appstructs = {sheets.name.IName.__identifier__: {'name': name}}
+            appstructs = {sheets.name.IName.__identifier__:
+                          {'name': normalized_name},
+                          sheets.title.ITitle.__identifier__:
+                          {'title': name}}
             badge = registry.content.create(IBadge.__identifier__,
                                             parent=badges_service,
                                             appstructs=appstructs)
         badges.append(badge)
     return badges
+
+
+def _normalize_badge_name(name: str) -> str:
+    return name.lower()
 
 
 def _assign_badges(user: IUser, badges: [IBadge], registry: Registry):
