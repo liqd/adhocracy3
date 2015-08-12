@@ -13,6 +13,7 @@ export interface ITabScope extends angular.IScope {
     heading : string;
     classes : string;
     select() : void;
+    setActive(active : boolean) : void;
     height : number;
 }
 
@@ -41,21 +42,15 @@ export class TabSetController {
         }
     }
 
-    public updateTabHeight(tab : ITabScope, element : angular.IAugmentedJQuery) {
-        var pane = element.find(".tab-pane");
-        pane.show();
-        tab.height = pane.outerHeight();
-        pane.css("display","");
-    }
-
     public select(selectedTab? : ITabScope) {
-
         _.forEach(this.$scope.tabs, (tab : ITabScope) => {
-            tab.active = false;
+            if (tab.active && tab !== selectedTab) {
+                tab.setActive(false);
+            }
         });
 
         if (typeof selectedTab !== "undefined") {
-            selectedTab.active = true;
+            selectedTab.setActive(true);
             this.$element.find(".tabset-panes").css("height", selectedTab.height);
         } else {
             this.$element.find(".tabset-panes").css("height", 0);
@@ -120,12 +115,21 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
             classes: "@"
         },
         link: (scope : ITabScope, element, attrs, tabsetCtrl : TabSetController) => {
+            var paneElement = element.find(".tab-pane");
 
             scope.height = 0;
 
-            scope.select = () => {
-                tabsetCtrl.updateTabHeight(scope, element);
+            scope.setActive = (active : boolean) => {
+                scope.active = active;
+                if (active) {
+                    paneElement.removeClass("ng-hide");
+                    scope.height = paneElement.outerHeight();
+                } else {
+                    paneElement.addClass("ng-hide");
+                }
+            };
 
+            scope.select = () => {
                 if (scope.active) {
                     tabsetCtrl.select();
                 } else {
@@ -135,9 +139,7 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
 
             tabsetCtrl.addTab(scope);
 
-            if (scope.active) {
-                tabsetCtrl.select(scope);
-            }
+            scope.setActive(scope.active);
 
             scope.$on("$destroy", () => {
                 tabsetCtrl.removeTab(scope);
