@@ -31,6 +31,7 @@ export var headerDirective = (
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+            scope.proposalItemType = RIGeoProposal.content_type;
 
             scope.setCameFrom = () => {
                 adhTopLevelState.setCameFrom();
