@@ -246,7 +246,8 @@ export var postCreate = (
 
 export var postEdit = (
     adhHttp : AdhHttp.Service<any>,
-    adhPreliminaryNames : AdhPreliminaryNames.Service
+    adhPreliminaryNames : AdhPreliminaryNames.Service,
+    adhUploadImage
 ) => (
     scope : IFormScope,
     oldVersion : RIDocumentVersion,
@@ -257,6 +258,7 @@ export var postEdit = (
     // and that new paragraphs are always appended to the end.
 
     var documentPath = AdhUtil.parentPath(oldVersion.path);
+    var poolPath = AdhUtil.parentPath(documentPath);
 
     const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
@@ -329,8 +331,21 @@ export var postEdit = (
         documentVersion.data[SIImageReference.nick] = oldImageReferenceSheet;
     }
 
-    return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
-        .then((result) => result[0]);
+    var commit = () => {
+        return adhHttp.deepPost(<any[]>_.flatten([documentVersion, paragraphItems, paragraphVersions]))
+            .then((result) => result[0]);
+    };
+
+    if (scope.$flow && scope.$flow.support && scope.$flow.files.length > 0) {
+        return adhUploadImage(poolPath, scope.$flow).then((imagePath : string) => {
+            documentVersion.data[SIImageReference.nick] = new SIImageReference.Sheet({
+                picture: imagePath
+            });
+            return commit();
+        });
+    } else {
+        return commit();
+    }
 };
 
 export var detailDirective = (
@@ -494,7 +509,9 @@ export var editDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhShowError,
     adhSubmitIfValid,
-    adhResourceUrlFilter
+    adhResourceUrlFilter,
+    adhUploadImage,
+    flowFactory
 ) => {
     return {
         restrict: "E",
@@ -507,6 +524,7 @@ export var editDirective = (
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
+            scope.$flow = flowFactory.create({singleFile: true});
             scope.showError = adhShowError;
 
             scope.addParagraph = () => {
@@ -524,7 +542,8 @@ export var editDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions, scope.hasMap);
+                    return postEdit(adhHttp, adhPreliminaryNames, adhUploadImage)(
+                        scope, scope.documentVersion, scope.paragraphVersions, scope.hasMap);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
@@ -583,6 +602,8 @@ export var register = (angular) => {
             "adhShowError",
             "adhSubmitIfValid",
             "adhResourceUrlFilter",
+            "adhUploadImage",
+            "flowFactory",
             editDirective])
         .directive("adhDocumentListing", ["adhConfig", listingDirective])
         .directive("adhDocumentListItem", [
