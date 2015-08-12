@@ -16,9 +16,14 @@
     height: 24px / $font-size-small * 1em;
     line-height: 24px / $font-size-small * 1em;
 
-    &:focus:enabled,
-    &:hover:enabled {
+    &:focus, &:hover {
         text-decoration: underline;
+    }
+
+    &.ng-disabled, &:disabled {
+        &:focus, &:hover {
+            text-decoration: underline;
+        }
     }
 }
 
