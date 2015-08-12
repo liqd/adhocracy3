@@ -9,6 +9,12 @@
     &:hover, &:focus {
         color: $color-text-highlight-normal;
     }
+
+    &.ng-disabled, &:disabled {
+        &:hover, &:focus {
+            color: $color-text-introvert;
+        }
+    }
 }
 
 .button {
@@ -16,9 +22,14 @@
     height: 24px / $font-size-small * 1em;
     line-height: 24px / $font-size-small * 1em;
 
-    &:focus:enabled,
-    &:hover:enabled {
+    &:focus, &:hover {
         text-decoration: underline;
+    }
+
+    &.ng-disabled, &:disabled {
+        &:focus, &:hover {
+            text-decoration: underline;
+        }
     }
 }
 
