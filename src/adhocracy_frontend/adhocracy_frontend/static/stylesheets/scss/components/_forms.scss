@@ -270,7 +270,7 @@ This error concerns the whole form.
     <form class="login-form">
         <input type="text" name="name" placeholder="email or username" />
         <input type="password" name="password" placeholder="password" />
-        <input type="submit" value="login" />
+        <input class="button button-cta" type="submit" value="login" />
     </form>
 </div>
 ```
@@ -299,7 +299,7 @@ This error concerns a single input.
         <input type="text" name="name" placeholder="email or username" />
         <span class="input-error">Too short</span>
         <input type="password" name="password" placeholder="password" />
-        <input type="submit" value="login" />
+        <input class="button button-cta" type="submit" value="login" />
     </form>
 </div>
 ```
