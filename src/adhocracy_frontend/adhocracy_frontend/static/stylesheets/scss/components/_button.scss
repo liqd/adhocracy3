@@ -19,6 +19,7 @@
     &.ng-disabled,
     &:disabled {
         @include opacity(0.5);
+        cursor: default;
     }
 }
 
