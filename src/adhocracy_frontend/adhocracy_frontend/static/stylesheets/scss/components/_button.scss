@@ -41,6 +41,7 @@ It may have the following states:
 <button type="button" class="button">Button</button>
 <input type="submit" class="button" value="Submit" />
 <input type="submit" class="button" value="Disabled" disabled="disabled" />
+<a class="button ng-disabled" href="">Disabled Link</a>
 ```
 */
 
@@ -58,6 +59,7 @@ A highlighted button. Each page should have one CTA at maxiumum.
 <button type="button" class="button-cta">Button</button>
 <input type="submit" class="button-cta" value="Submit" />
 <input type="submit" class="button-cta" value="Disabled" disabled="disabled" />
+<a class="button-cta ng-disabled" href="">Disabled Link</a>
 ```
 */
 
@@ -74,7 +76,9 @@ be used instead.
 ```html_example
 <a class="button-cta-secondary" href="">Link</a>
 <button type="button" class="button-cta-secondary">Button</button>
+<input type="submit" class="button-cta-secondary" value="Submit" />
 <input type="submit" class="button-cta-secondary" value="Disabled" disabled="disabled" />
+<a class="button-cta-secondary ng-disabled" href="">Disabled Link</a>
 ```
 */
 
