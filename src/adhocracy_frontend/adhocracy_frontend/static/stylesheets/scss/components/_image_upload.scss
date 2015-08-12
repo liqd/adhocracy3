@@ -1,0 +1,17 @@
+/*doc
+---
+title: Image Upload
+name: image-upload
+category: Widgets
+---
+
+<div class="image-upload">
+    <button type="button" class="button-cta-secondary image-upload-button">Change image</button>
+    <a  href="#" class="button image-upload-reset">reset</a>
+    <img src="/static/images/sample.jpg" class="image-upload-preview" width="200" alt="" />
+</div>
+*/
+.image-upload-preview {
+    display: block;
+    max-height: 10em;
+}
