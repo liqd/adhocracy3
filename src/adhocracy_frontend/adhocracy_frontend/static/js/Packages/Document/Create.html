@@ -36,16 +36,20 @@
 
         <label data-ng-if="$flow && $flow.support">
             <span class="label-text">{{ "TR__IMAGE_UPLOAD" | translate }}</span>
-            <div data-flow-init="" data-flow-object="$flow">
-                <button type="button" data-flow-btn="" class="button-cta-secondary">
+            <div data-flow-init="" data-flow-object="$flow" class="image-upload">
+                <button type="button" data-flow-btn="" class="button-cta-secondary image-upload-button">
                     <span data-ng-if="$flow.files.length">{{ "TR__IMAGE_CHANGE" | translate }}</span>
                     <span data-ng-if="!$flow.files.length">{{ "TR__IMAGE_CHOOSE" | translate }}</span>
                 </button>
                 <a  href=""
-                    class="button"
+                    class="button image-upload-reset"
                     data-ng-if="$flow.files.length"
                     data-ng-click="$flow.cancel()">{{ "TR__RESET" | translate }}</a>
-                <img data-ng-if="$flow.files.length" height="120" data-flow-img="$flow.files[0]" alt="{{ 'TR__IMAGE_SELECTED' | translate }}" />
+                <img
+                    class="image-upload-preview"
+                    data-ng-if="$flow.files.length"
+                    data-flow-img="$flow.files[0]"
+                    alt="{{ 'TR__IMAGE_SELECTED' | translate }}" />
             </div>
         </label>
     </div><!-- /.cover -->
