@@ -9,6 +9,12 @@
     &:hover, &:focus {
         color: $color-text-highlight-normal;
     }
+
+    &.ng-disabled, &:disabled {
+        &:hover, &:focus {
+            color: $color-text-introvert;
+        }
+    }
 }
 
 .button {
