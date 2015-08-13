@@ -27,7 +27,7 @@ def test_initiate_and_transition_to_result(registry, context):
 
 
 def _post_proposal_item(app_user, path='') -> TestResponse:
-    from adhocracy_core.resources.proposal import IProposal
+    from adhocracy_s1.resources.s1 import IProposal
     resp = app_user.post_resource(path, IProposal, {})
     return resp
 
@@ -50,12 +50,12 @@ class TestS1Workflow:
     def test_propose_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment in app_participant2.get_postable_types(
-            '/s1/item_0000000/comments')
+            '/s1/proposal_0000000/comments')
 
     def test_propose_participant_can_rate_proposal(self, app_participant2):
         from adhocracy_core.resources.rate import IRate
         assert IRate in app_participant2.get_postable_types(
-            '/s1/item_0000000/rates')
+            '/s1/proposal_0000000/rates')
 
     def test_change_state_to_select(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/s1', 'select')
@@ -68,12 +68,12 @@ class TestS1Workflow:
     def test_select_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment in app_participant2.get_postable_types(
-            '/s1/item_0000000/comments')
+            '/s1/proposal_0000000/comments')
 
     def test_select_participant_can_rate_proposal(self, app_participant2):
         from adhocracy_core.resources.rate import IRate
         assert IRate in app_participant2.get_postable_types(
-            '/s1/item_0000000/rates')
+            '/s1/proposal_0000000/rates')
 
     def test_change_state_to_result(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/s1', 'result')
@@ -82,10 +82,12 @@ class TestS1Workflow:
     def test_select_participant_cannot_comment_proposal(self, app_participant):
         from adhocracy_core.resources.comment import IComment
         assert IComment not in app_participant.get_postable_types(
-            '/s1/item_0000000/comments')
+        assert IComment in app_participant2.get_postable_types(
+            '/s1/proposal_0000000/comments')
 
     def test_select_participant_cannot_rate_proposal(self, app_participant):
         from adhocracy_core.resources.rate import IRate
         assert IRate not in app_participant.get_postable_types(
-            '/s1/item_0000000/rates')
+        assert IRate in app_participant2.get_postable_types(
+            '/s1/proposal_0000000/rates')
 
