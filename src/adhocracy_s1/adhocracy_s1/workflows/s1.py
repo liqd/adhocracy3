@@ -59,6 +59,29 @@ s1_meta = freeze({
 })
 
 
+s1_content_meta = freeze({
+    'initial_state': 'proposed',
+    'states': {
+        'proposed': {},
+        'voteable': {},
+        'selected': {},
+        'rejected': {},
+    },
+    'transitions': {
+        'to_votable': {'from_state': 'proposed',
+                       'to_state': 'voteable',
+                       },
+        'to_selected': {'from_state': 'voteable',
+                        'to_state': 'selected',
+                       },
+        'to_rejected': {'from_state': 'voteable',
+                        'to_state': 'rejected',
+                        },
+    },
+})
+
+
 def includeme(config):
     """Add workflow."""
     add_workflow(config.registry, s1_meta, 's1')
+    add_workflow(config.registry, s1_content_meta, 's1_content')

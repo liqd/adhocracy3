@@ -89,3 +89,21 @@ class TestS1Workflow:
         assert IRate in app_participant2.get_postable_types(
             '/s1/proposal_0000000/rates')
 
+
+@mark.usefixtures('integration')
+def test_s1_content_includeme_add_workflow(registry):
+    from adhocracy_core.workflows import AdhocracyACLWorkflow
+    workflow = registry.content.workflows['s1_content']
+    assert isinstance(workflow, AdhocracyACLWorkflow)
+
+
+@mark.usefixtures('integration')
+def test_s1_content_initiate_and_transition_to_selected(registry, context,
+                                                        request_):
+    workflow = registry.content.workflows['s1_content']
+    workflow.initialize(context)
+    assert workflow.state_of(context) is 'proposed'
+    workflow.transition_to_state(context, request_, 'voteable')
+    workflow.transition_to_state(context, request_, 'selected')
+
+

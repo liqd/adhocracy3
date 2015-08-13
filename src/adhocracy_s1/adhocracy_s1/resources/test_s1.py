@@ -36,7 +36,7 @@ class TestProposal:
         assert meta.iresource == resources.s1.IProposal
         assert meta.iresource.isOrExtends(
             adhocracy_core.resources.proposal.IProposal)
-        assert meta.workflow_name== ''
+        assert meta.workflow_name == 's1_content'
         assert meta.element_types == (resources.s1.IProposalVersion,)
         assert meta.item_type == resources.s1.IProposalVersion
         assert meta.permission_create == 'create_proposal'
