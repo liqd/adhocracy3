@@ -43,7 +43,7 @@ def _do_transition_to(app_user, path, state) -> TestResponse:
 @mark.functional
 class TestS1Workflow:
 
-    def test_propose_participant_creates_proposal(self, app_participant):
+    def test_propose_participant_can_create_proposal(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
         assert resp.status_code == 200
 
@@ -61,9 +61,9 @@ class TestS1Workflow:
         resp = _do_transition_to(app_initiator, '/s1', 'select')
         assert resp.status_code == 200
 
-    def test_select_participant_cannot_create_proposal(self, app_participant):
-        from adhocracy_core.resources.proposal import IProposal
-        assert IProposal not in app_participant.get_postable_types('/s1/')
+    def test_select_participant_can_create_proposal(self, app_participant):
+        resp = _post_proposal_item(app_participant, path='/s1')
+        assert resp.status_code == 200
 
     def test_select_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
@@ -79,15 +79,17 @@ class TestS1Workflow:
         resp = _do_transition_to(app_initiator, '/s1', 'result')
         assert resp.status_code == 200
 
-    def test_select_participant_cannot_comment_proposal(self, app_participant):
+    def test_result_participant_can_create_proposal(self, app_participant):
+        resp = _post_proposal_item(app_participant, path='/s1')
+        assert resp.status_code == 200
+
+    def test_result_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
-        assert IComment not in app_participant.get_postable_types(
         assert IComment in app_participant2.get_postable_types(
             '/s1/proposal_0000000/comments')
 
-    def test_select_participant_cannot_rate_proposal(self, app_participant):
+    def test_result_participant_can_rate_proposal(self, app_participant2):
         from adhocracy_core.resources.rate import IRate
-        assert IRate not in app_participant.get_postable_types(
         assert IRate in app_participant2.get_postable_types(
             '/s1/proposal_0000000/rates')
 
