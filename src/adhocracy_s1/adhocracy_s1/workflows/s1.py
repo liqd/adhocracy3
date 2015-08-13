@@ -24,7 +24,9 @@ s1_meta = freeze({
                    'description': '',
                    'acm': {'principals':                     ['participant', 'moderator', 'creator', 'initiator'],
                            'permissions':
-                             [['create_rate',                'Allow',        None,        None,      None],
+                             [['create_proposal',            'Allow',        None,        None,     'Allow'],
+                              ['edit_proposal',               None,          None,       'Allow',    None],
+                              ['create_rate',                'Allow',        None,        None,      None],
                               ['edit_rate',                   None,          None,       'Allow',    None],
                               ['create_comment',             'Allow',       'Allow',      None,     'Allow'],
                               ['edit_comment',                None,          None,       'Allow',    None],
@@ -32,7 +34,16 @@ s1_meta = freeze({
         },
         'result': {'title': 'Result',
                    'description': '',
-                   },
+                   'acm': {'principals':                    ['participant', 'moderator', 'creator', 'initiator'],
+                           'permissions':
+                                  [['create_proposal',            'Allow',        None,        None,     'Allow'],
+                                   ['edit_proposal',               None,          None,       'Allow',    None],
+                                   ['create_comment',             'Allow',       'Allow',      None,     'Allow'],
+                                   ['edit_comment',                None,          None,       'Allow',    None],
+                                   ['create_rate',                'Allow',        None,        None,      None],
+                                   ['edit_rate',                   None,          None,       'Allow',    None],
+                                   ]},
+                        },
     },
     'transitions': {
         'to_select': {'from_state': 'propose',
