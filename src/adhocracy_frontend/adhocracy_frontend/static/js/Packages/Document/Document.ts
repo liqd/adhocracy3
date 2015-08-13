@@ -1,9 +1,12 @@
 import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhBadge = require("../Badge/Badge");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
 import AdhInject = require("../Inject/Inject");
+import AdhMapping = require("../Mapping/Mapping");
+import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
@@ -11,16 +14,19 @@ import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
-import AdhCommentAdapter = require("../Comment/Adapter");
-
+import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
 import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
+import RIGeoDocument = require("../../Resources_/adhocracy_core/resources/document/IGeoDocument");
+import RIGeoDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -34,8 +40,16 @@ export interface IParagraph {
     selectedState? : string;
 }
 
+export interface IBadge {
+    title : string;
+    description : string;
+    name : string;
+}
+
 export interface IScope extends angular.IScope {
     path? : string;
+    hasMap? : boolean;
+    hasBadges?: boolean;
     options : AdhHttp.IOptions;
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
@@ -46,6 +60,10 @@ export interface IScope extends angular.IScope {
         creator? : string;
         creationDate? : string;
         modificationDate? : string;
+
+        // optional features
+        coordinates? : number[];
+        assignments?: IBadge[];
     };
     selectedState? : string;
     resource: any;
@@ -63,6 +81,7 @@ export interface IFormScope extends IScope {
     submit() : angular.IPromise<any>;
     cancel() : void;
     documentForm : any;
+    polygon? : number[][];
 }
 
 export var highlightSelectedParagraph = (
@@ -84,30 +103,43 @@ export var highlightSelectedParagraph = (
 export var bindPath = (
     $q : angular.IQService,
     adhHttp : AdhHttp.Service<any>,
+    adhGetBadges? : AdhBadge.IGetBadges,
     adhTopLevelState? : AdhTopLevelState.Service
 ) => (
     scope : IScope,
-    pathKey : string = "path"
+    pathKey : string = "path",
+    hasMap : boolean = false,
+    hasBadges : boolean = false
 ) : Function => {
-    var commentableAdapter = new AdhCommentAdapter.ListingCommentableAdapter();
-
     return scope.$watch(pathKey, (path : string) => {
         if (path) {
             adhHttp.get(path).then((documentVersion : RIDocumentVersion) => {
                 var paragraphPaths : string[] = documentVersion.data[SIDocument.nick].elements;
-                var paragraphPromises = _.map(paragraphPaths, (path) => adhHttp.get(path));
+                var paragraphPromises = _.map(paragraphPaths, (path) => {
+                    return $q.all([
+                        adhHttp.get(path),
+                        adhHttp.get(AdhUtil.parentPath(path), {
+                            content_type: RICommentVersion.content_type,
+                            depth: "all",
+                            tag: "LAST",
+                            count: true
+                        }).then((pool) => pool.data[SIPool.nick].count)
+                    ]);
+                });
 
-                return $q.all(paragraphPromises).then((paragraphVersions : RIParagraphVersion[]) => {
-                    var paragraphs = _.map(paragraphVersions, (paragraphVersion) => {
+                return $q.all(paragraphPromises).then((argss : any[][]) => {
+                    var paragraphs = _.map(argss, (args) => {
+                        var paragraphVersion : RIParagraphVersion = args[0];
+                        var commentCount : number = args[1];
                         return {
                             body: paragraphVersion.data[SIParagraph.nick].text,
-                            commentCount: commentableAdapter.totalCount(paragraphVersion),
+                            commentCount: commentCount,
                             path: paragraphVersion.path
                         };
                     });
 
                     scope.documentVersion = documentVersion;
-                    scope.paragraphVersions = paragraphVersions;
+                    scope.paragraphVersions = _.map(argss, (args) => args[0]);
 
                     scope.data = {
                         title: documentVersion.data[SITitle.nick].title,
@@ -119,6 +151,16 @@ export var bindPath = (
                         creator: documentVersion.data[SIMetadata.nick].creator,
                         picture: documentVersion.data[SIImageReference.nick].picture
                     };
+
+                    if (hasMap) {
+                        scope.data.coordinates = documentVersion.data[SIPoint.nick].coordinates;
+                    }
+
+                    if (hasBadges) {
+                        adhGetBadges(documentVersion).then((assignments) => {
+                            scope.data.assignments = assignments;
+                        });
+                    }
 
                     // FIXME: This probably isn't the right place for this also topLevelState
                     // had to be included in this function just for this
@@ -136,9 +178,13 @@ export var postCreate = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IFormScope,
-    poolPath : string
+    poolPath : string,
+    hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
-    var doc = new RIDocument({preliminaryNames: adhPreliminaryNames});
+    const documentClass = hasMap ? RIGeoDocument : RIDocument;
+    const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
+
+    var doc = new documentClass({preliminaryNames: adhPreliminaryNames});
     doc.parent = poolPath;
 
     var paragraphItems = [];
@@ -161,7 +207,7 @@ export var postCreate = (
         paragraphVersions.push(version);
     });
 
-    var documentVersion = new RIDocumentVersion({preliminaryNames: adhPreliminaryNames});
+    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
     documentVersion.parent = doc.path;
     documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [doc.first_version_path]
@@ -173,6 +219,11 @@ export var postCreate = (
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
+    if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
+        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+            coordinates: scope.data.coordinates
+        });
+    }
 
     return adhHttp.deepPost(<any[]>_.flatten([doc, documentVersion, paragraphItems, paragraphVersions]))
         .then((result) => result[1]);
@@ -184,12 +235,15 @@ export var postEdit = (
 ) => (
     scope : IFormScope,
     oldVersion : RIDocumentVersion,
-    oldParagraphVersions : RIParagraphVersion[]
+    oldParagraphVersions : RIParagraphVersion[],
+    hasMap : boolean = false
 ) : angular.IPromise<RIDocumentVersion> => {
     // This function assumes that paragraphs can not be reordered or deleted
     // and that new paragraphs are always appended to the end.
 
     var documentPath = AdhUtil.parentPath(oldVersion.path);
+
+    const documentVersionClass = hasMap ? RIGeoDocumentVersion : RIDocumentVersion;
 
     var paragraphItems : RIParagraph[] = [];
     var paragraphVersions : RIParagraphVersion[] = [];
@@ -237,7 +291,7 @@ export var postEdit = (
         }
     });
 
-    var documentVersion = new RIDocumentVersion({preliminaryNames: adhPreliminaryNames});
+    var documentVersion = new documentVersionClass({preliminaryNames: adhPreliminaryNames});
     documentVersion.parent = documentPath;
     documentVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
@@ -249,6 +303,11 @@ export var postEdit = (
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
+    if (hasMap && scope.data.coordinates && scope.data.coordinates[0] && scope.data.coordinates[1]) {
+        documentVersion.data[SIPoint.nick] = new SIPoint.Sheet({
+            coordinates: scope.data.coordinates
+        });
+    }
     // FIXME: workaround for a backend bug
     var oldImageReferenceSheet = oldVersion.data[SIImageReference.nick];
     if (oldImageReferenceSheet.picture) {
@@ -263,16 +322,20 @@ export var detailDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhGetBadges : AdhBadge.IGetBadges,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?",
+            hasBadges: "=?",
+            badgeclass: "=?"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp, adhTopLevelState)(scope);
+            bindPath($q, adhHttp, adhGetBadges, adhTopLevelState)(scope, undefined, scope.hasMap, scope.hasBadges);
             scope.$on("$destroy", adhTopLevelState.on("commentableUrl", (commentableUrl) => {
                 highlightSelectedParagraph(adhTopLevelState.get("commentableUrl"), scope);
             }));
@@ -284,16 +347,19 @@ export var listItemDirective = (
     $q : angular.IQService,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
+    adhGetBadges : AdhBadge.IGetBadges,
     adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?",
+            hasBadges: "=?"
         },
         link: (scope : IScope) => {
-            bindPath($q, adhHttp)(scope);
+            bindPath($q, adhHttp, adhGetBadges)(scope, undefined, scope.hasMap, scope.hasBadges);
 
             scope.$on("$destroy", adhTopLevelState.on("documentUrl", (documentVersionUrl) => {
                 if (!documentVersionUrl) {
@@ -306,6 +372,32 @@ export var listItemDirective = (
             }));
         }
     };
+};
+
+export var mapListItemDirective = (
+    $q : angular.IQService,
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhGetBadges : AdhBadge.IGetBadges,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    var directive : angular.IDirective = listItemDirective($q, adhConfig, adhHttp, adhGetBadges, adhTopLevelState);
+    var superLink = <Function>directive.link;
+
+    directive.require = "^adhMapListingInternal";
+    directive.link = (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
+        scope.hasMap = true;
+        superLink(scope);
+
+        var unregister = scope.$watch("data.coordinates", (coordinates : number[]) => {
+            if (typeof coordinates !== "undefined" && coordinates.length === 2) {
+                scope.$on("$destroy", mapListing.registerListItem(scope.path, coordinates[1], coordinates[0]));
+                unregister();
+            }
+        });
+    };
+
+    return directive;
 };
 
 export var listingDirective = (
@@ -337,7 +429,9 @@ export var createDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?",
+            polygon: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -345,7 +439,8 @@ export var createDirective = (
                 title: "",
                 paragraphs: [{
                     body: ""
-                }]
+                }],
+                coordinates: []
             };
             scope.showError = adhShowError;
 
@@ -357,12 +452,12 @@ export var createDirective = (
 
             scope.cancel = () => {
                 var processUrl = adhTopLevelState.get("processUrl");
-                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(processUrl));
+                adhTopLevelState.goToCameFrom(adhResourceUrlFilter(processUrl));
             };
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path, scope.hasMap);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
@@ -387,7 +482,10 @@ export var editDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
-            path: "@"
+            path: "@",
+            hasMap: "=?",
+            hasBadges: "=?",
+            polygon: "=?"
         },
         link: (scope : IFormScope, element) => {
             scope.errors = [];
@@ -399,16 +497,16 @@ export var editDirective = (
                 });
             };
 
-            bindPath($q, adhHttp)(scope);
+            bindPath($q, adhHttp)(scope, undefined, scope.hasMap);
 
             scope.cancel = () => {
                 var itemPath = AdhUtil.parentPath(scope.documentVersion.path);
-                adhTopLevelState.redirectToCameFrom(adhResourceUrlFilter(itemPath));
+                adhTopLevelState.goToCameFrom(adhResourceUrlFilter(itemPath));
             };
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
+                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions, scope.hasMap);
                 }).then((documentVersion : RIDocumentVersion) => {
                     var itemPath = AdhUtil.parentPath(documentVersion.path);
                     $location.url(adhResourceUrlFilter(itemPath));
@@ -430,6 +528,8 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhImage.moduleName,
             AdhInject.moduleName,
+            AdhMapping.moduleName,
+            AdhMarkdown.moduleName,
             AdhPreliminaryNames.moduleName,
             AdhResourceArea.moduleName,
             AdhResourceWidgets.moduleName,
@@ -442,7 +542,7 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("document-edit");
             adhEmbedProvider.embeddableDirectives.push("document-list-item");
         }])
-        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", detailDirective])
+        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", detailDirective])
         .directive("adhDocumentCreate", [
             "$location",
             "adhConfig",
@@ -466,5 +566,7 @@ export var register = (angular) => {
             editDirective])
         .directive("adhDocumentListing", ["adhConfig", listingDirective])
         .directive("adhDocumentListItem", [
-            "$q", "adhConfig", "adhHttp", "adhTopLevelState", listItemDirective]);
+            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", listItemDirective])
+        .directive("adhDocumentMapListItem", [
+            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", mapListItemDirective]);
 };

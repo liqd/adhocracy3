@@ -15,10 +15,12 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.interfaces import ISimple
 from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import add_badges_service
@@ -198,6 +200,8 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
             pool._autoname_lasts = {prefix: pool._autoname_last
                                     for prefix in prefixes}
             del pool._autoname_last
+        elif not hasattr(pool, '_autoname_lasts'):
+            pool._autoname_lasts = {prefix: 0 for prefix in prefixes}
 
 
 @log_migration
@@ -242,6 +246,13 @@ def remove_name_sheet_from_items(root):  # pragma: no cover
         noLongerProvides(resource, IName)
 
 
+@log_migration
+def add_workflow_assignment_sheet_to_pools_simples(root):  # pragma: no cover
+    """Add generic workflow sheet to pools and simples."""
+    migrate_new_sheet(root, IPool, IWorkflowAssignment)
+    migrate_new_sheet(root, ISimple, IWorkflowAssignment)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -254,3 +265,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(hide_password_resets)
     config.add_evolution_step(lower_case_users_emails)
     config.add_evolution_step(remove_name_sheet_from_items)
+    config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)

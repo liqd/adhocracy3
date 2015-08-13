@@ -9,6 +9,7 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid.traversal import resource_path
 from pyramid.security import Everyone
+from pyramid.settings import asbool
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
@@ -131,12 +132,13 @@ def _get_x_user_headers(request: Request) -> tuple:
     schema = Resource().bind(request=request, context=request.context)
     user_url = request.headers.get('X-User-Path', None)
     user_path = None
-    try:
-        user = schema.deserialize(user_url)
-        user_path = resource_path(user)
-    except Invalid:
-        # TODO: raise a proper colander error.
-        pass
+    if user_url is not None:
+        try:
+            user = schema.deserialize(user_url)
+            user_path = resource_path(user)
+        except Invalid:
+            # TODO: raise a proper colander error.
+            pass
     token = request.headers.get('X-User-Token', None)
     return (user_path, token)
 
@@ -194,6 +196,9 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
     def _get_authenticated_user_id(self, request: Request,
                                    tokenmanager: ITokenManger) -> str:
         userid, token = _get_x_user_headers(request)
+        settings = request.registry.settings
+        if not asbool(settings.get('adhocracy.validate_user_token', True)):
+            return userid
         authenticated_userid = tokenmanager.get_user_id(token,
                                                         timeout=self.timeout)
         if authenticated_userid != userid:

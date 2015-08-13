@@ -6,15 +6,15 @@ from adhocracy_core.workflows import add_workflow
 from pyrsistent import freeze
 
 standard_meta = freeze({
-    'states_order': ['draft', 'announce', 'participate', 'evaluate', 'result', 'closed'],
+    'initial_state': 'draft',
     'states': {
         'draft': {'title': 'Draft',
                   'description': 'This phase is for internal review.',
-                  'acm': {'principals':         ['anonymous',   'participant', 'moderator', 'creator', 'initiator'],
+                  'acm': {'principals':         ['anonymous',   'moderator',   'participant', 'creator', 'initiator'],
                           'permissions':
-                          [['view',              'Deny',        'Deny',        'Allow',     'Allow',   'Allow'],
-                           ['create_proposal',    None,          None,          None,        None,     'Allow'],
-                           ['edit_proposal',      None,          None,          None,       'Allow',   'Allow'],
+                          [['view',              'Deny',        'Allow',       'Deny',        'Allow',   'Allow'],
+                           ['create_document',    None,         'Allow',        None,          None,      None],
+                           ['edit_document',      None,         'Allow',        None,         'Allow',   'Allow'],
                           ]},
                   'display_only_to_roles': ['admin', 'initiator', 'moderator'],
                   },
@@ -25,9 +25,9 @@ standard_meta = freeze({
                         'description': '',
                         'acm': {'principals':                    ['participant', 'moderator', 'creator', 'initiator'],
                                 'permissions':
-                                  [['create_proposal',            'Allow',        None,        None,     'Allow'],
+                                  [['create_proposal',            'Allow',        None,        None,      None],
                                    ['edit_proposal',               None,          None,       'Allow',    None],
-                                   ['create_comment',             'Allow',       'Allow',      None,     'Allow'],
+                                   ['create_comment',             'Allow',       'Allow',      None,      None],
                                    ['edit_comment',                None,          None,       'Allow',    None],
                                    ['create_rate',                'Allow',        None,        None,      None],
                                    ['edit_rate',                   None,          None,       'Allow',    None],
@@ -37,12 +37,21 @@ standard_meta = freeze({
                      'description': '',
                      'acm': {'principals':                      ['participant', 'moderator', 'creator', 'initiator'],
                              'permissions':
-                             [['create_proposal',                 None,          None,        None,     'Allow'],
-                              ['edit_proposal',                   None,          None,        None,     'Allow'],
+                             [['create_proposal',                 None,          None,        None,      None],
+                              ['edit_proposal',                   None,          None,        None,      None],
+                              ['create_comment',                 'Allow',       'Allow',      None,      None],
+                              ['edit_comment',                    None,          None,       'Allow',    None],
                              ]}
         },
         'result': {'title': 'Result',
                    'description': '',
+                   'acm': {'principals':                        ['participant', 'moderator', 'creator', 'initiator'],
+                             'permissions':
+                             [['create_proposal',                 None,          None,        None,      None],
+                              ['edit_proposal',                   None,          None,        None,      None],
+                              ['create_comment',                  None,         'Allow',      None,     'Allow'],
+                              ['edit_comment',                    None,          None,       'Allow',    None],
+                             ]}
                    },
         'closed': {'title': 'Closed',
                    'description': '',

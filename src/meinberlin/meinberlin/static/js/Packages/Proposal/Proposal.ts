@@ -1,33 +1,35 @@
-/// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
-import AdhBadge = require("../../../Badge/Badge");
-import AdhConfig = require("../../../Config/Config");
-import AdhEmbed = require("../../../Embed/Embed");
-import AdhHttp = require("../../../Http/Http");
-import AdhMapping = require("../../../Mapping/Mapping");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
-import AdhRate = require("../../../Rate/Rate");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../../Util/Util");
+import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
+import AdhBadge = require("../Badge/Badge");
+import AdhConfig = require("../Config/Config");
+import AdhEmbed = require("../Embed/Embed");
+import AdhHttp = require("../Http/Http");
+import AdhMapping = require("../Mapping/Mapping");
+import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhRate = require("../Rate/Rate");
+import AdhResourceArea = require("../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUtil = require("../Util/Util");
 
-import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
-import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIMetadata = require("../../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIPoint = require("../../../../Resources_/adhocracy_core/sheets/geo/IPoint");
-import SIPool = require("../../../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
-import SIRateable = require("../../../../Resources_/adhocracy_core/sheets/rate/IRateable");
-import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIDescription = require("../../../../Resources_/adhocracy_core/sheets/description/IDescription");
-import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
+import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+import RIGeoProposal = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
+import RIGeoProposalVersion = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
+import RIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
+import RIKiezkassenProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
+import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
+import SIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
+import SILocationReference = require("../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import SIMultiPolygon = require("../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
+import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
+import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
-var pkgLocation = "/MeinBerlin/Kiezkassen/Proposal";
+var pkgLocation = "/Proposal";
 
 
 export interface IScope extends angular.IScope {
@@ -36,11 +38,7 @@ export interface IScope extends angular.IScope {
     errors? : AdhHttp.IBackendErrorItem[];
     data : {
         title : string;
-        budget : number;
         detail : string;
-        creatorParticipate : boolean;
-        locationText : string;
-        address : string;
         creator : string;
         creationDate : string;
         commentCount : number;
@@ -48,9 +46,15 @@ export interface IScope extends angular.IScope {
         lat : number;
         polygon: number[][];
         assignments : AdhBadge.IBadge[];
+
+        budget? : number;
+        creatorParticipate? : boolean;
+        locationText? : string;
+        address? : string;
     };
     selectedState? : string;
-    resource: RIProposalVersion;
+    isKiezkasse : boolean;
+    resource : any;
 }
 
 // FIXME: the following functions duplicate some of the adhResourceWidget functionality
@@ -64,7 +68,8 @@ var bindPath = (
     adhGetBadges : AdhBadge.IGetBadges
 ) => (
     scope : IScope,
-    pathKey : string = "path"
+    pathKey : string = "path",
+    isKiezkasse : boolean = false
 ) : void => {
     scope.$watch(pathKey, (value : string) => {
         if (value) {
@@ -76,13 +81,15 @@ var bindPath = (
                 tag: "LAST",
                 count: true
             }).then((pool) => {
-                adhHttp.get(value).then((resource : RIProposalVersion) => {
+                adhHttp.get(value).then((resource) => {
 
                     scope.resource = resource;
 
                     var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
                     var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                    var mainSheet : SIProposal.Sheet = resource.data[SIProposal.nick];
+                    if (isKiezkasse) {
+                        var kiezkassenSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                    }
                     var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
                     var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
                     var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
@@ -101,13 +108,8 @@ var bindPath = (
                                 adhGetBadges(resource).then((assignments) => {
                                     scope.data = {
                                         title: titleSheet.title,
-                                        budget: mainSheet.budget,
                                         detail: descriptionSheet.description,
-                                        creatorParticipate: mainSheet.creator_participate,
-                                        address: mainSheet.address,
                                         rateCount: ratesPro - ratesContra,
-                                        locationText: mainSheet.location_text,
-                                        adlocationText: mainSheet.location_text,
                                         creator: metadataSheet.creator,
                                         creationDate: metadataSheet.item_creation_date,
                                         commentCount: poolSheet.count,
@@ -116,6 +118,12 @@ var bindPath = (
                                         polygon: polygon,
                                         assignments: assignments
                                     };
+                                    if (isKiezkasse) {
+                                        scope.data.budget = kiezkassenSheet.budget;
+                                        scope.data.address = kiezkassenSheet.address;
+                                        scope.data.creatorParticipate = kiezkassenSheet.creator_participate;
+                                        scope.data.locationText = kiezkassenSheet.location_text;
+                                    }
                                 });
                             });
                         });
@@ -129,15 +137,19 @@ var bindPath = (
 
 var fill = (
     scope : IScope,
-    proposalVersion : RIProposalVersion
+    proposalVersion,
+    isKiezkasse : boolean = false
 ) : void => {
-    proposalVersion.data[SIProposal.nick] = new SIProposal.Sheet({
-        budget: scope.data.budget,
-        detail: scope.data.detail,
-        creator_participate: scope.data.creatorParticipate,
-        location_text: scope.data.locationText,
-        address: scope.data.address
-    });
+
+    if (isKiezkasse) {
+        proposalVersion.data[SIKiezkassenProposal.nick] = new SIKiezkassenProposal.Sheet({
+            budget: scope.data.budget,
+            detail: scope.data.detail,
+            creator_participate: scope.data.creatorParticipate,
+            location_text: scope.data.locationText,
+            address: scope.data.address
+        });
+    }
     proposalVersion.data[SITitle.nick] = new SITitle.Sheet({
         title: scope.data.title
     });
@@ -156,17 +168,21 @@ var postCreate = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    poolPath : string
+    poolPath : string,
+    isKiezkasse : boolean = false
 ) => {
-    var proposal = new RIProposal({preliminaryNames: adhPreliminaryNames});
-    proposal.parent = poolPath;
+    var proposalClass = isKiezkasse ? RIKiezkassenProposal : RIGeoProposal;
+    var proposalVersionClass = isKiezkasse ? RIKiezkassenProposalVersion : RIGeoProposalVersion;
 
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposal = new proposalClass({preliminaryNames: adhPreliminaryNames});
+    proposal.parent = poolPath;
+    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
+
     proposalVersion.parent = proposal.path;
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [proposal.first_version_path]
     });
-    fill(scope, proposalVersion);
+    fill(scope, proposalVersion, isKiezkasse);
 
     return adhHttp.deepPost([proposal, proposalVersion]);
 };
@@ -176,14 +192,17 @@ var postEdit = (
     adhPreliminaryNames : AdhPreliminaryNames.Service
 ) => (
     scope : IScope,
-    oldVersion : RIProposalVersion
+    oldVersion,
+    isKiezkasse : boolean = false
 ) => {
-    var proposalVersion = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+    var proposalVersionClass = isKiezkasse ? RIKiezkassenProposalVersion : RIGeoProposalVersion;
+
+    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
     });
-    fill(scope, proposalVersion);
+    fill(scope, proposalVersion, isKiezkasse);
 
     return adhHttp.deepPost([proposalVersion]);
 };
@@ -200,10 +219,11 @@ export var detailDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Detail.html",
         scope: {
-            path: "@"
+            path: "@",
+            isKiezkasse: "="
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope, undefined, scope.isKiezkasse);
         }
     };
 };
@@ -220,10 +240,11 @@ export var listItemDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         scope: {
-            path: "@"
+            path: "@",
+            isKiezkasse: "="
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope, undefined, scope.isKiezkasse);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
                     scope.selectedState = "";
@@ -250,10 +271,11 @@ export var mapListItemDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/ListItem.html",
         require: "^adhMapListingInternal",
         scope: {
-            path: "@"
+            path: "@",
+            isKiezkasse: "="
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope, undefined, scope.isKiezkasse);
 
             var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
                 if (typeof values[0] !== "undefined" && typeof values[1] !== "undefined") {
@@ -287,6 +309,9 @@ export var createDirective = (
 ) => {
     return {
         restrict: "E",
+        scope: {
+            isKiezkasse: "="
+        },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         link: (scope, element) => {
             scope.errors = [];
@@ -308,7 +333,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    return postCreate(adhHttp, adhPreliminaryNames)(scope, processUrl)
+                    return postCreate(adhHttp, adhPreliminaryNames)(scope, processUrl, scope.isKiezkasse)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[1].path)));
                         });
@@ -335,16 +360,17 @@ export var editDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Create.html",
         scope: {
-            path: "@"
+            path: "@",
+            isKiezkasse: "="
         },
         link: (scope, element) => {
             scope.errors = [];
             scope.showError = adhShowError;
             scope.create = false;
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope);
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(scope, undefined, scope.isKiezkasse);
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.meinBerlinProposalForm, () => {
-                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource)
+                    return postEdit(adhHttp, adhPreliminaryNames)(scope, scope.resource, scope.isKiezkasse)
                         .then((result) => {
                             $location.url(adhResourceUrlFilter(AdhUtil.parentPath(result[0].path)));
                     });
@@ -354,12 +380,8 @@ export var editDirective = (
     };
 };
 
-export var meinBerlinProposalFormController = ($scope, $element, $window) => {
-    console.log($scope);
-};
 
-
-export var moduleName = "adhMeinBerlinKiezkassenProposal";
+export var moduleName = "adhMeinBerlinProposal";
 
 export var register = (angular) => {
     angular
@@ -375,19 +397,19 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-detail");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list-item");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-create");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-edit");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-kiezkassen-proposal-list");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-detail");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list-item");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-create");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-edit");
+            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list");
         }])
-        .directive("adhMeinBerlinKiezkassenProposalDetail", [
+        .directive("adhMeinBerlinProposalDetail", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", detailDirective])
-        .directive("adhMeinBerlinKiezkassenProposalListItem", [
+        .directive("adhMeinBerlinProposalListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", listItemDirective])
-        .directive("adhMeinBerlinKiezkassenProposalMapListItem", [
+        .directive("adhMeinBerlinProposalMapListItem", [
             "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", mapListItemDirective])
-        .directive("adhMeinBerlinKiezkassenProposalCreate", [
+        .directive("adhMeinBerlinProposalCreate", [
             "adhConfig",
             "adhHttp",
             "adhPreliminaryNames",
@@ -398,7 +420,7 @@ export var register = (angular) => {
             "$location",
             createDirective
         ])
-        .directive("adhMeinBerlinKiezkassenProposalEdit", [
+        .directive("adhMeinBerlinProposalEdit", [
             "adhConfig",
             "adhHttp",
             "adhPermissions",
@@ -411,6 +433,5 @@ export var register = (angular) => {
             "adhGetBadges",
             "$location",
             editDirective
-        ])
-        .controller("meinBerlinKiezkassenProposalFormController", [meinBerlinProposalFormController]);
+        ]);
 };

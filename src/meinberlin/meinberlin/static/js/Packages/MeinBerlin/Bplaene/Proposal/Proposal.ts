@@ -11,7 +11,7 @@ import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resourc
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion");
 import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal");
 import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SIWorkflow = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IWorkflowAssignment");
+import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
 

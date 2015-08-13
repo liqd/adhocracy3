@@ -343,14 +343,31 @@ class TestResourceContentRegistry:
         with raises(ValueError):
             inst.resolve_isheet_field_from_dotted_string(dotted)
 
-    def test_get_worfklow(self, inst, mock_workflow):
-        inst.workflows['sample'] = mock_workflow
-        assert inst.get_workflow('sample') == mock_workflow
+    def test_get_workflow_non_iresource(self, inst):
+        context = testing.DummyResource()
+        assert inst.get_workflow(context) is None
 
-    def test_get_worfklow_raise_if_wrong_name(self, inst, mock_workflow):
+    def test_get_workflow_workflow_set(self, inst, context, mock_workflow,
+                                       resource_meta):
+        inst.workflows['sample'] = mock_workflow
+        meta = resource_meta._replace(workflow_name='sample')
+        inst.resources_meta[IResource] = meta
+        assert inst.get_workflow(context) == mock_workflow
+
+    def test_get_workflow_workflow_not_set(self, inst, context, mock_workflow,
+                                       resource_meta):
+        inst.workflows['sample'] = mock_workflow
+        meta = resource_meta._replace(workflow_name='')
+        inst.resources_meta[IResource] = meta
+        assert inst.get_workflow(context) is None
+
+    def test_get_workflow_raise_if_wrong_workflow_name(self, inst, context,
+                                                       resource_meta):
+        meta = resource_meta._replace(workflow_name='WRONG')
+        inst.resources_meta[IResource] = meta
         from adhocracy_core.exceptions import RuntimeConfigurationError
         with raises(RuntimeConfigurationError):
-            inst.get_workflow('sample')
+            inst.get_workflow(context)
 
 
 @fixture

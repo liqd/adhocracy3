@@ -7,12 +7,19 @@ from pytest import fixture
 from pytest import mark
 from pytest import raises
 from unittest.mock import Mock
+import pytest
+from substanced.workflow import WorkflowError
 
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.workflow import WorkflowAssignmentSchema
 from adhocracy_core.sheets import add_sheet_to_registry
+
+
+@fixture
+def registry(registry_with_content):
+    return registry_with_content
 
 
 class TestAdhocracyACLWorkflow:
@@ -61,8 +68,8 @@ class TestAddWorkflow:
     @fixture
     def cstruct(self) -> dict:
         """Return example workflow cstruct with required data."""
-        cstruct = freeze(\
-            {'states_order': ['draft', 'announced'],
+        cstruct = freeze(
+            {'initial_state': 'draft',
              'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []}},
@@ -84,7 +91,7 @@ class TestAddWorkflow:
         assert 'name' not in meta
         assert meta['states']
         assert meta['transitions']
-        assert meta['states_order']
+        assert meta['initial_state']
 
     def test_create_workflow_and_add_to_workflows_meta(self, registry, cstruct):
         from substanced.workflow import ACLWorkflow
@@ -101,7 +108,6 @@ class TestAddWorkflow:
         assert states[0]['initial'] is False
         assert workflow._states['draft'].acl == [('Deny', 'role:moderator', 'view')]
         assert states[1]['initial'] is True
-
 
     def test_create_workflow_and_add_transitions(self, registry, cstruct):
         transition_data = cstruct['transitions']['to_announced']
@@ -139,22 +145,12 @@ class TestAddWorkflow:
 
 
 @mark.usefixtures('integration')
-class TestSetupWorkflow:
+class TestTransitionToStates:
 
-    class IProcess(process.IProcess):
-        pass
-
-    class IWorkflowExample(IWorkflowAssignment):
-        pass
-
-    class WorkflowExampleAssignmentSchema(WorkflowAssignmentSchema):
-        """Some doc."""
-        workflow_name = 'test_workflow'
-
-    def _make_workflow(self, registry, name):
+    def _add_workflow(self, registry, name):
         from . import add_workflow
-        cstruct = freeze(\
-            {'states_order': ['draft', 'announced', 'participate'],
+        cstruct = freeze(
+            {'initial_state': 'draft',
              'states': {'draft': {'acm': {'principals':           ['moderator'],
                                           'permissions': [['view', 'Deny']]}},
                         'announced': {'acl': []},
@@ -170,47 +166,49 @@ class TestSetupWorkflow:
                                                 'callback': None,
                              }},
              })
-        return add_workflow(registry, cstruct, name)
+        add_workflow(registry, cstruct, name)
 
     @fixture
-    def meta_process(self):
-        from adhocracy_core.resources.process import process_meta
-        meta = process_meta._replace(iresource=self.IProcess,
-                                     extended_sheets=(self.IWorkflowExample,))
-        return meta
+    def resource_meta(self, resource_meta):
+        return resource_meta._replace(workflow_name='test_workflow')
 
-    @fixture
-    def meta_workflow_example(self):
-        from adhocracy_core.sheets.workflow import workflow_meta
-        meta = workflow_meta._replace(isheet=self.IWorkflowExample,
-                                      schema_class=self.WorkflowExampleAssignmentSchema)
-        return meta
+    def call_fut(self, *args, **kwargs):
+        from . import transition_to_states
+        return transition_to_states(*args, **kwargs)
 
-    def _register_metadata(self, registry, config, meta_process, meta_workflow_example):
-        add_resource_type_to_registry(meta_process, config)
-        add_sheet_to_registry(meta_workflow_example, registry)
+    def test_do_all_transitions_needed_to_set_state(self, integration, context,
+                                                    resource_meta):
+        registry = integration.registry
+        self._add_workflow(registry, 'test_workflow')
+        registry.content.resources_meta[resource_meta.iresource] = resource_meta
+        self.call_fut(context, ['announced', 'participate'], registry)
 
-    def test_setup_workflow(self, registry, config, meta_process, meta_workflow_example):
-        from . import setup_workflow
-        self._make_workflow(registry, 'test_workflow')
-        self._register_metadata(registry, config, meta_process, meta_workflow_example)
-        process = registry.content.create(self.IProcess.__identifier__)
-        setup_workflow(process, ['announced', 'participate'], registry)
         workflow = registry.content.workflows['test_workflow']
-        assert workflow.state_of(process) is 'participate'
+        assert workflow.state_of(context) is 'participate'
 
-    def test_setup_workflow_state_already_set(self, registry, config,
-                                              meta_process, meta_workflow_example):
-        from . import setup_workflow
-        self._make_workflow(registry, 'test_workflow')
-        self._register_metadata(registry, config, meta_process, meta_workflow_example)
-        process = registry.content.create(self.IProcess.__identifier__)
-        workflow = registry.content.workflows['test_workflow']
+    def test_error_if_state_already_set(self, integration, context,
+                                         resource_meta):
+        registry = integration.registry
+        self._add_workflow(registry, 'test_workflow')
+        registry.content.resources_meta[resource_meta.iresource] = resource_meta
         request = Request.blank('/dummy')
         request.registry = registry
-        context = testing.DummyResource()
+        workflow = registry.content.workflows['test_workflow']
         workflow.initialize(context)
         workflow.transition_to_state(context, request, 'announced')
         workflow.transition_to_state(context, request, 'participate')
-        setup_workflow(process, ['announced', 'participate'], registry)
-        assert workflow.state_of(process) is 'participate'
+
+        with pytest.raises(WorkflowError):
+            self.call_fut(context, ['announced', 'participate'], registry)
+
+    def test_optionally_reset_to_initial_state(self, integration, context,
+                                               resource_meta):
+        registry = integration.registry
+        self._add_workflow(registry, 'test_workflow')
+        registry.content.resources_meta[resource_meta.iresource] = resource_meta
+        self.call_fut(context, ['announced', 'participate'], registry)
+
+        self.call_fut(context, [], registry, reset=True)
+        workflow = registry.content.workflows['test_workflow']
+        assert workflow.state_of(context) is 'draft'
+

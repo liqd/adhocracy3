@@ -3,19 +3,15 @@ from colander import Invalid
 
 from pyramid.interfaces import IRequest
 from pyramid.registry import Registry
-from pyramid.request import Request
 from substanced.workflow import ACLWorkflow
 from substanced.workflow import WorkflowError
 from substanced.workflow import IWorkflow
 from zope.interface import implementer
 
 from adhocracy_core.authorization import acm_to_acl
+from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.exceptions import ConfigurationError
 from adhocracy_core.interfaces import IAdhocracyWorkflow
-from adhocracy_core.interfaces import IResource
-from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.utils import get_sheet_field
-from adhocracy_core.utils import get_matching_isheet
 from adhocracy_core.workflows.schemas import create_workflow_meta_schema
 
 
@@ -56,24 +52,20 @@ def add_workflow(registry: Registry, cstruct: dict, name: str):
     _add_workflow_to_registry(registry, appstruct, workflow, name)
 
 
-def setup_workflow(context: IResource, states: [str], registry: Registry):
-    """Initialize workflow and transition to the given states."""
-    request = Request.blank('/dummy')
-    request.registry = registry
-    request.__cached_principals__ = ['role:god']
-    workflow = get_workflow(context, registry)
-    workflow.initialize(context)
+def transition_to_states(context, states: [str], registry: Registry,
+                         reset=False):
+    """Initialize workflow if needed and do transitions to the given states.
+
+    :raises substanced.workflow.WorkflowError: if transition is missing to
+    do transitions to `states`.
+    """
+    request = create_fake_god_request(registry)
+    workflow = registry.content.get_workflow(context)
+    # TODO: raise if workflow is None
+    if not workflow.has_state(context) or reset:
+        workflow.initialize(context)
     for state in states:
         workflow.transition_to_state(context, request, state)
-
-
-def get_workflow(context, registry):
-    """Return the workflow for the given context."""
-    isheet = get_matching_isheet(context, IWorkflowAssignment)
-    workflow = get_sheet_field(context, isheet, 'workflow')
-    workflow_name = workflow.type
-    workflow = registry.content.workflows[workflow_name]
-    return workflow
 
 
 def _validate_workflow_cstruct(cstruct: dict) -> dict:
@@ -86,7 +78,7 @@ def _validate_workflow_cstruct(cstruct: dict) -> dict:
 def _create_workflow(registry: Registry,
                      appstruct: dict,
                      name: str) -> ACLWorkflow:
-    initial_state = appstruct['states_order'][0]
+    initial_state = appstruct['initial_state']
     workflow = AdhocracyACLWorkflow(initial_state=initial_state, type=name)
     for name, data in appstruct['states'].items():
         acl = acm_to_acl(data['acm'], registry)

@@ -74,7 +74,7 @@ class TestWorkflow:
     @fixture
     def required_cstruct(self) -> dict:
         return \
-            {'states_order': ['announced'],
+            {'initial_state': 'announced',
              'states': {'announced': {}},
              'transitions': {'to_announced': {'from_state': 'announced',
                                               'to_state': 'announced',
@@ -82,13 +82,13 @@ class TestWorkflow:
              }
 
     def test_required_fields(self, inst):
-        assert inst['states_order'].required
+        assert inst['initial_state'].required
         assert inst['states'].required
         assert inst['transitions'].required
 
     def test_deserialize_required(self, inst, required_cstruct):
         result = inst.deserialize(required_cstruct)
-        assert result['states_order']
+        assert result['initial_state']
         assert len(result['states']) == 1
         assert len(result['transitions']) == 1
 

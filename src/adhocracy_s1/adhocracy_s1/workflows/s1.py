@@ -6,7 +6,7 @@ from adhocracy_core.workflows import add_workflow
 
 
 s1_meta = freeze({
-    'states_order': ['propose', 'select', 'result'],
+    'initial_state': 'propose',
     'states': {
         'propose': {'title': 'Participate',
                     'description': '',

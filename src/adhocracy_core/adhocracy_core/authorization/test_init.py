@@ -300,3 +300,8 @@ def test_set_god_all_permissions():
     resource = testing.DummyResource(__acl__=[(Deny, 'role:creator', 'edit_comment')])
     set_god_all_permissions(resource)
     assert resource.__acl__[0] == (Allow, 'role:god', ALL_PERMISSIONS)
+
+def test_create_fake_god_request(registry):
+    from . import create_fake_god_request
+    req = create_fake_god_request(registry)
+    assert req.__cached_principals__ == ['role:god']

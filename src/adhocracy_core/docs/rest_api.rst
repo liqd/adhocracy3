@@ -287,7 +287,8 @@ to a array of stub views of allowed requests::
     >>> data_post_pool = {'content_type': 'adhocracy_core.resources.organisation.IOrganisation',
     ...                   'data': {'adhocracy_core.sheets.metadata.IMetadata': {},
     ...                            'adhocracy_core.sheets.title.ITitle': {},
-    ...                            'adhocracy_core.sheets.name.IName': {}}}
+    ...                            'adhocracy_core.sheets.name.IName': {},
+    ...                            'adhocracy_core.sheets.workflow.IWorkflowAssignment': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
 
@@ -1488,6 +1489,8 @@ custom filters:
 * *creator* the :term:`userid` of the resource creator. This is the path of the
   user resource url.
   Supports sorting.
+
+* *item_creation_date* the the item_creation_date value of resources with :class:`adhocracy_core.sheets.metadata.IMetadata`.
 
 * *badge* the badge names of resources with :class:`adhocracy_core.sheets.badge.IBadgeable`
   sheet.

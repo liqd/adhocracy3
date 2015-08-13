@@ -11,6 +11,7 @@ def includeme(config):
     config.include('.sheets')
     config.include('.resources')
     config.include('.workflows')
+    config.include('.evolution')
     config.add_translation_dirs('adhocracy_core:locale/',
                                 'adhocracy_spd:locale/')
 

@@ -10,9 +10,9 @@ from pyramid.paster import bootstrap
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 
+from adhocracy_core.authorization import create_fake_god_request
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.workflows import setup_workflow
-from adhocracy_core.workflows import get_workflow
+from adhocracy_core.workflows import transition_to_states
 
 
 def set_workflow_state():  # pragma: no cover
@@ -29,25 +29,90 @@ def set_workflow_state():  # pragma: no cover
     parser.add_argument('resource_path',
                         type=str,
                         help='path of the resource')
-    parser.add_argument('state',
+    parser.add_argument('-i',
+                        '--info',
+                        help='display information about the workflow',
+                        action='store_true')
+    parser.add_argument('-a',
+                        '--absolute',
+                        help='use an absolute path for the list of states',
+                        action='store_true')
+    parser.add_argument('-r',
+                        '--reset',
+                        help='reset workflow to initial state',
+                        action='store_true')
+    parser.add_argument('states',
                         type=str,
-                        help='name of the state')
+                        nargs='*',
+                        help='list of state name to do transition to')
     args = parser.parse_args()
     env = bootstrap(args.ini_file)
-    _set_workflow_state(env['root'],
-                        env['registry'],
-                        args.resource_path,
-                        args.state)
+    if args.info:
+        _print_workflow_info(env['root'],
+                             env['registry'],
+                             args.resource_path)
+    else:
+        _set_workflow_state(env['root'],
+                            env['registry'],
+                            args.resource_path,
+                            args.states,
+                            args.absolute,
+                            args.reset,)
     env['closer']()
+
+
+def _print_workflow_info(root: IResource,
+                         registry: Registry,
+                         resource_path: str):
+    resource = find_resource(root, resource_path)
+    workflow = registry.content.get_workflow(resource)
+    states = set(registry.content.workflows_meta[workflow.type]['states']
+                 .keys())
+    print('\nname: {}\ncurrent state: {}\nnext states: {}'
+          '\nall states (unordered): {}\n'
+          .format(workflow.type,
+                  workflow.state_of(resource),
+                  workflow.get_next_states(resource,
+                                           create_fake_god_request(registry)),
+                  states))
+
+
+def _get_states_to_transition(resource: IResource,
+                              registry: Registry,
+                              states: [str],
+                              absolute,
+                              reset) -> [str]:
+    _check_states(states)
+    if not absolute or reset:
+        return states
+    workflow = registry.content.get_workflow(resource)
+    state = workflow.state_of(resource)
+    if state in states:
+        return states[states.index(state) + 1:]
+    return states
+
+
+def _check_states(states):
+    for state in states:
+        if states.count(state) > 1:
+            raise ValueError('Duplicate state: {}'.format(state))
 
 
 def _set_workflow_state(root: IResource,
                         registry: Registry,
                         resource_path: str,
-                        state: str):
+                        states: [str],
+                        absolute=False,
+                        reset=False,
+                        ):
     resource = find_resource(root, resource_path)
-    workflow = get_workflow(resource, registry)
-    states = registry.content.workflows_meta[workflow.type]['states_order']
-    to_transition = states[1:states.index(state) + 1]
-    setup_workflow(resource, to_transition, registry)
+    states_to_transition = _get_states_to_transition(resource,
+                                                     registry,
+                                                     states,
+                                                     absolute,
+                                                     reset)
+    transition_to_states(resource,
+                         states_to_transition,
+                         registry,
+                         reset=reset)
     transaction.commit()

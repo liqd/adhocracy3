@@ -85,8 +85,9 @@ def _batch_post_full_sample_proposal(app_user) -> TestResponse:
     resp = app_user.batch(subrequests)
     return resp
 
+
 def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_mercator.sheets.mercator import IWorkflowAssignment
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
     data = {'data': {IWorkflowAssignment.__identifier__:\
                          {'workflow_state': state}}}
     resp = app_user.put(path, data)

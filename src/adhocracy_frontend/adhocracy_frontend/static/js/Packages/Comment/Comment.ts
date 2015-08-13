@@ -346,6 +346,21 @@ export var adhCreateOrShowCommentListing = (
     };
 };
 
+export var commentColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
+            scope.frontendOrderPredicate = (id) => id;
+            scope.frontendOrderReverse = true;
+        }
+    };
+};
+
 
 export var moduleName = "adhComment";
 
@@ -386,5 +401,6 @@ export var register = (angular) => {
                 var widget = new CommentCreate(
                     adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
-            }]);
+            }])
+        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective]);
 };

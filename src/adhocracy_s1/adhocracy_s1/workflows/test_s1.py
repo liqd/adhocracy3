@@ -33,7 +33,7 @@ def _post_proposal_item(app_user, path='') -> TestResponse:
 
 
 def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_s1.sheets.s1 import IWorkflowAssignment
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
     data = {'data': {IWorkflowAssignment.__identifier__:\
                          {'workflow_state': state}}}
     resp = app_user.put(path, data)

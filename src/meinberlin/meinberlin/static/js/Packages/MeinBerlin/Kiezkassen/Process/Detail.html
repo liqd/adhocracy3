@@ -11,8 +11,8 @@
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-params="{tag: 'LAST'}"
                 data-content-type="adhocracy_meinberlin.resources.kiezkassen.IProposalVersion">
-                <adh-mein-berlin-kiezkassen-proposal-list-item data-path="{{element}}">
-                </adh-mein-berlin-kiezkassen-proposal-list-item>
+                <adh-mein-berlin-proposal-list-item data-path="{{element}}" data-is-kiezkasse="true">
+                </adh-mein-berlin-proposal-list-item>
             </adh-listing>
 
             <div
@@ -31,6 +31,10 @@
                     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                     data-params="{tag: 'LAST'}"
                     data-content-type="adhocracy_meinberlin.resources.kiezkassen.IProposalVersion">
+                    <adh-mein-berlin-proposal-map-list-item
+                        data-path="{{item}}"
+                        data-is-kiezkasse="true">
+                    </adh-mein-berlin-proposal-map-list-item>
                 </adh-map-listing>
             </adh-wait>
         </div>

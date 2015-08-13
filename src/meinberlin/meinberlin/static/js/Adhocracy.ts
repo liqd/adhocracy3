@@ -16,7 +16,9 @@ import angularTranslate = require("angularTranslate");  if (angularTranslate) { 
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
+import markdownit = require("markdownit");
 import modernizr = require("modernizr");
 import moment = require("moment");
 import leaflet = require("leaflet");
@@ -28,14 +30,17 @@ import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
+import AdhDocument = require("./Packages/Document/Document");
 import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventManager = require("./Packages/EventManager/EventManager");
 import AdhHttp = require("./Packages/Http/Http");
+import AdhImage = require("./Packages/Image/Image");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
+import AdhMarkdown = require("./Packages/Markdown/Markdown");
 import AdhMeinBerlin = require("./Packages/MeinBerlin/MeinBerlin");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
@@ -84,8 +89,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
+        "flow",
         AdhComment.moduleName,
         AdhDone.moduleName,
+        AdhImage.moduleName,
         AdhMapping.moduleName,
 
         AdhCrossWindowMessaging.moduleName,
@@ -160,6 +167,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     app.value("angular", angular);
 
+    app.value("markdownit", markdownit);
     app.value("modernizr", modernizr);
     app.value("moment", moment);
     app.value("leaflet", leaflet);
@@ -171,16 +179,19 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhComment.register(angular);
     AdhCrossWindowMessaging.register(angular, config.trusted_domains !== []);
     AdhDateTime.register(angular);
+    AdhDocument.register(angular);
     AdhDone.register(angular);
     AdhEmbed.register(angular);
     AdhEventManager.register(angular);
     AdhHttp.register(angular, config, metaApi);
+    AdhImage.register(angular);
     AdhInject.register(angular);
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
     AdhMeinBerlin.register(angular);
     AdhMapping.register(angular);
+    AdhMarkdown.register(angular);
     AdhMovingColumns.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);

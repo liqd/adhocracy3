@@ -26,6 +26,13 @@
                 {{ "TR__ERROR_REQUIRED_TITLE" | translate }}
             </span>
         </label>
+        <adh-map-input
+            data-ng-if="hasMap && polygon"
+            data-lng="data.coordinates[0]"
+            data-lat="data.coordinates[1]"
+            data-polygon="polygon"
+            data-pin="document-selected"
+            data-height="170"></adh-map-input>
     </div><!-- /.cover -->
 
     <div class="section-jump-body">

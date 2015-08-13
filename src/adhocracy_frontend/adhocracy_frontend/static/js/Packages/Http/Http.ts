@@ -56,6 +56,7 @@ export interface IOptions {
     HEAD : boolean;
     delete : boolean;
     hide : boolean;
+    canPost(contentType : string) : boolean;
 }
 
 
@@ -65,8 +66,9 @@ export var emptyOptions : IOptions = {
     GET: false,
     POST: false,
     HEAD: false,
-    delete : false,
-    hide : false
+    delete: false,
+    hide: false,
+    canPost: (contentType) => false
 };
 
 
@@ -142,7 +144,15 @@ export class Service<Content extends ResourcesBase.Resource> {
             POST: !!raw.data.POST,
             HEAD: !!raw.data.HEAD,
             delete: Boolean(metadata && _.has(metadata, "deleted")),
-            hide: Boolean(metadata && _.has(metadata, "hidden"))
+            hide: Boolean(metadata && _.has(metadata, "hidden")),
+            canPost: (contentType : string) => {
+                if (raw.data.POST) {
+                    var postOptions = raw.data.POST.request_body;
+                    return _.any(postOptions, { "content_type": contentType });
+                } else {
+                    return false;
+                }
+            }
         };
     }
 

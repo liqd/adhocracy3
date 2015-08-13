@@ -1,20 +1,26 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import AdhConfig = require("../../../Config/Config");
+import AdhDocument = require("../../../Document/Document");
+import AdhHttp = require("../../../Http/Http");
+import AdhMapping = require("../../../Mapping/Mapping");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
+import AdhUtil = require("../../../Util/Util");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
-import RIDocument = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocument");
-import RIDocumentVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IDocumentVersion");
+import RIGeoDocument = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocument");
+import RIGeoDocumentVersion = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
+import RIGeoProposal = require("../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
+import RIGeoProposalVersion = require("../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
 import RIParagraph = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
 import RIParagraphVersion = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProposal");
-import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProposalVersion");
 import SIParagraph = require("../../../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
+import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
 
 var pkgLocation = "/MeinBerlin/Alexanderplatz/Workbench";
 
@@ -33,10 +39,22 @@ export var workbenchDirective = (
     };
 };
 
+export var getProcessPolygon = (
+    adhHttp : AdhHttp.Service<any>
+) => (processUrl : string) : angular.IPromise<any> => {
+    return adhHttp.get(processUrl).then((resource) => {
+        var locationUrl = resource.data[SILocationReference.nick].location;
+        return adhHttp.get(locationUrl).then((location) => {
+            return location.data[SIMultiPolygon.nick].coordinates[0][0];
+        });
+    });
+};
+
 export var processDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhHttp : AdhHttp.Service<any>
 ) => {
     return {
         restrict: "E",
@@ -46,6 +64,163 @@ export var processDetailColumnDirective = (
             column.bindVariablesAndClear(scope, ["processUrl"]);
             scope.$on("$destroy", adhTopLevelState.bind("tab", scope));
             adhPermissions.bindScope(scope, () => scope.processUrl, "processOptions");
+
+            scope.proposalType = RIGeoProposalVersion.content_type;
+            scope.documentType = RIGeoDocumentVersion.content_type;
+            scope.documentItemType = RIGeoDocument.content_type;
+            scope.shared.isShowMap = true;
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
+
+            scope.showMap = (isShowMap) => {
+                scope.shared.isShowMap = isShowMap;
+            };
+
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+        }
+    };
+};
+
+export var documentDetailColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
+            adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.documentUrl), "documentItemOptions");
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
+        }
+    };
+};
+
+export var proposalDetailColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+            adhPermissions.bindScope(scope, () => AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+
+            scope.setCameFrom = () => {
+                adhTopLevelState.setCameFrom();
+            };
+        }
+    };
+};
+
+export var documentCreateColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentCreateColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+
+            scope.cancel = () => {
+                var url = adhResourceUrl(scope.processUrl);
+                adhTopLevelState.goToCameFrom(url);
+            };
+        }
+    };
+};
+
+export var documentEditColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/DocumentEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "documentUrl"]);
+            scope.$watch("processUrl", (processUrl) => {
+                if (processUrl) {
+                    getProcessPolygon(adhHttp)(processUrl).then((polygon) => {
+                        scope.polygon = polygon;
+                    });
+                }
+            });
+
+            scope.cancel = () => {
+                var url = adhResourceUrl(AdhUtil.parentPath(scope.documentUrl));
+                adhTopLevelState.goToCameFrom(url);
+            };
+        }
+    };
+};
+
+export var proposalCreateColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+
+            scope.cancel = () => {
+                var url = adhResourceUrl(scope.processUrl);
+                adhTopLevelState.goToCameFrom(url);
+            };
+        }
+    };
+};
+
+export var proposalEditColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhResourceUrl
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+
+            scope.cancel = () => {
+                var url = adhResourceUrl(AdhUtil.parentPath(scope.proposalUrl));
+                adhTopLevelState.goToCameFrom(url);
+            };
         }
     };
 };
@@ -58,9 +233,11 @@ export var register = (angular) => {
 
     angular
         .module(moduleName, [
+            AdhDocument.moduleName,
+            AdhMapping.moduleName,
+            AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhProcess.moduleName,
-            AdhMovingColumns.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName
         ])
@@ -82,16 +259,43 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide",
                     tab: "documents"
                 })
-                .defaultVersionable(RIDocument, RIDocumentVersion, "", processType, "", {
+                .specific(RIAlexanderplatzProcess, "create_document", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.canPost(RIGeoDocument.content_type)) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
+                        });
+                    }])
+                .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
                     tab: "documents"
                 })
-                .specificVersionable(RIDocument, RIDocumentVersion, "", processType, "", [
-                    () => (item : RIDocument, version : RIDocumentVersion) => {
+                .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "", processType, "", [
+                    () => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
                         return {
                             documentUrl: version.path
                         };
+                    }])
+                .defaultVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    tab: "documents"
+                })
+                .specificVersionable(RIGeoDocument, RIGeoDocumentVersion, "edit", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoDocument, version : RIGeoDocumentVersion) => {
+                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    documentUrl: version.path
+                                };
+                            }
+                        });
                     }])
                 .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", {
                     space: "content",
@@ -100,9 +304,11 @@ export var register = (angular) => {
                 })
                 .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", [
                     () => (item : RIParagraph, version : RIParagraphVersion) => {
+                        var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
                         return {
                             commentableUrl: version.path,
-                            documentUrl: _.last(_.sortBy(version.data[SIParagraph.nick].documents))
+                            commentCloseUrl: documentUrl,
+                            documentUrl: documentUrl
                         };
                     }])
 
@@ -117,31 +323,83 @@ export var register = (angular) => {
                     movingColumns: "is-show-hide-hide",
                     tab: "proposals"
                 })
-                .defaultVersionable(RIProposal, RIProposalVersion, "", processType, "", {
+                .specific(RIAlexanderplatzProcess, "create_proposal", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIAlexanderplatzProcess) => {
+                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.canPost(RIGeoProposal.content_type)) {
+                                throw 401;
+                            } else {
+                                return {};
+                            }
+                        });
+                    }])
+                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", {
                     space: "content",
                     movingColumns: "is-show-show-hide",
                     tab: "proposals"
                 })
-                .specificVersionable(RIProposal, RIProposalVersion, "", processType, "", [
-                    () => (item : RIProposal, version : RIProposalVersion) => {
+                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "", processType, "", [
+                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                         return {
                             proposalUrl: version.path
                         };
                     }])
-                .defaultVersionable(RIProposal, RIProposalVersion, "comments", processType, "", {
+                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", {
+                    space: "content",
+                    movingColumns: "is-show-show-hide",
+                    tab: "proposals"
+                })
+                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "edit", processType, "", [
+                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
+                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                            if (!options.POST) {
+                                throw 401;
+                            } else {
+                                return {
+                                    proposalUrl: version.path
+                                };
+                            }
+                        });
+                    }])
+                .defaultVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", {
                     space: "content",
                     movingColumns: "is-collapse-show-show",
                     tab: "proposals"
                 })
-                .specificVersionable(RIProposal, RIProposalVersion, "comments", processType, "", [
-                    () => (item : RIProposal, version : RIProposalVersion) => {
+                .specificVersionable(RIGeoProposal, RIGeoProposalVersion, "comments", processType, "", [
+                    () => (item : RIGeoProposal, version : RIGeoProposalVersion) => {
                         return {
                             commentableUrl: version.path,
+                            commentCloseUrl: version.path,
                             proposalUrl: version.path
                         };
                     }]);
         }])
+        .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
+            adhMapDataProvider.icons["document"] = {
+                className: "icon-board-pin",
+                iconAnchor: [20, 39],
+                iconSize: [40, 40]
+            };
+            adhMapDataProvider.icons["document-selected"] = {
+                className: "icon-board-pin is-active",
+                iconAnchor: [20, 39],
+                iconSize: [40, 40]
+            };
+        }])
         .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", processDetailColumnDirective]);
+            "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", [
+            "adhConfig", "adhPermissions", "adhTopLevelState", documentDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", [
+            "adhConfig", "adhPermissions", "adhTopLevelState", proposalDetailColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", [
+            "adhConfig", "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", documentCreateColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalCreateColumn", [
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", proposalCreateColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", [
+            "adhConfig", "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", documentEditColumnDirective])
+        .directive("adhMeinBerlinAlexanderplatzProposalEditColumn", [
+            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", proposalEditColumnDirective]);
 };

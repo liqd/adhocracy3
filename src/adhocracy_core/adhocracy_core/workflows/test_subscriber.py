@@ -3,19 +3,13 @@ from pytest import mark
 from pytest import fixture
 
 
+@fixture
+def registry(registry_with_content):
+    return registry_with_content
+
+
 class TestInitWorkflow:
 
-    @fixture
-    def registry(self, mock_content_registry, mock_workflow):
-        mock_content_registry.workflows_meta['sample'] = {'workflow': mock_workflow}
-        registry = testing.DummyResource(content=mock_content_registry)
-        return registry
-
-    @fixture
-    def context(self):
-        from adhocracy_core.sheets.workflow import IWorkflowAssignment
-        context = testing.DummyResource(__provides__=IWorkflowAssignment)
-        return context
 
     @fixture
     def event(self, context, registry):
@@ -24,19 +18,22 @@ class TestInitWorkflow:
         return event
 
     def call_fut(self, event):
-        from .subscriber import initialize_workflows
-        return initialize_workflows(event)
+        from .subscriber import initialize_workflow
+        return initialize_workflow(event)
 
-    def test_ignore_if_already_initialized(self, event, mock_workflow, mock_sheet):
-        mock_sheet.get.return_value = {'workflow': mock_workflow}
-        event.registry.content.get_sheet.return_value = mock_sheet
+    def test_ignore_if_already_initialized(self, event, registry, mock_workflow):
+        registry.content.get_workflow.return_value = mock_workflow
         mock_workflow.has_state.return_value = True
         self.call_fut(event)
         assert not mock_workflow.initialize.called
 
-    def test_initalize(self, event, mock_workflow, mock_sheet):
-        mock_sheet.get.return_value = {'workflow': mock_workflow}
-        event.registry.content.get_sheet.return_value = mock_sheet
+    def test_ignore_if_resource_type_without_workflow(self, event, registry, mock_workflow):
+        registry.content.get_workflow.return_value =  None
+        self.call_fut(event)
+        assert not mock_workflow.initialize.called
+
+    def test_initalize(self, event, registry, mock_workflow):
+        registry.content.get_workflow.return_value = mock_workflow
         mock_workflow.has_state.return_value = False
         self.call_fut(event)
         assert mock_workflow.initialize.called_with(event.object)
@@ -50,8 +47,8 @@ def integration(config):
 
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
-    from .subscriber import initialize_workflows
+    from .subscriber import initialize_workflow
     handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-    assert initialize_workflows.__name__ in handlers
+    assert initialize_workflow.__name__ in handlers
 
 

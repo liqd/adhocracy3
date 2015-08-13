@@ -10,18 +10,6 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import ACM
 from adhocracy_core.schema import Roles
-from adhocracy_core.schema import AdhocracySequenceNode
-
-
-class StatesOrder(AdhocracySequenceNode):
-
-    """List of state names.
-
-    The first one is the initial state,
-    the others are only a hint how to list them
-    """
-
-    state_name = SingleLine()
 
 
 class WorkflowCallback(SchemaNode):
@@ -76,7 +64,7 @@ class WorkflowMeta(MappingSchema):
 
     """Data structure to define a workflow (finite state machine)."""
 
-    states_order = StatesOrder(missing=required)
+    initial_state = SingleLine(missing=required)
     states = SchemaNode(Mapping(unknown='preserve'),
                         missing=required)
     transitions = SchemaNode(Mapping(unknown='preserve'),

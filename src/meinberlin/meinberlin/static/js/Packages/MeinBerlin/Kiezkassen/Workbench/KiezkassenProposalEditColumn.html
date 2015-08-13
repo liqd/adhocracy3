@@ -18,9 +18,10 @@
     <adh-recompile-on-change
             data-ng-switch-when="body"
             data-value="{{proposalUrl}}">
-        <adh-mein-berlin-kiezkassen-proposal-edit
+        <adh-mein-berlin-proposal-edit
             data-ng-if="proposalUrl"
+            data-is-kiezkasse="true"
             data-path="{{proposalUrl}}">
-        </adh-mein-berlin-kiezkassen-proposal-edit>
+        </adh-mein-berlin-proposal-edit>
     </adh-recompile-on-change>
 </div>

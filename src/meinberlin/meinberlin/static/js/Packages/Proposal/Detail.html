@@ -1,5 +1,6 @@
-<article class="mein-berlin-kiezkassen-proposal-detail">
-    <header class="mein-berlin-kiezkassen-proposal-detail-header">
+<article class="mein-berlin-proposal-detail">
+    <header class="mein-berlin-proposal-detail-header">
+
         <span
                 data-ng-if="data.assignments.length > 0"
                 class="badge"
@@ -7,32 +8,34 @@
                     'm-is-realized': data.assignments[0].name === 'going_to_be_realized',
                     'm-is-not-realized': data.assignments[0].name === 'not_realizeable'
             }">{{ data.assignments[0].title }}</span>
-        <ul class="mein-berlin-kiezkassen-proposal-detail-meta">
-            <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-item-location">
+
+        <ul class="mein-berlin-proposal-detail-meta">
+            <li data-ng-if="isKiezkasse" class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-item-location">
                 <i class="icon-pin-detail"></i> {{data.locationText}}
             </li>
-            <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-item-comments">
+            <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-item-comments">
                 <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link">
                     <i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
                 </a>
             </li>
-            <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-budget">
-                <i class="mein-berlin-kiezkassen-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget}} &euro;
+            <li data-ng-if="!isKiezkasse"></li>
+            <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-budget">
+                <div data-ng-if="isKiezkasse"><i class="mein-berlin-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget}} &euro;</div>
             </li>
-            <li class="mein-berlin-kiezkassen-proposal-detail-meta-item mein-berlin-kiezkassen-proposal-detail-meta-participation">
+            <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-participation">
                 <adh-rate data-refers-to="{{path}}"></adh-rate>
             </li>
         </ul>
-        <h1 class="mein-berlin-kiezkassen-proposal-detail-header-title">{{ data.title }}</h1>
+        <h1 class="mein-berlin-proposal-detail-header-title">{{ data.title }}</h1>
     </header>
 
-    <section class="mein-berlin-kiezkassen-proposal-detail-body">
-        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link mein-berlin-kiezkassen-proposal-detail-body-comments">
+    <section class="mein-berlin-proposal-detail-body">
+        <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link mein-berlin-proposal-detail-body-comments">
             <i class="icon-speechbubble"></i> {{ data.commentCount }}
         </a>
-        <p class="mein-berlin-kiezkassen-proposal-detail-detail">{{data.detail}}</p>
+        <p class="mein-berlin-proposal-detail-detail">{{data.detail}}</p>
 
-        <p class="mein-berlin-kiezkassen-proposal-detail-author">
+        <p class="mein-berlin-proposal-detail-author">
             {{ "TR__BY" | translate }}
             <adh-user-meta data-path="{{data.creator}}" data-ng-if="data.creator"></adh-user-meta><br/>
             {{ "TR__ON" | translate }}

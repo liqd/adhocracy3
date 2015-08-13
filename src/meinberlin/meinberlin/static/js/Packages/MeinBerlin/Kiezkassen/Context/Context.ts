@@ -110,6 +110,7 @@ export var register = (angular) => {
                     () => (item : RIProposal, version : RIProposalVersion) => {
                         return {
                             commentableUrl: version.path,
+                            commentCloseUrl: version.path,
                             proposalUrl: version.path
                         };
                     }])
@@ -134,6 +135,7 @@ export var register = (angular) => {
                         return getCommentableUrl(version).then((commentable) => {
                             return {
                                 commentableUrl: commentable.path,
+                                commentCloseUrl: commentable.path,
                                 proposalUrl: commentable.path
                             };
                         });

@@ -72,7 +72,7 @@ def _post_proposal_itemversion(app_user, path='') -> TestResponse:
 
 
 def _do_transition_to(app_user, path, state) -> TestResponse:
-    from adhocracy_meinberlin.sheets.bplan import IWorkflowAssignment
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
     data = {'data': {IWorkflowAssignment.__identifier__:\
                          {'workflow_state': state}}}
     resp = app_user.put(path, data)

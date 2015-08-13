@@ -50,10 +50,10 @@ process_meta = process.process_meta._replace(
     is_implicit_addable=True,
     extended_sheets=(
         IDescription,
-        adhocracy_meinberlin.sheets.kiezkassen.IWorkflowAssignment,
         ILocationReference,
         IImageReference,
     ),
+    workflow_name = 'kiezkassen',
 )
 
 

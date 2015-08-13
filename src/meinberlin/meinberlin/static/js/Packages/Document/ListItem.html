@@ -1,0 +1,20 @@
+<a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}"
+    ng-class="{'m-no-picture':!data.picture}"
+    class="proposal-list-item meinberlin-alexanderplatz-proposal-list-item {{ selectedState }}">
+    <img class="proposal-list-item-image"
+        data-ng-if="data.picture"
+        data-ng-src="{{ data.picture | adhImageUri:'thumbnail' }}" alt="" />
+    <div class="proposal-list-item-body">
+        <div class="meinberlin-alexanderplatz-proposal-list-item-col-left">
+            <span data-ng-repeat="badge in data.assignments" class="badge m-info">{{ badge.title }}</span>
+            <h3 class="proposal-list-item-title">{{ data.title }}</h3>
+        </div>
+        <div class="meinberlin-alexanderplatz-proposal-list-item-col-right">
+            <ul class="meta-list">
+                <li class="meta-list-item">
+                    <i class="icon-speechbubble-unfilled"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
+                </li>
+            </ul>
+        </div>
+    </div>
+</a>

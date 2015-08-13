@@ -12,13 +12,10 @@ class TestS1Process:
     def test_meta(self, meta):
         import adhocracy_core.resources
         from adhocracy_s1 import resources
-        from adhocracy_s1 import sheets
         assert meta.iresource == resources.s1.IProcess
         assert meta.iresource.isOrExtends(
             adhocracy_core.resources.process.IProcess)
-        assert meta.extended_sheets == (
-            sheets.s1.IWorkflowAssignment,
-        )
+        assert meta.workflow_name== 's1'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

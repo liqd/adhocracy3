@@ -56,6 +56,7 @@ import AdhTracking = require("./Packages/Tracking/Tracking");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
+import AdhMapping = require("./Packages/Mapping/Mapping");
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
 webshim.setOptions("forms-ext", {"replaceUI": true});
@@ -97,7 +98,8 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhSticky.moduleName,
         AdhTracking.moduleName,
         AdhUserViews.moduleName,
-        AdhMarkdown.moduleName
+        AdhMarkdown.moduleName,
+        AdhMapping.moduleName
     ];
 
     if (config.cachebust) {
@@ -180,6 +182,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhListing.register(angular);
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
+    AdhMapping.register(angular);
     AdhDocument.register(angular);
     AdhSPDWorkbench.register(angular);
     AdhMovingColumns.register(angular);

@@ -148,7 +148,9 @@ Can create process content::
     >>> resp = participant.options('/organisation/process').json
     >>> pprint(sorted([r['content_type'] for r in resp['POST']['request_body']]))
     ['adhocracy_core.resources.document.IDocument',
+     'adhocracy_core.resources.document.IGeoDocument',
      'adhocracy_core.resources.external_resource.IExternalResource',
+     'adhocracy_core.resources.proposal.IGeoProposal',
      'adhocracy_core.resources.proposal.IProposal']
 
 Can edit his own process content::
@@ -226,10 +228,10 @@ Cannot create process structure organisation::
    >>> IOrganisation.__identifier__ not in postables
    True
 
-Can edit process structure organisation::
+Cannot edit process structure organisation (except the workflow state):
 
-   >>> 'PUT' in initiator.options('/organisation').json
-   False
+   >>> pprint(sorted([r for r in resp['PUT']['request_body']['data']]))
+   ['adhocracy_core.sheets.workflow.IWorkflowAssignment']
 
 Can create process structure process::
 

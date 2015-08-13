@@ -15,11 +15,6 @@
     font-size: $font-size-small;
     height: 24px / $font-size-small * 1em;
     line-height: 24px / $font-size-small * 1em;
-    text-transform: none;
-
-    &:first-letter {
-        text-transform: capitalize;
-    }
 
     &:focus:enabled,
     &:hover:enabled {
@@ -31,6 +26,10 @@
     @include border-radius(1em);
     font-weight: $font-weight-extrovert;
     padding: 0 (30px / $font-size-normal * 1em);
+}
+
+.button, .button-cta, .button-cta-secondary {
+    text-transform: capitalize;
 }
 
 /*doc

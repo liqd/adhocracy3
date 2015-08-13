@@ -37,15 +37,11 @@ def test_create_root_with_initial_content(registry):
 
 @mark.usefixtures('integration')
 def test_initialize_workflow(registry, monkeypatch):
+    from adhocracy_mercator.resources.mercator import IProcess
     from adhocracy_mercator.resources.root import initialize_workflow
-    import adhocracy_core.workflows
     workflow = registry.content.workflows['mercator']
-    get_workflow_mock = Mock(return_value=workflow)
-    monkeypatch.setattr(adhocracy_core.workflows,
-                        'get_workflow',
-                        get_workflow_mock)
     root = testing.DummyResource()
-    mercator = testing.DummyResource()
+    mercator = testing.DummyResource(__provides__=IProcess)
     root['mercator'] = mercator
     root.__acl__ = [(Allow, 'role:god', ALL_PERMISSIONS)]
     initialize_workflow(root, registry, {})

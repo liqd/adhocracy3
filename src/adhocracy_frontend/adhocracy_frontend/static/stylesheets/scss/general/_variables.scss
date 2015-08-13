@@ -63,6 +63,8 @@ $padding-medium: 1em;
 
 //Other
 $section-jump-navigation-width: 2em;
+$moving-column-single-width-max: $font-size-normal * 55;
+$moving-column-single-width-min: $font-size-normal * 35;
 
 @mixin font-tracking($value) {
     @if $value == narrow {

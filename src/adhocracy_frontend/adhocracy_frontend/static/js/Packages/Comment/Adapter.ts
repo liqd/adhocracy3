@@ -17,6 +17,9 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
         return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
     }
 
+    // NOTE: this is *not* a recursive comment count.
+    // "total" here means that it is not affected by any pagination
+    // which is not supported by this adapter anyway.
     public totalCount(container : ResourcesBase.Resource) {
         return this.elemRefs(container).length;
     }

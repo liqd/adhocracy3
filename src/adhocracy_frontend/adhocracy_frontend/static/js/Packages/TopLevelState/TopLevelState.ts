@@ -290,7 +290,7 @@ export class Service {
                         message: error.message
                     });
                 } else {
-                    this.redirectToLogin();
+                    this.setCameFromAndGo("/login");
                 }
                 break;
             default:
@@ -414,7 +414,11 @@ export class Service {
 
     private cameFrom : string;
 
-    public setCameFrom(path : string) : boolean {
+    public setCameFrom(path? : string) : boolean {
+        if (typeof path === "undefined") {
+            path = this.$location.path();
+        }
+
         var denylist = [
             "/login",
             "/register",
@@ -440,7 +444,10 @@ export class Service {
         this.cameFrom = undefined;
     }
 
-    public redirectToCameFrom(_default? : string) : void {
+    public goToCameFrom(_default : string, replace = false) : void {
+        if (replace) {
+            this.$location.replace();
+        }
         var cameFrom = this.getCameFrom();
         if (typeof cameFrom !== "undefined") {
             this.$location.url(cameFrom);
@@ -449,13 +456,15 @@ export class Service {
         }
     }
 
-    public redirectToLogin() : void {
-        this.setCameFrom(this.$location.path());
-        this.$location.replace();
-        this.$location.url("/login");
+    public setCameFromAndGo(url : string, replace = false) : void {
+        if (replace) {
+            this.$location.replace();
+        }
+        this.setCameFrom();
+        this.$location.url(url);
     }
 
-    public redirectToSpaceHome(space) : void {
+    public goToSpaceHome(space) : void {
         // FIXME : This only works in resource area, needs to be refactored
         var spaceDefaults = this.provider.getSpaceDefaults(space);
         var area = this.getArea();
@@ -497,7 +506,7 @@ export var spaceSwitch = (
             scope.$on("$destroy", adhTopLevelState.bind("space", scope, "currentSpace"));
             scope.setSpace = (space : string) => {
                 if (scope.currentSpace === space) {
-                    adhTopLevelState.redirectToSpaceHome(space);
+                    adhTopLevelState.goToSpaceHome(space);
                 } else {
                     adhTopLevelState.set("space", space);
                 }

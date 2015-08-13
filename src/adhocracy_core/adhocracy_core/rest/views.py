@@ -130,9 +130,11 @@ def validate_request_data(context: ILocation, request: Request,
     :raises HTTPBadRequest: HTTP 400 for bad request data.
     """
     parent = context if request.method == 'POST' else context.__parent__
+    workflow = _get_workflow(context, request)
     schema_with_binding = schema.bind(context=context,
                                       request=request,
                                       registry=request.registry,
+                                      workflow=workflow,
                                       parent_pool=parent)
     body = {}
     if request.content_type == 'multipart/form-data':
@@ -146,6 +148,14 @@ def validate_request_data(context: ILocation, request: Request,
     if request.errors:
         request.validated = {}
         raise HTTPBadRequest()
+
+
+def _get_workflow(context: IResource, request: Request):
+    if request.method == 'POST':
+        return
+    get_workflow = request.registry.content.get_workflow
+    workflow = get_workflow(context)
+    return workflow
 
 
 def _extract_json_body(request: Request) -> object:
@@ -419,7 +429,10 @@ class ResourceRESTView(RESTView):
                            if s.meta.isheet.isOrExtends(IWorkflowAssignment)]
         for sheet in workflow_sheets:
             workflow = sheet.get()['workflow']
-            states = workflow.get_next_states(self.context, self.request)
+            if workflow is None:
+                states = []
+            else:
+                states = workflow.get_next_states(self.context, self.request)
             isheet = sheet.meta.isheet
             cstruct[isheet.__identifier__] = {'workflow_state': states}
 

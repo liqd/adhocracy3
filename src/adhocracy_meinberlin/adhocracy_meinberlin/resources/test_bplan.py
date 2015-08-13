@@ -12,7 +12,6 @@ class TestProposal:
     def test_meta(self, meta):
         import adhocracy_core.sheets
         from adhocracy_meinberlin import resources
-        from adhocracy_meinberlin import sheets
         assert meta.iresource == resources.bplan.IProposal
         assert meta.element_types == (resources.bplan.IProposalVersion,)
         assert meta.item_type == resources.bplan.IProposalVersion
@@ -22,9 +21,9 @@ class TestProposal:
                                      adhocracy_core.sheets.pool.IPool,
                                      adhocracy_core.sheets.metadata.IMetadata,
                                      )
-        assert meta.extended_sheets == (sheets.bplan.IPrivateWorkflowAssignment,)
         assert meta.use_autonaming
         assert meta.autonaming_prefix == 'proposal_'
+        assert meta.workflow_name == 'bplan_private'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
@@ -67,10 +66,9 @@ class TestProcess:
         assert resources.bplan.IProcess.isOrExtends(IProcess)
         assert meta.is_implicit_addable is True
         assert meta.permission_create == 'create_process'
-        assert meta.extended_sheets == (
-            sheets.bplan.IWorkflowAssignment,
-        )
+        assert meta.extended_sheets == (sheets.bplan.IProcessSettings,)
         assert meta.permission_create == 'create_process'
+        assert meta.workflow_name == 'bplan'
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):

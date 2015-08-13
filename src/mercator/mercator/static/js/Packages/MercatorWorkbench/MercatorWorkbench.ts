@@ -13,11 +13,11 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
-import SIMercatorWorkflow = require("../../Resources_/adhocracy_mercator/sheets/mercator/IWorkflowAssignment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
+import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/MercatorWorkbench";
 
@@ -38,7 +38,7 @@ export var mercatorWorkbenchDirective = (
 
 var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) => {
     scope.redirectAfterProposalCancel = (resourcePath : string) => {
-        // FIXME: use adhTopLevelState.redirectToCameFrom
+        // FIXME: use adhTopLevelState.goToCameFrom
         $location.url(adhResourceUrlFilter(resourcePath));
     };
     scope.redirectAfterProposalSubmit = (result : any[]) => {
@@ -47,20 +47,6 @@ var bindRedirectsToScope = (scope, adhConfig, adhResourceUrlFilter, $location) =
             $location.url(adhResourceUrlFilter(proposalVersion.path));
         } else {
             throw 404;
-        }
-    };
-};
-
-
-export var commentColumnDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
-        require: "^adhMovingColumn",
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            column.bindVariablesAndClear(scope, ["proposalUrl", "commentableUrl"]);
-            scope.frontendOrderPredicate = (id) => id;
-            scope.frontendOrderReverse = true;
         }
     };
 };
@@ -143,7 +129,7 @@ export var mercatorProposalListingColumnDirective = (
 
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                var currentPhase = resource.data[SIMercatorWorkflow.nick].workflow_state;
+                var currentPhase = resource.data[SIWorkflow.nick].workflow_state;
 
                 if (typeof scope.shared.facets === "undefined") {
                     scope.shared.facets = [{
@@ -236,11 +222,13 @@ export var register = (angular) => {
 
                         if (commentable.content_type === RIMercatorProposalVersion.content_type) {
                             specifics["proposalUrl"] = specifics["commentableUrl"];
+                            specifics["commentCloseUrl"] = specifics["commentableUrl"];
                         } else {
                             var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
                             var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
                             return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
                                 specifics["proposalUrl"] = proposalUrl;
+                                specifics["commentCloseUrl"] = proposalUrl;
                             });
                         }
                     })
@@ -276,7 +264,6 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhMercatorWorkbench", ["adhConfig", "adhTopLevelState", mercatorWorkbenchDirective])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective])
         .directive("adhMercatorProposalCreateColumn", [
             "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalCreateColumnDirective])
         .directive("adhMercatorProposalDetailColumn", [
