@@ -9,24 +9,25 @@ from adhocracy_core.workflows import add_workflow
 
 def change_children_to_voteable(context: IPool, request: Request, **kwargs):
     """Do transition from state proposed to voteable for all children."""
-    for child in context.values():
-        workflow = request.registry.content.get_workflow(child)
-        if workflow is None:
-            continue
-        state = workflow.state_of(child)
-        if state == 'proposed':
-            workflow.transition_to_state(child, request, 'voteable')
+    _do_transition_for_children(context, request, from_state='proposed',
+                                to_state='voteable')
 
 
 def change_children_to_rejected(context: IPool, request: Request, **kwargs):
     """Do transition from state proposed to rejected for all children."""
+    _do_transition_for_children(context, request, from_state='voteable',
+                                to_state='rejected')
+
+
+def _do_transition_for_children(context, request: Request, from_state: str,
+                                to_state: str):
     for child in context.values():
         workflow = request.registry.content.get_workflow(child)
         if workflow is None:
             continue
         state = workflow.state_of(child)
-        if state == 'voteable':
-            workflow.transition_to_state(child, request, 'rejected')
+        if state == from_state:
+            workflow.transition_to_state(child, request, to_state)
 
 
 s1_meta = freeze({
