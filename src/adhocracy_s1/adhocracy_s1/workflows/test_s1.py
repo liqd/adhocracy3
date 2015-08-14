@@ -4,6 +4,70 @@ from pytest import mark
 from webtest import TestResponse
 
 
+class TestChangeChildrenToVotable:
+
+    @fixture
+    def registry(self, registry_with_content, mock_workflow):
+        registry_with_content.content.get_workflow.return_value = mock_workflow
+        return registry_with_content
+
+    def call_fut(self, *args, **kwargs):
+        from .s1 import change_children_to_voteable
+        return change_children_to_voteable(*args, **kwargs)
+
+    def test_ignore_if_no_workflow(self, context, request_, registry):
+        context['child'] = testing.DummyResource()
+        registry.content.get_workflow.return_value = None
+        self.call_fut(context, request_)
+
+    def test_ignore_if_state_is_not_propose(self, context, request_, registry,
+                                            mock_workflow):
+        context['child'] = testing.DummyResource()
+        mock_workflow.state_of.return_value = ''
+        self.call_fut(context, request_)
+        assert not mock_workflow.transition_to_state.called
+
+    def test_change_children_to_votable(self, context, request_, registry,
+                                        mock_workflow):
+        context['child'] = testing.DummyResource()
+        mock_workflow.state_of.return_value = 'proposed'
+        self.call_fut(context, request_)
+        mock_workflow.transition_to_state.assert_called_with(context['child'],
+                                                             request_, 'voteable')
+
+
+class TestChangeChildrenToVotable:
+
+    @fixture
+    def registry(self, registry_with_content, mock_workflow):
+        registry_with_content.content.get_workflow.return_value = mock_workflow
+        return registry_with_content
+
+    def call_fut(self, *args, **kwargs):
+        from .s1 import change_children_to_rejected
+        return change_children_to_rejected(*args, **kwargs)
+
+    def test_ignore_if_no_workflow(self, context, request_, registry):
+        context['child'] = testing.DummyResource()
+        registry.content.get_workflow.return_value = None
+        self.call_fut(context, request_)
+
+    def test_ignore_if_state_is_not_voteable(self, context, request_, registry,
+                                             mock_workflow):
+        context['child'] = testing.DummyResource()
+        mock_workflow.state_of.return_value = ''
+        self.call_fut(context, request_)
+        assert not mock_workflow.transition_to_state.called
+
+    def test_change_children_to_rejected(self, context, request_, registry,
+                                         mock_workflow):
+        context['child'] = testing.DummyResource()
+        mock_workflow.state_of.return_value = 'voteable'
+        self.call_fut(context, request_)
+        mock_workflow.transition_to_state.assert_called_with(context['child'],
+                                                             request_, 'rejected')
+
+
 @mark.usefixtures('integration')
 def test_s1_includeme_add_workflow(registry):
     from adhocracy_core.workflows import AdhocracyACLWorkflow
@@ -43,6 +107,11 @@ class TestS1Workflow:
         resp = _post_proposal_item(app_participant, path='/s1')
         assert resp.status_code == 200
 
+    def test_propose_proposal_has_state_propose(self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        resp = app_participant.get('/s1/proposal_0000000')
+        assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'proposed'
+
     def test_propose_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment in app_participant2.get_postable_types(
@@ -56,6 +125,11 @@ class TestS1Workflow:
     def test_change_state_to_select(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/s1', 'select')
         assert resp.status_code == 200
+
+    def test_select_proposal_has_state_votable(self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        resp = app_participant.get('/s1/proposal_0000000')
+        assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'voteable'
 
     def test_select_participant_can_create_proposal(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
@@ -74,6 +148,11 @@ class TestS1Workflow:
     def test_change_state_to_result(self, app_initiator):
         resp = _do_transition_to(app_initiator, '/s1', 'result')
         assert resp.status_code == 200
+
+    def test_result_proposal_has_state_rejected(self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        resp = app_participant.get('/s1/proposal_0000000')
+        assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'rejected'
 
     def test_result_participant_can_create_proposal(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
