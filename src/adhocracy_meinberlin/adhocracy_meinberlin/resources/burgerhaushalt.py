@@ -1,6 +1,4 @@
 """Burgerhaushalt proposal."""
-from adhocracy_core.interfaces import IItemVersion
-from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import process
 from adhocracy_core.resources import proposal
@@ -11,7 +9,7 @@ from adhocracy_core.sheets.image import IImageReference
 import adhocracy_meinberlin.sheets.burgerhaushalt
 
 
-class IProposalVersion(IItemVersion):
+class IProposalVersion(proposal.IProposalVersion):
 
     """Burgerhaushalt proposal version."""
 
@@ -22,7 +20,7 @@ proposal_version_meta = proposal.proposal_version_meta._replace(
                         IPoint))
 
 
-class IProposal(IItem):
+class IProposal(proposal.IProposal):
 
     """Burgerhaushalt proposal versions pool."""
 
@@ -31,9 +29,6 @@ proposal_meta = proposal.proposal_meta._replace(
     iresource=IProposal,
     element_types=(IProposalVersion,),
     item_type=IProposalVersion,
-    is_implicit_addable=True,
-    use_autonaming=True,
-    autonaming_prefix='proposal_',
 )
 
 
