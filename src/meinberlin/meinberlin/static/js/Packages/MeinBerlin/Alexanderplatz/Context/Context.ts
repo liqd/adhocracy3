@@ -9,13 +9,7 @@ import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhMeinBerlinAlexanderplatzWorkbench = require("../Workbench/Workbench");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
-import RIGeoDocument = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocument");
-import RIGeoDocumentVersion = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
 import RIGeoProposal = require("../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
-import RIGeoProposalVersion = require("../../../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
-import RIParagraph = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
-import RIParagraphVersion = require("../../../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import SIParagraph = require("../../../../Resources_/adhocracy_core/sheets/document/IParagraph");
 
 var pkgLocation = "/MeinBerlin/Alexanderplatz/Context";
 
