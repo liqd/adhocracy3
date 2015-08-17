@@ -92,7 +92,11 @@ export var processDetailColumnDirective = (
 export var documentDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service,
-    adhTopLevelState : AdhTopLevelState.Service
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhHttp : AdhHttp.Service<any>,
+    adhResourceUrl,
+    $location : angular.ILocationService,
+    $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
@@ -104,6 +108,16 @@ export var documentDetailColumnDirective = (
 
             scope.setCameFrom = () => {
                 adhTopLevelState.setCameFrom();
+            };
+
+            scope.hide = () => {
+                if ($window.confirm("Do you really want to delete this?")) {
+                    var itemPath = AdhUtil.parentPath(scope.documentUrl);
+                    adhHttp.hide(itemPath, RIGeoDocument.content_type)
+                        .then(() => {
+                            $location.url(adhResourceUrl(scope.processUrl));
+                        });
+                }
             };
         }
     };
@@ -396,7 +410,14 @@ export var register = (angular) => {
         .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", documentDetailColumnDirective])
+            "adhConfig",
+            "adhPermissions",
+            "adhTopLevelState",
+            "adhHttp",
+            "adhResourceUrlFilter",
+            "$location",
+            "$window",
+            documentDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", [
             "adhConfig", "adhPermissions", "adhTopLevelState", proposalDetailColumnDirective])
         .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", [
