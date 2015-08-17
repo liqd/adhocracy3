@@ -463,6 +463,7 @@ export var createDirective = (
         scope: {
             path: "@",
             hasMap: "=?",
+            hasImage: "=?",
             polygon: "=?"
         },
         link: (scope : IFormScope, element) => {
@@ -520,6 +521,7 @@ export var editDirective = (
             path: "@",
             hasMap: "=?",
             hasBadges: "=?",
+            hasImage: "=?",
             polygon: "=?"
         },
         link: (scope : IFormScope, element) => {

@@ -34,7 +34,7 @@
             data-pin="document-selected"
             data-height="170"></adh-map-input>
 
-        <label data-ng-if="$flow && $flow.support">
+        <label data-ng-if="hasImage && $flow && $flow.support">
             <span class="label-text">{{ "TR__IMAGE_UPLOAD" | translate }}</span>
             <div data-flow-init="" data-flow-object="$flow" class="image-upload">
                 <button type="button" data-flow-btn="" class="button-cta-secondary image-upload-button">
