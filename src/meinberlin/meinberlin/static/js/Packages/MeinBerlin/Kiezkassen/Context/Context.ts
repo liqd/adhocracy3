@@ -1,6 +1,5 @@
 import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
-import AdhHttp = require("../../../Http/Http");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
@@ -35,7 +34,6 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhEmbed.moduleName,
-            AdhHttp.moduleName,
             AdhMeinBerlinKiezkassenWorkbench.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
