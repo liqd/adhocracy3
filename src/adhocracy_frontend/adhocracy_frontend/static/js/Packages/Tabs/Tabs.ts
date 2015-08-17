@@ -123,9 +123,11 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
                 scope.active = active;
                 if (active) {
                     paneElement.removeClass("ng-hide");
+                    paneElement.addClass("is-active");
                     scope.height = paneElement.outerHeight();
                 } else {
                     paneElement.addClass("ng-hide");
+                    paneElement.removeClass("is-active");
                 }
             };
 
