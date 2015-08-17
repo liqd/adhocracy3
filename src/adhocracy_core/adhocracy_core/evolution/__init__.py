@@ -26,6 +26,8 @@ from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.proposal import IProposal
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.catalog import ICatalogsService
 
 
@@ -187,6 +189,27 @@ def make_users_badgeable(root):  # pragma: no cover
 
 
 @log_migration
+def make_proposals_badgeable(root):  # pragma: no cover
+    """Add badge services processes and make proposals badgeable."""
+    catalogs = find_service(root, 'catalogs')
+    proposals = _search_for_interfaces(catalogs, IProposal)
+    registry = get_current_registry(root)
+    for proposal in proposals:
+        if not IBadgeable.providedBy(proposal):
+            logger.info('add badgeable interface to {0}'.format(proposal))
+            alsoProvides(proposal, IBadgeable)
+        if 'badge_assignments' not in proposal:
+            logger.info('add badge assignments to {0}'.format(proposal))
+            add_badge_assignments_service(proposal, registry, {})
+    processes = _search_for_interfaces(catalogs, IProcess)
+    for process in processes:
+        if not IHasBadgesPool.providedBy(process):
+            logger.info('Add badges service to {0}'.format(process))
+            add_badges_service(process, registry, {})
+            alsoProvides(process, IHasBadgesPool)
+
+
+@log_migration
 def change_pools_autonaming_scheme(root):  # pragma: no cover
     """Change pool autonaming scheme."""
     registry = get_current_registry(root)
@@ -266,3 +289,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(lower_case_users_emails)
     config.add_evolution_step(remove_name_sheet_from_items)
     config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)
+    config.add_evolution_step(make_proposals_badgeable)
