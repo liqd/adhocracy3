@@ -6,7 +6,7 @@ import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
-import AdhMeinBerlinWorkbench = require("../Workbench/Workbench");
+import AdhMeinBerlinAlexanderplatzWorkbench = require("../Workbench/Workbench");
 
 import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
 import RIGeoDocument = require("../../../../Resources_/adhocracy_core/resources/document/IGeoDocument");
@@ -51,7 +51,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
-            AdhMeinBerlinWorkbench.moduleName,
+            AdhMeinBerlinAlexanderplatzWorkbench.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName
@@ -68,7 +68,7 @@ export var register = (angular) => {
                     ) => {
                     return $templateRequest(adhConfig.pkg_path + pkgLocation + "/template.html");
                 }]);
-            AdhMeinBerlinWorkbench.registerRoutes(processType, "alexanderplatz")(adhResourceAreaProvider);
+            AdhMeinBerlinAlexanderplatzWorkbench.registerRoutes(processType, "alexanderplatz")(adhResourceAreaProvider);
         }])
         .config(["adhMapDataProvider", (adhMapDataProvider: AdhMapping.MapDataProvider) => {
             adhMapDataProvider.icons["document"] = {

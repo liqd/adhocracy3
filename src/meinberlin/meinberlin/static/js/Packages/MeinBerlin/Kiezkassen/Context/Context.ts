@@ -5,7 +5,7 @@ import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
-import AdhMeinBerlinWorkbench = require("../Workbench/Workbench");
+import AdhMeinBerlinKiezkassenWorkbench = require("../Workbench/Workbench");
 
 import RIComment = require("../../../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
@@ -41,7 +41,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
-            AdhMeinBerlinWorkbench.moduleName,
+            AdhMeinBerlinKiezkassenWorkbench.moduleName,
             AdhPermissions.moduleName,
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName
