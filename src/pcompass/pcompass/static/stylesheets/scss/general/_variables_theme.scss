@@ -1,11 +1,16 @@
 //Brand colors
 $color-brand-one-normal: #f89523;
-$color-brand-one-extrovert: white;
+$color-brand-one-introvert: #f87323;
+$color-brand-one-extrovert: #faa84f;
 $color-brand-two-normal: $color-brand-one-normal;
-$color-brand-two-introvert: #f87323;
-$color-brand-two-extrovert: #faa84f;
+$color-brand-two-introvert: $color-brand-one-introvert;
+$color-brand-two-extrovert: $color-brand-one-extrovert;
 $color-brand-three-normal: #949699;
-$color-brand-four-normal: white;
+$color-brand-three-introvert: #565658;
+$color-brand-three-extrovert: #cecdce;
+$color-brand-four-normal: $color-brand-three-normal;
+$color-brand-four-introvert: $color-brand-three-introvert;
+$color-brand-four-extrovert: $color-brand-three-extrovert;
 
 // Text colors
 $color-text-normal: #333;
