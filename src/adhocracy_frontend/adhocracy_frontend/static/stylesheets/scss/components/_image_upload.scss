@@ -11,7 +11,12 @@ category: Widgets
     <img src="/static/images/sample.jpg" class="image-upload-preview" width="200" alt="" />
 </div>
 */
+.image-upload {
+    margin: 1.4em 0;
+}
+
 .image-upload-preview {
     display: block;
     max-height: 10em;
+    margin: 0.7em 0;
 }
