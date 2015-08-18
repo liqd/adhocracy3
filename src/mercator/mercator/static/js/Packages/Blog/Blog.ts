@@ -3,9 +3,9 @@ import AdhDocument = require("../Document/Document");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhImage = require("../Image/Image");
+import AdhListing = require("../Listing/Listing");
 import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPermissions = require("../Permissions/Permissions");
-import AdhListing = require("../Listing/Listing");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUtil = require("../Util/Util");
 
@@ -212,9 +212,9 @@ export var register = (angular) => {
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
             AdhImage.moduleName,
+            AdhListing.moduleName,
             AdhMarkdown.moduleName,
-            AdhPermissions.moduleName,
-            AdhListing.moduleName
+            AdhPermissions.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
