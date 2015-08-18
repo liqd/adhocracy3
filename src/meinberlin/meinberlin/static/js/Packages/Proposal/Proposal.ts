@@ -229,6 +229,7 @@ var postEdit = (
         proposalVersionClass = RIBurgerhaushaltProposalVersion;
     }
 
+    var proposalVersion = new proposalVersionClass({preliminaryNames: adhPreliminaryNames});
     proposalVersion.parent = AdhUtil.parentPath(oldVersion.path);
     proposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
         follows: [oldVersion.path]
