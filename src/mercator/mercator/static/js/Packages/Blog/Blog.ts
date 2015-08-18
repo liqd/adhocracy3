@@ -2,6 +2,7 @@ import AdhConfig = require("../Config/Config");
 import AdhDocument = require("../Document/Document");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
+import AdhImage = require("../Image/Image");
 import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhListing = require("../Listing/Listing");
@@ -210,6 +211,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
+            AdhImage.moduleName,
             AdhMarkdown.moduleName,
             AdhPermissions.moduleName,
             AdhListing.moduleName
