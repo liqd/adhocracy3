@@ -41,6 +41,7 @@ proposal_meta = item_meta._replace(
     element_types=(IProposalVersion,),
     item_type=IProposalVersion,
     is_implicit_addable=True,
+    autonaming_prefix='proposal_',
     permission_create='create_proposal',
 )._add(after_creation=(
     add_commentsservice,
