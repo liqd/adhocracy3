@@ -22,7 +22,7 @@ An absolute path can be given instead of a relative one with the
 `absolute` option. The following command will put the workflow in the
 'closed' phase, whatever the current state is::
 
-  ./bin/set_workflow_state --absolute etc/development.ini /organisation/workshop announce participate evaluate result closed
+    ./bin/set_workflow_state --absolute etc/development.ini /organisation/workshop announce participate evaluate result closed
 
 The current state and information about the workflow can be obtained with the `info` option::
 
