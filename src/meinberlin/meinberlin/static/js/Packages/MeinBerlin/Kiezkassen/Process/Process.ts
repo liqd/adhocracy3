@@ -91,20 +91,20 @@ export var phaseHeaderDirective = (
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
                 scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
-                if (resource.data[SIWorkflow.nick].announce) {
-                    scope.phases[0].startDate = resource.data[SIWorkflow.nick].announce.start_date;
+                if (resource.data[SIWorkflow.nick].state_data.announce) {
+                    scope.phases[0].startDate = resource.data[SIWorkflow.nick].state_data.announce.start_date;
                 }
-                if (resource.data[SIWorkflow.nick].participate) {
-                    scope.phases[0].endDate = resource.data[SIWorkflow.nick].participate.start_date;
-                    scope.phases[1].startDate = resource.data[SIWorkflow.nick].participate.start_date;
+                if (resource.data[SIWorkflow.nick].state_data.participate) {
+                    scope.phases[0].endDate = resource.data[SIWorkflow.nick].state_data.participate.start_date;
+                    scope.phases[1].startDate = resource.data[SIWorkflow.nick].state_data.participate.start_date;
                 }
-                if (resource.data[SIWorkflow.nick].frozen) {
-                    scope.phases[1].endDate = resource.data[SIWorkflow.nick].frozen.start_date;
-                    scope.phases[2].startDate = resource.data[SIWorkflow.nick].frozen.start_date;
+                if (resource.data[SIWorkflow.nick].state_data.frozen) {
+                    scope.phases[1].endDate = resource.data[SIWorkflow.nick].state_data.frozen.start_date;
+                    scope.phases[2].startDate = resource.data[SIWorkflow.nick].state_data.frozen.start_date;
                 }
-                if (resource.data[SIWorkflow.nick].result) {
-                    scope.phases[2].endDate = resource.data[SIWorkflow.nick].result.start_date;
-                    scope.phases[3].startDate = resource.data[SIWorkflow.nick].result.start_date;
+                if (resource.data[SIWorkflow.nick].state_data.result) {
+                    scope.phases[2].endDate = resource.data[SIWorkflow.nick].state_data.result.start_date;
+                    scope.phases[3].startDate = resource.data[SIWorkflow.nick].state_data.result.start_date;
                 }
             });
 
