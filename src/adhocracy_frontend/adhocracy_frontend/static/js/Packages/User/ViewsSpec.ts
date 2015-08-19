@@ -115,7 +115,7 @@ export var register = () => {
                     scopeMock = {
                         $watch: () => undefined,
                         loginForm: {
-                            $setPristine: () => undefined,
+                            $setPristine: () => undefined
                         }
                     };
                     directive.link(scopeMock);

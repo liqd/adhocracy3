@@ -5,8 +5,6 @@ import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
-
 var pkgLocation = "/MeinBerlin/Alexanderplatz/Process";
 
 
@@ -41,8 +39,8 @@ export var phaseHeaderDirective = (
                 shorttitle: "Phase 2",
                 title: "Varianten und Alternativen für den neuen Masterplan.",
                 description: "November bis Dezember 2015. Im zweiten Fachworkshop am 02.11. und im zweiten Bürgerworkshop am 09.11. " +
-                    "geht es um die Arbeit am neuen Masterplan. Zwischenergebnisse und Vorschläge erweitern die Ausstellung im Alexanderhaus. " +
-                    "Die Anmerkungen aus der Onlinebeteiligung werden in die Workshops mit einfließen.",
+                    "geht es um die Arbeit am neuen Masterplan. Zwischenergebnisse und Vorschläge erweitern die Ausstellung im " +
+                    "Alexanderhaus. Die Anmerkungen aus der Onlinebeteiligung werden in die Workshops mit einfließen.",
                 processType: "Workshopverfahren Alexanderplatz",
                 votingAvailable: true,
                 commentAvailable: true
