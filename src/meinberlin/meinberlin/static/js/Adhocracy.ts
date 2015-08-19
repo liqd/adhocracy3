@@ -43,6 +43,7 @@ import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
 import AdhMapping = require("./Packages/Mapping/Mapping");
 import AdhMarkdown = require("./Packages/Markdown/Markdown");
+import AdhMeinBerlinProposal = require("./Packages/Proposal/Proposal");
 import AdhMeinBerlin = require("./Packages/MeinBerlin/MeinBerlin");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
@@ -190,6 +191,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
     AdhMeinBerlin.register(angular);
+    AdhMeinBerlinProposal.register(angular);
     AdhMapping.register(angular);
     AdhMarkdown.register(angular);
     AdhMovingColumns.register(angular);
