@@ -131,14 +131,6 @@ export var kiezkassenDetailColumnDirective = (
     };
 };
 
-export var kiezkassenDetailAnnounceColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    var directive = kiezkassenDetailColumnDirective(adhConfig);
-    directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/KiezkassenDetailAnnounceColumn.html";
-    return directive;
-};
-
 export var kiezkassenEditColumnDirective = (
     adhConfig : AdhConfig.IService
 ) => {
@@ -282,6 +274,5 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenProposalCreateColumn", ["adhConfig", kiezkassenProposalCreateColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalEditColumn", ["adhConfig", kiezkassenProposalEditColumnDirective])
         .directive("adhMeinBerlinKiezkassenDetailColumn", ["adhConfig", kiezkassenDetailColumnDirective])
-        .directive("adhMeinBerlinKiezkassenDetailAnnounceColumn", ["adhConfig", kiezkassenDetailAnnounceColumnDirective])
         .directive("adhMeinBerlinKiezkassenEditColumn", ["adhConfig", kiezkassenEditColumnDirective]);
 };

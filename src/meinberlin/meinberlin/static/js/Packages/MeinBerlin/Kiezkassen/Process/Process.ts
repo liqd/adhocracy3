@@ -39,8 +39,10 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var locationUrl = resource.data[SILocationReference.nick].location;
+                        var stateName = resource.data[SIWorkflow.nick].workflow_state;
+                        scope.currentPhase = resource.data[SIWorkflow.nick].state_data[stateName];
 
+                        var locationUrl = resource.data[SILocationReference.nick].location;
                         adhHttp.get(locationUrl).then((location) => {
                             var polygon = location.data[SIMultiPolygon.nick].coordinates[0][0];
                             scope.polygon =  polygon;
@@ -49,30 +51,6 @@ export var detailDirective = (
                 }
             });
             adhPermissions.bindScope(scope, () => scope.path);
-        }
-    };
-};
-
-
-export var detailAnnounceDirective = (
-    adhConfig : AdhConfig.IService,
-    adhHttp : AdhHttp.Service<any>
-) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/DetailAnnounce.html",
-        scope: {
-            path: "@"
-        },
-        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            scope.$watch("path", (value : string) => {
-                if (value) {
-                    adhHttp.get(value).then((resource) => {
-                        scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
-                        scope.announceDescription = resource.data[SIWorkflow.nick].announce.description;
-                    });
-                }
-            });
         }
     };
 };
@@ -268,6 +246,5 @@ export var register = (angular) => {
         .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
-        .directive("adhMeinBerlinKiezkassenDetailAnnounce", ["adhConfig", "adhHttp", detailAnnounceDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", editDirective]);
 };
