@@ -8,13 +8,12 @@ Workflow state
 --------------
 
 The state of the workflow can be changed with the `set_workflow_state`
-command.
+command. In the following examples we assume there is process
+associated to /organisation/workshop resource with a standard
+workflow.
 
-A relative path containing all the states to execute before reaching
-the wanted state can be given. For example, assuming the current
-workflow is the standard one and the process is located in
-/organisation/workshop in the 'participate' state, we can type this
-command to set it to 'closed' state::
+To set a particular state, a relative path leading to the wanted state
+is entered::
 
     ./bin/set_workflow_state etc/development.ini /organisation/workshop evaluate result closed
 
@@ -27,6 +26,10 @@ An absolute path can be given instead of a relative one with the
 The current state and information about the workflow can be obtained with the `info` option::
 
     ./bin/set_workflow_state --info etc/development.ini /organisation/workshop
+
+To `reset` option is used to reset the workflow before setting the state::
+
+    ./bin/set_workflow_state --reset etc/development.ini /organisation/workshop draft announce
 
 
 Resources

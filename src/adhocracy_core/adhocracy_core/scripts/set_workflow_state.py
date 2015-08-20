@@ -18,9 +18,10 @@ from adhocracy_core.workflows import transition_to_states
 def set_workflow_state():  # pragma: no cover
     """Set a workflow state for a given resource.
 
-    usage::
+    A relative path containing all the states to transition to before
+    reaching the wanted state is given. Alternatively an absolute path
+    can be given instead of a relative one with the `absolute` option.
 
-        bin/set_workflow_state etc/development.ini <resource-path> <state>
     """
     docstring = inspect.getdoc(set_workflow_state)
     parser = argparse.ArgumentParser(description=docstring)
@@ -39,7 +40,8 @@ def set_workflow_state():  # pragma: no cover
                         action='store_true')
     parser.add_argument('-r',
                         '--reset',
-                        help='reset workflow to initial state',
+                        help='reset workflow before '
+                        'transitioning to the states',
                         action='store_true')
     parser.add_argument('states',
                         type=str,
