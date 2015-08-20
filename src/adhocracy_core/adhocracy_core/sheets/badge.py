@@ -16,6 +16,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 
 
@@ -163,6 +164,7 @@ badgeable_meta = sheet_meta._replace(
 
 
 def create_unique_badge_assignment_validator(badge_ref: Reference,
+                                             object_ref: Reference,
                                              kw: dict) -> callable:
     """Create validator to check that a badge assignment is unique.
 
@@ -177,13 +179,15 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
     def validator(node, value):
         new_badge = node.get_value(value, badge_ref.name)
         new_badge_name = get_sheet_field(new_badge, IName, 'name')
+        new_object = node.get_value(value, object_ref.name)
         pool = find_service(context, 'badge_assignments')
         for badge_assignment in pool.values():
-            badge = get_sheet_field(badge_assignment,
-                                    IBadgeAssignment,
-                                    'badge')
+            badge_sheet_values = get_sheet(badge_assignment,
+                                           IBadgeAssignment).get()
+            badge = badge_sheet_values['badge']
             badge_name = get_sheet_field(badge, IName, 'name')
-            if new_badge_name == badge_name:
+            obj = badge_sheet_values['object']
+            if new_badge_name == badge_name and new_object == obj:
                 raise colander.Invalid(badge_ref, 'Badge already assigned')
 
     return validator
@@ -202,7 +206,7 @@ class BadgeAssignmentSchema(colander.MappingSchema):
         """Validate the :term:`post_pool` for the object reference."""
         object_validator = create_post_pool_validator(self['object'], kw)
         badge_assignment_validator = create_unique_badge_assignment_validator(
-            self['badge'], kw)
+            self['badge'], self['object'], kw)
         return colander.All(object_validator, badge_assignment_validator)
 
 
