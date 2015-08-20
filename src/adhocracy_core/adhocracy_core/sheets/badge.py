@@ -162,20 +162,20 @@ badgeable_meta = sheet_meta._replace(
 )
 
 
-def create_unique_badge_assignment_validator(child_node: Reference,
+def create_unique_badge_assignment_validator(badge_ref: Reference,
                                              kw: dict) -> callable:
     """Create validator to check that a badge assignment is unique.
 
     Badge assignments is considered unique if there is at most one for each
     badge in :term:`post_pool`.
 
-    :param:`child_node` Reference to a sheet with :term:`post_pool` field.
+    :param:`badge` Reference to a sheet with :term:`post_pool` field.
     :param:`kw`: dictionary with keys `context` and `registry`.
     """
     context = kw['context']
 
     def validator(node, value):
-        new_badge = node.get_value(value, child_node.name)
+        new_badge = node.get_value(value, badge_ref.name)
         new_badge_name = get_sheet_field(new_badge, IName, 'name')
         pool = find_service(context, 'badge_assignments')
         for badge_assignment in pool.values():
@@ -184,7 +184,7 @@ def create_unique_badge_assignment_validator(child_node: Reference,
                                     'badge')
             badge_name = get_sheet_field(badge, IName, 'name')
             if new_badge_name == badge_name:
-                raise colander.Invalid(child_node, 'Badge already assigned')
+                raise colander.Invalid(badge_ref, 'Badge already assigned')
 
     return validator
 
