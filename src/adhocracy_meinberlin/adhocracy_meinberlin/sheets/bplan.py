@@ -8,7 +8,6 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import workflow
 from adhocracy_core.schema import DateTime
-from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
@@ -73,8 +72,8 @@ class ProcessSettingsSchema(colander.MappingSchema):
     """Settings for the B-Plan process."""
 
     office_worker = Reference(reftype=OfficeWorkerUserReference)
-    plan_number = Integer()
-    participation_kind = SingleLine()
+    plan_number = SingleLine(missing=colander.required)
+    participation_kind = SingleLine(missing=colander.required)
     participation_start_date = DateTime(default=None)
     participation_end_date = DateTime(default=None)
 
