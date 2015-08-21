@@ -320,6 +320,8 @@ class ResourceContentRegistry(ContentRegistry):
         iresource = get_iresource(context)
         if iresource is None:
             return None
+        if iresource not in self.resources_meta:  # ease testing
+            return None
         name = self.resources_meta[iresource].workflow_name
         if name == '':
             return None
