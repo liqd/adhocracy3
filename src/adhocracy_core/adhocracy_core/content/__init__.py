@@ -318,11 +318,10 @@ class ResourceContentRegistry(ContentRegistry):
         :raises RuntimeConfigurationError: if workflow is not registered
         """
         iresource = get_iresource(context)
-        if iresource is None:
+        try:
+            name = self.resources_meta[iresource].workflow_name
+        except KeyError:  # ease testing
             return None
-        if iresource not in self.resources_meta:  # ease testing
-            return None
-        name = self.resources_meta[iresource].workflow_name
         if name == '':
             return None
         try:
