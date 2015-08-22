@@ -91,8 +91,26 @@ s1_content_meta = freeze({
     'states': {
         'proposed': {},
         'voteable': {},
-        'selected': {},
-        'rejected': {},
+        'selected': {
+               'acm': {'principals':                     ['participant', 'moderator', 'creator', 'initiator'],
+                           'permissions':
+                             [['edit_proposal',               None,          None,       'Deny',    None],
+                              ['create_rate',                'Deny',         None,       'Deny',    None],
+                              ['edit_rate',                   None,          None,       'Deny',    None],
+                              ['create_comment',             'Deny',        'Deny',       None,    'Deny'],
+                              ['edit_comment',                None,          None,       'Deny',    None],
+                             ]}
+        },
+        'rejected': {
+                'acm': {'principals':                     ['participant', 'moderator', 'creator', 'initiator'],
+                           'permissions':
+                             [['edit_proposal',               None,          None,       'Deny',    None],
+                              ['create_rate',                'Deny',         None,       'Deny',    None],
+                              ['edit_rate',                   None,          None,       'Deny',    None],
+                              ['create_comment',             'Deny',        'Deny',       None,    'Deny'],
+                              ['edit_comment',                None,          None,       'Deny',    None],
+                             ]}
+        },
     },
     'transitions': {
         'to_votable': {'from_state': 'proposed',

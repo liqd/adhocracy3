@@ -36,7 +36,7 @@ class TestChangeChildrenToVotable:
                                                              request_, 'voteable')
 
 
-class TestChangeChildrenToVotable:
+class TestChangeChildrenToRejected:
 
     @fixture
     def registry(self, registry_with_content, mock_workflow):
@@ -105,7 +105,7 @@ class TestS1Workflow:
 
     def test_propose_participant_can_create_proposal(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
-        assert resp.status_code == 200
+        assert 'proposal_0000000' in resp.json['path']
 
     def test_propose_proposal_has_state_propose(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
@@ -133,7 +133,7 @@ class TestS1Workflow:
 
     def test_select_participant_can_create_proposal(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
-        assert resp.status_code == 200
+        assert 'proposal_0000001' in resp.json['path']
 
     def test_select_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
@@ -149,24 +149,34 @@ class TestS1Workflow:
         resp = _do_transition_to(app_initiator, '/s1', 'result')
         assert resp.status_code == 200
 
-    def test_result_proposal_has_state_rejected(self, app_participant):
+    def test_result_old_proposal_has_state_rejected(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000000')
         assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'rejected'
 
+    def test_result_participant_cannot_comment_old_proposal(self, app_participant2):
+        from adhocracy_core.resources.comment import IComment
+        assert IComment not in app_participant2.get_postable_types(
+            '/s1/proposal_0000002/comments')
+
+    def test_result_participant_cannot_rate_old_proposal(self, app_participant2):
+        from adhocracy_core.resources.rate import IRate
+        assert IRate not in app_participant2.get_postable_types(
+            '/s1/proposal_0000002/rates')
+
     def test_result_participant_can_create_proposal(self, app_participant):
         resp = _post_proposal_item(app_participant, path='/s1')
-        assert resp.status_code == 200
+        assert 'proposal_0000002' in resp.json['path']
 
     def test_result_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
         assert IComment in app_participant2.get_postable_types(
-            '/s1/proposal_0000000/comments')
+            '/s1/proposal_0000002/comments')
 
     def test_result_participant_can_rate_proposal(self, app_participant2):
         from adhocracy_core.resources.rate import IRate
         assert IRate in app_participant2.get_postable_types(
-            '/s1/proposal_0000000/rates')
+            '/s1/proposal_0000002/rates')
 
 
 @mark.usefixtures('integration')
