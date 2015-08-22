@@ -3,32 +3,57 @@
 # flake8: noqa
 from pyramid.request import Request
 from pyrsistent import freeze
+from substanced.util  import find_service
 from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import search_query
+from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.workflows import add_workflow
 
 
 def change_children_to_voteable(context: IPool, request: Request, **kwargs):
     """Do transition from state proposed to voteable for all children."""
-    _do_transition_for_children(context, request, from_state='proposed',
-                                to_state='voteable')
-
-
-def change_children_to_rejected(context: IPool, request: Request, **kwargs):
-    """Do transition from state proposed to rejected for all children."""
-    _do_transition_for_children(context, request, from_state='voteable',
-                                to_state='rejected')
-
-
-def _do_transition_for_children(context, request: Request, from_state: str,
-                                to_state: str):
     for child in context.values():
-        workflow = request.registry.content.get_workflow(child)
-        if workflow is None:
-            continue
-        state = workflow.state_of(child)
-        if state == from_state:
-            workflow.transition_to_state(child, request, to_state)
+        _do_transition(child, request, from_state='proposed', to_state='voteable')
 
+
+def change_children_to_rejected_or_selected(context: IPool, request: Request, **kwargs):
+    """Do transition from state proposed to rejected/selected for all children.
+
+    The most rated child does transition to state selected, the other to rejected.
+    """
+    rated_children = _get_children_sort_by_rates(context)
+    for pos,child in enumerate(rated_children):
+        if pos == 0:
+            _do_transition(child, request, from_state='voteable', to_state='selected')
+        else:
+            _do_transition(child, request, from_state='voteable', to_state='rejected')
+
+def _get_children_sort_by_rates(context) -> []:
+    catalog = find_service(context, 'catalogs')
+    if catalog is None:
+        return []  # ease testing
+    result = catalog.search(search_query._replace(root=context,
+                                                 depth=2,
+                                                 only_visible=True,
+                                                 interfaces=(IRateable, IVersionable),
+                                                 sort_by='rates',
+                                                 indexes={'tag': 'LAST'},
+                                                 ))
+    return (r.__parent__ for r in result.elements)
+
+
+def _do_transition(context, request: Request, from_state: str, to_state: str):
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    from adhocracy_core.exceptions import RuntimeConfigurationError
+    try:
+        sheet = request.registry.content.get_sheet(context, IWorkflowAssignment)
+    except RuntimeConfigurationError:
+        pass
+    else:
+        current_state = sheet.get()['workflow_state']
+        if current_state == from_state:
+            sheet.set({'workflow_state': to_state}, request=request)
 
 s1_meta = freeze({
     'initial_state': 'propose',
@@ -77,7 +102,7 @@ s1_meta = freeze({
                       },
         'to_result': {'from_state': 'select',
                       'to_state': 'result',
-                      'callback': 'adhocracy_s1.workflows.s1.change_children_to_rejected',
+                      'callback': 'adhocracy_s1.workflows.s1.change_children_to_rejected_or_selected',
                       },
         'to_propose': {'from_state': 'result',
                        'to_state': 'propose',
