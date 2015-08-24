@@ -303,7 +303,7 @@ class TestIndexWorkflowState:
         assert registry.adapters.lookup((IWorkflowAssignment,), IIndexView,
                                         name='adhocracy|workflow_state')
 
-class TestIndexWorkflowStateOfVersion:
+class TestIndexWorkflowStateOfItem:
 
     @fixture
     def registry(self, registry_with_content):

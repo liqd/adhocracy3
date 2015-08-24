@@ -60,7 +60,7 @@ def _reindex_resource_and_descendants(resource: IResource):
 
 
 def reindex_workflow_state(event):
-    """Reindex the workflow_state of item and its versions."""
+    """Reindex the workflow_state index for item and its versions."""
     catalogs = find_service(event.object, 'catalogs')
     catalogs.reindex_index(event.object, 'workflow_state')
     children = event.object.values()

@@ -149,7 +149,7 @@ def index_workflow_state(resource, default) -> [str]:
 
 
 def index_workflow_state_of_item(resource, default) -> [str]:
-    """Find item and return its value for the workflow_state index."""
+    """Find item and return it`s value for the workflow_state index."""
     item = find_interface(resource, IItem)
     try:
         state = get_sheet_field(item, IWorkflowAssignment, 'workflow_state')
