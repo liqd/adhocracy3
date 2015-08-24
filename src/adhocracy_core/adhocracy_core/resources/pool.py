@@ -83,11 +83,11 @@ class Pool(Base, Folder):
 
     def _get_next_number(self, prefix):
         if prefix in self._autoname_lasts:
-            number = self._autoname_lasts[prefix]
+            number = self._autoname_lasts[prefix].value
         else:
-            number = 0
-            self._autoname_lasts[prefix] = number
-        self._autoname_lasts[prefix] += 1
+            self._autoname_lasts[prefix] = Length()
+            number = self._autoname_lasts[prefix].value
+        self._autoname_lasts[prefix].change(1)
         return number
 
     def find_service(self, service_name, *sub_service_names):
