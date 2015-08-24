@@ -25,7 +25,7 @@ import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workfl
 var pkgLocation = "/MeinBerlin/Burgerhaushalt/Workbench";
 
 
-export var meinBerlinWorkbenchDirective = (
+export var burgerhaushaltWorkbenchDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
@@ -242,7 +242,7 @@ export var register = (angular) => {
                 return $q.when("<adh-mein-berlin-burgerhaushalt-workbench></adh-mein-berlin-burgerhaushalt-workbench>");
             }];
         }])
-        .directive("adhMeinBerlinBurgerhaushaltWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
+        .directive("adhMeinBerlinBurgerhaushaltWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", burgerhaushaltWorkbenchDirective])
         .directive("adhMeinBerlinBurgerhaushaltProposalDetailColumn", [
             "adhConfig", "adhPermissions", burgerhaushaltProposalDetailColumnDirective])
         .directive("adhMeinBerlinBurgerhaushaltProposalCreateColumn", ["adhConfig", burgerhaushaltProposalCreateColumnDirective])
