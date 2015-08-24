@@ -57,9 +57,9 @@ class TestBadgeableSheet:
 
 class TestCreateUniqueBadgeAssignmentValidator:
 
-    def call_fut(self, node, kw):
+    def call_fut(self, badge, obj, kw):
         from .badge import create_unique_badge_assignment_validator
-        return create_unique_badge_assignment_validator(node, kw)
+        return create_unique_badge_assignment_validator(badge, obj, kw)
 
     @fixture
     def context(self, pool, service, registry):
@@ -73,6 +73,7 @@ class TestCreateUniqueBadgeAssignmentValidator:
     @fixture
     def node(self, node):
         node['badge'] = testing.DummyResource()
+        node['object'] = testing.DummyResource()
         return node
 
     @fixture
@@ -88,14 +89,32 @@ class TestCreateUniqueBadgeAssignmentValidator:
         from .badge import IBadgeAssignment
         badge = testing.DummyResource(__provides__=IBadge)
         mock_sheet.get.return_value = {'name': 'badge0',
-                                       'badge': badge}
+                                       'badge': badge,
+                                       'object': node['object']}
         registry.content.get_sheet.return_value = mock_sheet
         kw = {'registry': registry, 'context': context}
-        validator = self.call_fut(node['badge'], kw)
+        validator = self.call_fut(node['badge'], node['object'], kw)
         assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
         context['badge_assignments']['assign0'] = assign0
         with raises(colander.Invalid):
-            validator(node, {'badge': badge})
+            validator(node, {'badge': badge,
+                             'object': node['object']})
+
+    def test_no_raise_if_object_different(
+            self, node, context, registry, mock_sheet):
+        import colander
+        from .badge import IBadge
+        from .badge import IBadgeAssignment
+        badge = testing.DummyResource(__provides__=IBadge)
+        mock_sheet.get.return_value = {'name': 'badge0',
+                                       'badge': badge,
+                                       'object': node['object']}
+        registry.content.get_sheet.return_value = mock_sheet
+        kw = {'registry': registry, 'context': context}
+        validator = self.call_fut(node['badge'], node['object'], kw)
+        assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
+        context['badge_assignments']['assign0'] = assign0
+        validator(node, {'badge': badge, 'object': testing.DummyResource()}) is None
 
     def test_valid(
             self, node, context, registry, mock_sheet):
@@ -107,14 +126,16 @@ class TestCreateUniqueBadgeAssignmentValidator:
         mock_sheet3 = deepcopy(mock_sheet)
         mock_sheet.get.return_value = {'name': 'badge0'}
         badge = testing.DummyResource(__provides__=IBadge)
-        mock_sheet2.get.return_value = {'badge': badge}
+        mock_sheet2.get.return_value = {'badge': badge,
+                                        'object': testing.DummyResource()}
         mock_sheet3.get.return_value = {'name': 'badge1'}
         registry.content.get_sheet.side_effect = [mock_sheet, mock_sheet2, mock_sheet3]
         kw = {'registry': registry, 'context': context}
-        validator = self.call_fut(node['badge'], kw)
+        validator = self.call_fut(node['badge'], node['object'], kw)
         assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
         context['badge_assignments']['assign0'] = assign0
-        assert validator(node, {'badge': badge}) is None
+        assert validator(node, {'badge': badge,
+                                'object': testing.DummyResource()}) is None
 
 class TestBadgeAssignmentsSheet:
 
@@ -168,6 +189,7 @@ class TestBadgeAssignmentsSheet:
         mock_create_post_pool_validator.assert_called_with(inst.schema['object'],
                                                            {})
         mock_create_unique_badge_assignment_validator.assert_called_with(inst.schema['badge'],
+                                                                         inst.schema['object'],
                                                                          {})
 
     @mark.usefixtures('integration')
