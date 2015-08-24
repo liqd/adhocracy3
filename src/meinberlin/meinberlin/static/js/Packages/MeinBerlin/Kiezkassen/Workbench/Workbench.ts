@@ -248,7 +248,7 @@ export var registerRoutes = (
         }]);
 };
 
-export var moduleName = "adhMeinBerlinWorkbench";
+export var moduleName = "adhMeinBerlinKiezkassenWorkbench";
 
 export var register = (angular) => {
     angular

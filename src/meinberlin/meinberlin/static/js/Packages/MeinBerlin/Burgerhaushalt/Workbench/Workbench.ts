@@ -221,7 +221,7 @@ export var registerRoutes = (
         }]);
 };
 
-export var moduleName = "adhMeinBerlinWorkbench";
+export var moduleName = "adhMeinBerlinBurgerhaushaltWorkbench";
 
 export var register = (angular) => {
     angular
