@@ -237,7 +237,7 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
             for prefix in pool._autoname_lasts.keys():
                 pool._autoname_lasts[prefix] \
                     = Length(pool._autoname_lasts[prefix])
-            # convert and dict to PersistentMapping
+            # convert dict to PersistentMapping
             pool._autoname_lasts = PersistentMapping(pool._autoname_lasts)
 
 
