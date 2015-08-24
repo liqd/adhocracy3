@@ -294,7 +294,7 @@ class TestIndexWorkflowState:
     def test_return_workflow_state(self, context, mock_sheet):
         from .adhocracy import index_workflow_state
         mock_sheet.get.return_value = {'workflow_state': 'STATE'}
-        assert index_workflow_state(context, ['default']) == ['STATE']
+        assert index_workflow_state(context, 'default') == 'STATE'
 
     @mark.usefixtures('integration')
     def test_register(self, registry):
@@ -323,18 +323,18 @@ class TestIndexWorkflowStateOfItem:
         alsoProvides(item, IWorkflowAssignment)
         item["version"] = context
         mock_sheet.get.return_value = {'workflow_state': 'STATE'}
-        assert index_workflow_state_of_item(context, 'default') == ['STATE']
+        assert index_workflow_state_of_item(context, 'default') == 'STATE'
 
     def test_return_default_if_item_without_workflow(self, context, item, registry):
         from adhocracy_core.exceptions import RuntimeConfigurationError
         from .adhocracy import index_workflow_state_of_item
         item["version"] = context
         registry.content.get_sheet.side_effect = RuntimeConfigurationError
-        assert index_workflow_state_of_item(context, ['default']) == ['default']
+        assert index_workflow_state_of_item(context, 'default') == 'default'
 
     def test_return_default_if_no_item_in_lineage(self, context, registry):
         from .adhocracy import index_workflow_state_of_item
-        assert index_workflow_state_of_item(context, ['default']) == ['default']
+        assert index_workflow_state_of_item(context, 'default') == 'default'
 
     @mark.usefixtures('integration')
     def test_register(self, registry):

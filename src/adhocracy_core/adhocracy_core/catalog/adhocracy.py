@@ -46,7 +46,7 @@ class AdhocracyCatalogIndexes:
     rates = catalog.Field()
     creator = catalog.Field()
     item_creation_date = catalog.Field()
-    workflow_state = catalog.Keyword()
+    workflow_state = catalog.Field()
     reference = Reference()
 
 
@@ -145,7 +145,7 @@ def index_badge(resource, default) -> [str]:
 def index_workflow_state(resource, default) -> [str]:
     """Return value for the workflow_state index."""
     state = get_sheet_field(resource, IWorkflowAssignment, 'workflow_state')
-    return [state]
+    return state
 
 
 def index_workflow_state_of_item(resource, default) -> [str]:
@@ -156,7 +156,7 @@ def index_workflow_state_of_item(resource, default) -> [str]:
     except (RuntimeConfigurationError, AttributeError):
         return default
     else:
-        return [state]
+        return state
 
 
 def includeme(config):
