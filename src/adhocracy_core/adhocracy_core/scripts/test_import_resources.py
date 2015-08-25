@@ -1,15 +1,19 @@
+from pyramid.traversal import find_resource
 from pytest import fixture
 from pytest import mark
 from tempfile import mkstemp
 import os
 import json
 import pytest
-from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.organisation import IOrganisation
-from adhocracy_core.sheets.name import IName
+from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.name import IName
+from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.utils import get_sheet_field
-
+from adhocracy_core.resources.badge import IBadge
 
 
 @fixture
@@ -156,6 +160,71 @@ class TestImportResources:
                          "data": {}}
         assert _get_expected_path(resource_info) == ''
 
+    def test_username_is_resolved_to_his_path(self, registry):
+        from adhocracy_core.scripts.import_resources import _import_resources
+        from .import_users import _get_user_locator
+
+        (self._tempfd, filename) = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {"path": "/principals/users/badge_assignments",
+                 "content_type": "adhocracy_core.resources.badge.IBadgeAssignment",
+                 "data": {"adhocracy_core.sheets.badge.IBadgeAssignment":
+                          {"subject": "user_by_login:god",
+                           "badge": "/orga/badges/badge0",
+                           "object": "/principals/users/0000000"
+                          },
+                          "adhocracy_core.sheets.name.IName": {"name": "assign0"}}
+                }]))
+
+        root = registry.content.create(IRootPool.__identifier__)
+        appstructs = {'adhocracy_core.sheets.name.IName': {'name': 'orga'}}
+        orga = registry.content.create(IOrganisation.__identifier__, root,
+                                appstructs=appstructs, registry=registry)
+        add_badges_service(orga, registry, {})
+        badge_appstructs = {'adhocracy_core.sheets.name.IName': {'name': 'badge0'}}
+        registry.content.create(IBadge.__identifier__,
+                                orga['badges'],
+                                appstructs=badge_appstructs,
+                                registry=registry)
+
+        _import_resources(root, registry, filename)
+        assignments = find_resource(root, '/principals/users/badge_assignments/')
+        assignment = list(assignments.values())[0]
+        subject = get_sheet_field(assignment, IBadgeAssignment, 'subject')
+        user_locator = _get_user_locator(root, registry)
+        god = user_locator.get_user_by_login('god')
+        assert subject == god
+
+    def test_raise_when_resolving_non_existing_user(self, registry):
+        from adhocracy_core.scripts.import_resources import _import_resources
+        from .import_users import _get_user_locator
+
+        (self._tempfd, filename) = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {"path": "/principals/users/badge_assignments",
+                 "content_type": "adhocracy_core.resources.badge.IBadgeAssignment",
+                 "data": {"adhocracy_core.sheets.badge.IBadgeAssignment":
+                          {"subject": "user_by_login:Malkovitch",
+                           "badge": "/orga/badges/badge0",
+                           "object": "/principals/users/0000000"
+                          },
+                          "adhocracy_core.sheets.name.IName": {"name": "assign0"}}
+                }]))
+
+        root = registry.content.create(IRootPool.__identifier__)
+        appstructs = {'adhocracy_core.sheets.name.IName': {'name': 'orga'}}
+        orga = registry.content.create(IOrganisation.__identifier__, root,
+                                appstructs=appstructs, registry=registry)
+        add_badges_service(orga, registry, {})
+        badge_appstructs = {'adhocracy_core.sheets.name.IName': {'name': 'badge0'}}
+        registry.content.create(IBadge.__identifier__,
+                                orga['badges'],
+                                appstructs=badge_appstructs,
+                                registry=registry)
+        with pytest.raises(ValueError):
+            _import_resources(root, registry, filename)
 
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):

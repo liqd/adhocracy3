@@ -7,7 +7,7 @@
               "adhocracy_core.sheets.title.ITitle":
               {"title": "Sample BPlan process"},
               "adhocracy_meinberlin.sheets.bplan.IProcessSettings":
-              {"office_worker": "/principals/users/0000000",
+              {"office_worker": "user_by_login:god",
                "plan_number": "1-35ba",
                "participation_kind": "öffentliche Auslegung",
                "participation_start_date": "2015-05-05",
