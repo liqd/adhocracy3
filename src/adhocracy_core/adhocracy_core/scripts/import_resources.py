@@ -123,9 +123,9 @@ def _resolve_users(resource_info: PMap,
     def _resolve_user(s):
         if not type(s) == str or not s.startswith('user_by_login:'):
             return s
-        users_locator = _get_user_locator(root, registry)
+        user_locator = _get_user_locator(root, registry)
         user_name = s.split('user_by_login:')[1]
-        user = users_locator.get_user_by_login(user_name)
+        user = user_locator.get_user_by_login(user_name)
         if user is None:
             raise ValueError('No such user: {}.'.format(user_name))
         return resource_path(user)
