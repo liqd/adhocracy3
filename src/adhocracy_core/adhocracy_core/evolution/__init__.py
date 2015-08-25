@@ -226,7 +226,7 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
         if hasattr(pool, '_autoname_last'):
             pool._autoname_lasts = PersistentMapping()
             for prefix in prefixes:
-                pool._autoname_lasts[prefix] = Length(pool._autoname_last)
+                pool._autoname_lasts[prefix] = Length(pool._autoname_last + 1)
             del pool._autoname_last
         elif not hasattr(pool, '_autoname_lasts'):
             pool._autoname_lasts = PersistentMapping()
