@@ -1,4 +1,5 @@
 """Basic type with children typically to create process structures."""
+from BTrees.Length import Length
 from substanced.folder import Folder
 from substanced.util import find_service
 from substanced.interfaces import IFolder
@@ -15,7 +16,6 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.base import Base
-from adhocracy_core.resources.base import Length
 from adhocracy_core.utils import now
 
 
