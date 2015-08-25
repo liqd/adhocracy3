@@ -137,6 +137,19 @@ class TestReindexResourceAndDescendants:
         assert mock_reindex.call_count == 2
 
 
+def test_reindex_workflow_state(event, catalog):
+    from unittest.mock import call
+    from .subscriber import reindex_workflow_state
+    from adhocracy_core.sheets.versions import IVersionable
+    event.object['version'] = testing.DummyResource(__provides__=IVersionable)
+    event.object['other'] = testing.DummyResource()
+    reindex_workflow_state(event)
+
+    index_calls = catalog.reindex_index.call_args_list
+    assert call(event.object, 'workflow_state') in index_calls
+    assert call(event.object['version'], 'workflow_state') in index_calls
+    assert call(event.object['other'], 'workflow_state') not in index_calls
+
 @mark.usefixtures('integration')
 def test_register_subscriber(registry):
     from adhocracy_core.catalog import subscriber
@@ -145,5 +158,6 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_visibility.__name__ in handlers
     assert subscriber.reindex_rates.__name__ in handlers
     assert subscriber.reindex_badge.__name__ in handlers
+    assert subscriber.reindex_workflow_state.__name__ in handlers
 
 
