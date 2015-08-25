@@ -632,11 +632,22 @@ export var register = (angular) => {
                         templateUrl: "/static/js/templates/CreatePasswordReset.html"
                     };
                 })
-                .when("register", () : AdhTopLevelState.IAreaInput => {
+                .when("register", ["adhHttp", (adhHttp : AdhHttp.Service<any>) : AdhTopLevelState.IAreaInput => {
                     return {
-                        templateUrl: "/static/js/templates/Register.html"
+                        templateUrl: "/static/js/templates/Register.html",
+                        route: (path, search) => {
+                            return adhHttp.options("/principals/users").then((options) => {
+                                if (!options.POST) {
+                                    throw 401;
+                                } else {
+                                    var data = _.clone(search);
+                                    data["_path"] = path;
+                                    return data;
+                                }
+                            });
+                        }
                     };
-                })
+                }])
                 .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", activateArea]);
         }])
         .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
