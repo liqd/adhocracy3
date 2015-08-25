@@ -352,6 +352,7 @@ export var indicatorDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceArea : AdhResourceArea.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
     $location : angular.ILocationService
 ) => {
     return {
@@ -366,6 +367,8 @@ export var indicatorDirective = (
             $scope.user = adhUser;
             $scope.credentials = adhCredentials;
             $scope.noLink = !adhResourceArea.has(RIUser.content_type);
+
+            adhPermissions.bindScope($scope, "/principals/users");
 
             $scope.logOut = () => {
                 adhUser.logOut();
@@ -667,7 +670,8 @@ export var register = (angular) => {
         .directive("adhCreatePasswordReset", [
             "adhConfig", "adhCredentials", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
         .directive("adhRegister", ["adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
-        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", "adhTopLevelState", "$location", indicatorDirective])
+        .directive("adhUserIndicator", [
+            "adhConfig", "adhResourceArea", "adhTopLevelState", "adhPermissions", "$location", indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", "adhGetBadges", metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
         .directive("adhUserDetailColumn", ["adhPermissions", "adhConfig", userDetailColumnDirective])

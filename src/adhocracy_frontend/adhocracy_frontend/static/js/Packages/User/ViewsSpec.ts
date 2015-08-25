@@ -7,6 +7,13 @@ import AdhUserViews = require("./Views");
 
 export var register = () => {
     describe("UserViews", () => {
+        var adhPermissionsMock;
+        beforeEach(() => {
+            adhPermissionsMock = {
+                bindScope: jasmine.createSpy("adhPermissions.bindScope").and.returnValue("")
+            };
+        });
+
         describe("loginDirective", () => {
             var directive;
             var adhConfigMock;
@@ -191,7 +198,7 @@ export var register = () => {
                 };
                 adhResourceAreaMock = jasmine.createSpyObj("adhResourceArea", ["has"]);
                 adhResourceAreaMock.has.and.returnValue(false);
-                directive = AdhUserViews.indicatorDirective(adhConfigMock, adhResourceAreaMock, null, null);
+                directive = AdhUserViews.indicatorDirective(adhConfigMock, adhResourceAreaMock, null, adhPermissionsMock, null);
             });
 
             describe("controller", () => {
