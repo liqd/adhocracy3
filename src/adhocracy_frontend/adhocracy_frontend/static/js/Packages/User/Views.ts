@@ -167,6 +167,7 @@ export var loginDirective = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
     adhShowError
 ) => {
     return {
@@ -177,6 +178,8 @@ export var loginDirective = (
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
             scope.showError = adhShowError;
+
+            adhPermissions.bindScope(scope, "/principals/users");
 
             scope.credentials = {
                 nameOrEmail: "",
@@ -665,7 +668,7 @@ export var register = (angular) => {
             "adhUser",
             "adhGetBadges",
             userProfileDirective])
-        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
+        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhPermissions", "adhShowError", loginDirective])
         .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", passwordResetDirective])
         .directive("adhCreatePasswordReset", [
             "adhConfig", "adhCredentials", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
