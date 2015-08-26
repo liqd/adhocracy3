@@ -2,6 +2,29 @@
 
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
+import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+
+
+// mirrors adhocracy_core.sheets.workflow.StateData
+export interface IStateData {
+    name : string;
+    description : string;
+    start_date : string;
+}
+
+export var getStateData = (sheet : SIWorkflow.Sheet, name : string) : IStateData => {
+    for (var i = 0; i < sheet.state_data.length; i++) {
+        if (sheet.state_data[i].name === name) {
+            return sheet.state_data[i];
+        }
+    }
+    return {
+        name: null,
+        description: null,
+        start_date: null
+    };
+};
+
 
 export class Provider implements angular.IServiceProvider {
     public templateFactories : {[processType : string]: any};
