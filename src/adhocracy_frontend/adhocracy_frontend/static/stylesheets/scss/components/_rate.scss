@@ -217,12 +217,6 @@ Click show results
         }
     }
 
-    &:hover, &:focus {
-        &.m-show-results-hover {
-            display: block;
-        }
-    }
-
     .rate-pro {
         &.is-rate-button-active,
         &:hover:not(.is-disabled),
