@@ -5,6 +5,7 @@ import AdhConfig = require("../../../Config/Config");
 import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
+import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal");
@@ -122,9 +123,10 @@ export var embedDirective = (
             };
 
             adhHttp.get(scope.path).then((resource) => {
-                scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
-                scope.announceText = resource.data[SIWorkflow.nick].announce.description;
-                scope.frozenText = resource.data[SIWorkflow.nick].frozen.description;
+                var sheet = resource.data[SIWorkflow.nick];
+                scope.currentPhase = sheet.workflow_state;
+                scope.announceText = AdhProcess.getStateData(sheet, "announce").description;
+                scope.frozenText = AdhProcess.getStateData(sheet, "frozen").description;
             });
         }
     };
