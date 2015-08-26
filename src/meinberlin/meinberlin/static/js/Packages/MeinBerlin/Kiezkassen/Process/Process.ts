@@ -7,6 +7,7 @@ import AdhConfig = require("..././../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
+import AdhProcess = require("../../../Process/Process");
 import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
@@ -41,8 +42,9 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var stateName = resource.data[SIWorkflow.nick].workflow_state;
-                        scope.currentPhase = resource.data[SIWorkflow.nick].state_data[stateName];
+                        var sheet = resource.data[SIWorkflow.nick];
+                        var stateName = sheet.workflow_state;
+                        scope.currentPhase = AdhProcess.getStateData(sheet, stateName);
 
                         var locationUrl = resource.data[SILocationReference.nick].location;
                         adhHttp.get(locationUrl).then((location) => {
@@ -70,22 +72,15 @@ export var phaseHeaderDirective = (
         link: (scope) => {
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
-                if (resource.data[SIWorkflow.nick].state_data.announce) {
-                    scope.phases[0].startDate = resource.data[SIWorkflow.nick].state_data.announce.start_date;
-                }
-                if (resource.data[SIWorkflow.nick].state_data.participate) {
-                    scope.phases[0].endDate = resource.data[SIWorkflow.nick].state_data.participate.start_date;
-                    scope.phases[1].startDate = resource.data[SIWorkflow.nick].state_data.participate.start_date;
-                }
-                if (resource.data[SIWorkflow.nick].state_data.frozen) {
-                    scope.phases[1].endDate = resource.data[SIWorkflow.nick].state_data.frozen.start_date;
-                    scope.phases[2].startDate = resource.data[SIWorkflow.nick].state_data.frozen.start_date;
-                }
-                if (resource.data[SIWorkflow.nick].state_data.result) {
-                    scope.phases[2].endDate = resource.data[SIWorkflow.nick].state_data.result.start_date;
-                    scope.phases[3].startDate = resource.data[SIWorkflow.nick].state_data.result.start_date;
-                }
+                var sheet = resource.data[SIWorkflow.nick];
+                scope.currentPhase = sheet.workflow_state;
+                scope.phases[0].startDate = AdhProcess.getStateData(sheet, "announce").start_date;
+                scope.phases[0].endDate = AdhProcess.getStateData(sheet, "participate").start_date;
+                scope.phases[1].startDate = AdhProcess.getStateData(sheet, "participate").start_date;
+                scope.phases[1].endDate = AdhProcess.getStateData(sheet, "evaluate").start_date;
+                scope.phases[2].startDate = AdhProcess.getStateData(sheet, "evaluate").start_date;
+                scope.phases[2].endDate = AdhProcess.getStateData(sheet, "result").start_date;
+                scope.phases[3].startDate = AdhProcess.getStateData(sheet, "result").start_date;
             });
 
             scope.phases = [{

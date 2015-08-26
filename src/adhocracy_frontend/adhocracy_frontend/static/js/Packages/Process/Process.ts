@@ -2,7 +2,7 @@
 
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 
 // mirrors adhocracy_core.sheets.workflow.StateData
