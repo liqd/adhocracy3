@@ -11,8 +11,10 @@ import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
+import SIImageReference = require("../../../../Resources_/adhocracy_core/sheets/image/IImageReference");
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
+import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
 import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
@@ -108,7 +110,7 @@ export var phaseHeaderDirective = (
                 votingAvailable: true,
                 commentAvailable: true
             }, {
-                name: "frozen",
+                name: "evaluate",
                 title: "Bürgerversammlung",
                 description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder " +
                     "bewertet werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle " +
@@ -165,23 +167,12 @@ export var editDirective = (
                 process = resource;
                 scope.data.title = process.data[SITitle.nick].title;
 
-                scope.data.announce_description = process.data[SIWorkflow.nick].announce.description;
-                scope.data.announce_start_date = moment(process.data[SIWorkflow.nick].announce.start_date).format("YYYY-MM-DD");
-
-                scope.data.draft_description = process.data[SIWorkflow.nick].draft.description;
-                scope.data.draft_start_date = moment(process.data[SIWorkflow.nick].draft.start_date).format("YYYY-MM-DD");
-
-                scope.data.participate_description = process.data[SIWorkflow.nick].participate.description;
-                scope.data.participate_start_date = moment(
-                                                            process.data[SIWorkflow.nick]
-                                                            .participate.start_date
-                                                           ).format("YYYY-MM-DD");
-
-                scope.data.frozen_description = process.data[SIWorkflow.nick].frozen.description;
-                scope.data.frozen_start_date = moment(process.data[SIWorkflow.nick].frozen.start_date).format("YYYY-MM-DD");
-
-                scope.data.result_description = process.data[SIWorkflow.nick].result.description;
-                scope.data.result_start_date = moment(process.data[SIWorkflow.nick].result.start_date).format("YYYY-MM-DD");
+                var sheet = process.data[SIWorkflow.nick];
+                _.forEach(["announce", "draft", "participate", "evaluate", "result", "closed"], (stateName : string) => {
+                    var data = AdhProcess.getStateData(sheet, stateName);
+                    scope.data[stateName + "_description"] = data.description;
+                    scope.data[stateName + "_start_date"] = moment(data.start_date).format("YYYY-MM-DD");
+                });
 
                 scope.data.currentWorkflowState = process.data[SIWorkflow.nick].workflow_state;
             });
@@ -193,8 +184,8 @@ export var editDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.kiezkassenProcessForm, () => {
                     process.data[SITitle.nick].title = scope.data.title;
-                    process.data["adhocracy_core.sheets.name.IName"] = undefined;
-                    process.data["adhocracy_core.sheets.image.IImageReference"] = undefined;
+                    process.data[SIName.nick] = undefined;
+                    process.data[SIImageReference.nick] = undefined;
 
                     if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
                         process.data[SIWorkflow.nick] = {
@@ -204,25 +195,14 @@ export var editDirective = (
                         process.data[SIWorkflow.nick] = {};
                     }
 
-                    process.data[SIWorkflow.nick]["announce"] = {};
-                    process.data[SIWorkflow.nick]["announce"].description = scope.data.announce_description;
-                    process.data[SIWorkflow.nick]["announce"].start_date = scope.data.announce_start_date;
-
-                    process.data[SIWorkflow.nick]["draft"] = {};
-                    process.data[SIWorkflow.nick]["draft"].description = scope.data.draft_description;
-                    process.data[SIWorkflow.nick]["draft"].start_date = scope.data.draft_start_date;
-
-                    process.data[SIWorkflow.nick]["participate"] = {};
-                    process.data[SIWorkflow.nick]["participate"].description = scope.data.participate_description;
-                    process.data[SIWorkflow.nick]["participate"].start_date = scope.data.participate_start_date;
-
-                    process.data[SIWorkflow.nick]["frozen"] = {};
-                    process.data[SIWorkflow.nick]["frozen"].description = scope.data.frozen_description;
-                    process.data[SIWorkflow.nick]["frozen"].start_date = scope.data.frozen_start_date;
-
-                    process.data[SIWorkflow.nick]["result"] = {};
-                    process.data[SIWorkflow.nick]["result"].description = scope.data.result_description;
-                    process.data[SIWorkflow.nick]["result"].start_date = scope.data.result_start_date;
+                    process.data[SIWorkflow.nick].state_data = _.map(
+                        ["announce", "draft", "participate", "evaluate", "result", "closed"], (stateName : string) => {
+                        return {
+                            name: stateName,
+                            description: scope.data[stateName + "_description"],
+                            start_date: scope.data[stateName + "_start_date"]
+                        };
+                    });
 
                     return adhHttp.put(process.path, process);
                 });
