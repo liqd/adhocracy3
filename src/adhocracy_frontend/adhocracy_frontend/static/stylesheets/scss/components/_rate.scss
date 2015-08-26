@@ -124,16 +124,65 @@ the `is-disabled` state.
 
 ```html_example
 <div class="rate">
-    <span class="rate-difference is-positive">1</span>
-    <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+    <span class="rate-difference is-positive">3</span>
+    <div class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </div>
+    <div class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </div>
 </div>
 
 <div class="rate is-disabled">
-    <span class="rate-difference is-positive">1</span>
-    <a href="" class="rate-pro is-rate-button-active is-disabled"><i class="icon-vote-up" title="Vote up"></i></a>
-    <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
+    <span class="rate-difference is-positive">3</span>
+    <div class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </div>
+    <div class="rate-button-container">
+        <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </div>
 </div>
+
+<div class="rate m-show-results-persist">
+    <span class="rate-difference is-positive">3</span>
+    <div class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </div>
+    <div class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </div>
+</div>
+
+<div class="rate m-show-results-hover">
+    <span class="rate-difference is-positive">3</span>
+    <div class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </div>
+    <div class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </div>
+</div>
+Hover show results
+<div class="rate is-cast m-show-results-click">
+    <span class="rate-difference is-positive">3</span>
+    <div class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </div>
+    <div class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </div>
+</div>
+Click show results
 ```
 */
 
@@ -144,6 +193,33 @@ the `is-disabled` state.
 
         &.is-disabled {
             cursor: not-allowed;
+        }
+    }
+
+    .rate-button-container {
+        @include inline-block;
+    }
+
+    .rate-results {
+        display: block;
+        padding-top: 3px / $font-size-small * 1em;
+        font-size: $font-size-small;
+        text-align: center;
+        visibility: hidden;
+    }
+
+    &.m-show-results-persist,
+    &:hover.m-show-results-hover,
+    &:focus.m-show-results-hover,
+    &.is-cast.m-show-results-click {
+        .rate-results {
+            visibility: visible;
+        }
+    }
+
+    &:hover, &:focus {
+        &.m-show-results-hover {
+            display: block;
         }
     }
 
@@ -166,6 +242,8 @@ the `is-disabled` state.
     }
 
     .rate-difference {
+        vertical-align: top;
+
         &.is-positive {
             color: $color-function-valid;
         }
