@@ -190,7 +190,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         return <Dict>_.extend({}, this.provider.defaults[key]);
     }
 
-    private getSpecifics(resource, view : string, processType : string, embedContext : string) : angular.IPromise<Dict> {
+    private getSpecifics(resource, view : string, processType : string, embedContext : string, process?) : angular.IPromise<Dict> {
         var key : string = resource.content_type + "@" + view + "@" + processType + "@" + embedContext;
         var specifics;
 
@@ -201,12 +201,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
             if (type === "version") {
                 specifics = this.adhHttp.get(AdhUtil.parentPath(resource.path)).then((item) => {
-                    return fn(item, resource, false);
+                    return fn(item, resource, false, process);
                 });
             } else if (type === "item") {
                 specifics = this.adhHttp.getNewestVersionPathNoFork(resource.path).then((versionPath) => {
                     return this.adhHttp.get(versionPath).then((version) => {
-                        return fn(resource, version, true);
+                        return fn(resource, version, true, process);
                     });
                 });
             } else {
@@ -342,7 +342,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 return;
             }
 
-            return self.getSpecifics(resource, view, processType, embedContext).then((specifics : Dict) => {
+            return self.getSpecifics(resource, view, processType, embedContext, process).then((specifics : Dict) => {
                 var defaults : Dict = self.getDefaults(resource.content_type, view, processType, embedContext);
 
                 var meta : Dict = {
