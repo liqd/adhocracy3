@@ -91,7 +91,7 @@ export var fill = (resource, scope, userPath : string) => {
     return clone;
 };
 
-export var badgeAssignmentDirective = (
+export var badgeAssignmentCreateDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService,
@@ -130,8 +130,8 @@ export var register = (angular) => {
             AdhHttp.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("assign-badge");
+            adhEmbedProvider.embeddableDirectives.push("badge-assignment-create");
         }])
         .factory("adhGetBadges", ["adhHttp", "$q", getBadgesFactory])
-        .directive("adhAssignBadge", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentDirective]);
+        .directive("adhBadgeAssignmentCreate", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentCreateDirective]);
 };
