@@ -1,0 +1,23 @@
+<div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <a href=""
+            data-ng-click="ctrl.toggleSidebar()"
+            data-ng-class="{'is-active': _showSidebar}"
+            class="moving-column-menu-button">{{ "TR__FILTERS" | translate }}</a>
+    </div>
+
+    <adh-facets
+        data-ng-switch-when="sidebar"
+        data-update="shared.update"
+        data-facets="shared.facets">
+    </adh-facets>
+
+    <div data-ng-switch-when="body">
+        <adh-s1-proposal-listing
+            data-ng-if="proposalState"
+            data-state="{{proposalState}}"
+            data-update="shared.update"
+            data-facets="shared.facets">
+        </adh-s1-proposal-listing>
+    </div>
+</div>

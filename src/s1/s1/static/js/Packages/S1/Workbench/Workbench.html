@@ -1,6 +1,9 @@
 <div data-adh-moving-columns="" class="moving-columns">
-    <adh-moving-column>
-        <adh-s1-proposal-create-column></adh-s1-proposal-create-column>
+    <adh-moving-column data-ng-switch="view">
+        <adh-s1-current-column data-ng-switch-default=""></adh-s1-current-column>
+        <adh-s1-next-column data-ng-switch-when="next"></adh-s1-next-column>
+        <adh-s1-archive-column data-ng-switch-when="archive"></adh-s1-archive-column>
+        <adh-s1-proposal-create-column data-ng-switch-when="create-proposal"></adh-s1-proposal-create-column>
     </adh-moving-column>
     <adh-moving-column>
         <adh-s1-proposal-detail-column data-ng-if="view !== 'edit'"></adh-s1-proposal-detail-column>

@@ -32,6 +32,44 @@ export var s1WorkbenchDirective = (
 };
 
 
+export var s1CurrentColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/CurrentColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.contentType = RIProposalVersion.content_type;
+
+            scope.$watch("processUrl", (processUrl : string) => {
+                adhHttp.get(processUrl).then((process : RIS1Process) => {
+                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+
+                    if (workflowState === "propose") {
+                        scope.proposalState = "proposed";
+                    } else {
+                        scope.proposalState = "votable";
+                    }
+                });
+            });
+
+            scope.shared.facets = [{
+                key: "sort",
+                name: "TR__SORT",
+                items: [
+                    {key: "rates", name: "TR__RATES"},
+                    {key: "title", name: "TR__TITLE"},
+                    {key: "item_creation_date", name: "TR__DATE"}
+                ]
+            }];
+        }
+    };
+};
+
+
 export var s1ProposalDetailColumnDirective = (
     adhConfig : AdhConfig.IService,
     adhPermissions : AdhPermissions.Service
@@ -206,6 +244,7 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", s1WorkbenchDirective])
+        .directive("adhS1CurrentColumn", ["adhConfig", "adhHttp", s1CurrentColumnDirective])
         .directive("adhS1ProposalDetailColumn", ["adhConfig", "adhPermissions", s1ProposalDetailColumnDirective])
         .directive("adhS1ProposalCreateColumn", ["adhConfig", s1ProposalCreateColumnDirective])
         .directive("adhS1ProposalEditColumn", ["adhConfig", s1ProposalEditColumnDirective]);

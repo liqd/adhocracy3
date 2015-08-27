@@ -293,6 +293,38 @@ export var editDirective = (
     };
 };
 
+export var listingDirective = (
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        scope: {
+            facets: "=?",
+            update: "=?",
+            sort: "=?",
+            state: "@?",
+            creator: "@?"
+        },
+        link: (scope) => {
+            scope.contentType = RIProposalVersion.content_type;
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
+            scope.params = {};
+
+            if (scope.creator) {
+                scope.params.creator = scope.creator.replace(adhConfig.rest_url, "").replace(/\/+$/, "");
+                // processUrl is "/" in user space
+                scope.params.depth = "all";
+            }
+            if (scope.state) {
+                scope.params.workflow_state = scope.state;
+            }
+        }
+    };
+};
+
+
 export var moduleName = "adhS1Proposal";
 
 export var register = (angular) => {
@@ -335,5 +367,6 @@ export var register = (angular) => {
         "$location",
         "$q",
         editDirective
-    ]);
+    ])
+    .directive("adhS1ProposalListing", ["adhConfig", "adhTopLevelState", listingDirective]);
 };
