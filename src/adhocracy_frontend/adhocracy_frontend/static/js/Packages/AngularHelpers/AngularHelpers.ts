@@ -1,6 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
+import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+
 import AdhHttp = require("../Http/Http");
 
 
@@ -280,6 +282,7 @@ export var moduleName = "adhAngularHelpers";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            "duScroll",
             AdhHttp.moduleName
         ])
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
