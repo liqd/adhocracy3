@@ -48,6 +48,7 @@ import AdhRate = require("./Packages/Rate/Rate");
 import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhS1 = require("./Packages/S1/S1");
 import AdhShareSocial = require("./Packages/ShareSocial/ShareSocial");
 import AdhSticky = require("./Packages/Sticky/Sticky");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
@@ -93,7 +94,8 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         AdhSticky.moduleName,
         AdhTracking.moduleName,
         AdhUserViews.moduleName,
-        AdhMarkdown.moduleName
+        AdhMarkdown.moduleName,
+        AdhS1.moduleName
     ];
 
     if (config.cachebust) {
@@ -180,6 +182,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhAngularHelpers.register(angular);
     AdhResourceArea.register(angular);
     AdhResourceWidgets.register(angular);
+    AdhS1.register(angular);
     AdhShareSocial.register(angular);
     AdhSticky.register(angular);
     AdhTopLevelState.register(angular);
