@@ -1,5 +1,6 @@
 /// <reference path="../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import AdhComment = require("../../Comment/Comment");
 import AdhConfig = require("../../Config/Config");
 import AdhHttp = require("../../Http/Http");
 import AdhMovingColumns = require("../../MovingColumns/MovingColumns");
@@ -178,6 +179,8 @@ export var registerRoutes = (
             return (item : RIProposal, version : RIProposalVersion, isVersion : boolean, process : RIS1Process) => {
                 return {
                     proposalUrl: version.path,
+                    commentableUrl: version.path,
+                    commentCloseUrl: version.path,
                     meeting: getMeeting(item, process)
                 };
             };
@@ -190,6 +193,7 @@ export var moduleName = "adhS1Workbench";
 export var register = (angular) => {
     angular
         .module(moduleName, [
+            AdhComment.moduleName,
             AdhHttp.moduleName,
             AdhProcess.moduleName,
             AdhResourceArea.moduleName,
