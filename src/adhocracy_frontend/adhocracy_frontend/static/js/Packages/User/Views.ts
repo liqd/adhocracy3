@@ -586,6 +586,31 @@ export var adhUserManagementHeaderDirective = (
     };
 };
 
+
+export var registerRoutes = (
+    context : string = ""
+) => (
+    adhResourceAreaProvider : AdhResourceArea.Provider
+) => {
+    adhResourceAreaProvider
+        .default(RIUser, "", "", context, {
+            space: "user",
+            movingColumns: "is-show-show-hide"
+        })
+        .specific(RIUser, "", "", context, () => (resource : RIUser) => {
+            return {
+                userUrl: resource.path
+            };
+        })
+        .default(RIUsersService, "", "", context, {
+            space: "user",
+            movingColumns: "is-show-hide-hide",
+            userUrl: "",  // not used by default, but should be overridable
+            focus: "0"
+        });
+};
+
+
 export var moduleName = "adhUserViews";
 
 export var register = (angular) => {
@@ -633,24 +658,7 @@ export var register = (angular) => {
                 })
                 .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", activateArea]);
         }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .default(RIUser, "", "", "", {
-                    space: "user",
-                    movingColumns: "is-show-show-hide"
-                })
-                .specific(RIUser, "", "", "", () => (resource : RIUser) => {
-                    return {
-                        userUrl: resource.path
-                    };
-                })
-                .default(RIUsersService, "", "", "", {
-                    space: "user",
-                    movingColumns: "is-show-hide-hide",
-                    userUrl: "",  // not used by default, but should be overridable
-                    focus: "0"
-                });
-        }])
+        .config(["adhResourceAreaProvider", registerRoutes()])
         .directive("adhListUsers", ["adhCredentials", "adhConfig", userListDirective])
         .directive("adhUserListItem", ["adhConfig", userListItemDirective])
         .directive("adhUserProfile", [
