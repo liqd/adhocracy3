@@ -21,6 +21,7 @@ import SIPool = require("../../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRateable = require("../../../Resources_/adhocracy_core/sheets/rate/IRateable");
 import SITitle = require("../../../Resources_/adhocracy_core/sheets/title/ITitle");
 import SIVersionable = require("../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import SIWorkflowAssignment = require("../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
 
 var pkgLocation = "/S1/Proposal";
 
@@ -37,6 +38,7 @@ interface IScope extends angular.IScope {
         creationDate : string;
         commentCount : number;
         assignments : AdhBadge.IBadge[];
+        workflowState : string;
     };
 }
 
@@ -77,18 +79,25 @@ var bindPath = (
     scope.$watch(pathKey, (value : string) => {
         if (value) {
             // get resource
-            adhHttp.get(value).then((resource : RIProposalVersion) => {
-                scope.resource = resource;
+            $q.all([
+                adhHttp.get(AdhUtil.parentPath(value)),
+                adhHttp.get(value)
+            ]).then((args) => {
+                var item : RIProposal = args[0];
+                var version : RIProposalVersion = args[1];
 
-                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
+                scope.resource = version;
+
+                var titleSheet : SITitle.Sheet = version.data[SITitle.nick];
+                var descriptionSheet : SIDescription.Sheet = version.data[SIDescription.nick];
+                var metadataSheet : SIMetadata.Sheet = version.data[SIMetadata.nick];
+                var rateableSheet : SIRateable.Sheet = version.data[SIRateable.nick];
+                var workflowAssignmentSheet : SIWorkflowAssignment.Sheet = item.data[SIWorkflowAssignment.nick];
 
                 $q.all([
-                    getCommentCount(resource),
-                    adhGetBadges(resource),
-                    adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path)
+                    getCommentCount(version),
+                    adhGetBadges(version),
+                    adhRate.fetchAggregatedRates(rateableSheet.post_pool, version.path)
                 ]).then((args) => {
                     var commentCount = args[0];
                     var badgeAssignments = args[1];
@@ -103,7 +112,8 @@ var bindPath = (
                         creator: metadataSheet.creator,
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: commentCount,
-                        assignments: badgeAssignments
+                        assignments: badgeAssignments,
+                        workflowState: workflowAssignmentSheet.workflow_state
                     };
                 });
             });

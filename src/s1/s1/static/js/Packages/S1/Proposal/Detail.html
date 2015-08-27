@@ -1,5 +1,5 @@
 <adh-recompile-on-change data-value="{{path}}">
-    <div class="s1-proposal-detail" data-ng-if="data.title">
+    <div class="s1-proposal-detail is-{{data.workflowState}}" data-ng-if="data.title">
         <h1>{{ data.title }}</h1>
 
         <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
