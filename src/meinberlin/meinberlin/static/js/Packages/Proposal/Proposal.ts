@@ -21,6 +21,7 @@ import RIGeoProposalVersion = require("../../Resources_/adhocracy_core/resources
 import RIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIKiezkassenProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIBurgerhaushaltProposal = require("../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal");
+import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
 import SIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SILocationReference = require("../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
@@ -76,65 +77,78 @@ var bindPath = (
     isKiezkasse : boolean = false,
     isBurgerhaushalt : boolean = false
 ) : void => {
+    var getPolygon = () => {
+        var processUrl = adhTopLevelState.get("processUrl");
+
+        return adhHttp.get(processUrl).then((process) => {
+            var locationUrl = process.data[SILocationReference.nick]["location"];
+
+            return adhHttp.get(locationUrl).then((location) => {
+                return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
+            });
+        });
+    };
+
+    var getCommentCount = (resource) : angular.IPromise<number> => {
+        var commentableSheet : SICommentabe.Sheet = resource.data[SICommentabe.nick];
+
+        return adhHttp.get(commentableSheet.post_pool, {
+            content_type: RICommentVersion.content_type,
+            depth: "all",
+            tag: "LAST",
+            count: true
+        }).then((pool) => {
+            return pool.data[SIPool.nick].count;
+        });
+    };
+
     scope.$watch(pathKey, (value : string) => {
         if (value) {
+            adhHttp.get(value).then((resource) => {
+                scope.resource = resource;
 
-            // FIXME: Load resources in parallel (use $q.all)
-            adhHttp.get(AdhUtil.parentPath(value), {
-                content_type: RICommentVersion.content_type,
-                depth: "all",
-                tag: "LAST",
-                count: true
-            }).then((pool) => {
-                adhHttp.get(value).then((resource) => {
+                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
+                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
+                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
+                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
 
-                    scope.resource = resource;
+                if (isKiezkasse) {
+                    var kiezkassenSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                } else if (isBurgerhaushalt) {
+                    var burgerhaushaltSheet : SIBurgerhaushaltProposal.Sheet = resource.data[SIBurgerhaushaltProposal.nick];
+                }
 
-                    var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                    var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
-                    if (isKiezkasse) {
-                        var kiezkassenSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
-                    } else if (isBurgerhaushalt) {
-                        var burgerhaushaltSheet : SIBurgerhaushaltProposal.Sheet = resource.data[SIBurgerhaushaltProposal.nick];
-                    }
-                    var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
-                    var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                    var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
-                    var poolSheet = pool.data[SIPool.nick];
-
+                // FIXME: Load resources in parallel (use $q.all)
+                getCommentCount(resource).then((commentCount : number) => {
                     adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path).then((rates) => {
                         // FIXME: an adapter should take care of this
                         var ratesPro = rates["1"] || 0;
                         var ratesContra = rates["-1"] || 0;
 
-                        var processUrl = adhTopLevelState.get("processUrl");
-                        adhHttp.get(processUrl).then((process) => {
-                            var locationUrl = process.data[SILocationReference.nick]["location"];
-                            adhHttp.get(locationUrl).then((location) => {
-                                var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                                adhGetBadges(resource).then((assignments) => {
-                                    scope.data = {
-                                        title: titleSheet.title,
-                                        detail: descriptionSheet.description,
-                                        rateCount: ratesPro - ratesContra,
-                                        creator: metadataSheet.creator,
-                                        creationDate: metadataSheet.item_creation_date,
-                                        commentCount: poolSheet.count,
-                                        lng: pointSheet.coordinates[0],
-                                        lat: pointSheet.coordinates[1],
-                                        polygon: polygon,
-                                        assignments: assignments
-                                    };
-                                    if (isKiezkasse) {
-                                        scope.data.budget = kiezkassenSheet.budget;
-                                        scope.data.address = kiezkassenSheet.address;
-                                        scope.data.creatorParticipate = kiezkassenSheet.creator_participate;
-                                        scope.data.locationText = kiezkassenSheet.location_text;
-                                    } else if (isBurgerhaushalt) {
-                                        scope.data.budget = burgerhaushaltSheet.budget;
-                                        scope.data.locationText = burgerhaushaltSheet.location_text;
-                                    }
-                                });
+                        getPolygon().then((polygon) => {
+                            adhGetBadges(resource).then((assignments) => {
+                                scope.data = {
+                                    title: titleSheet.title,
+                                    detail: descriptionSheet.description,
+                                    rateCount: ratesPro - ratesContra,
+                                    creator: metadataSheet.creator,
+                                    creationDate: metadataSheet.item_creation_date,
+                                    commentCount: commentCount,
+                                    lng: pointSheet.coordinates[0],
+                                    lat: pointSheet.coordinates[1],
+                                    polygon: polygon,
+                                    assignments: assignments
+                                };
+                                if (isKiezkasse) {
+                                    scope.data.budget = kiezkassenSheet.budget;
+                                    scope.data.address = kiezkassenSheet.address;
+                                    scope.data.creatorParticipate = kiezkassenSheet.creator_participate;
+                                    scope.data.locationText = kiezkassenSheet.location_text;
+                                } else if (isBurgerhaushalt) {
+                                    scope.data.budget = burgerhaushaltSheet.budget;
+                                    scope.data.locationText = burgerhaushaltSheet.location_text;
+                                }
                             });
                         });
                     });
