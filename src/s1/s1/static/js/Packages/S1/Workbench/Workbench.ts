@@ -2,8 +2,12 @@
 
 import AdhConfig = require("../../Config/Config");
 import AdhHttp = require("../../Http/Http");
+import AdhMovingColumns = require("../../MovingColumns/MovingColumns");
+import AdhPermissions = require("../../Permissions/Permissions");
 import AdhProcess = require("../../Process/Process");
 import AdhResourceArea = require("../../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../../TopLevelState/TopLevelState");
+import AdhUtil = require("../../Util/Util");
 
 import RIS1Process = require("../../../Resources_/adhocracy_s1/resources/s1/IProcess");
 import RIProposal = require("../../../Resources_/adhocracy_s1/resources/s1/IProposal");
@@ -14,15 +18,60 @@ var pkgLocation = "/S1/Workbench";
 
 
 export var s1WorkbenchDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("view", scope));
         }
     };
 };
+
+
+export var s1ProposalDetailColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhPermissions : AdhPermissions.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalDetailColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+            adhPermissions.bindScope(scope, () => scope.proposalUrl && AdhUtil.parentPath(scope.proposalUrl), "proposalItemOptions");
+        }
+    };
+};
+
+export var s1ProposalCreateColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalCreateColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+        }
+    };
+};
+
+export var s1ProposalEditColumnDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ProposalEditColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl", "proposalUrl"]);
+        }
+    };
+};
+
 
 /**
  *         | proposed | votable | selected | rejected
@@ -143,7 +192,8 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhHttp.moduleName,
             AdhProcess.moduleName,
-            AdhResourceArea.moduleName
+            AdhResourceArea.moduleName,
+            AdhTopLevelState.moduleName
         ])
         .config(["adhResourceAreaProvider", registerRoutes(RIS1Process.content_type)])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
@@ -151,5 +201,8 @@ export var register = (angular) => {
                 return $q.when("<adh-s1-workbench></adh-s1-workbench>");
             }];
         }])
-        .directive("adhS1Workbench", ["adhConfig", s1WorkbenchDirective]);
+        .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", s1WorkbenchDirective])
+        .directive("adhS1ProposalDetailColumn", ["adhConfig", "adhPermissions", s1ProposalDetailColumnDirective])
+        .directive("adhS1ProposalCreateColumn", ["adhConfig", s1ProposalCreateColumnDirective])
+        .directive("adhS1ProposalEditColumn", ["adhConfig", s1ProposalEditColumnDirective]);
 };
