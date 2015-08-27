@@ -1,0 +1,15 @@
+<div class="s1-header">
+    <span class="s1-header-logo">PARTOU.</span>
+    <a class="s1-header-link" data-ng-href="{{ processUrl | adhResourceUrl:'archive' }}">Archiv</a>
+
+    <span class="button-group">
+        <a class="button" data-ng-href="{{ processUrl | adhResourceUrl }}">Sitzung A</a>
+        <a class="button m-call-to-action" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">vorschlag machen</a>
+    </span>
+
+    <a class="button" data-ng-href="{{ processUrl | adhResourceUrl:'next' }}">Sitzung B</a>
+
+    <adh-user-indicator></adh-user-indicator>
+
+    <a data-ng-href="{{ '/principals/users' | adhResourceUrl }}">Nutzerliste</a>
+</div>
