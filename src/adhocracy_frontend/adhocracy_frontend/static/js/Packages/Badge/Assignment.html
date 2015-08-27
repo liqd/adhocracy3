@@ -7,9 +7,9 @@
     <select
         data-ng-model="data.badge"
         name="badges"
+        data-ng-options="badge.path as badge.title for badge in badges"
         required="required">
-        <option value="" data-selected="selected">Choose a badge</option>
-        <option value="{{ badge.path }}" data-ng-repeat="badge in badges">{{ badge.title }}</option>
+        <option value="">Choose a badge</option>
     </select>
     <span data-ng-show="form.$submitted || form.badges.$touched">
         <span class="input-error" data-ng-show="form.badges.$error.required">Please choose a badge</span>
