@@ -1,7 +1,7 @@
 <div class="mein-berlin-kiezkassen-detail">
-    <div data-ng-switch="currentPhase">
+    <div data-ng-switch="currentPhase.name">
         <div data-ng-switch-when="announce" class="mein-berlin-kiezkassen-detail-announce">
-            {{ announceDescription }}
+            {{ currentPhase.description }}
         </div>
         <div data-ng-switch-default="" class="mein-berlin-kiezkassen-detail-listing">
             <adh-listing

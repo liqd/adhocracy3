@@ -23,7 +23,7 @@
             > {{ data.rateCount | signum }} {{ "TR__RATES" | translate }}</p>
         <p
             class="meinberlin-proposal-list-meta-item m-location"
-            data-ng-if="isKiezkasse"
+            data-ng-if="isKiezkasse || isBurgerhaushalt"
             ><i class="meinberlin-proposal-list-meta-item-icon icon-pin-detail"></i
             > {{data.locationText}}</p>
     </div>

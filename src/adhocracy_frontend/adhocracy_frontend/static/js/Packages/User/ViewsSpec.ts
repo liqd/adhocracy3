@@ -23,7 +23,7 @@ export var register = () => {
                 };
                 adhUserMock = jasmine.createSpyObj("adhUserMock", ["logIn"]);
                 adhUserMock.logIn.and.returnValue(q.when(undefined));
-                adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
+                adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["goToCameFrom"]);
                 directive = AdhUserViews.loginDirective(adhConfigMock, adhUserMock, adhTopLevelStateMock, "adhShowError");
             });
 
@@ -64,7 +64,7 @@ export var register = () => {
                     });
                     it("redirects to cameFrom or / if everything goes well", (done) => {
                         scopeMock.logIn().then(() => {
-                            expect(adhTopLevelStateMock.redirectToCameFrom).toHaveBeenCalledWith("/");
+                            expect(adhTopLevelStateMock.goToCameFrom).toHaveBeenCalledWith("/", true);
                             done();
                         });
                     });
@@ -103,7 +103,7 @@ export var register = () => {
                 adhUserMock = jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                 adhUserMock.register.and.returnValue(q.when(undefined));
                 adhUserMock.logIn.and.returnValue(q.when(undefined));
-                adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
+                adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["goToCameFrom"]);
 
                 directive = AdhUserViews.registerDirective(adhConfigMock, null, adhUserMock, adhTopLevelStateMock, "adhShowError");
             });
@@ -113,7 +113,10 @@ export var register = () => {
 
                 beforeEach(() => {
                     scopeMock = {
-                        $watch: () => undefined
+                        $watch: () => undefined,
+                        loginForm: {
+                            $setPristine: () => undefined
+                        }
                     };
                     directive.link(scopeMock);
                 });
@@ -148,7 +151,7 @@ export var register = () => {
                     xit("redirects came from or / page after register ", (done) => {
                         // FIXME: this condition must now be tested after click on the activation link.
                         scopeMock.register().then(() => {
-                            expect(adhTopLevelStateMock.redirectToCameFrom).toHaveBeenCalledWith("/");
+                            expect(adhTopLevelStateMock.goToCameFrom).toHaveBeenCalledWith("/", true);
                             done();
                         });
                     });

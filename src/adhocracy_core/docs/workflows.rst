@@ -139,3 +139,16 @@ NOTE: The available next states depend on the workflow transitions and user perm
 NOTE: To make this work every state may have only one transition to another state.
 
 
+Workflow State filtering
+------------------------
+
+Filtering Pools allow to search for resource with specific workflow state:
+
+    >>> resp_data = app_god.get('/', {'workflow_state': 'WRONG'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    []
+
+    >>> resp_data = app_god.get('/', {'workflow_state': 'frozen'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/process/']
+

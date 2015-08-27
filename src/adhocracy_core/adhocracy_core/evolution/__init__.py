@@ -1,6 +1,9 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging
 from functools import wraps
+
+from BTrees.Length import Length
+from persistent.mapping import PersistentMapping
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from zope.interface.interfaces import IInterface
@@ -10,6 +13,7 @@ from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
 from substanced.util import find_service
 from substanced.interfaces import IFolder
+
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
@@ -26,6 +30,8 @@ from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.proposal import IProposal
+from adhocracy_core.resources.process import IProcess
 from adhocracy_core.catalog import ICatalogsService
 
 
@@ -187,6 +193,27 @@ def make_users_badgeable(root):  # pragma: no cover
 
 
 @log_migration
+def make_proposals_badgeable(root):  # pragma: no cover
+    """Add badge services processes and make proposals badgeable."""
+    catalogs = find_service(root, 'catalogs')
+    proposals = _search_for_interfaces(catalogs, IProposal)
+    registry = get_current_registry(root)
+    for proposal in proposals:
+        if not IBadgeable.providedBy(proposal):
+            logger.info('add badgeable interface to {0}'.format(proposal))
+            alsoProvides(proposal, IBadgeable)
+        if 'badge_assignments' not in proposal:
+            logger.info('add badge assignments to {0}'.format(proposal))
+            add_badge_assignments_service(proposal, registry, {})
+    processes = _search_for_interfaces(catalogs, IProcess)
+    for process in processes:
+        if not IHasBadgesPool.providedBy(process):
+            logger.info('Add badges service to {0}'.format(process))
+            add_badges_service(process, registry, {})
+            alsoProvides(process, IHasBadgesPool)
+
+
+@log_migration
 def change_pools_autonaming_scheme(root):  # pragma: no cover
     """Change pool autonaming scheme."""
     registry = get_current_registry(root)
@@ -197,11 +224,21 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
     for index, pool in enumerate(pools):
         logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count, pool))
         if hasattr(pool, '_autoname_last'):
-            pool._autoname_lasts = {prefix: pool._autoname_last
-                                    for prefix in prefixes}
+            pool._autoname_lasts = PersistentMapping()
+            for prefix in prefixes:
+                pool._autoname_lasts[prefix] = Length(pool._autoname_last + 1)
             del pool._autoname_last
         elif not hasattr(pool, '_autoname_lasts'):
-            pool._autoname_lasts = {prefix: 0 for prefix in prefixes}
+            pool._autoname_lasts = PersistentMapping()
+            for prefix in prefixes:
+                pool._autoname_lasts[prefix] = Length()
+        elif hasattr(pool, '_autoname_lasts'):
+            # convert int to Length
+            for prefix in pool._autoname_lasts.keys():
+                pool._autoname_lasts[prefix] \
+                    = Length(pool._autoname_lasts[prefix])
+            # convert dict to PersistentMapping
+            pool._autoname_lasts = PersistentMapping(pool._autoname_lasts)
 
 
 @log_migration
@@ -266,3 +303,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(lower_case_users_emails)
     config.add_evolution_step(remove_name_sheet_from_items)
     config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)
+    config.add_evolution_step(make_proposals_badgeable)

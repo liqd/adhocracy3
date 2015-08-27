@@ -1,0 +1,11 @@
+[{"path": "/organisation/",
+  "creator": "god",
+  "content_type": "adhocracy_meinberlin.resources.burgerhaushalt.IProcess",
+  "data": {"adhocracy_core.sheets.name.IName":
+           {"name": "burgerhaushalt"},
+           "adhocracy_core.sheets.geo.ILocationReference":
+           {"location": "/locations/alt-treptow"},
+           "adhocracy_core.sheets.title.ITitle":
+           {"title": "Burgerhaushalt"}}
+ }
+]

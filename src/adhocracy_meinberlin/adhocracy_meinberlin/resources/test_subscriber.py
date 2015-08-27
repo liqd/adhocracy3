@@ -43,7 +43,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
                                                 appstructs=user_appstructs,
                                                 parent=context['principals']['users'])
         return {'office_worker': office_worker,
-                'plan_number': '112233',
+                'plan_number': '112233-ba',
                 'participation_kind': 'öffentliche Auslegung',
                 'participation_start_date': datetime.date(2015, 5, 5),
                 'participation_end_date': datetime.date(2015, 6, 11)}
@@ -60,7 +60,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         user_appstructs = {adhocracy_core.sheets.principal.IUserExtended.__identifier__:
                            {'email': 'officeworkername@example.org'}}
         return {'office_worker': None,
-                'plan_number': '112233',
+                'plan_number': '112233-ba',
                 'participation_start_date': datetime.date(2015, 5, 5),
                 'participation_end_date': datetime.date(2015, 6, 11)}
 
@@ -123,7 +123,7 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
 
         msg_user = messenger.mailer.outbox[0]
         assert 'user@example.com' in msg_user.recipients
-        assert 'Ihre Stellungnahme zum Bebauungsplan 112233, öffentliche Auslegung' \
+        assert 'Ihre Stellungnahme zum Bebauungsplan 112233-ba, öffentliche Auslegung' \
             ' von 05/05/2015 - 11/06/2015.'  == msg_user.subject
         assert 'Vielen Dank' in msg_user.body
         assert 'Laura Muster' in msg_user.body
@@ -132,10 +132,10 @@ class TestBplanSubmissionConfirmationEmailSubscriber:
         assert '10000, Berlin' in msg_user.body
         assert 'BplanStatement1' in msg_user.body
         assert 'BplanStatement2' in msg_user.body
-        assert '112233' in msg_user.body
+        assert '112233-ba' in msg_user.body
         assert '05/05/2015' in msg_user.body
         assert '11/06/2015' in msg_user.body
-        assert 'Ihre Stellungnahme zum Bebauungsplan 112233, öffentliche Auslegung' \
+        assert 'Ihre Stellungnahme zum Bebauungsplan 112233-ba, öffentliche Auslegung' \
             ' von 05/05/2015 - 11/06/2015.' in msg_user.body
 
         msg_officeworker = messenger.mailer.outbox[1]

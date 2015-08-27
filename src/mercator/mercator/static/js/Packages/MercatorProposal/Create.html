@@ -366,19 +366,19 @@
                             data-flow-object="$flow"
                             data-ng-model="data.introduction.imageUpload"
                             data-ng-class="{ 'ng-invalid': mercatorProposalIntroductionForm['introduction-picture-upload'].$invalid }"
+                            class="image-upload"
                             name="introduction-picture-upload">
                             <div data-ng-if="data.introduction.picture && (!$flow.files || $flow.files.length == 0)">
                                 {{ "TR__IMAGE_CURRENT" | translate }}:
-                                <img class="mercator-proposal-detail-view-image"
+                                <img class="mercator-proposal-detail-view-image image-upload-preview"
                                      data-ng-src="{{ data.introduction.picture | adhImageUri }}"
-                                     style="width: 100%; height: 203px"
                                      alt="{{ 'TR__IMAGE_CURRENT' | translate }}" />
                             </div>
                             <button
                                 type="button"
                                 data-flow-btn=""
                                 data-flow-attrs="{accept:'image/*'}"
-                                class="button-cta-secondary">
+                                class="button-cta-secondary image-upload-button">
                                 <span data-ng-if="$flow.files.length > 0">{{ "TR__IMAGE_CHANGE" | translate }}</span>
                                 <span data-ng-if="!$flow.files.length || $flow.files.length == 0">{{ "TR__IMAGE_CHOOSE" | translate }}</span>
                             </button>
@@ -406,8 +406,8 @@
                                     {{"TR__ERROR_REQUIRED_IMAGE" | translate }}
                                 </span>
                             </div>
-                            <div class="picture-upload-file" ng-if="$flow.files.length > 0" data-ng-repeat="file in $flow.files">
-                                <img data-flow-img="file" height="120" alt="{{ 'TR__IMAGE_SELECTED' | translate }}" /><br/>{{file.name}}
+                            <div data-ng-if="$flow.files.length > 0" data-ng-repeat="file in $flow.files">
+                                <img class="image-upload-preview" data-flow-img="file" alt="{{ 'TR__IMAGE_SELECTED' | translate }}" /><br/>{{file.name}}
                             </div>
                         </div>
                     </label>

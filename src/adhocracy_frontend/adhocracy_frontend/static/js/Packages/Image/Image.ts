@@ -115,7 +115,7 @@ export var uploadImageDirective = (
 export var imageUriFilter = () => {
     return (path? : string, format : string = "detail") : string => {
         if (path) {
-            return path + "/" + format;
+            return path.replace(/\/$/, "") + "/" + format;
         } else {
             return "/static/fallback_" + format + ".jpg";
         }

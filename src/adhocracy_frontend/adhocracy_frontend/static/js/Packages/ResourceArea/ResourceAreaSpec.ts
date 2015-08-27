@@ -49,6 +49,11 @@ export var register = () => {
             });
 
             describe("route", () => {
+                beforeEach(() => {
+                    spyOn(service, "getProcess").and.returnValue(q.when(""));
+                    spyOn(service, "conditionallyRedirectVersionToLast").and.returnValue(q.when(false));
+                });
+
                 it("sets view field if specified", (done) => {
                     service.route("/platform/wlog/@blarg", {}).then((data) => {
                         expect(data["view"]).toBe("blarg");

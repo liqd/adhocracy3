@@ -43,7 +43,7 @@
         </label>
 
         <!-- Requested Budget -->
-        <label data-ng-if="isKiezkasse">
+        <label data-ng-if="isKiezkasse || isBurgerhaushalt">
             <span class="label-text">{{ "TR__MEINBERLIN_BUDGET" | translate }}</span>
             <input
                 type="number"
@@ -75,7 +75,7 @@
 
         <!-- LOCATION RELATED INFORMATION -->
         <!-- Related Place -->
-        <label data-ng-if="isKiezkasse">
+        <label data-ng-if="isKiezkasse || isBurgerhaushalt">
             <span class="label-text">{{ "TR__MEINBERLIN_LOCATION_TEXT" | translate }}</span>
             <input
                 type="text"
@@ -91,7 +91,7 @@
 
     <!-- Map -->
     <label>
-        <adh-map-input data-ng-if="data.polygon" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="170"></adh-map-input>
+        <adh-map-input data-ng-if="data.polygon" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="250"></adh-map-input>
     </label>
 
     <!-- DATA SUBMIT -->
@@ -102,9 +102,9 @@
             value="{{ 'TR__PUBLISH' | translate }}"
             class="button-cta form-footer-button-cta" />
 
-        <a data-ng-show="create" href="{{ processUrl | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
-        {{ "TR__CANCEL" | translate }}</a>
-        <a data-ng-show="!create" href="{{ path | adhParentPath | adhResourceUrl }}" data-ng-click="cancel()" class="button form-footer-button">
-        {{ "TR__CANCEL" | translate }}</a>
+        <a
+            href=""
+            data-ng-click="cancel()"
+            class="button form-footer-button">{{ "TR__CANCEL" | translate }}</a>
     </footer>
 </form>

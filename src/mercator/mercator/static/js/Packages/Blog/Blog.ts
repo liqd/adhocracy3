@@ -2,9 +2,10 @@ import AdhConfig = require("../Config/Config");
 import AdhDocument = require("../Document/Document");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
+import AdhImage = require("../Image/Image");
+import AdhListing = require("../Listing/Listing");
 import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPermissions = require("../Permissions/Permissions");
-import AdhListing = require("../Listing/Listing");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUtil = require("../Util/Util");
 
@@ -63,7 +64,8 @@ export var detailDirective = (
     adhPermissions : AdhPermissions.Service,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
-    adhSubmitIfValid
+    adhSubmitIfValid,
+    adhUploadImage
 ) => {
     return {
         restrict: "E",
@@ -105,7 +107,8 @@ export var detailDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return AdhDocument.postEdit(adhHttp, adhPreliminaryNames)(scope, scope.documentVersion, scope.paragraphVersions);
+                    return AdhDocument.postEdit(adhHttp, adhPreliminaryNames, adhUploadImage)(
+                        scope, scope.documentVersion, scope.paragraphVersions);
                 }).then((documentVersion : RIDocumentVersion) => {
                     if (typeof scope.onChange !== "undefined") {
                         scope.onChange();
@@ -123,7 +126,8 @@ export var createDirective = (
     adhHttp : AdhHttp.Service<any>,
     adhPreliminaryNames : AdhPreliminaryNames.Service,
     adhShowError,
-    adhSubmitIfValid
+    adhSubmitIfValid,
+    adhUploadImage
 ) => {
     return {
         restrict: "E",
@@ -170,7 +174,7 @@ export var createDirective = (
 
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.documentForm, () => {
-                    return AdhDocument.postCreate(adhHttp, adhPreliminaryNames)(scope, scope.path);
+                    return AdhDocument.postCreate(adhHttp, adhPreliminaryNames, adhUploadImage)(scope, scope.path);
                 }).then((documentVersion : RIDocumentVersion) => {
 
                     scope.cancel();
@@ -207,9 +211,10 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEmbed.moduleName,
             AdhHttp.moduleName,
+            AdhImage.moduleName,
+            AdhListing.moduleName,
             AdhMarkdown.moduleName,
-            AdhPermissions.moduleName,
-            AdhListing.moduleName
+            AdhPermissions.moduleName
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("blog-post");
@@ -225,8 +230,9 @@ export var register = (angular) => {
             "adhPreliminaryNames",
             "adhShowError",
             "adhSubmitIfValid",
+            "adhUploadImage",
             detailDirective])
         .directive("adhBlog", ["adhConfig", listingDirective])
         .directive("adhBlogPostCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective]);
+            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", "adhUploadImage", createDirective]);
 };

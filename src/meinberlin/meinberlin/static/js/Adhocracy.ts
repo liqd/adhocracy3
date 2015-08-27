@@ -25,9 +25,10 @@ import leaflet = require("leaflet");
 import webshim = require("polyfiller");
 
 import AdhAbuse = require("./Packages/Abuse/Abuse");
+import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhBadge = require("./Packages/Badge/Badge");
-import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
+import AdhConfig = require("./Packages/Config/Config");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhDocument = require("./Packages/Document/Document");
@@ -40,14 +41,15 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhLocale = require("./Packages/Locale/Locale");
 import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
+import AdhMapping = require("./Packages/Mapping/Mapping");
 import AdhMarkdown = require("./Packages/Markdown/Markdown");
+import AdhMeinBerlinProposal = require("./Packages/Proposal/Proposal");
 import AdhMeinBerlin = require("./Packages/MeinBerlin/MeinBerlin");
 import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProcess = require("./Packages/Process/Process");
 import AdhRate = require("./Packages/Rate/Rate");
-import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 import AdhShareSocial = require("./Packages/ShareSocial/ShareSocial");
@@ -58,7 +60,6 @@ import AdhTracking = require("./Packages/Tracking/Tracking");
 import AdhUser = require("./Packages/User/User");
 import AdhUserViews = require("./Packages/User/Views");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
-import AdhMapping = require("./Packages/Mapping/Mapping");
 
 import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
@@ -190,6 +191,7 @@ export var init = (config : AdhConfig.IService, metaApi) => {
     AdhLocale.register(angular);
     AdhLocalSocket.register(angular);
     AdhMeinBerlin.register(angular);
+    AdhMeinBerlinProposal.register(angular);
     AdhMapping.register(angular);
     AdhMarkdown.register(angular);
     AdhMovingColumns.register(angular);

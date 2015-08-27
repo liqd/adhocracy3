@@ -1,41 +1,32 @@
 """BPlan process resources."""
-from adhocracy_core.interfaces import IItemVersion
-from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.resources.itemversion import itemversion_meta
-from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources import process
+from adhocracy_core.resources import proposal
 import adhocracy_meinberlin.sheets.bplan
 
 
-class IProposalVersion(IItemVersion):
+class IProposalVersion(proposal.IProposalVersion):
 
     """BPlan proposal version."""
 
 
-proposal_version_meta = itemversion_meta._replace(
+proposal_version_meta = proposal.proposal_version_meta._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
     extended_sheets=(adhocracy_meinberlin.sheets.bplan.IProposal,
                      ),
-    permission_create='edit_proposal',
 )
 
 
-class IProposal(IItem):
+class IProposal(proposal.IProposal):
 
     """BPlan proposal versions pool."""
 
 
-proposal_meta = item_meta._replace(
-    content_name='Proposal',
+proposal_meta = proposal.proposal_meta._replace(
     iresource=IProposal,
     element_types=(IProposalVersion,),
     item_type=IProposalVersion,
-    is_implicit_addable=True,
-    permission_create='create_proposal',
-    use_autonaming=True,
-    autonaming_prefix='proposal_',
     workflow_name = 'bplan_private',
 )
 

@@ -1,11 +1,14 @@
 """Adhocracy catalog and index views."""
 from pyramid.traversal import resource_path
+from pyramid.traversal import find_interface
 from substanced import catalog
 from substanced.catalog import IndexFactory
 from substanced.util import find_service
 from adhocracy_core.catalog.index import ReferenceIndex
+from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
+from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
@@ -14,6 +17,7 @@ from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.versions import IVersionable
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import find_graph
 from adhocracy_core.interfaces import search_query
@@ -42,6 +46,7 @@ class AdhocracyCatalogIndexes:
     rates = catalog.Field()
     creator = catalog.Field()
     item_creation_date = catalog.Field()
+    workflow_state = catalog.Field()
     reference = Reference()
 
 
@@ -137,6 +142,23 @@ def index_badge(resource, default) -> [str]:
     return badge_names
 
 
+def index_workflow_state(resource, default) -> [str]:
+    """Return value for the workflow_state index."""
+    state = get_sheet_field(resource, IWorkflowAssignment, 'workflow_state')
+    return state
+
+
+def index_workflow_state_of_item(resource, default) -> [str]:
+    """Find item and return it`s value for the workflow_state index."""
+    item = find_interface(resource, IItem)
+    try:
+        state = get_sheet_field(item, IWorkflowAssignment, 'workflow_state')
+    except (RuntimeConfigurationError, AttributeError):
+        return default
+    else:
+        return state
+
+
 def includeme(config):
     """Register adhocracy catalog factory."""
     config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
@@ -177,4 +199,14 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='badge',
                          context=IBadgeable,
+                         )
+    config.add_indexview(index_workflow_state,
+                         catalog_name='adhocracy',
+                         index_name='workflow_state',
+                         context=IWorkflowAssignment,
+                         )
+    config.add_indexview(index_workflow_state_of_item,
+                         catalog_name='adhocracy',
+                         index_name='workflow_state',
+                         context=IVersionable,
                          )

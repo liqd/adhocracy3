@@ -290,8 +290,9 @@ def get_sheet_field(resource, isheet: ISheet, field_name: str,
     """Return value of `isheet` field `field_name` for `resource`.
 
     :raise KeyError: if `field_name` does not exists for `isheet` sheets.
-    :raise zope.component.ComponentLookupError: if there is no sheet adapter
-                                               registered for `isheet`.
+    :raises adhocracy_core.exceptions.RuntimeConfigurationError:
+        if there is no `isheet` sheet registered for context.
+
     """
     sheet = get_sheet(resource, isheet, registry=registry)
     field = sheet.get()[field_name]
