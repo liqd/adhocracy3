@@ -5,11 +5,11 @@ import AdhComment = require("../../../Comment/Comment");
 import AdhConfig = require("../../../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
-import AdhPermissions = require("../../../Permissions/Permissions");
 
 import AdhMeinBerlinBurgerhaushaltProcess = require("../Process/Process");
 import AdhMeinBerlinProposal = require("../../../Proposal/Proposal");
