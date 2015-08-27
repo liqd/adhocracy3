@@ -26,7 +26,7 @@ import SIWorkflowAssignment = require("../../../Resources_/adhocracy_core/sheets
 var pkgLocation = "/S1/Proposal";
 
 
-interface IScope extends angular.IScope {
+export interface IScope extends angular.IScope {
     path : string;
     resource : RIProposalVersion;
     selectedState? : string;
@@ -42,7 +42,7 @@ interface IScope extends angular.IScope {
     };
 }
 
-interface IFormScope extends IScope {
+export interface IFormScope extends IScope {
     poolPath : string;
     errors : AdhHttp.IBackendErrorItem[];
     showError : Function;
