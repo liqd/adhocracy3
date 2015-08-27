@@ -1,0 +1,19 @@
+<adh-recompile-on-change data-value="{{path}}">
+    <div class="s1-proposal-detail" data-ng-if="data.title">
+        <h1>{{ data.title }}</h1>
+
+        <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+        {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
+
+        <adh-rate data-refers-to="{{path}}"></adh-rate>
+        <a data-ng-href="{{ path | adhResourceUrl:'comments' }}">{{ "TR__COMMENTS" }}</a>
+
+        <tr />
+
+        <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+
+        <tr />
+
+        <adh-parse-markdown data-parsetext="data.description"></adh-parse-markdown>
+    </div>
+</adh-recompile-on-change>

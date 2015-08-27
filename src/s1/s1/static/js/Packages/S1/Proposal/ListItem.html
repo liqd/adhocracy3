@@ -1,0 +1,12 @@
+<a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}" class="s1-proposal-list-item {{selectedState}}">
+    TR__NEW_PROPOSAL
+    <ul class="s1-proposal-list-item-meta">
+        <li>{{ data.rateCount | signum }}</li>
+        <li>{{ data.commentCount }}</li>
+    </ul>
+
+    <h1>{{ data.title }}</h1>
+
+    <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta>
+    <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+</a>
