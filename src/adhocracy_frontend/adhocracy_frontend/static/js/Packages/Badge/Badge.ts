@@ -51,6 +51,46 @@ export var getBadgesFactory = (
     return $q.all(_.map(assignmentPaths, getBadge));
 };
 
+
+export var bindPath = (
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService
+) => (
+    scope
+) : void => {
+    scope.data = {
+        badge: "",
+        description: ""
+    };
+
+    var getBadge = (badge) => {
+        return {
+            title: badge.data[SITitle.nick].title,
+            path: badge.path
+        };
+    };
+
+    adhHttp.get(scope.badgesPath).then((badges) => {
+        var badgelist : string[] = badges.data[SIPool.nick].elements;
+        $q.all(_.map(badgelist, (b) => adhHttp.get(b))).then((result) => {
+            scope.badges = _.map(result, getBadge);
+        });
+    });
+};
+
+export var fill = (resource, scope, userPath : string) => {
+    var clone = _.cloneDeep(resource);
+    clone.data[SIDescription.nick] = {
+        description: scope.data.description
+    };
+    clone.data[SIBadgeAssignment.nick] = {
+        badge : scope.data.badge,
+        object : scope.badgeablePath,
+        subject : userPath
+    };
+    return clone;
+};
+
 export var badgeAssignmentDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -66,39 +106,14 @@ export var badgeAssignmentDirective = (
             badgeablePath: "@"
         },
         link: (scope, element) => {
-            scope.data = {
-                badge: "",
-                description: ""
-            };
-
-            var getBadge = (badge) => {
-                return {
-                    title: badge.data[SITitle.nick].title,
-                    path: badge.path
-                };
-            };
-
-            adhHttp.get(scope.badgesPath).then((badges) => {
-                var badgelist : string[] = badges.data[SIPool.nick].elements;
-                $q.all(_.map(badgelist, (b) => adhHttp.get(b))).then((result) => {
-                    scope.badges = _.map(result, getBadge);
-                });
-            });
+            bindPath(adhHttp, $q)(scope);
 
             scope.submit = () => {
                 var postdata = {
                     content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
-                postdata.data[SIDescription.nick] = {
-                    description: scope.data.description
-                };
-                postdata.data[SIBadgeAssignment.nick] = {
-                    badge : scope.data.badge,
-                    object : scope.badgeablePath,
-                    subject : adhCredentials.userPath
-                };
-                return adhHttp.post(scope.poolPath, postdata);
+                return adhHttp.post(scope.poolPath, fill(postdata, scope, adhCredentials.userPath));
             };
         }
     };
