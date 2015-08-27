@@ -56,7 +56,8 @@ export var bindPath = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
 ) => (
-    scope
+    scope,
+    pathKey? : string
 ) : void => {
     scope.data = {
         badge: "",
@@ -76,6 +77,21 @@ export var bindPath = (
             scope.badges = _.map(result, getBadge);
         });
     });
+
+    if (typeof pathKey !== "undefined") {
+        scope.$watch(pathKey, (path : string) => {
+            if (path) {
+                adhHttp.get(path).then((resource) => {
+                    scope.resource = resource;
+                    scope.badgeablePath = resource.data[SIBadgeAssignment.nick].object;
+                    scope.data = {
+                        description: resource.data[SIDescription.nick].description,
+                        badge: resource.data[SIBadgeAssignment.nick].badge
+                    };
+                });
+            }
+        });
+    }
 };
 
 export var fill = (resource, scope, userPath : string) => {
@@ -119,6 +135,29 @@ export var badgeAssignmentCreateDirective = (
     };
 };
 
+export var badgeAssignmentEditDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService,
+    adhCredentials : AdhCredentials.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
+        scope: {
+            path: "@",
+            badgesPath: "@"
+        },
+        link: (scope, element) => {
+            bindPath(adhHttp, $q)(scope, "path");
+
+            scope.submit = () => {
+                var resource = scope.resource;
+                return adhHttp.put(resource.path, fill(resource, scope, adhCredentials.userPath));
+            };
+        }
+    };
+};
 
 export var moduleName = "adhBadge";
 
@@ -131,7 +170,9 @@ export var register = (angular) => {
         ])
         .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
             adhEmbedProvider.embeddableDirectives.push("badge-assignment-create");
+            adhEmbedProvider.embeddableDirectives.push("badge-assignment-edit");
         }])
         .factory("adhGetBadges", ["adhHttp", "$q", getBadgesFactory])
-        .directive("adhBadgeAssignmentCreate", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentCreateDirective]);
+        .directive("adhBadgeAssignmentCreate", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentCreateDirective])
+        .directive("adhBadgeAssignmentEdit", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentEditDirective]);
 };
