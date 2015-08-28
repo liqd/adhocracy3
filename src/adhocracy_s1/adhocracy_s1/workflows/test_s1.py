@@ -13,6 +13,14 @@ class TestChangeChildrenToVotable:
         registry_with_content.content.get_sheet.return_value = mock_sheet
         return registry_with_content
 
+    @fixture
+    def mock_catalogs(self, monkeypatch, mock_catalogs) -> Mock:
+        """Monkeypatch find_service to return mock_catalogs."""
+        from . import s1
+        monkeypatch.setattr(s1, 'find_service', lambda x, y: mock_catalogs)
+        return mock_catalogs
+
+
     def call_fut(self, *args, **kwargs):
         from .s1 import change_children_to_voteable
         return change_children_to_voteable(*args, **kwargs)
@@ -30,11 +38,13 @@ class TestChangeChildrenToVotable:
         assert not mock_sheet.set.called
 
     def test_change_children_to_votable(self, context, request_, registry,
-                                        mock_sheet):
+                                        mock_sheet, mock_catalogs):
+        from unittest.mock import call
         context['child'] = testing.DummyResource()
         mock_sheet.get.return_value = {'workflow_state': 'proposed'}
         self.call_fut(context, request_)
-        mock_sheet.set.assert_called_with({'workflow_state': 'voteable'}, request=request_)
+        mock_sheet.set.assert_called_with({'workflow_state': 'voteable'},
+                                          request=request_)
 
 
 class TestChangeChildrenToRejected:
@@ -63,7 +73,8 @@ class TestChangeChildrenToRejected:
         from adhocracy_core.sheets.versions import IVersionable
         self.call_fut(context, request_)
 
-        wanted_query = search_query._replace(interfaces=(IRateable, IVersionable),
+        wanted_query = search_query._replace(interfaces=(IRateable,
+                                                         IVersionable),
                                              root=context,
                                              depth=2,
                                              only_visible=True,
@@ -78,7 +89,8 @@ class TestChangeChildrenToRejected:
         from adhocracy_core.exceptions import RuntimeConfigurationError
         version = testing.DummyResource()
         item['version'] = version
-        mock_catalogs.search.return_value = mock_catalogs.search.return_value._replace(elements=[version])
+        mock_catalogs.search.return_value =\
+            mock_catalogs.search.return_value._replace(elements=[version])
         registry.content.get_sheet.side_effect = RuntimeConfigurationError
         self.call_fut(context, request_)
         assert not mock_sheet.set.called
@@ -87,7 +99,8 @@ class TestChangeChildrenToRejected:
             self, context, item, request_, registry, mock_sheet, mock_catalogs):
         version = testing.DummyResource()
         item['version'] = version
-        mock_catalogs.search.return_value = mock_catalogs.search.return_value._replace(elements=[version])
+        mock_catalogs.search.return_value =\
+            mock_catalogs.search.return_value._replace(elements=[version])
         self.call_fut(context, request_)
         assert not mock_sheet.set.called
 
@@ -99,7 +112,8 @@ class TestChangeChildrenToRejected:
         item2 = item.clone()
         version = testing.DummyResource()
         item2['version'] = version
-        mock_catalogs.search.return_value = mock_catalogs.search.return_value._replace(elements=[version_most_rated, version])
+        mock_catalogs.search.return_value =\
+            mock_catalogs.search.return_value._replace(elements=[version_most_rated, version])
         mock_sheet.get.return_value = {'workflow_state': 'voteable'}
         self.call_fut(context, request_)
         # this is a ugly test assertion, it depends on call order
@@ -115,14 +129,19 @@ def test_s1_includeme_add_workflow(registry):
 
 
 @mark.usefixtures('integration')
-def test_s1_initiate_and_transition_to_result(registry, context, request_):
+def test_s1_initiate_and_transition_to_result(registry, pool_with_catalogs,
+                                              request_):
+    from adhocracy_core.sheets.workflow import IWorkflowAssignment
+    from adhocracy_s1.resources.s1 import IProcess
+    process = testing.DummyResource(__provides__=(IProcess,
+                                                  IWorkflowAssignment))
+    pool_with_catalogs["process"] = process
     workflow = registry.content.workflows['s1']
-    request = testing.DummyRequest()
-    workflow.initialize(context)
-    assert workflow.state_of(context) is 'propose'
-    workflow.transition_to_state(context, request, 'select')
-    workflow.transition_to_state(context, request, 'result')
-    workflow.transition_to_state(context, request, 'propose')
+    workflow.initialize(process)
+    assert workflow.state_of(process) is 'propose'
+    workflow.transition_to_state(process, request_, 'select')
+    workflow.transition_to_state(process, request_, 'result')
+    workflow.transition_to_state(process, request_, 'propose')
 
 
 def _post_proposal_item(app_user, path='') -> TestResponse:
@@ -151,7 +170,8 @@ class TestS1Workflow:
     def test_propose_proposal_has_state_propose(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000000')
-        assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'proposed'
+        assert resp.json['data'][IWorkflowAssignment.__identifier__]\
+                   ['workflow_state'] == 'proposed'
 
     def test_propose_participant_can_comment_proposal(self, app_participant2):
         from adhocracy_core.resources.comment import IComment
@@ -219,6 +239,14 @@ class TestS1Workflow:
         from adhocracy_core.resources.rate import IRate
         assert IRate in app_participant2.get_postable_types(
             '/s1/proposal_0000002/rates')
+
+    def test_result_everybody_can_list_proposals_used_for_this_meeting(
+            self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        from adhocracy_core.sheets.pool import IPool
+        resp = app_participant.get('/s1')
+        state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
+        decision_date = [x['start_date'] for x in state_data if x['name'] == 'result'][0]
 
 
 @mark.usefixtures('integration')
