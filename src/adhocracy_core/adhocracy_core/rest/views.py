@@ -54,7 +54,7 @@ from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
-from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
+from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
 from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
@@ -194,8 +194,10 @@ def validate_body_or_querystring(body, schema: MappingSchema,
     qs = request.GET
     if isinstance(schema, GETPoolRequestSchema):
         try:
-            schema = add_get_pool_request_extra_fields(qs, schema, context,
-                                                       request.registry)
+            schema = add_arbitrary_filter_nodes(qs,
+                                                schema,
+                                                context,
+                                                request.registry)
         except Invalid as err:  # pragma: no cover
             _add_colander_invalid_error_to_request(err, request,
                                                    location='querystring')
@@ -244,6 +246,8 @@ def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
     except Invalid as err:
         for child in err.children:
             _add_colander_invalid_error_to_request(child, request, location)
+        if not err.children:
+            _add_colander_invalid_error_to_request(err, request, location)
     request.validated.update(validated)
 
 

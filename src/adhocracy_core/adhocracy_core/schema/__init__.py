@@ -251,7 +251,7 @@ class Roles(AdhocracySequenceNode):
         return list(value_dict)
 
 
-class Interface(colander.SchemaType):
+class InterfaceType(colander.SchemaType):
 
     """A ZOPE interface in dotted name notation.
 
@@ -272,6 +272,11 @@ class Interface(colander.SchemaType):
             return DottedNameResolver().resolve(value)
         except Exception as err:
             raise colander.Invalid(node, msg=str(err), value=value)
+
+
+class Interface(AdhocracySchemaNode):
+
+    schema_type = InterfaceType
 
 
 class AbsolutePath(AdhocracySchemaNode):
@@ -333,7 +338,7 @@ class ContentType(AdhocracySchemaNode):
 
     """ContentType schema."""
 
-    schema_type = Interface
+    schema_type = InterfaceType
     default = deferred_content_type_default
 
 

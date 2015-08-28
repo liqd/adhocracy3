@@ -578,7 +578,7 @@ class TestGETPoolRequestSchema:
         from adhocracy_core.interfaces import Reference
         from adhocracy_core.schema import Resource
         from adhocracy_core.schema import Integer
-        from adhocracy_core.schema import ContentType
+        from adhocracy_core.schema import SingleLine
         from adhocracy_core.schema import Interface
         from hypatia.interfaces import IIndexSort
         catalog = context['catalogs']['adhocracy']
@@ -603,7 +603,7 @@ class TestGETPoolRequestSchema:
         target = context
         wanted = {'indexes': {'index1': 1,
                               'index2': 1,
-                              'content_type': IResource.__identifier__},
+                              'interfaces': IResource},
                   'depth': 100,
                   'frequency_of': 'index1',
                   'interfaces': (IName,),
@@ -626,7 +626,7 @@ class TestGETPoolRequestSchema:
         inst.add(node)
         node = colander.SchemaNode(Interface(), name='sheet').bind(**inst.bindings)
         inst.add(node)
-        node = ContentType(name='content_type').bind(**inst.bindings)
+        node = Interface(name='content_type').bind(**inst.bindings)
         inst.add(node)
         assert inst.deserialize(cstruct) == wanted
 
@@ -687,7 +687,7 @@ class TestGETPoolRequestSchema:
         inst = inst.bind(context=context)
         assert inst.deserialize(data)['show_count'] is False
 
-    def test_deserialize_extra_values_are_preserved(self, inst, context):
+    def test_deserialize_raise_if_extra_value(self, inst, context):
         data = {'extra1': 'blah',
                 'another_extra': 'blub'}
         inst = inst.bind(context=context)
@@ -728,7 +728,7 @@ class TestGETPoolRequestSchema:
             inst.deserialize(data)
 
 
-class TestAddGetPoolRequestExtraFields:
+class TestAddArbitraryFiltrNodes:
 
     @fixture
     def schema(self, context):
@@ -737,88 +737,78 @@ class TestAddGetPoolRequestExtraFields:
         return schema.bind(context=context)
 
     @fixture
-    def context(self, pool_with_catalogs):
-        return pool_with_catalogs
+    def mock_catalogs(self, monkeypatch, mock_catalogs):
+        from . import schemas
+        monkeypatch.setattr(schemas, 'find_service', lambda x, y: mock_catalogs)
+        return mock_catalogs
 
     @fixture
-    def registry(self, mock_content_registry):
-        return testing.DummyResource(content=mock_content_registry)
+    def index(self, mock_catalogs):
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=['str'])
+        index.__name__ = 'index'
+        mock_catalogs.get_index.return_value = index
+        return index
+
+    @fixture
+    def interfaces_index(self, mock_catalogs):
+        from adhocracy_core.interfaces import IResource
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=[IResource])
+        index.__name__ = 'interfaces'
+        mock_catalogs.get_index.return_value = index
+        return index
+
+    @fixture
+    def reference_index(self, mock_catalogs):
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=[object])
+        index.__name__ = 'reference'
+        mock_catalogs.get_index.return_value = index
+        return index
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def create_node(self, monkeypatch, node):
+        from . import schemas
+        mock = Mock(spec=schemas.create_arbitrary_filter_node,
+                    return_value=node)
+        monkeypatch.setattr(schemas, 'create_arbitrary_filter_node', mock)
+        return mock
 
     def call_fut(self, *args):
-        from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
-        return add_get_pool_request_extra_fields(*args)
+        from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
+        return add_arbitrary_filter_nodes(*args)
 
-    def test_call_without_extra_fields(self, schema):
+    def test_call_without_arbitrary_filters(self, schema):
         cstruct = {}
         assert self.call_fut(cstruct, schema, None, None) == schema
 
-    def test_call_with_missing_catalog(self, schema):
-        index_name = 'index1'
-        cstruct = {index_name: 'keyword'}
-        schema_extended = self.call_fut(cstruct, schema, None, None)
-        assert index_name not in schema_extended
-
-    def test_call_with_extra_sheet_filter(self, schema, context):
-        from adhocracy_core.schema import Interface
-        cstruct = {'sheet': 'sheet.x1'}
+    def test_call_with_arbitrary_filter_wrong(self, schema, context,
+                                              index):
+        cstruct = {'index': 'keyword'}
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended['sheet'], colander.SchemaNode)
-        assert isinstance(schema_extended['sheet'].typ, Interface)
+        assert 'keyword' not in schema_extended
 
-    def test_call_with_extra_content_type_filter(self, schema, context):
-        from adhocracy_core.schema import ContentType
-        cstruct = {'content_type': 'resource1'}
+    def test_call_with_arbitrary_filter(self, schema, context, create_node, index):
+        cstruct = {'index': 'keyword'}
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended['content_type'], ContentType)
+        create_node.assert_called_with(index, index.unique_values()[0], 'keyword')
+        assert 'index' in schema_extended
 
-    def test_call_with_extra_filter_wrong(self, schema, context):
-        index_name = 'index1'
-        cstruct = {index_name: 'keyword'}
-        with raises(colander.Invalid):
-            self.call_fut(cstruct, schema, context, None)
-
-    def test_call_with_extra_filter(self, schema, context):
-        from adhocracy_core.schema import SingleLine
-        index_name = 'index1'
-        index = testing.DummyResource()
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: 'keyword'}
+    def test_call_with_sheet_filter(self, schema, context, create_node,
+                                   interfaces_index):
+        cstruct = {'sheet': 'sheet.x1' }
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], SingleLine)
+        create_node.assert_called_with(interfaces_index,
+                                       interfaces_index.unique_values()[0],
+                                       'sheet.x1')
 
-    def test_call_with_extra_filter_with_empty_unique_values(self, schema,
-                                                             context):
-        from adhocracy_core.schema import SingleLine
-        index_name = 'index1'
-        index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[])
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: 'keyword'}
-        schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], SingleLine)
-
-    def test_call_with_extra_integer_filter(self, schema, context):
-        from adhocracy_core.schema import Integer
-        index_name = 'int_index'
-        index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[1, 2, 3])
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: '7'}
-        schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], Integer)
-
-    def test_call_with_extra_datetime_filter(self, schema, context):
-        from datetime import datetime
-        from adhocracy_core.schema import DateTime
-        index_name = 'date_index'
-        index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[datetime.now()])
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: datetime.now()}
-        schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], DateTime)
-
-    def test_call_with_extra_reference_name(self, schema, registry):
+    def test_call_with_reference_filter(self, schema, context, registry,
+                                        create_node, reference_index):
         from adhocracy_core.schema import Resource
         from adhocracy_core.schema import Reference
         isheet = ISheet.__identifier__
@@ -826,10 +816,12 @@ class TestAddGetPoolRequestExtraFields:
         reference_name = isheet + ':' + field
         cstruct = {reference_name: '/referenced'}
         registry.content.resolve_isheet_field_from_dotted_string.return_value = (ISheet, 'reference', Reference())
-        schema_extended = self.call_fut(cstruct, schema, None, registry)
-        assert isinstance(schema_extended[reference_name], Resource)
+        schema_extended = self.call_fut(cstruct, schema, context, registry)
+        create_node.assert_called_with(reference_index,
+                                       reference_index.unique_values()[0],
+                                       '/referenced')
 
-    def test_call_with_extra_reference_name_wrong_type(self, schema, registry):
+    def test_call_with_reference_filter_wrong_type(self, schema, registry):
         from adhocracy_core.schema import SingleLine
         isheet = ISheet.__identifier__
         field = 'reference'
@@ -839,7 +831,7 @@ class TestAddGetPoolRequestExtraFields:
         with raises(colander.Invalid):
             self.call_fut(cstruct, schema, None, registry)
 
-    def test_call_with_extra_reference_name_wrong(self, schema, registry):
+    def test_call_with_reference_filter_wrong(self, schema, registry):
         isheet = ISheet.__identifier__
         field = 'reference'
         reference_name = isheet + ':' + field
@@ -847,6 +839,33 @@ class TestAddGetPoolRequestExtraFields:
         registry.content.resolve_isheet_field_from_dotted_string.side_effect = ValueError
         with raises(colander.Invalid):
             self.call_fut(cstruct, schema, None, registry)
+
+class TestCreateArbitraryFilterNode:
+
+    from datetime import datetime
+    from hypatia.keyword import KeywordIndex
+    from hypatia.util import BaseIndexMixin
+    from adhocracy_core.catalog.index import ReferenceIndex
+    from adhocracy_core import schema
+    from adhocracy_core.resources.base import Base
+
+    def call_fut(self, *args):
+        from .schemas import  create_arbitrary_filter_node
+        return create_arbitrary_filter_node(*args)
+
+    @mark.parametrize("index, index_value, query, wanted_schema_class",
+                      [(BaseIndexMixin(), 'str', 'str', schema.SingleLine),
+                       (BaseIndexMixin(), 1, '1', schema.Integer),
+                       (BaseIndexMixin(), 1, 1, schema.Integer),
+                       (BaseIndexMixin(), True, 'True', schema.Boolean),
+                       (BaseIndexMixin(), True, True, schema.Boolean),
+                       (BaseIndexMixin(), datetime.now(), '2015',schema.DateTime),
+                       (BaseIndexMixin(), IResource, 'Interface', schema.Interface),
+                       (ReferenceIndex(), Base(), '/path', schema.Resource),
+                       ])
+    def test_call(self, index, index_value, query, wanted_schema_class):
+        node = self.call_fut(index, index_value, query)
+        assert isinstance(node, wanted_schema_class)
 
 
 class TestPostMessageUserViewRequestSchema:

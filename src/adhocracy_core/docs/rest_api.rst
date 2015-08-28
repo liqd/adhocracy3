@@ -1541,7 +1541,7 @@ You'll also get an error if you try to filter by a catalog that doesn't exist::
     ...             'foocat': 'whatever'},
     ...     status=400).json
     >>> resp_data['errors'][0]['description']
-    'No such catalog'
+    'Unrecognized keys in mapping: "{\'foocat\': \'whatever\'}"'
 
 *aggregateby* allows you to add the additional field `aggregateby` with
 aggregated index values of all result resources. You have to set the value

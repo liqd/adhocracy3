@@ -1,44 +1,50 @@
 """Data structures / validation specific to rest api requests."""
 from datetime import datetime
+
+import colander
+from colander import SchemaNode
 from hypatia.interfaces import IIndexSort
+from multipledispatch import dispatch
+from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.util import DottedNameResolver
 from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
-from colander import SchemaNode
-import colander
-
+from substanced.util import find_service
+from zope.interface.interface import InterfaceClass
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import IUserLocator
 from adhocracy_core.interfaces import Reference as ReferenceTuple
+from adhocracy_core.interfaces import SearchQuery
+from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
-from adhocracy_core.schema import Email
+from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import ContentType
 from adhocracy_core.schema import DateTime
+from adhocracy_core.schema import Email
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Interface
 from adhocracy_core.schema import Password
-from adhocracy_core.schema import Resource
-from adhocracy_core.schema import Resources
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import References
-from adhocracy_core.schema import ResourcePathSchema
+from adhocracy_core.schema import Resource
 from adhocracy_core.schema import ResourcePathAndContentSchema
+from adhocracy_core.schema import ResourcePathSchema
+from adhocracy_core.schema import Resources
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.utils import raise_colander_style_error
-from adhocracy_core.utils import unflatten_multipart_request
+from adhocracy_core.sheets.principal import IPasswordAuthentication
+from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.catalog import ICatalogsService
+from adhocracy_core.catalog.index import ReferenceIndex
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import now
-from adhocracy_core.interfaces import IUserLocator
-from adhocracy_core.resources.principal import IPasswordReset
-from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.sheets.principal import IPasswordAuthentication
-
+from adhocracy_core.utils import raise_colander_style_error
+from adhocracy_core.utils import unflatten_multipart_request
 
 resolver = DottedNameResolver()
 
@@ -137,7 +143,7 @@ def add_post_data_subschemas(node: SchemaNode, kw: dict):
         node.add(schema.bind(**kw))
 
 
-def _get_resource_type_based_on_request_type(request: Request):
+def _get_resource_type_based_on_request_type(request: Request) -> str:
     if request.content_type == 'application/json':
         return request.json_body.get('content_type')
     elif request.content_type == 'multipart/form-data':
@@ -451,58 +457,57 @@ class GETPoolRequestSchema(colander.Schema):
             search_query['show_count'] = appstruct['count']
         fields = tuple([x.name for x in GETPoolRequestSchema().children])
         fields += ('sheet',)
-        for key, value in appstruct.items():
-            if key in fields + SearchQuery._fields:
+        for filter, query in appstruct.items():
+            if filter in fields + SearchQuery._fields:
                 continue
-            if ':' in key:
+            if ':' in filter:
                 if 'references' not in search_query:  # pragma: no branch
                     search_query['references'] = []
-                isheet_name, isheet_field = key.split(':')
+                isheet_name, isheet_field = filter.split(':')
                 isheet = resolver.resolve(isheet_name)
-                target = appstruct[key]
+                target = appstruct[filter]
                 reference = ReferenceTuple(None, isheet, isheet_field, target)
                 search_query['references'].append(reference)
             else:
                 if 'indexes' not in search_query:
                     search_query['indexes'] = {}
-                search_query['indexes'][key] = value
-        if 'content_type' in appstruct:
-            content_type = appstruct['content_type'].__identifier__
-            search_query['indexes']['content_type'] = content_type
+                if filter == 'content_type':
+                    search_query['indexes']['interfaces'] = appstruct['content_type']
+                    continue
+                search_query['indexes'][filter] = query
         return search_query
 
 
-def add_get_pool_request_extra_fields(cstruct: dict,
-                                      schema: GETPoolRequestSchema,
-                                      context: IResource,
-                                      registry) -> GETPoolRequestSchema:
-    """Validate arbitrary fields in GETPoolRequestSchema data."""
-    extra_fields = _get_unknown_fields(cstruct, schema)
-    if not extra_fields:
-        return schema
-    schema_extra = schema.clone()
-    for name in extra_fields:
-        if _maybe_reference_filter_node(name, registry):
-            _add_reference_filter_node(name, schema_extra)
+
+
+def add_arbitrary_filter_nodes(cstruct: dict,
+                                       schema: GETPoolRequestSchema,
+                                       context: IResource,
+                                       registry) -> GETPoolRequestSchema:
+    """Add schema nodes for arbitrary/references filters to `schema`."""
+    extra_filters = [(k, v) for k, v in cstruct.items() if k not in schema]
+    if extra_filters:
+        schema = schema.clone()
+    catalogs = find_service(context, 'catalogs')
+    for filter_name, query in extra_filters:
+        if _is_reference_filter(filter_name, registry):
+            index_name = 'reference'
+        elif filter_name == 'sheet':
+            index_name = 'interfaces'
+        elif filter_name == 'content_type':
+            index_name = 'interfaces'
+        elif _is_arbitrary_filter(filter_name, catalogs):
+            index_name = filter_name
         else:
-            if name == 'content_type':
-                _add_content_type_filter_node(schema_extra)
-                continue
-            elif name == 'sheet':
-                _add_sheet_filter_node(schema_extra)
-                continue
-            index = _find_index_if_arbitrary_filter_node(name, context)
-            if index is not None:
-                _add_arbitrary_filter_node(name, index, schema_extra)
-    return schema_extra
+            continue
+        index = catalogs.get_index(index_name)
+        value_type = _get_index_value_type(index)
+        node = create_arbitrary_filter_node(index, value_type, query)
+        _add_node(schema, node, filter_name)
+    return schema
 
 
-def _get_unknown_fields(cstruct, schema):
-    unknown_fields = [key for key in cstruct if key not in schema]
-    return unknown_fields
-
-
-def _maybe_reference_filter_node(name, registry):
+def _is_reference_filter(name: str, registry: Registry) -> bool:
     """
     Check whether a name refers to a reference node in a sheet.
 
@@ -521,57 +526,62 @@ def _maybe_reference_filter_node(name, registry):
         raise_colander_style_error(None, name, 'Not a reference node')
 
 
-def _add_reference_filter_node(name, schema):
-    node = Resource(name=name).bind(**schema.bindings)
+def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:
+    """
+    Return True if `name' refers to an public arbitrary catalog index.
+    """
+
+    if name.startswith('private_'):
+        return False
+    else:
+        index = catalogs.get_index(name)
+        return index is not None
+
+
+def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
+    node = node.bind(**schema.bindings)
+    node.name = name
     schema.add(node)
 
-
-def _find_index_if_arbitrary_filter_node(name: str,
-                                         context: IResource) -> SDIndex:
-    """
-    Find the referenced index if `name' refers to an arbitrary catalog index.
-
-    Throws an exception otherwise.
-    If there are no catalogs, `None` is returned to facilitate testing.
-    """
-    catalog = find_catalog(context, 'adhocracy')
-    if not catalog:
-        return None
-    if name in catalog and not name.startswith('private_'):
-        return catalog[name]
-    else:
-        raise_colander_style_error(None, name, 'No such catalog')
+@dispatch(object, str, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    return SingleLine()
 
 
-def _add_arbitrary_filter_node(name, index: SDIndex, schema):
-    node = SingleLine(name=name)
-    is_int_index = False
-    is_date_index = False
+@dispatch(object, int, (int, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    return Integer()
+
+
+@dispatch(object, bool, (bool, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    return Boolean()
+
+
+@dispatch(object, datetime, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    return DateTime()
+
+
+@dispatch(object, InterfaceClass, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    return Interface()
+
+
+@dispatch(ReferenceIndex, object, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    return Resource()
+
+
+def _get_index_value_type(index: SDIndex) -> object:
+    if index is None:
+        return
     if 'unique_values' in index.__dir__():
         indexed_values = index.unique_values()
-        if indexed_values:
-            example_value = indexed_values and indexed_values[0]
-            is_int_index = isinstance(example_value, int)
-            is_date_index = isinstance(example_value, datetime)
-    node = Integer(name=name) if is_int_index else node
-    node = DateTime(name=name) if is_date_index else node
-    node = node.bind(**schema.bindings)
-    schema.add(node)
-
-
-def _add_content_type_filter_node(schema: SchemaNode):
-    node = ContentType(name='content_type',
-                       missing=colander.drop)
-    node = node.bind(**schema.bindings)
-    schema.add(node)
-
-
-def _add_sheet_filter_node(schema: SchemaNode):
-    node = SchemaNode(Interface(),
-                      name='sheet',
-                      missing=colander.drop)
-    node = node.bind(**schema.bindings)
-    schema.add(node)
+        return indexed_values and indexed_values[0]
+    elif index.__name__ == 'reference':
+        return object()
+    return None
 
 
 options_resource_response_data_dict =\

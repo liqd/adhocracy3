@@ -244,7 +244,7 @@ private and cannot be directly queried from the frontend::
     >>> resp.status_code
     400
     >>> resp.json['errors'][0]['description']
-    'No such catalog'
+    'Unrecognized keys in mapping: "{\'private_visibility\': \'hidden\'}"'
 
 Lets hide an item with referenced resources. Prior to doing so, lets check
 that there actually is a listed version::
