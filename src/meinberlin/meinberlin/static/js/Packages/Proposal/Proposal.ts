@@ -21,6 +21,7 @@ import RIGeoProposalVersion = require("../../Resources_/adhocracy_core/resources
 import RIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
 import RIKiezkassenProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
 import SIBurgerhaushaltProposal = require("../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal");
+import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
 import SIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
 import SILocationReference = require("../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
@@ -69,75 +70,92 @@ var bindPath = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadges,
+    $q : angular.IQService
 ) => (
     scope : IScope,
     pathKey : string = "path",
     isKiezkasse : boolean = false,
     isBurgerhaushalt : boolean = false
 ) : void => {
+    var getPolygon = () => {
+        var processUrl = adhTopLevelState.get("processUrl");
+
+        return adhHttp.get(processUrl).then((process) => {
+            var locationUrl = process.data[SILocationReference.nick]["location"];
+
+            return adhHttp.get(locationUrl).then((location) => {
+                return location.data[SIMultiPolygon.nick]["coordinates"][0][0];
+            });
+        });
+    };
+
+    var getCommentCount = (resource) : angular.IPromise<number> => {
+        var commentableSheet : SICommentable.Sheet = resource.data[SICommentable.nick];
+
+        return adhHttp.get(commentableSheet.post_pool, {
+            content_type: RICommentVersion.content_type,
+            depth: "all",
+            tag: "LAST",
+            count: true
+        }).then((pool) => {
+            return pool.data[SIPool.nick].count;
+        });
+    };
+
     scope.$watch(pathKey, (value : string) => {
         if (value) {
+            adhHttp.get(value).then((resource) => {
+                scope.resource = resource;
 
-            // FIXME: Load resources in parallel (use $q.all)
-            adhHttp.get(AdhUtil.parentPath(value), {
-                content_type: RICommentVersion.content_type,
-                depth: "all",
-                tag: "LAST",
-                count: true
-            }).then((pool) => {
-                adhHttp.get(value).then((resource) => {
+                var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
+                var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
+                var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
+                var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
+                var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
 
-                    scope.resource = resource;
+                if (isKiezkasse) {
+                    var kiezkassenSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                } else if (isBurgerhaushalt) {
+                    var burgerhaushaltSheet : SIBurgerhaushaltProposal.Sheet = resource.data[SIBurgerhaushaltProposal.nick];
+                }
 
-                    var titleSheet : SITitle.Sheet = resource.data[SITitle.nick];
-                    var descriptionSheet : SIDescription.Sheet = resource.data[SIDescription.nick];
+                $q.all([
+                    getCommentCount(resource),
+                    adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
+                    getPolygon(),
+                    adhGetBadges(resource)
+                ]).then((args) => {
+                    var commentCount = args[0];
+                    var rates = args[1];
+                    var polygon = args[2];
+                    var assignments = args[3];
+
+                    // FIXME: an adapter should take care of this
+                    var ratesPro = rates["1"] || 0;
+                    var ratesContra = rates["-1"] || 0;
+
+                    scope.data = {
+                        title: titleSheet.title,
+                        detail: descriptionSheet.description,
+                        rateCount: ratesPro - ratesContra,
+                        creator: metadataSheet.creator,
+                        creationDate: metadataSheet.item_creation_date,
+                        commentCount: commentCount,
+                        lng: pointSheet.coordinates[0],
+                        lat: pointSheet.coordinates[1],
+                        polygon: polygon,
+                        assignments: assignments
+                    };
                     if (isKiezkasse) {
-                        var kiezkassenSheet : SIKiezkassenProposal.Sheet = resource.data[SIKiezkassenProposal.nick];
+                        scope.data.budget = kiezkassenSheet.budget;
+                        scope.data.address = kiezkassenSheet.address;
+                        scope.data.creatorParticipate = kiezkassenSheet.creator_participate;
+                        scope.data.locationText = kiezkassenSheet.location_text;
                     } else if (isBurgerhaushalt) {
-                        var burgerhaushaltSheet : SIBurgerhaushaltProposal.Sheet = resource.data[SIBurgerhaushaltProposal.nick];
+                        scope.data.budget = burgerhaushaltSheet.budget;
+                        scope.data.locationText = burgerhaushaltSheet.location_text;
                     }
-                    var pointSheet : SIPoint.Sheet = resource.data[SIPoint.nick];
-                    var metadataSheet : SIMetadata.Sheet = resource.data[SIMetadata.nick];
-                    var rateableSheet : SIRateable.Sheet = resource.data[SIRateable.nick];
-                    var poolSheet = pool.data[SIPool.nick];
-
-                    adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path).then((rates) => {
-                        // FIXME: an adapter should take care of this
-                        var ratesPro = rates["1"] || 0;
-                        var ratesContra = rates["-1"] || 0;
-
-                        var processUrl = adhTopLevelState.get("processUrl");
-                        adhHttp.get(processUrl).then((process) => {
-                            var locationUrl = process.data[SILocationReference.nick]["location"];
-                            adhHttp.get(locationUrl).then((location) => {
-                                var polygon = location.data[SIMultiPolygon.nick]["coordinates"][0][0];
-                                adhGetBadges(resource).then((assignments) => {
-                                    scope.data = {
-                                        title: titleSheet.title,
-                                        detail: descriptionSheet.description,
-                                        rateCount: ratesPro - ratesContra,
-                                        creator: metadataSheet.creator,
-                                        creationDate: metadataSheet.item_creation_date,
-                                        commentCount: poolSheet.count,
-                                        lng: pointSheet.coordinates[0],
-                                        lat: pointSheet.coordinates[1],
-                                        polygon: polygon,
-                                        assignments: assignments
-                                    };
-                                    if (isKiezkasse) {
-                                        scope.data.budget = kiezkassenSheet.budget;
-                                        scope.data.address = kiezkassenSheet.address;
-                                        scope.data.creatorParticipate = kiezkassenSheet.creator_participate;
-                                        scope.data.locationText = kiezkassenSheet.location_text;
-                                    } else if (isBurgerhaushalt) {
-                                        scope.data.budget = burgerhaushaltSheet.budget;
-                                        scope.data.locationText = burgerhaushaltSheet.location_text;
-                                    }
-                                });
-                            });
-                        });
-                    });
                 });
             });
         }
@@ -245,7 +263,8 @@ export var detailDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadges,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
@@ -256,7 +275,7 @@ export var detailDirective = (
             isBurgerhaushalt: "=?"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined, scope.isKiezkasse, scope.isBurgerhaushalt);
         }
     };
@@ -268,7 +287,8 @@ export var listItemDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadges,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
@@ -279,7 +299,7 @@ export var listItemDirective = (
             isBurgerhaushalt: "=?"
         },
         link: (scope : IScope) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined, scope.isKiezkasse, scope.isBurgerhaushalt);
             scope.$on("$destroy", adhTopLevelState.on("proposalUrl", (proposalVersionUrl) => {
                 if (!proposalVersionUrl) {
@@ -300,7 +320,8 @@ export var mapListItemDirective = (
     adhPermissions : AdhPermissions.Service,
     adhRate : AdhRate.Service,
     adhTopLevelState : AdhTopLevelState.Service,
-    adhGetBadges : AdhBadge.IGetBadges
+    adhGetBadges : AdhBadge.IGetBadges,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
@@ -312,7 +333,7 @@ export var mapListItemDirective = (
             isBurgerhaushalt: "=?"
         },
         link: (scope : IScope, element, attrs, mapListing : AdhMapping.MapListingController) => {
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined, scope.isKiezkasse, scope.isBurgerhaushalt);
 
             var unregister = scope.$watchGroup(["data.lat", "data.lng"], (values : number[]) => {
@@ -398,7 +419,8 @@ export var editDirective = (
     adhSubmitIfValid,
     adhTopLevelState : AdhTopLevelState.Service,
     adhGetBadges : AdhBadge.IGetBadges,
-    $location : angular.ILocationService
+    $location : angular.ILocationService,
+    $q : angular.IQService
 ) => {
     return {
         restrict: "E",
@@ -412,7 +434,7 @@ export var editDirective = (
             scope.errors = [];
             scope.showError = adhShowError;
             scope.create = false;
-            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges)(
+            bindPath(adhHttp, adhPermissions, adhRate, adhTopLevelState, adhGetBadges, $q)(
                 scope, undefined, scope.isKiezkasse, scope.isBurgerhaushalt);
 
             scope.submit = () => {
@@ -456,11 +478,11 @@ export var register = (angular) => {
             adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list");
         }])
         .directive("adhMeinBerlinProposalDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", detailDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", detailDirective])
         .directive("adhMeinBerlinProposalListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", listItemDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", listItemDirective])
         .directive("adhMeinBerlinProposalMapListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", mapListItemDirective])
+            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", mapListItemDirective])
         .directive("adhMeinBerlinProposalCreate", [
             "adhConfig",
             "adhHttp",
@@ -484,6 +506,7 @@ export var register = (angular) => {
             "adhTopLevelState",
             "adhGetBadges",
             "$location",
+            "$q",
             editDirective
         ]);
 };

@@ -11,15 +11,16 @@ export var parseMarkdown = (adhConfig : AdhConfig.IService, markdownit) => {
         restrict: "E",
         link: (scope, element) => {
             var md = new markdownit();
-            var mdEl = angular.element("<div class=\"markdown-rendered\"></div>");
 
-            scope.$watch("parsetext", (newValue) => {
-                var mdElPrev = angular.element(element[0].querySelector(".markdown-rendered"));
-                if (mdElPrev) {
-                    mdElPrev.remove();
+            element.html("<div class=\"markdown-rendered\"></div>");
+            var wrapper = element.find(".markdown-rendered");
+
+            scope.$watch("parsetext", (newValue : string) => {
+                if (newValue) {
+                    wrapper.html(md.render(newValue));
+                } else {
+                    wrapper.html("");
                 }
-                mdEl.append(md.render(newValue));
-                element.append(mdEl);
             });
         }
     };
