@@ -20,6 +20,6 @@ Email-Adresse
 ${email}
 
 
-Ihre Stellungsnahme
+Ihre Stellungnahme
 
 ${statement}
