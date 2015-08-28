@@ -807,6 +807,17 @@ class TestAddGetPoolRequestExtraFields:
         schema_extended = self.call_fut(cstruct, schema, context, None)
         assert isinstance(schema_extended[index_name], Integer)
 
+    def test_call_with_extra_datetime_filter(self, schema, context):
+        from datetime import datetime
+        from adhocracy_core.schema import DateTime
+        index_name = 'date_index'
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=[datetime.now()])
+        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
+        cstruct = {index_name: datetime.now()}
+        schema_extended = self.call_fut(cstruct, schema, context, None)
+        assert isinstance(schema_extended[index_name], DateTime)
+
     def test_call_with_extra_reference_name(self, schema, registry):
         from adhocracy_core.schema import Resource
         from adhocracy_core.schema import Reference
