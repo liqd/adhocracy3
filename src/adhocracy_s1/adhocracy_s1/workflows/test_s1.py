@@ -107,6 +107,7 @@ class TestChangeChildrenToRejected:
 
     def test_change_most_rated_child_to_selected_and_other_to_rejected(
             self, context, item, request_, registry, mock_sheet, mock_catalogs):
+        from datetime import datetime
         from unittest.mock import call
         version_most_rated = testing.DummyResource()
         item['version'] = version_most_rated
@@ -116,10 +117,18 @@ class TestChangeChildrenToRejected:
         mock_catalogs.search.return_value =\
             mock_catalogs.search.return_value._replace(elements=[version_most_rated, version])
         mock_sheet.get.return_value = {'workflow_state': 'voteable'}
-        self.call_fut(context, request_)
+        decision_date = datetime.now()
+        self.call_fut(context, request_, decision_date=decision_date)
         # this is a ugly test assertion, it depends on call order
-        call({'workflow_state': 'selected'}, request=request_) in mock_sheet.set.call_args_list
-        call({'workflow_state': 'rejected'}, request=request_) in mock_sheet.set.call_args_list
+        assert mock_sheet.set.call_args_list ==\
+            [call({'workflow_state': 'selected',
+                   'state_data': [{'start_date': decision_date,
+                                   'name': 'selected'}]},
+                     request=request_),
+             call({'workflow_state': 'rejected',
+                   'state_data': [{'start_date': decision_date,
+                                   'name': 'rejected'}]},
+                      request=request_)]
 
 
 @mark.usefixtures('integration')
