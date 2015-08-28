@@ -18,11 +18,11 @@ export var movingColumns = (
     $window
 ) => {
     return {
-        link: (scope, element) => {
+        link: (scope, element, attrs) => {
             var cls : string;
             var fontSize : number = parseInt(element.css("font-size"), 10);
-
-            var maxShowWidth = 55 * fontSize;
+            var maxWidth = attrs.maxWidth ? attrs.maxWidth : 55;
+            var maxShowWidth = maxWidth * fontSize;
             var minShowWidth = 35 * fontSize;
             var collapseWidth = 2 * fontSize;
             var spacing = Math.ceil(0.3 * fontSize);
