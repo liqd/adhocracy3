@@ -19,7 +19,7 @@ PLZ, Ort
 
 ${postal_code_city}
 
-Email Adresse
+Email-Adresse
 
 ${email}
 
