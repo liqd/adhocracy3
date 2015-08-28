@@ -33,7 +33,7 @@ ein zukunftsweisendes Grundsatzprogramm auf den Weg bringen können.
 Die Debatte findet über die Software Adhocracy statt. Es wurde bereits
 ein Account für Sie mit folgenden Daten angelegt:
 
-    Registrierte Email: ${email}
+    Registrierte E-Mail: ${email}
     Pseudonymisierter Benutzername: ${user_name}
 
 Bevor Sie an der Diskussion teilnehmen können, müssen Sie noch unter

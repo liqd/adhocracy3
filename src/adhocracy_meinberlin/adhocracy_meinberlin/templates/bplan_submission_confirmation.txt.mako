@@ -16,7 +16,7 @@ ${street_number}
 PLZ, Ort
 ${postal_code_city}
 
-Email-Adresse
+E-Mail-Adresse
 ${email}
 
 
