@@ -75,6 +75,8 @@ def _do_transition(context, request: Request, from_state: str, to_state: str):
         current_state = sheet.get()['workflow_state']
         if current_state == from_state:
             sheet.set({'workflow_state': to_state}, request=request)
+            catalogs = find_service(context, 'catalogs')
+            catalogs.reindex_index(context, 'decision_date')
 
 s1_meta = freeze({
     'initial_state': 'propose',

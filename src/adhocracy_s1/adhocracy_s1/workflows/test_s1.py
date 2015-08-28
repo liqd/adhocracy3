@@ -45,6 +45,7 @@ class TestChangeChildrenToVotable:
         self.call_fut(context, request_)
         mock_sheet.set.assert_called_with({'workflow_state': 'voteable'},
                                           request=request_)
+        mock_catalogs.reindex_index.call_args == call(context['child'], 'decision_date')
 
 
 class TestChangeChildrenToRejected:
@@ -247,6 +248,10 @@ class TestS1Workflow:
         resp = app_participant.get('/s1')
         state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
         decision_date = [x['start_date'] for x in state_data if x['name'] == 'result'][0]
+        resp = app_participant.get('/s1', {'decision_date': decision_date})
+        assert resp.json['data'][IPool.__identifier__]['elements'] == \
+             ['http://localhost/s1/proposal_0000000/',
+              'http://localhost/s1/proposal_0000001/']
 
 
 @mark.usefixtures('integration')
@@ -257,12 +262,13 @@ def test_s1_content_includeme_add_workflow(registry):
 
 
 @mark.usefixtures('integration')
-def test_s1_content_initiate_and_transition_to_selected(registry, context,
-                                                        request_):
+def test_s1_content_initiate_and_transition_to_selected(registry, request_):
+    from adhocracy_s1.resources.s1 import IProcess
+    process = testing.DummyResource(__provides__=IProcess)
     workflow = registry.content.workflows['s1_content']
-    workflow.initialize(context)
-    assert workflow.state_of(context) is 'proposed'
-    workflow.transition_to_state(context, request_, 'voteable')
-    workflow.transition_to_state(context, request_, 'selected')
+    workflow.initialize(process)
+    assert workflow.state_of(process) is 'proposed'
+    workflow.transition_to_state(process, request_, 'voteable')
+    workflow.transition_to_state(process, request_, 'selected')
 
 

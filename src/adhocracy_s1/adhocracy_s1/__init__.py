@@ -13,6 +13,7 @@ def includeme(config):
     # add translations
     config.add_translation_dirs('adhocracy_core:locale/')
     # add extensions
+    config.include('.catalog')
     config.include('.sheets')
     config.include('.resources')
     config.include('.workflows')
