@@ -4,12 +4,7 @@
     </a>
     <a class="s1-header-link" data-ng-href="{{ processUrl | adhResourceUrl:'archive' }}">Archiv</a>
 
-    <span class="button-group">
-        <a class="button" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}">Sitzung A</a>
-        <a class="button m-call-to-action" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">vorschlag machen</a>
-    </span>
-
-    <a class="button" data-ng-href="{{ processUrl | adhResourceUrl:'next' }}">Sitzung B</a>
+    <adh-s1-meeting-selector></adh-s1-meeting-selector>
 
     <adh-user-indicator></adh-user-indicator>
 
