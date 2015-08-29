@@ -21,6 +21,17 @@
 }
 
 @font-face {
+    font-family: "Roboto";
+    src: font-url("../lib/roboto-fontface/fonts/Roboto-Medium.eot"); /* IE9 Compat Modes */
+    src: font-url("../lib/roboto-fontface/fonts/Roboto-Medium.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         font-url("../lib/roboto-fontface/fonts/Roboto-Medium.woff") format("woff"), /* Modern Browsers */
+         font-url("../lib/roboto-fontface/fonts/Roboto-Medium.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 500;
+    text-rendering: optimizeLegibility;
+}
+
+@font-face {
     font-family: "Merriweather";
     src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Regular.eot"); /* IE9 Compat Modes */
     src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Regular.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
