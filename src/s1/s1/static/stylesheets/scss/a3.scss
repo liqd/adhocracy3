@@ -6,7 +6,6 @@
 @import "compass/css3/inline-block";
 @import "compass/css3/text-shadow";
 @import "compass/utilities/general/clearfix";
-@import "compass/typography/text/replacement";
 @import "general/future";
 @import "general/a11y";
 
@@ -38,6 +37,7 @@
 @import "components/messaging";
 @import "components/listing";
 @import "components/user_indicator";
+@import "components/user_indicator_theme";
 @import "components/comment";
 @import "components/annotated_section";
 @import "components/commentable_section";

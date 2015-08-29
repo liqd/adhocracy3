@@ -1,0 +1,29 @@
+.s1-header {
+    @include rem(padding-top, 10px);
+
+    .s1-header-logo-link, .button,
+    .user-indicator {
+        @include rem(margin-right, 60px);
+    }
+
+    .button-group {
+        .button {
+            margin-right: 0;
+        }
+    }
+}
+
+.s1-header-logo-link {
+    @include inline-block;
+    @include rem(line-height, 30px);
+
+    &:hover, &:focus {
+        color: $color-text-normal;
+    }
+}
+
+.s1-header-logo {
+    @include rem(font-size, 17px);
+    @include rem(margin-left, 24px);
+    color: $color-brand-one-normal;
+}

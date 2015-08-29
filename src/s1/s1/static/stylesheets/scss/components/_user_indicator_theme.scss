@@ -1,0 +1,22 @@
+.user-indicator {
+    .user-indicator-logout,
+    .user-indicator-login,
+    .user-indicator-register {
+        @include rem(height, 30px);
+        @include rem(font-size, $font-size-normal);
+        @include rem(line-height, 30px);
+        @include rem(border-radius, 15px);
+        color: $color-button-text;
+        font-variant: none;
+        font-weight: $font-weight-medium;
+        text-transform: uppercase;
+
+        &:hover:enabled, &:focus:enabled {
+            color: $color-button-text-hover;
+        }
+
+        &:active:enabled {
+            color: $color-text-normal;
+        }
+    }
+}
