@@ -160,7 +160,7 @@ export var registerRoutes = (
                 return (resource : RIS1Process) => {
                     return adhHttp.options(resource.path).then((options) => {
                         if (options.POST) {
-                            var processState = resource.data[SIWorkflowAssignment.nick].workflow_stat;
+                            var processState = resource.data[SIWorkflowAssignment.nick].workflow_state;
                             return {
                                 meeting: processState === "propose" ? "current" : "next"
                             };
