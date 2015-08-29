@@ -538,12 +538,14 @@ def _find_index_if_arbitrary_filter_node(name: str,
 
 
 def _add_arbitrary_filter_node(name, index: SDIndex, schema):
-    int_index = False
+    node = SingleLine(name=name)
     if 'unique_values' in index.__dir__():
         indexed_values = index.unique_values()
-        if indexed_values and isinstance(indexed_values[0], int):
-            int_index = True
-    node = Integer(name=name) if int_index else SingleLine(name=name)
+        example_value = indexed_values and indexed_values[0]
+        if isinstance(example_value, int):
+            node = Integer(name=name)
+        elif isinstance(example_value, datetime):
+            node = DateTime(name=name)
     node = node.bind(**schema.bindings)
     schema.add(node)
 
