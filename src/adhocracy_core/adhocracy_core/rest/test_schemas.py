@@ -544,7 +544,7 @@ class TestPOSTBatchRequestSchema:
             inst.deserialize(data)
 
 
-class TestGETPoolRequestSchema():
+class TestGETPoolRequestSchema:
 
     @fixture
     def context(self, pool):
@@ -578,6 +578,8 @@ class TestGETPoolRequestSchema():
         from adhocracy_core.interfaces import Reference
         from adhocracy_core.schema import Resource
         from adhocracy_core.schema import Integer
+        from adhocracy_core.schema import ContentType
+        from adhocracy_core.schema import Interface
         from hypatia.interfaces import IIndexSort
         catalog = context['catalogs']['adhocracy']
         catalog['index1'] = testing.DummyResource(unique_values=lambda x: x,
@@ -599,10 +601,12 @@ class TestGETPoolRequestSchema():
                    ISheet.__identifier__ + ':x': '/',
                    }
         target = context
-        wanted = {'indexes': {'index1': 1, 'index2': 1},
+        wanted = {'indexes': {'index1': 1,
+                              'index2': 1,
+                              'content_type': IResource.__identifier__},
                   'depth': 100,
                   'frequency_of': 'index1',
-                  'interfaces': (IName, IResource),
+                  'interfaces': (IName,),
                   'limit': 2,
                   'offset': 1,
                   'references': [Reference(None, ISheet, 'x', target)],
@@ -619,6 +623,10 @@ class TestGETPoolRequestSchema():
         node = Integer(name='index1').bind(**inst.bindings)
         inst.add(node)
         node = Integer(name='index2').bind(**inst.bindings)
+        inst.add(node)
+        node = colander.SchemaNode(Interface(), name='sheet').bind(**inst.bindings)
+        inst.add(node)
+        node = ContentType(name='content_type').bind(**inst.bindings)
         inst.add(node)
         assert inst.deserialize(cstruct) == wanted
 
@@ -749,6 +757,19 @@ class TestAddGetPoolRequestExtraFields:
         cstruct = {index_name: 'keyword'}
         schema_extended = self.call_fut(cstruct, schema, None, None)
         assert index_name not in schema_extended
+
+    def test_call_with_extra_sheet_filter(self, schema, context):
+        from adhocracy_core.schema import Interface
+        cstruct = {'sheet': 'sheet.x1'}
+        schema_extended = self.call_fut(cstruct, schema, context, None)
+        assert isinstance(schema_extended['sheet'], colander.SchemaNode)
+        assert isinstance(schema_extended['sheet'].typ, Interface)
+
+    def test_call_with_extra_content_type_filter(self, schema, context):
+        from adhocracy_core.schema import ContentType
+        cstruct = {'content_type': 'resource1'}
+        schema_extended = self.call_fut(cstruct, schema, context, None)
+        assert isinstance(schema_extended['content_type'], ContentType)
 
     def test_call_with_extra_filter_wrong(self, schema, context):
         index_name = 'index1'

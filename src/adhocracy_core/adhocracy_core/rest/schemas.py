@@ -394,8 +394,6 @@ class GETPoolRequestSchema(colander.Schema):
     # Elements in this schema were multiple values should be allowed:
     # sheet, aggregateby, tag.
 
-    content_type = ContentType(missing=colander.drop)
-    sheet = SchemaNode(Interface(), missing=colander.drop)
     depth = PoolQueryDepth(missing=colander.drop)
     elements = PoolElementsForm(missing=colander.drop)
     count = SchemaNode(colander.Boolean(), missing=colander.drop)
@@ -436,8 +434,6 @@ class GETPoolRequestSchema(colander.Schema):
         interfaces = ()
         if 'sheet' in appstruct:
             interfaces += (appstruct['sheet'],)
-        if 'content_type' in appstruct:
-            interfaces += (appstruct['content_type'],)
         if interfaces:
             search_query['interfaces'] = interfaces
         if 'aggregateby' in appstruct:
@@ -454,6 +450,7 @@ class GETPoolRequestSchema(colander.Schema):
         if 'count' in appstruct:
             search_query['show_count'] = appstruct['count']
         fields = tuple([x.name for x in GETPoolRequestSchema().children])
+        fields += ('sheet',)
         for key, value in appstruct.items():
             if key in fields + SearchQuery._fields:
                 continue
@@ -469,6 +466,9 @@ class GETPoolRequestSchema(colander.Schema):
                 if 'indexes' not in search_query:
                     search_query['indexes'] = {}
                 search_query['indexes'][key] = value
+        if 'content_type' in appstruct:
+            content_type = appstruct['content_type'].__identifier__
+            search_query['indexes']['content_type'] = content_type
         return search_query
 
 
@@ -485,6 +485,12 @@ def add_get_pool_request_extra_fields(cstruct: dict,
         if _maybe_reference_filter_node(name, registry):
             _add_reference_filter_node(name, schema_extra)
         else:
+            if name == 'content_type':
+                _add_content_type_filter_node(schema_extra)
+                continue
+            elif name == 'sheet':
+                _add_sheet_filter_node(schema_extra)
+                continue
             index = _find_index_if_arbitrary_filter_node(name, context)
             if index is not None:
                 _add_arbitrary_filter_node(name, index, schema_extra)
@@ -544,6 +550,21 @@ def _add_arbitrary_filter_node(name, index: SDIndex, schema):
         if indexed_values and isinstance(indexed_values[0], int):
             int_index = True
     node = Integer(name=name) if int_index else SingleLine(name=name)
+    node = node.bind(**schema.bindings)
+    schema.add(node)
+
+
+def _add_content_type_filter_node(schema: SchemaNode):
+    node = ContentType(name='content_type',
+                       missing=colander.drop)
+    node = node.bind(**schema.bindings)
+    schema.add(node)
+
+
+def _add_sheet_filter_node(schema: SchemaNode):
+    node = SchemaNode(Interface(),
+                      name='sheet',
+                      missing=colander.drop)
     node = node.bind(**schema.bindings)
     schema.add(node)
 
