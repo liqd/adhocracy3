@@ -1,9 +1,11 @@
 <div class="s1-header">
-    <span class="s1-header-logo">PARTOU.</span>
+    <a data-ng-href="{{ processUrl | adhResourceUrl }}">
+        <span class="s1-header-logo">PARTOU.</span>
+    </a>
     <a class="s1-header-link" data-ng-href="{{ processUrl | adhResourceUrl:'archive' }}">Archiv</a>
 
     <span class="button-group">
-        <a class="button" data-ng-href="{{ processUrl | adhResourceUrl }}">Sitzung A</a>
+        <a class="button" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}">Sitzung A</a>
         <a class="button m-call-to-action" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">vorschlag machen</a>
     </span>
 

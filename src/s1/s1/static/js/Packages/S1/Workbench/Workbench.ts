@@ -144,6 +144,9 @@ export var registerRoutes = (
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
     adhResourceAreaProvider
         .default(RIS1Process, "", processType, context, {
+            space: "content"
+        })
+        .default(RIS1Process, "current", processType, context, {
             space: "content",
             meeting: "current",
             movingColumns: "is-show-hide-hide"
