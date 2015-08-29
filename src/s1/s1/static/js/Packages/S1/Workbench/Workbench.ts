@@ -144,6 +144,9 @@ export var registerRoutes = (
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
     adhResourceAreaProvider
         .default(RIS1Process, "", processType, context, {
+            space: "content"
+        })
+        .default(RIS1Process, "current", processType, context, {
             space: "content",
             meeting: "current",
             movingColumns: "is-show-hide-hide"
@@ -157,7 +160,7 @@ export var registerRoutes = (
                 return (resource : RIS1Process) => {
                     return adhHttp.options(resource.path).then((options) => {
                         if (options.POST) {
-                            var processState = resource.data[SIWorkflowAssignment.nick].workflow_stat;
+                            var processState = resource.data[SIWorkflowAssignment.nick].workflow_state;
                             return {
                                 meeting: processState === "propose" ? "current" : "next"
                             };
