@@ -594,19 +594,19 @@ search_result = SearchResult(elements=[],
                              group_by={})
 
 
-class SearchComparator(Enum):
+class Comparator(Enum):
 
     """Comparators for search query parameters."""
 
 
-class ReferenceIndexSearchComparator(SearchComparator):
+class ReferenceComparator(Comparator):
 
     """Comparators for :class:`adhocracy_core.catalog.index.ReferenceIndex`."""
 
     eq = 'eq'
 
 
-class FieldIndexSearchComparator(SearchComparator):
+class FieldComparator(Comparator):
 
     """Comparators for :class:`hypatia.field.FieldIndex` search index."""
 
@@ -616,16 +616,34 @@ class FieldIndexSearchComparator(SearchComparator):
     ge = 'ge'
     lt = 'lt'
     le = 'le'
+
+
+class FieldSequenceComparator(Comparator):
+
+    """Comparators for :class:`hypatia.field.FieldIndex` search index.
+
+    These comparators need to be combined with a sequence of index values.
+    """
+
     any = 'any'
     notany = 'notany'
 
 
-class KeywordIndexSearchComparator(SearchComparator):
+class KeywordComparator(Comparator):
 
     """Comparators for :class:`hypatia.keyword.KeywordIndex` search index."""
 
     eq = 'eq'
     noteq = 'noteq'
+
+
+class KeywordSequenceComparator(Comparator):
+
+    """Comparators for :class:`hypatia.keyword.KeywordIndex` search index.
+
+    These comparators need to be combined with a sequence of index values.
+    """
+
     any = 'any'
     notany = 'notany'
 

@@ -142,7 +142,8 @@ def validate_request_data(context: ILocation, request: Request,
     if request.content_type == 'application/json':
         body = _extract_json_body(request)
     validate_user_headers(request)
-    validate_body_or_querystring(body, schema_with_binding, context,
+    qs = _extract_querystring(request)
+    validate_body_or_querystring(body, qs, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
     if request.errors:
@@ -171,6 +172,18 @@ def _extract_json_body(request: Request) -> object:
     return json_body
 
 
+def _extract_querystring(request: Request) -> dict:
+    parameters = {}
+    for key, value_encoded in request.GET.items():
+        import json
+        try:
+            value = json.loads(value_encoded)
+        except (ValueError, TypeError):
+            value = value_encoded
+        parameters[key] = value
+    return parameters
+
+
 def validate_user_headers(request: Request):
     """
     Validate the user headers.
@@ -185,13 +198,12 @@ def validate_user_headers(request: Request):
             request.errors.append(error)
 
 
-def validate_body_or_querystring(body, schema: MappingSchema,
+def validate_body_or_querystring(body, qs: dict, schema: MappingSchema,
                                  context: IResource, request: Request):
     """Validate the querystring if this is a GET request, the body otherwise.
 
     This allows using just a single schema for all kinds of requests.
     """
-    qs = request.GET
     if isinstance(schema, GETPoolRequestSchema):
         try:
             schema = add_arbitrary_filter_nodes(qs,

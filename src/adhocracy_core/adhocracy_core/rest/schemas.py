@@ -11,9 +11,15 @@ from pyramid.util import DottedNameResolver
 from substanced.catalog.indexes import SDIndex
 from substanced.util import find_catalog
 from substanced.util import find_service
+from hypatia.field import FieldIndex
+from hypatia.keyword import KeywordIndex
 from zope.interface.interface import InterfaceClass
+from adhocracy_core.interfaces import FieldComparator
+from adhocracy_core.interfaces import FieldSequenceComparator
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IUserLocator
+from adhocracy_core.interfaces import KeywordComparator
+from adhocracy_core.interfaces import KeywordSequenceComparator
 from adhocracy_core.interfaces import Reference as ReferenceTuple
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import SheetToSheet
@@ -21,11 +27,15 @@ from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
+from adhocracy_core.schema import Booleans
 from adhocracy_core.schema import ContentType
 from adhocracy_core.schema import DateTime
+from adhocracy_core.schema import DateTimes
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import Integer
+from adhocracy_core.schema import Integers
 from adhocracy_core.schema import Interface
+from adhocracy_core.schema import Interfaces
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import References
@@ -34,6 +44,7 @@ from adhocracy_core.schema import ResourcePathAndContentSchema
 from adhocracy_core.schema import ResourcePathSchema
 from adhocracy_core.schema import Resources
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import SingleLines
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
 from adhocracy_core.sheets.metadata import IMetadata
@@ -439,7 +450,7 @@ class GETPoolRequestSchema(colander.Schema):
                 search_query['resolve'] = False
         interfaces = ()
         if 'sheet' in appstruct:
-            interfaces += (appstruct['sheet'],)
+            interfaces = appstruct['sheet']
         if interfaces:
             search_query['interfaces'] = interfaces
         if 'aggregateby' in appstruct:
@@ -476,7 +487,6 @@ class GETPoolRequestSchema(colander.Schema):
                     continue
                 search_query['indexes'][filter] = query
         return search_query
-
 
 
 
@@ -538,10 +548,22 @@ def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:
         return index is not None
 
 
+def _get_index_value_type(index: SDIndex) -> object:
+    if index is None:
+        return
+    if 'unique_values' in index.__dir__():
+        indexed_values = index.unique_values()
+        return indexed_values and indexed_values[0]
+    elif index.__name__ == 'reference':
+        return object()
+    return None
+
+
 def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
     node = node.bind(**schema.bindings)
     node.name = name
     schema.add(node)
+
 
 @dispatch(object, str, str)  # flake8: noqa
 def create_arbitrary_filter_node(index, value_type, query):
@@ -558,12 +580,28 @@ def create_arbitrary_filter_node(index, value_type, query):
     return Boolean()
 
 
+@dispatch(FieldIndex, bool, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableBooleans()
+    else:
+        return FieldComparableBoolean()
+
+
 @dispatch(object, datetime, str)  # flake8: noqa
 def create_arbitrary_filter_node(index, value_type, query):
     return DateTime()
 
 
-@dispatch(object, InterfaceClass, str)  # flake8: noqa
+@dispatch(FieldIndex, datetime, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableDateTimes()
+    else:
+        return FieldComparableDateTime()
+
+
+@dispatch(KeywordIndex, InterfaceClass, str)  # flake8: noqa
 def create_arbitrary_filter_node(index, value_type, query):
     return Interface()
 
@@ -573,15 +611,276 @@ def create_arbitrary_filter_node(index, value_type, query):
     return Resource()
 
 
-def _get_index_value_type(index: SDIndex) -> object:
-    if index is None:
-        return
-    if 'unique_values' in index.__dir__():
-        indexed_values = index.unique_values()
-        return indexed_values and indexed_values[0]
-    elif index.__name__ == 'reference':
-        return object()
-    return None
+@dispatch(KeywordIndex, int, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    if query[0] in KeywordSequenceComparator.__members__:
+        return KeywordComparableIntegers()
+    else:
+        return KeywordComparableInteger()
+
+
+@dispatch(FieldIndex, int, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableIntegers()
+    else:
+        return FieldComparableInteger()
+
+
+@dispatch(KeywordIndex, str, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    if query[0] in KeywordSequenceComparator.__members__:
+        return KeywordComparableSingleLines()
+    else:
+        return KeywordComparableSingleLine()
+
+
+@dispatch(FieldIndex, str, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    if query[0] in FieldSequenceComparator.__members__:
+        return FieldComparableSingleLines()
+    else:
+        return FieldComparableSingleLine()
+
+
+@dispatch(KeywordIndex, InterfaceClass, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, value_type, query):
+    if query[0] in KeywordSequenceComparator.__members__:
+        return KeywordComparableInterfaces()
+    else:
+        return KeywordComparableInterface()
+
+
+class KeywordComparableSchema(SingleLine):
+
+    """SingleLine of KeywordComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in KeywordComparator.__members__])
+
+
+class FieldComparableSchema(SingleLine):
+
+    """SingleLine of FieldComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldComparator.__members__])
+
+
+class KeywordSequenceComparableSchema(SingleLine):
+
+    """SingleLine of KeywordSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in KeywordSequenceComparator.__members__])
+
+
+class FieldSequenceComparableSchema(SingleLine):
+
+    """SingleLine of FieldSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldSequenceComparator.__members__])
+
+
+class KeywordComparableSequenceBase(colander.TupleSchema):
+
+    """Tuple with value KeywordSequenceComparable."""
+
+    comparable = KeywordSequenceComparableSchema()
+
+
+class KeywordComparableIntegers(KeywordComparableSequenceBase):
+
+    """Tuple with values KeywordSequenceComparable and Integers."""
+
+    value = Integers()
+
+
+class KeywordComparableInterfaces(KeywordComparableSequenceBase):
+
+    """Tuple with values KeywordSequenceComparable and Interfaces."""
+
+    value = Interfaces()
+
+
+class KeywordComparableSingleLines(KeywordComparableSequenceBase):
+
+    """Tuple with values KeywordSequenceComparable and SingleLines."""
+
+    value = SingleLines()
+
+
+class KeywordComparableDateTimes(KeywordComparableSequenceBase):
+
+    """Tuple with values KeywordSequenceComparable and DateTimes."""
+
+    value = DateTimes()
+
+
+class KeywordComparableBooleans(KeywordComparableSequenceBase):
+
+    """Tuple with values KeywordSequenceComparable and Booleans."""
+
+    value = Booleans()
+
+
+class KeywordComparableBase(colander.TupleSchema):
+
+    """Tuple with value KeywordComparable."""
+
+    comparable = KeywordComparableSchema()
+
+
+class KeywordComparableInteger(KeywordComparableBase):
+
+    """Tuple with values KeywordComparable and Integer."""
+
+    value = Integer()
+
+
+class KeywordComparableInterface(KeywordComparableBase):
+
+    """Tuple with values KeywordComparable and Interface."""
+
+    value = Interface()
+
+
+class KeywordComparableSingleLine(KeywordComparableBase):
+
+    """Tuple with values KeywordComparable and SingleLine."""
+
+    value = SingleLine()
+
+
+class KeywordComparableBoolean(KeywordComparableBase):
+
+    """Tuple with values KeywordComparable and Boolean."""
+
+    value = Boolean()
+
+
+class KeywordComparableDateTime(KeywordComparableBase):
+
+    """Tuple with values KeywordComparable and DateTime."""
+
+    value = DateTime()
+
+
+class FieldComparableSchema(SingleLine):
+
+    """SingleLine of FieldComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldComparator.__members__])
+
+
+class FieldComparableSchema(SingleLine):
+
+    """SingleLine of FieldComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldComparator.__members__])
+
+
+class FieldSequenceComparableSchema(SingleLine):
+
+    """SingleLine of FieldSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldSequenceComparator.__members__])
+
+
+class FieldSequenceComparableSchema(SingleLine):
+
+    """SingleLine of FieldSequenceComparable value."""
+
+    validator = colander.OneOf(
+        [x for x in FieldSequenceComparator.__members__])
+
+
+class FieldComparableSequenceBase(colander.TupleSchema):
+
+    """Tuple with value FieldSequenceComparable."""
+
+    comparable = FieldSequenceComparableSchema()
+
+
+class FieldComparableIntegers(FieldComparableSequenceBase):
+
+    """Tuple with values FieldSequenceComparable and Integers."""
+
+    value = Integers()
+
+
+class FieldComparableInterfaces(FieldComparableSequenceBase):
+
+    """Tuple with values FieldSequenceComparable and Interfaces."""
+
+    value = Interfaces()
+
+
+class FieldComparableSingleLines(FieldComparableSequenceBase):
+
+    """Tuple with values FieldSequenceComparable and SingleLines."""
+
+    value = SingleLines()
+
+
+class FieldComparableDateTimes(FieldComparableSequenceBase):
+
+    """Tuple with values FieldSequenceComparable and DateTimes."""
+
+    value = DateTimes()
+
+
+class FieldComparableBooleans(FieldComparableSequenceBase):
+
+    """Tuple with values FieldSequenceComparable and Booleans."""
+
+    value = Booleans()
+
+
+class FieldComparableBase(colander.TupleSchema):
+
+    """Tuple with value FieldComparable."""
+
+    comparable = FieldComparableSchema()
+
+
+class FieldComparableInteger(FieldComparableBase):
+
+    """Tuple with values FieldComparable and Integer."""
+
+    value = Integer()
+
+
+class FieldComparableInterface(FieldComparableBase):
+
+    """Tuple with values FieldComparable and Interface."""
+
+    value = Interface()
+
+
+class FieldComparableSingleLine(FieldComparableBase):
+
+    """Tuple with values FieldComparable and SingleLine."""
+
+    value = SingleLine()
+
+
+class FieldComparableBoolean(FieldComparableBase):
+
+    """Tuple with values FieldComparable and Boolean."""
+
+    value = Boolean()
+
+
+class FieldComparableDateTime(FieldComparableBase):
+
+    """Tuple with values FieldComparable and DateTime."""
+
+    value = DateTime()
 
 
 options_resource_response_data_dict =\

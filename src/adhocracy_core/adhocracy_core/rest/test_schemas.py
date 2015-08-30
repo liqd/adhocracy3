@@ -572,19 +572,22 @@ class TestGETPoolRequestSchema:
         assert inst.deserialize({}) == {}
 
     def test_deserialize_valid(self, inst, context):
+        from hypatia.interfaces import IIndexSort
         from adhocracy_core.sheets.name import IName
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import IResource
         from adhocracy_core.interfaces import Reference
         from adhocracy_core.schema import Resource
         from adhocracy_core.schema import Integer
-        from adhocracy_core.schema import SingleLine
         from adhocracy_core.schema import Interface
-        from hypatia.interfaces import IIndexSort
+        from .schemas import KeywordComparableInteger
+        from .schemas import KeywordComparableIntegers
         catalog = context['catalogs']['adhocracy']
         catalog['index1'] = testing.DummyResource(unique_values=lambda x: x,
                                                   __provides__=IIndexSort)
         catalog['index2'] = testing.DummyResource(unique_values=lambda x: x,
+                                                  __provides__=IIndexSort)
+        catalog['index3'] = testing.DummyResource(unique_values=lambda x: x,
                                                   __provides__=IIndexSort)
         cstruct = {'aggregateby': 'index1',
                    'content_type': 'adhocracy_core.interfaces.IResource',
@@ -592,7 +595,8 @@ class TestGETPoolRequestSchema:
                    'depth': '100',
                    'elements': 'content',
                    'index1': 1,
-                   'index2': 1,
+                   'index2': ['eq', 1],
+                   'index3': ['any', [1, 3]],
                    'limit': 2,
                    'offset': 1,
                    'reverse': 'True',
@@ -602,11 +606,12 @@ class TestGETPoolRequestSchema:
                    }
         target = context
         wanted = {'indexes': {'index1': 1,
-                              'index2': 1,
-                              'interfaces': IResource},
+                              'index2': ('eq', 1),
+                              'interfaces': IResource,
+                              'index3': ('any', [1, 3])},
                   'depth': 100,
                   'frequency_of': 'index1',
-                  'interfaces': (IName,),
+                  'interfaces': IName,
                   'limit': 2,
                   'offset': 1,
                   'references': [Reference(None, ISheet, 'x', target)],
@@ -620,13 +625,15 @@ class TestGETPoolRequestSchema:
         inst = inst.bind(context=context)
         node = Resource(name=ISheet.__identifier__ + ':x').bind(**inst.bindings)
         inst.add(node)
-        node = Integer(name='index1').bind(**inst.bindings)
+        node = Integer(name='index1')
         inst.add(node)
-        node = Integer(name='index2').bind(**inst.bindings)
+        node = KeywordComparableInteger(name='index2')
         inst.add(node)
-        node = colander.SchemaNode(Interface(), name='sheet').bind(**inst.bindings)
+        node = KeywordComparableIntegers(name='index3')
         inst.add(node)
         node = Interface(name='content_type').bind(**inst.bindings)
+        inst.add(node)
+        node = Interface(name='sheet').bind(**inst.bindings)
         inst.add(node)
         assert inst.deserialize(cstruct) == wanted
 
@@ -728,7 +735,93 @@ class TestGETPoolRequestSchema:
             inst.deserialize(data)
 
 
-class TestAddArbitraryFiltrNodes:
+class TestKeywordComparableSingeLine:
+
+    @fixture
+    def inst(self):
+        from .schemas import KeywordComparableSchema
+        return KeywordComparableSchema()
+
+    def test_create(self, inst):
+        from adhocracy_core.interfaces import KeywordComparator
+        assert inst.validator.choices ==\
+                [x for x in KeywordComparator.__members__]
+
+    def test_deserialize_empty(self, inst, context):
+        import colander
+        assert inst.deserialize() == colander.drop
+
+    def test_deserialize_invalid(self, inst, context):
+        from colander import Invalid
+        with raises(Invalid):
+            inst.deserialize('wrong')
+
+
+class TestFieldComparableSingleLine:
+
+    @fixture
+    def inst(self):
+        from .schemas import FieldComparableSchema
+        return FieldComparableSchema()
+
+    def test_create(self, inst):
+        from adhocracy_core.interfaces import FieldComparator
+        assert inst.validator.choices ==\
+                [x for x in FieldComparator.__members__]
+
+    def test_deserialize_empty(self, inst, context):
+        import  colander
+        assert inst.deserialize() == colander.drop
+
+    def test_deserialize_invalid(self, inst, context):
+        from colander import Invalid
+        with raises(Invalid):
+            inst.deserialize('wrong')
+
+
+def test_keyword_index_comparable_intergers_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableIntegers()
+    assert isinstance(inst, colander.TupleSchema)
+    assert isinstance(inst['comparable'], schemas.KeywordSequenceComparableSchema)
+    assert isinstance(inst['value'], schemas.Integers)
+
+
+def test_keyword_index_comparable_integer_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableInteger()
+    assert isinstance(inst['comparable'], schemas.KeywordComparableSchema)
+    assert isinstance(inst['value'], schemas.Integer)
+
+def test_keyword_index_comparable_singlelines_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableSingleLines()
+    assert isinstance(inst['comparable'], schemas.KeywordSequenceComparableSchema)
+    assert isinstance(inst['value'], schemas.SingleLines)
+
+
+def test_keyword_index_comparable_singleline_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableSingleLine()
+    assert isinstance(inst['comparable'], schemas.KeywordComparableSchema)
+    assert isinstance(inst['value'], schemas.SingleLine)
+
+
+def test_keyword_index_comparable_datetimes_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableDateTimes()
+    assert isinstance(inst['comparable'], schemas.KeywordSequenceComparableSchema)
+    assert isinstance(inst['value'], schemas.DateTimes)
+
+
+def test_keyword_index_comparable_datetime_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableDateTime()
+    assert isinstance(inst['comparable'], schemas.KeywordComparableSchema)
+    assert isinstance(inst['value'], schemas.DateTime)
+
+
+class TestAddArbitraryFilterNodes:
 
     @fixture
     def schema(self, context):
@@ -844,23 +937,34 @@ class TestCreateArbitraryFilterNode:
 
     from datetime import datetime
     from hypatia.keyword import KeywordIndex
-    from hypatia.util import BaseIndexMixin
+    from hypatia.field import FieldIndex
     from adhocracy_core.catalog.index import ReferenceIndex
     from adhocracy_core import schema
     from adhocracy_core.resources.base import Base
+    from . import schemas as rest_schemas
 
     def call_fut(self, *args):
         from .schemas import  create_arbitrary_filter_node
         return create_arbitrary_filter_node(*args)
 
     @mark.parametrize("index, index_value, query, wanted_schema_class",
-                      [(BaseIndexMixin(), 'str', 'str', schema.SingleLine),
-                       (BaseIndexMixin(), 1, '1', schema.Integer),
-                       (BaseIndexMixin(), 1, 1, schema.Integer),
-                       (BaseIndexMixin(), True, 'True', schema.Boolean),
-                       (BaseIndexMixin(), True, True, schema.Boolean),
-                       (BaseIndexMixin(), datetime.now(), '2015',schema.DateTime),
-                       (BaseIndexMixin(), IResource, 'Interface', schema.Interface),
+                      [(FieldIndex(''), 1, '1', schema.Integer),
+                       (FieldIndex(''), 1, 1, schema.Integer),
+                       (FieldIndex(''), 'str', 'str', schema.SingleLine),
+                       (KeywordIndex(''), 'str', ['eq', 'str'], rest_schemas.KeywordComparableSingleLine),
+                       (KeywordIndex(''), 'str', ['any', ['str', 'str2']], rest_schemas.KeywordComparableSingleLines),
+                       (FieldIndex(''), 'str', ['eq', 'str'], rest_schemas.FieldComparableSingleLine),
+                       (FieldIndex(''), 'str', ['any', ['str', 'str2']], rest_schemas.FieldComparableSingleLines),
+                       (FieldIndex(''), True, 'True', schema.Boolean),
+                       (FieldIndex(''), True, True, schema.Boolean),
+                       (FieldIndex(''), True, ['eq', True], rest_schemas.FieldComparableBoolean),
+                       (FieldIndex(''), True, ['any', [False, True]], rest_schemas.FieldComparableBooleans),
+                       (FieldIndex(''), datetime.now(), '2015', schema.DateTime),
+                       (FieldIndex(''), datetime.now(), ['eq', '2015'], rest_schemas.FieldComparableDateTime),
+                       (FieldIndex(''), datetime.now(), ['any', ['2015', '2016']], rest_schemas.FieldComparableDateTimes),
+                       (KeywordIndex(''), IResource, 'Interface', schema.Interface),
+                       (KeywordIndex(''), IResource, ['eq', 'Interface'], rest_schemas.KeywordComparableInterface),
+                       (KeywordIndex(''), IResource, ['any', ['Interface', 'Interface']], rest_schemas.KeywordComparableInterfaces),
                        (ReferenceIndex(), Base(), '/path', schema.Resource),
                        ])
     def test_call(self, index, index_value, query, wanted_schema_class):

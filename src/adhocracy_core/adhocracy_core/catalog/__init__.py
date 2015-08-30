@@ -10,8 +10,10 @@ from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
 from hypatia.util import ResultSet
 from adhocracy_core.interfaces import IServicePool
-from adhocracy_core.interfaces import FieldIndexSearchComparator
-from adhocracy_core.interfaces import KeywordIndexSearchComparator
+from adhocracy_core.interfaces import FieldComparator
+from adhocracy_core.interfaces import FieldSequenceComparator
+from adhocracy_core.interfaces import KeywordComparator
+from adhocracy_core.interfaces import KeywordSequenceComparator
 from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import search_result
@@ -197,9 +199,13 @@ class CatalogsServiceAdhocracy(CatalogsService):
             return False
         elif len(parameter) != 2:
             return False
-        elif parameter[0] in FieldIndexSearchComparator.__members__:
+        elif parameter[0] in FieldComparator.__members__:
             return True
-        elif parameter[0] in KeywordIndexSearchComparator.__members__:
+        elif parameter[0] in KeywordComparator.__members__:
+            return True
+        elif parameter[0] in KeywordSequenceComparator.__members__:
+            return True
+        elif parameter[0] in FieldSequenceComparator.__members__:
             return True
         else:
             return False
