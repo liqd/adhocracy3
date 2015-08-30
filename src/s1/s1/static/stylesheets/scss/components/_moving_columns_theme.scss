@@ -1,0 +1,21 @@
+.moving-column {
+    &.is-first-visible-child {
+        .moving-column-body {
+            border-left-color: transparent;
+        }
+    }
+
+    &.is-last-visible-child {
+        .moving-column-body {
+            border-right-color: transparent;
+        }
+    }
+
+    .moving-column-menu {
+        background: transparent;
+    }
+
+    .moving-column-body {
+        background: $color-background-base;
+    }
+}
