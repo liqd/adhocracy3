@@ -1,22 +1,26 @@
 .user-indicator {
-    .user-indicator-logout,
-    .user-indicator-login,
-    .user-indicator-register {
-        @include rem(height, 30px);
-        @include rem(font-size, $font-size-normal);
-        @include rem(line-height, 30px);
-        @include rem(border-radius, 15px);
-        color: $color-button-text;
-        font-variant: none;
-        font-weight: $font-weight-medium;
-        text-transform: uppercase;
+    vertical-align: top;
 
-        &:hover:enabled, &:focus:enabled {
-            color: $color-button-text-hover;
-        }
+    .button {
+        margin-right: 0;
+        text-align: left;
+    }
 
-        &:active:enabled {
-            color: $color-text-normal;
+    .user-indicator-icon {
+        @include rem(font-size, 20px);
+        @include rem(margin-right, 5px);
+    }
+
+    .user-data {
+        @include inline-block;
+
+        .button {
+            @include border-radius(0);
+            display: block;
         }
+    }
+
+    .user-indicator-lout {
+        line-height: 1;
     }
 }

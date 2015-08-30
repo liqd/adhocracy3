@@ -35,6 +35,15 @@ Narrower cta button
         @include rem(line-height, 20px);
         @include rem(border-radius, 10px);
     }
+
+    &.m-menu-action {
+        color: $color-brand-one-normal;
+        font-size: $font-size-small;
+
+        &:hover:enabled, &:focus:enabled {
+            color: $color-brand-one-extrovert;
+        }
+    }
 }
 
 .button-cta,
@@ -102,6 +111,24 @@ cta button variant
         &:active {
             background: $color-brand-two-normal;
             color: $color-text-inverted;
+        }
+    }
+}
+
+.button-group {
+    @include clearfix;
+    @include inline-block;
+
+    .button {
+        @include border-radius(0);
+        float: left;
+
+        &:first-child {
+            @include rem(border-radius, 15px 0 0 15px);
+        }
+
+        &:last-child {
+            @include rem(border-radius, 0 15px 15px 0);
         }
     }
 }
