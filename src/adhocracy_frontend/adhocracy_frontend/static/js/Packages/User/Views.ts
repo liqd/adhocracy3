@@ -380,10 +380,7 @@ export var indicatorDirective = (
                 adhTopLevelState.setCameFrom($location.url());
                 $location.url("/register");
             };
-        }],
-        link: (scope, elem, attrs) => {
-            scope.separator = attrs.separator;
-        }
+        }]
     };
 };
 
