@@ -111,6 +111,15 @@ export var s1ProposalEditColumnDirective = (
     };
 };
 
+export var s1LandingDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Landing.html"
+    };
+};
+
 
 /**
  *         | proposed | votable | selected | rejected
@@ -247,6 +256,7 @@ export var register = (angular) => {
             }];
         }])
         .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", s1WorkbenchDirective])
+        .directive("adhS1Landing", ["adhConfig", s1LandingDirective])
         .directive("adhS1CurrentColumn", ["adhConfig", "adhHttp", s1CurrentColumnDirective])
         .directive("adhS1ProposalDetailColumn", ["adhConfig", "adhPermissions", s1ProposalDetailColumnDirective])
         .directive("adhS1ProposalCreateColumn", ["adhConfig", s1ProposalCreateColumnDirective])

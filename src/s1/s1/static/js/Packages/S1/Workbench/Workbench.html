@@ -1,7 +1,7 @@
 <div class="l-center" data-ng-if="view === ''">
-    <div>Welcome to S-1</div>
+    <adh-s1-landing></adh-s1-landing>
 </div>
-<div data-ng-if="view !== ''" data-adh-moving-columns="" data-max-width="70" class="moving-columns">
+<div data-ng-if="view !== ''" data-adh-moving-columns="" data-max-width="64" class="moving-columns">
     <adh-moving-column data-ng-switch="view">
         <adh-s1-current-column data-ng-switch-default=""></adh-s1-current-column>
         <adh-s1-next-column data-ng-switch-when="next"></adh-s1-next-column>

@@ -22,6 +22,7 @@
 @import "general/variables_doc";
 
 @import "layout";
+@import "layout_theme";
 @import "general/mixins";
 
 @import "components/type";
@@ -62,6 +63,7 @@
 @import "components/image_upload";
 @import "components/s1_header";
 @import "components/s1_proposal";
+@import "components/s1_landing";
 
 @import "third_party/social_share";
 
