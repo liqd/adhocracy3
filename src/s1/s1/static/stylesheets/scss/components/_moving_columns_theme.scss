@@ -1,18 +1,23 @@
 .moving-column {
     &.is-first-visible-child {
         .moving-column-body {
-            border-left-color: transparent;
+            border-left-color: $color-background-base-introvert;
         }
     }
 
     &.is-last-visible-child {
         .moving-column-body {
-            border-right-color: transparent;
+            border-right-color: $color-background-base-introvert;
         }
     }
 
     .moving-column-menu {
         background: transparent;
+
+        .moving-column-menu-button {
+            color: $color-brand-one-normal;
+            line-height: 1;
+        }
     }
 
     .moving-column-body {

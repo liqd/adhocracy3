@@ -1,0 +1,34 @@
+.s1-proposal-list-item {
+    @include clearfix;
+    @include rem(padding, 21px 16px 17px 16px);
+    @include rem(border-bottom, 4px solid $color-background-base-introvert);
+    display: block;
+    text-decoration: none;
+
+    .s1-proposal-list-item-meta {
+        float: right;
+    }
+}
+
+.s1-proposal-list-item-type {
+    color: $color-brand-one-normal;
+}
+
+.s1-proposal-list-item-title {
+    @include rem(margin, 17px 0 14px);
+    @include rem(padding-bottom, 23px);
+    border-bottom: 1px solid $color-background-base-introvert;
+    color: $color-text-normal;
+    font-family: $font-family-serif;
+    font-size: $font-size-large;
+}
+
+.s1-proposal-list-item-creator a {
+    text-decoration: none;
+}
+
+.s1-proposal-list-item-time {
+    color: $color-text-introvert;
+    display: block;
+    padding-top: 2px;
+}

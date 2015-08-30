@@ -1,12 +1,12 @@
 <a data-ng-href="{{ path | adhParentPath | adhResourceUrl }}" class="s1-proposal-list-item {{selectedState}} is-{{data.workflowState}}">
     <span class="s1-proposal-list-item-type">{{ "TR__NEW_PROPOSAL" | translate }}</span>
-    <ul class="s1-proposal-list-item-meta">
-        <li>{{ data.rateCount | signum }}</li>
-        <li>{{ data.commentCount }}</li>
+    <ul class="s1-proposal-list-item-meta meta-list">
+        <li class="meta-list-item"><i class="icon-vote"></i> {{ data.rateCount | signum }}</li>
+        <li class="meta-list-item"><i class="icon-speechbubble-unfilled"></i> {{ data.commentCount }}</li>
     </ul>
 
-    <h1>{{ data.title }}</h1>
+    <h1 class="s1-proposal-list-item-title">{{ data.title }}</h1>
 
-    <adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta>
-    <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
+    <span class="s1-proposal-list-item-creator"><adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta></span>
+    <span class="s1-proposal-list-item-time"><adh-time data-datetime="data.creationDate" data-format="L"></adh-time></span>
 </a>

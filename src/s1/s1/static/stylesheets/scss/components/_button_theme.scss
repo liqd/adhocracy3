@@ -37,6 +37,7 @@ Narrower cta button
     }
 
     &.m-menu-action {
+        @include border-radius(0);
         color: $color-brand-one-normal;
         font-size: $font-size-small;
 
