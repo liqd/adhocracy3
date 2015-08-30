@@ -27,6 +27,7 @@ export var s1WorkbenchDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         link: (scope) => {
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("landingPage", scope));
         }
     };
 };
@@ -153,7 +154,8 @@ export var registerRoutes = (
 ) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
     adhResourceAreaProvider
         .default(RIS1Process, "", processType, context, {
-            space: "content"
+            space: "content",
+            landingPage: "true"
         })
         .default(RIS1Process, "current", processType, context, {
             space: "content",
