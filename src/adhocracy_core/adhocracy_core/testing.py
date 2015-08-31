@@ -328,6 +328,8 @@ def mock_catalogs(search_result) -> Mock:
     catalogs.search = search_mock
     reindex_index_mock = Mock(spec=CatalogsServiceAdhocracy.reindex_index)
     catalogs.reindex_index = reindex_index_mock
+    get_index_mock = Mock(spec=CatalogsServiceAdhocracy.get_index)
+    catalogs.get_index = get_index_mock
     return catalogs
 
 

@@ -9,6 +9,7 @@ from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.utils import is_deleted
 from adhocracy_core.utils import is_hidden
 from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.rate import IRateable
@@ -20,7 +21,6 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import find_graph
-from adhocracy_core.interfaces import search_query
 
 
 class Reference(IndexFactory):
@@ -41,6 +41,7 @@ class AdhocracyCatalogIndexes:
     tag = catalog.Keyword()
     private_visibility = catalog.Keyword()  # visible / deleted / hidden
     badge = catalog.Keyword()
+    item_badge = catalog.Keyword()
     title = catalog.Field()
     rate = catalog.Field()
     rates = catalog.Field()
@@ -142,6 +143,15 @@ def index_badge(resource, default) -> [str]:
     return badge_names
 
 
+def index_item_badge(resource, default) -> [str]:
+    """Find item and return its badge names for the item_badge index."""
+    item = find_interface(resource, IItem)
+    if item is None:
+        return default
+    badge_names = index_badge(item, default)
+    return badge_names
+
+
 def index_workflow_state(resource, default) -> [str]:
     """Return value for the workflow_state index."""
     state = get_sheet_field(resource, IWorkflowAssignment, 'workflow_state')
@@ -199,6 +209,11 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='badge',
                          context=IBadgeable,
+                         )
+    config.add_indexview(index_item_badge,
+                         catalog_name='adhocracy',
+                         index_name='item_badge',
+                         context=IVersionable,
                          )
     config.add_indexview(index_workflow_state,
                          catalog_name='adhocracy',
