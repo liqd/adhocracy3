@@ -1,7 +1,14 @@
 .moving-column {
+    &.is-collapse {
+        @include rem(top, 21px);
+        border-bottom: 0;
+        border-top: 0;
+        z-index: 10;
+    }
+
     &.is-first-visible-child {
         .moving-column-body {
-            border-left-color: $color-background-base-introvert;
+            border-left: $color-background-base-introvert;
         }
     }
 
@@ -13,7 +20,7 @@
 
     &:not(.is-first-visible-child) {
         .moving-column-body {
-            border-left-color: $color-background-base;
+            border-left: 0;
         }
     }
 
@@ -28,5 +35,16 @@
 
     .moving-column-body {
         background: $color-background-base;
+        border-bottom: 0;
+    }
+
+    .moving-column-tab {
+        float: left;
+    }
+
+    .moving-column-menu-nav-button {
+        background: transparent;
+        color: $color-brand-one-normal;
+        text-transform: uppercase;
     }
 }
