@@ -1,4 +1,4 @@
-import AdhConfig = require("..././../Config/Config");
+import AdhConfig = require("../../../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
