@@ -158,7 +158,7 @@ We can also use the filtering pool api to search for content with specific badge
     >>> resp['data']['adhocracy_core.sheets.pool.IPool']['elements']
     ['...document_0000000/',...document_0000000/VERSION_0000000/']
 
-In addition we can search for versions that have a item with a specific badge::
+In addition we can search for versions that have an item with a specific badge::
 
     >>> prop = {'item_badge': 'badge1',
     ...         'depth': 'all'}
