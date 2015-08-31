@@ -43,6 +43,19 @@
         </p>
     </section>
 
+    <section class="mein-berlin-proposal-badge-descriptions">
+        <div
+            data-ng-repeat="assignment in data.assignments"
+            data-ng-if="assignment.description"
+            class="badge-description"
+            data-ng-class="{
+                'm-is-realized': assignment.name === 'going_to_be_realized',
+                'm-is-not-realized': assignment.name === 'not_realizeable'
+            }">
+            <adh-parse-markdown data-parsetext="assignment.description"></adh-parse-markdown>
+        </div>
+    </section>
+
     <section>
         <adh-map-detail data-ng-if="data.polygon && data.lng && data.lat" data-lng="data.lng" data-lat="data.lat" data-polygon="data.polygon" data-height="170"></adh-map-detail>
     </section>
