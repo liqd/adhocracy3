@@ -64,7 +64,7 @@ class TestDoTransitionToVotable:
                                           request=request_)
 
 
-class TestChangeChildrenToRejected:
+class TestChangeChildrenToSelectedRejected:
 
     @fixture
     def registry(self, registry_with_content, mock_sheet):
@@ -126,7 +126,6 @@ class TestChangeChildrenToRejected:
             self, context, item, request_, registry, mock_sheet, mock_catalogs):
         from copy import copy
         from datetime import datetime
-        from unittest.mock import call
         version_most_rated = testing.DummyResource()
         item['version'] = version_most_rated
         item2 = item.clone()
@@ -246,6 +245,13 @@ class TestS1Workflow:
         resp = app_participant.get('/s1/proposal_0000000')
         assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'selected'
 
+    def test_result_old_proposal_has_stored_decisiont_date(self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        resp = app_participant.get('/s1/proposal_0000000')
+        decision_date = resp.json['data'][IWorkflowAssignment.__identifier__]\
+            ['state_data'][0]['start_date']
+        assert decision_date.endswith('+00:00')
+
     def test_result_old_proposal_not_most_rated_has_state_rejected(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000001')
@@ -324,7 +330,6 @@ class TestS1Workflow:
         assert resp.json['data'][IPool.__identifier__]['elements'] == \
              ['http://localhost/s1/proposal_0000002/',
               'http://localhost/s1/proposal_0000003/']
-
 
 
 @mark.usefixtures('integration')

@@ -14,7 +14,6 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.workflows import add_workflow
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import get_sheet_field
 
 
 def do_transition_to_propose(context: IPool, request: Request, **kwargs):
@@ -32,7 +31,7 @@ def do_transition_to_voteable(context: IPool, request: Request, **kwargs):
 def do_transition_to_result(context: IPool, request: Request, **kwargs):
     """Do various tasks to complete transition to result state."""
     decision_date = datetime.utcnow().replace(tzinfo=UTC)
-    _store_state_data(context, 'result', start_date=decision_date)
+    _store_state_data(context, 'result', request, start_date=decision_date)
     _change_children_to_rejected_or_selected(context, request,
                                               start_date=decision_date)
 
@@ -54,7 +53,8 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
                            to_state='rejected', start_date=start_date)
 
 
-def _store_state_data(context: IWorkflowAssignment, state_name: str, **kwargs):
+def _store_state_data(context: IWorkflowAssignment, state_name: str,
+                      request: Request, **kwargs):
     sheet = get_sheet(context, IWorkflowAssignment)
     state_data = sheet.get()['state_data']
     datas = [x for x in state_data if x['name'] == state_name]
@@ -64,7 +64,7 @@ def _store_state_data(context: IWorkflowAssignment, state_name: str, **kwargs):
     else:
         data = datas[0]
     data.update(**kwargs)
-    sheet.set({'state_data': state_data})
+    sheet.set({'state_data': state_data}, request=request)
 
 
 def _remove_state_data(context: IWorkflowAssignment, state_name: str,
@@ -107,9 +107,11 @@ def _do_transition(context, request: Request, from_state: str, to_state: str,
         if current_state == from_state:
             sheet.set({'workflow_state': to_state}, request=request)
             if start_date is not None:
-                _store_state_data(context, to_state, start_date=start_date)
+                _store_state_data(context, to_state, request,
+                                  start_date=start_date)
                 catalogs = find_service(context, 'catalogs')
                 catalogs.reindex_index(context, 'decision_date')
+
 
 s1_meta = freeze({
     'initial_state': 'propose',
