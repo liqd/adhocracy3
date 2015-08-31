@@ -6,7 +6,7 @@
         @include rem(margin-right, 60px);
     }
 
-    .button-group {
+    .button-group, .user-indicator {
         .button {
             margin-right: 0;
         }

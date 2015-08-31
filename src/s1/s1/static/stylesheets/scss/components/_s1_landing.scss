@@ -36,12 +36,7 @@ $susy: (
     float: right;
 
     .button {
-        @include rem(margin-left, 20px);
         font-weight: bold;
-
-        &.s1-landing-section-footer-more {
-            color: $color-brand-one-normal;
-        }
     }
 }
 
@@ -65,4 +60,8 @@ $susy: (
     .button {
         font-weight: $font-weight-extrovert;
     }
+}
+
+.s1-landing-section-footer-more {
+    @extend .m-introvert;
 }

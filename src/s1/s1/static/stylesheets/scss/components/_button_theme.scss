@@ -67,6 +67,10 @@ Narrower cta button
         color: $color-text-inverted;
     }
 
+    &.m-introvert {
+        color: $color-brand-one-normal;
+    }
+
     &.ng-disabled,
     &:disabled {
         &:hover,

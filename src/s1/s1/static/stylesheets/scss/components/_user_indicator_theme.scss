@@ -6,6 +6,10 @@
         text-align: left;
     }
 
+    a {
+        @include inline-block;
+    }
+
     .user-indicator-icon {
         @include rem(font-size, 20px);
         @include rem(margin-right, 5px);
