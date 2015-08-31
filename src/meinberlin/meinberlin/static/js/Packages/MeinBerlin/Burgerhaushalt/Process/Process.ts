@@ -4,6 +4,8 @@ import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
 
+import AdhMeinBerlinPhase = require("../../Phase/Phase");
+
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
 import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
@@ -49,6 +51,19 @@ export var detailDirective = (
 };
 
 
+export var phaseHeaderDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
+        scope: {},
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
+            scope.phases = [];
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinBurgerhaushaltProcess";
 
@@ -56,8 +71,10 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhMeinBerlinPhase.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName
         ])
+        .directive("adhMeinBerlinBurgerhaushaltPhaseHeader", ["adhConfig", phaseHeaderDirective])
         .directive("adhMeinBerlinBurgerhaushaltDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective]);
 };
