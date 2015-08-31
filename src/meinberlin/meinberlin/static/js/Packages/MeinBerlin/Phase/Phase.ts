@@ -1,6 +1,6 @@
 import AdhConfig = require("../../Config/Config");
 
-var pkgLocation = "/MeinBerlin/Phase";
+export var pkgLocation = "/MeinBerlin/Phase";
 
 
 export var phaseDirective = (adhConfig : AdhConfig.IService) => {

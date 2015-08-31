@@ -69,7 +69,7 @@ export var phaseHeaderDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
         scope: {},
         link: (scope) => {
             var processUrl = adhTopLevelState.get("processUrl");
