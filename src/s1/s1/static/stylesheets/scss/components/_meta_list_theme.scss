@@ -1,3 +1,16 @@
 .s1-proposal-list-item-meta {
     color: $color-text-extrovert;
+
+    .meta-list-item {
+        @include rem(margin-right, 23px);
+    }
+}
+
+.s1-meta-list-actions {
+    text-align: center;
+
+    .meta-list {
+        @include inline-block;
+        margin: 0 auto;
+    }
 }

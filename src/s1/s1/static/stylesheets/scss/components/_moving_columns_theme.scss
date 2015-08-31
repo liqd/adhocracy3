@@ -11,6 +11,12 @@
         }
     }
 
+    &:not(.is-first-visible-child) {
+        .moving-column-body {
+            border-left-color: $color-background-base;
+        }
+    }
+
     .moving-column-menu {
         background: transparent;
 

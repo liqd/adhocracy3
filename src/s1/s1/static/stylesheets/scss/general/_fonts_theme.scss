@@ -33,10 +33,7 @@
 
 @font-face {
     font-family: "Merriweather";
-    src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Regular.eot"); /* IE9 Compat Modes */
-    src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Regular.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-         font-url("../lib/merriweather-fontface/fonts/Merriweather-Regular.woff") format("woff"), /* Modern Browsers */
-         font-url("../lib/merriweather-fontface/fonts/Merriweather-Regular.ttf") format("truetype");
+    src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Regular.ttf") format("truetype");
     font-style: normal;
     font-weight: normal;
     text-rendering: optimizeLegibility;
@@ -44,10 +41,7 @@
 
 @font-face {
     font-family: "Merriweather";
-    src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Bold.eot"); /* IE9 Compat Modes */
-    src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Bold.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-         font-url("../lib/merriweather-fontface/fonts/Merriweather-Bold.woff") format("woff"), /* Modern Browsers */
-         font-url("../lib/merriweather-fontface/fonts/Merriweather-Bold.ttf") format("truetype");
+    src: font-url("../lib/merriweather-fontface/fonts/Merriweather-Bold.ttf") format("truetype");
     font-style: normal;
     font-weight: bold;
     text-rendering: optimizeLegibility;

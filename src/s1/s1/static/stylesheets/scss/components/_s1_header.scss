@@ -16,7 +16,7 @@
 .s1-header-logo-link {
     @include inline-block;
     @include rem(line-height, 30px);
-    color: $color-brand-one-extrovert;
+    color: $color-text-introvert;
 
     &:hover, &:focus {
         color: $color-text-normal;

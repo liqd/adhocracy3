@@ -5,7 +5,7 @@
         <li class="meta-list-item"><i class="icon-speechbubble-unfilled"></i> {{ data.commentCount }}</li>
     </ul>
 
-    <h1 class="s1-proposal-list-item-title">{{ data.title }}</h1>
+    <h1 class="s1-proposal-title">{{ data.title }}</h1>
 
     <span class="s1-proposal-list-item-creator"><adh-user-meta data-ng-if="data.creator" data-path="{{data.creator}}"></adh-user-meta></span>
     <span class="s1-proposal-list-item-time"><adh-time data-datetime="data.creationDate" data-format="L"></adh-time></span>
