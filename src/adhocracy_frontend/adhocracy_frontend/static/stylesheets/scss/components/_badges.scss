@@ -27,3 +27,19 @@ Badges for labeling things
     text-transform: uppercase;
     margin-right: 0.5em;
 }
+
+/*doc
+---
+title: Badge description
+name: badge-description
+parent: badge
+---
+
+The description of a badge assignment. The same modifiers as for `badge` apply.
+
+```html_example
+<div class="badge-description">
+    <p>Simple badge description</p>
+</div>
+```
+*/

@@ -14,6 +14,9 @@ Badge modifiers for labeling if a proposal has been realized or not.
 <span class="badge m-color m-is-realized">Is Realized</span>
 <span class="badge m-color m-is-not-realized">Is Not Relaized</span>
 <span class="badge m-color m-on-test">On Test</span>
+<div class="badge-description m-color m-is-realized">
+    <p>Modified badge description</p>
+</div>
 ```
 
 */
@@ -72,6 +75,25 @@ Badge modifiers for labeling if a proposal has been realized or not.
 
         &.m-on-test:before {
             background-color: $color-function-neutral;
+        }
+    }
+}
+
+.badge-description {
+    &.m-color {
+        border-left: 0.4em solid $color-text-highlight-normal;
+        padding-left: 0.5em;
+
+        &.m-is-realized {
+            border-left-color: $color-function-valid;
+        }
+
+        &.m-is-not-realized {
+            border-left-color: $color-function-invalid;
+        }
+
+        &.m-on-test {
+            border-left-color: $color-function-neutral;
         }
     }
 }
