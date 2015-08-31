@@ -56,13 +56,15 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
 
 def _store_state_data(context: IWorkflowAssignment, state_name: str, **kwargs):
     sheet = get_sheet(context, IWorkflowAssignment)
-    state_data_list = sheet.get()['state_data']
-    state_data = [x for x in state_data_list if x['name'] == state_name]
-    if state_data == []:
-        state_data = {'name': state_name}
-        state_data_list += [state_data]
-    state_data.update(**kwargs)
-    sheet.set({'state_data': state_data_list})
+    state_data = sheet.get()['state_data']
+    datas = [x for x in state_data if x['name'] == state_name]
+    if datas == []:
+        data = {'name': state_name}
+        state_data.append(data)
+    else:
+        data = datas[0]
+    data.update(**kwargs)
+    sheet.set({'state_data': state_data})
 
 
 def _remove_state_data(context: IWorkflowAssignment, state_name: str,

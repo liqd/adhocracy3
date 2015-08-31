@@ -308,6 +308,23 @@ class TestS1Workflow:
         resp = _do_transition_to(app_initiator, '/s1', 'select')
         assert resp.status_code == 200
 
+    def test_change_state_to_result_again(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/s1', 'result')
+        assert resp.status_code == 200
+
+    def test_result_everybody_can_list_proposals_used_for_this_meeting_again(
+            self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        from adhocracy_core.sheets.pool import IPool
+        resp = app_participant.get('/s1')
+        state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
+        datas = [x for x in state_data if x['name'] == 'result']
+        decision_date = datas[0]['start_date']
+        resp = app_participant.get('/s1', {'decision_date': decision_date})
+        assert resp.json['data'][IPool.__identifier__]['elements'] == \
+             ['http://localhost/s1/proposal_0000002/',
+              'http://localhost/s1/proposal_0000003/']
+
 
 
 @mark.usefixtures('integration')
