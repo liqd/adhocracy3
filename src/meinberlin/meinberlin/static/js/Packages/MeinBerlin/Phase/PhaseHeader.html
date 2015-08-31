@@ -4,7 +4,7 @@
         data-closed-by-default="true">
         <tab
             data-ng-repeat="phase in phases"
-            data-heading="{{phase.shorttitle}}"
+            data-heading="{{phase.shorttitle || phase.title}}"
             data-classes="m-phase"
             data-highlighted="phase.name == currentPhase">
             <adh-mein-berlin-phase data-phase="phase"></adh-mein-berlin-phase>

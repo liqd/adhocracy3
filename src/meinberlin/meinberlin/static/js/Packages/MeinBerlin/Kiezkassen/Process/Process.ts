@@ -71,7 +71,7 @@ export var phaseHeaderDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
         scope: {},
-        link: (scope) => {
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
                 var sheet = resource.data[SIWorkflow.nick];
