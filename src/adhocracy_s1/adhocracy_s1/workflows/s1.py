@@ -14,6 +14,12 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.workflows import add_workflow
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
+
+
+def do_transition_to_propose(context: IPool, request: Request, **kwargs):
+    """Do various tasks to complete transition to propose state."""
+    _remove_state_data(context, 'result', 'start_date', request)
 
 
 def do_transition_to_voteable(context: IPool, request: Request, **kwargs):
@@ -48,7 +54,7 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
                            to_state='rejected', start_date=start_date)
 
 
-def _store_state_data(context: IWorkflowAssignment, state_name:str, **kwargs):
+def _store_state_data(context: IWorkflowAssignment, state_name: str, **kwargs):
     sheet = get_sheet(context, IWorkflowAssignment)
     state_data_list = sheet.get()['state_data']
     state_data = [x for x in state_data_list if x['name'] == state_name]
@@ -57,6 +63,19 @@ def _store_state_data(context: IWorkflowAssignment, state_name:str, **kwargs):
         state_data_list += [state_data]
     state_data.update(**kwargs)
     sheet.set({'state_data': state_data_list})
+
+
+def _remove_state_data(context: IWorkflowAssignment, state_name: str,
+                       key: str, request: Request):
+    sheet = get_sheet(context, IWorkflowAssignment)
+    state_data = sheet.get()['state_data']
+    datas = [x for x in state_data if x['name'] == state_name]
+    if datas == []:
+        return
+    data = datas[0]
+    if key in data:
+        del data[key]
+    sheet.set({'state_data': state_data}, request=request)
 
 
 def _get_children_sort_by_rates(context) -> []:
@@ -141,6 +160,7 @@ s1_meta = freeze({
                       },
         'to_propose': {'from_state': 'result',
                        'to_state': 'propose',
+                       'callback': 'adhocracy_s1.workflows.s1.do_transition_to_propose',
                       },
     },
 })
