@@ -8,6 +8,14 @@
 
     .s1-proposal-list-item-meta {
         float: right;
+
+        .meta-list-item {
+            @include rem(margin-right, 8px);
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
     }
 
     &.is-selected {
@@ -59,4 +67,8 @@
     border-width: 1px 0;
     display: block;
     text-decoration: none;
+}
+
+.s1-proposal-detail-text {
+    @include rem(padding-top, 28px);
 }
