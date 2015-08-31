@@ -199,16 +199,13 @@ class CatalogsServiceAdhocracy(CatalogsService):
             return False
         elif len(parameter) != 2:
             return False
-        elif parameter[0] in FieldComparator.__members__:
+        elif parameter[0] in self._comparators:
             return True
-        elif parameter[0] in KeywordComparator.__members__:
-            return True
-        elif parameter[0] in KeywordSequenceComparator.__members__:
-            return True
-        elif parameter[0] in FieldSequenceComparator.__members__:
-            return True
-        else:
-            return False
+
+    _comparators = set(FieldComparator.__members__) \
+        .union(KeywordComparator.__members__) \
+        .union(KeywordSequenceComparator.__members__) \
+        .union(FieldSequenceComparator.__members__)
 
 
 def add_catalogs_system_and_adhocracy(context: ICatalogsService,

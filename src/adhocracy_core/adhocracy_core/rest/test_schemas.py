@@ -881,10 +881,19 @@ class TestAddArbitraryFilterNodes:
         assert self.call_fut(cstruct, schema, None, None) == schema
 
     def test_call_with_arbitrary_filter_wrong(self, schema, context,
-                                              index):
+                                              create_node, mock_catalogs):
         cstruct = {'index': 'keyword'}
+        mock_catalogs.get_index.return_value = None
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert 'keyword' not in schema_extended
+        assert not create_node.called
+        assert 'index' not in schema_extended
+
+    def test_call_with_arbitrary_filter_private(self, schema, context,
+                                                create_node):
+        cstruct = {'private_index': 'keyword'}
+        schema_extended = self.call_fut(cstruct, schema, context, None)
+        assert not create_node.called
+        assert 'private_index' not in schema_extended
 
     def test_call_with_arbitrary_filter(self, schema, context, create_node, index):
         cstruct = {'index': 'keyword'}
@@ -899,6 +908,14 @@ class TestAddArbitraryFilterNodes:
         create_node.assert_called_with(interfaces_index,
                                        interfaces_index.unique_values()[0],
                                        'sheet.x1')
+
+    def test_call_with_content_type_filter(self, schema, context, create_node,
+                                           interfaces_index):
+        cstruct = {'content_type': 'IResource'}
+        schema_extended = self.call_fut(cstruct, schema, context, None)
+        create_node.assert_called_with(interfaces_index,
+                                       interfaces_index.unique_values()[0],
+                                       'IResource')
 
     def test_call_with_reference_filter(self, schema, context, registry,
                                         create_node, reference_index):
@@ -933,6 +950,45 @@ class TestAddArbitraryFilterNodes:
         with raises(colander.Invalid):
             self.call_fut(cstruct, schema, None, registry)
 
+
+class TestGetIndexExampleValue:
+
+    @fixture
+    def index(self):
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=[])
+        return index
+
+    @fixture
+    def reference_index(self):
+        from adhocracy_core.catalog.index import ReferenceIndex
+        index = ReferenceIndex()
+        return index
+
+    def call_fut(self, *args):
+        from .schemas import _get_index_example_value
+        return _get_index_example_value(*args)
+
+    def test_return_none_if_index_is_none(self):
+        assert self.call_fut(None) is None
+
+    def test_return_none_if_index_has_no_unique_values(self, index):
+        delattr(index, 'unique_values')
+        assert self.call_fut(None) is None
+
+    def test_return_none_if_index_unique_values_is_empty(self, index):
+        assert self.call_fut(index) is None
+
+    def test_return_unique_values_first_entry(self, index):
+        index.unique_values.return_value = ['str']
+        assert self.call_fut(index) is 'str'
+
+    def test_return_object_if_reference_index(self, reference_index):
+        from adhocracy_core.resources.base import Base
+        result = self.call_fut(reference_index)
+        assert isinstance(result, Base)
+
+
 class TestCreateArbitraryFilterNode:
 
     from datetime import datetime
@@ -950,6 +1006,10 @@ class TestCreateArbitraryFilterNode:
     @mark.parametrize("index, index_value, query, wanted_schema_class",
                       [(FieldIndex(''), 1, '1', schema.Integer),
                        (FieldIndex(''), 1, 1, schema.Integer),
+                       (FieldIndex(''), 1, ['eq', '1'], rest_schemas.FieldComparableInteger),
+                       (FieldIndex(''), 1, ['any', ['1', '2']], rest_schemas.FieldComparableIntegers),
+                       (KeywordIndex(''), 1, ['eq', '1'], rest_schemas.KeywordComparableInteger),
+                       (KeywordIndex(''), 1, ['any', ['1', '2']], rest_schemas.KeywordComparableIntegers),
                        (FieldIndex(''), 'str', 'str', schema.SingleLine),
                        (KeywordIndex(''), 'str', ['eq', 'str'], rest_schemas.KeywordComparableSingleLine),
                        (KeywordIndex(''), 'str', ['any', ['str', 'str2']], rest_schemas.KeywordComparableSingleLines),
@@ -1080,7 +1140,6 @@ class TestDeferredValidateResetPasswordEmail:
         validator(node, 'test@email.de')
         user.activate.assert_called
         assert request.validated['user'] is user
-
 
 
 class TestPOSTResetPasswordRequestSchema:

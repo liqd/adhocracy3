@@ -24,6 +24,7 @@ from adhocracy_core.interfaces import Reference as ReferenceTuple
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.resources.principal import IPasswordReset
+from adhocracy_core.resources.base import Base
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
@@ -489,7 +490,6 @@ class GETPoolRequestSchema(colander.Schema):
         return search_query
 
 
-
 def add_arbitrary_filter_nodes(cstruct: dict,
                                        schema: GETPoolRequestSchema,
                                        context: IResource,
@@ -509,9 +509,9 @@ def add_arbitrary_filter_nodes(cstruct: dict,
         elif _is_arbitrary_filter(filter_name, catalogs):
             index_name = filter_name
         else:
-            continue
+            continue  # pragma: no cover
         index = catalogs.get_index(index_name)
-        value_type = _get_index_value_type(index)
+        value_type = _get_index_example_value(index)
         node = create_arbitrary_filter_node(index, value_type, query)
         _add_node(schema, node, filter_name)
     return schema
@@ -548,15 +548,15 @@ def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:
         return index is not None
 
 
-def _get_index_value_type(index: SDIndex) -> object:
+def _get_index_example_value(index: SDIndex) -> object:
+    """Return example entry from `index` or None."""
     if index is None:
         return
     if 'unique_values' in index.__dir__():
         indexed_values = index.unique_values()
-        return indexed_values and indexed_values[0]
-    elif index.__name__ == 'reference':
-        return object()
-    return None
+        return indexed_values and indexed_values[0] or None
+    elif isinstance(index, ReferenceIndex): # pragma: no cover
+        return Base()
 
 
 def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
