@@ -39,12 +39,22 @@
     }
 
     .moving-column-tab {
-        float: left;
+        display: none;
     }
 
     .moving-column-menu-nav-button {
         background: transparent;
         color: $color-brand-one-normal;
         text-transform: uppercase;
+    }
+
+    .moving-column-expand {
+        @include rem(font-size, 20px);
+        @include rem(padding-top, 5px);
+        color: $color-brand-one-normal;
+
+        &:hover, &:focus {
+            color: $color-text-highlight-normal;
+        }
     }
 }

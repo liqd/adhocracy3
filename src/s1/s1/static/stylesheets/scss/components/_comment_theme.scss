@@ -10,7 +10,7 @@
 }
 
 .comment-current-user {
-    @include rem(padding, 22px 0 7px 18px);
+    @include rem(padding, 0 0 7px 18px);
     color: $color-text-highlight-normal;
     display: block;
 }
@@ -41,4 +41,8 @@
 
 .comment-children-edit-form {
     padding-left: 0;
+}
+
+.comment-main {
+    @include rem(padding-top, 22px);
 }

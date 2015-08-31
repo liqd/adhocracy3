@@ -72,3 +72,28 @@
 .s1-proposal-detail-text {
     @include rem(padding-top, 28px);
 }
+
+.s1-proposal-form {
+    padding: 2em;
+
+    label {
+        @include rem(margin-bottom, 20px);
+        display: block;
+    }
+
+    .s1-proposal-form-title,
+    .s1-proposal-form-description {
+        background: $color-background-base-introvert;
+        border-left: 1px solid $color-text-introvert;
+    }
+
+    .s1-proposal-form-title {
+        @include rem(min-height, 50px);
+        font-weight: $font-weight-extrovert;
+        margin-top: 0;
+    }
+
+    .s1-proposal-form-description {
+        @include rem(min-height, 300px);
+    }
+}

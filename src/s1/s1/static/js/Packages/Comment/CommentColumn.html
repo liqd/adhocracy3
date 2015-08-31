@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <span data-ng-switch-when="body" class="comment-current-user">{{userName}}</span>
+    <span data-ng-switch-when="body" class="comment-current-user" data-ng-if="userName">{{userName}}</span>
 
     <adh-comment-listing
         data-ng-if="commentableUrl"
