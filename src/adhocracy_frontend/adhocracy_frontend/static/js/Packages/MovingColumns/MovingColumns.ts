@@ -26,7 +26,7 @@ export var movingColumns = (
             var minShowWidth = 35 * fontSize;
             var collapseWidth = 2 * fontSize;
             if (attrs.spacing) {
-                attrs.spacing = (parseInt(attrs.spacing) === 0) ? 0.0000001 : attrs.spacing; //FIXME: why doesn't 0 work ?
+                attrs.spacing = (parseInt(attrs.spacing, 10) === 0) ? 0.0000001 : attrs.spacing; // FIXME: why doesn't 0 work ?
             }
             var spacing = attrs.spacing ? attrs.spacing : Math.ceil(0.3 * fontSize);
 
