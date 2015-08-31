@@ -15,6 +15,7 @@ import AdhRate = require("../Rate/Rate");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -347,13 +348,15 @@ export var adhCreateOrShowCommentListing = (
 };
 
 export var commentColumnDirective = (
-    adhConfig : AdhConfig.IService
+    adhConfig : AdhConfig.IService,
+    adhUser : AdhUser.Service
 ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.userName = adhUser.data.name;
             column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
             scope.frontendOrderPredicate = (id) => id;
             scope.frontendOrderReverse = true;
@@ -402,5 +405,5 @@ export var register = (angular) => {
                     adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective]);
+        .directive("adhCommentColumn", ["adhConfig", "adhUser", commentColumnDirective]);
 };
