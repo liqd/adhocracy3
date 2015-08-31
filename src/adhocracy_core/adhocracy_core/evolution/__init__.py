@@ -1,6 +1,9 @@
 """Scripts to migrate legacy objects in existing databases."""
 import logging
 from functools import wraps
+
+from BTrees.Length import Length
+from persistent.mapping import PersistentMapping
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from zope.interface.interfaces import IInterface
@@ -10,6 +13,7 @@ from zope.interface import directlyProvides
 from substanced.evolution import add_evolution_step
 from substanced.util import find_service
 from substanced.interfaces import IFolder
+
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
@@ -220,11 +224,21 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
     for index, pool in enumerate(pools):
         logger.info('Migrating {0} of {1}: {2}'.format(index + 1, count, pool))
         if hasattr(pool, '_autoname_last'):
-            pool._autoname_lasts = {prefix: pool._autoname_last
-                                    for prefix in prefixes}
+            pool._autoname_lasts = PersistentMapping()
+            for prefix in prefixes:
+                pool._autoname_lasts[prefix] = Length(pool._autoname_last + 1)
             del pool._autoname_last
         elif not hasattr(pool, '_autoname_lasts'):
-            pool._autoname_lasts = {prefix: 0 for prefix in prefixes}
+            pool._autoname_lasts = PersistentMapping()
+            for prefix in prefixes:
+                pool._autoname_lasts[prefix] = Length()
+        elif hasattr(pool, '_autoname_lasts'):
+            # convert int to Length
+            for prefix in pool._autoname_lasts.keys():
+                pool._autoname_lasts[prefix] \
+                    = Length(pool._autoname_lasts[prefix])
+            # convert dict to PersistentMapping
+            pool._autoname_lasts = PersistentMapping(pool._autoname_lasts)
 
 
 @log_migration

@@ -31,7 +31,11 @@ export var register = () => {
                 var scopeMock;
 
                 beforeEach(() => {
-                    scopeMock = {};
+                    scopeMock = {
+                        loginForm: {
+                            $setPristine: () => undefined
+                        }
+                    };
                     directive.link(scopeMock);
                 });
 

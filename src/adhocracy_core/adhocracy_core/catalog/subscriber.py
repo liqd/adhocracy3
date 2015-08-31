@@ -17,6 +17,7 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import list_resource_with_descendants
 from adhocracy_core.utils import get_sheet_field
 
@@ -69,6 +70,16 @@ def reindex_item_badge(event):
         catalogs.reindex_index(versionable, 'item_badge')
 
 
+def reindex_workflow_state(event):
+    """Reindex the workflow_state index for item and its versions."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'workflow_state')
+    children = event.object.values()
+    versionables = (c for c in children if IVersionable.providedBy(c))
+    for versionable in versionables:
+        catalogs.reindex_index(versionable, 'workflow_state')
+
+
 def includeme(config):
     """Register index subscribers."""
     config.add_subscriber(reindex_tag,
@@ -90,5 +101,8 @@ def includeme(config):
                           ISheetBackReferenceModified,
                           object_iface=IItem,
                           event_isheet=IBadgeable)
+    config.add_subscriber(reindex_workflow_state,
+                          IResourceSheetModified,
+                          event_isheet=IWorkflowAssignment)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

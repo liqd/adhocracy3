@@ -23,4 +23,5 @@ def integration(integration):
     integration.include('adhocracy_mercator.sheets')
     integration.include('adhocracy_mercator.resources')
     integration.include('adhocracy_mercator.catalog')
+    integration.include('adhocracy_mercator.workflows')
     return integration

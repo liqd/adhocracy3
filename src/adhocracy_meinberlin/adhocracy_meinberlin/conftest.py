@@ -22,4 +22,5 @@ def integration(integration):
     """Include resource types and sheets."""
     integration.include('adhocracy_meinberlin.sheets')
     integration.include('adhocracy_meinberlin.resources')
+    integration.include('adhocracy_meinberlin.workflows')
     return integration

@@ -15,6 +15,10 @@ from pyramid.paster import bootstrap
 from pyramid.request import Request
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.traversal import resource_path
+from pyrsistent import PMap
+from pyrsistent import freeze
+from pyrsistent import ny
 from substanced.interfaces import IUserLocator
 from zope.interface.interfaces import IInterface
 
@@ -22,7 +26,6 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.schema import ContentType
 from adhocracy_core.sheets.name import IName
-
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +37,15 @@ def import_resources():  # pragma: no cover
 
         bin/import_resources etc/development.ini  <filename>
     """
+    epilog = """The input JSON file contains the interface name of the resource
+    type to create and a serialization of the sheets data.
+
+    Strings having the form 'user_by_login: <username>' are resolved
+    to the user's path.
+
+    """
     docstring = inspect.getdoc(import_resources)
-    parser = argparse.ArgumentParser(description=docstring)
+    parser = argparse.ArgumentParser(description=docstring, epilog=epilog)
     parser.add_argument('ini_file',
                         help='path to the adhocracy backend ini file')
     parser.add_argument('filename',
@@ -57,7 +67,7 @@ def _import_resources(root: IResource, registry: Registry, filename: str):
             logger.info('Skipping {}.'.format(expected_path))
         else:
             logger.info('Creating {}'.format(expected_path))
-            _create_resource(resource_info, request, registry, root)
+            _create_resource(freeze(resource_info), request, registry, root)
 
     transaction.commit()
 
@@ -84,12 +94,13 @@ def _resource_exists(expected_path: dict, context: IResource) -> bool:
         return False
 
 
-def _create_resource(resource_info: dict,
+def _create_resource(resource_info: PMap,
                      request: Request,
                      registry: Registry,
                      root: IPool):
     iresource = _deserialize_content_type(resource_info, request)
     parent = find_resource(root, resource_info['path'])
+    resource_info = _resolve_users(resource_info, root, registry)
     appstructs = _deserialize_data(resource_info, parent, request, registry)
     creator = _get_creator(resource_info, root, registry)
     registry.content.create(iresource.__identifier__,
@@ -99,6 +110,27 @@ def _create_resource(resource_info: dict,
                             request=request,
                             creator=creator,
                             )
+
+
+def _resolve_users(resource_info: PMap,
+                   root: IResource,
+                   registry: Registry) -> PMap:
+    """Resolve strings containing "user_by_name: <username>".
+
+    Strings of this form are resolved to the user's path.
+
+    """
+    def _resolve_user(s):
+        if not type(s) == str or not s.startswith('user_by_login:'):
+            return s
+        user_locator = _get_user_locator(root, registry)
+        user_name = s.split('user_by_login:')[1]
+        user = user_locator.get_user_by_login(user_name)
+        if user is None:
+            raise ValueError('No such user: {}.'.format(user_name))
+        return resource_path(user)
+
+    return resource_info.transform(['data', ny, ny], _resolve_user)
 
 
 def _deserialize_content_type(resource_info: dict,

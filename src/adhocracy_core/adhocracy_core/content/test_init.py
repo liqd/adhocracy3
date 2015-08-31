@@ -347,6 +347,9 @@ class TestResourceContentRegistry:
         context = testing.DummyResource()
         assert inst.get_workflow(context) is None
 
+    def test_get_workflow_no_iresource_metadata(self, context, inst):
+        assert inst.get_workflow(context) is None
+
     def test_get_workflow_workflow_set(self, inst, context, mock_workflow,
                                        resource_meta):
         inst.workflows['sample'] = mock_workflow

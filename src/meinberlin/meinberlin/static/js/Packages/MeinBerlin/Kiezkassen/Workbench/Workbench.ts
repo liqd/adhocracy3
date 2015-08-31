@@ -25,7 +25,7 @@ import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workfl
 var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
 
-export var meinBerlinWorkbenchDirective = (
+export var kiezkassenWorkbenchDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>
@@ -129,14 +129,6 @@ export var kiezkassenDetailColumnDirective = (
             };
         }
     };
-};
-
-export var kiezkassenDetailAnnounceColumnDirective = (
-    adhConfig : AdhConfig.IService
-) => {
-    var directive = kiezkassenDetailColumnDirective(adhConfig);
-    directive.templateUrl = adhConfig.pkg_path + pkgLocation + "/KiezkassenDetailAnnounceColumn.html";
-    return directive;
 };
 
 export var kiezkassenEditColumnDirective = (
@@ -256,7 +248,7 @@ export var registerRoutes = (
         }]);
 };
 
-export var moduleName = "adhMeinBerlinWorkbench";
+export var moduleName = "adhMeinBerlinKiezkassenWorkbench";
 
 export var register = (angular) => {
     angular
@@ -271,17 +263,18 @@ export var register = (angular) => {
             AdhResourceArea.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .config(["adhResourceAreaProvider", registerRoutes(RIKiezkassenProcess.content_type)])
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider) => {
+            registerRoutes(RIKiezkassenProcess.content_type)(adhResourceAreaProvider);
+        }])
         .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
             adhProcessProvider.templateFactories[RIKiezkassenProcess.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mein-berlin-workbench></adh-mein-berlin-workbench>");
+                return $q.when("<adh-mein-berlin-kiezkassen-workbench></adh-mein-berlin-kiezkassen-workbench>");
             }];
         }])
-        .directive("adhMeinBerlinWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", meinBerlinWorkbenchDirective])
+        .directive("adhMeinBerlinKiezkassenWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", kiezkassenWorkbenchDirective])
         .directive("adhMeinBerlinKiezkassenProposalDetailColumn", ["adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalCreateColumn", ["adhConfig", kiezkassenProposalCreateColumnDirective])
         .directive("adhMeinBerlinKiezkassenProposalEditColumn", ["adhConfig", kiezkassenProposalEditColumnDirective])
         .directive("adhMeinBerlinKiezkassenDetailColumn", ["adhConfig", kiezkassenDetailColumnDirective])
-        .directive("adhMeinBerlinKiezkassenDetailAnnounceColumn", ["adhConfig", kiezkassenDetailAnnounceColumnDirective])
         .directive("adhMeinBerlinKiezkassenEditColumn", ["adhConfig", kiezkassenEditColumnDirective]);
 };

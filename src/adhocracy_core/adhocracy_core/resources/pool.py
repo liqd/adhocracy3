@@ -1,4 +1,5 @@
 """Basic type with children typically to create process structures."""
+from BTrees.Length import Length
 from substanced.folder import Folder
 from substanced.util import find_service
 from substanced.interfaces import IFolder
@@ -15,7 +16,6 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.base import Base
-from adhocracy_core.resources.base import Length
 from adhocracy_core.utils import now
 
 
@@ -83,11 +83,11 @@ class Pool(Base, Folder):
 
     def _get_next_number(self, prefix):
         if prefix in self._autoname_lasts:
-            number = self._autoname_lasts[prefix]
+            number = self._autoname_lasts[prefix].value
         else:
-            number = 0
-            self._autoname_lasts[prefix] = number
-        self._autoname_lasts[prefix] += 1
+            self._autoname_lasts[prefix] = Length()
+            number = self._autoname_lasts[prefix].value
+        self._autoname_lasts[prefix].change(1)
         return number
 
     def find_service(self, service_name, *sub_service_names):

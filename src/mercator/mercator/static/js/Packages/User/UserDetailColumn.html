@@ -19,7 +19,13 @@
         data-value="{{userUrl}}">
         <adh-user-profile
             data-path="{{userUrl}}">
-            </adh-user-profile>
+            <section class="mercator-user-profile-proposal-list">
+                <h3 class="mercator-user-profile-proposal-list-heading">{{ "TR__USERS_PROPOSALS" | translate:userBasic }}</h3>
+                <adh-mercator-user-proposal-listing
+                    data-path="{{path}}">
+                </adh-mercator-user-proposal-listing>
+            </section>
+        </adh-user-profile>
     </adh-recompile-on-change>
 
     <adh-user-message

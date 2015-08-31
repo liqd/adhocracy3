@@ -1492,6 +1492,8 @@ custom filters:
 
 * *item_creation_date* the the item_creation_date value of resources with :class:`adhocracy_core.sheets.metadata.IMetadata`.
 
+* *workflow_state* workflow state, see :doc:`workflows`, the state of versions is the same as for its item.
+
 * *badge* the badge names of resources with :class:`adhocracy_core.sheets.badge.IBadgeable`
   sheet.
 

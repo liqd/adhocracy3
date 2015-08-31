@@ -1,17 +1,17 @@
-<div class="mein-berlin-kiezkassen-detail">
+<div class="mein-berlin-burgerhaushalt-detail">
     <div data-ng-switch="currentPhase.name">
-        <div data-ng-switch-when="announce" class="mein-berlin-kiezkassen-detail-announce">
+        <div data-ng-switch-when="announce" class="mein-berlin-burgerhaushalt-detail-announce">
             {{ currentPhase.description }}
         </div>
-        <div data-ng-switch-default="" class="mein-berlin-kiezkassen-detail-listing">
+        <div data-ng-switch-default="" class="mein-berlin-burgerhaushalt-detail-listing">
             <adh-listing
                 data-path="{{path}}"
                 data-ng-show="!shared.isShowMap"
                 data-no-create-form="true"
                 data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                 data-params="{tag: 'LAST'}"
-                data-content-type="adhocracy_meinberlin.resources.kiezkassen.IProposalVersion">
-                <adh-mein-berlin-proposal-list-item data-path="{{element}}" data-is-kiezkasse="true">
+                data-content-type="adhocracy_meinberlin.resources.burgerhaushalt.IProposalVersion">
+                <adh-mein-berlin-proposal-list-item data-path="{{element}}" data-is-burgerhaushalt="true">
                 </adh-mein-berlin-proposal-list-item>
             </adh-listing>
 
@@ -30,10 +30,10 @@
                     data-no-create-form="true"
                     data-empty-text="{{ 'TR__PROPOSAL_EMPTY_TEXT' | translate }}"
                     data-params="{tag: 'LAST'}"
-                    data-content-type="adhocracy_meinberlin.resources.kiezkassen.IProposalVersion">
+                    data-content-type="adhocracy_meinberlin.resources.burgerhaushalt.IProposalVersion">
                     <adh-mein-berlin-proposal-map-list-item
                         data-path="{{item}}"
-                        data-is-kiezkasse="true">
+                        data-is-burgerhaushalt="true">
                     </adh-mein-berlin-proposal-map-list-item>
                 </adh-map-listing>
             </adh-wait>

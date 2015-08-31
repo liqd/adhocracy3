@@ -32,6 +32,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'private_visibility' in catalogs['adhocracy']
     assert 'badge' in catalogs['adhocracy']
     assert 'title' in catalogs['adhocracy']
+    assert 'workflow_state' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -324,4 +325,70 @@ class TestIndexTitle:
         from substanced.interfaces import IIndexView
         assert registry.adapters.lookup((ITitle,), IIndexView,
                                         name='adhocracy|title')
+
+
+class TestIndexWorkflowState:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def mock_sheet(self, mock_sheet, registry):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IWorkflowAssignment)
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def test_return_workflow_state(self, context, mock_sheet):
+        from .adhocracy import index_workflow_state
+        mock_sheet.get.return_value = {'workflow_state': 'STATE'}
+        assert index_workflow_state(context, 'default') == 'STATE'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IWorkflowAssignment,), IIndexView,
+                                        name='adhocracy|workflow_state')
+
+class TestIndexWorkflowStateOfItem:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def mock_sheet(self, mock_sheet, registry):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IWorkflowAssignment)
+        registry.content.get_sheet.return_value = mock_sheet
+        return mock_sheet
+
+    def test_return_workflow_state_of_item(self, context, item, mock_sheet):
+        from zope.interface import alsoProvides
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        from .adhocracy import index_workflow_state_of_item
+        alsoProvides(item, IWorkflowAssignment)
+        item["version"] = context
+        mock_sheet.get.return_value = {'workflow_state': 'STATE'}
+        assert index_workflow_state_of_item(context, 'default') == 'STATE'
+
+    def test_return_default_if_item_without_workflow(self, context, item, registry):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        from .adhocracy import index_workflow_state_of_item
+        item["version"] = context
+        registry.content.get_sheet.side_effect = RuntimeConfigurationError
+        assert index_workflow_state_of_item(context, 'default') == 'default'
+
+    def test_return_default_if_no_item_in_lineage(self, context, registry):
+        from .adhocracy import index_workflow_state_of_item
+        assert index_workflow_state_of_item(context, 'default') == 'default'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.versions import IVersionable
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IVersionable,), IIndexView,
+                                        name='adhocracy|workflow_state')
 
