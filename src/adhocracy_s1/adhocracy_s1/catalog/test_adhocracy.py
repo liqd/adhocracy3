@@ -11,68 +11,57 @@ def test_create_s1_catalog_indexes():
     assert isinstance(inst.decision_date, Field)
 
 
-class TestIndexDescisionDateOfProcess:
+class TestIndexDescisionDate:
 
     @fixture
     def registry(self, registry_with_content):
         return registry_with_content
 
     @fixture
-    def process(self, item):
-        from adhocracy_s1.resources.s1 import IProcess
-        process = testing.DummyResource(__provides__=IProcess)
-        process['item'] = item
-        return process
-
-    @fixture
-    def process_workflow_sheet(self, mock_sheet):
-        return deepcopy(mock_sheet)
-
-    @fixture
-    def item_workflow_sheet(self, mock_sheet):
-        return deepcopy(mock_sheet)
+    def item(self):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        item = testing.DummyResource(__provides__=IWorkflowAssignment)
+        item['version'] = testing.DummyResource()
+        return item
 
     def call_fut(self, *args):
-        from .adhocracy import index_decision_date_of_process
-        return index_decision_date_of_process(*args)
+        from .adhocracy import index_decision_date
+        return index_decision_date(*args)
 
-    def test_return_default_if_no_process_in_lineage(self, item):
-        item.__parent__ = None
-        assert self.call_fut(item, 'default') == 'default'
+    def test_ignore_if_not_state_data_in_linegae(self, context, registry):
+        assert self.call_fut(context, 'default') == 'default'
 
-    def test_return_default_if_process_has_no_result_start_date(
-            self, item, process, process_workflow_sheet, registry):
-        from adhocracy_core.sheets.workflow import IWorkflowAssignment
-        registry.content.get_sheet.return_value = process_workflow_sheet
-        process_workflow_sheet.get.return_value = {'state_data': []}
-        assert self.call_fut(item, 'default') == 'default'
-        registry.content.get_sheet.assert_called_with(process, IWorkflowAssignment)
-
-    def test_return_default_if_process_has_result_start_date_but_item_state_is_wrong(
-            self, item, item_workflow_sheet, process, process_workflow_sheet, registry):
-        from adhocracy_core.sheets.workflow import IWorkflowAssignment
-        registry.content.get_sheet.side_effect = [process_workflow_sheet, item_workflow_sheet]
-        process_workflow_sheet.get.return_value = {'state_data': []}
-        item_workflow_sheet.get.return_value = {'workflow_state': 'WRONG'}
-        assert self.call_fut(item, 'default') == 'default'
-
-    def test_return_result_start_date_of_process_if_item_state_is_selected_or_rejected(
-            self, item, item_workflow_sheet, process, process_workflow_sheet, registry):
+    def test_return_state_data_of_state_date_selected_in_lineage(
+            self, item, registry, mock_sheet):
         from datetime import datetime
-        registry.content.get_sheet.side_effect = [process_workflow_sheet, item_workflow_sheet]
-        process_workflow_sheet.get.return_value = {'state_data': []}
-        item_workflow_sheet.get.return_value = {'workflow_state': 'selected'}
         decision_date = datetime.now()
-        process_workflow_sheet.get.return_value =\
-            {'state_data': [{'name': 'result',
-                             'start_date': decision_date}]}
-        assert self.call_fut(item, 'default') == decision_date
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'state_data': [{'name': 'selected',
+                                                       'start_date': decision_date}]}
+        assert self.call_fut(item['version'], 'default') == decision_date
+
+    def test_return_state_data_of_state_date_rejected_in_lineage(
+            self, item, registry, mock_sheet):
+        from datetime import datetime
+        decision_date = datetime.now()
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'state_data': [{'name': 'rejected',
+                                                       'start_date': decision_date}]}
+        assert self.call_fut(item['version'], 'default') == decision_date
+
 
     @mark.usefixtures('integration')
     def test_register(self, registry):
         from adhocracy_s1.resources.s1 import IProposal
         from substanced.interfaces import IIndexView
         assert registry.adapters.lookup((IProposal,), IIndexView,
+                                        name='adhocracy|decision_date')
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_s1.resources.s1 import IProposalVersion
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IProposalVersion,), IIndexView,
                                         name='adhocracy|decision_date')
 
 
