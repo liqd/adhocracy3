@@ -12,6 +12,8 @@ import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
+import AdhMeinBerlinPhase = require("../../Phase/Phase");
+
 import SIImageReference = require("../../../../Resources_/adhocracy_core/sheets/image/IImageReference");
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
@@ -129,17 +131,6 @@ export var phaseHeaderDirective = (
 };
 
 
-export var phaseDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Phase.html",
-        scope: {
-            phase: "="
-        }
-    };
-};
-
-
 export var editDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
@@ -213,12 +204,12 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhMeinBerlinPhase.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTabs.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", editDirective]);

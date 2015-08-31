@@ -5,6 +5,8 @@ import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
+import AdhMeinBerlinPhase = require("../../Phase/Phase");
+
 var pkgLocation = "/MeinBerlin/Alexanderplatz/Process";
 
 
@@ -60,27 +62,17 @@ export var phaseHeaderDirective = (
 };
 
 
-export var phaseDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Phase.html",
-        scope: {
-            phase: "="
-        }
-    };
-};
-
 export var moduleName = "adhMeinBerlinAlexanderplatzProcess";
 
 export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhMeinBerlinPhase.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTabs.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .directive("adhMeinBerlinAlexanderplatzPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinAlexanderplatzPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective]);
 };
