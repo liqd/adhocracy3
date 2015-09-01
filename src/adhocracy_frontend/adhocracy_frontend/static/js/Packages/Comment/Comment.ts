@@ -356,7 +356,7 @@ export var commentColumnDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentColumn.html",
         require: "^adhMovingColumn",
         link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
-            if (adhUser.name) {
+            if (adhUser) {
                 scope.userName = adhUser.data.name;
             }
             column.bindVariablesAndClear(scope, ["commentCloseUrl", "commentableUrl"]);
