@@ -117,6 +117,11 @@ category: Variables
         <td>For invalid content</td>
     </tr>
     <tr>
+        <td><div class="example-color color-function-neutral"></div></td>
+        <td><code>color-function-neutral</code></td>
+        <td>For neutral (neither valid nor invalid) content</td>
+    </tr>
+    <tr>
         <td colspan="3"><strong>Structural colors</strong></td>
     </tr>
     <tr>
@@ -213,6 +218,7 @@ category: Variables
 
 .color-function-valid {background-color: $color-function-valid;}
 .color-function-invalid {background-color: $color-function-invalid;}
+.color-function-neutral {background-color: $color-function-neutral;}
 
 .color-background-base {background-color: $color-background-base;}
 .color-background-base-introvert {background-color: $color-background-base-introvert;}
@@ -230,7 +236,7 @@ category: Variables
 .color-button-cta-active-background {background-color: $color-button-cta-active-background;}
 
 // some static contrast checks for a11y
-@include check-contrast($color-text-normal, $color-background-base);
+@include check-contrast($color-text-normal, $color-background-base, 7);
 @include check-contrast($color-text-normal, $color-structure-introvert);
 @include check-contrast($color-text-extrovert, $color-background-base);
 @include check-contrast($color-text-extrovert, $color-structure-introvert);
