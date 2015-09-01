@@ -187,8 +187,6 @@ Click show results
 */
 
 .rate {
-    @include clearfix;
-
     a {
         color: $color-text-highlight-introvert;
         text-decoration: none;
