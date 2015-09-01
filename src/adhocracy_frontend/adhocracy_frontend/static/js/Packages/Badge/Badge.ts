@@ -6,6 +6,7 @@ import AdhConfig = require("../Config/Config");
 import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
 import AdhEmbed = require("../Embed/Embed");
+import AdhUtil = require("../Util/Util");
 
 import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
 import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
@@ -31,8 +32,13 @@ export var getBadgesFactory = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
 ) : IGetBadges => (
-    resource : SIBadgeable.HasSheet
+    resource : SIBadgeable.HasSheet,
+    includeParent? : boolean
 ) : angular.IPromise<IBadge[]> => {
+    if (typeof includeParent === "undefined") {
+        includeParent = !!resource.content_type.match(/Version$/);
+    }
+
     var assignmentPaths = resource.data[SIBadgeable.nick].assignments;
 
     var getBadge = (assignmentPath : string) => {
@@ -48,7 +54,17 @@ export var getBadgesFactory = (
         });
     };
 
-    return $q.all(_.map(assignmentPaths, getBadge));
+    if (includeParent) {
+        var parentPath = AdhUtil.parentPath(resource.path);
+
+        return adhHttp.get(parentPath).then((parentResource) => {
+            var parentAssignments = parentResource.data[SIBadgeable.nick].assignments;
+            assignmentPaths = assignmentPaths.concat(parentAssignments);
+            return $q.all(_.map(assignmentPaths, getBadge));
+        });
+    } else {
+        return $q.all(_.map(assignmentPaths, getBadge));
+    }
 };
 
 
