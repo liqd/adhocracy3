@@ -53,28 +53,20 @@ Badge modifiers for labeling if a proposal has been realized or not.
 
     &.m-color {
         background-color: $color-text-introvert;
-        padding-left: 5px / $font-size-smaller * 1em + 1.4em;
+        border-style: solid;
+        border-width: 0 0 0 ($badge-height * 1em);
         position: relative;
 
-        &:before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 1.4em;
+        &.m-is-realized {
+            border-color: $color-function-valid;
         }
 
-        &.m-is-realized:before {
-            background-color: $color-function-valid;
+        &.m-is-not-realized {
+            border-color: $color-function-invalid;
         }
 
-        &.m-is-not-realized:before {
-            background-color: $color-function-invalid;
-        }
-
-        &.m-on-test:before {
-            background-color: $color-function-neutral;
+        &.m-on-test {
+            border-color: $color-function-neutral;
         }
     }
 }
