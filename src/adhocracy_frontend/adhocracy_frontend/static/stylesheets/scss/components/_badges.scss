@@ -23,7 +23,7 @@ Badges for labeling things
     color: $color-text-normal;
     font-size: $font-size-smaller;
     padding: 0 5px / $font-size-smaller * 1em;
-    line-height: 1 + 4px / $font-size-smaller;
+    line-height: $badge-height;
     text-transform: uppercase;
     margin-right: 0.5em;
 }
