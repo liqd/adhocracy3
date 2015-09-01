@@ -232,13 +232,17 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
             pool._autoname_lasts = PersistentMapping()
             for prefix in prefixes:
                 pool._autoname_lasts[prefix] = Length()
-        elif hasattr(pool, '_autoname_lasts'):
+        if hasattr(pool, '_autoname_lasts'):
             # convert int to Length
             for prefix in pool._autoname_lasts.keys():
-                pool._autoname_lasts[prefix] \
-                    = Length(pool._autoname_lasts[prefix])
+                if isinstance(pool._autoname_lasts[prefix], int):
+                    pool._autoname_lasts[prefix] \
+                        = Length(pool._autoname_lasts[prefix].value)
+                elif isinstance(pool._autoname_lasts[prefix].value, Length):
+                    pool._autoname_lasts[prefix] = Length(1)
             # convert dict to PersistentMapping
-            pool._autoname_lasts = PersistentMapping(pool._autoname_lasts)
+            if not isinstance(pool._autoname_lasts, PersistentMapping):
+                pool._autoname_lasts = PersistentMapping(pool._autoname_lasts)
 
 
 @log_migration
