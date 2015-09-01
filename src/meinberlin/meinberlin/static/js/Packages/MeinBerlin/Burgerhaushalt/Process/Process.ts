@@ -62,25 +62,27 @@ export var phaseHeaderDirective = (
             scope.phases = [{
                 name: "information",
                 title: "Information",
-                description: "Ab dem Start der Ideensammlungsphase können sich alle interessierten Bürgerinnen und Bürger beteiligen " +
-                    "und Vorschläge zu der geplanten Mittelvergabe einreichen, diskutieren und bewerten.",
+                description: "Ab dem 02.09.2015 können sich alle interessierten Bürgerinnen und Bürger zum Bürgerhaushalt " +
+                    "Treptow-Köpenick online beteiligen. Auf der Internetseite des Bezirksamtes Treptow-Köpenick sowie eine " +
+                    "Einwohnerversammlung werden allen Interessierten Informationen zum Verfahren zur Verfügung gestellt. Bisher " +
+                    "offline eingereichte Vorschläge werden von den Fachämtern online eingetragen.",
                 processType: "Bürgerhaushalt",
                 votingAvailable: true,
                 commentAvailable: true
             }, {
                 name: "collection",
                 title: "Ideensammlung",
-                description: "In dieser Phase bringen Bürgerinnen und Bürger ihre Vorschläge zu der geplanten Mittelvergabe online ein " +
-                    "und können Vorschläge anderer bewerten und diskutieren. Vorschläge beziehen sich auf das laufende oder zukünftige " +
-                    "Kalenderjahr und können stets eingebracht werden. Vorschläge können auch offline eingereicht werden.",
+                description: "In dieser Phase bringen Bürgerinnen und Bürger ihre Vorschläge ein und können Vorschläge anderer bewerten " +
+                    "und diskutieren. Vorschläge beziehen sich auf das laufende oder zukünftige Kalenderjahr und können stets " +
+                    "eingebracht werden. Vorschläge können auch offline eingereicht werden.",
                 processType: "Bürgerhaushalt",
                 votingAvailable: true,
                 commentAvailable: true
             }, {
                 name: "result",
                 title: "Ergebnisse",
-                description: "In der letzten Phase werden die Ergebnisse online gestellt. Bürgerinnen und Bürger können den Status " +
-                    "Ihres Vorschlags sehen und gegebenenfalls die Stellungnahme vom Fachamt lesen.",
+                description: "Bürgerinnen und Bürger können den Status aller Vorschläge sehen und gegebenenfalls die Stellungnahme des " +
+                    "im Bezirksamt zuständigen Fachamtes lesen.",
                 processType: "Bürgerhaushalt",
                 votingAvailable: false,
                 commentAvailable: false
