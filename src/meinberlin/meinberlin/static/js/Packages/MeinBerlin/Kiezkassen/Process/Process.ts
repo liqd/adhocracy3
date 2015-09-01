@@ -3,7 +3,7 @@
 
 import _ = require("lodash");
 
-import AdhConfig = require("..././../Config/Config");
+import AdhConfig = require("../../../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
@@ -11,6 +11,8 @@ import AdhProcess = require("../../../Process/Process");
 import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
+
+import AdhMeinBerlinPhase = require("../../Phase/Phase");
 
 import SIImageReference = require("../../../../Resources_/adhocracy_core/sheets/image/IImageReference");
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
@@ -67,9 +69,9 @@ export var phaseHeaderDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
         scope: {},
-        link: (scope) => {
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
                 var sheet = resource.data[SIWorkflow.nick];
@@ -124,17 +126,6 @@ export var phaseHeaderDirective = (
                 votingAvailable: false,
                 commentAvailable: false
             }];
-        }
-    };
-};
-
-
-export var phaseDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Phase.html",
-        scope: {
-            phase: "="
         }
     };
 };
@@ -213,12 +204,12 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhMeinBerlinPhase.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName,
             AdhTabs.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
         .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
         .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", editDirective]);

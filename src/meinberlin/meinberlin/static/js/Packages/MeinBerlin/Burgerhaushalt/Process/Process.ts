@@ -4,6 +4,8 @@ import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
 
+import AdhMeinBerlinPhase = require("../../Phase/Phase");
+
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
 import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
@@ -49,6 +51,44 @@ export var detailDirective = (
 };
 
 
+export var phaseHeaderDirective = (
+    adhConfig : AdhConfig.IService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
+        scope: {},
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
+            scope.phases = [{
+                name: "information",
+                title: "Information",
+                description: "Ab dem Start der Ideensammlungsphase können sich alle interessierten Bürgerinnen und Bürger beteiligen " +
+                    "und Vorschläge zu der geplanten Mittelvergabe einreichen, diskutieren und bewerten.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: true,
+                commentAvailable: true
+            }, {
+                name: "collection",
+                title: "Ideensammlung",
+                description: "In dieser Phase bringen Bürgerinnen und Bürger ihre Vorschläge zu der geplanten Mittelvergabe online ein " +
+                    "und können Vorschläge anderer bewerten und diskutieren. Vorschläge beziehen sich auf das laufende oder zukünftige " +
+                    "Kalenderjahr und können stets eingebracht werden. Vorschläge können auch offline eingereicht werden.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: true,
+                commentAvailable: true
+            }, {
+                name: "result",
+                title: "Ergebnisse",
+                description: "In der letzten Phase werden die Ergebnisse online gestellt. Bürgerinnen und Bürger können den Status " +
+                    "Ihres Vorschlags sehen und gegebenenfalls die Stellungnahme vom Fachamt lesen.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: false,
+                commentAvailable: false
+            }];
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinBurgerhaushaltProcess";
 
@@ -56,8 +96,10 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhMeinBerlinPhase.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName
         ])
+        .directive("adhMeinBerlinBurgerhaushaltPhaseHeader", ["adhConfig", phaseHeaderDirective])
         .directive("adhMeinBerlinBurgerhaushaltDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective]);
 };
