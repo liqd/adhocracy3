@@ -12,7 +12,7 @@
             'is-positive': rates(1) > rates(-1)}">
         {{rates(1) - rates(-1) | signum}}
     </span>
-    <div class="rate-button-container">
+    <span class="rate-button-container">
         <a
             href=""
             class="rate-pro"
@@ -24,8 +24,8 @@
             <i class="icon-vote-up" title="{{'TR__RATE_VOTE_UP' | translate}}"></i>
         </a>
         <span class="rate-results"><span data-ng-if="rates(1) !== 0">+</span>{{rates(1)}}</span>
-    </div>
-    <div class="rate-button-container">
+    </span>
+    <span class="rate-button-container">
         <a
             href=""
             class="rate-contra"
@@ -37,5 +37,5 @@
             <i class="icon-vote-down" title="{{'TR__RATE_VOTE_DOWN' | translate}}"></i>
         </a>
         <span class="rate-results"><span data-ng-if="rates(-1) !== 0">-</span>{{rates(-1)}}</span>
-    </div>
+    </span>
 </div>
