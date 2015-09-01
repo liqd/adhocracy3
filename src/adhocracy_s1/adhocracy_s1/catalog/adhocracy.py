@@ -41,10 +41,10 @@ def includeme(config):
     config.add_indexview(index_decision_date,
                          catalog_name='adhocracy',
                          index_name='decision_date',
-                         context=IProposal,
+                         context=IProposalVersion,
                          )
     config.add_indexview(index_decision_date,
                          catalog_name='adhocracy',
                          index_name='decision_date',
-                         context=IProposalVersion,
+                         context=IProposal,
                          )

@@ -109,8 +109,6 @@ def _do_transition(context, request: Request, from_state: str, to_state: str,
             if start_date is not None:
                 _store_state_data(context, to_state, request,
                                   start_date=start_date)
-                catalogs = find_service(context, 'catalogs')
-                catalogs.reindex_index(context, 'decision_date')
 
 
 s1_meta = freeze({
