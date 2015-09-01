@@ -187,6 +187,8 @@ Click show results
 */
 
 .rate {
+    @include clearfix;
+
     a {
         color: $color-text-highlight-introvert;
         text-decoration: none;
@@ -198,14 +200,17 @@ Click show results
 
     .rate-button-container {
         @include inline-block;
+        position: relative;
     }
 
     .rate-results {
         display: block;
         padding-top: 3px / $font-size-small * 1em;
         font-size: $font-size-small;
+        position: absolute;
         text-align: center;
         visibility: hidden;
+        width: 100%;
     }
 
     &.m-show-results-persist,
@@ -236,8 +241,6 @@ Click show results
     }
 
     .rate-difference {
-        vertical-align: top;
-
         &.is-positive {
             color: $color-function-valid;
         }
