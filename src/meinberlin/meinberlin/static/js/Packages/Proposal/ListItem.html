@@ -7,12 +7,14 @@
         {{ "TR__ON" | translate }}
         <adh-time data-datetime="data.creationDate" data-format="L"></adh-time>
         <span
-            data-ng-if="data.assignments.length > 0"
+            data-ng-repeat="assignment in data.assignments"
             class="badge"
             data-ng-class="{
-                'm-is-realized': data.assignments[0].name === 'going_to_be_realized',
-                'm-is-not-realized': data.assignments[0].name === 'not_realizeable'
-        }">{{ data.assignments[0].title }}</span>
+                'm-is-realized': assignment.name === 'going_to_be_realized',
+                'm-is-not-realized': assignment.name === 'not_realizeable',
+                'm-on-test': assignment.name === 'on_test',
+                'm-color': isBurgerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
+            }">{{ assignment.title }}</span>
     </div>
     <div class="meinberlin-proposal-list-item-col-right">
         <p class="meinberlin-proposal-list-meta-item m-comments"
