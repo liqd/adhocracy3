@@ -2,6 +2,7 @@ import AdhConfig = require("..././../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
+import AdhProcess = require("../../../Process/Process");
 
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
@@ -30,8 +31,9 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var stateName = resource.data[SIWorkflow.nick].workflow_state;
-                        scope.currentPhase = resource.data[SIWorkflow.nick].state_data[stateName];
+                        var sheet = resource.data[SIWorkflow.nick];
+                        var stateName = sheet.workflow_state;
+                        scope.currentPhase = AdhProcess.getStateData(sheet, stateName);
 
                         var locationUrl = resource.data[SILocationReference.nick].location;
                         adhHttp.get(locationUrl).then((location) => {

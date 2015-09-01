@@ -17,7 +17,7 @@ Dein Nutzerprofil wird dann mit folgenden Nutzerdaten erstellt und mit
 einem Badge versehen, das Dich als Experte auf der Plattform
 auszeichnet.
 
-    Registrierte Email: ${email}
+    Registrierte E-Mail: ${email}
     Benutzername: ${user_name}
 
 
