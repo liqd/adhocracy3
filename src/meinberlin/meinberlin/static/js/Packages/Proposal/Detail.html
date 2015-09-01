@@ -6,7 +6,9 @@
             class="badge"
             data-ng-class="{
                 'm-is-realized': assignment.name === 'going_to_be_realized',
-                'm-is-not-realized': assignment.name === 'not_realizeable'
+                'm-is-not-realized': assignment.name === 'not_realizeable',
+                'm-on-test': assignment.name === 'on_test',
+                'm-color': isBurgerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
             }">{{ assignment.title }}</span>
 
         <ul class="mein-berlin-proposal-detail-meta">
@@ -50,7 +52,9 @@
             class="badge-description"
             data-ng-class="{
                 'm-is-realized': assignment.name === 'going_to_be_realized',
-                'm-is-not-realized': assignment.name === 'not_realizeable'
+                'm-is-not-realized': assignment.name === 'not_realizeable',
+                'm-on-test': assignment.name === 'on_test',
+                'm-color': isBurgerhaushalt && (assignment.name === 'going_to_be_realized' || assignment.name === 'not_realizeable' || assignment.name === 'on_test')
             }">
             <adh-parse-markdown data-parsetext="assignment.description"></adh-parse-markdown>
         </div>
