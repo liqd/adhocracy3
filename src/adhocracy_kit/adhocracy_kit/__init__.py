@@ -10,6 +10,8 @@ def includeme(config):
     config.include('adhocracy_spd')
     # commit to allow overriding pyramid config
     config.commit()
+    # include kit resource types
+    config.include('.resources')
     # add translations
     config.add_translation_dirs('adhocracy_spd:locale/')
 
