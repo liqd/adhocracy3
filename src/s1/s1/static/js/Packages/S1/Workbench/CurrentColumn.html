@@ -1,13 +1,13 @@
 <div data-ng-switch="transclusionId">
     <div data-ng-switch-when="menu">
         <div class="moving-column-menu-sorts">
-            <span class="moving-column-menu-sort-label">{{ "TR__SORT_BY" | translate }}</span>
+            <span class="button m-menu-action">{{ "TR__SORT_BY" | translate }}</span>
             <a href=""
-                class="moving-column-menu-sort-option"
+                class="button m-menu-action"
                 data-ng-click="shared.setSort('rates')"
                 data-ng-class="{'is-active': shared.sort==='rates'}">{{ "TR__RATES" | translate }}</a>
             <a href=""
-                class="moving-column-menu-sort-option"
+                class="button m-menu-action"
                 data-ng-click="shared.setSort('item_creation_date')"
                 data-ng-class="{'is-active': shared.sort==='item_creation_date'}">{{ "TR__CREATION_DATE" | translate }}</a>
         </div>

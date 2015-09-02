@@ -41,7 +41,7 @@ Narrower cta button
         color: $color-brand-one-normal;
         font-size: $font-size-small;
 
-        &:hover:enabled, &:focus:enabled {
+        &:hover:enabled, &:focus:enabled, &.is-active {
             color: $color-brand-one-extrovert;
         }
     }
@@ -49,7 +49,7 @@ Narrower cta button
 
 .button-cta,
 .button-cta-secondary {
-    &:active {
+    &:active, &.is-active {
         color: $color-text-inverted;
     }
 }
@@ -62,7 +62,7 @@ Narrower cta button
         background: $color-brand-one-introvert;
     }
 
-    &:active {
+    &:active, &.is-active {
         background: $color-brand-one-extrovert;
         color: $color-text-inverted;
     }
