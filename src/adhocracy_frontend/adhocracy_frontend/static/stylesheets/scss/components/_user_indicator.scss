@@ -11,9 +11,10 @@ It is usually used in the header bar.
 
 .user-indicator {
     @include inline-block;
-    @include text(introvert);
     vertical-align: middle;
     white-space: nowrap;
+    color: $color-text-introvert;
+    font-weight: $font-weight-introvert;
 
     a {
         display: inline;

@@ -7,7 +7,9 @@ category: Type
 */
 
 body {
-    @include text(running);
+    color: $color-text-normal;
+    font-size: $font-size-normal;
+    line-height: $line-height-normal;
 
     @media print {
         // scss-lint:disable ImportantRule

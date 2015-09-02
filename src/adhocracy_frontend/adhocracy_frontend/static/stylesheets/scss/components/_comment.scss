@@ -151,8 +151,9 @@ parent: comment
 
 .comment-header {
     @include clearfix;
-    @include text(introvert);
+    color: $color-text-introvert;
     font-size: $font-size-small;
+    font-weight: $font-weight-introvert;
     margin-bottom: 10px / $font-size-small * 1em;
     padding-top: 3px / $font-size-small * 1em;
 
