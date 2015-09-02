@@ -1,13 +1,12 @@
 <div class="s1-workflow-switch">
-{{availableStates}} {{newState}}
-    <div class="s1-workflow-switch-phases-container">
-        <ul class="s1-workflow-switch-phases">
-            <li class="is-current-workflow"><a href="">{{ "TR__S1_WORKFLOW_CREATE" | translate }}</a></li>
-            <li class="is-current-workflow"><a href="">{{ "TR__S1_WORKFLOW_REVIEW" | translate }}</a></li>
-            <li class="is-current-workflow"><a href="">{{ "TR__S1_WORKFLOW_WINNERS" | translate }}</a></li>
+    <div class="s1-workflow-switch-states-container">
+        <ul class="s1-states">
+            <li class="s1-state" data-ng-class="{ 'is-selected': workflowState == 'propose' }">{{ "TR__S1_WORKFLOW_PROPOSE" | translate }}</li>
+            <li class="s1-state" data-ng-class="{ 'is-selected': workflowState == 'select' }">{{ "TR__S1_WORKFLOW_SELECT" | translate }}</li>
+            <li class="s1-state" data-ng-class="{ 'is-selected': workflowState == 'result' }">{{ "TR__S1_WORKFLOW_RESULT" | translate }}</li>
         </ul>
     </div>
     <div class="s1-workflow-switch-container">
-        <a href="" data-ng-click="switchState(newState)" data-ng-repeat="newState in availableStates">{{ "TR__S1_SWITCH_TO" | translate }} {{ newState }}</a>
+        <a class="button m-menu-action" href="" data-ng-click="switchState(newState)" data-ng-repeat="newState in availableStates">{{ "TR__S1_SWITCH_TO" | translate }} {{ newState }}</a>
     </div>
 </div>

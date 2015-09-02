@@ -73,9 +73,14 @@ export var workflowSwitchDirective = (
             path: "@"
         },
         link: (scope, element) => {
+
             adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
                 scope.availableStates = AdhUtil.deepPluck(raw, [
                     "data", "PUT", "request_body", "data", SIWorkflow.nick, "workflow_state"]);
+            });
+
+            adhHttp.get(scope.path).then((process) => {
+                scope.workflowState = process.data[SIWorkflow.nick].workflow_state;
             });
 
             scope.switchState = (newState) => {
