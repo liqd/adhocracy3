@@ -332,8 +332,10 @@ export var listingDirective = (
             }
             if (scope.state) {
                 scope.params.workflow_state = scope.state;
-                scope.params.decision_date = scope.decisionDate;
                 scope.params.depth = "all";
+            }
+            if (scope.decisionDate) {
+                scope.params.decision_date = scope.decisionDate;
             }
         }
     };
