@@ -64,15 +64,11 @@ export var s1CurrentColumnDirective = (
                 });
             });
 
-            scope.shared.facets = [{
-                key: "sort",
-                name: "TR__SORT",
-                items: [
-                    {key: "rates", name: "TR__RATES"},
-                    {key: "title", name: "TR__TITLE"},
-                    {key: "item_creation_date", name: "TR__DATE"}
-                ]
-            }];
+            scope.shared.sort = "rates";
+            scope.shared.reverse = true;
+            scope.shared.setSort = (sort : string) => {
+                scope.shared.sort = sort;
+            };
         }
     };
 };
@@ -102,15 +98,11 @@ export var s1NextColumnDirective = (
                 });
             });
 
-            scope.shared.facets = [{
-                key: "sort",
-                name: "TR__SORT",
-                items: [
-                    {key: "rates", name: "TR__RATES"},
-                    {key: "title", name: "TR__TITLE"},
-                    {key: "item_creation_date", name: "TR__DATE"}
-                ]
-            }];
+            scope.shared.sort = "rates";
+            scope.shared.reverse = true;
+            scope.shared.setSort = (sort : string) => {
+                scope.shared.sort = sort;
+            };
         }
     };
 };
@@ -150,6 +142,12 @@ export var s1ArchiveColumnDirective = (
                     {key: "item_creation_date", name: "TR__DATE"}
                 ]
             }];
+
+            scope.shared.sort = "rates";
+            scope.shared.reverse = true;
+            scope.shared.setSort = (sort : string) => {
+                scope.shared.sort = sort;
+            };
         }
     };
 };

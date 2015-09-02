@@ -316,6 +316,7 @@ export var listingDirective = (
             facets: "=?",
             update: "=?",
             sort: "=?",
+            reverse: "=?",
             state: "@?",
             decisionDate: "@?",
             creator: "@?"
