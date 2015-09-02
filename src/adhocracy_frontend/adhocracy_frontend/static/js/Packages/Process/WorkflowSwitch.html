@@ -1,12 +1,12 @@
 <div class="s1-workflow-switch">
-    <div class="s1-workflow-switch-states-container">
+    <div class="s1-workflow-switch-states-container" data-ng-class="{ 'has-switch': availableStates }">
         <ul class="s1-states">
             <li class="s1-state" data-ng-class="{ 'is-selected': workflowState == 'propose' }">{{ "TR__S1_WORKFLOW_PROPOSE" | translate }}</li>
             <li class="s1-state" data-ng-class="{ 'is-selected': workflowState == 'select' }">{{ "TR__S1_WORKFLOW_SELECT" | translate }}</li>
             <li class="s1-state" data-ng-class="{ 'is-selected': workflowState == 'result' }">{{ "TR__S1_WORKFLOW_RESULT" | translate }}</li>
         </ul>
     </div>
-    <div class="s1-workflow-switch-container">
+    <div class="s1-workflow-switch-container" data-ng-if="availableStates">
         <a class="button m-menu-action" href="" data-ng-click="switchState(newState)" data-ng-repeat="newState in availableStates">{{ "TR__S1_SWITCH_TO" | translate }} {{ newState }}</a>
     </div>
 </div>

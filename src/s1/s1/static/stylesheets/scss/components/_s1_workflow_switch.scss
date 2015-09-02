@@ -1,7 +1,7 @@
 .s1-workflow-switch {
     @include clearfix;
+    @include rem(margin, 0 auto 27px);
     width: $moving-column-single-width-max;
-    margin: 0 auto;
 }
 
 $state-height: 15px;
@@ -69,7 +69,7 @@ $arrow-width: 5px;
     }
 }
 
-.s1-workflow-switch-states-container {
+.s1-workflow-switch-states-container.has-switch {
     @include span(9 of 12 first);
 }
 
@@ -79,5 +79,6 @@ $arrow-width: 5px;
 
     .button {
         @include rem(line-height, $state-height);
+        height: auto;
     }
 }

@@ -4,7 +4,8 @@
     position: relative;
 
     .s1-header-logo-link, .button,
-    .user-indicator, .button-group {
+    .user-indicator, .button-group,
+    .s1-header-link {
         @include rem(margin-right, 60px);
     }
 
