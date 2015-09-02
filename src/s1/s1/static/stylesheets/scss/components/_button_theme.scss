@@ -82,6 +82,12 @@ Narrower cta button
     }
 }
 
+.button-cta {
+    &:active, &.is-active {
+        background: $color-brand-one-extrovert;
+    }
+}
+
 /*doc
 ---
 title: Call-to-action button variant

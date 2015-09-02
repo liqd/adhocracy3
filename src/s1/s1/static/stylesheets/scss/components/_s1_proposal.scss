@@ -25,6 +25,10 @@
 
 .s1-proposal-list-item-type {
     color: $color-brand-one-normal;
+
+    &.is-selected {
+        color: $color-function-winner;
+    }
 }
 
 .s1-proposal-title {
