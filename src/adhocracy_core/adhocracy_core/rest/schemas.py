@@ -554,7 +554,10 @@ def _get_index_example_value(index: SDIndex) -> object:
         return
     if 'unique_values' in index.__dir__():
         indexed_values = index.unique_values()
-        return indexed_values and indexed_values[0] or None
+        if len(indexed_values) > 0:
+            return indexed_values[0]
+        else:
+            return
     elif isinstance(index, ReferenceIndex): # pragma: no cover
         return Base()
 
