@@ -130,10 +130,14 @@ export var s1ArchiveColumnDirective = (
 
             scope.$watch("processUrl", (processUrl : string) => {
                 adhHttp.get(processUrl).then((process : RIS1Process) => {
-                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
-
-                    // FIXME: filter for only those which are not in the current meeting
                     scope.proposalState = "[\"any\", [\"selected\", \"rejected\"]]";
+
+                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                    if (workflowState === "result") {
+                        var decisionDate = AdhUtil.deepPluck(
+                            AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+                        scope.decisionDate = "[\"lt\",  \"" + decisionDate + "\"]";
+                    }
                 });
             });
 
@@ -223,7 +227,12 @@ var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
     } else if (proposalState === "votable") {
         return "current";
     } else {
-        return "archive";
+        var processDecisionDate = AdhUtil.deepPluck(
+            AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
+        var proposalDecisionDate = AdhUtil.deepPluck(
+            AdhProcess.getStateData(proposal.data[SIWorkflowAssignment.nick], proposalState), ["start_date"]);
+
+        return (processDecisionDate === proposalDecisionDate) ? "current" : "archive";
     }
 };
 
