@@ -5,6 +5,6 @@
 
 <a class="button-cta-secondary" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}" data-ng-if="workflowState !== 'propose'">Sitzung A</a>
 <span class="button-group" data-ng-if="workflowState !== 'propose'">
-    <a class="button" data-ng-href="{{ processUrl | adhResourceUrl:'next' }}">Sitzung B</a>
-    <a class="button m-call-to-action" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">vorschlag machen</a>
+    <a class="button button-cta" data-ng-href="{{ processUrl | adhResourceUrl:'next' }}">Sitzung B</a>
+    <a class="button button-cta m-variant" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">vorschlag machen</a>
 </span>
