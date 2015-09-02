@@ -64,9 +64,7 @@ export class Service {
 export var workflowSwitchDirective = (
     adhConfig : AdhConfig.IService,
     adhHttp : AdhHttp.Service<any>,
-    adhTopLevelState : AdhTopLevelState.Service,
-    adhProcess : Service,
-    $compile : angular.ICompileService
+    $window : angular.IWindowService
 ) => {
     return {
         restrict: "E",
@@ -86,7 +84,10 @@ export var workflowSwitchDirective = (
                         workflow_state: newState
                     };
                     process.data[SIName.nick] = undefined;
-                    adhHttp.put(scope.path, process);
+                    adhHttp.put(scope.path, process).then((response) => {
+                        $window.alert("Switched to process state " + newState + ". Page reloading...");
+                        $window.parent.location.reload();
+                    });
                 });
             };
 
@@ -129,6 +130,6 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName
         ])
         .provider("adhProcess", Provider)
-        .directive("adhWorkflowSwitch", ["adhConfig", "adhHttp", "adhTopLevelState", "adhProcess", "$compile", workflowSwitchDirective])
+        .directive("adhWorkflowSwitch", ["adhConfig", "adhHttp", "$window", workflowSwitchDirective])
         .directive("adhProcessView", ["adhTopLevelState", "adhProcess", "$compile", processViewDirective]);
 };
