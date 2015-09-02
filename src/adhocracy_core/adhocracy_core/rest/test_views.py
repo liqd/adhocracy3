@@ -130,7 +130,7 @@ class TestValidateRequest:
         self.call_fut(context, request_, schema=CountSchema())
         assert request_.validated == {'count': 1}
 
-    def test_non_valid_with_schema_wrong_data(self, context, request_):
+    def test_non_valid_with_schema_wrong_data_value(self, context, request_):
         from pyramid.httpexceptions import HTTPBadRequest
         from .exceptions import error_entry
         request_.body = '{"count": "wrong_value"}'
@@ -140,6 +140,30 @@ class TestValidateRequest:
         assert request_.errors == [error_entry('body',
                                                 'count',
                                                 '"wrong_value" is not a number')]
+
+    def test_non_valid_with_schema_wrong_data_key_ignore(self, context,
+                                                         request_):
+        request_.body = '{"wrong_key": "1"}'
+        request_.method = 'POST'
+        schema = CountSchema().clone()
+        schema.typ.unknown = 'ignore'
+        self.call_fut(context, request_, schema=schema)
+        assert request_.errors == []
+        assert request_.validated == {}
+
+    def test_non_valid_with_schema_wrong_data_key_raise(self, context,
+                                                        request_):
+        from pyramid.httpexceptions import HTTPBadRequest
+        from .exceptions import error_entry
+        request_.body = '{"wrong_key": "1"}'
+        request_.method = 'POST'
+        schema = CountSchema().clone()
+        schema.typ.unknown = 'raise'
+        with pytest.raises(HTTPBadRequest):
+            self.call_fut(context, request_, schema=schema)
+        assert request_.errors == [error_entry('body',
+                                               '',
+                                               'Unrecognized keys in mapping: "{\'wrong_key\': \'1\'}"')]
 
     def test_non_valid_with_non_json_data(self, context, request_):
         from pyramid.httpexceptions import HTTPBadRequest

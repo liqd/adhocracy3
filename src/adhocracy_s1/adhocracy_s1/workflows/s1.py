@@ -16,6 +16,11 @@ from adhocracy_core.workflows import add_workflow
 from adhocracy_core.utils import get_sheet
 
 
+def do_transition_to_propose(context: IPool, request: Request, **kwargs):
+    """Do various tasks to complete transition to propose state."""
+    _remove_state_data(context, 'result', 'start_date', request)
+
+
 def do_transition_to_voteable(context: IPool, request: Request, **kwargs):
     """Do transition from state proposed to voteable for all children."""
     for child in context.values():
@@ -26,7 +31,7 @@ def do_transition_to_voteable(context: IPool, request: Request, **kwargs):
 def do_transition_to_result(context: IPool, request: Request, **kwargs):
     """Do various tasks to complete transition to result state."""
     decision_date = datetime.utcnow().replace(tzinfo=UTC)
-    _store_state_data(context, 'result', start_date=decision_date)
+    _store_state_data(context, 'result', request, start_date=decision_date)
     _change_children_to_rejected_or_selected(context, request,
                                               start_date=decision_date)
 
@@ -48,15 +53,31 @@ def _change_children_to_rejected_or_selected(context: IPool, request: Request,
                            to_state='rejected', start_date=start_date)
 
 
-def _store_state_data(context: IWorkflowAssignment, state_name:str, **kwargs):
+def _store_state_data(context: IWorkflowAssignment, state_name: str,
+                      request: Request, **kwargs):
     sheet = get_sheet(context, IWorkflowAssignment)
-    state_data_list = sheet.get()['state_data']
-    state_data = [x for x in state_data_list if x['name'] == state_name]
-    if state_data == []:
-        state_data = {'name': state_name}
-        state_data_list += [state_data]
-    state_data.update(**kwargs)
-    sheet.set({'state_data': state_data_list})
+    state_data = sheet.get()['state_data']
+    datas = [x for x in state_data if x['name'] == state_name]
+    if datas == []:
+        data = {'name': state_name}
+        state_data.append(data)
+    else:
+        data = datas[0]
+    data.update(**kwargs)
+    sheet.set({'state_data': state_data}, request=request)
+
+
+def _remove_state_data(context: IWorkflowAssignment, state_name: str,
+                       key: str, request: Request):
+    sheet = get_sheet(context, IWorkflowAssignment)
+    state_data = sheet.get()['state_data']
+    datas = [x for x in state_data if x['name'] == state_name]
+    if datas == []:
+        return
+    data = datas[0]
+    if key in data:
+        del data[key]
+    sheet.set({'state_data': state_data}, request=request)
 
 
 def _get_children_sort_by_rates(context) -> []:
@@ -86,9 +107,9 @@ def _do_transition(context, request: Request, from_state: str, to_state: str,
         if current_state == from_state:
             sheet.set({'workflow_state': to_state}, request=request)
             if start_date is not None:
-                _store_state_data(context, to_state, start_date=start_date)
-                catalogs = find_service(context, 'catalogs')
-                catalogs.reindex_index(context, 'decision_date')
+                _store_state_data(context, to_state, request,
+                                  start_date=start_date)
+
 
 s1_meta = freeze({
     'initial_state': 'propose',
@@ -141,6 +162,7 @@ s1_meta = freeze({
                       },
         'to_propose': {'from_state': 'result',
                        'to_state': 'propose',
+                       'callback': 'adhocracy_s1.workflows.s1.do_transition_to_propose',
                       },
     },
 })

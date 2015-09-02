@@ -1315,14 +1315,7 @@ Filtering Pools
 
 It's possible to filter and aggregate the information collected in pools by
 adding suitable GET parameters. For example, we can only retrieve children
-of a specific content type::
-
-    >>> resp_data = testapp.get('/Documents/document_0000000',
-    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/']
+that implement a specific sheet:
 
 Or only children that implement a specific sheet::
 
@@ -1336,10 +1329,71 @@ Note that multiple filters are combined by AND. If we specify a content_type
 filter and a sheet filter, only the elements matched by *both* filters will be
 returned. The same applies to all other filters as well.
 
-Note: Currently it's not possible to specify multiple values for the *sheet*
-filter (which would be combined by AND or possibly -- using a different
-syntax -- by OR). We may add this functionality in the future if there is a
-need for it.
+For more sophisticated queries you can add various comparator suffix to your
+parameter value. The available comparators depend on the choosedn filter.
+
+*eq* 'equal to' is the default comparator we already used implicit::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000',
+    ...     params={'sheet': '["eq", "adhocracy_core.sheets.tags.ITag"]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/FIRST/',
+     'http://localhost/Documents/document_0000000/LAST/']
+
+*noteq* not equal to::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000',
+    ...     params={'sheet': '["noteq", "adhocracy_core.sheets.tags.ITag"]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/VERSION_0000000/',...
+
+*gt* greater then::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    ...     params={'name': '["gt", "rate_0000000"]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/rates/rate_0000001/']
+
+*ge* greater or equal to::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    ...     params={'name': '["ge", "rate_0000000"]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/rates/rate_0000000/',
+     'http://localhost/Documents/document_0000000/rates/rate_0000001/']
+
+
+*lt* lower then::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    ...     params={'name': '["lt", "rate_0000001"]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/rates/rate_0000000/']
+
+*le* lower or equal to::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    ...     params={'name': '["le", "rate_0000001"]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/rates/rate_0000000/',
+     'http://localhost/Documents/document_0000000/rates/rate_0000001/']
+
+Some comparators can handle a list of query values.
+
+*any*::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    ...     params={'name': '["any", ["rate_0000000", "rate_0000001"]]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/rates/rate_0000000/',
+     'http://localhost/Documents/document_0000000/rates/rate_0000001/']
+
+*notany*::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000/rates/',
+    ...     params={'name': '["notany", ["rate_0000000", "rate_0000001"]]'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    []
 
 By default, only direct children of a pool are listed as elements,
 i.e. the standard depth is 1. Setting the *depth* filter to a higher
@@ -1456,6 +1510,16 @@ their paths::
     >>> pprint(tag)
     {'content_type': 'adhocracy_core.interfaces.ITag',...'path': 'http://localhost/Documents/document_0000000/FIRST/'...
 
+*content_type* filter resources with a specific content type::
+
+    >>> resp_data = testapp.get('/Documents/document_0000000',
+    ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraph'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/',
+     'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/',
+     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/']
+
+Valid query comparables: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
 *tag* is a filter that allows filtering only resources with a
 specific tag. Often we are only interested in the newest versions of
@@ -1470,35 +1534,45 @@ versions of all documents::
      'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/VERSION_0000001/',
      'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/']
 
+Valid query comparables: 'eq', 'noteq', 'any', 'notany'
+
 *<custom>* filter: depending on the backend configuration there are additional
 custom filters:
 
 * *rate* the rate value of resources with :class:`adhocracy_core.sheets.rate.IRate`
   sheet. This is mostly useful for the requests with the *aggregated* filter.
   Supports sorting.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
 * *rates* the aggregated value of all :class:`adhocracy_core.sheets.rate.IRate`
   resources referencing a resource with :class:`adhocracy_core.sheets.rate.IRateable`.
   Only the LAST version of each rate is counted. Supports sorting.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
 * *name* the identifier value of all resources (last part in the resource url).
   This is the same value like the name in the :class:`adhocracy_core.sheets.name.IName`
   sheet.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
   Supports sorting.
 
 * *creator* the :term:`userid` of the resource creator. This is the path of the
   user resource url.
+  Valid query comparable: 'eq'
   Supports sorting.
 
 * *item_creation_date* the the item_creation_date value of resources with :class:`adhocracy_core.sheets.metadata.IMetadata`.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
 * *workflow_state* workflow state, see :doc:`workflows`, the state of versions is the same as for its item.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
 * *badge* the badge names of resources with :class:`adhocracy_core.sheets.badge.IBadgeable`
   sheet.
+  Valid query comparable: 'eq', 'noteq', 'any', 'notany'
 
 * *title* the title of resources with :class:`adhocracy_core.sheets.title.ITitle`
   sheet.
+  Valid query comparable: 'eq', 'noteq', 'lt', 'le', 'gt', 'ge', 'any', 'notany'
 
 *<package.sheets.sheet.ISheet:FieldName>* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
@@ -1512,6 +1586,8 @@ reference target. ::
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/']
+
+Valid query comparable: 'eq'
 
 If the specified sheet or field doesn't exist or if the field exists but is
 not a reference field, the backend responds with an error::
@@ -1541,7 +1617,7 @@ You'll also get an error if you try to filter by a catalog that doesn't exist::
     ...             'foocat': 'whatever'},
     ...     status=400).json
     >>> resp_data['errors'][0]['description']
-    'No such catalog'
+    'Unrecognized keys in mapping: "{\'foocat\': \'whatever\'}"'
 
 *aggregateby* allows you to add the additional field `aggregateby` with
 aggregated index values of all result resources. You have to set the value

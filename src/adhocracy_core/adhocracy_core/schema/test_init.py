@@ -115,8 +115,8 @@ class TestInterface():
 
     @fixture
     def inst(self):
-        from adhocracy_core.schema import Interface
-        return Interface()
+        from adhocracy_core.schema import InterfaceType
+        return InterfaceType()
 
     def test_serialize_colander_null(self, inst):
         result = inst.serialize(None, colander.null)

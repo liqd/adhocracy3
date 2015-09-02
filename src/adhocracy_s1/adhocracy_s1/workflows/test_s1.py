@@ -5,6 +5,32 @@ from unittest.mock import Mock
 from webtest import TestResponse
 
 
+class TestDoTransitionToPropose:
+
+    @fixture
+    def registry(self, registry_with_content, mock_sheet):
+        mock_sheet.get.return_value = {'state_data': []}
+        registry_with_content.content.get_sheet.return_value = mock_sheet
+        return registry_with_content
+
+    def call_fut(self, *args, **kwargs):
+        from .s1 import do_transition_to_propose
+        return do_transition_to_propose(*args, **kwargs)
+
+    def test_ignore_if_no_result_state_data(self, context, request_, registry,
+                                            mock_sheet):
+        self.call_fut(context, request_)
+        assert not mock_sheet.set.called
+
+    def test_remove_result_state_data_start_date(
+            self, context, request_, registry, mock_sheet):
+        mock_sheet.get.return_value = {'state_data': [{'name': 'result',
+                                                       'start_date': '2015'}]}
+        self.call_fut(context, request_)
+        mock_sheet.set.assert_called_with({'state_data': [{'name': 'result'}]},
+                                          request=request_)
+
+
 class TestDoTransitionToVotable:
 
     @fixture
@@ -38,7 +64,7 @@ class TestDoTransitionToVotable:
                                           request=request_)
 
 
-class TestChangeChildrenToRejected:
+class TestChangeChildrenToSelectedRejected:
 
     @fixture
     def registry(self, registry_with_content, mock_sheet):
@@ -100,7 +126,6 @@ class TestChangeChildrenToRejected:
             self, context, item, request_, registry, mock_sheet, mock_catalogs):
         from copy import copy
         from datetime import datetime
-        from unittest.mock import call
         version_most_rated = testing.DummyResource()
         item['version'] = version_most_rated
         item2 = item.clone()
@@ -220,6 +245,13 @@ class TestS1Workflow:
         resp = app_participant.get('/s1/proposal_0000000')
         assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'selected'
 
+    def test_result_old_proposal_has_stored_decisiont_date(self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        resp = app_participant.get('/s1/proposal_0000000')
+        decision_date = resp.json['data'][IWorkflowAssignment.__identifier__]\
+            ['state_data'][0]['start_date']
+        assert decision_date.endswith('+00:00')
+
     def test_result_old_proposal_not_most_rated_has_state_rejected(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000001')
@@ -255,11 +287,49 @@ class TestS1Workflow:
         from adhocracy_core.sheets.pool import IPool
         resp = app_participant.get('/s1')
         state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
-        decision_date = [x['start_date'] for x in state_data if x['name'] == 'result'][0]
+        datas = [x for x in state_data if x['name'] == 'result']
+        decision_date = datas[0]['start_date']
         resp = app_participant.get('/s1', {'decision_date': decision_date})
         assert resp.json['data'][IPool.__identifier__]['elements'] == \
              ['http://localhost/s1/proposal_0000000/',
               'http://localhost/s1/proposal_0000001/']
+
+    def test_change_state_to_propose_again(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/s1', 'propose')
+        assert resp.status_code == 200
+
+    def test_propose_again_old_decision_date_is_removed(self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        resp = app_participant.get('/s1')
+        state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
+        datas = [x for x in state_data if x['name'] == 'result']
+        decision_date = datas[0]['start_date']
+        assert decision_date is None
+
+    def test_propose_participant_can_create_proposals_again(self, app_participant):
+        resp = _post_proposal_item(app_participant, path='/s1')
+        assert 'proposal_0000003' in resp.json['path']
+
+    def test_change_state_to_select_again(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/s1', 'select')
+        assert resp.status_code == 200
+
+    def test_change_state_to_result_again(self, app_initiator):
+        resp = _do_transition_to(app_initiator, '/s1', 'result')
+        assert resp.status_code == 200
+
+    def test_result_everybody_can_list_proposals_used_for_this_meeting_again(
+            self, app_participant):
+        from adhocracy_core.sheets.workflow import IWorkflowAssignment
+        from adhocracy_core.sheets.pool import IPool
+        resp = app_participant.get('/s1')
+        state_data = resp.json['data'][IWorkflowAssignment.__identifier__]['state_data']
+        datas = [x for x in state_data if x['name'] == 'result']
+        decision_date = datas[0]['start_date']
+        resp = app_participant.get('/s1', {'decision_date': decision_date})
+        assert resp.json['data'][IPool.__identifier__]['elements'] == \
+             ['http://localhost/s1/proposal_0000002/',
+              'http://localhost/s1/proposal_0000003/']
 
 
 @mark.usefixtures('integration')
