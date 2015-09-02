@@ -15,7 +15,7 @@
             </span>
         </span>
 
-        <span class="phase-date">
+        <span class="phase-date" data-ng-if="phase.startDate || phase.endDate">
             <i class="icon-calendar"></i>
             <span data-ng-if="phase.startDate" title="{{ 'TR__START_DATE' | translate }}">
                 <adh-time data-datetime="phase.startDate" format="L"></adh-time>

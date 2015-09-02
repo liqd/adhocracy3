@@ -44,7 +44,9 @@ var pkgLocation = "/Rate";
 
 export interface IRateScope extends angular.IScope {
     refersTo : string;
+    showResults : string;
     disabled : boolean;
+    isCast : boolean;
     myRate : number;
     rates(rate : number) : number;
     optionsPostPool : AdhHttp.IOptions;
@@ -202,6 +204,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
         templateUrl: adhConfig.pkg_path + pkgLocation + template,
         scope: {
             refersTo: "@",
+            showResults: "@",
             disabled: "="
         },
         link: (scope : IRateScope) : void => {
@@ -318,6 +321,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                             })
                             .then(() => undefined);
                     }).finally<void>(() => {
+                        scope.isCast = true;
                         lock = false;
                     });
                 }

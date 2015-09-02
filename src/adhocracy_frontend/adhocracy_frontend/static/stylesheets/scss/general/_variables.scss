@@ -12,6 +12,7 @@ $color-text-inverted: white;
 // Function colors
 $color-function-valid: #2eac66;
 $color-function-invalid: #e6332a;
+$color-function-neutral: #f6d02b;
 $color-function-animation-enter: greenyellow;
 
 // Background colors
@@ -66,6 +67,7 @@ $padding-medium: 1em;
 $section-jump-navigation-width: 2em;
 $moving-column-single-width-max: $font-size-normal * 55;
 $moving-column-single-width-min: $font-size-normal * 35;
+$badge-height: 1 + 4px / $font-size-smaller;
 
 @mixin font-tracking($value) {
     @if $value == narrow {
