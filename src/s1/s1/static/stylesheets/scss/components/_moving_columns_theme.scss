@@ -26,10 +26,15 @@
 
     .moving-column-menu {
         background: transparent;
+        padding-left: 0;
 
         .moving-column-menu-button {
             color: $color-brand-one-normal;
             line-height: 1;
+        }
+
+        .button {
+            margin-right: 17px;
         }
     }
 
