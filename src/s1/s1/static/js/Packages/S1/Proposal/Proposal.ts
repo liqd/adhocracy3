@@ -253,10 +253,12 @@ export var createDirective = (
                 });
             };
 
-            scope.cancel = () => {
-                var fallback = adhResourceUrlFilter(scope.poolPath);
-                adhTopLevelState.goToCameFrom(fallback);
-            };
+            scope.$on("$destroy", adhTopLevelState.on("meeting", (meeting) => {
+                scope.cancel = () => {
+                    var fallback = adhResourceUrlFilter(scope.poolPath, meeting);
+                    adhTopLevelState.goToCameFrom(fallback);
+                };
+            }));
         }
     };
 };
