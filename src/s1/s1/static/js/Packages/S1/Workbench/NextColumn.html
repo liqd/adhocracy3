@@ -1,4 +1,8 @@
-<div data-ng-switch="transclusionId">
+<div data-ng-switch="transclusionId" data-ng-if="processState === 'propose'">
+    Meeting B is not yet open for participation.
+</div>
+
+<div data-ng-switch="transclusionId" data-ng-if="processState !== 'propose'">
     <div data-ng-switch-when="menu">
         <a href=""
             data-ng-click="ctrl.toggleSidebar()"
@@ -16,7 +20,6 @@
         <adh-s1-proposal-listing
             data-ng-if="proposalState"
             data-state="{{proposalState}}"
-            data-decision-date="{{decisionDate}}"
             data-update="shared.update"
             data-facets="shared.facets">
         </adh-s1-proposal-listing>

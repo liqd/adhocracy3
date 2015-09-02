@@ -315,6 +315,7 @@ export var listingDirective = (
             update: "=?",
             sort: "=?",
             state: "@?",
+            decisionDate: "@?",
             creator: "@?"
         },
         link: (scope) => {
@@ -329,6 +330,7 @@ export var listingDirective = (
             }
             if (scope.state) {
                 scope.params.workflow_state = scope.state;
+                scope.params.decision_date = scope.decisionDate;
                 scope.params.depth = "all";
             }
         }

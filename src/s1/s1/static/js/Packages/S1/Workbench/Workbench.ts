@@ -26,7 +26,9 @@ export var s1WorkbenchDirective = (
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Workbench.html",
         link: (scope) => {
+            scope.$on("$destroy", adhTopLevelState.bind("processUrl", scope));
             scope.$on("$destroy", adhTopLevelState.bind("view", scope));
+            scope.$on("$destroy", adhTopLevelState.bind("meeting", scope));
             scope.$on("$destroy", adhTopLevelState.bind("landingPage", scope));
         }
     };
@@ -48,12 +50,90 @@ export var s1CurrentColumnDirective = (
             scope.$watch("processUrl", (processUrl : string) => {
                 adhHttp.get(processUrl).then((process : RIS1Process) => {
                     var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+                    var decisionDate = AdhUtil.deepPluck(
+                        AdhProcess.getStateData(process.data[SIWorkflowAssignment.nick], "result"), ["start_date"]);
 
                     if (workflowState === "propose") {
                         scope.proposalState = "proposed";
+                    } else if (workflowState === "select") {
+                        scope.proposalState = "voteable";
                     } else {
-                        scope.proposalState = "votable";
+                        scope.proposalState = "[\"any\", [\"selected\", \"rejected\"]]";
+                        scope.decisionDate = decisionDate;
                     }
+                });
+            });
+
+            scope.shared.facets = [{
+                key: "sort",
+                name: "TR__SORT",
+                items: [
+                    {key: "rates", name: "TR__RATES"},
+                    {key: "title", name: "TR__TITLE"},
+                    {key: "item_creation_date", name: "TR__DATE"}
+                ]
+            }];
+        }
+    };
+};
+
+
+export var s1NextColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/NextColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.contentType = RIProposalVersion.content_type;
+
+            scope.$watch("processUrl", (processUrl : string) => {
+                adhHttp.get(processUrl).then((process : RIS1Process) => {
+                    scope.processState = process.data[SIWorkflowAssignment.nick].workflow_state;
+
+                    if (scope.processState === "propose") {
+                        scope.proposalState = "none";
+                    } else {
+                        scope.proposalState = "proposed";
+                    }
+                });
+            });
+
+            scope.shared.facets = [{
+                key: "sort",
+                name: "TR__SORT",
+                items: [
+                    {key: "rates", name: "TR__RATES"},
+                    {key: "title", name: "TR__TITLE"},
+                    {key: "item_creation_date", name: "TR__DATE"}
+                ]
+            }];
+        }
+    };
+};
+
+
+export var s1ArchiveColumnDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/ArchiveColumn.html",
+        require: "^adhMovingColumn",
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            column.bindVariablesAndClear(scope, ["processUrl"]);
+            scope.contentType = RIProposalVersion.content_type;
+
+            scope.$watch("processUrl", (processUrl : string) => {
+                adhHttp.get(processUrl).then((process : RIS1Process) => {
+                    var workflowState = process.data[SIWorkflowAssignment.nick].workflow_state;
+
+                    // FIXME: filter for only those which are not in the current meeting
+                    scope.proposalState = "[\"any\", [\"selected\", \"rejected\"]]";
                 });
             });
 
@@ -260,6 +340,8 @@ export var register = (angular) => {
         .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", s1WorkbenchDirective])
         .directive("adhS1Landing", ["adhConfig", s1LandingDirective])
         .directive("adhS1CurrentColumn", ["adhConfig", "adhHttp", s1CurrentColumnDirective])
+        .directive("adhS1NextColumn", ["adhConfig", "adhHttp", s1NextColumnDirective])
+        .directive("adhS1ArchiveColumn", ["adhConfig", "adhHttp", s1ArchiveColumnDirective])
         .directive("adhS1ProposalDetailColumn", ["adhConfig", "adhPermissions", s1ProposalDetailColumnDirective])
         .directive("adhS1ProposalCreateColumn", ["adhConfig", s1ProposalCreateColumnDirective])
         .directive("adhS1ProposalEditColumn", ["adhConfig", s1ProposalEditColumnDirective]);
