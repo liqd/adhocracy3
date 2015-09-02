@@ -1,8 +1,14 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import AdhConfig = require("../Config/Config");
+import AdhHttp = require("../Http/Http");
+import AdhUtil = require("../Util/Util");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
+import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+
+var pkgLocation = "/Process";
 
 
 // mirrors adhocracy_core.sheets.workflow.StateData
@@ -55,6 +61,39 @@ export class Service {
     }
 }
 
+export var workflowSwitchDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhProcess : Service,
+    $compile : angular.ICompileService
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/WorkflowSwitch.html",
+        scope: {
+            path: "@"
+        },
+        link: (scope, element) => {
+            adhHttp.options(scope.path, {importOptions: false}).then((raw) => {
+                scope.availableStates = AdhUtil.deepPluck(raw, [
+                    "data", "PUT", "request_body", "data", SIWorkflow.nick, "workflow_state"]);
+            });
+
+            scope.switchState = (newState) => {
+                adhHttp.get(scope.path).then((process) => {
+                    process.data[SIWorkflow.nick] = {
+                        workflow_state: newState
+                    };
+                    process.data[SIName.nick] = undefined;
+                    adhHttp.put(scope.path, process);
+                });
+            };
+
+        }
+    };
+};
+
 export var processViewDirective = (
     adhTopLevelState : AdhTopLevelState.Service,
     adhProcess : Service,
@@ -90,5 +129,6 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName
         ])
         .provider("adhProcess", Provider)
+        .directive("adhWorkflowSwitch", ["adhConfig", "adhHttp", "adhTopLevelState", "adhProcess", "$compile", workflowSwitchDirective])
         .directive("adhProcessView", ["adhTopLevelState", "adhProcess", "$compile", processViewDirective]);
 };
