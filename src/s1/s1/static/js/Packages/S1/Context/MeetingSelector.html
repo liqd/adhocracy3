@@ -1,10 +1,10 @@
 <span class="button-group" data-ng-if="workflowState === 'propose'">
-    <a class="button button-cta" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}">Sitzung A</a>
+    <a class="button button-cta" data-ng-class="{'is-active': meeting == 'current'}" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}">Sitzung A</a>
     <a class="button button-cta m-variant" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">vorschlag machen</a>
 </span>
 
-<a class="button-cta-secondary" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}" data-ng-if="workflowState !== 'propose'">Sitzung A</a>
+<a class="button-cta-secondary" data-ng-class="{'is-active': meeting == 'current'}" data-ng-href="{{ processUrl | adhResourceUrl:'current' }}" data-ng-if="workflowState !== 'propose'">Sitzung A</a>
 <span class="button-group" data-ng-if="workflowState !== 'propose'">
-    <a class="button button-cta" data-ng-href="{{ processUrl | adhResourceUrl:'next' }}">Sitzung B</a>
+    <a class="button button-cta" data-ng-class="{'is-active': meeting == 'next'}" data-ng-href="{{ processUrl | adhResourceUrl:'next' }}">Sitzung B</a>
     <a class="button button-cta m-variant" data-ng-href="{{ processUrl | adhResourceUrl:'create-proposal' }}">vorschlag machen</a>
 </span>
