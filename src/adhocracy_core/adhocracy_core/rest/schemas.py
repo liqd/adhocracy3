@@ -556,6 +556,8 @@ def _get_index_example_value(index: SDIndex) -> object:
         indexed_values = index.unique_values()
         if len(indexed_values) > 0:
             return indexed_values[0]
+        elif index.qname() == 'tag':
+            return ''
         else:
             return
     elif isinstance(index, ReferenceIndex): # pragma: no cover
