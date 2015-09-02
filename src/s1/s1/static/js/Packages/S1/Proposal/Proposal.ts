@@ -329,6 +329,7 @@ export var listingDirective = (
             }
             if (scope.state) {
                 scope.params.workflow_state = scope.state;
+                scope.params.depth = "all";
             }
         }
     };
