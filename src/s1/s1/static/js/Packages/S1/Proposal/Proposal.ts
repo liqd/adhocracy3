@@ -6,6 +6,7 @@ import AdhConfig = require("../../Config/Config");
 import AdhHttp = require("../../Http/Http");
 import AdhPermissions = require("../../Permissions/Permissions");
 import AdhPreliminaryNames = require("../../PreliminaryNames/PreliminaryNames");
+import AdhProcess = require("../../Process/Process");
 import AdhRate = require("../../Rate/Rate");
 import AdhResourceArea = require("../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../TopLevelState/TopLevelState");
@@ -113,7 +114,8 @@ var bindPath = (
                         creationDate: metadataSheet.item_creation_date,
                         commentCount: commentCount,
                         assignments: badgeAssignments,
-                        workflowState: workflowAssignmentSheet.workflow_state
+                        workflowState: workflowAssignmentSheet.workflow_state,
+                        decisionDate: AdhProcess.getStateData(workflowAssignmentSheet, workflowAssignmentSheet.workflow_state).start_date
                     };
                 });
             });
