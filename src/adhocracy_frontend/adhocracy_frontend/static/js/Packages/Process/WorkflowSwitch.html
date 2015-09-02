@@ -1,1 +1,13 @@
-<div><a href="" data-ng-click="switchState(newState)" data-ng-repeat="newState in availableStates">switch to {{ newState }}</a></div>
+<div class="s1-workflow-switch">
+{{availableStates}} {{newState}}
+    <div class="s1-workflow-switch-phases-container">
+        <ul class="s1-workflow-switch-phases">
+            <li class="is-current-workflow"><a href="">{{ "TR__S1_WORKFLOW_CREATE" | translate }}</a></li>
+            <li class="is-current-workflow"><a href="">{{ "TR__S1_WORKFLOW_REVIEW" | translate }}</a></li>
+            <li class="is-current-workflow"><a href="">{{ "TR__S1_WORKFLOW_WINNERS" | translate }}</a></li>
+        </ul>
+    </div>
+    <div class="s1-workflow-switch-container">
+        <a href="" data-ng-click="switchState(newState)" data-ng-repeat="newState in availableStates">{{ "TR__S1_SWITCH_TO" | translate }} {{ newState }}</a>
+    </div>
+</div>
