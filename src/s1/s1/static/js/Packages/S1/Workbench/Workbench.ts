@@ -209,11 +209,6 @@ export var s1LandingDirective = (
  * propose | current  | -       | archive  | archive
  * select  | next     | current | archive  | archive
  * result  | next     | -       | cur/arc  | cur/arc
- *
- * FIXME: currently it is not possible to distinguish whether
- * selected/rejected proposals in the result state are results of the
- * current iteration or archived. The current implementation treats
- * them as archived.
  */
 var getMeeting = (proposal : RIProposal, process : RIS1Process) => {
     var processState = process.data[SIWorkflowAssignment.nick].workflow_state;
