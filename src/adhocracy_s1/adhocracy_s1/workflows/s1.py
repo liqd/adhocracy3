@@ -89,6 +89,7 @@ def _get_children_sort_by_rates(context) -> []:
                                                   only_visible=True,
                                                   interfaces=(IRateable, IVersionable),
                                                   sort_by='rates',
+                                                  reverse=True,
                                                   indexes={'tag': 'LAST',
                                                            'workflow_state': 'voteable'},
 
