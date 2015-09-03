@@ -18,7 +18,7 @@
                 maxlength="100"
                 required="required"
                 class="s1-proposal-form-title s1-proposal-title"
-                placeholder="{{ 'TR__S1_TITLE' | translate }}" />
+                placeholder="{{ 'TR__S1_TITLE_PLACEHOLDER' | translate }}" />
             <span class="input-error" data-ng-show="showError(S1ProposalForm, S1ProposalForm.title, 'required')">
                 {{ "TR__S1_ERROR_REQUIRED_TITLE" | translate }}
             </span>
@@ -31,7 +31,7 @@
                 name="description"
                 maxlength="1000"
                 class="s1-proposal-form-description"
-                placeholder="{{ 'TR__S1_DESCRIPTION' | translate }}"
+                placeholder="{{ 'TR__S1_DESCRIPTION_PLACEHOLDER' | translate }}"
                 required="required"></textarea>
 
             <span class="input-error" data-ng-show="showError(S1ProposalForm, S1ProposalForm.description, 'required')">
