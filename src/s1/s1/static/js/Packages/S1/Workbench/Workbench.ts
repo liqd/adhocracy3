@@ -254,7 +254,7 @@ export var registerRoutes = (
                         if (options.POST) {
                             var processState = resource.data[SIWorkflowAssignment.nick].workflow_state;
                             return {
-                                meeting: processState === "propose" ? "current" : "next"
+                                targetMeeting: processState === "propose" ? "current" : "next"
                             };
                         } else {
                             throw 401;

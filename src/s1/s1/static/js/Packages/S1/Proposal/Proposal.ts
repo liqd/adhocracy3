@@ -255,7 +255,7 @@ export var createDirective = (
                 });
             };
 
-            scope.$on("$destroy", adhTopLevelState.on("meeting", (meeting) => {
+            scope.$on("$destroy", adhTopLevelState.on("targetMeeting", (meeting) => {
                 scope.cancel = () => {
                     var fallback = adhResourceUrlFilter(scope.poolPath, meeting);
                     adhTopLevelState.goToCameFrom(fallback);
