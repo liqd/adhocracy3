@@ -134,12 +134,11 @@ export var s1ArchiveColumnDirective = (
             });
 
             scope.shared.facets = [{
-                key: "sort",
-                name: "TR__SORT",
+                key: "workflow_state",
+                name: "TR__S1_FACET_STATE_HEADER",
                 items: [
-                    {key: "rates", name: "TR__RATES"},
-                    {key: "title", name: "TR__TITLE"},
-                    {key: "item_creation_date", name: "TR__DATE"}
+                    {key: "selected", name: "TR__S1_FACET_SELECTED"},
+                    {key: "rejected", name: "TR__S1_FACET_REJECTED"}
                 ]
             }];
 
