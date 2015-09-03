@@ -1,4 +1,15 @@
 <div data-ng-switch="transclusionId">
+    <div data-ng-switch-when="menu">
+        <a href=""
+            data-ng-click="edit()"
+            data-ng-class="{'is-active': isEdit}"
+            class="button m-menu-action">{{ "TR__EDIT" | translate }}</a> <!-- FIXME: dummy class -->
+        <div class="moving-column-menu-nav">
+            <a
+                class="moving-column-menu-nav-button"
+                data-ng-href="{{ commentCloseUrl | adhParentPath | adhResourceUrl }}">{{ 'TR__CLOSE' | translate }} X</a>
+        </div>
+    </div>
     <adh-s1-proposal-detail
         data-ng-switch-when="body"
         data-path="{{proposalUrl}}">
