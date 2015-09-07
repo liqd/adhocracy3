@@ -60,26 +60,25 @@ In adhocracy we create what we call a *package* for every reusable
 feature. A package may contain services, directives and filters. Each
 package has its own folder in ``Packages/``.
 
-A package may contain arbitrary TypeScript modules. But it is always
-required to contain a TypeScript module with the same name as the
-package. This TypeScript module wires all contents of the package into
-an angular module.
+A package may contain arbitrary TypeScript modules. These must not
+import any other TypeScript modules except for type-checking.
 
-This angular module is exposed by a variable ``moduleName`` and a
+In addition, there must be a TypeScript module named ``Module.ts`` that
+defines an angular module by exporting a variable ``moduleName`` and a
 function ``register``. ``moduleName`` contains the name that should be
 used for this module. By convention the module name is the package name
 in camel case prefixed with 'adh'.  ``register`` takes angular as a
 first argument and registers the module with all of its services and
 directives.
 
+``Module.ts`` must also take care of importing additional code, both
+from other packages and from third party libraries. For other packages
+that can be done by importing ``Module.ts`` from that package and adding
+it as a angular module dependency using its ``moduleName``. This way it
+is also made sure that requirejs will actually load the code.
+
 .. FIXME: Packages should also include all CSS and other static content
    they depend on.
-
-A package must not directly use TypeScript modules from other Packages.
-When you want to actually use the code from other packages, you must
-import the corresponding angular module referenced by the TypeScript
-module's ``moduleName`` variable. This way it is also made sure that
-requirejs will actually load the code.
 
 .. FIXME: We might want to have exceptions, e.g. Util
 
