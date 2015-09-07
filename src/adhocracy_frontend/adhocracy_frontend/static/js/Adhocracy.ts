@@ -22,39 +22,41 @@ import webshim = require("polyfiller");
 import leaflet = require("leaflet");
 import markdownit = require("markdownit");
 
-import AdhAbuse = require("./Packages/Abuse/Abuse");
-import AdhBadge = require("./Packages/Badge/Badge");
+import AdhAbuseModule = require("./Packages/Abuse/Module");
+import AdhBadgeModule = require("./Packages/Badge/Module");
+import AdhCommentModule = require("./Packages/Comment/Module");
+import AdhCrossWindowMessagingModule = require("./Packages/CrossWindowMessaging/Module");
+import AdhDateTimeModule = require("./Packages/DateTime/Module");
+import AdhDocumentWorkbenchModule = require("./Packages/DocumentWorkbench/Module");
+import AdhDoneModule = require("./Packages/Done/Module");
+import AdhEmbedModule = require("./Packages/Embed/Module");
+import AdhEventManagerModule = require("./Packages/EventManager/Module");
+import AdhHttpModule = require("./Packages/Http/Module");
+import AdhImageModule = require("./Packages/Image/Module");
+import AdhInjectModule = require("./Packages/Inject/Module");
+import AdhListingModule = require("./Packages/Listing/Module");
+import AdhLocaleModule = require("./Packages/Locale/Module");
+import AdhLocalSocketModule = require("./Packages/LocalSocket/Module");
+import AdhMarkdownModule = require("./Packages/Markdown/Module");
+import AdhMappingModule = require("./Packages/Mapping/Module");
+import AdhMovingColumnsModule = require("./Packages/MovingColumns/Module");
+import AdhPermissionsModule = require("./Packages/Permissions/Module");
+import AdhPreliminaryNamesModule = require("./Packages/PreliminaryNames/Module");
+import AdhProcessModule = require("./Packages/Process/Module");
+import AdhRateModule = require("./Packages/Rate/Module");
+import AdhAngularHelpersModule = require("./Packages/AngularHelpers/Module");
+import AdhResourceAreaModule = require("./Packages/ResourceArea/Module");
+import AdhResourceWidgetsModule = require("./Packages/ResourceWidgets/Module");
+import AdhShareSocialModule = require("./Packages/ShareSocial/Module");
+import AdhStickyModule = require("./Packages/Sticky/Module");
+import AdhTopLevelStateModule = require("./Packages/TopLevelState/Module");
+import AdhTrackingModule = require("./Packages/Tracking/Module");
+import AdhUserModule = require("./Packages/User/Module");
+import AdhUserViewsModule = require("./Packages/User/ViewsModule");
+import AdhWebSocketModule = require("./Packages/WebSocket/Module");
+
 import AdhConfig = require("./Packages/Config/Config");
-import AdhComment = require("./Packages/Comment/Comment");
-import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
-import AdhDateTime = require("./Packages/DateTime/DateTime");
-import AdhDocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
-import AdhDone = require("./Packages/Done/Done");
-import AdhEmbed = require("./Packages/Embed/Embed");
-import AdhEventManager = require("./Packages/EventManager/EventManager");
-import AdhHttp = require("./Packages/Http/Http");
-import AdhImage = require("./Packages/Image/Image");
-import AdhInject = require("./Packages/Inject/Inject");
-import AdhListing = require("./Packages/Listing/Listing");
-import AdhLocale = require("./Packages/Locale/Locale");
-import AdhLocalSocket = require("./Packages/LocalSocket/LocalSocket");
-import AdhMarkdown = require("./Packages/Markdown/Markdown");
-import AdhMapping = require("./Packages/Mapping/Mapping");
-import AdhMovingColumns = require("./Packages/MovingColumns/MovingColumns");
-import AdhPermissions = require("./Packages/Permissions/Permissions");
-import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
-import AdhProcess = require("./Packages/Process/Process");
-import AdhRate = require("./Packages/Rate/Rate");
-import AdhAngularHelpers = require("./Packages/AngularHelpers/AngularHelpers");
-import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
-import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
-import AdhShareSocial = require("./Packages/ShareSocial/ShareSocial");
-import AdhSticky = require("./Packages/Sticky/Sticky");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
-import AdhTracking = require("./Packages/Tracking/Tracking");
-import AdhUser = require("./Packages/User/User");
-import AdhUserViews = require("./Packages/User/Views");
-import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
 import AdhTemplates = require("adhTemplates");  if (AdhTemplates) { ; };
 
 webshim.setOptions("basePath", "/static/lib/webshim/js-webshim/minified/shims/");
@@ -84,16 +86,16 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAnimate",
         "ngAria",
         "ngMessages",
-        AdhComment.moduleName,
-        AdhDocumentWorkbench.moduleName,
-        AdhDone.moduleName,
-        AdhCrossWindowMessaging.moduleName,
-        AdhEmbed.moduleName,
-        AdhResourceArea.moduleName,
-        AdhSticky.moduleName,
-        AdhTracking.moduleName,
-        AdhUserViews.moduleName,
-        AdhMarkdown.moduleName
+        AdhCommentModule.moduleName,
+        AdhDocumentWorkbenchModule.moduleName,
+        AdhDoneModule.moduleName,
+        AdhCrossWindowMessagingModule.moduleName,
+        AdhEmbedModule.moduleName,
+        AdhResourceAreaModule.moduleName,
+        AdhStickyModule.moduleName,
+        AdhTrackingModule.moduleName,
+        AdhUserViewsModule.moduleName,
+        AdhMarkdownModule.moduleName
     ];
 
     if (config.cachebust) {
@@ -155,38 +157,38 @@ export var init = (config : AdhConfig.IService, metaApi) => {
 
     // register our modules
     app.value("adhConfig", config);
-    AdhAbuse.register(angular);
-    AdhBadge.register(angular);
-    AdhComment.register(angular);
-    AdhCrossWindowMessaging.register(angular, config.trusted_domains !== []);
-    AdhDateTime.register(angular);
-    AdhDocumentWorkbench.register(angular);
-    AdhDone.register(angular);
-    AdhEmbed.register(angular);
-    AdhEventManager.register(angular);
-    AdhHttp.register(angular, config, metaApi);
-    AdhImage.register(angular);
-    AdhInject.register(angular);
-    AdhListing.register(angular);
-    AdhLocale.register(angular);
-    AdhLocalSocket.register(angular);
-    AdhMapping.register(angular);
-    AdhMarkdown.register(angular);
-    AdhMovingColumns.register(angular);
-    AdhPermissions.register(angular);
-    AdhPreliminaryNames.register(angular);
-    AdhProcess.register(angular);
-    AdhRate.register(angular);
-    AdhAngularHelpers.register(angular);
-    AdhResourceArea.register(angular);
-    AdhResourceWidgets.register(angular);
-    AdhShareSocial.register(angular);
-    AdhSticky.register(angular);
-    AdhTopLevelState.register(angular);
-    AdhTracking.register(angular);
-    AdhUser.register(angular);
-    AdhUserViews.register(angular);
-    AdhWebSocket.register(angular);
+    AdhAbuseModule.register(angular);
+    AdhBadgeModule.register(angular);
+    AdhCommentModule.register(angular);
+    AdhCrossWindowMessagingModule.register(angular, config.trusted_domains !== []);
+    AdhDateTimeModule.register(angular);
+    AdhDocumentWorkbenchModule.register(angular);
+    AdhDoneModule.register(angular);
+    AdhEmbedModule.register(angular);
+    AdhEventManagerModule.register(angular);
+    AdhHttpModule.register(angular, config, metaApi);
+    AdhImageModule.register(angular);
+    AdhInjectModule.register(angular);
+    AdhListingModule.register(angular);
+    AdhLocaleModule.register(angular);
+    AdhLocalSocketModule.register(angular);
+    AdhMappingModule.register(angular);
+    AdhMarkdownModule.register(angular);
+    AdhMovingColumnsModule.register(angular);
+    AdhPermissionsModule.register(angular);
+    AdhPreliminaryNamesModule.register(angular);
+    AdhProcessModule.register(angular);
+    AdhRateModule.register(angular);
+    AdhAngularHelpersModule.register(angular);
+    AdhResourceAreaModule.register(angular);
+    AdhResourceWidgetsModule.register(angular);
+    AdhShareSocialModule.register(angular);
+    AdhStickyModule.register(angular);
+    AdhTopLevelStateModule.register(angular);
+    AdhTrackingModule.register(angular);
+    AdhUserModule.register(angular);
+    AdhUserViewsModule.register(angular);
+    AdhWebSocketModule.register(angular);
 
     // force-load some services
     var injector = angular.bootstrap(document.body, ["a3"], {strictDi: true});

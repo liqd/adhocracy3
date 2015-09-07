@@ -5,7 +5,6 @@ import ResourcesBase = require("../../ResourcesBase");
 import AdhConfig = require("../Config/Config");
 import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
-import AdhProcess = require("../Process/Process");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -418,25 +417,4 @@ export var directive = (adhResourceArea : Service, $compile : angular.ICompileSe
             });
         }
     };
-};
-
-
-export var moduleName = "adhResourceArea";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhProcess.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
-            adhTopLevelStateProvider
-                .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
-        }])
-        .provider("adhResourceArea", Provider)
-        .directive("adhResourceArea", ["adhResourceArea", "$compile", directive])
-        .filter("adhParentPath", () => AdhUtil.parentPath)
-        .filter("adhResourceUrl", ["adhConfig", resourceUrl]);
 };

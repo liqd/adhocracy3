@@ -558,21 +558,3 @@ export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
         }]
     };
 };
-
-
-export var moduleName = "adhTopLevelState";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhEventManager.moduleName,
-            AdhTracking.moduleName
-        ])
-        .provider("adhTopLevelState", Provider)
-        .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
-        .directive("adhRoutingError", ["adhConfig", routingErrorDirective])
-        .directive("adhSpace", ["adhTopLevelState", spaceDirective])
-        .directive("adhSpaceSwitch", ["adhTopLevelState", "adhConfig", spaceSwitch])
-        .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);
-};

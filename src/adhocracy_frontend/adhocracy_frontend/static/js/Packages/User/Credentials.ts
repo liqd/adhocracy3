@@ -129,15 +129,3 @@ export class Service {
         this.adhCache.invalidateAll();
     }
 }
-
-
-export var moduleName = "adhCredentials";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhTracking.moduleName
-        ])
-        .service("adhCredentials", [
-            "adhConfig", "adhCache", "adhTracking", "modernizr", "angular", "$q", "$http", "$timeout", "$rootScope", "$window", Service]);
-};

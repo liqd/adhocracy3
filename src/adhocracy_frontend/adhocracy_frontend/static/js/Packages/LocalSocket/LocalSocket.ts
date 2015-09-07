@@ -97,14 +97,3 @@ export class Service {
         };
     }
 }
-
-
-export var moduleName = "adhLocalSocket";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEventManager.moduleName
-        ])
-        .service("adhLocalSocket", ["adhEventManagerClass", Service]);
-};

@@ -80,15 +80,3 @@ export var processViewDirective = (
         }
     };
 };
-
-
-export var moduleName = "adhProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhTopLevelState.moduleName
-        ])
-        .provider("adhProcess", Provider)
-        .directive("adhProcessView", ["adhTopLevelState", "adhProcess", "$compile", processViewDirective]);
-};

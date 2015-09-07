@@ -422,15 +422,3 @@ export var htmlTranslateDirective = ($compile, $translate, adhWrap : Wrap) => {
         }
     };
 };
-
-
-export var moduleName = "adhLocale";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .filter("adhCountryName", countryName)
-        .service("adhWrap", ["$interpolate", Wrap])
-        .directive("adhHtmlTranslate", ["$compile", "$translate", "adhWrap", htmlTranslateDirective])
-        .directive("countrySelect", ["$translate", "adhConfig", countrySelect]);
-};

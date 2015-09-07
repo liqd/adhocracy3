@@ -69,11 +69,3 @@ export class Service {
     }
 
 }
-
-export var moduleName = "adhTracking";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .service("adhTracking", ["$q", "$window", "adhConfig", Service]);
-};

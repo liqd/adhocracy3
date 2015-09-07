@@ -221,19 +221,3 @@ export var factory = (
     }
 };
 
-
-export var moduleName = "adhCrossWindowMessaging";
-
-export var register = (angular, trusted = false) => {
-    var mod = angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhUser.moduleName
-        ]);
-
-    if (trusted) {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", "adhCredentials", "adhUser", factory]);
-    } else {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", factory]);
-    }
-};

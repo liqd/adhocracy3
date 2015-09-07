@@ -1,6 +1,5 @@
 import _ = require("lodash");
 
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhCredentials = require("../User/Credentials");
 import AdhEventManager = require("../EventManager/EventManager");
@@ -19,8 +18,6 @@ import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUs
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
-
-import Adapter = require("./Adapter");
 
 var pkgLocation = "/Rate";
 
@@ -354,49 +351,4 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                 });
         }
     };
-};
-
-
-export var moduleName = "adhRate";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhCredentials.moduleName,
-            AdhEventManager.moduleName,
-            AdhHttp.moduleName,
-            AdhPermissions.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhWebSocket.moduleName
-        ])
-        .service("adhRateEventManager", ["adhEventManagerClass", (cls) => new cls()])
-        .service("adhRate", ["$q", "adhHttp", Service])
-        .directive("adhRate", [
-            "$q",
-            "adhRate",
-            "adhRateEventManager",
-            "adhConfig",
-            "adhHttp",
-            "adhWebSocket",
-            "adhPermissions",
-            "adhCredentials",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhDone",
-            directiveFactory("/Rate.html", new Adapter.RateAdapter())])
-        .directive("adhLike", [
-            "$q",
-            "adhRate",
-            "adhRateEventManager",
-            "adhConfig",
-            "adhHttp",
-            "adhWebSocket",
-            "adhPermissions",
-            "adhCredentials",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhDone",
-            directiveFactory("/Like.html", new Adapter.LikeAdapter())]);
 };

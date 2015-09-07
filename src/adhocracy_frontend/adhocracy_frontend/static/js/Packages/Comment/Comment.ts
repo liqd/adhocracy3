@@ -1,17 +1,12 @@
 import _ = require("lodash");
 
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../Config/Config");
 import AdhCredentials = require("../User/Credentials");
-import AdhDateTime = require("../DateTime/DateTime");
-import AdhDone = require("../Done/Done");
-import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
 import AdhMovingColumns = require("../MovingColumns/MovingColumns");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhRate = require("../Rate/Rate");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
@@ -21,8 +16,6 @@ import ResourcesBase = require("../../ResourcesBase");
 
 import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-
-import Adapter = require("./Adapter");
 
 var pkgLocation = "/Comment";
 
@@ -361,46 +354,3 @@ export var commentColumnDirective = (
     };
 };
 
-
-export var moduleName = "adhComment";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhCredentials.moduleName,
-            AdhDateTime.moduleName,
-            AdhDone.moduleName,
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhListing.moduleName,
-            AdhPermissions.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhRate.moduleName,
-            AdhResourceWidgets.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .directive("adhCommentListingPartial",
-            ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-                new AdhListing.Listing(new Adapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)])
-        .directive("adhCommentListing", ["adhConfig", "adhTopLevelState", "$location", adhCommentListing])
-        .directive("adhCreateOrShowCommentListing", [
-            "adhConfig", "adhDone", "adhHttp", "adhPreliminaryNames", "adhCredentials", adhCreateOrShowCommentListing])
-        .directive("adhCommentResource", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$window", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $window, $q) => {
-                var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentResource(
-                    adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
-                return widget.createRecursionDirective(adhRecursionHelper);
-            }])
-        .directive("adhCommentCreate", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhTopLevelState", "adhRecursionHelper", "$window", "$q",
-            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, adhRecursionHelper, $window, $q) => {
-                var adapter = new Adapter.CommentAdapter();
-                var widget = new CommentCreate(
-                    adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
-                return widget.createRecursionDirective(adhRecursionHelper);
-            }])
-        .directive("adhCommentColumn", ["adhConfig", commentColumnDirective]);
-};

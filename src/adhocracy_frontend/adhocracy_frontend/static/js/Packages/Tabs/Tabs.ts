@@ -149,13 +149,3 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
         }
     };
 };
-
-
-export var moduleName = "adhTabs";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .directive("tabset", ["adhConfig", tabsetDirective])
-        .directive("tab", ["adhConfig", tabDirective]);
-};

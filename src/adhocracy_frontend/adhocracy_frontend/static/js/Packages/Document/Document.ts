@@ -1,16 +1,8 @@
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhBadge = require("../Badge/Badge");
 import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
-import AdhImage = require("../Image/Image");
-import AdhInject = require("../Inject/Inject");
 import AdhMapping = require("../Mapping/Mapping");
-import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -555,61 +547,3 @@ export var editDirective = (
     };
 };
 
-
-export var moduleName = "adhDocument";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            "duScroll",
-            "ngMessages",
-            AdhAngularHelpers.moduleName,
-            AdhHttp.moduleName,
-            AdhImage.moduleName,
-            AdhInject.moduleName,
-            AdhMapping.moduleName,
-            AdhMarkdown.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhResourceArea.moduleName,
-            AdhResourceWidgets.moduleName,
-            AdhSticky.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("document-detail");
-            adhEmbedProvider.embeddableDirectives.push("document-create");
-            adhEmbedProvider.embeddableDirectives.push("document-edit");
-            adhEmbedProvider.embeddableDirectives.push("document-list-item");
-        }])
-        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", detailDirective])
-        .directive("adhDocumentCreate", [
-            "$location",
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            "adhUploadImage",
-            "flowFactory",
-            createDirective])
-        .directive("adhDocumentEdit", [
-            "$location",
-            "$q",
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            "adhUploadImage",
-            "flowFactory",
-            editDirective])
-        .directive("adhDocumentListing", ["adhConfig", listingDirective])
-        .directive("adhDocumentListItem", [
-            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", listItemDirective])
-        .directive("adhDocumentMapListItem", [
-            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", mapListItemDirective]);
-};

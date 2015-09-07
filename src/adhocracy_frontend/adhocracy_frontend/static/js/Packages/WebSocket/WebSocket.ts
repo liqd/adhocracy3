@@ -199,15 +199,3 @@ export var rawWebSocketFactoryFactory = (modernizr : ModernizrStatic) => {
         return dummyWebSocketFactory;
     }
 };
-
-
-export var moduleName = "adhWebSocket";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEventManager.moduleName
-        ])
-        .factory("adhRawWebSocketFactory", ["modernizr", rawWebSocketFactoryFactory])
-        .service("adhWebSocket", ["adhConfig", "adhEventManagerClass", "adhRawWebSocketFactory", Service]);
-};

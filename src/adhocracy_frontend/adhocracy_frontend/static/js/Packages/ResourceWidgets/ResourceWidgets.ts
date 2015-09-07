@@ -404,16 +404,3 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         return;
     }
 }
-
-
-export var moduleName = "adhResourceWidgets";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEventManager.moduleName,
-            AdhHttp.moduleName,
-            AdhPreliminaryNames.moduleName
-        ])
-        .directive("adhResourceWrapper", resourceWrapper);
-};
