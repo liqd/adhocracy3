@@ -32,12 +32,12 @@ A user list item within a listing widget
 */
 
 .user-list-item-link {
+    @include rem(padding, 20px 20px 20px 1rem);
     background: $color-background-base-introvert;
     border-bottom: 2px solid $color-structure-normal;
     display: block;
     line-height: 1;
     overflow: hidden;
-    padding: 20 / 14 * 1em 20 / 14 * 1em 20 / 14 * 1em 1em;
     text-decoration: none;
 
     .user-list-item-name {
@@ -45,7 +45,7 @@ A user list item within a listing widget
         font-size: $font-size-large;
 
         + .badge {
-            margin-left: 10px / $font-size-small * 1em;
+            @include rem(margin-left, 10px);
         }
     }
 

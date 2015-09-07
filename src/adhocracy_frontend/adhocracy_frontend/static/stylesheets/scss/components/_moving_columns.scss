@@ -226,11 +226,11 @@ States:
 */
 .moving-column-menu {
     @include clearfix;
+    @include rem(font-size, $font-size-small);
+    @include rem(height, $moving-column-menu-height);
+    @include rem(line-height, $moving-column-menu-height);
+    @include rem(padding, 0 0 0 $padding-small);
     background: $color-structure-normal;
-    font-size: $font-size-small;
-    height: $moving-column-menu-height * ($font-size-normal / $font-size-small);
-    line-height: $moving-column-menu-height * ($font-size-normal / $font-size-small) / 1em;
-    padding: 0 0 0 $padding-small;
 
     .moving-column-menu-sort-option,
     .moving-column-menu-button {
@@ -249,31 +249,31 @@ States:
     .moving-column-menu-button,
     .moving-column-menu-sort-label {
         @include inline-block;
+        @include rem(font-size, $font-size-small);
+        @include rem(margin-right, 30px);
         color: $color-text-highlight-introvert;
-        font-size: $font-size-small;
         font-weight: $font-weight-introvert;
         float: left;
-        margin-right: 2.5em;
     }
 
     .moving-column-menu-sort-label {
+        @include rem(margin-right, 1rem);
         font-style: italic;
-        margin-right: 1em;
     }
 
     .moving-column-menu-sort-option {
         margin: 0;
 
         &:not(:last-child) {
-            margin-right: 1em;
+            @include rem(margin-right, 1rem);
             position: relative;
 
             &:after {
                 @include inline-block;
+                @include rem(right, -1rem);
+                @include rem(width, 1rem);
                 content: "|";
                 position: absolute;
-                right: -1em;
-                width: 1em;
                 text-align: center;
                 color: $color-text-highlight-introvert;
             }
@@ -286,11 +286,11 @@ States:
 }
 
 .moving-column-icon {
+    @include rem(margin-right, 30px);
+    @include rem(font-size, 17px);
     float: left;
-    font-size: 17px;
     line-height: (24/17);
     vertical-align: middle;
-    margin-right: 30px / 17px * 1em;
 }
 
 .moving-column-menu-nav {
@@ -298,9 +298,9 @@ States:
 
     .moving-column-menu-nav-button {
         @include inline-block;
+        @include rem(min-width, 3.5rem);
+        @include rem(padding, 0 0.5rem);
         font-weight: $font-weight-extrovert;
-        min-width: 3.5em;
-        padding: 0 0.5em;
         text-align: center;
         vertical-align: baseline;
         text-decoration: none;
@@ -323,6 +323,7 @@ States:
 }
 
 .moving-column-sidebar {
+    @include rem(padding, 16px 20px);
     @include transition(left 0.5s);
     border-top: 1px solid $color-structure-border;
     display: none;
@@ -330,7 +331,6 @@ States:
     width: 25%;
     z-index: 1;
     background-color: $color-structure-normal;
-    padding: (16px / $font-size-normal * 1em) (20px / $font-size-normal * 1em);
 
     &.is-visible {
         left: 0;
@@ -343,11 +343,11 @@ States:
     }
 
     .moving-column-sidebar-close {
+        @include rem(right, 1rem);
+        @include rem(top, 1rem);
         color: $color-text-introvert;
         position: absolute;
-        right: 1em;
         text-decoration: none;
-        top: 1em;
 
         &:hover, &:focus {
             color: $color-text-extrovert;
@@ -399,8 +399,8 @@ A list of alert messages to notify users in the moving column
 }
 
 .moving-column-alert {
+    @include rem(padding, 1rem);
     background: $color-structure-normal;
-    padding: 1em;
     text-align: center;
 
     &.m-error {
@@ -418,9 +418,9 @@ A list of alert messages to notify users in the moving column
 
 .moving-column-overlay {
     @include clearfix;
+    @include rem(padding, 1rem);
     background: $color-structure-normal;
     border-top: 1px solid $color-structure-border;
-    padding: 1em;
     z-index: 3;
     max-height: 80%;
     overflow-y: auto;

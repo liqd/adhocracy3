@@ -18,14 +18,14 @@ Badges for labeling things
 */
 
 .badge {
+    @include rem(padding, 0 5px);
     @include inline-block;
+    @include rem(margin-right, 5px);
     background: $color-structure-normal;
     color: $color-text-normal;
     font-size: $font-size-smaller;
-    padding: 0 5px / $font-size-smaller * 1em;
     line-height: $badge-height;
     text-transform: uppercase;
-    margin-right: 0.5em;
 }
 
 /*doc

@@ -55,8 +55,8 @@ is selected, no state is applied.
 }
 
 .comment {
-    margin-bottom: 2em;
-    padding: 0 1em;
+    @include rem(margin-bottom, 2rem);
+    @include rem(padding, 0 1rem);
 
     &:last-child {
         margin-bottom: 0;
@@ -135,7 +135,7 @@ parent: comment
 */
 
 .comment-main {
-    padding-bottom: 20px / $font-size-normal * 1em;
+    @include rem(padding-bottom, 20px);
 }
 
 .comment-title {
@@ -146,16 +146,16 @@ parent: comment
 }
 
 .comment-content-edit-text {
-    margin-bottom: 0.5em;
+    margin-bottom: 0.5rem;
 }
 
 .comment-header {
     @include clearfix;
+    @include rem(margin-bottom, 10px);
+    @include rem(padding-top, 3px);
     color: $color-text-introvert;
     font-size: $font-size-small;
     font-weight: $font-weight-introvert;
-    margin-bottom: 10px / $font-size-small * 1em;
-    padding-top: 3px / $font-size-small * 1em;
 
     .comment-header-creator,
     .comment-header-date,
@@ -200,10 +200,10 @@ parent: comment
     }
 
     .comment-header-links {
-        padding-right: 20px / $font-size-small * 1em;
+        @include rem(padding-right, 20px);
 
         a {
-            margin-left: 14px / $font-size-small * 1em;
+            @include rem(margin-left, 14px);
         }
     }
 
@@ -234,8 +234,8 @@ parent: comment
 
 .comment-create-form-text,
 .comment-edit-form-text {
+    @include rem(min-height, 5.8rem);
     background: $color-text-inverted;
-    min-height: 5.8em;
 }
 
 .comment-edit-form-text {

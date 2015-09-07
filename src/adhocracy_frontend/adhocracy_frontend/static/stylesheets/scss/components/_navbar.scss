@@ -25,15 +25,15 @@ aligned ones will wrap.
 */
 .navbar {
     @include clearfix;
-    margin: 0.5em 0;
+    @include rem(margin, 0.5rem 0);
 
     .navbar-left {
+        @include rem(margin-right, 0.5rem);
         float: left;
-        margin-right: 0.5em;
     }
 
     .navbar-right {
+        @include rem(margin-right, 0.5rem);
         float: right;
-        margin-left: 0.5em;
     }
 }

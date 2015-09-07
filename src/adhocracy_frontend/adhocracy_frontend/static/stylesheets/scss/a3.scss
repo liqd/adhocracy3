@@ -15,13 +15,12 @@
 @import "third_party/normalize";
 @import "general/normalize";
 
-@import "general/mixins";
-
 @import "general/variables";
 @import "general/variables_theme";
 @import "general/variables_extra";
 @import "general/variables_doc";
 
+@import "general/mixins";
 @import "layout";
 
 @import "components/type";

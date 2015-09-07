@@ -38,7 +38,7 @@ A section with a additional annotation, typically displayed in a second column.
     }
 
     .annotated-section-annotation {
-        margin-bottom: 2em;
+        @include rem(margin-bottom, 2rem);
         width: $annotation-width;
     }
 }

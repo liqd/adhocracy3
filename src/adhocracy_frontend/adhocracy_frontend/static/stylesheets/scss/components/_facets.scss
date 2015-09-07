@@ -6,21 +6,21 @@
     }
 
     .facet {
-        margin-bottom: 50px / $font-size-normal * 1em;
+        @include rem(margin-bottom, 50px);
     }
 
     .facet-header {
+        @include rem(margin, 0 0 20px);
         color: $color-text-introvert;
         font-size: $font-size-small;
         font-weight: $font-weight-normal;
         line-height: 1.15;
-        margin: 0 0 (20px / $font-size-normal * 1em);
     }
 
     .facet-item {
+        @include rem(margin-bottom, 1rem);
         display: block;
         line-height: 1;
-        margin-bottom: 1em;
         color: inherit;
         text-decoration: inherit;
 
