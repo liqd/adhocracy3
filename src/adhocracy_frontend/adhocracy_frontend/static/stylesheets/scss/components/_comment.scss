@@ -57,10 +57,6 @@ is selected, no state is applied.
     margin-bottom: 2em;
     padding: 0 1em;
 
-    &:last-child {
-        margin-bottom: 0;
-    }
-
     &.is-not-selected {
         background: $color-background-base-introvert;
     }
