@@ -594,6 +594,60 @@ search_result = SearchResult(elements=[],
                              group_by={})
 
 
+class Comparator(Enum):
+
+    """Comparators for search query parameters."""
+
+
+class ReferenceComparator(Comparator):
+
+    """Comparators for :class:`adhocracy_core.catalog.index.ReferenceIndex`."""
+
+    eq = 'eq'
+
+
+class FieldComparator(Comparator):
+
+    """Comparators for :class:`hypatia.field.FieldIndex` search index."""
+
+    eq = 'eq'
+    noteq = 'noteq'
+    gt = 'gt'
+    ge = 'ge'
+    lt = 'lt'
+    le = 'le'
+
+
+class FieldSequenceComparator(Comparator):
+
+    """Comparators for :class:`hypatia.field.FieldIndex` search index.
+
+    These comparators need to be combined with a sequence of index values.
+    """
+
+    any = 'any'
+    notany = 'notany'
+
+
+class KeywordComparator(Comparator):
+
+    """Comparators for :class:`hypatia.keyword.KeywordIndex` search index."""
+
+    eq = 'eq'
+    noteq = 'noteq'
+
+
+class KeywordSequenceComparator(Comparator):
+
+    """Comparators for :class:`hypatia.keyword.KeywordIndex` search index.
+
+    These comparators need to be combined with a sequence of index values.
+    """
+
+    any = 'any'
+    notany = 'notany'
+
+
 class SearchQuery(namedtuple('Query', ['interfaces',
                                        'indexes',
                                        'references',
@@ -615,11 +669,17 @@ class SearchQuery(namedtuple('Query', ['interfaces',
     Search resources:
     -----------------
 
-    interfaces (IInterface or (IInterface)):
+    interfaces (IInterface or (IInterface)
+    or (KeywordSearchComparator, IInterface)
+    or (KeywordSearchComparator, (IInterface)):
         Resource type (iresource) or sheet (isheet) interfaces
-    indexes ({str:object}):
-        Mapping index name to wanted index value. Available indexes are defined
-        in :class:`adhocracy_core.catalog.adhocracy`
+    indexes ({str:object}
+    or {str:(SearchComparator, object)}
+    or {str:(SearchComparator, (object))}
+        Mapping index name to wanted index value.
+        Available indexes are defined in
+        :class:`adhocracy_core.catalog.adhocracy`
+        Available :class:`SearchComparator`s depend on the index type.
     references (Reference):
         References with (source, isheet, isheet_field, target).
         If `source` is None search for resources referencing target
