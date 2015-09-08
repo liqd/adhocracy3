@@ -46,9 +46,8 @@ class TestProposalSheet:
         assert inst.meta.schema_class == ProposalSchema
 
     def test_get_empty(self, meta, context):
-        from decimal import Decimal
         inst = meta.sheet_class(meta, context)
-        wanted = {'budget': Decimal(0),
+        wanted = {'budget': None,
                   'location_text': '',
                   }
         assert inst.get() == wanted
@@ -63,5 +62,19 @@ class TestProposalSchema:
 
     def test_create(self, inst):
         assert inst['budget'].validator.min == 0
-        assert inst['budget'].required
+        assert inst['budget'].required is False
         assert inst['location_text'].validator.max == 100
+
+    def test_serialize_emtpy(self, inst):
+        assert inst.serialize() == {'budget': None,
+                                    'location_text': ''}
+
+    def test_deserialize_emtpy(self, inst):
+        assert inst.deserialize({}) == {}
+
+    def test_deserialize_budget_none(self, inst):
+        assert inst.deserialize({'budget': None}) == {}
+
+    def test_deserialize_budget_positive_int(self, inst):
+        from decimal import Decimal
+        assert inst.deserialize({'budget': 1}) == {'budget': Decimal(1)}
