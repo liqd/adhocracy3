@@ -20,7 +20,6 @@ is selected, no state is applied.
         Comment Create Form
     </div>
 
-
     <div class="comment-children">
         <div class="comment">
             <div class="comment-main debug-placeholder">Comment Main</div>
@@ -57,10 +56,6 @@ is selected, no state is applied.
 .comment {
     margin-bottom: 2em;
     padding: 0 1em;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
 
     &.is-not-selected {
         background: $color-background-base-introvert;
@@ -123,6 +118,45 @@ parent: comment
             </div>
         </div>
     </div>
+    <div class="comment-content">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue.</p>
+        <p>Nam tincidunt congue enim, ut porta lorem lacinia consectetur. Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut gravida lorem. Ut turpis felis, pulvinar a semper sed, adipiscing id dolor. Pellentesque auctor nisi id magna consequat sagittis. Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar at malesuada arcu rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris vitae nisi at sem facilisis semper ac in est.</p>
+    </div>
+</div>
+
+<div class="comment-main">
+    <div class="comment-header">
+        <div class="comment-header-column1">
+            <span class="comment-header-creator">
+                <a href="">god</a>
+            </span>
+            <span class="comment-header-date">
+                25 minutes ago
+            </span>
+        </div>
+        <div class="comment-header-column2">
+            <span class="comment-header-links">
+                <a href="" class="comment-header-link" title="Reply">
+                    <i class="comment-header-icon icon-reply"></i>
+                </a>
+                <a href="" class="comment-header-link ng-scope" title="Edit">
+                    <i class="comment-header-icon icon-pencil"></i>
+                </a>
+                <a href="" class="comment-header-link ng-scope" title="Report">
+                    <i class="comment-header-icon icon-ban-circle"></i>
+                </a>
+                <a href="" class="comment-header-link ng-scope" title="Delete">
+                    <i class="comment-header-icon icon-x"></i>
+                </a>
+            </span>
+            <div class="rate">
+                <span class="rate-difference is-positive">+1</span>
+                    <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+                    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+                </span>
+            </div>
+        </div>
+    </div>
     <div class="comment-children-edit-form">
         <textarea class="comment-edit-form-text"></textarea>
         <footer class="form-footer">
@@ -151,8 +185,9 @@ parent: comment
 
 .comment-header {
     @include clearfix;
-    @include text(introvert);
+    color: $color-text-introvert;
     font-size: $font-size-small;
+    font-weight: $font-weight-introvert;
     margin-bottom: 10px / $font-size-small * 1em;
     padding-top: 3px / $font-size-small * 1em;
 

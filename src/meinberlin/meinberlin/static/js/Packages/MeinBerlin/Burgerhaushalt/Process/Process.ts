@@ -3,6 +3,9 @@ import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
+import AdhTopLevelState = require("..././../TopLevelState/TopLevelState");
+
+import AdhMeinBerlinPhase = require("../../Phase/Phase");
 
 import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
 import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
@@ -49,6 +52,54 @@ export var detailDirective = (
 };
 
 
+export var phaseHeaderDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
+        scope: {},
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
+            var processUrl = adhTopLevelState.get("processUrl");
+            adhHttp.get(processUrl).then((resource) => {
+                var sheet : SIWorkflow.Sheet = resource.data[SIWorkflow.nick];
+                scope.currentPhase = sheet.workflow_state;
+            });
+
+            scope.phases = [{
+                name: "announce",
+                title: "Information",
+                description: "Ab dem 02.09.2015 können sich alle interessierten Bürgerinnen und Bürger zum Bürgerhaushalt " +
+                    "Treptow-Köpenick online beteiligen. Auf der Internetseite des Bezirksamtes Treptow-Köpenick sowie eine " +
+                    "Einwohnerversammlung werden allen Interessierten Informationen zum Verfahren zur Verfügung gestellt. Bisher " +
+                    "offline eingereichte Vorschläge werden von den Fachämtern online eingetragen.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: true,
+                commentAvailable: true
+            }, {
+                name: "participate",
+                title: "Ideensammlung",
+                description: "In dieser Phase bringen Bürgerinnen und Bürger ihre Vorschläge ein und können Vorschläge anderer bewerten " +
+                    "und diskutieren. Vorschläge beziehen sich auf das laufende oder zukünftige Kalenderjahr und können stets " +
+                    "eingebracht werden. Vorschläge können auch offline eingereicht werden.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: true,
+                commentAvailable: true
+            }, {
+                name: "result",
+                title: "Ergebnisse",
+                description: "Bürgerinnen und Bürger können den Status aller Vorschläge sehen und gegebenenfalls die Stellungnahme des " +
+                    "im Bezirksamt zuständigen Fachamtes lesen.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: false,
+                commentAvailable: false
+            }];
+        }
+    };
+};
+
 
 export var moduleName = "adhMeinBerlinBurgerhaushaltProcess";
 
@@ -56,8 +107,10 @@ export var register = (angular) => {
     angular
         .module(moduleName, [
             AdhHttp.moduleName,
+            AdhMeinBerlinPhase.moduleName,
             AdhMovingColumns.moduleName,
             AdhPermissions.moduleName
         ])
+        .directive("adhMeinBerlinBurgerhaushaltPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
         .directive("adhMeinBerlinBurgerhaushaltDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective]);
 };
