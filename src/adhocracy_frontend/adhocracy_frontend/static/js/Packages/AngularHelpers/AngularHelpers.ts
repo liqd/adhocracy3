@@ -1,6 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
+import _ = require("lodash");
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
 
 import AdhHttp = require("../Http/Http");
@@ -46,6 +47,11 @@ export var recursionHelper = ($compile) => {
             };
         }
     };
+};
+
+
+export var numberOrDashFilter = (n) : string => {
+    return _.isFinite(n) ? n : "—";
 };
 
 
@@ -287,6 +293,7 @@ export var register = (angular) => {
         ])
         .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
         .filter("signum", () => (n : number) : string => (typeof n === "number") ? (n > 0 ? "+" + n.toString() : n.toString()) : "0")
+        .filter("numberOrDash", () => numberOrDashFilter)
         .factory("adhRecursionHelper", ["$compile", recursionHelper])
         .factory("adhShowError", () => showError)
         .factory("adhSingleClickWrapper", ["$timeout", singleClickWrapperFactory])

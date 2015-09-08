@@ -22,7 +22,7 @@
             </li>
             <li data-ng-if="!(isKiezkasse || isBurgerhaushalt)"></li>
             <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-budget">
-                <div data-ng-if="isKiezkasse || isBurgerhaushalt"><i class="mein-berlin-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget}} &euro;</div>
+                <div data-ng-if="isKiezkasse || isBurgerhaushalt"><i class="mein-berlin-proposal-detail-meta-item-icon icon-budget"></i> {{data.budget | numberOrDash}} &euro;</div>
             </li>
             <li class="mein-berlin-proposal-detail-meta-item mein-berlin-proposal-detail-meta-participation">
                 <adh-rate data-refers-to="{{path}}"></adh-rate>
