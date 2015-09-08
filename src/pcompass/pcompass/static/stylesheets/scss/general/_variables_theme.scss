@@ -1,3 +1,13 @@
+$font-family-normal: "Open Sans", sans-serif;
+$font-size-smaller: 10px;
+$font-size-small: 12px;
+$font-size-normal: 15px;
+$font-size-plus: 18px;
+$font-size-large: 21px;
+$font-size-huge: 40px;
+
+$line-height-normal: 1.4;
+
 //Brand colors
 $color-brand-one-normal: #f89523;
 $color-brand-one-introvert: #f87323;
@@ -13,7 +23,7 @@ $color-brand-four-introvert: $color-brand-three-introvert;
 $color-brand-four-extrovert: $color-brand-three-extrovert;
 
 // Text colors
-$color-text-normal: #333;
+$color-text-normal: #4d4d4d;
 $color-text-extrovert: #1c1c1b;
 $color-text-highlight-normal: $color-brand-one-normal;
 
