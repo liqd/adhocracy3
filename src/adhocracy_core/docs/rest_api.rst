@@ -1407,6 +1407,12 @@ value allows also including grandchildren (depth=2) or even great-grandchildren
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     [...'http://localhost/Documents/document_0000000/VERSION_0000001/'...]
 
+    >>> resp_data = testapp.get('/Documents',
+    ...     params={'content_type': 'adhocracy_core.resources.document.IDocumentVersion',
+    ...             'depth': '2'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
+    [...'http://localhost/Documents/document_0000000/VERSION_0000001/'...]
+
 Without specifying a deeper depth, the above query for IDocumentVersions
 wouldn't have found anything, since they are children of children of the pool::
 

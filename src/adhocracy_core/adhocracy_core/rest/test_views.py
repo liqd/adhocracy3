@@ -633,7 +633,10 @@ class TestPoolRESTView:
         response = inst.get()
 
         assert response['data'] == {IPool.__identifier__: {}}
-        assert mock_sheet.get_cstruct.call_args[1] == {'params': {'param1': 1}}
+        assert mock_sheet.get_cstruct.call_args[1] == {'params': {'param1': 1,
+                                                       'depth': 1,
+                                                       'root': context,
+                                                       }}
 
     def test_post_valid(self, request, context):
         request.root = context

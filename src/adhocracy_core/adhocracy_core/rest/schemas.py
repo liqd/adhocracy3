@@ -350,9 +350,9 @@ class PoolQueryDepth(SchemaNode):
     arbitrary depth.
     """
 
-    schema_type = colander.String
-    validator = colander.Regex(r'^(\d+|all)$')
-    missing = '1'
+    schema_type = colander.Integer
+    missing = 1
+    validator=colander.Range(min=1)
 
 
 @colander.deferred
@@ -412,7 +412,7 @@ class GETPoolRequestSchema(colander.Schema):
     # Elements in this schema were multiple values should be allowed:
     # sheet, aggregateby, tag.
 
-    depth = PoolQueryDepth(missing=colander.drop)
+    depth = PoolQueryDepth()
     elements = PoolElementsForm(missing=colander.drop)
     count = SchemaNode(colander.Boolean(), missing=colander.drop)
     sort = SchemaNode(colander.String(),
@@ -434,15 +434,17 @@ class GETPoolRequestSchema(colander.Schema):
         TODO: CHANGE API according to internal SearchQuery api.
              refactor to follow coding guideline better.
         """
+        depth_cstruct = cstruct.get('depth', None)
+        if depth_cstruct == 'all':
+            cstruct['depth'] = 100
         appstruct = super().deserialize(cstruct)
         search_query = {}
         if appstruct:
             search_query['root'] = self.bindings['context']
         if 'depth' in appstruct:
-            depth_bbb = appstruct['depth']
-            depth = None
-            if depth_bbb != 'all':
-                depth = int(depth_bbb)
+            depth = appstruct['depth']
+            if depth == 100:
+                depth = None
             search_query['depth'] = depth
         if 'elements' in appstruct:
             elements = appstruct.get('elements')

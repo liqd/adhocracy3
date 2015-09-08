@@ -569,7 +569,8 @@ class TestGETPoolRequestSchema:
 
     def test_deserialize_empty(self, inst, context):
         inst = inst.bind(context=context)
-        assert inst.deserialize({}) == {}
+        assert inst.deserialize({}) == {'depth': 1,
+                                        'root': context}
 
     def test_deserialize_valid(self, inst, context):
         from hypatia.interfaces import IIndexSort
@@ -592,7 +593,7 @@ class TestGETPoolRequestSchema:
         cstruct = {'aggregateby': 'index1',
                    'content_type': 'adhocracy_core.interfaces.IResource',
                    'count': 'true',
-                   'depth': '100',
+                   'depth': 'all',
                    'elements': 'content',
                    'index1': 1,
                    'index2': ['eq', 1],
@@ -609,7 +610,7 @@ class TestGETPoolRequestSchema:
                               'index2': ('eq', 1),
                               'interfaces': IResource,
                               'index3': ('any', [1, 3])},
-                  'depth': 100,
+                  'depth': None,
                   'frequency_of': 'index1',
                   'interfaces': IName,
                   'limit': 2,
@@ -678,14 +679,25 @@ class TestGETPoolRequestSchema:
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_depth_all(self, inst, context):
+    def test_deserialize_depth_valid_all(self, inst, context):
         data = {'depth': 'all'}
         inst = inst.bind(context=context)
         assert inst.deserialize(data)['depth'] is None
 
-    @mark.parametrize('value', ['-7', '1.5', 'fall', 'alle'])
-    def test_deserialize_depth_invalid(self, inst, value):
+    def test_deserialize_depth_valid_number(self, inst, context):
+        data = {'depth': '2'}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['depth'] == 2
+
+    def test_deserialize_depth_default(self, inst, context):
+        data = {}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['depth'] == 1
+
+    @mark.parametrize('value', ['-7', '1.5'])
+    def test_deserialize_depth_invalid(self, inst, value, context):
         data = {'depth': value}
+        inst = inst.bind(context=context)
         with raises(colander.Invalid):
             inst.deserialize(data)
 
