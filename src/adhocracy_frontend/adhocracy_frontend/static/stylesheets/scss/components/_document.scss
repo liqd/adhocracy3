@@ -46,7 +46,6 @@ A form for creating documents. This contains a <a href="#section-jump">section j
     padding: 0;
 
     .document-form-add-paragraph-button {
-        @include rem(height, $button-height);
         @include rem(margin-bottom, 45px);
         float: right;
     }

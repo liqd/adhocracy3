@@ -203,8 +203,8 @@ Click show results
 
     .rate-results {
         @include rem(font-size, $font-size-small);
-        @include rem(padding-top, 3px);
         display: block;
+        padding-top: 3px;
         position: absolute;
         text-align: center;
         visibility: hidden;

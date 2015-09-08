@@ -102,10 +102,10 @@
     &:before {
         @include rem(border-top, 7.5px solid transparent);
         @include rem(border-right, 8px solid $color-brand-one-normal);
-        @include rem(border-bottom, 7.5px solid $color-brand-one-normal);
+        @include rem(border-bottom, 7.5px solid transparent);
+        @include rem(left, -8px);
         content: "";
         height: 0;
-        left: -8px;
         position: absolute;
         top: 0;
         width: 0;
@@ -127,9 +127,9 @@
 }
 
 .blog-post-actions {
-    @include rem(line-height, 15px);
+    @include rem(font-size, $font-size-small);
     float: right;
-    font-size: $font-size-small;
+    line-height: 1.25;
 }
 
 .blog-post-actions-item {

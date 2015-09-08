@@ -74,7 +74,7 @@ States:
 
     .commentable-section-show-comments {
         @include show-comments;
-        @include rem(max-width, 36px/14px);
+        @include rem(max-width, 36px);
         @include rem(right, 1rem);
         @include rem(top, 1rem);
         position: absolute;

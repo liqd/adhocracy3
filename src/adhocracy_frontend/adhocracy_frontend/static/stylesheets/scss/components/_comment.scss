@@ -146,16 +146,16 @@ parent: comment
 }
 
 .comment-content-edit-text {
-    margin-bottom: 0.5rem;
+    @include rem(margin-bottom, 0.5rem);
 }
 
 .comment-header {
     @include clearfix;
+    @include rem(font-size, $font-size-small);
     @include rem(margin-bottom, 10px);
-    @include rem(padding-top, 3px);
     color: $color-text-introvert;
-    font-size: $font-size-small;
     font-weight: $font-weight-introvert;
+    padding-top: 3px;
 
     .comment-header-creator,
     .comment-header-date,

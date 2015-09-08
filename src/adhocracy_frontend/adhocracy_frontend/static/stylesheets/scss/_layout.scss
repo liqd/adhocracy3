@@ -157,7 +157,7 @@ depends on a lot of factors:
 ```
 */
 .main-header {
-    @include rem(line-height, 2.8571rem);
+    @include rem(line-height, 40px);
     position: relative;
 
     @media print {
