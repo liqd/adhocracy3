@@ -24,12 +24,12 @@ from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.proposal import IProposal
 from adhocracy_core.resources.process import IProcess
@@ -168,6 +168,15 @@ def _get_autonaming_prefixes(registry: Registry) -> [str]:
     meta = registry.content.resources_meta.values()
     prefixes = [m.autonaming_prefix for m in meta if m.use_autonaming]
     return list(set(prefixes))
+
+
+def _get_used_autonaming_prefixes(pool: IPool, prefixes: [str]) -> [str]:
+    used_prefixes = set()
+    for child_name in pool:
+        for prefix in prefixes:
+            if child_name.startswith(prefix):
+                used_prefixes.add(prefix)
+    return list(used_prefixes)
 
 
 @log_migration
@@ -323,7 +332,41 @@ def add_workflow_assignment_sheet_to_pools_simples(root):  # pragma: no cover
 @log_migration
 def migrate_rate_sheet_to_attribute_storage(root):  # pragma: no cover
     """Migrate rate sheet to attribute storage."""
-    migrate_to_attribute_storage(root, IRate)
+    import adhocracy_core.sheets.rate
+    migrate_to_attribute_storage(root, adhocracy_core.sheets.rate.IRate)
+
+
+@log_migration
+def move_autoname_last_counters_to_attributes(root):  # pragma: no cover
+    """Move autoname last counters of pools to attributes.
+
+    Remove _autoname_lasts attribute.
+    Instead add private attributes to store autoname last counter objects.
+    Cleanup needless counter objects.
+    """
+    registry = get_current_registry(root)
+    prefixes = _get_autonaming_prefixes(registry)
+    catalogs = find_service(root, 'catalogs')
+    pools = _search_for_interfaces(catalogs, (IPool, IFolder))
+    count = len(pools)
+    for index, pool in enumerate(pools):
+        logger.info('Migrating resource {0} {1} of {2}'
+                    .format(pool, index + 1, count))
+        if hasattr(pool, '_autoname_last'):
+            logger.info('Remove "_autoname_last" attribute')
+            delattr(pool, '_autoname_last')
+        if hasattr(pool, '_autoname_lasts'):
+            used_prefixes = _get_used_autonaming_prefixes(pool, prefixes)
+            for prefix in used_prefixes:
+                is_badge_service = IBadgeAssignmentsService.providedBy(pool)
+                if prefix == '' and not is_badge_service:
+                    continue
+                logger.info('Move counter object for prefix {0} to attribute'
+                            .format(prefix))
+                counter = pool._autoname_lasts.get(prefix, Length())
+                setattr(pool, '_autoname_last_' + prefix, counter)
+            logger.info('Remove "_autoname_lasts" attribute')
+            delattr(pool, '_autoname_lasts')
 
 
 def includeme(config):  # pragma: no cover
@@ -341,3 +384,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)
     config.add_evolution_step(make_proposals_badgeable)
     config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
+    config.add_evolution_step(move_autoname_last_counters_to_attributes)
