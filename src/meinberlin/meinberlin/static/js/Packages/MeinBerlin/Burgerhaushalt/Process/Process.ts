@@ -1,9 +1,9 @@
-import AdhConfig = require("..././../Config/Config");
+import AdhConfig = require("../../../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
-import AdhTopLevelState = require("..././../TopLevelState/TopLevelState");
+import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 
 import AdhMeinBerlinPhase = require("../../Phase/Phase");
 
@@ -98,19 +98,4 @@ export var phaseHeaderDirective = (
             }];
         }
     };
-};
-
-
-export var moduleName = "adhMeinBerlinBurgerhaushaltProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhMeinBerlinPhase.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName
-        ])
-        .directive("adhMeinBerlinBurgerhaushaltPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
-        .directive("adhMeinBerlinBurgerhaushaltDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective]);
 };

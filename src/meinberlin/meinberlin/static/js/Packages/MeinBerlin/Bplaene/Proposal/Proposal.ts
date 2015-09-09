@@ -1,12 +1,9 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
 import AdhConfig = require("../../../Config/Config");
-import AdhEmbed = require("../../../Embed/Embed");
 import AdhHttp = require("../../../Http/Http");
 import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
 import AdhProcess = require("../../../Process/Process");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 
 import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal");
 import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion");
@@ -130,24 +127,4 @@ export var embedDirective = (
             });
         }
     };
-};
-
-
-export var moduleName = "adhMeinBplaeneProposal";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhResourceArea.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-embed");
-        }])
-        .directive("adhMeinBerlinBplaeneProposalCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
-        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", "adhHttp", embedDirective]);
 };

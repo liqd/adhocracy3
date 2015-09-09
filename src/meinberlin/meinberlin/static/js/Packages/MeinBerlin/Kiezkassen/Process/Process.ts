@@ -8,7 +8,6 @@ import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhProcess = require("../../../Process/Process");
-import AdhTabs = require("../../../Tabs/Tabs");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
 
@@ -195,22 +194,4 @@ export var editDirective = (
             };
         }
     };
-};
-
-
-export var moduleName = "adhMeinBerlinKiezkassenProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhMeinBerlinPhase.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhTabs.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
-        .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", editDirective]);
 };

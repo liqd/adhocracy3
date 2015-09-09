@@ -30,12 +30,3 @@ export var phaseDirective = (adhConfig : AdhConfig.IService) => {
         }
     };
 };
-
-
-export var moduleName = "adhMeinBerlinPhase";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .directive("adhMeinBerlinPhase", ["adhConfig", phaseDirective]);
-};

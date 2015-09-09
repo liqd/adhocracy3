@@ -1,18 +1,12 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAbuse = require("../../../Abuse/Abuse");
-import AdhComment = require("../../../Comment/Comment");
 import AdhConfig = require("../../../Config/Config");
 import AdhHttp = require("../../../Http/Http");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhProcess = require("../../../Process/Process");
+import AdhPermissions = require("../../../Permissions/Permissions");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
-import AdhPermissions = require("../../../Permissions/Permissions");
-
-import AdhMeinBerlinBurgerhaushaltProcess = require("../Process/Process");
-import AdhMeinBerlinProposal = require("../../../Proposal/Proposal");
 
 import RIComment = require("../../../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
@@ -219,33 +213,4 @@ export var registerRoutes = (
                 });
             };
         }]);
-};
-
-export var moduleName = "adhMeinBerlinBurgerhaushaltWorkbench";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAbuse.moduleName,
-            AdhComment.moduleName,
-            AdhHttp.moduleName,
-            AdhMeinBerlinBurgerhaushaltProcess.moduleName,
-            AdhMeinBerlinProposal.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhResourceAreaProvider", registerRoutes(RIBurgerhaushaltProcess.content_type)])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIBurgerhaushaltProcess.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mein-berlin-burgerhaushalt-workbench></adh-mein-berlin-burgerhaushalt-workbench>");
-            }];
-        }])
-        .directive("adhMeinBerlinBurgerhaushaltWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", burgerhaushaltWorkbenchDirective])
-        .directive("adhMeinBerlinBurgerhaushaltProposalDetailColumn", [
-            "adhConfig", "adhPermissions", burgerhaushaltProposalDetailColumnDirective])
-        .directive("adhMeinBerlinBurgerhaushaltProposalCreateColumn", ["adhConfig", burgerhaushaltProposalCreateColumnDirective])
-        .directive("adhMeinBerlinBurgerhaushaltProposalEditColumn", ["adhConfig", burgerhaushaltProposalEditColumnDirective])
-        .directive("adhMeinBerlinBurgerhaushaltDetailColumn", ["adhConfig", burgerhaushaltDetailColumnDirective]);
 };

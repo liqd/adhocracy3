@@ -1,15 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhBadge = require("../Badge/Badge");
 import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 import AdhMapping = require("../Mapping/Mapping");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhRate = require("../Rate/Rate");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -452,61 +449,4 @@ export var editDirective = (
             };
         }
     };
-};
-
-
-export var moduleName = "adhMeinBerlinProposal";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhBadge.moduleName,
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhMapping.moduleName,
-            AdhPermissions.moduleName,
-            AdhRate.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-detail");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list-item");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-create");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-edit");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list");
-        }])
-        .directive("adhMeinBerlinProposalDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", detailDirective])
-        .directive("adhMeinBerlinProposalListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", listItemDirective])
-        .directive("adhMeinBerlinProposalMapListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", mapListItemDirective])
-        .directive("adhMeinBerlinProposalCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            "$location",
-            createDirective
-        ])
-        .directive("adhMeinBerlinProposalEdit", [
-            "adhConfig",
-            "adhHttp",
-            "adhPermissions",
-            "adhPreliminaryNames",
-            "adhRate",
-            "adhResourceUrlFilter",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhTopLevelState",
-            "adhGetBadges",
-            "$location",
-            "$q",
-            editDirective
-        ]);
 };
