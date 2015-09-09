@@ -1,18 +1,18 @@
-import AdhEmbedModule = require("../../../Embed/Module");
-import AdhPermissionsModule = require("../../../Permissions/Module");
-import AdhResourceAreaModule = require("../../../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../../../TopLevelState/Module");
+import * as AdhEmbedModule from "../../../Embed/Module";
+import * as AdhPermissionsModule from "../../../Permissions/Module";
+import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
-import AdhMeinBerlinBurgerhaushaltWorkbenchModule = require("../Workbench/Module");
+import * as AdhMeinBerlinBurgerhaushaltWorkbenchModule from "../Workbench/Module";
 
-import AdhEmbed = require("../../../Embed/Embed");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import * as AdhEmbed from "../../../Embed/Embed";
+import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 
-import AdhMeinBerlinBurgerhaushaltWorkbench = require("../Workbench/Workbench");
+import * as AdhMeinBerlinBurgerhaushaltWorkbench from "../Workbench/Workbench";
 
-import RIBurgerhaushaltProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess");
+import RIBurgerhaushaltProcess from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 
-import Context = require("./Context");
+import * as Context from "./Context";
 
 
 export var moduleName = "adhMeinBerlinBurgerhaushaltContext";

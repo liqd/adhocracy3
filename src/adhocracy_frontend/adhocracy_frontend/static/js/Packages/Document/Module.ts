@@ -1,19 +1,19 @@
-import AdhAngularHelpersModule = require("../AngularHelpers/Module");
-import AdhBadgeModule = require("../Badge/Module");
-import AdhEmbedModule = require("../Embed/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhImageModule = require("../Image/Module");
-import AdhInjectModule = require("../Inject/Module");
-import AdhMappingModule = require("../Mapping/Module");
-import AdhMarkdownModule = require("../Markdown/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
-import AdhResourceAreaModule = require("../ResourceArea/Module");
-import AdhResourceWidgetsModule = require("../ResourceWidgets/Module");
-import AdhStickyModule = require("../Sticky/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhImageModule from "../Image/Module";
+import * as AdhInjectModule from "../Inject/Module";
+import * as AdhMappingModule from "../Mapping/Module";
+import * as AdhMarkdownModule from "../Markdown/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhResourceWidgetsModule from "../ResourceWidgets/Module";
+import * as AdhStickyModule from "../Sticky/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhDocument = require("./Document");
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhDocument from "./Document";
+import * as AdhEmbed from "../Embed/Embed";
 
 
 export var moduleName = "adhDocument";

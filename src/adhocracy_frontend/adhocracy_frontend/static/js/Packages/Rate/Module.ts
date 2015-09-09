@@ -1,14 +1,14 @@
-import AdhAngularHelpersModule = require("../AngularHelpers/Module");
-import AdhCredentialsModule = require("../User/Module");
-import AdhEventManagerModule = require("../EventManager/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
-import AdhWebSocketModule = require("../WebSocket/Module");
+import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhCredentialsModule from "../User/Module";
+import * as AdhEventManagerModule from "../EventManager/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhWebSocketModule from "../WebSocket/Module";
 
-import AdhRate = require("./Rate");
-import Adapter = require("./Adapter");
+import * as AdhRate from "./Rate";
+import * as Adapter from "./Adapter";
 
 
 export var moduleName = "adhRate";

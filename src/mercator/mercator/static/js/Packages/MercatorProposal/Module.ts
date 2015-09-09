@@ -1,22 +1,22 @@
-import AdhAngularHelpersModule = require("../AngularHelpers/Module");
-import AdhBadgeModule = require("../Badge/Module");
-import AdhCredentialsModule = require("../User/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhImageModule = require("../Image/Module");
-import AdhInjectModule = require("../Inject/Module");
-import AdhLocaleModule = require("../Locale/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
-import AdhResourceAreaModule = require("../ResourceArea/Module");
-import AdhResourceWidgetsModule = require("../ResourceWidgets/Module");
-import AdhStickyModule = require("../Sticky/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhCredentialsModule from "../User/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhImageModule from "../Image/Module";
+import * as AdhInjectModule from "../Inject/Module";
+import * as AdhLocaleModule from "../Locale/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhResourceWidgetsModule from "../ResourceWidgets/Module";
+import * as AdhStickyModule from "../Sticky/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhUtil = require("../Util/Util");
+import * as AdhUtil from "../Util/Util";
 
-import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
+import RIProcess from "../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 
-import MercatorProposal = require("./MercatorProposal");
+import * as MercatorProposal from "./MercatorProposal";
 
 
 export var moduleName = "adhMercatorProposal";

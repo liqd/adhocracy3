@@ -1,18 +1,18 @@
-import AdhAngularHelpersModule = require("../AngularHelpers/Module");
-import AdhBadgeModule = require("../Badge/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhLocaleModule = require("../Locale/Module");
-import AdhMovingColumnsModule = require("../MovingColumns/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhResourceAreaModule = require("../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhLocaleModule from "../Locale/Module";
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhCredentialsModule = require("./CredentialsModule");
-import AdhUserModule = require("./Module");
+import * as AdhCredentialsModule from "./CredentialsModule";
+import * as AdhUserModule from "./Module";
 
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import AdhUserViews = require("./Views");
+import * as AdhUserViews from "./Views";
 
 
 export var moduleName = "adhUserViews";

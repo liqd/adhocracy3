@@ -1,23 +1,23 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhEventManager = require("../EventManager/EventManager");
-import AdhHttp = require("../Http/Http");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResourceUtil = require("../Util/ResourceUtil");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhEventManager from "../EventManager/EventManager";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceUtil from "../Util/ResourceUtil";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
+import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
+import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SIRate from "../../Resources_/adhocracy_core/sheets/rate/IRate";
+import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 
 var pkgLocation = "/Rate";
 

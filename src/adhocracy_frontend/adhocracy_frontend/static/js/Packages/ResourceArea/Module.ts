@@ -1,12 +1,12 @@
-import AdhEmbedModule = require("../Embed/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhProcessModule = require("../Process/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhProcessModule from "../Process/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import AdhResourceArea = require("./ResourceArea");
+import * as AdhResourceArea from "./ResourceArea";
 
 
 export var moduleName = "adhResourceArea";

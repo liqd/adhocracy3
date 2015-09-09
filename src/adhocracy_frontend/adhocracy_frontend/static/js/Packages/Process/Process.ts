@@ -1,8 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 
 // mirrors adhocracy_core.sheets.workflow.StateData

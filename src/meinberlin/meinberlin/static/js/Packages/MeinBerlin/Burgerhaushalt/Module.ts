@@ -1,6 +1,6 @@
-import AdhMeinBerlinBurgerhaushaltContextModule = require("./Context/Module");
-import AdhMeinBerlinBurgerhaushaltProcessModule = require("./Process/Module");
-import AdhMeinBerlinBurgerhaushaltWorkbenchModule = require("./Workbench/Module");
+import * as AdhMeinBerlinBurgerhaushaltContextModule from "./Context/Module";
+import * as AdhMeinBerlinBurgerhaushaltProcessModule from "./Process/Module";
+import * as AdhMeinBerlinBurgerhaushaltWorkbenchModule from "./Workbench/Module";
 
 
 export var moduleName = "adhMeinBerlinBurgerhaushalt";

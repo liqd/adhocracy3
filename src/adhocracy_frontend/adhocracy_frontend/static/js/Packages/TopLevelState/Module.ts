@@ -1,8 +1,8 @@
-import AdhCredentialsModule = require("../User/Module");
-import AdhEventManagerModule = require("../EventManager/Module");
-import AdhTrackingModule = require("../Tracking/Module");
+import * as AdhCredentialsModule from "../User/Module";
+import * as AdhEventManagerModule from "../EventManager/Module";
+import * as AdhTrackingModule from "../Tracking/Module";
 
-import AdhTopLevelState = require("./TopLevelState");
+import * as AdhTopLevelState from "./TopLevelState";
 
 
 export var moduleName = "adhTopLevelState";

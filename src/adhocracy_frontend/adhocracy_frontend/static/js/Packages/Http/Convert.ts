@@ -1,16 +1,16 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import ResourcesBase = require("../../ResourcesBase");
-import Resources_ = require("../../Resources_");
+import * as ResourcesBase from "../../ResourcesBase";
+import * as Resources_ from "../../Resources_";
 
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
-import AdhCache = require("./Cache");
-import AdhMetaApi = require("./MetaApi");
+import * as AdhCache from "./Cache";
+import * as AdhMetaApi from "./MetaApi";
 
 
 var sanityCheck = (obj : ResourcesBase.Resource) : void => {

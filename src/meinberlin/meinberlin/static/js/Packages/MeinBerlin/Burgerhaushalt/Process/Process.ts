@@ -1,15 +1,15 @@
-import AdhConfig = require("../../../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhProcess = require("../../../Process/Process");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhProcess from "../../../Process/Process";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
-import AdhMeinBerlinPhase = require("../../Phase/Phase");
+import * as AdhMeinBerlinPhase from "../../Phase/Phase";
 
-import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MeinBerlin/Burgerhaushalt/Process";
 

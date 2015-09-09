@@ -1,6 +1,6 @@
-import AdhEventManagerModule = require("../EventManager/Module");
+import * as AdhEventManagerModule from "../EventManager/Module";
 
-import AdhLocalSocket = require("./LocalSocket");
+import * as AdhLocalSocket from "./LocalSocket";
 
 
 export var moduleName = "adhLocalSocket";

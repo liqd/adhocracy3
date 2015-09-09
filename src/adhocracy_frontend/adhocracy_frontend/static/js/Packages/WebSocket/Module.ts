@@ -1,6 +1,6 @@
-import AdhEventManagerModule = require("../EventManager/Module");
+import * as AdhEventManagerModule from "../EventManager/Module";
 
-import AdhWebSocket = require("./WebSocket");
+import * as AdhWebSocket from "./WebSocket";
 
 
 export var moduleName = "adhWebSocket";

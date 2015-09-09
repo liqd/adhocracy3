@@ -1,4 +1,4 @@
-import AdhConfig = require("../../Config/Config");
+import * as AdhConfig from "../../Config/Config";
 
 export var pkgLocation = "/MeinBerlin/Phase";
 

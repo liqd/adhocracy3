@@ -1,12 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhHttp = require("../Http/Http");
+import * as AdhHttp from "../Http/Http";
 
-import AdhCredentials = require("./Credentials");
+import * as AdhCredentials from "./Credentials";
 
-import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
-import SIUserExtended = require("../../Resources_/adhocracy_core/sheets/principal/IUserExtended");
+import * as SIPasswordAuthentication from "../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication";
+import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
+import * as SIUserExtended from "../../Resources_/adhocracy_core/sheets/principal/IUserExtended";
 
 
 export interface IUserBasic {

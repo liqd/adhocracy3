@@ -1,18 +1,18 @@
-import AdhCommentModule = require("../Comment/Module");
-import AdhMovingColumnsModule = require("../MovingColumns/Module");
-import AdhProcessModule = require("../Process/Module");
-import AdhResourceAreaModule = require("../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
-import AdhUserModule = require("../User/Module");
+import * as AdhCommentModule from "../Comment/Module";
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
+import * as AdhProcessModule from "../Process/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhUserModule from "../User/Module";
 
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
 
-import AdhDocumentWorkbench = require("./DocumentWorkbench");
+import * as AdhDocumentWorkbench from "./DocumentWorkbench";
 
-import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
+import RIBasicPool from "../../Resources_/adhocracy_core/resources/pool/IBasicPool";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
 
 
 export var moduleName = "adhDocumentWorkbench";

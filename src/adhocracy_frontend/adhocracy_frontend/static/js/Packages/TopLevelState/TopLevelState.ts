@@ -23,12 +23,12 @@
  * change paths without a reload and in being more flexibel.
  */
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhEventManager = require("../EventManager/EventManager");
-import AdhTracking = require("../Tracking/Tracking");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhEventManager from "../EventManager/EventManager";
+import * as AdhTracking from "../Tracking/Tracking";
 
 var pkgLocation = "/TopLevelState";
 

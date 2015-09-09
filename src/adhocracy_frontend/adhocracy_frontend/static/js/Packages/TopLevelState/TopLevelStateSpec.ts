@@ -1,8 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import q = require("q");
-import _ = require("lodash");
-import AdhTopLevelState = require("./TopLevelState");
+import * as q from "q";
+import * as _ from "lodash";
+import * as AdhTopLevelState from "./TopLevelState";
 
 export var register = () => {
 

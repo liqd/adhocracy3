@@ -1,9 +1,9 @@
 /// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhEventManager = require("../EventManager/EventManager");
+import * as AdhConfig from "../Config/Config";
+import * as AdhEventManager from "../EventManager/EventManager";
 
 
 /**

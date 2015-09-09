@@ -1,8 +1,8 @@
-import socialSharePrivacy = require("socialSharePrivacy");  if (socialSharePrivacy) { ; }
+import * as socialSharePrivacy from "socialSharePrivacy";  if (socialSharePrivacy) { ; }
 
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhEmbed from "../Embed/Embed";
 
-import AdhShareSocial = require("./ShareSocial");
+import * as AdhShareSocial from "./ShareSocial";
 
 
 export var moduleName = "adhSocialShare";

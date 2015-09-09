@@ -1,10 +1,10 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUser = require("../User/User");
+import * as AdhConfig from "../Config/Config";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUser from "../User/User";
 
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
 
 
 var pkgLocation = "/DocumentWorkbench";

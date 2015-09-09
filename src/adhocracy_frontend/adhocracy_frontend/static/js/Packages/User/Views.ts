@@ -1,17 +1,17 @@
-import AdhBadge = require("../Badge/Badge");
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhBadge from "../Badge/Badge";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import AdhCredentials = require("./Credentials");
-import AdhUser = require("./User");
+import * as AdhCredentials from "./Credentials";
+import * as AdhUser from "./User";
 
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
+import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 
 var pkgLocation = "/User";
 

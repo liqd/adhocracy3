@@ -1,4 +1,4 @@
-import AdhDateTime = require("./DateTime");
+import * as AdhDateTime from "./DateTime";
 
 
 export var moduleName = "adhDateTime";

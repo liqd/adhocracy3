@@ -1,7 +1,7 @@
-import AdhHttpModule = require("../Http/Module");
-import AdhCredentialsModule = require("./CredentialsModule");
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhCredentialsModule from "./CredentialsModule";
 
-import AdhUser = require("./User");
+import * as AdhUser from "./User";
 
 
 export var moduleName = "adhUser";

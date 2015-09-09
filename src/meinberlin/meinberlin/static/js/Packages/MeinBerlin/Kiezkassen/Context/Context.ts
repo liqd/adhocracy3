@@ -1,6 +1,6 @@
-import AdhConfig = require("../../../Config/Config");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Context";
 

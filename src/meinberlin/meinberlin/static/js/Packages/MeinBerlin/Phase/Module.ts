@@ -1,4 +1,4 @@
-import Phase = require("./Phase");
+import * as Phase from "./Phase";
 
 
 export var moduleName = "adhMeinBerlinPhase";

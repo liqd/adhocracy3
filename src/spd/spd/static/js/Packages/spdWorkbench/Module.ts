@@ -1,18 +1,18 @@
-import AdhAbuseModule = require("../Abuse/Module");
-import AdhCommentModule = require("../Comment/Module");
-import AdhDocumentModule = require("../Document/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhMovingColumnsModule = require("../MovingColumns/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhProcessModule = require("../Process/Module");
-import AdhResourceAreaModule = require("../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhAbuseModule from "../Abuse/Module";
+import * as AdhCommentModule from "../Comment/Module";
+import * as AdhDocumentModule from "../Document/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhProcessModule from "../Process/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhProcess = require("../Process/Process");
+import * as AdhProcess from "../Process/Process";
 
-import RIDigitalLebenProcess = require("../../Resources_/adhocracy_spd/resources/digital_leben/IProcess");
+import RIDigitalLebenProcess from "../../Resources_/adhocracy_spd/resources/digital_leben/IProcess";
 
-import SpdWorkbench = require("./spdWorkbench");
+import * as SpdWorkbench from "./spdWorkbench";
 
 
 export var moduleName = "adhSPDWorkbench";

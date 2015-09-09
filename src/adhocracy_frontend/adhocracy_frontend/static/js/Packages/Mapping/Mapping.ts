@@ -1,20 +1,20 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import AdhConfig = require("../Config/Config");
-import AdhListing = require("../Listing/Listing");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhListing from "../Listing/Listing";
+import * as AdhWebSocket from "../WebSocket/WebSocket";
 
 // FIXME: See #1008
-import AdhHttp = require("../Http/Http");  if (AdhHttp) { ; }
-import AdhPermissions = require("../Permissions/Permissions");  if (AdhPermissions) { ; }
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");  if (AdhPreliminaryNames) { ; }
+import * as AdhHttp from "../Http/Http";  if (AdhHttp) { ; }
+import * as AdhPermissions from "../Permissions/Permissions";  if (AdhPermissions) { ; }
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";  if (AdhPreliminaryNames) { ; }
 
-import AdhMappingUtils = require("./MappingUtils");
+import * as AdhMappingUtils from "./MappingUtils";
 
 var pkgLocation = "/Mapping";
 

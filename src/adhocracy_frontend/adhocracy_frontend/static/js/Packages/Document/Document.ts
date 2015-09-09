@@ -1,26 +1,26 @@
-import AdhBadge = require("../Badge/Badge");
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhMapping = require("../Mapping/Mapping");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhBadge from "../Badge/Badge";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMapping from "../Mapping/Mapping";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
-import RIGeoDocument = require("../../Resources_/adhocracy_core/resources/document/IGeoDocument");
-import RIGeoDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
-import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
-import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
-import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
-import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RIGeoDocument from "../../Resources_/adhocracy_core/resources/document/IGeoDocument";
+import RIGeoDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
+import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SIDocument from "../../Resources_/adhocracy_core/sheets/document/IDocument";
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
+import * as SIPoint from "../../Resources_/adhocracy_core/sheets/geo/IPoint";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Document";
 

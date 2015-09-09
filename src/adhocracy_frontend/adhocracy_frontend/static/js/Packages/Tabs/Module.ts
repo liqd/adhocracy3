@@ -1,4 +1,4 @@
-import AdhTabs = require("./Tabs");
+import * as AdhTabs from "./Tabs";
 
 
 export var moduleName = "adhTabs";

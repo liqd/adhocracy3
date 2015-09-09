@@ -1,21 +1,21 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhHttp = require("../Http/Http");
-import AdhListing = require("../Listing/Listing");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResourceUtil = require("../Util/ResourceUtil");
-import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhHttp from "../Http/Http";
+import * as AdhListing from "../Listing/Listing";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceUtil from "../Util/ResourceUtil";
+import * as AdhResourceWidgets from "../ResourceWidgets/ResourceWidgets";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import RIExternalResource from "../../Resources_/adhocracy_core/resources/external_resource/IExternalResource";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/Comment";
 

@@ -1,6 +1,6 @@
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhProcess = require("./Process");
+import * as AdhProcess from "./Process";
 
 
 export var moduleName = "adhProcess";

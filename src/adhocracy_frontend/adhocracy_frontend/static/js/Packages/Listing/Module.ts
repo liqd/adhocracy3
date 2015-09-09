@@ -1,10 +1,10 @@
-import AdhHttpModule = require("../Http/Module");
-import AdhInjectModule = require("../Inject/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
-import AdhWebSocketModule = require("../WebSocket/Module");
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhInjectModule from "../Inject/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhWebSocketModule from "../WebSocket/Module";
 
-import AdhListing = require("./Listing");
+import * as AdhListing from "./Listing";
 
 
 export var moduleName = "adhListing";

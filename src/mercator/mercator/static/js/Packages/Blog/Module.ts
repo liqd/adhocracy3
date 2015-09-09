@@ -1,14 +1,14 @@
-import AdhEmbedModule = require("../Embed/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhImageModule = require("../Image/Module");
-import AdhListingModule = require("../Listing/Module");
-import AdhMarkdownModule = require("../Markdown/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
+import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhImageModule from "../Image/Module";
+import * as AdhListingModule from "../Listing/Module";
+import * as AdhMarkdownModule from "../Markdown/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhEmbed from "../Embed/Embed";
 
-import Blog = require("./Blog");
+import * as Blog from "./Blog";
 
 
 export var moduleName = "adhBlog";

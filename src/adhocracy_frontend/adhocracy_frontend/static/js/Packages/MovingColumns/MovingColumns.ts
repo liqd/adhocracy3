@@ -1,7 +1,7 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhConfig from "../Config/Config";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 export var pkgLocation = "/MovingColumns";
 

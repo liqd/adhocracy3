@@ -1,12 +1,12 @@
-import AdhAngularHelpersModule = require("../../../AngularHelpers/Module");
-import AdhEmbedModule = require("../../../Embed/Module");
-import AdhHttpModule = require("../../../Http/Module");
-import AdhPreliminaryNamesModule = require("../../../PreliminaryNames/Module");
-import AdhResourceAreaModule = require("../../../ResourceArea/Module");
+import * as AdhAngularHelpersModule from "../../../AngularHelpers/Module";
+import * as AdhEmbedModule from "../../../Embed/Module";
+import * as AdhHttpModule from "../../../Http/Module";
+import * as AdhPreliminaryNamesModule from "../../../PreliminaryNames/Module";
+import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
 
-import AdhEmbed = require("../../../Embed/Embed");
+import * as AdhEmbed from "../../../Embed/Embed";
 
-import Proposal = require("./Proposal");
+import * as Proposal from "./Proposal";
 
 
 export var moduleName = "adhMeinBplaeneProposal";

@@ -1,10 +1,10 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import q = require("q");
+import * as q from "q";
 
-import AdhResourceUtil = require("../Util/ResourceUtil");
+import * as AdhResourceUtil from "../Util/ResourceUtil";
 
-import AdhComment = require("./Comment");
+import * as AdhComment from "./Comment";
 
 var RESOURCE = {
     path: "path",

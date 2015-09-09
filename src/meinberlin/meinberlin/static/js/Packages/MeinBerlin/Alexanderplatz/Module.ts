@@ -1,6 +1,6 @@
-import AdhMeinBerlinAlexanderplatzWorkbenchModule = require("./Workbench/Module");
-import AdhMeinBerlinAlexanderplatzContextModule = require("./Context/Module");
-import AdhMeinBerlinAlexanderplatzProcessModule = require("./Process/Module");
+import * as AdhMeinBerlinAlexanderplatzWorkbenchModule from "./Workbench/Module";
+import * as AdhMeinBerlinAlexanderplatzContextModule from "./Context/Module";
+import * as AdhMeinBerlinAlexanderplatzProcessModule from "./Process/Module";
 
 
 export var moduleName = "adhMeinBerlinAlexanderplatz";
