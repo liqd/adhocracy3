@@ -70,7 +70,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.network :forwarded_port, guest: 6541, host: 6541
   config.vm.network :forwarded_port, guest: 6551, host: 6551
-  config.vm.network :forwarded_port, guest: 8080, host: 8080
+  config.vm.network :forwarded_port, guest: 6561, host: 6561
 
   config.vm.provision :shell, inline: PROVISION_ROOT
   config.vm.provision :shell, inline: PROVISION_USER, :privileged => false
