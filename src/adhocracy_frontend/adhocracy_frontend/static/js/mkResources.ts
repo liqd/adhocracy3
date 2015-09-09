@@ -242,9 +242,9 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
     var headerFooter = (relativeRoot : string, contents : string) : string => {
         var header = "";
         header += "/* tslint:disable:variable-name */\n\n";
-        header += "import Base = require(\"" + canonicalizePath(relativeRoot + "../ResourcesBase") + "\");\n";
-        header += "import PreliminaryNames = require(\"" +
-            canonicalizePath(relativeRoot + "../Packages/PreliminaryNames/PreliminaryNames") + "\");\n\n";
+        header += "import * as Base from \"" + canonicalizePath(relativeRoot + "../ResourcesBase") + "\";\n";
+        header += "import * as PreliminaryNames from \"" +
+            canonicalizePath(relativeRoot + "../Packages/PreliminaryNames/PreliminaryNames") + "\";\n\n";
 
         var footer = "";
         footer += "/* tslint:enable:variable-name */\n";
@@ -459,7 +459,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         }
     };
 
-    sheetI += "import _ = require(\"lodash\");\n\n";
+    sheetI += "import * as _ from \"lodash\";\n\n";
 
     sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
 
@@ -728,7 +728,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     resourceC += mkDataDeclaration("    ") + "\n\n";
     resourceC += mkGettersSetters("    ") + "\n";
     resourceC += "}\n\n";
-    resourceC += "export = " + mkResourceClassName(mkNick(modulePath, metaApi)) + ";\n\n";
+    resourceC += "export default " + mkResourceClassName(mkNick(modulePath, metaApi)) + ";\n\n";
 
     modules[modulePath] = resourceC;
 };
@@ -757,7 +757,13 @@ mkImportStatement = (modulePath : string, relativeRoot : string, metaApi : MetaA
     var tsModName = mkModuleName(modulePath, metaApi);
     var tsModPath = pyModuleToTsModule(modulePath);
     var tsModPathCanonicalized = canonicalizePath(relativeRoot + tsModPath);
-    return "import " + tsModName + " = require(\"" + tsModPathCanonicalized + "\");\n";
+
+    // FIXME: have a better indicator for this distinction
+    if (tsModName[0] === "R") {
+        return "import " + tsModName + " from \"" + tsModPathCanonicalized + "\";\n";
+    } else {
+        return "import * as " + tsModName + " from \"" + tsModPathCanonicalized + "\";\n";
+    }
 };
 
 mkNick = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
