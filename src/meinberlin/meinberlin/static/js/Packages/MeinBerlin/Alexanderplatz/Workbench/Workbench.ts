@@ -1,12 +1,9 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import AdhConfig = require("../../../Config/Config");
-import AdhDocument = require("../../../Document/Document");
 import AdhHttp = require("../../../Http/Http");
-import AdhMapping = require("../../../Mapping/Mapping");
 import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
 import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhProcess = require("../../../Process/Process");
 import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
 import AdhUtil = require("../../../Util/Util");
@@ -370,62 +367,4 @@ export var registerRoutes = (
                     proposalUrl: version.path
                 };
             }]);
-};
-
-
-export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
-
-export var register = (angular) => {
-    var processType = RIAlexanderplatzProcess.content_type;
-
-    angular
-        .module(moduleName, [
-            AdhDocument.moduleName,
-            AdhMapping.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mein-berlin-alexanderplatz-workbench></adh-mein-berlin-alexanderplatz-workbench>");
-            }];
-        }])
-        .config(["adhResourceAreaProvider", registerRoutes(processType)])
-        .config(["adhMapDataProvider", (adhMapDataProvider : AdhMapping.MapDataProvider) => {
-            adhMapDataProvider.icons["document"] = {
-                className: "icon-board-pin",
-                iconAnchor: [20, 39],
-                iconSize: [40, 40]
-            };
-            adhMapDataProvider.icons["document-selected"] = {
-                className: "icon-board-pin is-active",
-                iconAnchor: [20, 39],
-                iconSize: [40, 40]
-            };
-        }])
-        .directive("adhMeinBerlinAlexanderplatzWorkbench", ["adhConfig", "adhTopLevelState", workbenchDirective])
-        .directive("adhMeinBerlinAlexanderplatzProcessColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", "adhHttp", processDetailColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzDocumentDetailColumn", [
-            "adhConfig",
-            "adhPermissions",
-            "adhTopLevelState",
-            "adhHttp",
-            "adhResourceUrlFilter",
-            "$location",
-            "$window",
-            documentDetailColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzProposalDetailColumn", [
-            "adhConfig", "adhPermissions", "adhTopLevelState", proposalDetailColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzDocumentCreateColumn", [
-            "adhConfig", "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", documentCreateColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzProposalCreateColumn", [
-            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", proposalCreateColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzDocumentEditColumn", [
-            "adhConfig", "adhHttp", "adhTopLevelState", "adhResourceUrlFilter", documentEditColumnDirective])
-        .directive("adhMeinBerlinAlexanderplatzProposalEditColumn", [
-            "adhConfig", "adhTopLevelState", "adhResourceUrlFilter", proposalEditColumnDirective]);
 };

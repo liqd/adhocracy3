@@ -459,6 +459,8 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         }
     };
 
+    sheetI += "import _ = require(\"lodash\");\n\n";
+
     sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
 
     sheetI += "export class Sheet extends Base.Sheet {\n";

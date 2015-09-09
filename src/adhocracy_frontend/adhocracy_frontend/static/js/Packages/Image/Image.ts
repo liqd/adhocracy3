@@ -1,7 +1,6 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
 
 import RIImage = require("../../Resources_/adhocracy_core/resources/image/IImage");
@@ -120,21 +119,4 @@ export var imageUriFilter = () => {
             return "/static/fallback_" + format + ".jpg";
         }
     };
-};
-
-
-export var moduleName = "adhImage";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("upload-image");
-        }])
-        .factory("adhUploadImage", ["adhHttp", uploadImageFactory])
-        .directive("adhUploadImage", ["adhConfig", "adhHttp", "adhUploadImage", "flowFactory", uploadImageDirective])
-        .filter("adhImageUri", imageUriFilter);
 };

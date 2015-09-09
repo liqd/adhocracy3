@@ -10,7 +10,6 @@ import AdhCredentials = require("../User/Credentials");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhUtil = require("../Util/Util");
-import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -586,27 +585,4 @@ export var busyDirective = (adhConfig : AdhConfig.IService, adhBusy : Busy) => {
             scope.busy = adhBusy;
         }
     };
-};
-
-
-export var moduleName = "adhHttp";
-
-export var register = (angular, config, metaApi) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhWebSocket.moduleName,
-            "angular-cache",
-        ])
-        .config(["$httpProvider", ($httpProvider) => {
-            $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
-        }])
-        .service("adhHttpBusy", ["$q", Busy])
-        .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
-        .service("adhHttp", [
-            "$http", "$q", "$timeout", "adhCredentials", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
-        .service("adhCache", ["$q", "adhConfig", "adhWebSocket", "CacheFactory", AdhCache.Service])
-        .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
-        .filter("adhFormatError", () => AdhError.formatError);
 };

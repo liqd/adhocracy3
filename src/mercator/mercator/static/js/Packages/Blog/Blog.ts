@@ -1,10 +1,6 @@
 import AdhConfig = require("../Config/Config");
 import AdhDocument = require("../Document/Document");
-import AdhEmbed = require("../Embed/Embed");
 import AdhHttp = require("../Http/Http");
-import AdhImage = require("../Image/Image");
-import AdhListing = require("../Listing/Listing");
-import AdhMarkdown = require("../Markdown/Markdown");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUtil = require("../Util/Util");
@@ -201,38 +197,4 @@ export var listingDirective = (adhConfig : AdhConfig.IService) => {
             scope.contentType = RIDocumentVersion.content_type;
         }
     };
-};
-
-
-export var moduleName = "adhBlog";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhImage.moduleName,
-            AdhListing.moduleName,
-            AdhMarkdown.moduleName,
-            AdhPermissions.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("blog-post");
-            adhEmbedProvider.embeddableDirectives.push("blog-post-create");
-            adhEmbedProvider.embeddableDirectives.push("blog");
-        }])
-        .directive("adhBlogPost", [
-            "$q",
-            "$window",
-            "adhConfig",
-            "adhHttp",
-            "adhPermissions",
-            "adhPreliminaryNames",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhUploadImage",
-            detailDirective])
-        .directive("adhBlog", ["adhConfig", listingDirective])
-        .directive("adhBlogPostCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", "adhUploadImage", createDirective]);
 };

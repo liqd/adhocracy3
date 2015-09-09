@@ -1,7 +1,6 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
-import AdhShareSocial = require("../ShareSocial/ShareSocial");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 export var pkgLocation = "/MovingColumns";
@@ -295,17 +294,4 @@ export var movingColumnDirective = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/MovingColumn.html",
         controller: ["adhTopLevelState", "$timeout", "$scope", MovingColumnController]
     };
-};
-
-
-export var moduleName = "adhMovingColumns";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhTopLevelState.moduleName,
-            AdhShareSocial.moduleName
-        ])
-        .directive("adhMovingColumn", ["adhConfig", movingColumnDirective])
-        .directive("adhMovingColumns", ["adhTopLevelState", "$timeout", "$window", movingColumns]);
 };

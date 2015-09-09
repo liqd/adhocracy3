@@ -33,14 +33,3 @@ export var reportAbuseDirective = (adhHttp : AdhHttp.Service<any>, adhConfig : A
     };
 };
 
-
-export var moduleName = "adhReportAbuse";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhMovingColumns.moduleName
-        ])
-        .directive("adhReportAbuse", ["adhHttp", "adhConfig", reportAbuseDirective]);
-};

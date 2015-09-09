@@ -39,15 +39,3 @@ export class Service {
         });
     }
 }
-
-
-export var moduleName = "adhPermissions";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhHttp.moduleName
-        ])
-        .service("adhPermissions", ["adhHttp", "adhCredentials", Service]);
-};

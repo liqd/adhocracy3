@@ -184,39 +184,3 @@ export var canonicalUrl = (adhConfig : AdhConfig.IService) => {
         return adhConfig.canonical_url + internalUrl;
     };
 };
-
-
-export var moduleName = "adhEmbed";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            "pascalprecht.translate",
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
-            adhTopLevelStateProvider
-                .when("embed", ["$location", "adhEmbed", (
-                    $location : angular.ILocationService,
-                    adhEmbed : Service
-                ) : AdhTopLevelState.IAreaInput => {
-                    return adhEmbed.route($location);
-                }]);
-        }])
-        .run(["$location", "$translate", "adhConfig", ($location, $translate, adhConfig) => {
-            // Note: This works despite the routing removing the locale search
-            // parameter immediately after. This is a bit awkward though.
-
-            // FIXME: centralize locale setup in adhLocale
-            var params = $location.search();
-            if (params.hasOwnProperty("locale")) {
-                $translate.use(params.locale);
-            }
-            if (typeof params.locale !== "undefined") {
-                adhConfig.locale = params.locale;
-            }
-        }])
-        .provider("adhEmbed", Provider)
-        .directive("href", ["adhConfig", "$location", "$rootScope", hrefDirective])
-        .filter("adhCanonicalUrl", ["adhConfig", canonicalUrl]);
-};

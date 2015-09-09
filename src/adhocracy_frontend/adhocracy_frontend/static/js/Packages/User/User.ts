@@ -124,17 +124,3 @@ export class Service {
         }).then(success, AdhHttp.logBackendError);
     }
 }
-
-
-export var moduleName = "adhUser";
-
-export var register = (angular) => {
-    AdhCredentials.register(angular);
-
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhHttp.moduleName
-        ])
-        .service("adhUser", ["adhHttp", "adhCredentials", "$rootScope", Service]);
-};

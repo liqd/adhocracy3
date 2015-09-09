@@ -3,20 +3,15 @@
 
 import _ = require("lodash");
 
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
 import AdhBadge = require("../Badge/Badge");
 import AdhConfig = require("../Config/Config");
 import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
-import AdhImage = require("../Image/Image");
-import AdhInject = require("../Inject/Inject");
-import AdhLocale = require("../Locale/Locale");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-import AdhSticky = require("../Sticky/Sticky");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
@@ -49,7 +44,6 @@ import RIMercatorStory = require("../../Resources_/adhocracy_mercator/resources/
 import RIMercatorStoryVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IStoryVersion");
 import RIMercatorValue = require("../../Resources_/adhocracy_mercator/resources/mercator/IValue");
 import RIMercatorValueVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IValueVersion");
-import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
@@ -1127,163 +1121,75 @@ export var mercatorProposalFormController = ($scope : IControllerScope, $element
 };
 
 
-export var moduleName = "adhMercatorProposal";
+export var registerRoutes = (
+    processType : string = "",
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+    adhResourceAreaProvider
+        .default(RIMercatorProposalVersion, "", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specific(RIMercatorProposalVersion, "", processType, context, () => (resource : RIMercatorProposalVersion) => {
+            return {
+                proposalUrl: resource.path
+            };
+        })
+        .default(RIMercatorProposalVersion, "edit", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-hide"
+        })
+        .specific(RIMercatorProposalVersion, "edit", processType, context, ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
+            return (resource : RIMercatorProposalVersion) => {
+                var poolPath = AdhUtil.parentPath(resource.path);
 
-export var register = (angular) => {
-    var processType = RIProcess.content_type;
-
-    angular
-        .module(moduleName, [
-            "duScroll",
-            "ngMessages",
-            AdhAngularHelpers.moduleName,
-            AdhBadge.moduleName,
-            AdhHttp.moduleName,
-            AdhImage.moduleName,
-            AdhInject.moduleName,
-            AdhLocale.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhResourceArea.moduleName,
-            AdhResourceWidgets.moduleName,
-            AdhSticky.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .default(RIMercatorProposalVersion, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide"
-                })
-                .specific(RIMercatorProposalVersion, "", processType, "", () => (resource : RIMercatorProposalVersion) => {
-                    return {
-                        proposalUrl: resource.path
-                    };
-                })
-                .default(RIMercatorProposalVersion, "edit", processType, "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-hide"
-                })
-                .specific(RIMercatorProposalVersion, "edit", processType, "", ["adhHttp", (adhHttp : AdhHttp.Service<any>) => {
-                    return (resource : RIMercatorProposalVersion) => {
-                        var poolPath = AdhUtil.parentPath(resource.path);
-
-                        return adhHttp.options(poolPath).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
-                                throw 401;
-                            } else {
-                                return {
-                                    proposalUrl: resource.path
-                                };
-                            }
-                        });
-                    };
-                }])
-                .default(RIMercatorProposalVersion, "blog", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide",
-                    proposalTab: "blog"
-                })
-                .specific(RIMercatorProposalVersion, "blog", processType, "", () => (resource : RIMercatorProposalVersion) => {
-                    return {
-                        proposalUrl: resource.path
-                    };
-                })
-                .default(RIMercatorProposalVersion, "comments", processType, "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-show"
-                })
-                .specific(RIMercatorProposalVersion, "comments", processType, "", () => (resource : RIMercatorProposalVersion) => {
-                    return {
-                        proposalUrl: resource.path,
-                        commentableUrl: resource.path,
-                        commentCloseUrl: resource.path
-                    };
+                return adhHttp.options(poolPath).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {
+                            proposalUrl: resource.path
+                        };
+                    }
                 });
-
-            _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
-                adhResourceAreaProvider
-                    .default(RIMercatorProposalVersion, "comments:" + section, processType, "", {
-                        space: "content",
-                        movingColumns: "is-collapse-show-show"
-                    })
-                    .specific(RIMercatorProposalVersion, "comments:" + section, processType, "", () =>
-                        (resource : RIMercatorProposalVersion) => {
-                            return {
-                                proposalUrl: resource.path,
-                                commentableUrl: resource.data[SIMercatorSubResources.nick][section],
-                                commentCloseUrl: resource.path
-                            };
-                        }
-                    );
-            }).value();
-        }])
-        .config(["flowFactoryProvider", (flowFactoryProvider) => {
-            if (typeof flowFactoryProvider.defaults === "undefined") {
-                flowFactoryProvider.defaults = {};
-            }
-            flowFactoryProvider.defaults = {
-                singleFile: true,
-                maxChunkRetries: 1,
-                chunkRetryInterval: 5000,
-                simultaneousUploads: 4,
-                permanentErrors: [404, 500, 501, 502, 503],
-                // these are not native to flow but used by custom functions
-                minimumWidth: 400,
-                maximumByteSize: 3000000,
-                acceptedFileTypes: [
-                    "gif",
-                    "jpeg",
-                    "png"
-                ]  // correspond to exact mime types EG image/png
             };
         }])
-        // NOTE: we do not use a Widget based directive here for performance reasons
-        .directive("adhMercatorProposal", ["$q", "adhConfig", "adhHttp", "adhTopLevelState", "adhGetBadges", listItem])
-        .directive("adhMercatorProposalDetailView", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhGetBadges",
-            "adhUploadImage",
-            "flowFactory",
-            "moment",
-            "$window",
-            "$location",
-            "$q",
-            (...args) => {
-                var widget = AdhUtil.construct(DetailWidget, args);
-                return widget.createDirective();
-            }])
-        .directive("adhMercatorProposalCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhGetBadges",
-            "adhUploadImage",
-            "$timeout",
-            "flowFactory",
-            "moment",
-            "modernizr",
-            "$window",
-            "$location",
-            "$q",
-            (...args) => {
-                var widget = AdhUtil.construct(CreateWidget, args);
-                return widget.createDirective();
-            }])
-        .directive("adhMercatorProposalListing", ["adhConfig", listing])
-        .directive("adhMercatorUserProposalListing", ["adhConfig", userListing])
-        .directive("adhMercatorProposalAddButton", [
-            "adhConfig",
-            "adhHttp",
-            "adhTopLevelState",
-            "adhPermissions",
-            "adhCredentials",
-            "$q",
-            addButton
-            ])
-        .controller("mercatorProposalFormController", [
-            "$scope", "$element", "$window", "adhShowError", "adhSubmitIfValid", mercatorProposalFormController]);
+        .default(RIMercatorProposalVersion, "blog", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide",
+            proposalTab: "blog"
+        })
+        .specific(RIMercatorProposalVersion, "blog", processType, context, () => (resource : RIMercatorProposalVersion) => {
+            return {
+                proposalUrl: resource.path
+            };
+        })
+        .default(RIMercatorProposalVersion, "comments", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-show"
+        })
+        .specific(RIMercatorProposalVersion, "comments", processType, context, () => (resource : RIMercatorProposalVersion) => {
+            return {
+                proposalUrl: resource.path,
+                commentableUrl: resource.path,
+                commentCloseUrl: resource.path
+            };
+        });
+
+    _(SIMercatorSubResources.Sheet._meta.readable).forEach((section : string) => {
+        adhResourceAreaProvider
+            .default(RIMercatorProposalVersion, "comments:" + section, processType, context, {
+                space: "content",
+                movingColumns: "is-collapse-show-show"
+            })
+            .specific(RIMercatorProposalVersion, "comments:" + section, processType, context, () =>
+                (resource : RIMercatorProposalVersion) => {
+                    return {
+                        proposalUrl: resource.path,
+                        commentableUrl: resource.data[SIMercatorSubResources.nick][section],
+                        commentCloseUrl: resource.path
+                    };
+                }
+            );
+    }).value();
 };

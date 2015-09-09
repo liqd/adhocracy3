@@ -7,7 +7,6 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
-import AdhInject = require("../Inject/Inject");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhWebSocket = require("../WebSocket/WebSocket");
@@ -309,22 +308,4 @@ export var facets = (adhConfig : AdhConfig.IService) => {
             };
         }
     };
-};
-
-
-export var moduleName = "adhListing";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhInject.moduleName,
-            AdhPermissions.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhWebSocket.moduleName
-        ])
-        .directive("adhFacets", ["adhConfig", facets])
-        .directive("adhListing",
-            ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-                new Listing(new ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 };

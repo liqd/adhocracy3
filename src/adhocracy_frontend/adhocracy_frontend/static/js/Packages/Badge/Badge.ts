@@ -5,7 +5,6 @@ import _ = require("lodash");
 import AdhConfig = require("../Config/Config");
 import AdhCredentials = require("../User/Credentials");
 import AdhHttp = require("../Http/Http");
-import AdhEmbed = require("../Embed/Embed");
 
 import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
 import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
@@ -157,22 +156,4 @@ export var badgeAssignmentEditDirective = (
             };
         }
     };
-};
-
-export var moduleName = "adhBadge";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("badge-assignment-create");
-            adhEmbedProvider.embeddableDirectives.push("badge-assignment-edit");
-        }])
-        .factory("adhGetBadges", ["adhHttp", "$q", getBadgesFactory])
-        .directive("adhBadgeAssignmentCreate", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentCreateDirective])
-        .directive("adhBadgeAssignmentEdit", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentEditDirective]);
 };
