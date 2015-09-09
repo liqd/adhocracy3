@@ -24,6 +24,7 @@ from adhocracy_core.sheets.title import ITitle
 from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.rate import IRate
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
@@ -36,6 +37,31 @@ from adhocracy_core.catalog import ICatalogsService
 
 
 logger = logging.getLogger(__name__)
+
+
+def migrate_to_attribute_storage(context: IPool, isheet: IInterface):
+    """Add new sheet data for`isheet` from annotation to attribute storage."""
+    registry = get_current_registry(context)
+    catalogs = find_service(context, 'catalogs')
+    query = search_query._replace(interfaces=(isheet,))
+    sheet_meta = registry.content.sheets_meta[isheet]
+    annotation_key = sheet_meta.isheet.__identifier__
+    resources = catalogs.search(query).elements
+    count = len(resources)
+    logger.info('Migrating {0} resources with {1} to attribute storage'
+                .format(count, isheet))
+    for index, resource in enumerate(resources):
+        data = getattr(resource, '_sheets', {})
+        if annotation_key in data:
+            logger.info('Migrating resource {0} of {1}'
+                        .format(index + 1, count))
+            for field, value in data[annotation_key].items():
+                setattr(resource, field, value)
+            del data[annotation_key]
+        else:
+            continue
+        if data == {}:
+            delattr(resource, '_sheets')
 
 
 def migrate_new_sheet(context: IPool,
@@ -294,6 +320,12 @@ def add_workflow_assignment_sheet_to_pools_simples(root):  # pragma: no cover
     migrate_new_sheet(root, ISimple, IWorkflowAssignment)
 
 
+@log_migration
+def migrate_rate_sheet_to_attribute_storage(root):  # pragma: no cover
+    """Migrate rate sheet to attribute storage."""
+    migrate_to_attribute_storage(root, IRate)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -308,3 +340,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(remove_name_sheet_from_items)
     config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)
     config.add_evolution_step(make_proposals_badgeable)
+    config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
