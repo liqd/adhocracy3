@@ -47,5 +47,7 @@ setup(name='adhocracy_frontend',
       adhocracy_frontend = adhocracy_frontend.testing
       [pyramid.scaffold]
       adhocracy_frontend=adhocracy_frontend.scaffolds:AdhocracyExtensionTemplate
+      [console_scripts]
+      deps2dot=adhocracy_frontend.scripts.deps2dot:main
       """,
       )
