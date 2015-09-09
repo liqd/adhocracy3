@@ -23,6 +23,7 @@ import leaflet = require("leaflet");
 import markdownit = require("markdownit");
 
 import AdhAbuseModule = require("./Packages/Abuse/Module");
+import AdhAngularHelpersModule = require("./Packages/AngularHelpers/Module");
 import AdhBadgeModule = require("./Packages/Badge/Module");
 import AdhCommentModule = require("./Packages/Comment/Module");
 import AdhCrossWindowMessagingModule = require("./Packages/CrossWindowMessaging/Module");
@@ -37,14 +38,13 @@ import AdhInjectModule = require("./Packages/Inject/Module");
 import AdhListingModule = require("./Packages/Listing/Module");
 import AdhLocaleModule = require("./Packages/Locale/Module");
 import AdhLocalSocketModule = require("./Packages/LocalSocket/Module");
-import AdhMarkdownModule = require("./Packages/Markdown/Module");
 import AdhMappingModule = require("./Packages/Mapping/Module");
+import AdhMarkdownModule = require("./Packages/Markdown/Module");
 import AdhMovingColumnsModule = require("./Packages/MovingColumns/Module");
 import AdhPermissionsModule = require("./Packages/Permissions/Module");
 import AdhPreliminaryNamesModule = require("./Packages/PreliminaryNames/Module");
 import AdhProcessModule = require("./Packages/Process/Module");
 import AdhRateModule = require("./Packages/Rate/Module");
-import AdhAngularHelpersModule = require("./Packages/AngularHelpers/Module");
 import AdhResourceAreaModule = require("./Packages/ResourceArea/Module");
 import AdhResourceWidgetsModule = require("./Packages/ResourceWidgets/Module");
 import AdhShareSocialModule = require("./Packages/ShareSocial/Module");
@@ -87,8 +87,8 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngAria",
         "ngMessages",
         AdhCommentModule.moduleName,
-        AdhDocumentWorkbenchModule.moduleName,
         AdhCrossWindowMessagingModule.moduleName,
+        AdhDocumentWorkbenchModule.moduleName,
         AdhEmbedModule.moduleName,
         AdhResourceAreaModule.moduleName,
         AdhTrackingModule.moduleName,
