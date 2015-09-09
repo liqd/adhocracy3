@@ -1,4 +1,4 @@
-import AdhCredentialsModule = require("../User/Credentials");
+import AdhCredentialsModule = require("../User/CredentialsModule");
 import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
 import AdhWebSocketModule = require("../WebSocket/Module");
 
