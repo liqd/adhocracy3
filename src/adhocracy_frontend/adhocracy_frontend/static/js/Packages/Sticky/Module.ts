@@ -1,3 +1,5 @@
+import Sticky = require("sticky"); if (Sticky) { ; };
+
 import AdhSticky = require("./Sticky");
 
 

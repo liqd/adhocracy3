@@ -1,5 +1,3 @@
-import socialSharePrivacy = require("socialSharePrivacy");  if (socialSharePrivacy) { ; }
-
 import AdhConfig = require("../Config/Config");
 
 export var PATH = "/static/lib/jquery.socialshareprivacy/socialshareprivacy/";

@@ -1,3 +1,5 @@
+import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+
 import AdhHttpModule = require("../Http/Module");
 
 import AdhAngularHelpers = require("./AngularHelpers");

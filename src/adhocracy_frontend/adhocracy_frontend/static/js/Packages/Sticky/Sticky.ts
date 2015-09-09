@@ -1,8 +1,5 @@
 /// <reference path="../../_all.d.ts"/>
 
-import Sticky = require("sticky"); if (Sticky) { ; };
-
-
 export var createDirective = (modernizr : ModernizrStatic) => {
     return {
         restrict: "A",

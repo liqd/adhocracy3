@@ -1,3 +1,5 @@
+import socialSharePrivacy = require("socialSharePrivacy");  if (socialSharePrivacy) { ; }
+
 import AdhEmbed = require("../Embed/Embed");
 
 import AdhShareSocial = require("./ShareSocial");

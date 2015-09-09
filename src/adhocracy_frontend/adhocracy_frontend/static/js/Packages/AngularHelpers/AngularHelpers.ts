@@ -1,8 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import angularScroll = require("angularScroll");  if (angularScroll) { ; };
-
 import AdhHttp = require("../Http/Http");
 
 
