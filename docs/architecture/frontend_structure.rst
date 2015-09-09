@@ -16,7 +16,7 @@ module systems. We use `external modules
 <http://www.typescriptlang.org/Handbook#modules-going-external>`_).
 A module ``example.ts`` can be imported like this::
 
-    import Example = require("./example");
+    import * as Example from "./example";
 
 Static imports have the benefit of allowing to check for the existence
 of modules and for circular imports at compile time. But be aware that
