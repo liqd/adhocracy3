@@ -1,5 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 
+import _ = require("lodash");
+
 import AdhConfig = require("../Config/Config");
 import AdhEventManager = require("../EventManager/EventManager");
 
