@@ -1,22 +1,22 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIDigitalLebenProcess = require("../../Resources_/adhocracy_spd/resources/digital_leben/IProcess");
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
-import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
-import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIDigitalLebenProcess from "../../Resources_/adhocracy_spd/resources/digital_leben/IProcess";
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
 
 var pkgLocation = "/spdWorkbench";
 

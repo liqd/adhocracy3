@@ -1,9 +1,9 @@
-import AdhEmbedModule = require("../Embed/Module");
-import AdhHttpModule = require("../Http/Module");
+import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHttpModule from "../Http/Module";
 
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhEmbed from "../Embed/Embed";
 
-import AdhImage = require("./Image");
+import * as AdhImage from "./Image";
 
 
 export var moduleName = "adhImage";

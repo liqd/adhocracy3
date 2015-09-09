@@ -1,7 +1,7 @@
-import AdhHttpModule = require("../Http/Module");
-import AdhMovingColumnsModule = require("../MovingColumns/Module");
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
 
-import AdhAbuse = require("./Abuse");
+import * as AdhAbuse from "./Abuse";
 
 
 export var moduleName = "adhReportAbuse";

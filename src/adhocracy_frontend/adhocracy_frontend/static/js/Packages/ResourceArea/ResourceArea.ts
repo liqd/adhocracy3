@@ -1,15 +1,15 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhEmbed from "../Embed/Embed";
+import * as AdhHttp from "../Http/Http";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/ResourceArea";
 

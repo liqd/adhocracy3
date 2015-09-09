@@ -14,13 +14,13 @@
  * See ResourceWrapperController for a description of the interface.
  */
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhEventManager = require("../EventManager/EventManager");
-import AdhHttp = require("../Http/Http");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import * as AdhEventManager from "../EventManager/EventManager";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
 
 export enum Mode {display, edit};

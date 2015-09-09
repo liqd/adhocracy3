@@ -1,20 +1,20 @@
-import AdhAbuseModule = require("../../../Abuse/Module");
-import AdhCommentModule = require("../../../Comment/Module");
-import AdhHttpModule = require("../../../Http/Module");
-import AdhMovingColumnsModule = require("../../../MovingColumns/Module");
-import AdhProcessModule = require("../../../Process/Module");
-import AdhResourceAreaModule = require("../../../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../../../TopLevelState/Module");
-import AdhPermissionsModule = require("../../../Permissions/Module");
+import * as AdhAbuseModule from "../../../Abuse/Module";
+import * as AdhCommentModule from "../../../Comment/Module";
+import * as AdhHttpModule from "../../../Http/Module";
+import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
+import * as AdhProcessModule from "../../../Process/Module";
+import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
+import * as AdhPermissionsModule from "../../../Permissions/Module";
 
-import AdhMeinBerlinBurgerhaushaltProcessModule = require("../Process/Module");
-import AdhMeinBerlinProposalModule = require("../../../Proposal/Module");
+import * as AdhMeinBerlinBurgerhaushaltProcessModule from "../Process/Module";
+import * as AdhMeinBerlinProposalModule from "../../../Proposal/Module";
 
-import AdhProcess = require("../../../Process/Process");
+import * as AdhProcess from "../../../Process/Process";
 
-import RIBurgerhaushaltProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess");
+import RIBurgerhaushaltProcess from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
 
-import Workbench = require("./Workbench");
+import * as Workbench from "./Workbench";
 
 
 export var moduleName = "adhMeinBerlinBurgerhaushaltWorkbench";

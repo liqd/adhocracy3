@@ -1,16 +1,16 @@
-import AdhAngularHelpersModule = require("../AngularHelpers/Module");
-import AdhEmbedModule = require("../Embed/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhInjectModule = require("../Inject/Module");
-import AdhListingModule = require("../Listing/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
-import AdhWebSocketModule = require("../WebSocket/Module");
+import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhInjectModule from "../Inject/Module";
+import * as AdhListingModule from "../Listing/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhWebSocketModule from "../WebSocket/Module";
 
-import AdhEmbed = require("../Embed/Embed");
-import AdhListing = require("../Listing/Listing");
+import * as AdhEmbed from "../Embed/Embed";
+import * as AdhListing from "../Listing/Listing";
 
-import AdhMapping = require("./Mapping");
+import * as AdhMapping from "./Mapping";
 
 
 export var moduleName = "adhMapping";

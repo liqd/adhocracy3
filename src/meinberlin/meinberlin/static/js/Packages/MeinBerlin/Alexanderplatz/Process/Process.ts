@@ -1,8 +1,8 @@
-import AdhConfig = require("../../../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
-import AdhMeinBerlinPhase = require("../../Phase/Phase");
+import * as AdhMeinBerlinPhase from "../../Phase/Phase";
 
 
 export var phaseHeaderDirective = (

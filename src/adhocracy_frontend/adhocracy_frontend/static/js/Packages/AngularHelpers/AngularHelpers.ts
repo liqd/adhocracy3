@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import AdhHttp = require("../Http/Http");
+import * as AdhHttp from "../Http/Http";
 
 
 export var recursionHelper = ($compile) => {

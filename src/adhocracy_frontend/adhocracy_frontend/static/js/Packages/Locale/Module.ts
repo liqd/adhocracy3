@@ -1,4 +1,4 @@
-import AdhLocale = require("./Locale");
+import * as AdhLocale from "./Locale";
 
 
 export var moduleName = "adhLocale";

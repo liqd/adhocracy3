@@ -1,8 +1,8 @@
-import AdhMeinBerlinKiezkassenModule = require("./Kiezkassen/Module");
-import AdhMeinBerlinBplaeneModule = require("./Bplaene/Module");
-import AdhMeinBerlinAlexanderplatzModule = require("./Alexanderplatz/Module");
-import AdhMeinBerlinBurgerhaushaltModule = require("./Burgerhaushalt/Module");
-import AdhMeinBerlinPhaseModule = require("./Phase/Module");
+import * as AdhMeinBerlinKiezkassenModule from "./Kiezkassen/Module";
+import * as AdhMeinBerlinBplaeneModule from "./Bplaene/Module";
+import * as AdhMeinBerlinAlexanderplatzModule from "./Alexanderplatz/Module";
+import * as AdhMeinBerlinBurgerhaushaltModule from "./Burgerhaushalt/Module";
+import * as AdhMeinBerlinPhaseModule from "./Phase/Module";
 
 
 export var moduleName = "adhMeinBerlin";

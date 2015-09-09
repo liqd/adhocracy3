@@ -1,24 +1,24 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../../../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhProcess = require("../../../Process/Process");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../../Util/Util");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhProcess from "../../../Process/Process";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Util/Util";
 
-import AdhMeinBerlinPhase = require("../../Phase/Phase");
+import * as AdhMeinBerlinPhase from "../../Phase/Phase";
 
-import SIImageReference = require("../../../../Resources_/adhocracy_core/sheets/image/IImageReference");
-import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
-import SIName = require("../../../../Resources_/adhocracy_core/sheets/name/IName");
-import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 

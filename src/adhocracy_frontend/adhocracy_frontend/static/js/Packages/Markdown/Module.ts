@@ -1,8 +1,8 @@
-import AdhEmbedModule = require("../Embed/Module");
+import * as AdhEmbedModule from "../Embed/Module";
 
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhEmbed from "../Embed/Embed";
 
-import AdhMarkdown = require("./Markdown");
+import * as AdhMarkdown from "./Markdown";
 
 
 export var moduleName = "adhMarkdown";

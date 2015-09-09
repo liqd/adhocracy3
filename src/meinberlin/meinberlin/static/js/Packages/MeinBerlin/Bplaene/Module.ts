@@ -1,4 +1,4 @@
-import AdhMeinBerlinBplaeneProposalModule = require("./Proposal/Module");
+import * as AdhMeinBerlinBplaeneProposalModule from "./Proposal/Module";
 
 export var moduleName = "adhMeinBerlinBplaene";
 

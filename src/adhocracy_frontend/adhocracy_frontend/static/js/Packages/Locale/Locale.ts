@@ -1,4 +1,4 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
 /* Country list from Wikipedia: http://de.wikipedia.org/wiki/Liste_der_Staaten_der_Erde */
 export var allCountries = [

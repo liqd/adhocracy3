@@ -1,18 +1,18 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhHttp = require("../Http/Http");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhHttp from "../Http/Http";
 
-import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
-import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
-import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
-import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
-import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
+import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
+import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Badge";
 

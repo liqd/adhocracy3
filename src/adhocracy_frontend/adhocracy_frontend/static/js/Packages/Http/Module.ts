@@ -1,11 +1,11 @@
-import AdhCredentialsModule = require("../User/CredentialsModule");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
-import AdhWebSocketModule = require("../WebSocket/Module");
+import * as AdhCredentialsModule from "../User/CredentialsModule";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhWebSocketModule from "../WebSocket/Module";
 
-import AdhCache = require("./Cache");
-import AdhError = require("./Error");
-import AdhHttp = require("./Http");
-import AdhMetaApi = require("./MetaApi");
+import * as AdhCache from "./Cache";
+import * as AdhError from "./Error";
+import * as AdhHttp from "./Http";
+import * as AdhMetaApi from "./MetaApi";
 
 
 export var moduleName = "adhHttp";

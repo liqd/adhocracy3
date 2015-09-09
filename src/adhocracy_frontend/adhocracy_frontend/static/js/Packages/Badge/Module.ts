@@ -1,10 +1,10 @@
-import AdhCredentialsModule = require("../User/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhEmbedModule = require("../Embed/Module");
+import * as AdhCredentialsModule from "../User/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhEmbedModule from "../Embed/Module";
 
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhEmbed from "../Embed/Embed";
 
-import AdhBadge = require("./Badge");
+import * as AdhBadge from "./Badge";
 
 
 export var moduleName = "adhBadge";

@@ -1,18 +1,18 @@
-import AdhEmbedModule = require("../../../Embed/Module");
-import AdhPermissionsModule = require("../../../Permissions/Module");
-import AdhResourceAreaModule = require("../../../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../../../TopLevelState/Module");
+import * as AdhEmbedModule from "../../../Embed/Module";
+import * as AdhPermissionsModule from "../../../Permissions/Module";
+import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
-import AdhMeinBerlinKiezkassenWorkbenchModule = require("../Workbench/Module");
+import * as AdhMeinBerlinKiezkassenWorkbenchModule from "../Workbench/Module";
 
-import AdhEmbed = require("../../../Embed/Embed");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import * as AdhEmbed from "../../../Embed/Embed";
+import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
 
-import AdhMeinBerlinKiezkassenWorkbench = require("../Workbench/Workbench");
+import * as AdhMeinBerlinKiezkassenWorkbench from "../Workbench/Workbench";
 
-import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
+import RIKiezkassenProcess from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
 
-import Context = require("./Context");
+import * as Context from "./Context";
 
 
 export var moduleName = "adhMeinBerlinKiezkassenContext";

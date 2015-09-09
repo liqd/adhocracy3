@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhResourceUtil = require("./ResourceUtil");
+import * as AdhResourceUtil from "./ResourceUtil";
 
 
 export var register = () => {

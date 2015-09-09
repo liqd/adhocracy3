@@ -1,17 +1,17 @@
-import AdhAngularHelpersModule = require("../AngularHelpers/Module");
-import AdhBadgeModule = require("../Badge/Module");
-import AdhEmbedModule = require("../Embed/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhMappingModule = require("../Mapping/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
-import AdhRateModule = require("../Rate/Module");
-import AdhResourceAreaModule = require("../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
+import * as AdhBadgeModule from "../Badge/Module";
+import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhMappingModule from "../Mapping/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+import * as AdhRateModule from "../Rate/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhEmbed from "../Embed/Embed";
 
-import Proposal = require("./Proposal");
+import * as Proposal from "./Proposal";
 
 
 export var moduleName = "adhMeinBerlinProposal";

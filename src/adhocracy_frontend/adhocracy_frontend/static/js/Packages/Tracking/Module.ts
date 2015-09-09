@@ -1,4 +1,4 @@
-import AdhTracking = require("./Tracking");
+import * as AdhTracking from "./Tracking";
 
 
 export var moduleName = "adhTracking";

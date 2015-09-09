@@ -1,7 +1,7 @@
-import AdhShareSocialModule = require("../ShareSocial/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhShareSocialModule from "../ShareSocial/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhMovingColumns = require("./MovingColumns");
+import * as AdhMovingColumns from "./MovingColumns";
 
 
 export var moduleName = "adhMovingColumns";

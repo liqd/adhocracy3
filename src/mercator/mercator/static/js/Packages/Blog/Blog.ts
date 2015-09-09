@@ -1,12 +1,12 @@
-import AdhConfig = require("../Config/Config");
-import AdhDocument = require("../Document/Document");
-import AdhHttp = require("../Http/Http");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhDocument from "../Document/Document";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhUtil from "../Util/Util";
 
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 
 var pkgLocation = "/Blog";
 

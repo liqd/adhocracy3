@@ -33,11 +33,11 @@
  * 10 in particular, but others may be affected.)
  */
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhUser = require("../User/User");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhUser from "../User/User";
 
 
 export interface IMessage {

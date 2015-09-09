@@ -10,9 +10,9 @@ var _s : any = require("underscore.string");
 
 declare var process : any;
 
-import Base = require("./ResourcesBase");
-import UtilR = require("./mkResources/Util");
-import MetaApi = require("./Packages/Http/MetaApi");
+import * as Base from "./ResourcesBase";
+import * as UtilR from "./mkResources/Util";
+import * as MetaApi from "./Packages/Http/MetaApi";
 
 
 

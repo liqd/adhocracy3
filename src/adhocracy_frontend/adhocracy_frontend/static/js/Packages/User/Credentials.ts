@@ -1,8 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhCache = require("../Http/Cache");
-import AdhConfig = require("../Config/Config");
-import AdhTracking = require("../Tracking/Tracking");
+import * as AdhCache from "../Http/Cache";
+import * as AdhConfig from "../Config/Config";
+import * as AdhTracking from "../Tracking/Tracking";
 
 
 export class Service {

@@ -1,8 +1,8 @@
-import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+import * as angularScroll from "angularScroll";  if (angularScroll) { ; };
 
-import AdhHttpModule = require("../Http/Module");
+import * as AdhHttpModule from "../Http/Module";
 
-import AdhAngularHelpers = require("./AngularHelpers");
+import * as AdhAngularHelpers from "./AngularHelpers";
 
 
 export var moduleName = "adhAngularHelpers";

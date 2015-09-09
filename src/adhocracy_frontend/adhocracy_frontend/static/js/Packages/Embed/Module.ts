@@ -1,8 +1,8 @@
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import AdhEmbed = require("./Embed");
+import * as AdhEmbed from "./Embed";
 
 
 export var moduleName = "adhEmbed";

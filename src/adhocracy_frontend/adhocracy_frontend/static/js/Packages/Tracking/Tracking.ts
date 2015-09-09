@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
+import * as AdhConfig from "../Config/Config";
 
 export interface PiwikWindow extends Window {
     _paq : any[];

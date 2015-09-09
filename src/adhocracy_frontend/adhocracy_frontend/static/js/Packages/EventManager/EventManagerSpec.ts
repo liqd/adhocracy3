@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhEventManager = require("./EventManager");
+import * as AdhEventManager from "./EventManager";
 
 export var register = () => {
     describe("EventManager", () => {

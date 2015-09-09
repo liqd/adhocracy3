@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhCredentials = require("../User/Credentials");
-import AdhHttp = require("../Http/Http");
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhHttp from "../Http/Http";
 
 
 export class Service {

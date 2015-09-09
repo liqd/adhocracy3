@@ -1,18 +1,18 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
-import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
-import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIMercatorProposalVersion from "../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion";
+import RIProcess from "../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MercatorWorkbench";
 

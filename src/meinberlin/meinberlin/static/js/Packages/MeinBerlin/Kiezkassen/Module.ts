@@ -1,6 +1,6 @@
-import AdhMeinBerlinKiezkassenContextModule = require("./Context/Module");
-import AdhMeinBerlinKiezkassenProcessModule = require("./Process/Module");
-import AdhMeinBerlinKiezkassenWorkbenchModule = require("./Workbench/Module");
+import * as AdhMeinBerlinKiezkassenContextModule from "./Context/Module";
+import * as AdhMeinBerlinKiezkassenProcessModule from "./Process/Module";
+import * as AdhMeinBerlinKiezkassenWorkbenchModule from "./Workbench/Module";
 
 
 export var moduleName = "adhMeinBerlinKiezkassen";

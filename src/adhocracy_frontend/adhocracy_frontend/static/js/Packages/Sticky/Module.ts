@@ -1,6 +1,6 @@
-import Sticky = require("sticky"); if (Sticky) { ; };
+import * as Sticky from "sticky"; if (Sticky) { ; };
 
-import AdhSticky = require("./Sticky");
+import * as AdhSticky from "./Sticky";
 
 
 export var moduleName = "adhSticky";

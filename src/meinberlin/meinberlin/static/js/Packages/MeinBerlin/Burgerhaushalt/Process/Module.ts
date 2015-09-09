@@ -1,11 +1,11 @@
-import AdhHttpModule = require("../../../Http/Module");
-import AdhMovingColumnsModule = require("../../../MovingColumns/Module");
-import AdhPermissionsModule = require("../../../Permissions/Module");
-import AdhTopLevelStateModule = require("../../../TopLevelState/Module");
+import * as AdhHttpModule from "../../../Http/Module";
+import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
+import * as AdhPermissionsModule from "../../../Permissions/Module";
+import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
-import AdhMeinBerlinPhaseModule = require("../../Phase/Module");
+import * as AdhMeinBerlinPhaseModule from "../../Phase/Module";
 
-import Process = require("./Process");
+import * as Process from "./Process";
 
 
 export var moduleName = "adhMeinBerlinBurgerhaushaltProcess";

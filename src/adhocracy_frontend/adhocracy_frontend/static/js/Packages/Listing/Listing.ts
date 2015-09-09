@@ -3,17 +3,17 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 
 var pkgLocation = "/Listing";
 

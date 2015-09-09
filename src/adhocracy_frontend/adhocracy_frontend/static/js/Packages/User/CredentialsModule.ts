@@ -1,6 +1,6 @@
-import AdhTrackingModule = require("../Tracking/Module");
+import * as AdhTrackingModule from "../Tracking/Module";
 
-import AdhCredentials = require("./Credentials");
+import * as AdhCredentials from "./Credentials";
 
 
 export var moduleName = "adhCredentials";

@@ -1,4 +1,4 @@
-import AdhPreliminaryNames = require("./PreliminaryNames");
+import * as AdhPreliminaryNames from "./PreliminaryNames";
 
 
 export var moduleName = "adhPreliminaryNames";

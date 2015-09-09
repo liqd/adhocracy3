@@ -1,7 +1,7 @@
-import AdhCredentialsModule = require("../User/Module");
-import AdhUserModule = require("../User/Module");
+import * as AdhCredentialsModule from "../User/Module";
+import * as AdhUserModule from "../User/Module";
 
-import AdhCrossWindowMessaging = require("./CrossWindowMessaging");
+import * as AdhCrossWindowMessaging from "./CrossWindowMessaging";
 
 
 export var moduleName = "adhCrossWindowMessaging";

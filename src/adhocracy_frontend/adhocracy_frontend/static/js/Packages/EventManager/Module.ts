@@ -1,4 +1,4 @@
-import AdhEventManager = require("./EventManager");
+import * as AdhEventManager from "./EventManager";
 
 
 export var moduleName = "adhEventManager";

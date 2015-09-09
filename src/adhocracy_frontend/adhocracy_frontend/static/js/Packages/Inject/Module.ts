@@ -1,4 +1,4 @@
-import AdhInject = require("./Inject");
+import * as AdhInject from "./Inject";
 
 
 export var moduleName = "adhInject";

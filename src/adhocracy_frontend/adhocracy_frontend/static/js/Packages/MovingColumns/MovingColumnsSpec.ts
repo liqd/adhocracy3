@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhMovingColumns = require("./MovingColumns");
+import * as AdhMovingColumns from "./MovingColumns";
 
 export var register = () => {
     describe("MovingColumns", () => {

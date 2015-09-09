@@ -1,8 +1,8 @@
-import AdhEventManagerModule = require("../EventManager/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhPreliminaryNamesModule = require("../PreliminaryNames/Module");
+import * as AdhEventManagerModule from "../EventManager/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 
-import AdhResourceWidgets = require("./ResourceWidgets");
+import * as AdhResourceWidgets from "./ResourceWidgets";
 
 
 export var moduleName = "adhResourceWidgets";

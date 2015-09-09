@@ -1,17 +1,17 @@
-import AdhAbuseModule = require("../Abuse/Module");
-import AdhCommentModule = require("../Comment/Module");
-import AdhHttpModule = require("../Http/Module");
-import AdhListingModule = require("../Listing/Module");
-import AdhMercatorProposalModule = require("../MercatorProposal/Module");
-import AdhMovingColumnsModule = require("../MovingColumns/Module");
-import AdhPermissionsModule = require("../Permissions/Module");
-import AdhResourceAreaModule = require("../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../TopLevelState/Module");
-import AdhUserModule = require("../User/Module");
+import * as AdhAbuseModule from "../Abuse/Module";
+import * as AdhCommentModule from "../Comment/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhListingModule from "../Listing/Module";
+import * as AdhMercatorProposalModule from "../MercatorProposal/Module";
+import * as AdhMovingColumnsModule from "../MovingColumns/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhResourceAreaModule from "../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhUserModule from "../User/Module";
 
-import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
+import RIProcess from "../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
 
-import MercatorWorkbench = require("./MercatorWorkbench");
+import * as MercatorWorkbench from "./MercatorWorkbench";
 
 
 export var moduleName = "adhMercatorWorkbench";

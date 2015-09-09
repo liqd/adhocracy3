@@ -1,18 +1,18 @@
-import AdhDocumentModule = require("../../../Document/Module");
-import AdhHttpModule = require("../../../Http/Module");
-import AdhMappingModule = require("../../../Mapping/Module");
-import AdhMovingColumnsModule = require("../../../MovingColumns/Module");
-import AdhPermissionsModule = require("../../../Permissions/Module");
-import AdhProcessModule = require("../../../Process/Module");
-import AdhResourceAreaModule = require("../../../ResourceArea/Module");
-import AdhTopLevelStateModule = require("../../../TopLevelState/Module");
+import * as AdhDocumentModule from "../../../Document/Module";
+import * as AdhHttpModule from "../../../Http/Module";
+import * as AdhMappingModule from "../../../Mapping/Module";
+import * as AdhMovingColumnsModule from "../../../MovingColumns/Module";
+import * as AdhPermissionsModule from "../../../Permissions/Module";
+import * as AdhProcessModule from "../../../Process/Module";
+import * as AdhResourceAreaModule from "../../../ResourceArea/Module";
+import * as AdhTopLevelStateModule from "../../../TopLevelState/Module";
 
-import RIAlexanderplatzProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess");
+import RIAlexanderplatzProcess from "../../../../Resources_/adhocracy_meinberlin/resources/alexanderplatz/IProcess";
 
-import AdhMapping = require("../../../Mapping/Mapping");
-import AdhProcess = require("../../../Process/Process");
+import * as AdhMapping from "../../../Mapping/Mapping";
+import * as AdhProcess from "../../../Process/Process";
 
-import Workbench = require("./Workbench");
+import * as Workbench from "./Workbench";
 
 
 export var moduleName = "adhMeinBerlinAlexanderplatzWorkbench";
