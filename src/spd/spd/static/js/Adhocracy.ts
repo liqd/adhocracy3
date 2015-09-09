@@ -87,19 +87,13 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngMessages",
         "duScroll",
         "flow",
-        AdhImage.moduleName,
         AdhComment.moduleName,
-        AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
-        AdhDocument.moduleName,
         AdhSPDWorkbench.moduleName,
         AdhResourceArea.moduleName,
-        AdhSticky.moduleName,
         AdhTracking.moduleName,
         AdhUserViews.moduleName,
-        AdhMarkdown.moduleName,
-        AdhMapping.moduleName
     ];
 
     if (config.cachebust) {

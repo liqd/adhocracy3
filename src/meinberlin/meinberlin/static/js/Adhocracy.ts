@@ -94,15 +94,10 @@ export var init = (config : AdhConfig.IService, metaApi) => {
         "ngMessages",
         "flow",
         AdhCommentModule.moduleName,
-        AdhDoneModule.moduleName,
-        AdhImageModule.moduleName,
-        AdhMappingModule.moduleName,
-
         AdhCrossWindowMessagingModule.moduleName,
         AdhEmbedModule.moduleName,
         AdhMeinBerlinModule.moduleName,
         AdhResourceAreaModule.moduleName,
-        AdhStickyModule.moduleName,
         AdhTrackingModule.moduleName,
         AdhUserViewsModule.moduleName
     ];
