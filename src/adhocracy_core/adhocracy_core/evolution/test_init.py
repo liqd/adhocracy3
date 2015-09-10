@@ -264,7 +264,6 @@ class TestMigrateToAttributeStorageSheet:
     @fixture
     def context(self, pool, mock_catalogs):
         pool['catalogs'] = mock_catalogs
-        pool._sheets = {}
         return pool
 
     def call_fut(self, *args, **kwargs):
@@ -275,15 +274,8 @@ class TestMigrateToAttributeStorageSheet:
             self, context, mock_catalogs, search_result, registry, query):
         mock_catalogs.search.return_value = search_result._replace(elements=[])
         self.call_fut(context, ISheet)
-        search_query = query._replace(interfaces=(ISheet,))
+        search_query = query._replace(interfaces=ISheet)
         assert mock_catalogs.search.call_args[0][0] == search_query
-
-    def test_ignore_if_resources_with_sheet_but_no_annotation_sheet_data(
-            self, context, registry, mock_catalogs, search_result):
-        mock_catalogs.search.return_value = search_result._replace(
-            elements=[context])
-        context._sheet = {}
-        assert self.call_fut(context, ISheet) is None
 
     def test_ignore_if_resources_with_sheet_but_no_annotation_data(
             self, context, registry, mock_catalogs, search_result):
@@ -292,12 +284,13 @@ class TestMigrateToAttributeStorageSheet:
         assert self.call_fut(context, ISheet) is None
 
     def test_cp_annotation_sheet_data_to_attribute_storage(
-            self, context, registry, mock_catalogs, search_result,
-            mock_sheet):
+            self, context, registry, mock_catalogs, search_result, mock_sheet):
         mock_catalogs.search.return_value = search_result._replace(
             elements=[context])
-        annotation_key = mock_sheet.meta.isheet.__identifier__
-        context._sheets = {annotation_key: {'field1': 'value'}}
+        annotation_key = '_sheet_' + mock_sheet.meta.isheet\
+            .__identifier__.replace('.', '_')
+        appstruct = {'field1': 'value'}
+        setattr(context, annotation_key, appstruct)
         self.call_fut(context, ISheet)
         assert context.field1 == 'value'
 
@@ -306,20 +299,10 @@ class TestMigrateToAttributeStorageSheet:
             mock_sheet):
         mock_catalogs.search.return_value = search_result._replace(
             elements=[context])
-        annotation_key = mock_sheet.meta.isheet.__identifier__
-        context._sheets = {'other': {},
-                           annotation_key: {'field1': 'value'}}
+        annotation_key = '_sheet_' + mock_sheet.meta.isheet \
+            .__identifier__.replace('.', '_')
+        appstruct = {'field1': 'value'}
+        setattr(context, annotation_key, appstruct)
         self.call_fut(context, ISheet)
-        assert 'other' in context._sheets
-        assert annotation_key not in context._sheets
-
-    def test_rm_sheets_attribute_if_empty(
-            self, context, registry, mock_catalogs, search_result,
-            mock_sheet):
-        mock_catalogs.search.return_value = search_result._replace(
-            elements=[context])
-        annotation_key = mock_sheet.meta.isheet.__identifier__
-        context._sheets = {annotation_key: {'field1': 'value'}}
-        self.call_fut(context, ISheet)
-        assert not hasattr(context, '_sheets')
+        assert not hasattr(context, annotation_key)
 

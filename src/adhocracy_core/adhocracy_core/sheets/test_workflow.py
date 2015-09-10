@@ -211,7 +211,9 @@ class TestWorkflowAssignmentSheet:
         inst.schema = inst.schema.clone()
         inst.schema.add(MappingSchema(name='other'))
         inst.set({'other': {}})
-        assert 'other' in inst._data
+        appstruct = getattr(context, inst._annotation_key)
+        assert 'other' in appstruct
+
 
     def tesget_next_states(self, meta, context, registry, mock_workflow):
         registry.content.get_workflow.return_value = mock_workflow

@@ -40,28 +40,26 @@ logger = logging.getLogger(__name__)
 
 
 def migrate_to_attribute_storage(context: IPool, isheet: IInterface):
-    """Add new sheet data for`isheet` from annotation to attribute storage."""
+    """Migrate sheet data for`isheet` from annotation to attribute storage."""
     registry = get_current_registry(context)
-    catalogs = find_service(context, 'catalogs')
-    query = search_query._replace(interfaces=(isheet,))
     sheet_meta = registry.content.sheets_meta[isheet]
-    annotation_key = sheet_meta.isheet.__identifier__
-    resources = catalogs.search(query).elements
+    isheet_name = sheet_meta.isheet.__identifier__
+    annotation_key = '_sheet_' + isheet_name.replace('.', '_')
+    catalogs = find_service(context, 'catalogs')
+    resources = _search_for_interfaces(catalogs, isheet)
     count = len(resources)
     logger.info('Migrating {0} resources with {1} to attribute storage'
                 .format(count, isheet))
     for index, resource in enumerate(resources):
-        data = getattr(resource, '_sheets', {})
+        data = resource.__dict__
         if annotation_key in data:
             logger.info('Migrating resource {0} of {1}'
                         .format(index + 1, count))
             for field, value in data[annotation_key].items():
                 setattr(resource, field, value)
-            del data[annotation_key]
+            delattr(resource, annotation_key)
         else:
             continue
-        if data == {}:
-            delattr(resource, '_sheets')
 
 
 def migrate_new_sheet(context: IPool,
@@ -369,6 +367,28 @@ def move_autoname_last_counters_to_attributes(root):  # pragma: no cover
             delattr(pool, '_autoname_lasts')
 
 
+@log_migration
+def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
+    """Move sheet annotation data to resource attributes.
+
+    Remove `_sheets` dictionary to store sheets data annotations.
+    Instead add private attributes for every sheet data annotation to resource.
+    """
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=(IResource,))
+    resources = catalogs.search(query).elements
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        if not hasattr(resource, '_sheets'):
+            continue
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        for data_key, appstruct in resource._sheets.items():
+            annotation_key = '_sheet_' + data_key.replace('.', '_')
+            if appstruct:
+                setattr(resource, annotation_key, appstruct)
+        delattr(resource, '_sheets')
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -383,5 +403,6 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(remove_name_sheet_from_items)
     config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)
     config.add_evolution_step(make_proposals_badgeable)
+    config.add_evolution_step(move_sheet_annotation_data_to_attributes)
     config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
     config.add_evolution_step(move_autoname_last_counters_to_attributes)
