@@ -9,8 +9,9 @@ from adhocracy_core.schema import ACM
 
 
 kit_acm = ACM().deserialize(
-    {'principals':                                   ['anonymous', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
-     'permissions': [['create_user',                   Deny,       None,          None,         None,      None,        Allow],
+    {'principals':                                   ['anonymous', 'authenticated', 'participant', 'moderator',  'creator', 'initiator', 'admin'],
+     'permissions': [['create_user',                   Deny,        None,            None,          None,         None,      None,        Allow],
+                     ['view',                          Deny,        Allow,           Allow,         Allow,        Allow,     Allow,       Allow],
                      ]})
 
 
