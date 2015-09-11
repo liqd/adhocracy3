@@ -384,6 +384,15 @@ def delete_not_activated_users(request: Request, age_in_days: int):
         del user.__parent__[user.__name__]
 
 
+def delete_password_resets(request: Request, age_in_days: int):
+    """Delete password resets that are older than `age_in_days`."""
+    resets = find_service(request.root, 'principals', 'resets')
+    expired = [u for u in resets.values() if is_older_then(u, age_in_days)]
+    for reset in expired:
+        logger.info('deleting reset {0}.format(reset)'.format(reset))
+        del resets[reset.__name__]
+
+
 def includeme(config):
     """Add resource types to registry."""
     add_resource_type_to_registry(principals_meta, config)

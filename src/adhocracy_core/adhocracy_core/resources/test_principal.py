@@ -62,7 +62,6 @@ class TestPrincipalsService:
     @mark.usefixtures('integration')
     def test_register_services(self, meta, registry, pool):
         from substanced.util import find_service
-        from . import principal
         registry.content.create(meta.iresource.__identifier__, parent=pool)
         assert find_service(pool, 'principals', 'users')
         assert find_service(pool, 'principals', 'groups')
@@ -77,7 +76,6 @@ class TestUsers:
         return users_meta
 
     def test_meta(self, meta):
-        from adhocracy_core import sheets
         from . import badge
         from . import principal
         assert meta.iresource is principal.IUsersService
@@ -99,7 +97,6 @@ class TestUser:
         return user_meta
 
     def test_meta(self, meta):
-        from . import badge
         from . import principal
         import adhocracy_core.sheets
         assert meta.iresource is principal.IUser
@@ -528,45 +525,34 @@ class TestDeleteNotActiveUsers:
         assert 'user' in users
 
 
-    def mock_is_older(self, monkeypatch):
-        from adhocracy_core.sheets.metadata import is_older_then
+class TestDeletePasswordResets:
+
+    @fixture
+    def reset(self):
+        reset = testing.DummyResource()
+        return reset
+
+    @fixture
+    def resets(self, reset, monkeypatch):
         from . import principal
-        mock = Mock(spec=is_older_then)
-        monkeypatch.setattr(principal, 'is_older_then', mock)
+        mock = testing.DummyResource()
+        mock['reset'] = reset
+        monkeypatch.setattr(principal, 'find_service', lambda x, y, z: mock)
         return mock
 
-    @fixture
-    def user(self):
-        user = testing.DummyResource(active=False, email='', name='')
-        return user
-
-    @fixture
-    def users(self, context, user):
-        context['user'] = user
-        return context
-
     def call_fut(self, *args):
-        from .principal import delete_not_activated_users
-        return delete_not_activated_users(*args)
+        from .principal import delete_password_resets
+        return delete_password_resets(*args)
 
-    def test_delete_not_active_users_older_then_days(
-            self, users, user, request_, mock_is_older, mock_user_locator):
+    def test_delete_resets_older_then_days(
+            self, resets, reset, request_, mock_is_older):
         mock_is_older.return_value = True
-        mock_user_locator.get_users.return_value = [user]
         self.call_fut(request_, 7)
-        mock_is_older.assert_called_with(user, 7)
-        assert 'user' not in users
+        mock_is_older.assert_called_with(reset, 7)
+        assert 'reset' not in resets
 
-    def test_ignore_not_active_user_younger_then_days(
-            self, users, user, request_, mock_is_older, mock_user_locator):
+    def test_ignore_resets_younger_then_days(
+            self, resets, reset, request_, mock_is_older):
         mock_is_older.return_value = False
-        mock_user_locator.get_users.return_value = [user]
         self.call_fut(request_, 7)
-        assert 'user' in users
-
-    def test_ignore_active_user(
-            self, users, user, request_, mock_user_locator):
-        user.active = True
-        mock_user_locator.get_users.return_value = [user]
-        self.call_fut(request_, 7)
-        assert 'user' in users
+        assert 'reset' in resets
