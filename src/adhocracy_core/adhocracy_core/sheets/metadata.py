@@ -15,6 +15,7 @@ from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import now
 
 
 logger = getLogger(__name__)
@@ -121,6 +122,12 @@ def view_blocked_by_metadata(resource: IResource, registry: Registry,
     result['modification_date'] = appstruct['modification_date']
     result['modified_by'] = appstruct['modified_by']
     return result
+
+
+def is_older_then(resource: IMetadata, days: int) -> bool:
+    """Check if the creation date of `context` is older than `days`."""
+    timedelta = now() - resource.creation_date
+    return timedelta.days >= days
 
 
 def includeme(config):

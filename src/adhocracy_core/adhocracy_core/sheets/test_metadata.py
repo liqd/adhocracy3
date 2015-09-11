@@ -118,3 +118,31 @@ class TestVisibility:
         result = self.call_fut(resource, registry, 'hidden')
         assert result['modified_by'] == user
         assert result['modification_date'] == now
+
+
+class TestIsOlderThen:
+
+    def call_fut(self, *args):
+        from .metadata import is_older_then
+        return is_older_then(*args)
+
+    @fixture
+    def now(self):
+        from pytz import UTC
+        from datetime import datetime
+        now = datetime.utcnow().replace(tzinfo=UTC)
+        return now
+
+    def test_creation_date_older_then_days(self, context, now):
+        from datetime import timedelta
+        context.creation_date = now - timedelta(days=8)
+        assert self.call_fut(context, 7) is True
+
+    def test_creation_date_equal_to_days(self, context, now):
+        from datetime import timedelta
+        context.creation_date = now - timedelta(days=7)
+        assert self.call_fut(context, 7) is True
+
+    def test_creation_date_younger_then_days(self, context, now):
+        context.creation_date = now
+        assert self.call_fut(context, 7) is False
