@@ -62,12 +62,17 @@ Roles with example permission mapping:
         set workflow
         manage principals
 
+# TODO the role definition is outdated
+
 Mappings of principals to local roles are associate with resources and
 are inherited within the object hierarchy in the database.
 The creator is the principal who created the local context.
 The creator role is automatically set for a specific local context and is not
 inherited.
 
+Permission mappings for roles with high priority override those with lower
+priorty. The order is determined by :var:`adhocracy_core.schema.ROLE_PRINCIPALS`
+from left (low) right (high).
 
 ACL (Access Control List)
 .........................

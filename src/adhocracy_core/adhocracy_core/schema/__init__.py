@@ -220,7 +220,7 @@ SYSTEM_PRINCIPALS = ['everyone',
 
 class Role(AdhocracySchemaNode):
 
-    """Permssion :term:`role` name.
+    """Permission :term:`role` name.
 
     Example value: 'reader'
     """
@@ -251,7 +251,7 @@ class Roles(AdhocracySequenceNode):
         return list(value_dict)
 
 
-class Interface(colander.SchemaType):
+class InterfaceType(colander.SchemaType):
 
     """A ZOPE interface in dotted name notation.
 
@@ -272,6 +272,16 @@ class Interface(colander.SchemaType):
             return DottedNameResolver().resolve(value)
         except Exception as err:
             raise colander.Invalid(node, msg=str(err), value=value)
+
+
+class Interface(AdhocracySchemaNode):
+
+    schema_type = InterfaceType
+
+
+class Interfaces(AdhocracySequenceNode):
+
+    interface = Interface()
 
 
 class AbsolutePath(AdhocracySchemaNode):
@@ -329,11 +339,16 @@ class Boolean(AdhocracySchemaNode):
     missing = False
 
 
+class Booleans(AdhocracySequenceNode):
+
+    bool = Boolean()
+
+
 class ContentType(AdhocracySchemaNode):
 
     """ContentType schema."""
 
-    schema_type = Interface
+    schema_type = InterfaceType
     default = deferred_content_type_default
 
 
@@ -657,6 +672,11 @@ class DateTime(AdhocracySchemaNode):
     missing = deferred_date_default
 
 
+class DateTimes(colander.SequenceSchema):
+
+    date = DateTime()
+
+
 @colander.deferred
 def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
     """Return the post_pool path for the given `context`.
@@ -756,6 +776,16 @@ class Integer(AdhocracySchemaNode):
     missing = colander.drop
 
 
+class Integers(AdhocracySequenceNode):
+
+    """SchemaNode for a list of Integer values.
+
+    Example value: [1,2]
+    """
+
+    integer = Integer()
+
+
 class FileStoreType(colander.SchemaType):
 
     """Accepts raw file data as per as 'multipart/form-data' upload."""
@@ -799,7 +829,7 @@ class FileStore(AdhocracySchemaNode):
     missing = colander.drop
 
 
-class SingleLineList(colander.SequenceSchema):
+class SingleLines(colander.SequenceSchema):
 
     """List of SingleLines."""
 

@@ -1,10 +1,9 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import _ = require("lodash");
-import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+import * as _ from "lodash";
 
-import AdhHttp = require("../Http/Http");
+import * as AdhHttp from "../Http/Http";
 
 
 export var recursionHelper = ($compile) => {
@@ -280,26 +279,4 @@ export var submitIfValid = (
         container.scrollToElementAnimated(getFirstFormError(form, element), 20);
         return $q.reject([]);
     }
-};
-
-
-export var moduleName = "adhAngularHelpers";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            "duScroll",
-            AdhHttp.moduleName
-        ])
-        .filter("join", () => (list : any[], separator : string = ", ") : string => list.join(separator))
-        .filter("signum", () => (n : number) : string => (typeof n === "number") ? (n > 0 ? "+" + n.toString() : n.toString()) : "0")
-        .filter("numberOrDash", () => numberOrDashFilter)
-        .factory("adhRecursionHelper", ["$compile", recursionHelper])
-        .factory("adhShowError", () => showError)
-        .factory("adhSingleClickWrapper", ["$timeout", singleClickWrapperFactory])
-        .factory("adhSubmitIfValid", ["$q", submitIfValid])
-        .directive("adhRecompileOnChange", ["$compile", recompileOnChange])
-        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .directive("adhWait", waitForCondition)
-        .directive("adhInputSync", ["$timeout" , inputSync]);
 };

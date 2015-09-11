@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhPreliminaryNames = require("./PreliminaryNames");
+import * as AdhPreliminaryNames from "./PreliminaryNames";
 
 export var register = () => {
     describe("PreliminaryNames", () => {

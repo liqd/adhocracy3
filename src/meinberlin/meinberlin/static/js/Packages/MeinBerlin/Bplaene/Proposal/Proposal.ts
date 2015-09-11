@@ -1,18 +1,15 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAngularHelpers = require("../../../AngularHelpers/AngularHelpers");
-import AdhConfig = require("../../../Config/Config");
-import AdhEmbed = require("../../../Embed/Embed");
-import AdhHttp = require("../../../Http/Http");
-import AdhPreliminaryNames = require("../../../PreliminaryNames/PreliminaryNames");
-import AdhProcess = require("../../../Process/Process");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhPreliminaryNames from "../../../PreliminaryNames/PreliminaryNames";
+import * as AdhProcess from "../../../Process/Process";
 
-import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal");
-import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion");
-import SIProposal = require("../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal");
-import SIVersionable = require("../../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import RIProposal from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposal";
+import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/bplan/IProposalVersion";
+import * as SIProposal from "../../../../Resources_/adhocracy_meinberlin/sheets/bplan/IProposal";
+import * as SIVersionable from "../../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MeinBerlin/Bplaene/Proposal";
 
@@ -130,24 +127,4 @@ export var embedDirective = (
             });
         }
     };
-};
-
-
-export var moduleName = "adhMeinBplaeneProposal";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhResourceArea.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-bplaene-proposal-embed");
-        }])
-        .directive("adhMeinBerlinBplaeneProposalCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", createDirective])
-        .directive("adhMeinBerlinBplaeneProposalEmbed", ["adhConfig", "adhHttp", embedDirective]);
 };

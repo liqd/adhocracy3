@@ -1,4 +1,4 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
 /* Country list from Wikipedia: http://de.wikipedia.org/wiki/Liste_der_Staaten_der_Erde */
 export var allCountries = [
@@ -421,16 +421,4 @@ export var htmlTranslateDirective = ($compile, $translate, adhWrap : Wrap) => {
             ], update);
         }
     };
-};
-
-
-export var moduleName = "adhLocale";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .filter("adhCountryName", countryName)
-        .service("adhWrap", ["$interpolate", Wrap])
-        .directive("adhHtmlTranslate", ["$compile", "$translate", "adhWrap", htmlTranslateDirective])
-        .directive("countrySelect", ["$translate", "adhConfig", countrySelect]);
 };

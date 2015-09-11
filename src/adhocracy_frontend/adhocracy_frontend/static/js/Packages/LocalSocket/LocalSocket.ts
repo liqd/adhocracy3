@@ -1,6 +1,6 @@
-import AdhEventManager = require("../EventManager/EventManager");
-import AdhUtil = require("../Util/Util");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhEventManager from "../EventManager/EventManager";
+import * as AdhUtil from "../Util/Util";
+import * as AdhWebSocket from "../WebSocket/WebSocket";
 
 
 export interface ILocalEvent extends AdhWebSocket.IServerEvent {}
@@ -97,14 +97,3 @@ export class Service {
         };
     }
 }
-
-
-export var moduleName = "adhLocalSocket";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEventManager.moduleName
-        ])
-        .service("adhLocalSocket", ["adhEventManagerClass", Service]);
-};

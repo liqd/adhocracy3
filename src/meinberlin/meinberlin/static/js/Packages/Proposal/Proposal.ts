@@ -1,37 +1,34 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
-import AdhBadge = require("../Badge/Badge");
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
-import AdhMapping = require("../Mapping/Mapping");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhRate = require("../Rate/Rate");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhBadge from "../Badge/Badge";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMapping from "../Mapping/Mapping";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhRate from "../Rate/Rate";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RIBurgerhaushaltProposal = require("../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal");
-import RIBurgerhaushaltProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion");
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIGeoProposal = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposal");
-import RIGeoProposalVersion = require("../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion");
-import RIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
-import RIKiezkassenProposalVersion = require("../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIBurgerhaushaltProposal = require("../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal");
-import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
-import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
-import SIKiezkassenProposal = require("../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal");
-import SILocationReference = require("../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIMultiPolygon = require("../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
-import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
-import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import RIBurgerhaushaltProposal from "../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
+import RIBurgerhaushaltProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIGeoProposal from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposal";
+import RIGeoProposalVersion from "../../Resources_/adhocracy_core/resources/proposal/IGeoProposalVersion";
+import RIKiezkassenProposal from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
+import RIKiezkassenProposalVersion from "../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIBurgerhaushaltProposal from "../../Resources_/adhocracy_meinberlin/sheets/burgerhaushalt/IProposal";
+import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIKiezkassenProposal from "../../Resources_/adhocracy_meinberlin/sheets/kiezkassen/IProposal";
+import * as SILocationReference from "../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIMultiPolygon from "../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIPoint from "../../Resources_/adhocracy_core/sheets/geo/IPoint";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SIRateable from "../../Resources_/adhocracy_core/sheets/rate/IRateable";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Proposal";
 
@@ -452,61 +449,4 @@ export var editDirective = (
             };
         }
     };
-};
-
-
-export var moduleName = "adhMeinBerlinProposal";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhBadge.moduleName,
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhMapping.moduleName,
-            AdhPermissions.moduleName,
-            AdhRate.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-detail");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list-item");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-create");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-edit");
-            adhEmbedProvider.embeddableDirectives.push("mein-berlin-proposal-list");
-        }])
-        .directive("adhMeinBerlinProposalDetail", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", detailDirective])
-        .directive("adhMeinBerlinProposalListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", listItemDirective])
-        .directive("adhMeinBerlinProposalMapListItem", [
-            "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", mapListItemDirective])
-        .directive("adhMeinBerlinProposalCreate", [
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            "$location",
-            createDirective
-        ])
-        .directive("adhMeinBerlinProposalEdit", [
-            "adhConfig",
-            "adhHttp",
-            "adhPermissions",
-            "adhPreliminaryNames",
-            "adhRate",
-            "adhResourceUrlFilter",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhTopLevelState",
-            "adhGetBadges",
-            "$location",
-            "$q",
-            editDirective
-        ]);
 };

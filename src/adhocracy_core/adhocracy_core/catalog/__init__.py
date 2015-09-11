@@ -10,6 +10,10 @@ from hypatia.interfaces import IIndex
 from hypatia.interfaces import IResultSet
 from hypatia.util import ResultSet
 from adhocracy_core.interfaces import IServicePool
+from adhocracy_core.interfaces import FieldComparator
+from adhocracy_core.interfaces import FieldSequenceComparator
+from adhocracy_core.interfaces import KeywordComparator
+from adhocracy_core.interfaces import KeywordSequenceComparator
 from adhocracy_core.interfaces import SearchResult
 from adhocracy_core.interfaces import SearchQuery
 from adhocracy_core.interfaces import search_result
@@ -36,7 +40,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
 
         :raises KeyError: if `index_name`  index does not exists.
         """
-        index = self._get_index(index_name)
+        index = self.get_index(index_name)
         if index is None:
             msg = 'catalog index {0} does not exist.'.format(index_name)
             raise KeyError(msg)
@@ -58,33 +62,45 @@ class CatalogsServiceAdhocracy(CatalogsService):
         return result
 
     def _search_elements(self, query) -> IResultSet:
-        interfaces = normalize_to_tuple(query.interfaces)
-        if not interfaces:
-            interfaces = (IResource,)
-        interfaces_index = self._get_index('interfaces')
+        interfaces_index = self.get_index('interfaces')
         if interfaces_index is None:  # pragma: no branch
             return ResultSet(set(), 0, None)
-        index_query = interfaces_index.all(interfaces)
+        interfaces_value = self._get_query_value(query.interfaces)
+        if not interfaces_value:
+            interfaces_value = (IResource,)
+        interfaces_comparator = self._get_query_comparator(query.interfaces)
+        if interfaces_comparator is None:
+            interfaces_value = normalize_to_tuple(interfaces_value)
+            index_query = interfaces_index.all(interfaces_value)
+        else:
+            index_comparator = getattr(interfaces_index, interfaces_comparator)
+            index_query = index_comparator(interfaces_value)
         if query.root is not None:
             depth = query.depth or None
-            path_index = self._get_index('path')
+            path_index = self.get_index('path')
             index_query &= path_index.eq(query.root,
                                          depth=depth,
                                          include_origin=False)
         if query.indexes:
-            for name, value in query.indexes.items():
-                index = self._get_index(name)
-                index_query &= index.eq(value)
+            for index_name, value in query.indexes.items():
+                index = self.get_index(index_name)
+                comparator = self._get_query_comparator(value)
+                if comparator is None:
+                    index_comparator = index.eq
+                else:
+                    index_comparator = getattr(index, comparator)
+                index_value = self._get_query_value(value)
+                index_query &= index_comparator(index_value)
         if query.only_visible:
-            visibility_index = self._get_index('private_visibility')
+            visibility_index = self.get_index('private_visibility')
             index_query &= visibility_index.eq('visible')
         if query.allows:
-            allowed_index = self._get_index('allowed')
+            allowed_index = self.get_index('allowed')
             principals, permission = query.allows
             index_query &= allowed_index.allows(principals, permission)
         elements = index_query.execute(resolver=None)
         if query.references:
-            index = self._get_index('reference')
+            index = self.get_index('reference')
             for reference in query.references:
                 referencence_elements = index.search_with_order(reference)
                 referencence_elements.resolver = elements.resolver
@@ -95,7 +111,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
                           query: SearchQuery) -> dict:
         frequency_of = {}
         if query.frequency_of:
-            index = self._get_index(query.frequency_of)
+            index = self.get_index(query.frequency_of)
             for value in index.unique_values():
                 value_query = index.eq(value)
                 value_elements = value_query.execute(resolver=None)
@@ -109,7 +125,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
     def _get_group_by(self, elements: IResultSet, query: SearchQuery) -> dict:
         group_by = {}
         if query.group_by:
-            index = self._get_index(query.group_by)
+            index = self.get_index(query.group_by)
             for value in index.unique_values():
                 value_query = index.eq(value)
                 value_elements = value_query.execute(resolver=None)
@@ -117,7 +133,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
                 if len(intersect) == 0:
                     continue
                 group_by[value] = intersect
-        sort_index = self._get_index(query.sort_by)
+        sort_index = self.get_index(query.sort_by)
         if sort_index is not None:
             for key, intersect in group_by.items():
                 intersect_sorted = intersect.sort(sort_index,
@@ -132,7 +148,7 @@ class CatalogsServiceAdhocracy(CatalogsService):
 
     def _sort_elements(self, elements: IResultSet,
                        query: SearchQuery) -> IResultSet:
-        sort_index = self._get_index(query.sort_by)
+        sort_index = self.get_index(query.sort_by)
         if sort_index is not None:
             # TODO: We should assert the IIndexSort interface here, but
             # hypatia.field.FieldIndex is missing this interface.
@@ -160,11 +176,36 @@ class CatalogsServiceAdhocracy(CatalogsService):
             elements = [x for x in elements]
         return elements
 
-    def _get_index(self, name) -> IIndex:
+    def get_index(self, name) -> IIndex:
         system = self.get('system', {})
         adhocracy = self.get('adhocracy', {})
         index = system.get(name, None) or adhocracy.get(name, None)
         return index
+
+    def _get_query_value(self, query_parameter: tuple) -> object:
+        if self._is_tuple_starting_with_comparator(query_parameter):
+            return query_parameter[1]
+        else:
+            return query_parameter
+
+    def _get_query_comparator(self, query_parameter: tuple) -> object:
+        if self._is_tuple_starting_with_comparator(query_parameter):
+            return query_parameter[0]
+        else:
+            return
+
+    def _is_tuple_starting_with_comparator(self, parameter: tuple) -> bool:
+        if not isinstance(parameter, tuple):
+            return False
+        elif len(parameter) != 2:
+            return False
+        elif parameter[0] in self._comparators:
+            return True
+
+    _comparators = set(FieldComparator.__members__) \
+        .union(KeywordComparator.__members__) \
+        .union(KeywordSequenceComparator.__members__) \
+        .union(FieldSequenceComparator.__members__)
 
 
 def add_catalogs_system_and_adhocracy(context: ICatalogsService,

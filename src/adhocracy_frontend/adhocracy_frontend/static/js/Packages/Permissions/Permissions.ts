@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhCredentials = require("../User/Credentials");
-import AdhHttp = require("../Http/Http");
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhHttp from "../Http/Http";
 
 
 export class Service {
@@ -39,15 +39,3 @@ export class Service {
         });
     }
 }
-
-
-export var moduleName = "adhPermissions";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhHttp.moduleName
-        ])
-        .service("adhPermissions", ["adhHttp", "adhCredentials", Service]);
-};

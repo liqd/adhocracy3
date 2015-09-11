@@ -1,0 +1,46 @@
+import * as AdhEmbedModule from "../Embed/Module";
+import * as AdhHttpModule from "../Http/Module";
+import * as AdhImageModule from "../Image/Module";
+import * as AdhListingModule from "../Listing/Module";
+import * as AdhMarkdownModule from "../Markdown/Module";
+import * as AdhPermissionsModule from "../Permissions/Module";
+import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
+
+import * as AdhEmbed from "../Embed/Embed";
+
+import * as Blog from "./Blog";
+
+
+export var moduleName = "adhBlog";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhEmbedModule.moduleName,
+            AdhHttpModule.moduleName,
+            AdhImageModule.moduleName,
+            AdhListingModule.moduleName,
+            AdhMarkdownModule.moduleName,
+            AdhPermissionsModule.moduleName,
+            AdhPreliminaryNamesModule.moduleName
+        ])
+        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
+            adhEmbedProvider.embeddableDirectives.push("blog-post");
+            adhEmbedProvider.embeddableDirectives.push("blog-post-create");
+            adhEmbedProvider.embeddableDirectives.push("blog");
+        }])
+        .directive("adhBlogPost", [
+            "$q",
+            "$window",
+            "adhConfig",
+            "adhHttp",
+            "adhPermissions",
+            "adhPreliminaryNames",
+            "adhShowError",
+            "adhSubmitIfValid",
+            "adhUploadImage",
+            Blog.detailDirective])
+        .directive("adhBlog", ["adhConfig", Blog.listingDirective])
+        .directive("adhBlogPostCreate", [
+            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", "adhUploadImage", Blog.createDirective]);
+};
