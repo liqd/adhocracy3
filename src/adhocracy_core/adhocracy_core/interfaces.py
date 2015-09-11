@@ -496,6 +496,9 @@ class ITokenManger(Interface):  # pragma: no cover
     def delete_token(token: str):
         """ Delete authentication token."""
 
+    def delete_expired_tokens(timeout: float):
+        """ Delete expired authentication tokens."""
+
 
 class VisibilityChange(Enum):
 
