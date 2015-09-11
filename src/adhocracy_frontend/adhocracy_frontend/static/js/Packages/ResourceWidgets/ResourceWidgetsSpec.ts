@@ -1,8 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import q = require("q");
+import * as q from "q";
 
-import AdhResourceWidgets = require("./ResourceWidgets");
+import * as AdhResourceWidgets from "./ResourceWidgets";
 
 
 var getArgsByFirst = (spy, needle) => {

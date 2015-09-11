@@ -1,20 +1,24 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("..././../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhTabs = require("../../../Tabs/Tabs");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../../Util/Util");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhProcess from "../../../Process/Process";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Util/Util";
 
-import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
-import SITitle = require("../../../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import * as AdhMeinBerlinPhase from "../../Phase/Phase";
+
+import * as SIImageReference from "../../../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIName from "../../../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SITitle from "../../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Process";
 
@@ -39,8 +43,9 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var stateName = resource.data[SIWorkflow.nick].workflow_state;
-                        scope.currentPhase = resource.data[SIWorkflow.nick].state_data[stateName];
+                        var sheet = resource.data[SIWorkflow.nick];
+                        var stateName = sheet.workflow_state;
+                        scope.currentPhase = AdhProcess.getStateData(sheet, stateName);
 
                         var locationUrl = resource.data[SILocationReference.nick].location;
                         adhHttp.get(locationUrl).then((location) => {
@@ -63,27 +68,20 @@ export var phaseHeaderDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
         scope: {},
-        link: (scope) => {
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
             var processUrl = adhTopLevelState.get("processUrl");
             adhHttp.get(processUrl).then((resource) => {
-                scope.currentPhase = resource.data[SIWorkflow.nick].workflow_state;
-                if (resource.data[SIWorkflow.nick].state_data.announce) {
-                    scope.phases[0].startDate = resource.data[SIWorkflow.nick].state_data.announce.start_date;
-                }
-                if (resource.data[SIWorkflow.nick].state_data.participate) {
-                    scope.phases[0].endDate = resource.data[SIWorkflow.nick].state_data.participate.start_date;
-                    scope.phases[1].startDate = resource.data[SIWorkflow.nick].state_data.participate.start_date;
-                }
-                if (resource.data[SIWorkflow.nick].state_data.frozen) {
-                    scope.phases[1].endDate = resource.data[SIWorkflow.nick].state_data.frozen.start_date;
-                    scope.phases[2].startDate = resource.data[SIWorkflow.nick].state_data.frozen.start_date;
-                }
-                if (resource.data[SIWorkflow.nick].state_data.result) {
-                    scope.phases[2].endDate = resource.data[SIWorkflow.nick].state_data.result.start_date;
-                    scope.phases[3].startDate = resource.data[SIWorkflow.nick].state_data.result.start_date;
-                }
+                var sheet = resource.data[SIWorkflow.nick];
+                scope.currentPhase = sheet.workflow_state;
+                scope.phases[0].startDate = AdhProcess.getStateData(sheet, "announce").start_date;
+                scope.phases[0].endDate = AdhProcess.getStateData(sheet, "participate").start_date;
+                scope.phases[1].startDate = AdhProcess.getStateData(sheet, "participate").start_date;
+                scope.phases[1].endDate = AdhProcess.getStateData(sheet, "evaluate").start_date;
+                scope.phases[2].startDate = AdhProcess.getStateData(sheet, "evaluate").start_date;
+                scope.phases[2].endDate = AdhProcess.getStateData(sheet, "result").start_date;
+                scope.phases[3].startDate = AdhProcess.getStateData(sheet, "result").start_date;
             });
 
             scope.phases = [{
@@ -108,7 +106,7 @@ export var phaseHeaderDirective = (
                 votingAvailable: true,
                 commentAvailable: true
             }, {
-                name: "frozen",
+                name: "evaluate",
                 title: "Bürgerversammlung",
                 description: "In dieser Phase können keine Vorschläge mehr online eingereicht, kommentiert oder " +
                     "bewertet werden. Vorschläge können aber noch offline in der Bürgerversammlung gemacht werden. Alle " +
@@ -127,17 +125,6 @@ export var phaseHeaderDirective = (
                 votingAvailable: false,
                 commentAvailable: false
             }];
-        }
-    };
-};
-
-
-export var phaseDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Phase.html",
-        scope: {
-            phase: "="
         }
     };
 };
@@ -165,23 +152,12 @@ export var editDirective = (
                 process = resource;
                 scope.data.title = process.data[SITitle.nick].title;
 
-                scope.data.announce_description = process.data[SIWorkflow.nick].announce.description;
-                scope.data.announce_start_date = moment(process.data[SIWorkflow.nick].announce.start_date).format("YYYY-MM-DD");
-
-                scope.data.draft_description = process.data[SIWorkflow.nick].draft.description;
-                scope.data.draft_start_date = moment(process.data[SIWorkflow.nick].draft.start_date).format("YYYY-MM-DD");
-
-                scope.data.participate_description = process.data[SIWorkflow.nick].participate.description;
-                scope.data.participate_start_date = moment(
-                                                            process.data[SIWorkflow.nick]
-                                                            .participate.start_date
-                                                           ).format("YYYY-MM-DD");
-
-                scope.data.frozen_description = process.data[SIWorkflow.nick].frozen.description;
-                scope.data.frozen_start_date = moment(process.data[SIWorkflow.nick].frozen.start_date).format("YYYY-MM-DD");
-
-                scope.data.result_description = process.data[SIWorkflow.nick].result.description;
-                scope.data.result_start_date = moment(process.data[SIWorkflow.nick].result.start_date).format("YYYY-MM-DD");
+                var sheet = process.data[SIWorkflow.nick];
+                _.forEach(["announce", "draft", "participate", "evaluate", "result", "closed"], (stateName : string) => {
+                    var data = AdhProcess.getStateData(sheet, stateName);
+                    scope.data[stateName + "_description"] = data.description;
+                    scope.data[stateName + "_start_date"] = moment(data.start_date).format("YYYY-MM-DD");
+                });
 
                 scope.data.currentWorkflowState = process.data[SIWorkflow.nick].workflow_state;
             });
@@ -193,8 +169,8 @@ export var editDirective = (
             scope.submit = () => {
                 return adhSubmitIfValid(scope, element, scope.kiezkassenProcessForm, () => {
                     process.data[SITitle.nick].title = scope.data.title;
-                    process.data["adhocracy_core.sheets.name.IName"] = undefined;
-                    process.data["adhocracy_core.sheets.image.IImageReference"] = undefined;
+                    process.data[SIName.nick] = undefined;
+                    process.data[SIImageReference.nick] = undefined;
 
                     if (_.contains(scope.data.availableWorkflowStates, scope.data.workflowState)) {
                         process.data[SIWorkflow.nick] = {
@@ -204,47 +180,18 @@ export var editDirective = (
                         process.data[SIWorkflow.nick] = {};
                     }
 
-                    process.data[SIWorkflow.nick]["announce"] = {};
-                    process.data[SIWorkflow.nick]["announce"].description = scope.data.announce_description;
-                    process.data[SIWorkflow.nick]["announce"].start_date = scope.data.announce_start_date;
-
-                    process.data[SIWorkflow.nick]["draft"] = {};
-                    process.data[SIWorkflow.nick]["draft"].description = scope.data.draft_description;
-                    process.data[SIWorkflow.nick]["draft"].start_date = scope.data.draft_start_date;
-
-                    process.data[SIWorkflow.nick]["participate"] = {};
-                    process.data[SIWorkflow.nick]["participate"].description = scope.data.participate_description;
-                    process.data[SIWorkflow.nick]["participate"].start_date = scope.data.participate_start_date;
-
-                    process.data[SIWorkflow.nick]["frozen"] = {};
-                    process.data[SIWorkflow.nick]["frozen"].description = scope.data.frozen_description;
-                    process.data[SIWorkflow.nick]["frozen"].start_date = scope.data.frozen_start_date;
-
-                    process.data[SIWorkflow.nick]["result"] = {};
-                    process.data[SIWorkflow.nick]["result"].description = scope.data.result_description;
-                    process.data[SIWorkflow.nick]["result"].start_date = scope.data.result_start_date;
+                    process.data[SIWorkflow.nick].state_data = _.map(
+                        ["announce", "draft", "participate", "evaluate", "result", "closed"], (stateName : string) => {
+                        return {
+                            name: stateName,
+                            description: scope.data[stateName + "_description"],
+                            start_date: scope.data[stateName + "_start_date"]
+                        };
+                    });
 
                     return adhHttp.put(process.path, process);
                 });
             };
         }
     };
-};
-
-
-export var moduleName = "adhMeinBerlinKiezkassenProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhTabs.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .directive("adhMeinBerlinKiezkassenPhase", ["adhConfig", phaseDirective])
-        .directive("adhMeinBerlinKiezkassenPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective])
-        .directive("adhMeinBerlinKiezkassenDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective])
-        .directive("adhMeinBerlinKiezkassenEdit", ["adhConfig", "adhHttp", "adhShowError", "adhSubmitIfValid", "moment", editDirective]);
 };

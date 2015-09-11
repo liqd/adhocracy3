@@ -1,8 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import q = require("q");
+import * as q from "q";
 
-import AdhUserViews = require("./Views");
+import * as AdhUserViews from "./Views";
 
 
 export var register = () => {

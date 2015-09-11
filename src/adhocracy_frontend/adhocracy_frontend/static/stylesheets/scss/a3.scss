@@ -16,6 +16,7 @@
 @import "general/normalize";
 
 @import "general/variables";
+@import "general/variables_theme";
 @import "general/variables_extra";
 @import "general/variables_doc";
 
@@ -29,6 +30,7 @@
 @import "components/navbar";
 @import "components/moving_columns";
 @import "components/meta_list";
+@import "components/map";
 @import "components/messaging";
 @import "components/listing";
 @import "components/user_indicator";
@@ -36,6 +38,7 @@
 @import "components/annotated_section";
 @import "components/commentable_section";
 @import "components/chapter";
+@import "components/document";
 @import "components/jump_navigation";
 @import "components/section_jump";
 @import "components/space_switch";
@@ -61,3 +64,5 @@
 @import "overwrite";
 
 @import "print";
+
+@import "theme";

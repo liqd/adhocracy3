@@ -1,11 +1,8 @@
-import AdhConfig = require("..././../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhTabs = require("../../../Tabs/Tabs");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
-var pkgLocation = "/MeinBerlin/Alexanderplatz/Process";
+import * as AdhMeinBerlinPhase from "../../Phase/Phase";
 
 
 export var phaseHeaderDirective = (
@@ -15,9 +12,9 @@ export var phaseHeaderDirective = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/PhaseHeader.html",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
         scope: {},
-        link: (scope) => {
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
             var processUrl = adhTopLevelState.get("processUrl");
 
             scope.currentPhase = adhConfig.custom["alexanderplatz_phase"];
@@ -57,30 +54,4 @@ export var phaseHeaderDirective = (
             }];
         }
     };
-};
-
-
-export var phaseDirective = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Phase.html",
-        scope: {
-            phase: "="
-        }
-    };
-};
-
-export var moduleName = "adhMeinBerlinAlexanderplatzProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhTabs.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .directive("adhMeinBerlinAlexanderplatzPhase", ["adhConfig", phaseDirective])
-        .directive("adhMeinBerlinAlexanderplatzPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective]);
 };

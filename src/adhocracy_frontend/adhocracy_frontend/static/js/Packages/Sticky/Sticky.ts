@@ -1,8 +1,5 @@
 /// <reference path="../../_all.d.ts"/>
 
-import Sticky = require("sticky"); if (Sticky) { ; };
-
-
 export var createDirective = (modernizr : ModernizrStatic) => {
     return {
         restrict: "A",
@@ -16,13 +13,4 @@ export var createDirective = (modernizr : ModernizrStatic) => {
             }
         }
     };
-};
-
-
-export var moduleName = "adhSticky";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .directive("adhSticky", ["modernizr", createDirective]);
 };

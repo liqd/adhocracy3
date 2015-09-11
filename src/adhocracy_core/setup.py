@@ -22,7 +22,8 @@ requires = [
     'websocket-client',
     'Pillow',
     'requests',
-    'pyrsistent'
+    'pyrsistent',
+    'multipledispatch',
 ]
 
 if sys.version_info < (3, 4):

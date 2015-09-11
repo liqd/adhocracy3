@@ -1,13 +1,13 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import q = require("q");
+import * as q from "q";
 
 // This is only used at compile time and will be stripped by the compiler
-import AdhConfig = require("../Config/Config");
+import * as AdhConfig from "../Config/Config";
 
 // the module under test
-import AdhListing = require("./Listing");
+import * as AdhListing from "./Listing";
 
 
 var config : AdhConfig.IService = <any>{

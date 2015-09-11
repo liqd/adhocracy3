@@ -1,13 +1,12 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
 
-import RIImage = require("../../Resources_/adhocracy_core/resources/image/IImage");
-import SIHasAssetPool = require("../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool");
-import SIImageMetadata = require("../../Resources_/adhocracy_core/sheets/image/IImageMetadata");
-import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
+import RIImage from "../../Resources_/adhocracy_core/resources/image/IImage";
+import * as SIHasAssetPool from "../../Resources_/adhocracy_core/sheets/asset/IHasAssetPool";
+import * as SIImageMetadata from "../../Resources_/adhocracy_core/sheets/image/IImageMetadata";
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
 
 var pkgLocation = "/Image";
 
@@ -120,21 +119,4 @@ export var imageUriFilter = () => {
             return "/static/fallback_" + format + ".jpg";
         }
     };
-};
-
-
-export var moduleName = "adhImage";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("upload-image");
-        }])
-        .factory("adhUploadImage", ["adhHttp", uploadImageFactory])
-        .directive("adhUploadImage", ["adhConfig", "adhHttp", "adhUploadImage", "flowFactory", uploadImageDirective])
-        .filter("adhImageUri", imageUriFilter);
 };

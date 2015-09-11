@@ -11,12 +11,19 @@ Badge modifiers for labeling if a proposal has been realized or not.
 <span class="badge m-is-realized">Is Realized</span>
 <span class="badge m-is-not-realized">Is Not Realized</span>
 <span class="badge m-info">Information</span>
+<span class="badge m-color m-is-realized">Is Realized</span>
+<span class="badge m-color m-is-not-realized">Is Not Relaized</span>
+<span class="badge m-color m-on-test">On Test</span>
+<div class="badge-description m-color m-is-realized">
+    <p>Modified badge description</p>
+</div>
 ```
 
 */
 
 .badge {
     &.m-info,
+    &.m-color,
     &.m-is-realized,
     &.m-is-not-realized {
         color: $color-text-inverted;
@@ -41,6 +48,44 @@ Badge modifiers for labeling if a proposal has been realized or not.
             margin-right: 5px / $font-size-smaller * 1em;
             background-color: $color-text-introvert;
             vertical-align: baseline;
+        }
+    }
+
+    &.m-color {
+        background-color: $color-text-introvert;
+        border-style: solid;
+        border-width: 0 0 0 ($badge-height * 1em);
+        position: relative;
+
+        &.m-is-realized {
+            border-color: $color-function-valid;
+        }
+
+        &.m-is-not-realized {
+            border-color: $color-function-invalid;
+        }
+
+        &.m-on-test {
+            border-color: $color-function-neutral;
+        }
+    }
+}
+
+.badge-description {
+    &.m-color {
+        border-left: 0.4em solid $color-text-highlight-normal;
+        padding-left: 0.5em;
+
+        &.m-is-realized {
+            border-left-color: $color-function-valid;
+        }
+
+        &.m-is-not-realized {
+            border-left-color: $color-function-invalid;
+        }
+
+        &.m-on-test {
+            border-left-color: $color-function-neutral;
         }
     }
 }

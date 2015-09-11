@@ -1,11 +1,15 @@
-import AdhConfig = require("..././../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../../Permissions/Permissions");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhProcess from "../../../Process/Process";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
-import SILocationReference = require("../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference");
-import SIMultiPolygon = require("../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon");
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import * as AdhMeinBerlinPhase from "../../Phase/Phase";
+
+import * as SILocationReference from "../../../../Resources_/adhocracy_core/sheets/geo/ILocationReference";
+import * as SIMultiPolygon from "../../../../Resources_/adhocracy_core/sheets/geo/IMultiPolygon";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MeinBerlin/Burgerhaushalt/Process";
 
@@ -30,8 +34,9 @@ export var detailDirective = (
             scope.$watch("path", (value : string) => {
                 if (value) {
                     adhHttp.get(value).then((resource) => {
-                        var stateName = resource.data[SIWorkflow.nick].workflow_state;
-                        scope.currentPhase = resource.data[SIWorkflow.nick].state_data[stateName];
+                        var sheet = resource.data[SIWorkflow.nick];
+                        var stateName = sheet.workflow_state;
+                        scope.currentPhase = AdhProcess.getStateData(sheet, stateName);
 
                         var locationUrl = resource.data[SILocationReference.nick].location;
                         adhHttp.get(locationUrl).then((location) => {
@@ -47,15 +52,50 @@ export var detailDirective = (
 };
 
 
+export var phaseHeaderDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + AdhMeinBerlinPhase.pkgLocation + "/PhaseHeader.html",
+        scope: {},
+        link: (scope : AdhMeinBerlinPhase.IPhaseHeaderScope) => {
+            var processUrl = adhTopLevelState.get("processUrl");
+            adhHttp.get(processUrl).then((resource) => {
+                var sheet : SIWorkflow.Sheet = resource.data[SIWorkflow.nick];
+                scope.currentPhase = sheet.workflow_state;
+            });
 
-export var moduleName = "adhMeinBerlinBurgerhaushaltProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName
-        ])
-        .directive("adhMeinBerlinBurgerhaushaltDetail", ["adhConfig", "adhHttp", "adhPermissions", detailDirective]);
+            scope.phases = [{
+                name: "announce",
+                title: "Information",
+                description: "Ab dem 02.09.2015 können sich alle interessierten Bürgerinnen und Bürger zum Bürgerhaushalt " +
+                    "Treptow-Köpenick online beteiligen. Auf der Internetseite des Bezirksamtes Treptow-Köpenick sowie eine " +
+                    "Einwohnerversammlung werden allen Interessierten Informationen zum Verfahren zur Verfügung gestellt. Bisher " +
+                    "offline eingereichte Vorschläge werden von den Fachämtern online eingetragen.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: true,
+                commentAvailable: true
+            }, {
+                name: "participate",
+                title: "Ideensammlung",
+                description: "In dieser Phase bringen Bürgerinnen und Bürger ihre Vorschläge ein und können Vorschläge anderer bewerten " +
+                    "und diskutieren. Vorschläge beziehen sich auf das laufende oder zukünftige Kalenderjahr und können stets " +
+                    "eingebracht werden. Vorschläge können auch offline eingereicht werden.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: true,
+                commentAvailable: true
+            }, {
+                name: "result",
+                title: "Ergebnisse",
+                description: "Bürgerinnen und Bürger können den Status aller Vorschläge sehen und gegebenenfalls die Stellungnahme des " +
+                    "im Bezirksamt zuständigen Fachamtes lesen.",
+                processType: "Bürgerhaushalt",
+                votingAvailable: false,
+                commentAvailable: false
+            }];
+        }
+    };
 };

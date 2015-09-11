@@ -1,6 +1,6 @@
 // <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhLocale = require("./Locale");
+import * as AdhLocale from "./Locale";
 
 
 export var register = () => {

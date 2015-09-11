@@ -33,7 +33,9 @@ combination with `.jump-navigation.m-narrow.m-unnumbered`.
 */
 
 .section-jump-cover-header {
-    @include text(header);
+    color: $color-text-extrovert;
+    font-size: $font-size-large;
+    font-weight: $font-weight-normal;
     margin: 0;
 
     @media print {
