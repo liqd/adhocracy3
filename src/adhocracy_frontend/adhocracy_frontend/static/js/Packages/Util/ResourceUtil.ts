@@ -1,10 +1,10 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-import AdhUtil = require("./Util");
+import * as AdhUtil from "./Util";
 
 
 /**

@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhWebSocket = require("./LocalSocket");
+import * as AdhWebSocket from "./LocalSocket";
 
 
 export var register = () => {

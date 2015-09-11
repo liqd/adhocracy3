@@ -1,13 +1,13 @@
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhUtil = require("../Util/Util");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhUtil from "../Util/Util";
+import * as AdhWebSocket from "../WebSocket/WebSocket";
 
-import AdhHttp = require("./Http");
+import * as AdhHttp from "./Http";
 
 export interface IHttpCacheItem {
     wsOff : () => void;

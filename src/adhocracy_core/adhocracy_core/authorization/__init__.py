@@ -18,6 +18,9 @@ from adhocracy_core.utils import get_root
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 from adhocracy_core.events import LocalRolesModified
+from adhocracy_core.schema import ACEPrincipal
+from adhocracy_core.schema import ROLE_PRINCIPALS
+from adhocracy_core.schema import SYSTEM_PRINCIPALS
 
 
 CREATOR_ROLEID = 'role:creator'
@@ -105,7 +108,17 @@ def acm_to_acl(acm: dict, registry: Registry) -> [str]:
     To avoid generating too many ACE, action which are None will not
     generate an ACE.
 
+    Permissions for principals with high priority are listed first and override
+    succeding permissions. The order is determined by
+    :var:`adhocracy_core.schema.ROLE_PRINCIPALS`. Pricipals with higher
+    index in this list have higer priority.
     """
+    acl = _migrate_acm_to_acl(acm)
+    _sort_by_principal_priority(acl)
+    return acl
+
+
+def _migrate_acm_to_acl(acm: dict) -> dict:
     acl = []
     idx = 0
     for principal in acm['principals']:
@@ -116,6 +129,16 @@ def acm_to_acl(acm: dict, registry: Registry) -> [str]:
                 ace = (action, principal, permission_name)
                 acl.append(ace)
         idx = idx + 1
+    return acl
+
+
+def _sort_by_principal_priority(acl: list) -> list:
+    roles = ROLE_PRINCIPALS.copy()
+    roles.reverse()
+    systems = SYSTEM_PRINCIPALS
+    schema = ACEPrincipal()
+    principals = [schema.deserialize(x) for x in roles + systems]
+    acl.sort(key=lambda x: principals.index(x[1]))
     return acl
 
 

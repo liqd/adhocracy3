@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
 
 export function deepPluck(base, keys : string[]) : any {

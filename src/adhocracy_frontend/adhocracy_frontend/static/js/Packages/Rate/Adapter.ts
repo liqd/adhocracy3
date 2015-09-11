@@ -1,16 +1,16 @@
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
-import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
-import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import RIRate from "../../Resources_/adhocracy_core/resources/rate/IRate";
+import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
+import * as SILikeable from "../../Resources_/adhocracy_core/sheets/rate/ILikeable";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIRateable from "../../Resources_/adhocracy_core/sheets/rate/IRateable";
+import * as SIRate from "../../Resources_/adhocracy_core/sheets/rate/IRate";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-import AdhRate = require("./Rate");
+import * as AdhRate from "./Rate";
 
 
 export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {

@@ -66,8 +66,8 @@ the transifex-client can be used::
 .. NOTE:: The configuration for transifex-client is stored in
    ``src/{package_name}/.tx/config``.
 
-.. WARNING:: Transifiex requires us to specify a "source language"
-   (currently english). This has the benefit that translators do not
+.. WARNING:: Transifex requires us to specify a "source language"
+   (currently English). This has the benefit that translators do not
    need to handle technical strings. But it also has several
    disadvantages:
 

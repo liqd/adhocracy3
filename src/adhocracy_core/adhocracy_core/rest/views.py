@@ -54,7 +54,7 @@ from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import options_resource_response_data_dict
-from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
+from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
 from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
@@ -142,7 +142,8 @@ def validate_request_data(context: ILocation, request: Request,
     if request.content_type == 'application/json':
         body = _extract_json_body(request)
     validate_user_headers(request)
-    validate_body_or_querystring(body, schema_with_binding, context,
+    qs = _extract_querystring(request)
+    validate_body_or_querystring(body, qs, schema_with_binding, context,
                                  request)
     _validate_extra_validators(extra_validators, context, request)
     if request.errors:
@@ -171,6 +172,18 @@ def _extract_json_body(request: Request) -> object:
     return json_body
 
 
+def _extract_querystring(request: Request) -> dict:
+    parameters = {}
+    for key, value_encoded in request.GET.items():
+        import json
+        try:
+            value = json.loads(value_encoded)
+        except (ValueError, TypeError):
+            value = value_encoded
+        parameters[key] = value
+    return parameters
+
+
 def validate_user_headers(request: Request):
     """
     Validate the user headers.
@@ -185,17 +198,18 @@ def validate_user_headers(request: Request):
             request.errors.append(error)
 
 
-def validate_body_or_querystring(body, schema: MappingSchema,
+def validate_body_or_querystring(body, qs: dict, schema: MappingSchema,
                                  context: IResource, request: Request):
     """Validate the querystring if this is a GET request, the body otherwise.
 
     This allows using just a single schema for all kinds of requests.
     """
-    qs = request.GET
     if isinstance(schema, GETPoolRequestSchema):
         try:
-            schema = add_get_pool_request_extra_fields(qs, schema, context,
-                                                       request.registry)
+            schema = add_arbitrary_filter_nodes(qs,
+                                                schema,
+                                                context,
+                                                request.registry)
         except Invalid as err:  # pragma: no cover
             _add_colander_invalid_error_to_request(err, request,
                                                    location='querystring')
@@ -244,6 +258,8 @@ def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
     except Invalid as err:
         for child in err.children:
             _add_colander_invalid_error_to_request(child, request, location)
+        if not err.children:
+            _add_colander_invalid_error_to_request(err, request, location)
     request.validated.update(validated)
 
 

@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhMercatorProposal = require("./MercatorProposal");
+import * as AdhMercatorProposal from "./MercatorProposal";
 
 
 export var register = () => {

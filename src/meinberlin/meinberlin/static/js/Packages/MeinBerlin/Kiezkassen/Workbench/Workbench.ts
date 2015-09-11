@@ -1,26 +1,20 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAbuse = require("../../../Abuse/Abuse");
-import AdhComment = require("../../../Comment/Comment");
-import AdhConfig = require("../../../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhProcess = require("../../../Process/Process");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../../Util/Util");
-import AdhPermissions = require("../../../Permissions/Permissions");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Util/Util";
 
-import AdhMeinBerlinKiezkassenProcess = require("../Process/Process");
-import AdhMeinBerlinProposal = require("../../../Proposal/Proposal");
-
-import RIComment = require("../../../../Resources_/adhocracy_core/resources/comment/IComment");
-import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIKiezkassenProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess");
-import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal");
-import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion");
-import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIKiezkassenProcess from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProcess";
+import RIProposal from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposal";
+import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/kiezkassen/IProposalVersion";
+import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MeinBerlin/Kiezkassen/Workbench";
 
@@ -246,35 +240,4 @@ export var registerRoutes = (
                 });
             };
         }]);
-};
-
-export var moduleName = "adhMeinBerlinKiezkassenWorkbench";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAbuse.moduleName,
-            AdhComment.moduleName,
-            AdhHttp.moduleName,
-            AdhMeinBerlinKiezkassenProcess.moduleName,
-            AdhMeinBerlinProposal.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider) => {
-            registerRoutes(RIKiezkassenProcess.content_type)(adhResourceAreaProvider);
-        }])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIKiezkassenProcess.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mein-berlin-kiezkassen-workbench></adh-mein-berlin-kiezkassen-workbench>");
-            }];
-        }])
-        .directive("adhMeinBerlinKiezkassenWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", kiezkassenWorkbenchDirective])
-        .directive("adhMeinBerlinKiezkassenProposalDetailColumn", ["adhConfig", "adhPermissions", kiezkassenProposalDetailColumnDirective])
-        .directive("adhMeinBerlinKiezkassenProposalCreateColumn", ["adhConfig", kiezkassenProposalCreateColumnDirective])
-        .directive("adhMeinBerlinKiezkassenProposalEditColumn", ["adhConfig", kiezkassenProposalEditColumnDirective])
-        .directive("adhMeinBerlinKiezkassenDetailColumn", ["adhConfig", kiezkassenDetailColumnDirective])
-        .directive("adhMeinBerlinKiezkassenEditColumn", ["adhConfig", kiezkassenEditColumnDirective]);
 };

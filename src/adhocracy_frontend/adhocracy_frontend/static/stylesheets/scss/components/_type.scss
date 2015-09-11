@@ -7,7 +7,9 @@ category: Type
 */
 
 body {
-    @include text(running);
+    color: $color-text-normal;
+    font-size: $font-size-normal;
+    line-height: $line-height-normal;
 
     @media print {
         // scss-lint:disable ImportantRule
@@ -63,7 +65,7 @@ p {
     // break very long words
     word-wrap: break-word;
     hyphens: auto;
-    line-height: 1.15;
+    line-height: $line-height-normal;
     margin: 0 0 1em;
 
     @media print {

@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhEmbed = require("./Embed");
+import * as AdhEmbed from "./Embed";
 
 export var register = () => {
     describe("Embed", () => {

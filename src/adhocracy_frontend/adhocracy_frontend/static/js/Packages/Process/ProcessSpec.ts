@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhProcess = require("./Process");
+import * as AdhProcess from "./Process";
 
 export var register = () => {
     describe("Process", () => {
