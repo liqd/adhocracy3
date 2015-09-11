@@ -19,6 +19,15 @@ def integration(integration):
 
 
 @fixture
+def mock_is_older(monkeypatch):
+    from adhocracy_core.sheets.metadata import is_older_then
+    from . import principal
+    mock = Mock(spec=is_older_then)
+    monkeypatch.setattr(principal, 'is_older_then', mock)
+    return mock
+
+
+@fixture
 def principals(pool_with_catalogs, registry):
     from adhocracy_core.resources.principal import IPrincipalsService
     inst = registry.content.create(IPrincipalsService.__identifier__,
@@ -472,3 +481,92 @@ class TestGroupsAndRolesFinder:
     def test_userid_with_groups_and_group_roles(self, request, mock_user_locator):
         mock_user_locator.get_role_and_group_roleids.return_value = ['group:Readers']
         assert self.call_fut('userid', request) == ['group:Readers']
+
+
+class TestDeleteNotActiveUsers:
+
+    @fixture
+    def request_(self, context, registry):
+        request = testing.DummyRequest(context=context)
+        request.registry = registry
+        return request
+
+    @fixture
+    def user(self):
+        user = testing.DummyResource(active=False, email='', name='')
+        return user
+
+    @fixture
+    def users(self, context, user):
+        context['user'] = user
+        return context
+
+    def call_fut(self, *args):
+        from .principal import delete_not_activated_users
+        return delete_not_activated_users(*args)
+
+    def test_delete_not_active_users_older_then_days(
+            self, users, user, request_, mock_is_older, mock_user_locator):
+        mock_is_older.return_value = True
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        mock_is_older.assert_called_with(user, 7)
+        assert 'user' not in users
+
+    def test_ignore_not_active_user_younger_then_days(
+            self, users, user, request_, mock_is_older, mock_user_locator):
+        mock_is_older.return_value = False
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        assert 'user' in users
+
+    def test_ignore_active_user(
+            self, users, user, request_, mock_user_locator):
+        user.active = True
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        assert 'user' in users
+
+
+    def mock_is_older(self, monkeypatch):
+        from adhocracy_core.sheets.metadata import is_older_then
+        from . import principal
+        mock = Mock(spec=is_older_then)
+        monkeypatch.setattr(principal, 'is_older_then', mock)
+        return mock
+
+    @fixture
+    def user(self):
+        user = testing.DummyResource(active=False, email='', name='')
+        return user
+
+    @fixture
+    def users(self, context, user):
+        context['user'] = user
+        return context
+
+    def call_fut(self, *args):
+        from .principal import delete_not_activated_users
+        return delete_not_activated_users(*args)
+
+    def test_delete_not_active_users_older_then_days(
+            self, users, user, request_, mock_is_older, mock_user_locator):
+        mock_is_older.return_value = True
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        mock_is_older.assert_called_with(user, 7)
+        assert 'user' not in users
+
+    def test_ignore_not_active_user_younger_then_days(
+            self, users, user, request_, mock_is_older, mock_user_locator):
+        mock_is_older.return_value = False
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        assert 'user' in users
+
+    def test_ignore_active_user(
+            self, users, user, request_, mock_user_locator):
+        user.active = True
+        mock_user_locator.get_users.return_value = [user]
+        self.call_fut(request_, 7)
+        assert 'user' in users

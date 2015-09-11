@@ -24,6 +24,7 @@ from adhocracy_core.resources.base import Base
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.metadata import is_older_then
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
@@ -366,6 +367,21 @@ def groups_and_roles_finder(userid: str, request: Request) -> list:
     groupids = userlocator.get_groupids(userid) or []
     roleids = userlocator.get_role_and_group_roleids(userid) or []
     return groupids + roleids
+
+
+def delete_not_activated_users(request: Request, age_in_days: int):
+    """Delete not activate users that are older than `age_in_days`."""
+    userlocator = request.registry.getMultiAdapter((request.context, request),
+                                                   IRolesUserLocator)
+    users = userlocator.get_users()
+    not_activated = (u for u in users if not u.active)
+    expired = [u for u in not_activated if is_older_then(u, age_in_days)]
+    for user in expired:
+        msg = 'deleting user {0}: name {1} email {2}'.format(user,
+                                                             user.email,
+                                                             user.name)
+        print(msg)
+        del user.__parent__[user.__name__]
 
 
 def includeme(config):
