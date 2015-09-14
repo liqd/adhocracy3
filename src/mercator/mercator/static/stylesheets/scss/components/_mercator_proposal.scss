@@ -230,7 +230,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
 .mercator-proposal-form-footer,
 .mercator-proposal-detail-footer {
-    padding-bottom: 500px;
+    @include rem(padding-bottom, 500px);
 }
 
 .mercator-proposal-budget-col {

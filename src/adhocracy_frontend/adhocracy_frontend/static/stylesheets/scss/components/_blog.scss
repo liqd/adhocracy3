@@ -84,8 +84,8 @@
 }
 
 .blog-post-header {
+    @include rem(padding-left, 8px);
     overflow: hidden;
-    padding-left: 8px;
 }
 
 .blog-post-title {
