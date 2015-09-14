@@ -61,6 +61,7 @@ export var register = (angular) => {
                 })
                 .when("register", ["adhHttp", (adhHttp : AdhHttp.Service<any>) : AdhTopLevelState.IAreaInput => {
                     return {
+                        templateUrl: "/static/js/templates/Register.html",
                         route: (path, search) => {
                             return adhHttp.options("/principals/users").then((options) => {
                                 if (!options.POST) {
