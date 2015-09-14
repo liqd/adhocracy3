@@ -10,7 +10,7 @@ A like-button with counter.
 The button has the is-rate-button-active state.
 
 ```html_example
-<div class="like">
+<div class="like" style="margin-bottom: 10px">
     <span class="like-difference">+4</span>
     <a class="like-button">Like</a>
 </div>
@@ -54,8 +54,8 @@ $arrow-width: 1rem;
     text-decoration: none;
 
     &:before {
-        @include rem(border-top, $line-height/2 solid $color-structure-transparent);
-        @include rem(border-bottom, $line-height/2 solid $color-structure-transparent);
+        @include rem(border-top, $line-height/2 * $font-size-small solid $color-structure-transparent);
+        @include rem(border-bottom, $line-height/2 * $font-size-small solid $color-structure-transparent);
         @include rem(border-right, $arrow-width solid $color-brand-one-normal);
         content: "";
         position: absolute;
