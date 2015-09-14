@@ -15,7 +15,7 @@
         text-transform: uppercase;
 
         @media print {
-            font-size: $font-size-plus;
+            @include rem(font-size, $font-size-plus);
             margin-bottom: 3px;
         }
     }

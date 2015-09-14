@@ -10,9 +10,9 @@
     }
 
     .facet-header {
+        @include rem(font-size, $font-size-small);
         @include rem(margin, 0 0 20px);
         color: $color-text-introvert;
-        font-size: $font-size-small;
         font-weight: $font-weight-normal;
         line-height: 1.15;
     }

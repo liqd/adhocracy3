@@ -33,9 +33,9 @@ A Meta list of items, often with icons
 }
 
 .meta-list-item {
+    @include rem(font-size, $font-size-small);
     @include rem(margin-right, 10px);
     color: $color-text-introvert;
-    font-size: $font-size-small;
     float: left;
 
     i {
@@ -46,8 +46,8 @@ A Meta list of items, often with icons
     }
 
     @media print {
+        @include rem(font-size, $font-size-normal);
         float: none;
-        font-size: $font-size-normal;
 
         i:not(.m-definition-before):not(.m-definition-after), &.meta-list-item-rate {
             display: none;

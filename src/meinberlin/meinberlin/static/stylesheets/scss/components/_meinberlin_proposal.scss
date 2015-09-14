@@ -46,15 +46,15 @@
     }
 
     [class*=icon-] {
+        @include rem(font-size, 17px);
+        @include rem(line-height, 17px);
         display: block;
-        line-height: 17px;
-        font-size: 17px;
     }
 }
 
 .mein-berlin-proposal-detail-body-comments-icon {
+    @include rem(font-size, 20px);
     display: block;
-    font-size: 20px;
 }
 
 .mein-berlin-proposal-detail-header {

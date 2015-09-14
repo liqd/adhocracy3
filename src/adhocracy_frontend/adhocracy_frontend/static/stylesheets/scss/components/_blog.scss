@@ -1,9 +1,9 @@
 .blog-tabs {
+    @include rem(font-size, $font-size-small);
     @include rem(line-height, 30px);
     border: 2px solid $color-structure-normal;
     border-width: 2px 0 3px;
     clear: left;
-    font-size: $font-size-small;
     overflow: hidden;
     text-transform: uppercase;
 }
@@ -44,8 +44,8 @@
         }
 
         .paragraph {
+            @include rem(font-size, $font-size-small);
             background: $color-background-base;
-            font-size: $font-size-small;
             line-height: 1.5;
         }
 
@@ -89,11 +89,11 @@
 }
 
 .blog-post-title {
+    @include rem(font-size, $font-size-smaller);
     @include rem(line-height, 15px);
     @include rem(padding, 0 20px);
     background: $color-brand-one-normal;
     float: left;
-    font-size: $font-size-smaller;
     font-weight: $font-weight-normal;
     margin: 0;
     text-transform: uppercase;
@@ -113,8 +113,8 @@
 }
 
 .blog-post-meta {
+    @include rem(font-size, $font-size-small);
     color: $color-text-introvert;
-    font-size: $font-size-small;
     margin-left: 8px;
 
     a {
@@ -143,8 +143,8 @@
 }
 
 .blog-post-paragraph {
+    @include rem(font-size, $font-size-small);
     padding: 10px 8px;
-    font-size: $font-size-small;
 
     p {
         line-height: 1.5;

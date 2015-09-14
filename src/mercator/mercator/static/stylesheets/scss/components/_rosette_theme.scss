@@ -19,7 +19,7 @@ Add a winning rosette or similar to an element. Must have a position:relative or
 
 .has-rosette {
     &:after, &:before {
-        font-size: $font-size-normal;
+        @include rem(font-size, $font-size-normal);
     }
 
     &:after {

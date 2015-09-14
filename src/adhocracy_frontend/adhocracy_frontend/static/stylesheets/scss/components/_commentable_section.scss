@@ -14,8 +14,8 @@ A mixin to show comments somewhere
 
 @mixin show-comments {
     @include disguised-link;
+    @include rem(font-size, $font-size-small);
     @include inline-block;
-    font-size: $font-size-small;
     text-align: center;
 
     i {

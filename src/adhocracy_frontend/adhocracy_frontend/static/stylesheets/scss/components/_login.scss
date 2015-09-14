@@ -122,8 +122,8 @@ Dialog for login related flow (login, register, password reset).
 }
 
 .login-info {
+    @include rem(font-size, $font-size);
     @include rem(margin, 24px 0 28px);
-    font-size: $font-size-small;
 
     a {
         text-decoration: none;
@@ -131,11 +131,11 @@ Dialog for login related flow (login, register, password reset).
 }
 
 .login-cancel {
+    @include rem(font-size, $font-size-plus);
     @include rem(margin-bottom, 24px);
     @include rem(margin-top, 160px);
     color: $color-text-highlight-introvert;
     display: block;
-    font-size: $font-size-plus;
     font-variant: small-caps;
     text-decoration: none;
     text-transform: lowercase;

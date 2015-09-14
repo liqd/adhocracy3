@@ -130,10 +130,10 @@ The menu should always have the same state as its columns.
     }
 
     &.is-collapse {
+        @include rem(font-size, $font-size-small);
         background-color: $color-background-base;
         border: 2px solid $color-structure-normal;
         border-width: 2px 2px 2px 0;
-        font-size: $font-size-small;
         text-align: center;
 
         .moving-column-icon {
@@ -179,9 +179,9 @@ The menu should always have the same state as its columns.
 }
 
 .moving-column-body {
+    @include rem(border-width, 0 $moving-column-border-width $moving-column-border-width);
+    @include rem(font-size, $font-size-normal);
     border: 0 solid $color-structure-normal;
-    border-width: 0 $moving-column-border-width $moving-column-border-width;
-    font-size: $font-size-normal;
 
     @media print {
         border: 0;
@@ -316,7 +316,7 @@ States:
         }
 
         .moving-column-menu-nav-icon {
-            font-size: $font-size-smaller;
+            @include rem(font-size, $font-size-smaller);
             line-height: 24px / $font-size-smaller;
         }
     }

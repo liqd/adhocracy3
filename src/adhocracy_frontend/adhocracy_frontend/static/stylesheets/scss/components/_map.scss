@@ -74,12 +74,13 @@ rather than in response to user action.
 ```
 */
 .map-info-persistent {
+    @include rem(font-size, $font-size-small);
     @include rem(padding, 5px);
     background: $color-background-base-introvert;
-    font-size: $font-size-small;
 }
 
 .leaflet-marker-icon {
+    @include rem(font-size, 42px);
     @include text-shadow(
         -1px -1px 0 $color-text-inverted,
         1px -1px 0 $color-text-inverted,
@@ -87,7 +88,6 @@ rather than in response to user action.
         1px 1px 0 $color-text-inverted
     );
     color: $color-brand-two-normal;
-    font-size: 42px;
 
     &.is-active, &:hover, &:focus {
         color: $color-brand-one-introvert;
@@ -110,8 +110,8 @@ rather than in response to user action.
 }
 
 .map-list-navigate {
+    @include rem(font-size, $font-size-normal);
     font-weight: bold;
-    font-size: $font-size-normal;
 
     &:hover, &:focus {
         text-decoration: none;
