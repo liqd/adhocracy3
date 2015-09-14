@@ -66,7 +66,8 @@ $padding-medium: 1rem;
 $section-jump-navigation-width: 2rem;
 $moving-column-single-width-max: $font-size-normal * 55;
 $moving-column-single-width-min: $font-size-normal * 35;
-$badge-height: 1 + 4px / $font-size-smaller;
+$badge-line-height: 1 + 4px / $font-size-smaller;
+$badge-height: $badge-line-height * $font-size-smaller;
 
 //Line-height (leading)
 $line-height-normal: 1.15;
