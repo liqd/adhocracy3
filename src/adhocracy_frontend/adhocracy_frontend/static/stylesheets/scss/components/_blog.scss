@@ -114,8 +114,8 @@
 
 .blog-post-meta {
     @include rem(font-size, $font-size-small);
+    @include rem(margin-left, 8px);
     color: $color-text-introvert;
-    margin-left: 8px;
 
     a {
         text-decoration: none;
