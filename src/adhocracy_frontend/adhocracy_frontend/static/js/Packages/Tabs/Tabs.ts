@@ -1,8 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
+import * as AdhConfig from "../Config/Config";
 
 var pkgLocation = "/Tabs";
 
@@ -148,14 +148,4 @@ export var tabDirective = (adhConfig : AdhConfig.IService) => {
             });
         }
     };
-};
-
-
-export var moduleName = "adhTabs";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .directive("tabset", ["adhConfig", tabsetDirective])
-        .directive("tab", ["adhConfig", tabDirective]);
 };

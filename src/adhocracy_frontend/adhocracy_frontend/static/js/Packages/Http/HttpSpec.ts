@@ -1,17 +1,17 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import q = require("q");
+import * as q from "q";
 
-import AdhHttp = require("./Http");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import * as AdhHttp from "./Http";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
-import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
+import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import * as SITag from "../../Resources_/adhocracy_core/sheets/tags/ITag";
 
-import Convert = require("./Convert");
-import Error = require("./Error");
+import * as Convert from "./Convert";
+import * as Error from "./Error";
 
 
 var mkHttpMock = (adhPreliminaryNames : AdhPreliminaryNames.Service) => {

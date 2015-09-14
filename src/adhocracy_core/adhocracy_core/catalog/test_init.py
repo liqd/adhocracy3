@@ -68,6 +68,7 @@ class TestCatalogsServiceAdhocracy:
         inst['system']['interfaces'].action_mode = MODE_IMMEDIATE
         inst['system']['allowed'].action_mode = MODE_IMMEDIATE
         inst['adhocracy']['tag'].action_mode = MODE_IMMEDIATE
+        inst['adhocracy']['badge'].action_mode = MODE_IMMEDIATE
         return inst
 
     @fixture
@@ -107,7 +108,6 @@ class TestCatalogsServiceAdhocracy:
         assert 'system' in res
 
     def test_reindex_all(self, registry, pool, inst):
-        from hypatia.catalog import Catalog
         inst['adhocracy'].reindex_resource = Mock()
         inst['system'].reindex_resource = Mock()
         child = self._make_resource(registry, parent=pool)
@@ -143,10 +143,10 @@ class TestCatalogsServiceAdhocracy:
     def test_search_with_interface(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItemVersion
         missing_iresource = self._make_resource(registry, parent=pool)
-        right = self._make_resource(registry, parent=pool,
+        has_iresource = self._make_resource(registry, parent=pool,
                                     iresource=IItemVersion)
-        result = inst.search(query._replace(interfaces=(IItemVersion,)))
-        assert list(result.elements) == [right]
+        result = inst.search(query._replace(interfaces=IItemVersion))
+        assert list(result.elements) == [has_iresource]
 
     def test_search_with_interfaces(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import ISimple
@@ -158,6 +158,38 @@ class TestCatalogsServiceAdhocracy:
                                                 iresource=IItemVersion)
         result = inst.search(query._replace(interfaces=(IVersionable, ISimple)))
         assert list(result.elements) == []
+
+    def test_search_with_interface_and_noteq(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IItemVersion
+        missing_iresource = self._make_resource(registry, parent=pool)
+        has_iresource = self._make_resource(registry, parent=pool,
+                                             iresource=IItemVersion)
+        result = inst.search(query._replace(interfaces=('noteq', IItemVersion)))
+        result_list = list(result.elements)
+        assert has_iresource not in result_list
+        assert missing_iresource in result_list
+
+    def test_search_with_interfaces_and_notany(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import ISimple
+        from adhocracy_core.interfaces import IItemVersion
+        from adhocracy_core.sheets.versions import IVersionable
+        has_isheet = self._make_resource(registry, parent=pool,
+                                             iresource=ISimple)
+        has_iresource = self._make_resource(registry, parent=pool,
+                                             iresource=IItemVersion)
+        missing_iresource = self._make_resource(registry, parent=pool)
+        result = inst.search(query._replace(
+            interfaces=('notany', (IVersionable, ISimple))))
+        result_elemets = list(result.elements)
+        assert has_isheet not in result_elemets
+        assert has_iresource not in result_elemets
+        assert missing_iresource in result_elemets
+
+    def test_search_with_interfaces_raise_if_wrong_keyword_index_comparator(
+            self, registry, pool, inst, query):
+        from adhocracy_core.sheets.versions import IVersionable
+        with raises(AttributeError):
+            inst.search(query._replace(interfaces=('gt', (IVersionable,))))
 
     def test_search_with_root_return_all_descendants(self, registry, pool, inst,
                                                      query):
@@ -205,9 +237,42 @@ class TestCatalogsServiceAdhocracy:
     def test_search_with_indexes(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import IItem
         item = self._make_resource(registry, parent=pool, iresource=IItem)
-        first = item['VERSION_0000000']
+        has_tag = item['VERSION_0000000']
         result = inst.search(query._replace(indexes={'tag': 'FIRST'}))
-        assert list(result.elements) == [first]
+        assert list(result.elements) == [has_tag]
+
+    def test_search_with_indexes_and_noteq(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IItem
+        item = self._make_resource(registry, parent=pool, iresource=IItem)
+        has_tag = item['VERSION_0000000']
+        missing_tag = item
+        result = inst.search(query._replace(
+            indexes={'tag': ('noteq', 'FIRST')}))
+        result_elements = list(result.elements)
+        assert has_tag not in result_elements
+        assert missing_tag in result_elements
+
+    def test_search_with_indexes_and_any(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IItem
+        item = self._make_resource(registry, parent=pool, iresource=IItem)
+        has_tag = item['VERSION_0000000']
+        missing_tag = item
+        result = inst.search(query._replace(
+            indexes={'tag': ('any', ('FIRST', 'LAST'))}))
+        result_elements = list(result.elements)
+        assert has_tag in result_elements
+        assert missing_tag not in result_elements
+
+    def test_search_with_indexes_and_any(self, registry, pool, inst, query):
+        from adhocracy_core.interfaces import IItem
+        item = self._make_resource(registry, parent=pool, iresource=IItem)
+        has_tag = item['VERSION_0000000']
+        missing_tag = item
+        result = inst.search(query._replace(
+            indexes={'tag': ('notany', ('FIRST', 'LAST'))}))
+        result_elenments = list(result.elements)
+        assert has_tag not in result_elenments
+        assert missing_tag in result_elenments
 
     def test_search_with_references(self, registry, pool, inst, query):
         from adhocracy_core.interfaces import ITag

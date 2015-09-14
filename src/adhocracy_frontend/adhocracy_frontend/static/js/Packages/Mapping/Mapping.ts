@@ -1,22 +1,20 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/leaflet/leaflet.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhListing = require("../Listing/Listing");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhListing from "../Listing/Listing";
+import * as AdhWebSocket from "../WebSocket/WebSocket";
 
 // FIXME: See #1008
-import AdhHttp = require("../Http/Http");  if (AdhHttp) { ; }
-import AdhPermissions = require("../Permissions/Permissions");  if (AdhPermissions) { ; }
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");  if (AdhPreliminaryNames) { ; }
+import * as AdhHttp from "../Http/Http";  if (AdhHttp) { ; }
+import * as AdhPermissions from "../Permissions/Permissions";  if (AdhPermissions) { ; }
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";  if (AdhPreliminaryNames) { ; }
 
-import AdhMappingUtils = require("./MappingUtils");
+import * as AdhMappingUtils from "./MappingUtils";
 
 var pkgLocation = "/Mapping";
 
@@ -546,50 +544,3 @@ export class Listing<Container extends ResourcesBase.Resource> extends AdhListin
         return directive;
     }
 }
-
-
-export var moduleName = "adhMapping";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhEmbed.moduleName,
-            AdhListing.moduleName,
-            "adhInject",
-            "duScroll"
-        ])
-        .provider("adhMapData", MapDataProvider)
-        .config(["adhEmbedProvider", (adhEmbedProvider : AdhEmbed.Provider) => {
-            adhEmbedProvider.registerEmbeddableDirectives(["map-input", "map-detail", "map-listing-internal"]);
-        }])
-        .config(["adhMapDataProvider", (adhMapDataProvider : MapDataProvider) => {
-            adhMapDataProvider.style = {
-                fillColor: "#000",
-                color: "#000",
-                opacity: 0.5,
-                stroke: false
-            };
-
-            adhMapDataProvider.icons["item"] = {
-                className: "icon-map-pin",
-                iconAnchor: [17.5, 41],
-                iconSize: [35, 42]
-            };
-            adhMapDataProvider.icons["add"] = {
-                className: "icon-map-pin-add",
-                iconAnchor: [16.5, 41],
-                iconSize: [35, 42]
-            };
-            adhMapDataProvider.icons["item-selected"] = {
-                className: "icon-map-pin is-active",
-                iconAnchor: [17.5, 41],
-                iconSize: [33, 42]
-            };
-        }])
-        .directive("adhMapInput", ["adhConfig", "adhSingleClickWrapper", "adhMapData", "$timeout", "leaflet", mapInput])
-        .directive("adhMapDetail", ["adhMapData", "leaflet", "$timeout", mapDetail])
-        .directive("adhMapListingInternal", ["adhConfig", "adhHttp", mapListingInternal])
-        .directive("adhMapListing", ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-                new Listing(new AdhListing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
-};

@@ -1,15 +1,15 @@
-import AdhComment = require("./Comment");
-import AdhListing = require("../Listing/Listing");
-import AdhUtil = require("../Util/Util");
+import * as AdhComment from "./Comment";
+import * as AdhListing from "../Listing/Listing";
+import * as AdhUtil from "../Util/Util";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
-import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SICommentable from "../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
 
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {

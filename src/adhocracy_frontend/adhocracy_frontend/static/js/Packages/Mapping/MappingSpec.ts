@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhMapping = require("./Mapping");
+import * as AdhMapping from "./Mapping";
 
 
 export var register = () => {

@@ -544,7 +544,7 @@ class TestPOSTBatchRequestSchema:
             inst.deserialize(data)
 
 
-class TestGETPoolRequestSchema():
+class TestGETPoolRequestSchema:
 
     @fixture
     def context(self, pool):
@@ -569,28 +569,35 @@ class TestGETPoolRequestSchema():
 
     def test_deserialize_empty(self, inst, context):
         inst = inst.bind(context=context)
-        assert inst.deserialize({}) == {}
+        assert inst.deserialize({}) == {'depth': 1,
+                                        'root': context}
 
     def test_deserialize_valid(self, inst, context):
+        from hypatia.interfaces import IIndexSort
         from adhocracy_core.sheets.name import IName
         from adhocracy_core.interfaces import ISheet
         from adhocracy_core.interfaces import IResource
         from adhocracy_core.interfaces import Reference
         from adhocracy_core.schema import Resource
         from adhocracy_core.schema import Integer
-        from hypatia.interfaces import IIndexSort
+        from adhocracy_core.schema import Interface
+        from .schemas import KeywordComparableInteger
+        from .schemas import KeywordComparableIntegers
         catalog = context['catalogs']['adhocracy']
         catalog['index1'] = testing.DummyResource(unique_values=lambda x: x,
                                                   __provides__=IIndexSort)
         catalog['index2'] = testing.DummyResource(unique_values=lambda x: x,
                                                   __provides__=IIndexSort)
+        catalog['index3'] = testing.DummyResource(unique_values=lambda x: x,
+                                                  __provides__=IIndexSort)
         cstruct = {'aggregateby': 'index1',
                    'content_type': 'adhocracy_core.interfaces.IResource',
                    'count': 'true',
-                   'depth': '100',
+                   'depth': 'all',
                    'elements': 'content',
                    'index1': 1,
-                   'index2': 1,
+                   'index2': ['eq', 1],
+                   'index3': ['any', [1, 3]],
                    'limit': 2,
                    'offset': 1,
                    'reverse': 'True',
@@ -599,10 +606,13 @@ class TestGETPoolRequestSchema():
                    ISheet.__identifier__ + ':x': '/',
                    }
         target = context
-        wanted = {'indexes': {'index1': 1, 'index2': 1},
-                  'depth': 100,
+        wanted = {'indexes': {'index1': 1,
+                              'index2': ('eq', 1),
+                              'interfaces': IResource,
+                              'index3': ('any', [1, 3])},
+                  'depth': None,
                   'frequency_of': 'index1',
-                  'interfaces': (IName, IResource),
+                  'interfaces': IName,
                   'limit': 2,
                   'offset': 1,
                   'references': [Reference(None, ISheet, 'x', target)],
@@ -616,9 +626,15 @@ class TestGETPoolRequestSchema():
         inst = inst.bind(context=context)
         node = Resource(name=ISheet.__identifier__ + ':x').bind(**inst.bindings)
         inst.add(node)
-        node = Integer(name='index1').bind(**inst.bindings)
+        node = Integer(name='index1')
         inst.add(node)
-        node = Integer(name='index2').bind(**inst.bindings)
+        node = KeywordComparableInteger(name='index2')
+        inst.add(node)
+        node = KeywordComparableIntegers(name='index3')
+        inst.add(node)
+        node = Interface(name='content_type').bind(**inst.bindings)
+        inst.add(node)
+        node = Interface(name='sheet').bind(**inst.bindings)
         inst.add(node)
         assert inst.deserialize(cstruct) == wanted
 
@@ -663,14 +679,25 @@ class TestGETPoolRequestSchema():
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_depth_all(self, inst, context):
+    def test_deserialize_depth_valid_all(self, inst, context):
         data = {'depth': 'all'}
         inst = inst.bind(context=context)
         assert inst.deserialize(data)['depth'] is None
 
-    @mark.parametrize('value', ['-7', '1.5', 'fall', 'alle'])
-    def test_deserialize_depth_invalid(self, inst, value):
+    def test_deserialize_depth_valid_number(self, inst, context):
+        data = {'depth': '2'}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['depth'] == 2
+
+    def test_deserialize_depth_default(self, inst, context):
+        data = {}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['depth'] == 1
+
+    @mark.parametrize('value', ['-7', '1.5'])
+    def test_deserialize_depth_invalid(self, inst, value, context):
         data = {'depth': value}
+        inst = inst.bind(context=context)
         with raises(colander.Invalid):
             inst.deserialize(data)
 
@@ -679,7 +706,7 @@ class TestGETPoolRequestSchema():
         inst = inst.bind(context=context)
         assert inst.deserialize(data)['show_count'] is False
 
-    def test_deserialize_extra_values_are_preserved(self, inst, context):
+    def test_deserialize_raise_if_extra_value(self, inst, context):
         data = {'extra1': 'blah',
                 'another_extra': 'blub'}
         inst = inst.bind(context=context)
@@ -720,7 +747,93 @@ class TestGETPoolRequestSchema():
             inst.deserialize(data)
 
 
-class TestAddGetPoolRequestExtraFields:
+class TestKeywordComparableSingeLine:
+
+    @fixture
+    def inst(self):
+        from .schemas import KeywordComparableSchema
+        return KeywordComparableSchema()
+
+    def test_create(self, inst):
+        from adhocracy_core.interfaces import KeywordComparator
+        assert inst.validator.choices ==\
+                [x for x in KeywordComparator.__members__]
+
+    def test_deserialize_empty(self, inst, context):
+        import colander
+        assert inst.deserialize() == colander.drop
+
+    def test_deserialize_invalid(self, inst, context):
+        from colander import Invalid
+        with raises(Invalid):
+            inst.deserialize('wrong')
+
+
+class TestFieldComparableSingleLine:
+
+    @fixture
+    def inst(self):
+        from .schemas import FieldComparableSchema
+        return FieldComparableSchema()
+
+    def test_create(self, inst):
+        from adhocracy_core.interfaces import FieldComparator
+        assert inst.validator.choices ==\
+                [x for x in FieldComparator.__members__]
+
+    def test_deserialize_empty(self, inst, context):
+        import  colander
+        assert inst.deserialize() == colander.drop
+
+    def test_deserialize_invalid(self, inst, context):
+        from colander import Invalid
+        with raises(Invalid):
+            inst.deserialize('wrong')
+
+
+def test_keyword_index_comparable_intergers_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableIntegers()
+    assert isinstance(inst, colander.TupleSchema)
+    assert isinstance(inst['comparable'], schemas.KeywordSequenceComparableSchema)
+    assert isinstance(inst['value'], schemas.Integers)
+
+
+def test_keyword_index_comparable_integer_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableInteger()
+    assert isinstance(inst['comparable'], schemas.KeywordComparableSchema)
+    assert isinstance(inst['value'], schemas.Integer)
+
+def test_keyword_index_comparable_singlelines_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableSingleLines()
+    assert isinstance(inst['comparable'], schemas.KeywordSequenceComparableSchema)
+    assert isinstance(inst['value'], schemas.SingleLines)
+
+
+def test_keyword_index_comparable_singleline_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableSingleLine()
+    assert isinstance(inst['comparable'], schemas.KeywordComparableSchema)
+    assert isinstance(inst['value'], schemas.SingleLine)
+
+
+def test_keyword_index_comparable_datetimes_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableDateTimes()
+    assert isinstance(inst['comparable'], schemas.KeywordSequenceComparableSchema)
+    assert isinstance(inst['value'], schemas.DateTimes)
+
+
+def test_keyword_index_comparable_datetime_tuple_create():
+    from . import schemas
+    inst = schemas.KeywordComparableDateTime()
+    assert isinstance(inst['comparable'], schemas.KeywordComparableSchema)
+    assert isinstance(inst['value'], schemas.DateTime)
+
+
+class TestAddArbitraryFilterNodes:
 
     @fixture
     def schema(self, context):
@@ -729,86 +842,107 @@ class TestAddGetPoolRequestExtraFields:
         return schema.bind(context=context)
 
     @fixture
-    def context(self, pool_with_catalogs):
-        return pool_with_catalogs
+    def mock_catalogs(self, monkeypatch, mock_catalogs):
+        from . import schemas
+        monkeypatch.setattr(schemas, 'find_service', lambda x, y: mock_catalogs)
+        return mock_catalogs
 
     @fixture
-    def registry(self, mock_content_registry):
-        return testing.DummyResource(content=mock_content_registry)
+    def index(self, mock_catalogs):
+        index = testing.DummyResource()
+        index.__name__ = 'index'
+        mock_catalogs.get_index.return_value = index
+        return index
+
+    @fixture
+    def interfaces_index(self, mock_catalogs):
+        index = testing.DummyResource()
+        index.__name__ = 'interfaces'
+        mock_catalogs.get_index.return_value = index
+        return index
+
+    @fixture
+    def reference_index(self, mock_catalogs):
+        index = testing.DummyResource()
+        index.__name__ = 'reference'
+        mock_catalogs.get_index.return_value = index
+        return index
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    @fixture
+    def create_node(self, monkeypatch, node):
+        from . import schemas
+        mock = Mock(spec=schemas.create_arbitrary_filter_node,
+                    return_value=node)
+        monkeypatch.setattr(schemas, 'create_arbitrary_filter_node', mock)
+        return mock
 
     def call_fut(self, *args):
-        from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
-        return add_get_pool_request_extra_fields(*args)
+        from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
+        return add_arbitrary_filter_nodes(*args)
 
-    def test_call_without_extra_fields(self, schema):
+    def test_call_without_arbitrary_filters(self, schema):
         cstruct = {}
         assert self.call_fut(cstruct, schema, None, None) == schema
 
-    def test_call_with_missing_catalog(self, schema):
-        index_name = 'index1'
-        cstruct = {index_name: 'keyword'}
-        schema_extended = self.call_fut(cstruct, schema, None, None)
-        assert index_name not in schema_extended
-
-    def test_call_with_extra_filter_wrong(self, schema, context):
-        index_name = 'index1'
-        cstruct = {index_name: 'keyword'}
-        with raises(colander.Invalid):
-            self.call_fut(cstruct, schema, context, None)
-
-    def test_call_with_extra_filter(self, schema, context):
-        from adhocracy_core.schema import SingleLine
-        index_name = 'index1'
-        index = testing.DummyResource()
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: 'keyword'}
+    def test_call_with_arbitrary_filter_wrong(self, schema, context,
+                                              create_node, mock_catalogs):
+        cstruct = {'index': 'keyword'}
+        mock_catalogs.get_index.return_value = None
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], SingleLine)
+        assert not create_node.called
+        assert 'index' not in schema_extended
 
-    def test_call_with_extra_filter_with_empty_unique_values(self, schema,
-                                                             context):
-        from adhocracy_core.schema import SingleLine
-        index_name = 'index1'
-        index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[])
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: 'keyword'}
+    def test_call_with_arbitrary_filter_private(self, schema, context,
+                                                create_node):
+        cstruct = {'private_index': 'keyword'}
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], SingleLine)
+        assert not create_node.called
+        assert 'private_index' not in schema_extended
 
-    def test_call_with_extra_integer_filter(self, schema, context):
-        from adhocracy_core.schema import Integer
-        index_name = 'int_index'
-        index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[1, 2, 3])
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: '7'}
+    def test_call_with_arbitrary_filter(self, schema, context, create_node, index):
+        from .schemas import INDEX_EXAMPLE_VALUES
+        cstruct = {'index': 'keyword'}
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], Integer)
+        create_node.assert_called_with(index, INDEX_EXAMPLE_VALUES['default'], 'keyword')
+        assert 'index' in schema_extended
 
-    def test_call_with_extra_datetime_filter(self, schema, context):
-        from datetime import datetime
-        from adhocracy_core.schema import DateTime
-        index_name = 'date_index'
-        index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[datetime.now()])
-        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
-        cstruct = {index_name: datetime.now()}
+    def test_call_with_sheet_filter(self, schema, context, create_node,
+                                   interfaces_index):
+        from .schemas import INDEX_EXAMPLE_VALUES
+        cstruct = {'sheet': 'sheet.x1' }
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        assert isinstance(schema_extended[index_name], DateTime)
+        create_node.assert_called_with(interfaces_index,
+                                       INDEX_EXAMPLE_VALUES['interfaces'],
+                                       'sheet.x1')
 
-    def test_call_with_extra_reference_name(self, schema, registry):
-        from adhocracy_core.schema import Resource
+    def test_call_with_content_type_filter(self, schema, context, create_node,
+                                           interfaces_index):
+        from .schemas import INDEX_EXAMPLE_VALUES
+        cstruct = {'content_type': 'IResource'}
+        schema_extended = self.call_fut(cstruct, schema, context, None)
+        create_node.assert_called_with(interfaces_index,
+                                       INDEX_EXAMPLE_VALUES['interfaces'],
+                                       'IResource')
+
+    def test_call_with_reference_filter(self, schema, context, registry,
+                                        create_node, reference_index):
+        from .schemas import INDEX_EXAMPLE_VALUES
         from adhocracy_core.schema import Reference
         isheet = ISheet.__identifier__
         field = 'reference'
         reference_name = isheet + ':' + field
         cstruct = {reference_name: '/referenced'}
         registry.content.resolve_isheet_field_from_dotted_string.return_value = (ISheet, 'reference', Reference())
-        schema_extended = self.call_fut(cstruct, schema, None, registry)
-        assert isinstance(schema_extended[reference_name], Resource)
+        schema_extended = self.call_fut(cstruct, schema, context, registry)
+        create_node.assert_called_with(reference_index,
+                                       INDEX_EXAMPLE_VALUES['reference'],
+                                       '/referenced')
 
-    def test_call_with_extra_reference_name_wrong_type(self, schema, registry):
+    def test_call_with_reference_filter_wrong_type(self, schema, registry):
         from adhocracy_core.schema import SingleLine
         isheet = ISheet.__identifier__
         field = 'reference'
@@ -818,7 +952,7 @@ class TestAddGetPoolRequestExtraFields:
         with raises(colander.Invalid):
             self.call_fut(cstruct, schema, None, registry)
 
-    def test_call_with_extra_reference_name_wrong(self, schema, registry):
+    def test_call_with_reference_filter_wrong(self, schema, registry):
         isheet = ISheet.__identifier__
         field = 'reference'
         reference_name = isheet + ':' + field
@@ -826,6 +960,94 @@ class TestAddGetPoolRequestExtraFields:
         registry.content.resolve_isheet_field_from_dotted_string.side_effect = ValueError
         with raises(colander.Invalid):
             self.call_fut(cstruct, schema, None, registry)
+
+
+class TestGetIndexExampleValue:
+
+    @fixture
+    def index(self):
+        index = testing.DummyResource()
+        index.unique_values = Mock(return_value=[])
+        return index
+
+    def call_fut(self, *args):
+        from .schemas import _get_index_example_value
+        return _get_index_example_value(*args)
+
+    def test_return_none_if_index_is_none(self):
+        assert self.call_fut(None) is None
+
+    def test_return_str_if_unknown_index(self, index):
+        from adhocracy_core.resources.base import Base
+        index.__name__ = 'unknown'
+        result = self.call_fut(index)
+        assert isinstance(result, str)
+
+    def test_return_int_if_rate_index(self, index):
+        index.__name__ = 'rate'
+        result = self.call_fut(index)
+        assert isinstance(result, int)
+
+    def test_return_datetiem_if_item_creation_date_index(self, index):
+        from datetime import datetime
+        index.__name__ = 'item_creation_date'
+        result = self.call_fut(index)
+        assert isinstance(result, datetime)
+
+    def test_return_object_if_reference_index(self, index):
+        from adhocracy_core.resources.base import Base
+        index.__name__ = 'reference'
+        result = self.call_fut(index)
+        assert isinstance(result, Base)
+
+    def test_return_object_if_creator_index(self, index):
+        from adhocracy_core.resources.base import Base
+        index.__name__ = 'creator'
+        result = self.call_fut(index)
+        assert isinstance(result, Base)
+
+
+class TestCreateArbitraryFilterNode:
+
+    from datetime import datetime
+    from hypatia.keyword import KeywordIndex
+    from hypatia.field import FieldIndex
+    from adhocracy_core.catalog.index import ReferenceIndex
+    from adhocracy_core import schema
+    from adhocracy_core.resources.base import Base
+    from . import schemas as rest_schemas
+
+    def call_fut(self, *args):
+        from .schemas import  create_arbitrary_filter_node
+        return create_arbitrary_filter_node(*args)
+
+    @mark.parametrize("index, index_value, query, wanted_schema_class",
+                      [(FieldIndex(''), 1, '1', schema.Integer),
+                       (FieldIndex(''), 1, 1, schema.Integer),
+                       (FieldIndex(''), 1, ['eq', '1'], rest_schemas.FieldComparableInteger),
+                       (FieldIndex(''), 1, ['any', ['1', '2']], rest_schemas.FieldComparableIntegers),
+                       (KeywordIndex(''), 1, ['eq', '1'], rest_schemas.KeywordComparableInteger),
+                       (KeywordIndex(''), 1, ['any', ['1', '2']], rest_schemas.KeywordComparableIntegers),
+                       (FieldIndex(''), 'str', 'str', schema.SingleLine),
+                       (KeywordIndex(''), 'str', ['eq', 'str'], rest_schemas.KeywordComparableSingleLine),
+                       (KeywordIndex(''), 'str', ['any', ['str', 'str2']], rest_schemas.KeywordComparableSingleLines),
+                       (FieldIndex(''), 'str', ['eq', 'str'], rest_schemas.FieldComparableSingleLine),
+                       (FieldIndex(''), 'str', ['any', ['str', 'str2']], rest_schemas.FieldComparableSingleLines),
+                       (FieldIndex(''), True, 'True', schema.Boolean),
+                       (FieldIndex(''), True, True, schema.Boolean),
+                       (FieldIndex(''), True, ['eq', True], rest_schemas.FieldComparableBoolean),
+                       (FieldIndex(''), True, ['any', [False, True]], rest_schemas.FieldComparableBooleans),
+                       (FieldIndex(''), datetime.now(), '2015', schema.DateTime),
+                       (FieldIndex(''), datetime.now(), ['eq', '2015'], rest_schemas.FieldComparableDateTime),
+                       (FieldIndex(''), datetime.now(), ['any', ['2015', '2016']], rest_schemas.FieldComparableDateTimes),
+                       (KeywordIndex(''), IResource, 'Interface', schema.Interface),
+                       (KeywordIndex(''), IResource, ['eq', 'Interface'], rest_schemas.KeywordComparableInterface),
+                       (KeywordIndex(''), IResource, ['any', ['Interface', 'Interface']], rest_schemas.KeywordComparableInterfaces),
+                       (ReferenceIndex(), Base(), '/path', schema.Resource),
+                       ])
+    def test_call(self, index, index_value, query, wanted_schema_class):
+        node = self.call_fut(index, index_value, query)
+        assert isinstance(node, wanted_schema_class)
 
 
 class TestPostMessageUserViewRequestSchema:
@@ -936,7 +1158,6 @@ class TestDeferredValidateResetPasswordEmail:
         validator(node, 'test@email.de')
         user.activate.assert_called
         assert request.validated['user'] is user
-
 
 
 class TestPOSTResetPasswordRequestSchema:

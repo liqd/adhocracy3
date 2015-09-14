@@ -1,11 +1,8 @@
-import AdhConfig = require("../../../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhTabs = require("../../../Tabs/Tabs");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
 
-import AdhMeinBerlinPhase = require("../../Phase/Phase");
+import * as AdhMeinBerlinPhase from "../../Phase/Phase";
 
 
 export var phaseHeaderDirective = (
@@ -57,20 +54,4 @@ export var phaseHeaderDirective = (
             }];
         }
     };
-};
-
-
-export var moduleName = "adhMeinBerlinAlexanderplatzProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhHttp.moduleName,
-            AdhMeinBerlinPhase.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhTabs.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .directive("adhMeinBerlinAlexanderplatzPhaseHeader", ["adhConfig", "adhHttp", "adhTopLevelState", phaseHeaderDirective]);
 };

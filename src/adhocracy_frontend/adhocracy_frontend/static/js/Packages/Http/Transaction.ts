@@ -1,17 +1,17 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import * as AdhConfig from "../Config/Config";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import AdhCache = require("./Cache");
-import AdhConvert = require("./Convert");
-import AdhError = require("./Error");
-import AdhHttp = require("./Http");
-import AdhMetaApi = require("./MetaApi");
+import * as AdhCache from "./Cache";
+import * as AdhConvert from "./Convert";
+import * as AdhError from "./Error";
+import * as AdhHttp from "./Http";
+import * as AdhMetaApi from "./MetaApi";
 
 export interface ITransactionResult {
     index : number;

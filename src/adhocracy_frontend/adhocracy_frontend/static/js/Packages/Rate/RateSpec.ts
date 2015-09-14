@@ -1,13 +1,13 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import q = require("q");
+import * as q from "q";
 
-import AdhRate = require("./Rate");
-import AdhRateAdapter = require("./Adapter");
+import * as AdhRate from "./Rate";
+import * as AdhRateAdapter from "./Adapter";
 import AdhPreliminaryNames = require ("../PreliminaryNames/PreliminaryNames");
 
-import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
+import RIRateVersion from "../../Resources_/adhocracy_core/resources/rate/IRateVersion";
+import * as SIRate from "../../Resources_/adhocracy_core/sheets/rate/IRate";
 
 var mkScopeMock = () => {
     return {

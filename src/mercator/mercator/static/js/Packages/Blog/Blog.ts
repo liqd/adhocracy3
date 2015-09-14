@@ -1,16 +1,12 @@
-import AdhConfig = require("../Config/Config");
-import AdhDocument = require("../Document/Document");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
-import AdhImage = require("../Image/Image");
-import AdhListing = require("../Listing/Listing");
-import AdhMarkdown = require("../Markdown/Markdown");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhDocument from "../Document/Document";
+import * as AdhHttp from "../Http/Http";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhUtil from "../Util/Util";
 
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
 
 var pkgLocation = "/Blog";
 
@@ -201,38 +197,4 @@ export var listingDirective = (adhConfig : AdhConfig.IService) => {
             scope.contentType = RIDocumentVersion.content_type;
         }
     };
-};
-
-
-export var moduleName = "adhBlog";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhImage.moduleName,
-            AdhListing.moduleName,
-            AdhMarkdown.moduleName,
-            AdhPermissions.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("blog-post");
-            adhEmbedProvider.embeddableDirectives.push("blog-post-create");
-            adhEmbedProvider.embeddableDirectives.push("blog");
-        }])
-        .directive("adhBlogPost", [
-            "$q",
-            "$window",
-            "adhConfig",
-            "adhHttp",
-            "adhPermissions",
-            "adhPreliminaryNames",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhUploadImage",
-            detailDirective])
-        .directive("adhBlog", ["adhConfig", listingDirective])
-        .directive("adhBlogPostCreate", [
-            "adhConfig", "adhHttp", "adhPreliminaryNames", "adhShowError", "adhSubmitIfValid", "adhUploadImage", createDirective]);
 };

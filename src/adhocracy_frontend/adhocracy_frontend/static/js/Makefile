@@ -18,17 +18,14 @@ compile: compile_tests_browser
 AdhocracySpec.ts: .phony
 	./AdhocracySpec.sh > AdhocracySpec.ts
 
-compile_tests_browser: AdhocracySpec.ts
-	$(TSC) --module amd --sourcemap Adhocracy*.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
+compile_tests: AdhocracySpec.ts
+	$(TSC) --module umd --sourcemap Adhocracy*.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
 test-no-blanket: .phony
 	cat ../test.html | perl -pe 's/(data-cover-flags=".*)(")$$/$$1 engineOnly$$2/' > ../test-no-blanket.html
 
-compile_tests_node: AdhocracySpec.ts
-	$(TSC) --module commonjs Adhocracy*.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
-
 description:
-	$(TSC) -d --module amd --sourcemap --out Adhocracy.js Adhocracy.ts
+	$(TSC) -d --module umd --sourcemap --out Adhocracy.js Adhocracy.ts
 
 
 # run tests
