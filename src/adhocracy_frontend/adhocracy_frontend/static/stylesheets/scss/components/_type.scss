@@ -6,9 +6,12 @@ category: Type
 ---
 */
 
+html {
+    @include rem-baseline;
+}
+
 body {
     color: $color-text-normal;
-    font-size: $font-size-normal;
     line-height: $line-height-normal;
 
     @media print {
