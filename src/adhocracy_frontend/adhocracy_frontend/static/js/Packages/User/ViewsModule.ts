@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 import * as AdhAngularHelpersModule from "../AngularHelpers/Module";
 import * as AdhBadgeModule from "../Badge/Module";
 import * as AdhHttpModule from "../Http/Module";
@@ -10,6 +12,7 @@ import * as AdhTopLevelStateModule from "../TopLevelState/Module";
 import * as AdhCredentialsModule from "./CredentialsModule";
 import * as AdhUserModule from "./Module";
 
+import * as AdhHttp from "../Http/Http";
 import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
 import * as AdhUserViews from "./Views";
@@ -56,11 +59,21 @@ export var register = (angular) => {
                         templateUrl: "/static/js/templates/CreatePasswordReset.html"
                     };
                 })
-                .when("register", () : AdhTopLevelState.IAreaInput => {
+                .when("register", ["adhHttp", (adhHttp : AdhHttp.Service<any>) : AdhTopLevelState.IAreaInput => {
                     return {
-                        templateUrl: "/static/js/templates/Register.html"
+                        route: (path, search) => {
+                            return adhHttp.options("/principals/users").then((options) => {
+                                if (!options.POST) {
+                                    throw 401;
+                                } else {
+                                    var data = _.clone(search);
+                                    data["_path"] = path;
+                                    return data;
+                                }
+                            });
+                        }
                     };
-                })
+                }])
                 .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", AdhUserViews.activateArea]);
         }])
         .config(["adhResourceAreaProvider", AdhUserViews.registerRoutes()])
@@ -75,7 +88,7 @@ export var register = (angular) => {
             "adhUser",
             "adhGetBadges",
             AdhUserViews.userProfileDirective])
-        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.loginDirective])
+        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhPermissions", "adhShowError", AdhUserViews.loginDirective])
         .directive("adhPasswordReset", [
             "adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.passwordResetDirective])
         .directive("adhCreatePasswordReset", [
@@ -88,7 +101,8 @@ export var register = (angular) => {
             AdhUserViews.createPasswordResetDirective])
         .directive("adhRegister", [
             "adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", AdhUserViews.registerDirective])
-        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", "adhTopLevelState", "$location", AdhUserViews.indicatorDirective])
+        .directive("adhUserIndicator", [
+            "adhConfig", "adhResourceArea", "adhTopLevelState", "adhPermissions", "$location", AdhUserViews.indicatorDirective])
         .directive("adhUserMeta", ["adhConfig", "adhResourceArea", "adhGetBadges", AdhUserViews.metaDirective])
         .directive("adhUserMessage", ["adhConfig", "adhHttp", AdhUserViews.userMessageDirective])
         .directive("adhUserDetailColumn", ["adhPermissions", "adhConfig", AdhUserViews.userDetailColumnDirective])

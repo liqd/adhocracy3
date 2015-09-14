@@ -7,6 +7,13 @@ import * as AdhUserViews from "./Views";
 
 export var register = () => {
     describe("UserViews", () => {
+        var adhPermissionsMock;
+        beforeEach(() => {
+            adhPermissionsMock = {
+                bindScope: jasmine.createSpy("adhPermissions.bindScope").and.returnValue("")
+            };
+        });
+
         describe("loginDirective", () => {
             var directive;
             var adhConfigMock;
@@ -24,7 +31,8 @@ export var register = () => {
                 adhUserMock = jasmine.createSpyObj("adhUserMock", ["logIn"]);
                 adhUserMock.logIn.and.returnValue(q.when(undefined));
                 adhTopLevelStateMock = jasmine.createSpyObj("adhTopLevelStateMock", ["goToCameFrom"]);
-                directive = AdhUserViews.loginDirective(adhConfigMock, adhUserMock, adhTopLevelStateMock, "adhShowError");
+                directive = AdhUserViews.loginDirective(
+                    adhConfigMock, adhUserMock, adhTopLevelStateMock, adhPermissionsMock, "adhShowError");
             });
 
             describe("link", () => {
@@ -191,7 +199,7 @@ export var register = () => {
                 };
                 adhResourceAreaMock = jasmine.createSpyObj("adhResourceArea", ["has"]);
                 adhResourceAreaMock.has.and.returnValue(false);
-                directive = AdhUserViews.indicatorDirective(adhConfigMock, adhResourceAreaMock, null, null);
+                directive = AdhUserViews.indicatorDirective(adhConfigMock, adhResourceAreaMock, null, adhPermissionsMock, null);
             });
 
             describe("controller", () => {

@@ -165,6 +165,7 @@ export var loginDirective = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
     adhShowError
 ) => {
     return {
@@ -175,6 +176,8 @@ export var loginDirective = (
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
             scope.showError = adhShowError;
+
+            adhPermissions.bindScope(scope, "/principals/users");
 
             scope.credentials = {
                 nameOrEmail: "",
@@ -350,6 +353,7 @@ export var indicatorDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceArea : AdhResourceArea.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
     $location : angular.ILocationService
 ) => {
     return {
@@ -364,6 +368,8 @@ export var indicatorDirective = (
             $scope.user = adhUser;
             $scope.credentials = adhCredentials;
             $scope.noLink = !adhResourceArea.has(RIUser.content_type);
+
+            adhPermissions.bindScope($scope, "/principals/users");
 
             $scope.logOut = () => {
                 adhUser.logOut();
