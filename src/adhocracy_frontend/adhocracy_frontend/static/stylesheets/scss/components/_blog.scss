@@ -74,7 +74,7 @@
     @include rem(margin-bottom, 30px);
 
     .document-form {
-        padding: 0 0 0 8px;
+        @include rem(padding, 0 0 0 8px);
         background: transparent;
 
         .paragraph {
@@ -144,7 +144,7 @@
 
 .blog-post-paragraph {
     @include rem(font-size, $font-size-small);
-    padding: 10px 8px;
+    @include rem(padding, 10px 8px);
 
     p {
         line-height: 1.5;
