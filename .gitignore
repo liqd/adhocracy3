@@ -26,6 +26,7 @@ __pycache__
 /include/
 /lib/
 /local/
+/src/current
 etc/scss-lint.yml
 etc/tslint.json
 /etc/development.ini
