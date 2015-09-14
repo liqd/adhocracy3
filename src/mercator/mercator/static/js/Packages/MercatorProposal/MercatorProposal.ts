@@ -30,8 +30,7 @@ import RIMercatorIntroduction from "../../Resources_/adhocracy_mercator/resource
 import RIMercatorIntroductionVersion from "../../Resources_/adhocracy_mercator/resources/mercator/IIntroductionVersion";
 import RIMercatorIntroImage from "../../Resources_/adhocracy_mercator/resources/mercator/IIntroImage";
 import RIMercatorOrganizationInfo from "../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfo";
-import RIMercatorOrganizationInfoVersion =
-    require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion");
+import RIMercatorOrganizationInfoVersion from "../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion";
 import RIMercatorOutcome from "../../Resources_/adhocracy_mercator/resources/mercator/IOutcome";
 import RIMercatorOutcomeVersion from "../../Resources_/adhocracy_mercator/resources/mercator/IOutcomeVersion";
 import RIMercatorPartners from "../../Resources_/adhocracy_mercator/resources/mercator/IPartners";
