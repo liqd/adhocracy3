@@ -454,15 +454,24 @@ Units
 This gives an order of preference for the units that must be used with
 different types of values starting from preferred.
 
+Please note for all 'rem' units the rem mixin is used eg:
+
+@include rem(margin, 10px 5px);
+@include rem(margin-bottom, 2rem);
+@include rem(border, 3px solid $color-function-valid);
+
+This automatically calculates rem units with a px fallback for older browsers.
+
 -  length:
 
    -  layout: ``%``
-   -  else: ``em``
-   -  not sure about ``rem`` because of compatibility
+   -  distances relative to element font-size ``em``
+   -  less than 3px width ``px``
+   -  else: ``rem mixin``
    -  in the context of images, ``px`` may be used to avoid low-quality
       rescaling
 
--  font-size: keyword, ``%``, ``px``
+-  font-size: ``rem mixin``
 
    -  outside of variable definitions only variables and ``%`` must be
       used
