@@ -87,7 +87,7 @@ input[type="number"],
 select,
 textarea {
     @include rem(margin-bottom, 0.5rem);
-    @include rem(padding, 0.25rem $font-size-normal);
+    @include rem(padding, 0.25rem 1rem);
     display: block;
     width: 100%;
     border: 1px solid $color-structure-border;
