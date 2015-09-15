@@ -19,12 +19,12 @@ phase. If the feature is available, they have the status `is-available`.
 
     &:after {
         @include border-radius(50%);
-        @include rem(border, 2.4px solid);
-        @include rem(bottom, 1.4px);
-        @include rem(right, 0.4px);
+        border: 0.18em solid;
+        bottom: 0.1em;
         content: "";
         position: absolute;
         display: block;
+        right: 0.03em;
         width: 0;
         height: 0;
     }
