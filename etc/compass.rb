@@ -1,12 +1,12 @@
 http_path = "/"
-css_dir = "src/current/*/build/stylesheets"
-sass_dir = "src/current/*/build/stylesheets/scss"
-fonts_dir = "src/current/*/build/fonts"
+css_dir = "src/current/current/build/stylesheets"
+sass_dir = "src/current/current/build/stylesheets/scss"
+fonts_dir = "src/current/current/build/fonts"
 http_fonts_path = "../fonts"
-images_dir = "src/current/*/build/images"
-javascripts_dir = "src/current/*/build/js"
+images_dir = "src/current/current/build/images"
+javascripts_dir = "src/current/current/build/js"
 sourcemap = true
-add_import_path "src/current/*/build/stylesheets/scss"
+add_import_path "src/current/current/build/stylesheets/scss"
 Sass::Script::Number.precision = 8
 asset_cache_buster do |path, file|
     if file

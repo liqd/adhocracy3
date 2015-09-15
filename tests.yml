@@ -3,6 +3,6 @@ pyunit:
 pyfunc:
     command: bin/py.test --timeout=60 -q -m"functional and not jasmine" src/adhocracy_*
 jsunit:
-    command: bin/jasmine-node src/current/*/build/js/
+    command: bin/jasmine-node src/current/current/build/js/
 acceptance:
     command: bin/protractor etc/protractorConf.js
