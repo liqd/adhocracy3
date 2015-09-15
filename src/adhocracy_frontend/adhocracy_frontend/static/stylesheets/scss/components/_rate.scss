@@ -36,7 +36,7 @@ The button has the is-rate-button-active state.
 }
 
 $line-height: (24/12);
-$arrow-width: 1rem;
+$arrow-width: 1em;
 
 .like-button {
     @include inline-block;
@@ -54,8 +54,8 @@ $arrow-width: 1rem;
     text-decoration: none;
 
     &:before {
-        @include rem(border-top, $line-height/2 * $font-size-small solid $color-structure-transparent);
-        @include rem(border-bottom, $line-height/2 * $font-size-small solid $color-structure-transparent);
+        @include rem(border-top, $line-height/2 * 1em solid $color-structure-transparent);
+        @include rem(border-bottom, $line-height/2 * 1em solid $color-structure-transparent);
         @include rem(border-right, $arrow-width solid $color-brand-one-normal);
         content: "";
         position: absolute;
