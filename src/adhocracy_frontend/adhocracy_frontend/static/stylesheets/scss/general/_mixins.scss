@@ -15,15 +15,15 @@ $rem-px-only: false !default;
     $separator: list-separator($values);
 
     @each $value in $values {
+        $item: $value;
         @if type-of($value) == "number" and unit($value) == "rem" and $to == "px" {
-            $result: append($result, $value / 1rem * $rem-baseline, $separator);
+            $item: $value / 1rem * $rem-baseline;
         } @else if type-of($value) == "number" and unit($value) == "px" and $to == "rem" {
-            $result: append($result, $value / ($rem-baseline / 1rem), $separator);
+            $item: $value / ($rem-baseline / 1rem);
         } @else if type-of($value) == "list" {
-            $result: append($result, rem-convert($to, $value...), $separator);
-        } @else {
-            $result: append($result, $value, $separator);
+            $item: rem-convert($to, $value...);
         }
+        $result: append($result, $item, $separator);
     }
 
     @return $result;
