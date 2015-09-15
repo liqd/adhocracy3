@@ -158,8 +158,8 @@ parent: phase-header
     background: $color-background-base-introvert;
 
     [class^="icon"] {
+        @include rem(font-size, 1.11rem);
         @include rem(margin-right, 6px);
-        font-size: 130%;
     }
 }
 

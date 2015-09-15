@@ -19,9 +19,9 @@ phase. If the feature is available, they have the status `is-available`.
 
     &:after {
         @include border-radius(50%);
-        @include rem(border, 0.15rem);
-        @include rem(bottom, 0.12rem);
-        @include rem(right, 0.05rem);
+        @include rem(border, 2.4px solid);
+        @include rem(bottom, 1.4px);
+        @include rem(right, 0.4px);
         content: "";
         position: absolute;
         display: block;
