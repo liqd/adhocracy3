@@ -33,7 +33,7 @@ aligned ones will wrap.
     }
 
     .navbar-right {
-        @include rem(margin-right, 0.5rem);
+        @include rem(margin-left, 0.5rem);
         float: right;
     }
 }
