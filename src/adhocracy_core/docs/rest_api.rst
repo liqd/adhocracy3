@@ -1219,32 +1219,35 @@ omitted::
      'code': 200}
     >>> pprint(batch_resp['responses'][1])
     {'body': {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
-              'path': '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/'},
+              'path': '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'},
      'code': 200}
     >>> pprint(batch_resp['responses'][2])
     {'body': {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
               'data': {...},
-              'path': '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/'},
+              'path': '.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'},
      'code': 200}
      >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['text']
      'sein blick ist vom vorüberziehn der stäbchen'
 
 
-Now the first, empty paragraph version should contain the newly
-created paragraph version as its only successor ::
+New Versions are only created once within one batch request. That means the second
+subrequest does not create a second version, but updates the existing first version:
 
-    .. >>> v1 = batch_resp[2]['body']['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by']
-    .. >>> v2 = [batch_resp[1]['path']]
-    .. >>> v1 == v2
-    .. True
-    .. >>> print(v1, v2)
-    .. ...
+    >>> v0 = batch_resp['responses'][0]['body']['first_version_path']
+    >>> v0_again = batch_resp['responses'][1]['body']['path']
+    >>> v0 == v0_again
+    True
 
-The LAST tag should point to the version we created within the batch request::
+The follow reference points to None, because the there is only one version:
+
+    >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
+    []
+
+The LAST tag should point to the last version we created within the batch request::
 
     >>> resp_data = testapp.get(rest_url + "/Documents/document_0000000/PARAGRAPH_0000002/LAST").json
     >>> resp_data['data']['adhocracy_core.sheets.tags.ITag']['elements']
-    ['.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/']
+    ['.../Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/']
 
 All creation and modification dates are equal for one batch request:
 
@@ -1538,7 +1541,7 @@ versions of all documents::
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/Documents/document_0000000/PARAGRAPH_0000000/VERSION_0000001/',
      'http://localhost/Documents/document_0000000/PARAGRAPH_0000001/VERSION_0000001/',
-     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000001/']
+     'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/']
 
 Valid query comparables: 'eq', 'noteq', 'any', 'notany'
 
@@ -1583,7 +1586,20 @@ custom filters:
 *<package.sheets.sheet.ISheet:FieldName>* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
 the isheet plus the field name separated by ':' The value is the wanted
-reference target. ::
+reference target.
+
+First we create more paragraphs versions::
+
+    >>> pvrs0_path = 'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'
+    >>> pvrs = {'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
+    ...         'data': {'adhocracy_core.sheets.versions.IVersionable': {
+    ...                  'follows': [pvrs0_path]}},
+    ...          'root_versions': [pvrs0_path]}
+    >>> resp = testapp.post_json('http://localhost/Documents/document_0000000/PARAGRAPH_0000002',
+    ...                           pvrs, headers=god_header)
+    >>> pvrs1_path = resp.json["path"]
+
+Now we can search references::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'content_type': 'adhocracy_core.resources.paragraph.IParagraphVersion',
@@ -1600,7 +1616,7 @@ not a reference field, the backend responds with an error::
 
     >>> resp_data = testapp.get('/Documents/document_0000000',
     ...     params={'adhocracy_core.sheets.NoSuchSheet:nowhere':
-    ...             'http://localhost/Documents/document_0000000/kapitel2/VERSION_0000000/'},
+    ...             'http://localhost/Documents/document_0000000/PARAGRAPH_0000002/VERSION_0000000/'},
     ...     status=400).json
     >>> resp_data['errors'][0]['description']
     'No such sheet or field'

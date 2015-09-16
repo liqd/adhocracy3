@@ -65,8 +65,10 @@ from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import extract_events_from_changelog_metadata
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import get_user
 from adhocracy_core.utils import is_batchmode
 from adhocracy_core.utils import strip_optional_prefix
@@ -625,13 +627,21 @@ class ItemRESTView(PoolRESTView):
         last_new_version = validated.get('_last_new_version_in_transaction',
                                          None)
         if last_new_version is not None:
+            follows = get_sheet_field(last_new_version,
+                                      IVersionable,
+                                      'follows',
+                                      registry=self.request.registry)
+            is_first_version = follows == []
             sheets = self.registry.get_sheets_create(last_new_version,
                                                      self.request)
             appstructs = self.request.validated.get('data', {})
             for sheet in sheets:
-                name = sheet.meta.isheet.__identifier__
-                if name in appstructs:  # pragma: no branch
-                    sheet.set(appstructs[name],
+                isheet = sheet.meta.isheet
+                is_versions_sheet = IVersionable.isEqualOrExtendedBy(isheet)
+                if is_first_version and is_versions_sheet:
+                    continue
+                if isheet.__identifier__ in appstructs:  # pragma: no branch
+                    sheet.set(appstructs[isheet.__identifier__],
                               request=self.request)
             resource = last_new_version
         else:

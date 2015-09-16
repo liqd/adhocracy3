@@ -61,18 +61,19 @@ class TestItemVersion:
         version_0 = self.make_one(config, context)
         assert IItemVersion.providedBy(version_0)
 
-    def test_create_new_version(self, config, context):
+    def test_create_first_and_send_version_added_event(self, config, context):
         events = create_event_listener(config, IItemVersionNewVersionAdded)
-        creator = self.make_one(config, context)
-
         version_0 = self.make_one(config, context)
-        version_1 = self.make_one(config, context,
-                                   follows=[version_0], creator=creator)
+        assert events[0].object == None
+        assert events[0].new_version == version_0
 
-        assert len(events) == 1
+    def test_create_followoing_and_send_version_added_event(self, config,
+                                                            context):
+        version_0 = self.make_one(config, context)
+        events = create_event_listener(config, IItemVersionNewVersionAdded)
+        version_1 = self.make_one(config, context, follows=[version_0])
         assert events[0].object == version_0
         assert events[0].new_version == version_1
-        assert events[0].creator == creator
 
     def test_create_new_version_with_referencing_resources(self, config,
                                                            context):

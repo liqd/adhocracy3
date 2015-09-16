@@ -81,7 +81,7 @@ def add_changelog_followed(event):
         return
     _add_changelog(event.registry, event.object, key='followed_by',
                    value=event.new_version)
-    item = find_interface(event.object, IItem)
+    item = find_interface(event.new_version, IItem)
     _add_changelog(event.registry, item, key='last_version',
                    value=event.new_version)
 
