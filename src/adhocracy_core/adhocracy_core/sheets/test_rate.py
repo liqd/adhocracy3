@@ -56,9 +56,9 @@ class TestRateSheet:
     def test_create(self, meta, context):
         from adhocracy_core.sheets.rate import IRate
         from adhocracy_core.sheets.rate import RateSchema
-        from adhocracy_core.sheets import AnnotationRessourceSheet
+        from adhocracy_core.sheets import AttributeResourceSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, AnnotationRessourceSheet)
+        assert issubclass(meta.sheet_class, AttributeResourceSheet)
         assert inst.meta.isheet == IRate
         assert inst.meta.schema_class == RateSchema
         assert inst.meta.create_mandatory
