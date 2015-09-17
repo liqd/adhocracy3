@@ -176,7 +176,7 @@ def includeme(config):
 
     You need to set the ws server url in your settings to make this work::
 
-        adhocracy.ws_url =  ws://localhost:8080
+        adhocracy.ws_url =  ws://localhost:6561
 
     """
     settings = config.registry.settings
