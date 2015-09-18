@@ -466,6 +466,8 @@ different types of values starting from preferred.
 -  0 length: no unit
 -  line-height: no unit, ``em``, ``rem``
 
+   -  see `explanation by Eric Meyer
+      <http://meyerweb.com/eric/thoughts/2006/02/08/unitless-line-heights/>`_.
 
 -  color: keyword, short hex, long hex, ``rgba``, ``hsla``
 -  generally prefer variables to keywords to numeric values
