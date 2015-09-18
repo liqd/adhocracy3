@@ -1,21 +1,21 @@
 .section-jump-cover {
     .like {
-        margin-top: -0.35714285em;
+        @include rem(margin-top, -5px);
     }
 }
 
 .section-jump-main {
     h3 {
+        @include rem(font-size, $font-size-small);
+        @include rem(margin, 0 0 15px);
         color: $color-text-introvert;
-        font-size: $font-size-small;
         font-weight: $font-weight-normal;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.03rem;
         line-height: 1.15;
-        margin: 0 0 (15px / $font-size-small * 1em);
         text-transform: uppercase;
 
         @media print {
-            font-size: $font-size-plus;
+            @include rem(font-size, $font-size-plus);
             margin-bottom: 3px;
         }
     }

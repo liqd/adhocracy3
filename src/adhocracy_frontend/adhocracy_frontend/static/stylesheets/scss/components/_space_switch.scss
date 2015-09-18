@@ -21,7 +21,7 @@ Switch the space (content/user)
 */
 .space-switch {
     @include inline-block;
-    margin: 0 1em;
+    @include rem(margin, 0 1rem);
     vertical-align: baseline;
 
     a {
@@ -41,7 +41,7 @@ Switch the space (content/user)
     }
 
     .separator {
-        margin: 0 1em;
+        @include rem(margin, 0 1rem);
         border-left: 2px solid $color-structure-extrovert;
     }
 }

@@ -17,12 +17,12 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
     .form-inline label {
         @include inline-block;
-        padding-right: 1em;
+        @include rem(padding-right, 1rem);
     }
 
     fieldset {
+        @include rem(padding, 0 0 0 1.6rem);
         border: 0;
-        padding: 0 0 0 1.6em;
     }
 
     .annotated-section {
@@ -43,7 +43,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-annotation {
-    padding: 1em;
+    @include rem(padding, 1rem);
     position: relative;
 }
 
@@ -51,18 +51,18 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 .mercator-proposal-form-heading,
 .mercator-proposal-form-sub-subheading,
 .mercator-proposal-form-annotation-heading {
-    font-size: $font-size-plus;
-    margin: 0 0 0.8em;
+    @include rem(margin, 0 0 $font-size-small);
+    @include rem(font-size, $font-size-plus);
 }
 
 .mercator-proposal-form-heading,
 .mercator-proposal-form-annotation-heading {
+    @include rem(margin, 0 -1rem 0.8rem);
+    @include rem(padding, 0 1rem 1px);
     border: 1px solid $color-structure-normal;
     border-width: 1px 0;
     font-weight: bold;
     line-height: 1.5;
-    margin: 0 -1em 0.8em;
-    padding: 0 1em 1px;
 
     &.active {
         color: $color-text-highlight-normal;
@@ -70,9 +70,9 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-annotation-heading {
+    @include rem(margin, -$font-size-normal -$font-size-normal $font-size-normal);
     background: $color-background-base;
     font-weight: normal;
-    margin: -0.8751em -0.8751em 0.8751em;
     text-transform: uppercase;
 }
 
@@ -82,14 +82,14 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
 .mercator-proposal-form-subheading +
 .mercator-proposal-form-sub-subheading {
-    margin-top: -0.8em;
+    @include rem(margin-top, -$font-size-normal);
 }
 
 .mercator-proposal-form-nav {
     @extend .jump-navigation;
+    @include rem(font-size, -$font-size-small);
+    @include rem(width, $mercator-proposal-form-nav-width);
     float: left;
-    width: $mercator-proposal-form-nav-width;
-    font-size: $font-size-small;
     padding: 1px 1px 0;
 
     ul, ol {
@@ -122,12 +122,12 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-form-section {
-    padding: 0 1em;
+    @include rem(padding, 0 1rem);
 }
 
 .mercator-proposal-form-footer {
+    @include rem(padding, 1rem);
     border-top: 2px solid $color-structure-normal;
-    padding: 1em;
 }
 
 .mercator-proposal-detail-view {
@@ -149,7 +149,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
 .mercator-proposal-detail-orgs-columns {
     @media screen {
-        margin: (20px / $font-size-normal * 1em) 0;
+        @include rem(margin, 20px 0);
         overflow: hidden;
         padding: 0;
 
@@ -167,7 +167,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-meta {
-    padding-bottom: 1.66666666em;
+    @include rem(padding-bottom, 20px);
 
     .mercator-proposal-detail-meta-item-total-comments {
         i {
@@ -185,7 +185,7 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
     }
 
     i {
-        font-size: 23px / $font-size-small * 1em;
+        @include rem(font-size, 23px);
     }
 
     @media print {
@@ -194,20 +194,20 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 }
 
 .mercator-proposal-detail-footer {
+    @include rem(padding, 10px 1rem);
     border-top: 2px solid  $color-structure-normal;
     overflow: hidden;
-    padding: (10 / 14 * 1em) 1em;
 
     i {
-        font-size: 10px / $font-size-normal * 1em;
+        @include rem(font-size, 10px);
         margin-right: 2px;
         vertical-align: middle;
     }
 
     .button-back-to-top {
+        @include rem(line-height, 24px);
         color: $color-text-introvert;
         float: left;
-        line-height: 24px / $font-size-normal * 1em;
         text-decoration: none;
 
         &:hover, &:focus {
@@ -230,22 +230,22 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
 
 .mercator-proposal-form-footer,
 .mercator-proposal-detail-footer {
-    padding-bottom: 500px;
+    @include rem(padding-bottom, 500px);
 }
 
 .mercator-proposal-budget-col {
     @include inline-block;
+    @include rem(margin-bottom, 20px);
+    @include rem(padding-right, 2rem);
     color: $color-text-introvert;
-    margin-bottom: 20px / $font-size-normal * 1em;
-    padding-right: 2em;
 
     &.requested {
         color: $color-text-normal;
     }
 
     strong {
+        @include rem(font-size, $font-size-large);
         display: block;
-        font-size: $font-size-large;
         font-weight: normal;
     }
 
@@ -253,16 +253,16 @@ $mercator-proposal-form-nav-width: 100% / 12 * 2;
         display: block;
 
         strong {
+            @include rem(font-size, $font-size-normal);
             @include inline-block;
-            font-size: $font-size-normal;
             font-weight: $font-weight-extrovert;
         }
     }
 }
 
 .mercator-proposal-other-sources {
+    @include rem(padding-top, 1rem);
     clear: left;
-    padding-top: 1em;
 }
 
 .inline-box-online {

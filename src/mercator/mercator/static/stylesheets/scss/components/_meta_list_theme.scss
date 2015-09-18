@@ -15,8 +15,8 @@
     padding-bottom: 0;
 
     .meta-list-item-budget {
+        @include rem(font-size, $font-size-plus);
         color: $color-text-highlight-normal;
-        font-size: $font-size-plus;
     }
 
     .meta-list-item-supporters {
@@ -38,6 +38,6 @@
 
 .mercator-proposal-detail-meta-list {
     .meta-list-item-badge {
-        padding-right: 5em;
+        @include rem(padding-right, 5rem);
     }
 }

@@ -30,17 +30,17 @@ Banner showing up if the browser is not supported.
 */
 .unsupported-browser {
     @include clearfix;
+    @include rem(padding, 1rem 1rem 0.5rem);
     background: $color-structure-normal;
-    padding: 1em 1em 0.5em;
 
     h1 {
-        font-size: $font-size-plus;
+        @include rem(margin, 0 0 5px);
+        @include rem(font-size, $font-size-plus);
         font-weight: $font-weight-normal;
-        margin: 0 0 (5px / $font-size-plus * 1em);
     }
 
     .language-block {
-        margin: 0 0 1em 56px;
+        @include rem(margin, 0 0 1rem 56px);
     }
 
     p {

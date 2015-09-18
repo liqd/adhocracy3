@@ -24,9 +24,9 @@ It is usually used in the header bar.
     .user-indicator-logout,
     .user-indicator-login,
     .user-indicator-register {
+        @include rem(font-size, $font-size-plus);
         color: $color-text-highlight-introvert;
         font-variant: small-caps;
-        font-size: $font-size-plus;
         text-transform: lowercase;
 
         &:hover, &:focus {

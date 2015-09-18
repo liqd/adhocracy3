@@ -3,5 +3,5 @@
 }
 
 .user-profile-info-name .badge {
-    margin-top: 20px / $font-size-small * 1em;
+    @include rem(margin-top, 20px);
 }
