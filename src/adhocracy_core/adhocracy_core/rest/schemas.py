@@ -576,17 +576,17 @@ def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
     schema.add(node)
 
 
-@dispatch(object, str, str)  # flake8: noqa
+@dispatch((FieldIndex, KeywordIndex), str, str)  # flake8: noqa
 def create_arbitrary_filter_node(index, example_value, query):
     return SingleLine()
 
 
-@dispatch(object, int, (int, str))  # flake8: noqa
+@dispatch((FieldIndex, KeywordIndex), int, (int, str))  # flake8: noqa
 def create_arbitrary_filter_node(index, example_value, query):
     return Integer()
 
 
-@dispatch(object, bool, (bool, str))  # flake8: noqa
+@dispatch((FieldIndex, KeywordIndex), bool, (bool, str))  # flake8: noqa
 def create_arbitrary_filter_node(index, example_value, query):
     return Boolean()
 
@@ -599,7 +599,7 @@ def create_arbitrary_filter_node(index, example_value, query):
         return FieldComparableBoolean()
 
 
-@dispatch(object, datetime, str)  # flake8: noqa
+@dispatch((FieldIndex, KeywordIndex), datetime, str)  # flake8: noqa
 def create_arbitrary_filter_node(index, example_value, query):
     return DateTime()
 
