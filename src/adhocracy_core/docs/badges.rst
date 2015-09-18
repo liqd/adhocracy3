@@ -20,6 +20,7 @@ Start adhocracy app and log in some users::
     >>> participant = getfixture('app_participant')
     >>> initiator = getfixture('app_initiator')
     >>> admin = getfixture('app_admin')
+    >>> log = getfixture('log')
 
 Create participation process structure/content to get started::
 
