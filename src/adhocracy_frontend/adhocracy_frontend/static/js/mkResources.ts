@@ -480,6 +480,8 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
 
     sheetI += "export interface HasSheet {\n";
     sheetI += "    data : { \"" + modulePath + "\" : Sheet }\n";
+    sheetI += "    path : string;\n";
+    sheetI += "    content_type : string;\n";
     sheetI += "}\n\n";
 
     hasSheetI += mkSheetSetter(sheet.nick, sheet.fields, "HasSheet");
