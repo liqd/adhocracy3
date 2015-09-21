@@ -1,0 +1,25 @@
+<div>
+    <select
+        data-ng-model="data.option"
+        name="options"
+        data-ng-options="option for option in options">
+        <option value="">{{ "TR__CREATE_BADGE_ASSIGNMENT" | translate }}</option>
+    </select>
+
+    <div data-ng-if="ready">
+        <adh-badge-assignment-edit
+            data-ng-if="data.option"
+            data-path="{{data.option}}"
+            data-badges-path="{{badgesPath}}"
+            data-on-submit="submit"
+            data-on-cancel="cancel"></adh-badge-assignment-edit>
+
+        <adh-badge-assignment-create
+            data-ng-if="!data.option"
+            data-badgeable-path="{{badgeablePath}}"
+            data-pool-path="{{poolPath}}"
+            data-badges-path="{{badgesPath}}"
+            data-on-submit="submit"
+            data-on-cancel="cancel"></adh-badge-assignment-create>
+    </div>
+</div>
