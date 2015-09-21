@@ -478,7 +478,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     sheetI += mkFieldSignatures(sheet.fields, "    public ", ";\n") + "\n";
     sheetI += "}\n\n";
 
-    sheetI += "export interface HasSheet {\n";
+    sheetI += "export interface HasSheet extends Base.IResource {\n";
     sheetI += "    data : { \"" + modulePath + "\" : Sheet }\n";
     sheetI += "    path : string;\n";
     sheetI += "    content_type : string;\n";
