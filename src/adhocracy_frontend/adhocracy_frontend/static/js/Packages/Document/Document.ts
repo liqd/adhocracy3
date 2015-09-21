@@ -207,7 +207,6 @@ export var postCreate = (
         follows: [doc.first_version_path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        description: "",
         elements: <string[]>_.map(paragraphVersions, "path")
     });
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
@@ -306,7 +305,6 @@ export var postEdit = (
         follows: [oldVersion.path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        description: "",
         elements: paragraphRefs
     });
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({

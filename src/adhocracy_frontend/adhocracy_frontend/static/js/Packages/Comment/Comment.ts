@@ -64,6 +64,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
         comments : string[];
         path : string;
         replyPoolPath : string;
+        edited : boolean;
     };
 }
 
