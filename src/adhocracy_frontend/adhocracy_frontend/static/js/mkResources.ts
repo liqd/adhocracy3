@@ -1009,7 +1009,7 @@ isWriteableField = (field) => field.editable || field.creatable || field.create_
 mkdirForFile = (filepath : string) : void => {
     var dirpath : string[] = _s.words(filepath, "/");
     dirpath.pop();
-    _fs.mkdirSync(dirpath.join("/"), 0755, true);
+    _fs.mkdirSync(dirpath.join("/"), 0o755, true);
 };
 
 pyModuleToTsModule = (filepath : string) : string =>
