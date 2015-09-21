@@ -17,7 +17,6 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     create(args : {
         preliminaryNames : AdhPreliminaryNames.Service;
         path ?: string;
-        name ?: string;
         subject : string;
         object : string;
         rate ?: number;
@@ -25,8 +24,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     }) : RIRateVersion {
         var resource = new RIRateVersion({
             preliminaryNames: args.preliminaryNames,
-            path: args.path,
-            name: args.name
+            path: args.path
         });
         if (typeof args.rate === "undefined") {
             args.rate = 0;
