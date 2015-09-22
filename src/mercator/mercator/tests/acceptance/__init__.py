@@ -1,1 +1,0 @@
-"""Adhocarcy acceptacne tests."""

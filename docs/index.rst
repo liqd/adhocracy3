@@ -13,6 +13,7 @@ Contents
 
    installation
    development
+   administration
    architecture/index
    coding_guides/index
    api/index

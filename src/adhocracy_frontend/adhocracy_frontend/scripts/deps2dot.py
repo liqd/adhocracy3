@@ -37,7 +37,7 @@ def get_modules():
 
             with open(path) as fh:
                 for line in fh:
-                    match = re.match('import .* = require\("(.*)"\);', line)
+                    match = re.match('import \* as .* from "(.*)";', line)
                     if match:
                         import_path = match.groups()[0] + '.ts'
                         if import_path.endswith('Module.ts'):

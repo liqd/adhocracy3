@@ -251,3 +251,58 @@ def test_get_autonaming_prefixes(resource_meta, registry_with_content):
     registry_with_content.content = inst
     result = _get_autonaming_prefixes(registry_with_content)
     assert sorted(result) == ['', 'VERSION_']
+
+
+class TestMigrateToAttributeStorageSheet:
+
+    @fixture
+    def registry(self, registry_with_content, mock_sheet):
+        registry = registry_with_content
+        registry.content.sheets_meta[mock_sheet.meta.isheet] = mock_sheet.meta
+        return registry
+
+    @fixture
+    def context(self, pool, mock_catalogs):
+        pool['catalogs'] = mock_catalogs
+        return pool
+
+    def call_fut(self, *args, **kwargs):
+        from . import migrate_to_attribute_storage
+        return migrate_to_attribute_storage(*args, **kwargs)
+
+    def test_ignore_if_no_resources_with_sheet(
+            self, context, mock_catalogs, search_result, registry, query):
+        mock_catalogs.search.return_value = search_result._replace(elements=[])
+        self.call_fut(context, ISheet)
+        search_query = query._replace(interfaces=ISheet)
+        assert mock_catalogs.search.call_args[0][0] == search_query
+
+    def test_ignore_if_resources_with_sheet_but_no_annotation_data(
+            self, context, registry, mock_catalogs, search_result):
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
+        assert self.call_fut(context, ISheet) is None
+
+    def test_cp_annotation_sheet_data_to_attribute_storage(
+            self, context, registry, mock_catalogs, search_result, mock_sheet):
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
+        annotation_key = '_sheet_' + mock_sheet.meta.isheet\
+            .__identifier__.replace('.', '_')
+        appstruct = {'field1': 'value'}
+        setattr(context, annotation_key, appstruct)
+        self.call_fut(context, ISheet)
+        assert context.field1 == 'value'
+
+    def test_rm_annotation_sheet_data(
+            self, context, registry, mock_catalogs, search_result,
+            mock_sheet):
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[context])
+        annotation_key = '_sheet_' + mock_sheet.meta.isheet \
+            .__identifier__.replace('.', '_')
+        appstruct = {'field1': 'value'}
+        setattr(context, annotation_key, appstruct)
+        self.call_fut(context, ISheet)
+        assert not hasattr(context, annotation_key)
+

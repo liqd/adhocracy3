@@ -92,7 +92,15 @@ class TokenMangerAnnotationStorage:
     def delete_token(self, token: str):
         """Delete authentication token."""
         if token in self.token_to_user_id_timestamp:
+
             del self.token_to_user_id_timestamp[token]
+
+    def delete_expired_tokens(self, timeout: float):
+        all = self.token_to_user_id_timestamp.items()
+        expired = [t for t, (u, date) in all if self._is_expired(date,
+                                                                 timeout)]
+        for token in expired:
+            self.delete_token(token)
 
 
 def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
