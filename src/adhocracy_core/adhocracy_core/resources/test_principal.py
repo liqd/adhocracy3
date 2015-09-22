@@ -20,9 +20,9 @@ def integration(integration):
 
 @fixture
 def mock_is_older(monkeypatch):
-    from adhocracy_core.sheets.metadata import is_older_then
+    from adhocracy_core.sheets.metadata import is_older_than
     from . import principal
-    mock = Mock(spec=is_older_then)
+    mock = Mock(spec=is_older_than)
     monkeypatch.setattr(principal, 'is_older_then', mock)
     return mock
 

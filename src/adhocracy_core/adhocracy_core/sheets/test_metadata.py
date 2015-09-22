@@ -123,8 +123,8 @@ class TestVisibility:
 class TestIsOlderThen:
 
     def call_fut(self, *args):
-        from .metadata import is_older_then
-        return is_older_then(*args)
+        from .metadata import is_older_than
+        return is_older_than(*args)
 
     @fixture
     def now(self):

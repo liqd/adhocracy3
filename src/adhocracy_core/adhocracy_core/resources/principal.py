@@ -24,7 +24,7 @@ from adhocracy_core.resources.base import Base
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.metadata import is_older_then
+from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
@@ -375,7 +375,7 @@ def delete_not_activated_users(request: Request, age_in_days: int):
                                                    IRolesUserLocator)
     users = userlocator.get_users()
     not_activated = (u for u in users if not u.active)
-    expired = [u for u in not_activated if is_older_then(u, age_in_days)]
+    expired = [u for u in not_activated if is_older_than(u, age_in_days)]
     for user in expired:
         msg = 'deleting user {0}: name {1} email {2}'.format(user,
                                                              user.email,
@@ -387,7 +387,7 @@ def delete_not_activated_users(request: Request, age_in_days: int):
 def delete_password_resets(request: Request, age_in_days: int):
     """Delete password resets that are older than `age_in_days`."""
     resets = find_service(request.root, 'principals', 'resets')
-    expired = [u for u in resets.values() if is_older_then(u, age_in_days)]
+    expired = [u for u in resets.values() if is_older_than(u, age_in_days)]
     for reset in expired:
         print('deleting reset {0}'.format(reset))
         del resets[reset.__name__]

@@ -59,7 +59,7 @@ from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
-from adhocracy_core.sheets.metadata import is_older_then
+from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
@@ -1092,7 +1092,7 @@ def validate_activation_path(context, request: Request):
     error = error_entry('body', 'path', 'Unknown or expired activation path')
     if user is None:
         request.errors.append(error)
-    elif is_older_then(user, days=7):
+    elif is_older_than(user, days=7):
         request.errors.append(error)
         user.activation_path = None
     else:
