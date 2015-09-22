@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from pyramid import testing
 from pytest import fixture
 from pytest import raises
@@ -74,6 +76,7 @@ class TestCreateUniqueBadgeAssignmentValidator:
     def node(self, node):
         node['badge'] = testing.DummyResource()
         node['object'] = testing.DummyResource()
+        node['object2'] = testing.DummyResource()
         return node
 
     @fixture
@@ -81,6 +84,13 @@ class TestCreateUniqueBadgeAssignmentValidator:
         request = testing.DummyRequest()
         request.root = context
         return request
+
+    @fixture
+    def mock_find_service(self, monkeypatch):
+        from . import badge
+        mock = Mock()
+        monkeypatch.setattr(badge, 'find_service', mock)
+        return mock
 
     def test_raise_if_assignment_already_exists(
             self, node, context, registry, mock_sheet):
@@ -99,6 +109,60 @@ class TestCreateUniqueBadgeAssignmentValidator:
         with raises(colander.Invalid):
             validator(node, {'badge': badge,
                              'object': node['object']})
+
+
+    def test_no_raise_if_updating(
+            self, node, context, registry, mock_sheet):
+        import colander
+        from .badge import IBadge
+        from .badge import IBadgeAssignment
+        badge = testing.DummyResource(__provides__=IBadge)
+        mock_sheet.get.return_value = {'name': 'badge0',
+                                       'badge': badge,
+                                       'object': node['object']}
+        registry.content.get_sheet.return_value = mock_sheet
+        assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
+        kw = {'registry': registry, 'context': assign0}
+        validator = self.call_fut(node['badge'], node['object'], kw)
+        context['badge_assignments']['assign0'] = assign0
+        validator(node, {'badge': badge,
+                         'object': node['object']}) is None
+
+    def test_raise_if_updating_but_result_in_same_badge(
+            self, node, context, registry, mock_sheet, mock_find_service):
+        import colander
+        from .badge import IBadge
+        from .badge import IBadgeAssignment
+        mock_sheet_badge = deepcopy(mock_sheet)
+        mock_sheet_name = deepcopy(mock_sheet)
+        mock_sheet_badge2 = deepcopy(mock_sheet)
+        mock_sheet_name2 = deepcopy(mock_sheet)
+        badge = testing.DummyResource(__provides__=IBadge)
+        mock_sheet_badge.get.return_value = {'badge': badge,
+                                             'object': node['object']}
+        mock_sheet_name.get.return_value = {'name': 'badge0'}
+        mock_sheet_badge2.get.return_value = {'badge': badge,
+                                              'object': node['object2']}
+        mock_sheet_name2.get.return_value = {'name': 'badge0'}
+        registry.content.get_sheet.side_effect = [mock_sheet_name,
+                                                  mock_sheet_badge,
+                                                  mock_sheet_name,
+                                                  mock_sheet_badge2,
+                                                  mock_sheet_name2,
+                                                  ]
+        assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
+        assign1 = testing.DummyResource(__provides__=IBadgeAssignment)
+        context['badge_assignments']['assign0'] = assign0
+        context['badge_assignments']['assign1'] = assign1
+        mock_pool = Mock()
+        mock_find_service.return_value = mock_pool
+        mock_pool.values.return_value = [assign0, assign1]
+        kw = {'registry': registry, 'context': assign0}
+        validator = self.call_fut(node['badge'], node['object'], kw)
+        with raises(colander.Invalid):
+            validator(node, {'badge': badge,
+                             'object': node['object2']})
+
 
     def test_no_raise_if_object_different(
             self, node, context, registry, mock_sheet):
