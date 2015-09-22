@@ -626,7 +626,7 @@ class ItemRESTView(PoolRESTView):
         root_versions = validated.get('root_versions', [])
         last_new_version = validated.get('_last_new_version_in_transaction',
                                          None)
-        if last_new_version is not None:
+        if last_new_version is not None:  # this only happens in batch request
             follows = get_sheet_field(last_new_version,
                                       IVersionable,
                                       'follows',

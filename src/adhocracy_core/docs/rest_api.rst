@@ -1238,7 +1238,7 @@ subrequest does not create a second version, but updates the existing first vers
     >>> v0 == v0_again
     True
 
-The follow reference points to None, because the there is only one version:
+The follow reference points to None:
 
     >>> batch_resp['responses'][2]['body']['data']['adhocracy_core.sheets.versions.IVersionable']['follows']
     []
