@@ -5,15 +5,13 @@
             data-ng-repeat="assignment in data.assignments"
             class="badge">{{ assignment.title }}</span>
 
-        <ul class="proposal-detail-meta">
-            <li class="proposal-detail-meta-item proposal-detail-meta-item-comments">
+        <ul class="meta-list">
+            <li class="meta-list-item meta-item-comments">
                 <a href="{{ path | adhParentPath | adhResourceUrl:'comments' }}" class="disguised-link">
                     <i class="icon-speechbubble"></i> {{ data.commentCount }} {{ "TR__COMMENTS" | translate }}
                 </a>
             </li>
-            <li></li>
-            <li></li>
-            <li class="proposal-detail-meta-item proposal-detail-meta-participation">
+            <li class="meta-list-item meta-list-item-participation">
                 <adh-rate data-refers-to="{{path}}"></adh-rate>
             </li>
         </ul>
