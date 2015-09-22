@@ -380,7 +380,7 @@ def delete_not_activated_users(request: Request, age_in_days: int):
         msg = 'deleting user {0}: name {1} email {2}'.format(user,
                                                              user.email,
                                                              user.name)
-        print(msg)
+        logger.info(msg)
         del user.__parent__[user.__name__]
 
 
@@ -389,7 +389,7 @@ def delete_password_resets(request: Request, age_in_days: int):
     resets = find_service(request.root, 'principals', 'resets')
     expired = [u for u in resets.values() if is_older_than(u, age_in_days)]
     for reset in expired:
-        print('deleting reset {0}'.format(reset))
+        logger.info('deleting reset {0}'.format(reset))
         del resets[reset.__name__]
 
 
