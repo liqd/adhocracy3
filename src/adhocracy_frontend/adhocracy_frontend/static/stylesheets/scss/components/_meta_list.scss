@@ -48,7 +48,7 @@ Vertical
 
     &.m-vertical {
         .meta-list-item {
-            @include rem(padding-bottom, 5px);
+            @include rem(padding-bottom, 10px);
             float: none;
 
             &:last-child {
