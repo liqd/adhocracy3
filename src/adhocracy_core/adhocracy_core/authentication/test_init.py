@@ -77,6 +77,26 @@ class TokenManagerUnitTest(unittest.TestCase):
         inst.delete_token(self.token)
         assert self.token not in inst.token_to_user_id_timestamp
 
+    def test_delete_expired_tokens_delete_token_if_expired(self):
+        inst = self.make_one(self.context)
+        inst.token_to_user_id_timestamp[self.token] = (self.userid, self.timestamp)
+        inst._is_expired = Mock(return_value=True)
+        inst.delete_token = Mock()
+        timeout = 0.1
+        inst.delete_expired_tokens(timeout)
+
+        inst._is_expired.assert_called_with(self.timestamp, timeout)
+        inst.delete_token.assert_called_with(self.token)
+
+    def test_delete_expired_tokens_ignore_token_if_not_expired(self):
+        inst = self.make_one(self.context)
+        inst.token_to_user_id_timestamp[self.token] = (self.userid, self.timestamp)
+        inst._is_expired = Mock(return_value=False)
+        inst.delete_token = Mock()
+        timeout = 0.1
+        inst.delete_expired_tokens(timeout)
+        assert not inst.delete_token.called
+
 
 class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
@@ -292,6 +312,17 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         self.request.headers = self.token_and_user_id_headers
         assert inst.forget(self.request) == {}
         assert tokenmanager.delete_token.is_called
+
+    def delete_expired_tokens(self, timeout: float):
+        from . import TokenMangerAnnotationStorage
+        tokenmanager = Mock(spec=TokenMangerAnnotationStorage)
+        request = testing.DummyRequest()
+        timeout = 0.1
+        inst = self.make_one('',
+                             get_tokenmanager=lambda x: tokenmanager,
+                             timeout=timeout)
+        inst.delete_expired_tokens(request)
+        tokenmanager.delete_expired_tokens.assert_called_with(timeout)
 
 
 class GetTokenManagerUnitTest(unittest.TestCase):

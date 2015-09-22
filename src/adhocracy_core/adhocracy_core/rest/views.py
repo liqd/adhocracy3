@@ -1,8 +1,6 @@
 """GET/POST/PUT requests processing."""
 from collections import defaultdict
 from copy import deepcopy
-from datetime import datetime
-from datetime import timezone
 from logging import getLogger
 
 from colander import Invalid
@@ -34,7 +32,6 @@ from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.resources.asset import IAssetsService
 from adhocracy_core.resources.asset import validate_and_complete_asset
-from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
@@ -62,6 +59,7 @@ from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.sheets.principal import IPasswordAuthentication
 from adhocracy_core.sheets.pool import IPool as IPoolSheet
@@ -1101,24 +1099,16 @@ def validate_activation_path(context, request: Request):
     locator = request.registry.getMultiAdapter((context, request),
                                                IUserLocator)
     user = locator.get_user_by_activation_path(path)
-    registry = request.registry
-    if user is None or _activation_time_window_has_expired(user, registry):
-        error = error_entry('body', 'path',
-                            'Unknown or expired activation path')
+    error = error_entry('body', 'path', 'Unknown or expired activation path')
+    if user is None:
         request.errors.append(error)
+    elif is_older_than(user, days=8):
+        request.errors.append(error)
+        user.activation_path = None
     else:
         user.activate()
+        user.activation_path = None
         request.validated['user'] = user
-    if user is not None:
-        user.activation_path = None  # activation path can only be used once
-
-
-def _activation_time_window_has_expired(user: IUser, registry) -> bool:
-    """Check that user account was created less than 7 days ago."""
-    metadata = get_sheet(user, IMetadata, registry=registry)
-    creation_date = metadata.get()['creation_date']
-    timedelta = datetime.now(timezone.utc) - creation_date
-    return timedelta.days >= 7
 
 
 @view_defaults(

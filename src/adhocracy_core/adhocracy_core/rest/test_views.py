@@ -1391,14 +1391,8 @@ class TestValidateActivationPathUnitTest:
         return request_
 
     @fixture
-    def user_with_metadata(self, config):
-        from adhocracy_core.sheets.metadata import IMetadata
-        config.include('adhocracy_core.content')
-        config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.changelog')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.sheets.metadata')
-        user = testing.DummyResource(__provides__=IMetadata)
+    def user(self):
+        user = testing.DummyResource()
         user.activate = Mock()
         return user
 
@@ -1406,32 +1400,28 @@ class TestValidateActivationPathUnitTest:
         from adhocracy_core.rest.views import validate_activation_path
         return validate_activation_path(context, _request)
 
-    def test_valid(self, _request, user_with_metadata, context,
+    def test_valid(self, _request, user, context,
                    mock_user_locator):
-        mock_user_locator.get_user_by_activation_path.return_value = \
-            user_with_metadata
+        from datetime import datetime
+        from datetime import timezone
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        user.creation_date = datetime.now(timezone.utc)
         self.call_fut(context, _request)
-        assert _request.validated['user'] == user_with_metadata
-        assert user_with_metadata.activate.called
+        assert _request.validated['user'] == user
+        assert user.activate.called
 
     def test_not_found(self, _request, context, mock_user_locator):
         mock_user_locator.get_user_by_activation_path.return_value = None
         self.call_fut(context, _request)
         assert 'Unknown or expired activation path' == _request.errors[0].description
 
-    def test_found_but_expired(self, _request, user_with_metadata, context,
+    def test_found_but_expired(self, _request, user, context,
                                mock_user_locator):
         from datetime import datetime
         from datetime import timezone
-        from adhocracy_core.sheets.metadata import IMetadata
-        from adhocracy_core.utils import get_sheet
-        mock_user_locator.get_user_by_activation_path.return_value = \
-            user_with_metadata
-        metadata = get_sheet(user_with_metadata, IMetadata)
-        appstruct = metadata.get()
-        appstruct['creation_date'] = datetime(
-            year=2010, month=1, day=1, tzinfo=timezone.utc)
-        metadata.set(appstruct, omit_readonly=False)
+        mock_user_locator.get_user_by_activation_path.return_value = user
+        user.creation_date = datetime(year=2010, month=1, day=1, tzinfo=timezone.utc)
+        self.call_fut(context, _request)
         self.call_fut(context, _request)
         assert 'Unknown or expired activation path' == _request.errors[0].description
 
