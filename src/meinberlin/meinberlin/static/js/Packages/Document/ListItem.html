@@ -5,11 +5,11 @@
         data-ng-if="data.picture"
         data-ng-src="{{ data.picture | adhImageUri:'thumbnail' }}" alt="" />
     <div class="proposal-list-item-body">
-        <div class="meinberlin-alexanderplatz-proposal-list-item-col-left">
+        <div class="proposal-list-item-col-left">
             <span data-ng-repeat="badge in data.assignments" class="badge m-info">{{ badge.title }}</span>
             <h3 class="proposal-list-item-title">{{ data.title }}</h3>
         </div>
-        <div class="meinberlin-alexanderplatz-proposal-list-item-col-right">
+        <div class="proposal-list-item-col-right">
             <ul class="meta-list">
                 <li class="meta-list-item">
                     <i class="icon-speechbubble-unfilled"></i> {{ data.commentCountTotal }} {{ "TR__COMMENTS" | translate }}
