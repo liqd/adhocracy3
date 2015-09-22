@@ -48,7 +48,6 @@ class Pool(Base, Folder):
         Folder.__init__(self, data=data, family=family)
         Base.__init__(self)
         self.__changed_descendants_counter__ = Length()
-        self._autoname_lasts = PersistentMapping()
 
     def next_name(self, subobject, prefix='') -> str:
         """Generate name to add subobject to the folder.
@@ -82,12 +81,12 @@ class Pool(Base, Folder):
         return str(int(name)).zfill(self._autoname_length)
 
     def _get_next_number(self, prefix):
-        if prefix in self._autoname_lasts:
-            number = self._autoname_lasts[prefix].value
-        else:
-            self._autoname_lasts[prefix] = Length()
-            number = self._autoname_lasts[prefix].value
-        self._autoname_lasts[prefix].change(1)
+        last = getattr(self, '_autoname_last_' + prefix, None)
+        if last is None:
+            last = Length()
+            setattr(self, '_autoname_last_' + prefix, last)
+        number = last.value
+        last.change(1)
         return number
 
     def find_service(self, service_name, *sub_service_names):
