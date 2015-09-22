@@ -125,8 +125,8 @@ class TestCreateUniqueBadgeAssignmentValidator:
         kw = {'registry': registry, 'context': assign0}
         validator = self.call_fut(node['badge'], node['object'], kw)
         context['badge_assignments']['assign0'] = assign0
-        validator(node, {'badge': badge,
-                         'object': node['object']}) is None
+        assert validator(node, {'badge': badge,
+                                'object': node['object']}) is None
 
     def test_raise_if_updating_but_result_in_same_badge(
             self, node, context, registry, mock_sheet, mock_find_service):
@@ -178,7 +178,7 @@ class TestCreateUniqueBadgeAssignmentValidator:
         validator = self.call_fut(node['badge'], node['object'], kw)
         assign0 = testing.DummyResource(__provides__=IBadgeAssignment)
         context['badge_assignments']['assign0'] = assign0
-        validator(node, {'badge': badge, 'object': testing.DummyResource()}) is None
+        assert validator(node, {'badge': badge, 'object': testing.DummyResource()}) is None
 
     def test_valid(
             self, node, context, registry, mock_sheet):
