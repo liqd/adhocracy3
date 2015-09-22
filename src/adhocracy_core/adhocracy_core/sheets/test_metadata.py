@@ -141,7 +141,7 @@ class TestIsOlderThen:
     def test_creation_date_equal_to_days(self, context, now):
         from datetime import timedelta
         context.creation_date = now - timedelta(days=7)
-        assert self.call_fut(context, 7) is True
+        assert self.call_fut(context, 7) is False
 
     def test_creation_date_younger_then_days(self, context, now):
         context.creation_date = now

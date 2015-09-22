@@ -1092,7 +1092,7 @@ def validate_activation_path(context, request: Request):
     error = error_entry('body', 'path', 'Unknown or expired activation path')
     if user is None:
         request.errors.append(error)
-    elif is_older_than(user, days=7):
+    elif is_older_than(user, days=8):
         request.errors.append(error)
         user.activation_path = None
     else:

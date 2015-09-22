@@ -127,7 +127,7 @@ def view_blocked_by_metadata(resource: IResource, registry: Registry,
 def is_older_than(resource: IMetadata, days: int) -> bool:
     """Check if the creation date of `context` is older than `days`."""
     timedelta = now() - resource.creation_date
-    return timedelta.days >= days
+    return timedelta.days > days
 
 
 def includeme(config):
