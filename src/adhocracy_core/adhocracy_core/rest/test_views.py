@@ -1416,8 +1416,8 @@ class TestValidateActivationPathUnitTest:
         from datetime import datetime
         from datetime import timezone
         mock_user_locator.get_user_by_activation_path.return_value = user
-        self.call_fut(context, _request)
         user.creation_date = datetime(year=2010, month=1, day=1, tzinfo=timezone.utc)
+        self.call_fut(context, _request)
         self.call_fut(context, _request)
         assert 'Unknown or expired activation path' == _request.errors[0].description
 

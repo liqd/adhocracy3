@@ -23,7 +23,7 @@ def mock_is_older(monkeypatch):
     from adhocracy_core.sheets.metadata import is_older_than
     from . import principal
     mock = Mock(spec=is_older_than)
-    monkeypatch.setattr(principal, 'is_older_then', mock)
+    monkeypatch.setattr(principal, 'is_older_than', mock)
     return mock
 
 
