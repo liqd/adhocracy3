@@ -5,7 +5,6 @@ from substanced.util import find_service
 from substanced.interfaces import IFolder
 from zope.interface import implementer
 from zope.deprecation import deprecated
-from persistent.mapping import PersistentMapping
 
 import adhocracy_core.sheets.name
 import adhocracy_core.sheets.pool
