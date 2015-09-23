@@ -9,8 +9,7 @@ import * as AdhUtil from "../../Util/Util";
 import * as SIComment from "../../../Resources_/adhocracy_core/sheets/comment/IComment";
 import RIComment from "../../../Resources_/adhocracy_core/resources/comment/IComment";
 import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
-import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/pcompass/IProcess";
-import RIProcess from "../../../Resources_/adhocracy_pcompass/resources/pcompass/IProcess";
+import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/request/IProcess";
 import RIProposal from "../../../Resources_/adhocracy_core/resources/proposal/IProposal";
 import RIProposalVersion from "../../../Resources_/adhocracy_core/resources/proposal/IProposalVersion";
 
@@ -102,7 +101,7 @@ export var registerRoutes = (
             movingColumns: "is-show-show-hide"
         })
         .specific(RIPcompassProcess, "create_proposal", processType, context, [
-            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIProcess) => {
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIPcompassProcess) => {
                 return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
                     if (!options.POST) {
                         throw 401;

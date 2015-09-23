@@ -10,7 +10,7 @@ import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
 
 import * as AdhPcompassWorkbench from "../Workbench/Workbench";
 
-import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/pcompass/IProcess";
+import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/request/IProcess";
 
 import * as Context from "./Context";
 
