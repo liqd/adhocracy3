@@ -1,16 +1,18 @@
+import json
+import os
+
+from pyramid.request import Request
 from pytest import fixture
 from pytest import mark
+from substanced.interfaces import IUserLocator
+from substanced.util import find_service
+from tempfile import mkstemp
+import pytest
+
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 
-from substanced.util import find_service
-from pyramid.request import Request
-from substanced.interfaces import IUserLocator
-from tempfile import mkstemp
-import os
-import json
-import pytest
 
 @mark.usefixtures('integration')
 class TestImportUsers:
