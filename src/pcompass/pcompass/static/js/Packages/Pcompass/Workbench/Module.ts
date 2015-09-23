@@ -10,7 +10,7 @@ import * as AdhTopLevelStateModule from "../../TopLevelState/Module";
 
 import * as AdhProcess from "../../Process/Process";
 
-import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/pcompass/IProcess";
+import RIPcompassProcess from "../../../Resources_/adhocracy_pcompass/resources/request/IProcess";
 
 import * as Workbench from "./Workbench";
 
