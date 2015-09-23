@@ -8,7 +8,7 @@
     },
     {"path": "/organisation",
      "creator": "god",
-     "content_type": "adhocracy_pcompass.resources.pcompass.IProcess",
+     "content_type": "adhocracy_pcompass.resources.request.IProcess",
      "data": {"adhocracy_core.sheets.name.IName":
               {"name": "pcompass"}
              }

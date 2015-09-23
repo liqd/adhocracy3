@@ -11,6 +11,7 @@ from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import Reference
 from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets import AttributeResourceSheet
 from adhocracy_core.schema import Integer
 from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.schema import UniqueReferences
@@ -165,6 +166,7 @@ class RateSchema(colander.MappingSchema):
 
 rate_meta = sheet_meta._replace(isheet=IRate,
                                 schema_class=RateSchema,
+                                sheet_class=AttributeResourceSheet,
                                 create_mandatory=True)
 
 

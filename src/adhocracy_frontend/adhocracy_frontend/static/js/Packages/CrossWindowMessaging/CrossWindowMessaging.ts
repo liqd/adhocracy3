@@ -47,6 +47,11 @@ export interface IMessage {
 
 export interface IMessageData {
     embedderOrigin? : string;
+    height? : number;
+    token? : string;
+    userPath? : string;
+    userData? : any;
+    url? : string;
 }
 
 export interface IPostMessageService {
@@ -150,7 +155,7 @@ export class Service implements IService {
                 _self.$rootScope.$watch(() => typeof _self.adhUser.data !== "undefined", (loggedIn) => _self.sendLoginState(loggedIn));
             }
 
-            _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl) => {
+            _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl : string) => {
                 _self.postMessage(
                     "urlchange",
                     {url: absUrl}

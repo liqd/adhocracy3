@@ -28,7 +28,20 @@ export interface IResourceClass {
 }
 
 
-export class Resource {
+export interface IResource {
+    data : Object;
+    path : string;
+    parent : string;
+    first_version_path : string;
+    root_versions : string[];
+
+    getReferences() : string[];
+    isInstanceOf(resourceType : string) : boolean;
+    hasSheet(sheet : string) : boolean;
+}
+
+
+export class Resource implements IResource {
     public data : Object;
 
     // these path attributes may be undefined or null.
