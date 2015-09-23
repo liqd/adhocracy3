@@ -17,6 +17,7 @@ Start Adhocracy testapp ::
     >>> participant = getfixture('app_participant')
     >>> moderator = getfixture('app_moderator')
     >>> admin = getfixture('app_admin')
+    >>> log = getfixture('log')
 
 Message to a User
 -----------------
