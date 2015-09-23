@@ -21,8 +21,10 @@ from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadge
 from adhocracy_core.resources.subscriber import _get_default_group
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core import sheets
 from adhocracy_core.scripts.assign_badges import create_badge_assignment
+from adhocracy_core.sheets.name import IName
 
 
 logger = logging.getLogger(__name__)
@@ -62,7 +64,10 @@ def _import_users(context: IResource, registry: Registry, filename: str):
         if user_by_name or user_by_email:
             logger.info('Updating user {} ({})'.format(user_info['name'],
                                                        user_info['email']))
-            _update_user(user_by_name, user_by_email, user_info, groups)
+            _update_user(user_by_name,
+                         user_by_email,
+                         user_info,
+                         groups, registry)
         else:
             logger.info('Creating user {}'.format(user_info['name']))
             send_invitation = user_info.get('send_invitation_mail', False)
@@ -100,7 +105,8 @@ def _locate_user(user_info, context, registry):
 def _update_user(user_by_name: IUser,
                  user_by_email: IUser,
                  user_info: dict,
-                 groups: IResource):
+                 groups: IResource,
+                 registry: Registry):
     if user_by_name is not None\
             and user_by_email is not None\
             and user_by_name != user_by_email:
@@ -125,6 +131,20 @@ def _update_user(user_by_name: IUser,
     roles_names = user_info.get('roles', [])
     permissions_sheet.set({'roles': roles_names,
                            'groups': user_groups})
+    badges_names = user_info.get('badges', [])
+    _update_badges_assignments(user, badges_names, registry)
+
+
+def _update_badges_assignments(user: IUser,
+                               badges_names: [str],
+                               registry: Registry) -> None:
+    _delete_badges_assignments(user)
+    badges = _create_badges(user, badges_names, registry)
+    normalized_badges_names = [_normalize_badge_name(b) for b in badges_names]
+    badges_to_assign = [b for b in badges
+                        if get_sheet_field(b, IName, 'name')
+                        in normalized_badges_names]
+    _assign_badges(user, badges_to_assign, registry)
 
 
 def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
@@ -208,3 +228,14 @@ def _normalize_badge_name(name: str) -> str:
 def _assign_badges(user: IUser, badges: [IBadge], registry: Registry):
     for badge in badges:
         create_badge_assignment(user, badge, user, '', registry)
+
+
+def _delete_badges_assignments(user: IUser) -> None:
+    assignments = find_service(user, 'badge_assignments')
+    to_delete = []
+    for assignment in assignments.values():
+        appstruct = get_sheet(assignment, sheets.badge.IBadgeAssignment).get()
+        if appstruct['subject'] == user and appstruct['object'] == user:
+            to_delete.append(assignment.__name__)
+    for assignment_name in to_delete:
+        assignments.remove(assignment_name)

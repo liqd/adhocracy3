@@ -1,6 +1,10 @@
 from pytest import fixture
 from pytest import mark
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
+
+from substanced.util import find_service
 from pyramid.request import Request
 from substanced.interfaces import IUserLocator
 from tempfile import mkstemp
@@ -192,6 +196,35 @@ class TestImportUsers:
         with pytest.raises(ValueError):
             self.call_fut(context, registry, filename)
 
+    def test_update_badges(self, context, registry, log):
+        from adhocracy_core import sheets
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'alice@example.org',
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
+                 'groups': ['gods'], 'badges': ['Moderator', 'Beginner']},
+            ]))
+        locator = self._get_user_locator(context, registry)
+        self.call_fut(context, registry, filename)
+
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'alice@example.org',
+                 'badges': ['Expert']}]))
+
+        self.call_fut(context, registry, filename)
+        alice = locator.get_user_by_login('Alice')
+        assignments = find_service(alice, 'badge_assignments').values()
+        assert len(assignments) == 1
+
+        assignment = assignments[0]
+        assignment_sheet = get_sheet(assignment, sheets.badge.IBadgeAssignment)
+        badge = context['principals']['badges']['expert']
+        assert assignment_sheet.get() == {'object': alice,
+                                          'badge': badge,
+                                          'subject': alice}
+
     def test_create_and_send_invitation_mail(self, context, registry, mock_messenger):
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
@@ -219,8 +252,6 @@ class TestImportUsers:
     def test_create_and_create_and_assign_badge(self, context, registry,
                                                 mock_messenger):
         from adhocracy_core import sheets
-        from adhocracy_core.utils import get_sheet
-        from adhocracy_core.utils import get_sheet_field
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
