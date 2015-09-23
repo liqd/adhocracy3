@@ -31,6 +31,7 @@ export interface IScope extends angular.IScope {
         title : string;
         detail : string;
         creator : string;
+        rateCount : number;
         creationDate : string;
         commentCount : number;
         assignments : AdhBadge.IBadge[];
