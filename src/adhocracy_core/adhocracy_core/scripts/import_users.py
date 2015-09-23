@@ -132,16 +132,18 @@ def _get_groups(groups_names: [str], groups: IResource) -> [IResource]:
 
 def _create_user(user_info: dict, users: IResource, registry: Registry,
                  groups: IResource, activate=True) -> IUser:
-    groups = _get_groups(user_info['groups'], groups)
+    groups_names = user_info.get('groups', [])
+    groups = _get_groups(groups_names, groups)
     if groups == []:
         default = _get_default_group(users)
         groups = [default]
+    roles_names = user_info.get('roles', [])
     appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
                  sheets.principal.IUserExtended.__identifier__:
                  {'email': user_info['email']},
                  sheets.principal.IPermissions.__identifier__:
-                 {'roles': user_info['roles'],
+                 {'roles': roles_names,
                   'groups': groups},
                  sheets.principal.IPasswordAuthentication.
                  __identifier__: {'password': user_info['initial-password']},
