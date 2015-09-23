@@ -142,8 +142,8 @@ class TestMercatorWorkflow:
         """
         resp = app_participant.batch(create_proposal_batch)
         resp = app_participant.batch(update_proposal_batch)
-        assert app_participant.get('/proposal_0000001/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
-        assert "VERSION_0000002" in app_participant.get('/proposal_0000001/VERSION_0000002').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
+        assert app_participant.get('/proposal_0000001/VERSION_0000001').json_body['data']['adhocracy_mercator.sheets.mercator.IUserInfo']['personal_name'] == 'pita Updated'
+        assert "VERSION_0000001" in app_participant.get('/proposal_0000001/VERSION_0000001').json_body['data']['adhocracy_mercator.sheets.mercator.IMercatorSubResources']['organization_info']
 
     def test_participate_cannot_edit_other_users_proposal(self, app_participant, app_god):
         resp = _post_proposal_item(app_god, path='/')
