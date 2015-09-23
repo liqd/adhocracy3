@@ -119,9 +119,11 @@ def _update_user(user_by_name: IUser,
     if user_by_email is None:
         userextended_sheet = get_sheet(user, sheets.principal.IUserExtended)
         userextended_sheet.set({'email': user_info['email']})
-    user_groups = _get_groups(user_info['groups'], groups)
+    groups_names = user_info.get('groups', [])
+    user_groups = _get_groups(groups_names, groups)
     permissions_sheet = get_sheet(user, sheets.principal.IPermissions)
-    permissions_sheet.set({'roles': user_info['roles'],
+    roles_names = user_info.get('roles', [])
+    permissions_sheet.set({'roles': roles_names,
                            'groups': user_groups})
 
 
