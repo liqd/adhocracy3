@@ -25,7 +25,7 @@ class TestImportUsers:
         from adhocracy_core.scripts.import_users import _import_users
         return _import_users(root, registry, filename)
 
-    
+
     def test_create(self, context, registry, log):
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
