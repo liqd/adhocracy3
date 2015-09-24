@@ -15,6 +15,7 @@ class TestPolarizableSheet:
 
     @fixture
     def inst(self, pool, service):
+        pool['polarizations'] = service
         from adhocracy_core.sheets.polarization import polarizable_meta
         return polarizable_meta.sheet_class(polarizable_meta, pool)
 
@@ -31,4 +32,30 @@ class TestPolarizableSheet:
 
 
     def test_get_empty(self, inst):
-        assert inst.get() == {'position': 'pro'}
+        post_pool = inst.context['polarizations']
+        assert inst.get() == {'post_pool': post_pool,
+                              'polarizations': []}
+
+class TestPolarizationSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.polarization import polarization_meta
+        return polarization_meta
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.polarization import IPolarization
+        from adhocracy_core.sheets.polarization import PolarizationSchema
+        from adhocracy_core.sheets import AnnotationRessourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, AnnotationRessourceSheet)
+        assert inst.meta.isheet == IPolarization
+        assert inst.meta.schema_class == PolarizationSchema
+        assert inst.meta.create_mandatory
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'subject': None,
+                              'object': None,
+                              'position': 'pro',
+                              }
