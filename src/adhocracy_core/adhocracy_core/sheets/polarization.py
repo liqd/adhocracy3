@@ -1,23 +1,24 @@
 """Polarization sheet."""
 import colander
 
-from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.interfaces import IPredicateSheet
-from adhocracy_core.sheets import add_sheet_to_registry
-from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.interfaces import ISheet
-from adhocracy_core.schema import Reference as ReferenceSchema
+from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import PostPool
+from adhocracy_core.schema import Reference as ReferenceSchema
+from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.sheets import sheet_meta
 
 
-class IPolarization(IPredicateSheet):
+class IPolarization(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for the polarization sheet."""
 
 
-class IPolarizable(ISheet):
+class IPolarizable(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for resources than can be polarized."""
 
@@ -105,4 +106,5 @@ polarizable_meta = sheet_meta._replace(
 
 def includeme(config):
     """Register sheets, adapters and index views."""
+    add_sheet_to_registry(polarization_meta, config.registry)
     add_sheet_to_registry(polarizable_meta, config.registry)
