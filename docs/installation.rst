@@ -108,10 +108,6 @@ Shutdown everything nicely::
 Run test suites
 ---------------
 
-Run pytest suite::
+Run test suite::
 
-    bin/py.test_run_all
-
-Run protractor acceptance tests::
-
-    bin/protractor etc/protractorConf.js
+    bin/polytester
