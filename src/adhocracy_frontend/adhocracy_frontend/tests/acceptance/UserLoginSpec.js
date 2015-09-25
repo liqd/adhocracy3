@@ -79,6 +79,7 @@ describe("user password reset", function() {
     it("error displayed if the email is not associated to an user", function() {
         var page = new UserPages.ResetPasswordCreatePage().get();
         page.fill("abc@xy.de");
+        browser.wait(browser.isElementPresent(element(by.css(".form-error"))), 1000)
         expect(element(by.css(".form-error")).getText()).toContain("No user");
     });
 
@@ -105,7 +106,7 @@ describe("user password reset", function() {
 
         browser.driver.wait(function() {
             return resetUrl != "";
-        }).then(function() {
+        }, 1000).then(function() {
             var resetPage = new UserPages.ResetPasswordPage().get(resetUrl);
             resetPage.fill('new password');
 
