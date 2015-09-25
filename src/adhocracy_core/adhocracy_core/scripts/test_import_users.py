@@ -60,6 +60,7 @@ class TestImportUsers:
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
 
+
     def test_create_default_values(self, context, registry, log):
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
@@ -77,6 +78,28 @@ class TestImportUsers:
         bob_user_id = resource_path(bob)
         groups = locator.get_groups(bob_user_id)
         assert groups == [default_group]
+
+    def test_create_gen_default_password(self, context, registry, log):
+        from pyramid.traversal import resource_path
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice',
+                 'email': 'alice@example.org',
+                 'roles': ['contributor'],
+                 'groups': ['gods']},
+            ]))
+        locator = self._get_user_locator(context, registry)
+
+        self.call_fut(context, registry, filename)
+
+        god_group = context['principals']['groups']['gods']
+        alice = locator.get_user_by_login('Alice')
+        assert alice.active
+        alice = locator.get_user_by_login('Alice')
+        alice_user_id = resource_path(alice)
+        groups = locator.get_groups(alice_user_id)
+        assert groups == [god_group]
 
     def test_create_email_not_lower_case(self, context, registry, log):
         self._tempfd, filename = mkstemp()
@@ -341,5 +364,3 @@ class TestImportUsers:
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
-
-

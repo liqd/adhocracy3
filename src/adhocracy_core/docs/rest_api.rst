@@ -20,6 +20,7 @@ Some imports to work with rest api calls::
 Start Adhocracy testapp::
 
     >>> from webtest import TestApp
+    >>> log = getfixture('log')
     >>> app = getfixture('app')
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
