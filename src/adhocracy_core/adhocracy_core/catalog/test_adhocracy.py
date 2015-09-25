@@ -394,7 +394,7 @@ class TestIndexWorkflowStateOfItem:
                                         name='adhocracy|workflow_state')
 
 
-class TestUserName:
+class TestIndexUserName:
 
     @fixture
     def registry(self, registry_with_content):
@@ -408,3 +408,13 @@ class TestUserName:
         registry.content.get_sheet.return_value = mock_sheet
         mock_sheet.get.return_value = {'name': 'user_name'}
         assert self.call_fut(context, 'default') == 'user_name'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserBasic,), IIndexView,
+                                        name='adhocracy|user_name')
+
+
+

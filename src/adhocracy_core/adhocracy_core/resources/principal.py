@@ -15,6 +15,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IRolesUserLocator
+from adhocracy_core.interfaces import search_query
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources import resource_meta
 from adhocracy_core.resources.pool import Pool
@@ -273,11 +274,14 @@ class UserLocatorAdapter(object):
 
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
-        # TODO use catalog for all get_user_by_ methods
-        users = self.get_users()
-        for user in users:
-            if user.name == login:
-                return user
+        catalogs = find_service(self.context, 'catalogs')
+        query = search_query._replace(indexes={'user_name': login},
+                                      resolve=True)
+        users = catalogs.search(query).elements
+        if len(users) == 1:
+            return users[0]
+        else:
+            return None
 
     def get_users(self) -> [IUser]:
         """Return all users."""

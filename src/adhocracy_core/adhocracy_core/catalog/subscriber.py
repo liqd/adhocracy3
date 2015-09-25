@@ -17,6 +17,7 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
 from adhocracy_core.utils import list_resource_with_descendants
 from adhocracy_core.utils import get_sheet_field
@@ -32,6 +33,12 @@ def reindex_rates(event):
     """Reindex the rates index if a rate backreference is modified."""
     catalogs = find_service(event.object, 'catalogs')
     catalogs.reindex_index(event.object, 'rates')
+
+
+def reindex_user_basic(event):
+    """Reindex indexes for :class:`adhcoracy_core.sheets.IUserBasic` sheet."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'user_name')
 
 
 def reindex_badge(event):
@@ -104,5 +111,8 @@ def includeme(config):
     config.add_subscriber(reindex_workflow_state,
                           IResourceSheetModified,
                           event_isheet=IWorkflowAssignment)
+    config.add_subscriber(reindex_user_basic,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')

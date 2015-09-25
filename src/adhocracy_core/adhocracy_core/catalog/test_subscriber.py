@@ -39,6 +39,12 @@ def test_reindex_rate_index(event, catalog):
     catalog.reindex_index.assert_called_with(event.object, 'rates')
 
 
+def test_reindex_user_basic(event, catalog):
+    from .subscriber import reindex_user_basic
+    reindex_user_basic(event)
+    catalog.reindex_index.assert_called_with(event.object, 'user_name')
+
+
 def test_reindex_badge_index(event, catalog, mock_sheet, registry_with_content):
     from .subscriber import reindex_badge
     badgeable = testing.DummyResource()
@@ -173,5 +179,6 @@ def test_register_subscriber(registry):
     assert subscriber.reindex_badge.__name__ in handlers
     assert subscriber.reindex_item_badge.__name__ in handlers
     assert subscriber.reindex_workflow_state.__name__ in handlers
+    assert subscriber.reindex_user_basic.__name__ in handlers
 
 
