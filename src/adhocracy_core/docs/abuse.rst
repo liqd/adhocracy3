@@ -17,6 +17,7 @@ Start Adhocracy testapp::
     >>> app = getfixture('app')
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
+    >>> log = getfixture('log')
 
 Reporting bad content
 ---------------------

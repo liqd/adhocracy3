@@ -17,8 +17,6 @@ __pycache__
 /bin
 /docs/build
 /docs/styleguide/*
-/etc/compass.min.rb
-/etc/compass.rb
 /etc/hologram.yml
 /python
 /develop-eggs
@@ -26,6 +24,8 @@ __pycache__
 /include/
 /lib/
 /local/
+/src/current
+/src/*/current
 etc/scss-lint.yml
 etc/tslint.json
 /etc/development.ini

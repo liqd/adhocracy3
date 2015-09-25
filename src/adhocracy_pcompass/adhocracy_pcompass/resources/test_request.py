@@ -5,7 +5,7 @@ class TestProcess:
 
     @fixture
     def meta(self):
-        from .pcompass import process_meta
+        from .request import process_meta
         return process_meta
 
     def test_meta(self, meta):

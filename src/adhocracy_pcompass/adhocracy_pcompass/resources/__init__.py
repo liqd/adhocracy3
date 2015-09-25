@@ -3,4 +3,4 @@
 
 def includeme(config):
     """Include resource types."""
-    config.include('.pcompass')
+    config.include('.request')
