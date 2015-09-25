@@ -303,10 +303,14 @@ class UserLocatorAdapter(object):
 
     def get_user_by_email(self, email: str) -> IUser:
         """Find user per email or return None."""
-        users = self.get_users()
-        for user in users:
-            if user.email == email:
-                return user
+        catalogs = find_service(self.context, 'catalogs')
+        query = search_query._replace(indexes={'private_user_email': email},
+                                      resolve=True)
+        users = catalogs.search(query).elements
+        if len(users) == 1:
+            return users[0]
+        else:
+            return None
 
     def get_user_by_activation_path(self, activation_path: str) -> IUser:
         """Find user per activation path or return None."""

@@ -1342,6 +1342,14 @@ class TestValidateActivationPathUnitTest:
     @fixture
     def user(self):
         user = testing.DummyResource()
+
+    def user_with_metadata(self, config):
+        from adhocracy_core.sheets.metadata import IMetadata
+        config.include('adhocracy_core.content')
+        config.include('adhocracy_core.events')
+        config.include('adhocracy_core.changelog')
+        config.include('adhocracy_core.sheets.metadata')
+        user = testing.DummyResource(__provides__=IMetadata)
         user.activate = Mock()
         return user
 

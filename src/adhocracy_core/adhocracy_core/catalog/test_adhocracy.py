@@ -34,6 +34,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'title' in catalogs['adhocracy']
     assert 'workflow_state' in catalogs['adhocracy']
     assert 'user_name' in catalogs['adhocracy']
+    assert 'private_user_email' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -416,5 +417,28 @@ class TestIndexUserName:
         assert registry.adapters.lookup((IUserBasic,), IIndexView,
                                         name='adhocracy|user_name')
 
+
+
+class TestIndexUserEmail:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_email
+        return index_user_email(*args)
+
+    def test_return_user_name(self, registry, context, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'email': 'test@test.de'}
+        assert self.call_fut(context, 'default') == 'test@test.de'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserExtended
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserExtended,), IIndexView,
+                                        name='adhocracy|private_user_email')
 
 

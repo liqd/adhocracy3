@@ -342,17 +342,20 @@ class TestUserLocatorAdapter:
         assert IRolesUserLocator.providedBy(inst)
         assert verifyObject(IRolesUserLocator, inst)
 
-    def test_get_user_by_email_user_exists(self, context, request_, inst):
-        from .principal import IUser
-        user = testing.DummyResource(email='test@test.de', __provides__=IUser)
-        context['principals']['users']['User1'] = user
+    def test_get_user_by_email_user_exists(self, inst, mock_catalogs,
+                                           search_result, query):
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
         assert inst.get_user_by_email('test@test.de') is user
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            indexes={'private_user_email': 'test@test.de'},
+            resolve=True,
+        )
 
-    def test_get_user_by_email_user_not_exists(self, context, request_, inst):
-        from .principal import IUser
-        user = testing.DummyResource(email='', __provides__=IUser)
-        context['principals']['users']['User1'] = user
+    def test_get_user_by_email_user_not_exists(self, inst, mock_catalogs):
         assert inst.get_user_by_email('wrong@test.de') is None
+        assert mock_catalogs.search.called
 
     def test_get_user_by_login_user_exists(self, inst, mock_catalogs,
                                            search_result, query):
