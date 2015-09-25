@@ -53,6 +53,7 @@ class AdhocracyCatalogIndexes:
     reference = Reference()
     user_name = catalog.Field()
     private_user_email = catalog.Field()
+    private_user_activation_path = catalog.Field()
 
 
 def index_creator(resource, default) -> str:
@@ -185,6 +186,14 @@ def index_user_email(resource, default) -> str:
     return name
 
 
+def index_user_activation_path(resource, default) -> str:
+    """Return value for the private_user_activationpath index."""
+    path = getattr(resource, 'activation_path', None)
+    if path is None:
+        return default
+    return path
+
+
 def includeme(config):
     """Register adhocracy catalog factory."""
     config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
@@ -249,5 +258,10 @@ def includeme(config):
     config.add_indexview(index_user_email,
                          catalog_name='adhocracy',
                          index_name='private_user_email',
+                         context=IUserExtended,
+                         )
+    config.add_indexview(index_user_activation_path,
+                         catalog_name='adhocracy',
+                         index_name='private_user_activation_path',
                          context=IUserBasic,
                          )

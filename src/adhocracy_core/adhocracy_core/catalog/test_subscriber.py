@@ -51,6 +51,13 @@ def test_reindex_user_email(event, catalog):
     catalog.reindex_index.assert_called_with(event.object, 'private_user_email')
 
 
+def test_reindex_user_activation_path(event, catalog):
+    from .subscriber import reindex_user_activation_path
+    reindex_user_activation_path(event)
+    catalog.reindex_index.assert_called_with(event.object,
+                                             'private_user_activation_path')
+
+
 def test_reindex_badge_index(event, catalog, mock_sheet, registry_with_content):
     from .subscriber import reindex_badge
     badgeable = testing.DummyResource()

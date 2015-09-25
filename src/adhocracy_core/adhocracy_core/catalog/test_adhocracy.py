@@ -35,6 +35,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'workflow_state' in catalogs['adhocracy']
     assert 'user_name' in catalogs['adhocracy']
     assert 'private_user_email' in catalogs['adhocracy']
+    assert 'private_user_activation_path' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -442,3 +443,23 @@ class TestIndexUserEmail:
                                         name='adhocracy|private_user_email')
 
 
+class TestIndexUserActivationPath:
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_activation_path
+        return index_user_activation_path(*args)
+
+    def test_return_user_activation_path(self, context):
+        context.activation_path = '/path'
+        assert self.call_fut(context, 'default') == '/path'
+
+    def test_return_default_if_activation_path_is_none(self, context):
+        context.activation_path = None
+        assert self.call_fut(context, 'default') == 'default'
+
+    @mark.usefixtures('integration')
+    def test_register(self, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        from substanced.interfaces import IIndexView
+        assert registry.adapters.lookup((IUserBasic,), IIndexView,
+                                        name='adhocracy|private_user_activation_path')

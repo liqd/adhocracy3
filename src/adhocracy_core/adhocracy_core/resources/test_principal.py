@@ -372,19 +372,20 @@ class TestUserLocatorAdapter:
         assert inst.get_user_by_login('wrong login name') is None
         assert mock_catalogs.search.called
 
-    def test_get_user_by_activation_path_user_exists(self, context, request_, inst):
-        from .principal import IUser
-        user = testing.DummyResource(activation_path='/activate/foo',
-                                     __provides__=IUser)
-        context['principals']['users']['User1'] = user
-        other = testing.DummyResource()
-        context['principals']['users']['other'] = other
+    def test_get_user_by_activation_path_user_exists(self, inst, mock_catalogs,
+                                                     search_result, query):
+        user = testing.DummyResource()
+        mock_catalogs.search.return_value = search_result._replace(
+            elements=[user])
         assert inst.get_user_by_activation_path('/activate/foo') is user
-        
-    def test_get_user_by_activation_path_user_not_exists(self, context, request_, inst):
-        user = testing.DummyResource(activation_path=None)
-        context['principals']['users']['User1'] = user
+        assert mock_catalogs.search.call_args[0][0] == query._replace(
+            indexes={'private_user_activation_path': '/activate/foo'},
+            resolve=True,
+        )
+
+    def test_get_user_by_activation_path_user_not_exists(self, inst, mock_catalogs):
         assert inst.get_user_by_activation_path('/activate/no_such_link') is None
+        assert mock_catalogs.search.called
 
     def test_get_user_by_userid_user_exists(self, context, request_, inst):
         user = testing.DummyResource()

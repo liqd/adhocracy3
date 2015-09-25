@@ -48,6 +48,12 @@ def reindex_user_email(event):
     catalogs.reindex_index(event.object, 'private_user_email')
 
 
+def reindex_user_activation_path(event):
+    """Reindex indexes `private_user_activation_path`."""
+    catalogs = find_service(event.object, 'catalogs')
+    catalogs.reindex_index(event.object, 'private_user_activation_path')
+
+
 def reindex_badge(event):
     """Reindex badge index if a backreference is modified/created."""
     # TODO we cannot listen to the backreference modified event of the
@@ -124,5 +130,8 @@ def includeme(config):
     config.add_subscriber(reindex_user_email,
                           IResourceSheetModified,
                           event_isheet=IUserExtended)
+    config.add_subscriber(reindex_user_activation_path,
+                          IResourceSheetModified,
+                          event_isheet=IUserBasic)
     # add subscriber to updated allowed index
     config.scan('substanced.objectmap.subscribers')
