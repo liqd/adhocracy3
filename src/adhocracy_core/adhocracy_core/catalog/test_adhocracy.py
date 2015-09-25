@@ -33,6 +33,7 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     assert 'badge' in catalogs['adhocracy']
     assert 'title' in catalogs['adhocracy']
     assert 'workflow_state' in catalogs['adhocracy']
+    assert 'user_name' in catalogs['adhocracy']
 
 
 class TestIndexMetadata:
@@ -392,3 +393,18 @@ class TestIndexWorkflowStateOfItem:
         assert registry.adapters.lookup((IVersionable,), IIndexView,
                                         name='adhocracy|workflow_state')
 
+
+class TestUserName:
+
+    @fixture
+    def registry(self, registry_with_content):
+        return registry_with_content
+
+    def call_fut(self, *args):
+        from .adhocracy import index_user_name
+        return index_user_name(*args)
+
+    def test_return_user_name(self, registry, context, mock_sheet):
+        registry.content.get_sheet.return_value = mock_sheet
+        mock_sheet.get.return_value = {'name': 'user_name'}
+        assert self.call_fut(context, 'default') == 'user_name'

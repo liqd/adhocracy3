@@ -19,6 +19,7 @@ from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.utils import find_graph
 
@@ -49,6 +50,7 @@ class AdhocracyCatalogIndexes:
     item_creation_date = catalog.Field()
     workflow_state = catalog.Field()
     reference = Reference()
+    user_name = catalog.Field()
 
 
 def index_creator(resource, default) -> str:
@@ -169,6 +171,12 @@ def index_workflow_state_of_item(resource, default) -> [str]:
         return state
 
 
+def index_user_name(resource, default) -> str:
+    """Return value for the user_name index."""
+    name = get_sheet_field(resource, IUserBasic, 'name')
+    return name
+
+
 def includeme(config):
     """Register adhocracy catalog factory."""
     config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
@@ -224,4 +232,9 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='workflow_state',
                          context=IVersionable,
+                         )
+    config.add_indexview(index_user_name,
+                         catalog_name='adhocracy',
+                         index_name='user_name',
+                         context=IUserBasic,
                          )

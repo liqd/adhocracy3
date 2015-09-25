@@ -355,9 +355,9 @@ class TestUserLocatorAdapter:
         context['principals']['users']['other'] = other
         assert inst.get_user_by_login('login name') is user
 
-    def test_get_user_by_login_user_not_exists(self, context, request, inst):
-        user = testing.DummyResource(name='')
-        context['principals']['users']['User1'] = user
+    def test_get_user_by_login_user_not_exists(self, context, request, inst,
+                                               mock_catalogs, search_result):
+        mock_catalogs.search.return_value = search_result
         assert inst.get_user_by_login('wrong login name') is None
 
     def test_get_user_by_activation_path_user_exists(self, context, request, inst):
