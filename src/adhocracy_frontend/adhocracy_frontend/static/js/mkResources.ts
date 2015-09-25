@@ -935,7 +935,7 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
             name: null
         });
         break;
-    case "adhocracy_core.sheets.polarization.Position":
+    case "adhocracy_core.sheets.relation.Position":
         resultType = "string";
         break;
     default:

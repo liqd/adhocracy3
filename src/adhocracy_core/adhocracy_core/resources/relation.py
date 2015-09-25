@@ -1,4 +1,4 @@
-"""Polarization resource type."""
+"""Statements about relations between process content/comments."""
 from pyramid.registry import Registry
 
 from adhocracy_core.interfaces import IItemVersion
@@ -10,11 +10,21 @@ from adhocracy_core.resources.itemversion import itemversion_meta
 from adhocracy_core.resources.item import item_meta
 from adhocracy_core.resources.service import service_meta
 
-import adhocracy_core.sheets.polarization
+import adhocracy_core.sheets.relation
 import adhocracy_core.sheets.comment
 
 
-class IPolarizationVersion(IItemVersion):
+class IRelation(IItem):
+
+    """Relation versions pool."""
+
+
+class IRelationVersion(IItemVersion):
+
+    """Relation version."""
+
+
+class IPolarizationVersion(IRelationVersion):
 
     """A polarization in a discussion."""
 
@@ -22,14 +32,13 @@ class IPolarizationVersion(IItemVersion):
 polarizationversion_meta = itemversion_meta._replace(
     content_name='PolarizationVersion',
     iresource=IPolarizationVersion,
-    extended_sheets=(adhocracy_core.sheets.polarization.IPolarization,
-                     adhocracy_core.sheets.comment.ICommentable,
+    extended_sheets=(adhocracy_core.sheets.relation.IPolarization,
                      ),
     permission_create='edit_comment',
 )
 
 
-class IPolarization(IItem):
+class IPolarization(IRelation):
 
     """Polarization versions pool."""
 
@@ -46,28 +55,28 @@ polarization_meta = item_meta._replace(
 )
 
 
-class IPolarizationsService(IServicePool):
+class IRelationsService(IServicePool):
 
-    """The 'polarizations' ServicePool."""
+    """The 'relations' ServicePool."""
 
 
-polarizations_meta = service_meta._replace(
-    iresource=IPolarizationsService,
-    content_name='polarizations',
-    element_types=(IPolarization,),
+relations_meta = service_meta._replace(
+    iresource=IRelationsService,
+    content_name='relations',
+    element_types=(IRelation,),
 )
 
 
-def add_polarizationsservice(context: IPool,
-                             registry: Registry,
-                             options: dict):
-    """Add `polarizations` service to context."""
-    registry.content.create(IPolarizationsService.__identifier__,
+def add_relationsservice(context: IPool,
+                         registry: Registry,
+                         options: dict):
+    """Add `relations` service to context."""
+    registry.content.create(IRelationsService.__identifier__,
                             parent=context)
 
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(polarizations_meta, config)
+    add_resource_type_to_registry(relations_meta, config)
     add_resource_type_to_registry(polarizationversion_meta, config)
     add_resource_type_to_registry(polarization_meta, config)

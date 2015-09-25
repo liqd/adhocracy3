@@ -1,4 +1,4 @@
-"""Polarization sheet."""
+"""Sheets for statements about relations between process content/comments."""
 import colander
 
 from adhocracy_core.interfaces import IPredicateSheet
@@ -25,7 +25,7 @@ class IPolarizable(ISheet, ISheetReferenceAutoUpdateMarker):
 
 class ICanPolarize(ISheet):
 
-    """Marker interface for resources that can rate."""
+    """Marker interface for resources that can polarize."""
 
 
 class Position(AdhocracySchemaNode):
@@ -40,7 +40,7 @@ class Position(AdhocracySchemaNode):
 
 class PolarizationSubjectReference(SheetToSheet):
 
-    """Reference from polarization to polarizer."""
+    """Reference from polarization to polarize."""
 
     source_isheet = IPolarization
     source_isheet_field = 'subject'
@@ -58,8 +58,7 @@ class PolarizationObjectReference(SheetToSheet):
 
 class PolarizationSchema(colander.MappingSchema):
 
-    """
-    Polarizable sheet data structure.
+    """Polarizable sheet data structure.
 
     `position`: the position in the debate, 'pro' or 'contra'.
     """
@@ -78,8 +77,8 @@ class CanPolarizeSchema(colander.MappingSchema):
     """CanPolarize sheet data structure."""
 
 
-can_rate_meta = sheet_meta._replace(isheet=ICanPolarize,
-                                    schema_class=CanPolarizeSchema)
+can_polarize_meta = sheet_meta._replace(isheet=ICanPolarize,
+                                        schema_class=CanPolarizeSchema)
 
 
 class PolarizableSchema(colander.MappingSchema):
@@ -92,7 +91,7 @@ class PolarizableSchema(colander.MappingSchema):
     polarizations = UniqueReferences(readonly=True,
                                      backref=True,
                                      reftype=PolarizationObjectReference)
-    post_pool = PostPool(iresource_or_service_name='polarizations')
+    post_pool = PostPool(iresource_or_service_name='relations')
 
 
 polarizable_meta = sheet_meta._replace(
@@ -108,3 +107,4 @@ def includeme(config):
     """Register sheets, adapters and index views."""
     add_sheet_to_registry(polarization_meta, config.registry)
     add_sheet_to_registry(polarizable_meta, config.registry)
+    add_sheet_to_registry(can_polarize_meta, config.registry)
