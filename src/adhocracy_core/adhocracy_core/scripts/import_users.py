@@ -7,6 +7,8 @@ import argparse
 import inspect
 import logging
 import json
+import string
+import os
 
 import transaction
 from pyramid.paster import bootstrap
@@ -136,6 +138,7 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
     if groups == []:
         default = _get_default_group(users)
         groups = [default]
+    password = user_info.get('initial-password', _gen_password())
     appstruct = {sheets.principal.IUserBasic.__identifier__:
                  {'name': user_info['name']},
                  sheets.principal.IUserExtended.__identifier__:
@@ -144,7 +147,7 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
                  {'roles': user_info['roles'],
                   'groups': groups},
                  sheets.principal.IPasswordAuthentication.
-                 __identifier__: {'password': user_info['initial-password']},
+                 __identifier__: {'password': password},
                  }
     user = registry.content.create(IUser.__identifier__,
                                    users,
@@ -154,6 +157,12 @@ def _create_user(user_info: dict, users: IResource, registry: Registry,
     if activate:
         user.activate()
     return user
+
+
+def _gen_password():
+    chars = string.ascii_letters + string.digits + '+_'
+    pwd_len = 20
+    return ''.join(chars[int(c) % len(chars)] for c in os.urandom(pwd_len))
 
 
 def _send_invitation_mail(user: IUser, user_info: dict, registry: Registry):
