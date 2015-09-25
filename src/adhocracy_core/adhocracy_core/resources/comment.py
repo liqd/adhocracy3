@@ -12,6 +12,7 @@ from adhocracy_core.resources.service import service_meta
 
 import adhocracy_core.sheets.comment
 import adhocracy_core.sheets.rate
+import adhocracy_core.sheets.relation
 
 
 class ICommentVersion(IItemVersion):
@@ -24,7 +25,9 @@ commentversion_meta = itemversion_meta._replace(
     iresource=ICommentVersion,
     extended_sheets=(adhocracy_core.sheets.comment.IComment,
                      adhocracy_core.sheets.comment.ICommentable,
-                     adhocracy_core.sheets.rate.IRateable),
+                     adhocracy_core.sheets.rate.IRateable,
+                     adhocracy_core.sheets.relation.ICanPolarize,
+                     ),
     permission_create='edit_comment',
 )
 
