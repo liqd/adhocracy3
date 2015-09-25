@@ -164,7 +164,7 @@ export class Service<Content extends ResourcesBase.Resource> {
 
         return this.adhCache.memoize(path, "OPTIONS",
             () => this.adhCredentials.ready.then(
-                () => this.$http({method: "OPTIONS", url: path, headers: headers})
+                () => this.$http({method: "OPTIONS", url: path, headers: <any>headers})
             )
         ).then((response) => {
             if (typeof config.importOptions === "undefined" || config.importOptions) {
@@ -184,7 +184,7 @@ export class Service<Content extends ResourcesBase.Resource> {
 
         return this.adhCredentials.ready.then(() => this.$http.get(path, {
             params : params,
-            headers : headers
+            headers : <any>headers
         }));
     }
 
@@ -228,7 +228,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         this.adhCache.invalidate(path);
 
         return this.adhCredentials.ready.then(() => this.$http.put(path, obj, {
-            headers: headers
+            headers: <any>headers
         }));
     }
 
@@ -283,12 +283,12 @@ export class Service<Content extends ResourcesBase.Resource> {
                     method: "POST",
                     url: path,
                     data: obj,
-                    headers: _.assign({"Content-Type": undefined}, headers),
+                    headers: <any>_.assign({"Content-Type": undefined}, headers),
                     transformRequest: undefined
                 });
             } else {
                 return _self.$http.post(path, obj, {
-                    headers: headers
+                    headers: <any>headers
                 });
             }
         });
