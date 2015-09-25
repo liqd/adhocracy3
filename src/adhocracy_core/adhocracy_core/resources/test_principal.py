@@ -383,16 +383,17 @@ class TestUserLocatorAdapter:
             resolve=True,
         )
 
-    def test_get_user_by_activation_path_user_not_exists(self, inst, mock_catalogs):
+    def test_get_user_by_activation_path_user_not_exists(self, inst,
+                                                         mock_catalogs):
         assert inst.get_user_by_activation_path('/activate/no_such_link') is None
         assert mock_catalogs.search.called
 
-    def test_get_user_by_userid_user_exists(self, context, request_, inst):
+    def test_get_user_by_userid_user_exists(self, context, inst):
         user = testing.DummyResource()
         context['principals']['users']['User1'] = user
         assert inst.get_user_by_userid('/principals/users/User1') is user
 
-    def test_get_user_by_userid_user_not_exists(self, context, request_, inst):
+    def test_get_user_by_userid_user_not_exists(self, inst):
         assert inst.get_user_by_userid('/principals/users/User1') is None
 
     def test_get_groupids_user_exists(self, context, mock_sheet, request_, inst):
@@ -406,10 +407,10 @@ class TestUserLocatorAdapter:
         context['principals']['users']['User1'] = user
         assert inst.get_groupids('/principals/users/User1') == ['group:group1']
 
-    def test_get_groupids_user_not_exists(self, context, request_, inst):
+    def test_get_groupids_user_not_exists(self, inst):
         assert inst.get_groupids('/principals/users/User1') is None
 
-    def test_get_role_and_group_role_ids_user_exists(self, context, request_, inst):
+    def test_get_role_and_group_role_ids_user_exists(self, context, inst):
         inst.get_user_by_userid = Mock()
         inst.get_user_by_userid.return_value = context
         inst.get_roleids = Mock()
@@ -419,7 +420,7 @@ class TestUserLocatorAdapter:
         assert inst.get_role_and_group_roleids('/principals/users/User1') ==\
                ['role:admin', 'role:reader']
 
-    def test_get_role_and_group_roleids_user_not_exists(self, context, request_, inst):
+    def test_get_role_and_group_roleids_user_not_exists(self, inst):
         assert inst.get_role_and_group_roleids('/principals/users/User1') is None
 
     def test_get_group_roleids_user_exists(self, inst, context, mock_sheet, request_,
@@ -435,7 +436,7 @@ class TestUserLocatorAdapter:
         context['principals']['users']['User1'] = user
         assert inst.get_group_roleids('/principals/users/User1') == ['role:role1']
 
-    def test_get_group_roleids_user_not_exists(self, context, request_, inst):
+    def test_get_group_roleids_user_not_exists(self, inst):
         assert inst.get_group_roleids('/principals/users/User1') is None
 
     def test_get_roleids_user_exists(self, context, mock_sheet, request_, inst):
@@ -445,7 +446,7 @@ class TestUserLocatorAdapter:
         context['principals']['users']['User1'] = user
         assert inst.get_roleids('/principals/users/User1') == ['role:role1']
 
-    def test_get_roleids_user_not_exists(self, context, request_, inst):
+    def test_get_roleids_user_not_exists(self, inst):
         assert inst.get_roleids('/principals/users/User1') is None
 
 
