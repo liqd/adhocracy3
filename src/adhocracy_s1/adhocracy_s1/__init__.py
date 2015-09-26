@@ -17,6 +17,7 @@ def includeme(config):
     config.include('.sheets')
     config.include('.resources')
     config.include('.workflows')
+    config.include('.rest')
 
 
 def main(global_config, **settings):

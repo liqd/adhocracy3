@@ -252,7 +252,7 @@ class TestS1Workflow:
         resp = app_participant.get('/s1/proposal_0000000')
         assert resp.json['data'][IWorkflowAssignment.__identifier__]['workflow_state'] == 'selected'
 
-    def test_result_old_proposal_has_stored_decisiont_date(self, app_participant):
+    def test_result_old_proposal_has_stored_decision_date(self, app_participant):
         from adhocracy_core.sheets.workflow import IWorkflowAssignment
         resp = app_participant.get('/s1/proposal_0000000')
         decision_date = resp.json['data'][IWorkflowAssignment.__identifier__]\
