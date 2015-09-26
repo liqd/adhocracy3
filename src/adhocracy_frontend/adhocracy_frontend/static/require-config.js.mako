@@ -19,7 +19,7 @@ require.config({
         Adhocracy: "./Adhocracy",
         adhTemplates: "./templates",
 % endif
-        text: "../lib/requirejs-text/text",
+        text: "../lib/text/text",
         jquery: "../lib/jquery/dist/jquery",
 % if minify:
         angular: "../lib/angular/angular.min",

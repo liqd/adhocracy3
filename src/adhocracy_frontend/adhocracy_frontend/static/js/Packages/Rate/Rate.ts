@@ -317,7 +317,7 @@ export var directiveFactory = (template : string, adapter : IRateAdapter<RIRateV
                                 return $q.all([updateMyRate(), updateAggregatedRates()]);
                             })
                             .then(() => undefined);
-                    }).finally<void>(() => {
+                    }).finally(() => {
                         scope.isCast = true;
                         lock = false;
                     });

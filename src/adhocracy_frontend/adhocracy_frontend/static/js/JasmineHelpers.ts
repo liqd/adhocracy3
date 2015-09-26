@@ -3,7 +3,7 @@
 
 import * as _ from "lodash";
 
-export var customMatchers = {
+export var customMatchers : jasmine.CustomMatcherFactories = {
     toSetEqual: function(util, customEqualityTesters) {
 
         return {
