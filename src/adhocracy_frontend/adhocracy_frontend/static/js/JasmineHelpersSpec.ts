@@ -1,7 +1,7 @@
 /// <reference path="../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 /// <reference path="_all.d.ts"/>
 
-import JasmineHelpers = require("./JasmineHelpers");
+import * as JasmineHelpers from "./JasmineHelpers";
 
 export var register = () => {
     describe("JasmineHelpers", () => {

@@ -12,6 +12,7 @@ $color-text-inverted: white;
 // Function colors
 $color-function-valid: #2eac66;
 $color-function-invalid: #e6332a;
+$color-function-neutral: #f6d02b;
 $color-function-animation-enter: greenyellow;
 
 // Background colors
@@ -53,79 +54,22 @@ $font-size-large: 21px;
 $font-size-huge: 40px;
 
 // em is relative to $font-size-normal
-$moving-column-menu-height: 24px / $font-size-normal * 1em;
+$moving-column-menu-height: 24px;
 $moving-column-border-width: 5px;
 $annotation-width: 34%;
 
 //Padding
-$padding-small: 0.5em;
-$padding-medium: 1em;
+$padding-small: 0.5rem;
+$padding-medium: 1rem;
 
 //Other
-$section-jump-navigation-width: 2em;
+$section-jump-navigation-width: 2rem;
 $moving-column-single-width-max: $font-size-normal * 55;
 $moving-column-single-width-min: $font-size-normal * 35;
+$badge-line-height: 1 + 4px / $font-size-smaller;
+$badge-height: $badge-line-height * $font-size-smaller;
 
-@mixin font-tracking($value) {
-    @if $value == narrow {
-        word-spacing: 0.025em;
-        letter-spacing: 0.025em;
-    } @else if $value == normal {
-        word-spacing: 0.050em;
-        letter-spacing: 0.050em;
-    } @else {
-        word-spacing: $value;
-        letter-spacing: $value;
-    }
-}
-
-@mixin text($value) {
-    @if $value == running {
-        font-family: $font-family-normal;
-        font-weight: $font-weight-normal;
-        font-size: $font-size-normal;
-        //@include font-tracking(normal);
-        line-height: 1.2;
-        color: $color-text-normal;
-    } @else if $value == functional {
-        font-family: $font-family-normal;
-        font-weight: $font-weight-normal;
-        font-size: $font-size-plus;
-        @include font-tracking(normal);
-        line-height: 1.2;
-        color: $color-text-normal;
-    } @else if $value == functional-introvert {
-        font-family: $font-family-normal;
-        font-weight: $font-weight-introvert;
-        font-size: $font-size-small;
-        @include font-tracking(narrow);
-        line-height: 1.5;
-        color: $color-text-introvert;
-    } @else if $value == introvert {
-        font-family: $font-family-normal;
-        font-weight: $font-weight-introvert;
-        font-size: $font-size-normal;
-        @include font-tracking(narrow);
-        line-height: 1.2;
-        color: $color-text-introvert;
-    } @else if $value == header {
-        font-family: $font-family-normal;
-        font-weight: $font-weight-normal;
-        font-size: $font-size-large;
-        @include font-tracking(narrow);
-        line-height: 1.2;
-        color: $color-text-extrovert;
-    } @else if $value == meta {
-        font-family: $font-family-normal;
-        font-weight: $font-weight-normal;
-        font-size: $font-size-small;
-        @include font-tracking(normal);
-        line-height: 1.2;
-        color: $color-text-introvert;
-        text-transform: uppercase;
-    } @else {
-        @warn "no such text-style: #{$value}";
-    }
-}
-
-$width-action: 3em;
+//Line-height (leading)
+$line-height-normal: 1.15;
+$line-height-large: 1.2;
+$line-height-plus: 1.6;

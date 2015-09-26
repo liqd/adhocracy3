@@ -14,12 +14,3 @@ export class Service {
         return path.length > 2 && path[0] === "@" && path[1] !== "@";
     }
 }
-
-
-export var moduleName = "adhPreliminaryNames";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .service("adhPreliminaryNames", Service);
-};

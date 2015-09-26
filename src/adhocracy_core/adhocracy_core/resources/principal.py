@@ -24,6 +24,7 @@ from adhocracy_core.resources.base import Base
 from adhocracy_core.resources.badge import add_badge_assignments_service
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.metadata import is_older_than
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
@@ -273,16 +274,15 @@ class UserLocatorAdapter(object):
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
         # TODO use catalog for all get_user_by_ methods
-        users = self._get_users()
+        users = self.get_users()
         for user in users:
             if user.name == login:
                 return user
 
-    def _get_users(self) -> [IUser]:
+    def get_users(self) -> [IUser]:
+        """Return all users."""
         users = find_service(self.context, 'principals', 'users')
-        for user in users.values():
-            if IUser.providedBy(user):
-                yield user
+        return (u for u in users.values() if IUser.providedBy(u))
 
     def get_user_by_userid(self, userid: str) -> IUser:
         """Find user by :term:`userid` or return None."""
@@ -299,14 +299,14 @@ class UserLocatorAdapter(object):
 
     def get_user_by_email(self, email: str) -> IUser:
         """Find user per email or return None."""
-        users = self._get_users()
+        users = self.get_users()
         for user in users:
             if user.email == email:
                 return user
 
     def get_user_by_activation_path(self, activation_path: str) -> IUser:
         """Find user per activation path or return None."""
-        users = self._get_users()
+        users = self.get_users()
         for user in users:
             if user.activation_path == activation_path:  # pragma: no branch
                 return user
@@ -367,6 +367,30 @@ def groups_and_roles_finder(userid: str, request: Request) -> list:
     groupids = userlocator.get_groupids(userid) or []
     roleids = userlocator.get_role_and_group_roleids(userid) or []
     return groupids + roleids
+
+
+def delete_not_activated_users(request: Request, age_in_days: int):
+    """Delete not activate users that are older than `age_in_days`."""
+    userlocator = request.registry.getMultiAdapter((request.context, request),
+                                                   IRolesUserLocator)
+    users = userlocator.get_users()
+    not_activated = (u for u in users if not u.active)
+    expired = [u for u in not_activated if is_older_than(u, age_in_days)]
+    for user in expired:
+        msg = 'deleting user {0}: name {1} email {2}'.format(user,
+                                                             user.email,
+                                                             user.name)
+        logger.info(msg)
+        del user.__parent__[user.__name__]
+
+
+def delete_password_resets(request: Request, age_in_days: int):
+    """Delete password resets that are older than `age_in_days`."""
+    resets = find_service(request.root, 'principals', 'resets')
+    expired = [u for u in resets.values() if is_older_than(u, age_in_days)]
+    for reset in expired:
+        logger.info('deleting reset {0}'.format(reset))
+        del resets[reset.__name__]
 
 
 def includeme(config):

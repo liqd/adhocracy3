@@ -23,12 +23,12 @@
  * change paths without a reload and in being more flexibel.
  */
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhEventManager = require("../EventManager/EventManager");
-import AdhTracking = require("../Tracking/Tracking");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhEventManager from "../EventManager/EventManager";
+import * as AdhTracking from "../Tracking/Tracking";
 
 var pkgLocation = "/TopLevelState";
 
@@ -557,22 +557,4 @@ export var routingErrorDirective = (adhConfig  : AdhConfig.IService) => {
             $scope.$on("$destroy", adhTopLevelState.bind("message", $scope));
         }]
     };
-};
-
-
-export var moduleName = "adhTopLevelState";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhEventManager.moduleName,
-            AdhTracking.moduleName
-        ])
-        .provider("adhTopLevelState", Provider)
-        .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
-        .directive("adhRoutingError", ["adhConfig", routingErrorDirective])
-        .directive("adhSpace", ["adhTopLevelState", spaceDirective])
-        .directive("adhSpaceSwitch", ["adhTopLevelState", "adhConfig", spaceSwitch])
-        .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);
 };

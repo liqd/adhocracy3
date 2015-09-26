@@ -108,10 +108,9 @@ Shutdown everything nicely::
 Run test suites
 ---------------
 
-Run pytest suite::
+Run test suite::
 
-    bin/py.test_run_all
+    bin/polytester
 
-Run protractor acceptance tests::
-
-    bin/protractor etc/protractorConf.js
+.. NOTE:: You need to have chrome/chromium installed in order to run the
+   acceptance tests.

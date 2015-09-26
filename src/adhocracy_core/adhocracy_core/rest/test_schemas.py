@@ -569,7 +569,8 @@ class TestGETPoolRequestSchema:
 
     def test_deserialize_empty(self, inst, context):
         inst = inst.bind(context=context)
-        assert inst.deserialize({}) == {}
+        assert inst.deserialize({}) == {'depth': 1,
+                                        'root': context}
 
     def test_deserialize_valid(self, inst, context):
         from hypatia.interfaces import IIndexSort
@@ -592,7 +593,7 @@ class TestGETPoolRequestSchema:
         cstruct = {'aggregateby': 'index1',
                    'content_type': 'adhocracy_core.interfaces.IResource',
                    'count': 'true',
-                   'depth': '100',
+                   'depth': 'all',
                    'elements': 'content',
                    'index1': 1,
                    'index2': ['eq', 1],
@@ -609,7 +610,7 @@ class TestGETPoolRequestSchema:
                               'index2': ('eq', 1),
                               'interfaces': IResource,
                               'index3': ('any', [1, 3])},
-                  'depth': 100,
+                  'depth': None,
                   'frequency_of': 'index1',
                   'interfaces': IName,
                   'limit': 2,
@@ -678,14 +679,25 @@ class TestGETPoolRequestSchema:
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_depth_all(self, inst, context):
+    def test_deserialize_depth_valid_all(self, inst, context):
         data = {'depth': 'all'}
         inst = inst.bind(context=context)
         assert inst.deserialize(data)['depth'] is None
 
-    @mark.parametrize('value', ['-7', '1.5', 'fall', 'alle'])
-    def test_deserialize_depth_invalid(self, inst, value):
+    def test_deserialize_depth_valid_number(self, inst, context):
+        data = {'depth': '2'}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['depth'] == 2
+
+    def test_deserialize_depth_default(self, inst, context):
+        data = {}
+        inst = inst.bind(context=context)
+        assert inst.deserialize(data)['depth'] == 1
+
+    @mark.parametrize('value', ['-7', '1.5'])
+    def test_deserialize_depth_invalid(self, inst, value, context):
         data = {'depth': value}
+        inst = inst.bind(context=context)
         with raises(colander.Invalid):
             inst.deserialize(data)
 
@@ -838,16 +850,13 @@ class TestAddArbitraryFilterNodes:
     @fixture
     def index(self, mock_catalogs):
         index = testing.DummyResource()
-        index.unique_values = Mock(return_value=['str'])
         index.__name__ = 'index'
         mock_catalogs.get_index.return_value = index
         return index
 
     @fixture
     def interfaces_index(self, mock_catalogs):
-        from adhocracy_core.interfaces import IResource
         index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[IResource])
         index.__name__ = 'interfaces'
         mock_catalogs.get_index.return_value = index
         return index
@@ -855,7 +864,6 @@ class TestAddArbitraryFilterNodes:
     @fixture
     def reference_index(self, mock_catalogs):
         index = testing.DummyResource()
-        index.unique_values = Mock(return_value=[object])
         index.__name__ = 'reference'
         mock_catalogs.get_index.return_value = index
         return index
@@ -896,30 +904,33 @@ class TestAddArbitraryFilterNodes:
         assert 'private_index' not in schema_extended
 
     def test_call_with_arbitrary_filter(self, schema, context, create_node, index):
+        from .schemas import INDEX_EXAMPLE_VALUES
         cstruct = {'index': 'keyword'}
         schema_extended = self.call_fut(cstruct, schema, context, None)
-        create_node.assert_called_with(index, index.unique_values()[0], 'keyword')
+        create_node.assert_called_with(index, INDEX_EXAMPLE_VALUES['default'], 'keyword')
         assert 'index' in schema_extended
 
     def test_call_with_sheet_filter(self, schema, context, create_node,
                                    interfaces_index):
+        from .schemas import INDEX_EXAMPLE_VALUES
         cstruct = {'sheet': 'sheet.x1' }
         schema_extended = self.call_fut(cstruct, schema, context, None)
         create_node.assert_called_with(interfaces_index,
-                                       interfaces_index.unique_values()[0],
+                                       INDEX_EXAMPLE_VALUES['interfaces'],
                                        'sheet.x1')
 
     def test_call_with_content_type_filter(self, schema, context, create_node,
                                            interfaces_index):
+        from .schemas import INDEX_EXAMPLE_VALUES
         cstruct = {'content_type': 'IResource'}
         schema_extended = self.call_fut(cstruct, schema, context, None)
         create_node.assert_called_with(interfaces_index,
-                                       interfaces_index.unique_values()[0],
+                                       INDEX_EXAMPLE_VALUES['interfaces'],
                                        'IResource')
 
     def test_call_with_reference_filter(self, schema, context, registry,
                                         create_node, reference_index):
-        from adhocracy_core.schema import Resource
+        from .schemas import INDEX_EXAMPLE_VALUES
         from adhocracy_core.schema import Reference
         isheet = ISheet.__identifier__
         field = 'reference'
@@ -928,7 +939,7 @@ class TestAddArbitraryFilterNodes:
         registry.content.resolve_isheet_field_from_dotted_string.return_value = (ISheet, 'reference', Reference())
         schema_extended = self.call_fut(cstruct, schema, context, registry)
         create_node.assert_called_with(reference_index,
-                                       reference_index.unique_values()[0],
+                                       INDEX_EXAMPLE_VALUES['reference'],
                                        '/referenced')
 
     def test_call_with_reference_filter_wrong_type(self, schema, registry):
@@ -959,12 +970,6 @@ class TestGetIndexExampleValue:
         index.unique_values = Mock(return_value=[])
         return index
 
-    @fixture
-    def reference_index(self):
-        from adhocracy_core.catalog.index import ReferenceIndex
-        index = ReferenceIndex()
-        return index
-
     def call_fut(self, *args):
         from .schemas import _get_index_example_value
         return _get_index_example_value(*args)
@@ -972,20 +977,33 @@ class TestGetIndexExampleValue:
     def test_return_none_if_index_is_none(self):
         assert self.call_fut(None) is None
 
-    def test_return_none_if_index_has_no_unique_values(self, index):
-        delattr(index, 'unique_values')
-        assert self.call_fut(None) is None
-
-    def test_return_none_if_index_unique_values_is_empty(self, index):
-        assert self.call_fut(index) is None
-
-    def test_return_unique_values_first_entry(self, index):
-        index.unique_values.return_value = ['str']
-        assert self.call_fut(index) is 'str'
-
-    def test_return_object_if_reference_index(self, reference_index):
+    def test_return_str_if_unknown_index(self, index):
         from adhocracy_core.resources.base import Base
-        result = self.call_fut(reference_index)
+        index.__name__ = 'unknown'
+        result = self.call_fut(index)
+        assert isinstance(result, str)
+
+    def test_return_int_if_rate_index(self, index):
+        index.__name__ = 'rate'
+        result = self.call_fut(index)
+        assert isinstance(result, int)
+
+    def test_return_datetiem_if_item_creation_date_index(self, index):
+        from datetime import datetime
+        index.__name__ = 'item_creation_date'
+        result = self.call_fut(index)
+        assert isinstance(result, datetime)
+
+    def test_return_object_if_reference_index(self, index):
+        from adhocracy_core.resources.base import Base
+        index.__name__ = 'reference'
+        result = self.call_fut(index)
+        assert isinstance(result, Base)
+
+    def test_return_object_if_creator_index(self, index):
+        from adhocracy_core.resources.base import Base
+        index.__name__ = 'creator'
+        result = self.call_fut(index)
         assert isinstance(result, Base)
 
 

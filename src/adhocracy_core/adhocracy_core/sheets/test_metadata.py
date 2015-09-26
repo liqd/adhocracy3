@@ -6,12 +6,8 @@ from unittest.mock import Mock
 
 
 @fixture
-def mock_metadata_sheet(context, mock_sheet, registry_with_content):
-    from adhocracy_core.testing import register_sheet
-    from .metadata import IMetadata
-    mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
-    register_sheet(context, mock_sheet, registry_with_content)
-    return mock_sheet
+def registry(registry_with_content):
+    return registry_with_content
 
 
 class TestIMetadataSchema:
@@ -88,30 +84,14 @@ class TestMetadataSheet:
         assert inst.meta.readable is True
         assert inst.meta.sheet_class is AttributeResourceSheet
 
-
-
-@fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.events')
-    config.include('adhocracy_core.changelog')
-    config.include('adhocracy_core.sheets.metadata')
-
-
-@mark.usefixtures('integration')
-def test_includeme_register_metadata_sheet(config):
-    from adhocracy_core.sheets.metadata import IMetadata
-    from adhocracy_core.utils import get_sheet
-    context = testing.DummyResource(__provides__=IMetadata)
-    assert get_sheet(context, IMetadata)
+    @mark.usefixtures('integration')
+    def test_includeme_register_metadata_sheet(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)
 
 
 class TestVisibility:
-
-    @fixture
-    def registry(self, registry_with_content):
-        return registry_with_content
 
     def call_fut(self, *args):
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
@@ -138,3 +118,31 @@ class TestVisibility:
         result = self.call_fut(resource, registry, 'hidden')
         assert result['modified_by'] == user
         assert result['modification_date'] == now
+
+
+class TestIsOlderThen:
+
+    def call_fut(self, *args):
+        from .metadata import is_older_than
+        return is_older_than(*args)
+
+    @fixture
+    def now(self):
+        from pytz import UTC
+        from datetime import datetime
+        now = datetime.utcnow().replace(tzinfo=UTC)
+        return now
+
+    def test_creation_date_older_then_days(self, context, now):
+        from datetime import timedelta
+        context.creation_date = now - timedelta(days=8)
+        assert self.call_fut(context, 7) is True
+
+    def test_creation_date_equal_to_days(self, context, now):
+        from datetime import timedelta
+        context.creation_date = now - timedelta(days=7)
+        assert self.call_fut(context, 7) is False
+
+    def test_creation_date_younger_then_days(self, context, now):
+        context.creation_date = now
+        assert self.call_fut(context, 7) is False

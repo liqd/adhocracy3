@@ -15,9 +15,12 @@ from substanced.util import find_service
 from substanced.interfaces import IFolder
 
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import search_query
 from adhocracy_core.interfaces import ResourceMetadata
+from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.sheets.pool import IPool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.sheets.title import ITitle
@@ -25,10 +28,12 @@ from adhocracy_core.sheets.badge import IHasBadgesPool
 from adhocracy_core.sheets.badge import IBadgeable
 from adhocracy_core.sheets.principal import IUserExtended
 from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.resources.pool import IBasicPool
 from adhocracy_core.resources.asset import IPoolWithAssets
 from adhocracy_core.resources.badge import add_badges_service
 from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.proposal import IProposal
 from adhocracy_core.resources.process import IProcess
@@ -36,6 +41,29 @@ from adhocracy_core.catalog import ICatalogsService
 
 
 logger = logging.getLogger(__name__)
+
+
+def migrate_to_attribute_storage(context: IPool, isheet: IInterface):
+    """Migrate sheet data for`isheet` from annotation to attribute storage."""
+    registry = get_current_registry(context)
+    sheet_meta = registry.content.sheets_meta[isheet]
+    isheet_name = sheet_meta.isheet.__identifier__
+    annotation_key = '_sheet_' + isheet_name.replace('.', '_')
+    catalogs = find_service(context, 'catalogs')
+    resources = _search_for_interfaces(catalogs, isheet)
+    count = len(resources)
+    logger.info('Migrating {0} resources with {1} to attribute storage'
+                .format(count, isheet))
+    for index, resource in enumerate(resources):
+        data = resource.__dict__
+        if annotation_key in data:
+            logger.info('Migrating resource {0} of {1}'
+                        .format(index + 1, count))
+            for field, value in data[annotation_key].items():
+                setattr(resource, field, value)
+            delattr(resource, annotation_key)
+        else:
+            continue
 
 
 def migrate_new_sheet(context: IPool,
@@ -144,6 +172,15 @@ def _get_autonaming_prefixes(registry: Registry) -> [str]:
     return list(set(prefixes))
 
 
+def _get_used_autonaming_prefixes(pool: IPool, prefixes: [str]) -> [str]:
+    used_prefixes = set()
+    for child_name in pool:
+        for prefix in prefixes:
+            if child_name.startswith(prefix):
+                used_prefixes.add(prefix)
+    return list(used_prefixes)
+
+
 @log_migration
 def evolve1_add_title_sheet_to_pools(root: IPool):  # pragma: no cover
     """Add title sheet to basic pools and asset pools."""
@@ -232,13 +269,17 @@ def change_pools_autonaming_scheme(root):  # pragma: no cover
             pool._autoname_lasts = PersistentMapping()
             for prefix in prefixes:
                 pool._autoname_lasts[prefix] = Length()
-        elif hasattr(pool, '_autoname_lasts'):
+        if hasattr(pool, '_autoname_lasts'):
             # convert int to Length
             for prefix in pool._autoname_lasts.keys():
-                pool._autoname_lasts[prefix] \
-                    = Length(pool._autoname_lasts[prefix])
+                if isinstance(pool._autoname_lasts[prefix], int):
+                    pool._autoname_lasts[prefix] \
+                        = Length(pool._autoname_lasts[prefix].value)
+                elif isinstance(pool._autoname_lasts[prefix].value, Length):
+                    pool._autoname_lasts[prefix] = Length(1)
             # convert dict to PersistentMapping
-            pool._autoname_lasts = PersistentMapping(pool._autoname_lasts)
+            if not isinstance(pool._autoname_lasts, PersistentMapping):
+                pool._autoname_lasts = PersistentMapping(pool._autoname_lasts)
 
 
 @log_migration
@@ -290,6 +331,103 @@ def add_workflow_assignment_sheet_to_pools_simples(root):  # pragma: no cover
     migrate_new_sheet(root, ISimple, IWorkflowAssignment)
 
 
+@log_migration
+def migrate_rate_sheet_to_attribute_storage(root):  # pragma: no cover
+    """Migrate rate sheet to attribute storage."""
+    import adhocracy_core.sheets.rate
+    migrate_to_attribute_storage(root, adhocracy_core.sheets.rate.IRate)
+
+
+@log_migration
+def move_autoname_last_counters_to_attributes(root):  # pragma: no cover
+    """Move autoname last counters of pools to attributes.
+
+    Remove _autoname_lasts attribute.
+    Instead add private attributes to store autoname last counter objects.
+    Cleanup needless counter objects.
+    """
+    registry = get_current_registry(root)
+    prefixes = _get_autonaming_prefixes(registry)
+    catalogs = find_service(root, 'catalogs')
+    pools = _search_for_interfaces(catalogs, (IPool, IFolder))
+    count = len(pools)
+    for index, pool in enumerate(pools):
+        logger.info('Migrating resource {0} {1} of {2}'
+                    .format(pool, index + 1, count))
+        if hasattr(pool, '_autoname_last'):
+            logger.info('Remove "_autoname_last" attribute')
+            delattr(pool, '_autoname_last')
+        if hasattr(pool, '_autoname_lasts'):
+            used_prefixes = _get_used_autonaming_prefixes(pool, prefixes)
+            for prefix in used_prefixes:
+                is_badge_service = IBadgeAssignmentsService.providedBy(pool)
+                if prefix == '' and not is_badge_service:
+                    continue
+                logger.info('Move counter object for prefix {0} to attribute'
+                            .format(prefix))
+                counter = pool._autoname_lasts.get(prefix, Length())
+                setattr(pool, '_autoname_last_' + prefix, counter)
+            logger.info('Remove "_autoname_lasts" attribute')
+            delattr(pool, '_autoname_lasts')
+
+
+@log_migration
+def move_sheet_annotation_data_to_attributes(root):  # pragma: no cover
+    """Move sheet annotation data to resource attributes.
+
+    Remove `_sheets` dictionary to store sheets data annotations.
+    Instead add private attributes for every sheet data annotation to resource.
+    """
+    catalogs = find_service(root, 'catalogs')
+    query = search_query._replace(interfaces=(IResource,))
+    resources = catalogs.search(query).elements
+    count = len(resources)
+    for index, resource in enumerate(resources):
+        if not hasattr(resource, '_sheets'):
+            continue
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        for data_key, appstruct in resource._sheets.items():
+            annotation_key = '_sheet_' + data_key.replace('.', '_')
+            if appstruct:
+                setattr(resource, annotation_key, appstruct)
+        delattr(resource, '_sheets')
+
+
+@log_migration
+def remove_empty_first_versions(root):  # pragma: no cover
+    """Remove empty first versions."""
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    items = _search_for_interfaces(catalogs, IItem)
+    count = len(items)
+    for index, item in enumerate(items):
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        if 'VERSION_0000000' not in item:
+            continue
+        first_version = item['VERSION_0000000']
+        is_empty = _is_version_without_data(first_version)
+        has_follower = _has_follower(first_version, registry)
+        if is_empty and has_follower:
+            logger.info('Delete empty version {0}.'.format(first_version))
+            del item['VERSION_0000000']
+
+
+def _is_version_without_data(version: IItemVersion) -> bool:
+    for attribute in version.__dict__:
+        if attribute.startswith('_sheet_'):
+            return False
+        if attribute == 'rate':
+            return False
+    else:
+        return True
+
+
+def _has_follower(version: IItemVersion, registry: Registry) -> bool:
+    followed_by = get_sheet_field(version, IVersionable, 'followed_by',
+                                  registry=registry)
+    return followed_by != []
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -304,3 +442,7 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(remove_name_sheet_from_items)
     config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)
     config.add_evolution_step(make_proposals_badgeable)
+    config.add_evolution_step(move_sheet_annotation_data_to_attributes)
+    config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
+    config.add_evolution_step(move_autoname_last_counters_to_attributes)
+    config.add_evolution_step(remove_empty_first_versions)

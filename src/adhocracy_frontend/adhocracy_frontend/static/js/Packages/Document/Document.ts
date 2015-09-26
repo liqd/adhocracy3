@@ -1,34 +1,26 @@
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
-import AdhBadge = require("../Badge/Badge");
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
-import AdhImage = require("../Image/Image");
-import AdhInject = require("../Inject/Inject");
-import AdhMapping = require("../Mapping/Mapping");
-import AdhMarkdown = require("../Markdown/Markdown");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-import AdhSticky = require("../Sticky/Sticky");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhBadge from "../Badge/Badge";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMapping from "../Mapping/Mapping";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
-import RIGeoDocument = require("../../Resources_/adhocracy_core/resources/document/IGeoDocument");
-import RIGeoDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion");
-import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
-import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
-import SIImageReference = require("../../Resources_/adhocracy_core/sheets/image/IImageReference");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
-import SIPoint = require("../../Resources_/adhocracy_core/sheets/geo/IPoint");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RIGeoDocument from "../../Resources_/adhocracy_core/resources/document/IGeoDocument";
+import RIGeoDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IGeoDocumentVersion";
+import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SIDocument from "../../Resources_/adhocracy_core/sheets/document/IDocument";
+import * as SIImageReference from "../../Resources_/adhocracy_core/sheets/image/IImageReference";
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
+import * as SIPoint from "../../Resources_/adhocracy_core/sheets/geo/IPoint";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/Document";
 
@@ -215,7 +207,6 @@ export var postCreate = (
         follows: [doc.first_version_path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        description: "",
         elements: <string[]>_.map(paragraphVersions, "path")
     });
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
@@ -314,7 +305,6 @@ export var postEdit = (
         follows: [oldVersion.path]
     });
     documentVersion.data[SIDocument.nick] = new SIDocument.Sheet({
-        description: "",
         elements: paragraphRefs
     });
     documentVersion.data[SITitle.nick] = new SITitle.Sheet({
@@ -555,61 +545,3 @@ export var editDirective = (
     };
 };
 
-
-export var moduleName = "adhDocument";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            "duScroll",
-            "ngMessages",
-            AdhAngularHelpers.moduleName,
-            AdhHttp.moduleName,
-            AdhImage.moduleName,
-            AdhInject.moduleName,
-            AdhMapping.moduleName,
-            AdhMarkdown.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhResourceArea.moduleName,
-            AdhResourceWidgets.moduleName,
-            AdhSticky.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("document-detail");
-            adhEmbedProvider.embeddableDirectives.push("document-create");
-            adhEmbedProvider.embeddableDirectives.push("document-edit");
-            adhEmbedProvider.embeddableDirectives.push("document-list-item");
-        }])
-        .directive("adhDocumentDetail", ["$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", detailDirective])
-        .directive("adhDocumentCreate", [
-            "$location",
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            "adhUploadImage",
-            "flowFactory",
-            createDirective])
-        .directive("adhDocumentEdit", [
-            "$location",
-            "$q",
-            "adhConfig",
-            "adhHttp",
-            "adhPreliminaryNames",
-            "adhTopLevelState",
-            "adhShowError",
-            "adhSubmitIfValid",
-            "adhResourceUrlFilter",
-            "adhUploadImage",
-            "flowFactory",
-            editDirective])
-        .directive("adhDocumentListing", ["adhConfig", listingDirective])
-        .directive("adhDocumentListItem", [
-            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", listItemDirective])
-        .directive("adhDocumentMapListItem", [
-            "$q", "adhConfig", "adhHttp", "adhGetBadges", "adhTopLevelState", mapListItemDirective]);
-};

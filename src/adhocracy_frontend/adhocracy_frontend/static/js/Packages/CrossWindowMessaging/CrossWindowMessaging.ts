@@ -33,11 +33,11 @@
  * 10 in particular, but others may be affected.)
  */
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhUser = require("../User/User");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhUser from "../User/User";
 
 
 export interface IMessage {
@@ -47,6 +47,11 @@ export interface IMessage {
 
 export interface IMessageData {
     embedderOrigin? : string;
+    height? : number;
+    token? : string;
+    userPath? : string;
+    userData? : any;
+    url? : string;
 }
 
 export interface IPostMessageService {
@@ -146,11 +151,11 @@ export class Service implements IService {
         if (_self.embedderOrigin === "*") {
             _self.embedderOrigin = data.embedderOrigin;
 
-            if (typeof _self.adhCredentials !== "undefined") {
-                _self.$rootScope.$watch(() => _self.adhCredentials.loggedIn, (loggedIn) => _self.sendLoginState(loggedIn));
+            if (typeof _self.adhUser !== "undefined") {
+                _self.$rootScope.$watch(() => typeof _self.adhUser.data !== "undefined", (loggedIn) => _self.sendLoginState(loggedIn));
             }
 
-            _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl) => {
+            _self.$rootScope.$watch(() => _self.$location.absUrl(), (absUrl : string) => {
                 _self.postMessage(
                     "urlchange",
                     {url: absUrl}
@@ -221,19 +226,3 @@ export var factory = (
     }
 };
 
-
-export var moduleName = "adhCrossWindowMessaging";
-
-export var register = (angular, trusted = false) => {
-    var mod = angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhUser.moduleName
-        ]);
-
-    if (trusted) {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", "adhCredentials", "adhUser", factory]);
-    } else {
-        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$location", "$window", "$rootScope", factory]);
-    }
-};

@@ -15,7 +15,7 @@ class ConfigViewTest(unittest.TestCase):
         request = testing.DummyRequest(scheme='http')
         request.registry.settings = None
         assert self.call_fut(request) == \
-            {'ws_url': 'ws://example.com:8080',
+            {'ws_url': 'ws://example.com:6561',
              'pkg_path': '/static/js/Packages',
              'rest_url': 'http://localhost:6541',
              'rest_platform_path': '/adhocracy/',
@@ -36,7 +36,7 @@ class ConfigViewTest(unittest.TestCase):
     def test_ws_url_without_ws_url_settings_scheme_https(self):
         request = testing.DummyRequest(scheme='https')
         request.registry.settings = None
-        assert self.call_fut(request)['ws_url'] == 'wss://example.com:8080'
+        assert self.call_fut(request)['ws_url'] == 'wss://example.com:6561'
 
     def test_ws_url_with_ws_url_settings(self):
         request = testing.DummyRequest(scheme='http')

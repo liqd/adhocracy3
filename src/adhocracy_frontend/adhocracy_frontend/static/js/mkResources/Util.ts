@@ -5,7 +5,7 @@
 var _s : any = require("underscore.string");
 /* tslint:enable:no-var-requires */
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
 export var mkThingList : <T>(things : T[], render : (T) => string, tab : string, separator : string) => string;
 export var dotAndUnderscoreToCaml : (string) => string;

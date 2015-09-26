@@ -1,19 +1,17 @@
-import AdhAngularHelpers = require("../AngularHelpers/AngularHelpers");
-import AdhBadge = require("../Badge/Badge");
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhLocale = require("../Locale/Locale");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhBadge from "../Badge/Badge";
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import AdhCredentials = require("./Credentials");
-import AdhUser = require("./User");
+import * as AdhCredentials from "./Credentials";
+import * as AdhUser from "./User";
 
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+import RIUser from "../../Resources_/adhocracy_core/resources/principal/IUser";
+import RIUsersService from "../../Resources_/adhocracy_core/resources/principal/IUsersService";
+import * as SIUserBasic from "../../Resources_/adhocracy_core/sheets/principal/IUserBasic";
 
 var pkgLocation = "/User";
 
@@ -167,6 +165,7 @@ export var loginDirective = (
     adhConfig : AdhConfig.IService,
     adhUser : AdhUser.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
     adhShowError
 ) => {
     return {
@@ -177,6 +176,8 @@ export var loginDirective = (
             scope.errors = [];
             scope.supportEmail = adhConfig.support_email;
             scope.showError = adhShowError;
+
+            adhPermissions.bindScope(scope, "/principals/users");
 
             scope.credentials = {
                 nameOrEmail: "",
@@ -352,6 +353,7 @@ export var indicatorDirective = (
     adhConfig : AdhConfig.IService,
     adhResourceArea : AdhResourceArea.Service,
     adhTopLevelState : AdhTopLevelState.Service,
+    adhPermissions : AdhPermissions.Service,
     $location : angular.ILocationService
 ) => {
     return {
@@ -366,6 +368,8 @@ export var indicatorDirective = (
             $scope.user = adhUser;
             $scope.credentials = adhCredentials;
             $scope.noLink = !adhResourceArea.has(RIUser.content_type);
+
+            adhPermissions.bindScope($scope, "/principals/users");
 
             $scope.logOut = () => {
                 adhUser.logOut();
@@ -608,77 +612,4 @@ export var registerRoutes = (
             userUrl: "",  // not used by default, but should be overridable
             focus: "0"
         });
-};
-
-
-export var moduleName = "adhUserViews";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAngularHelpers.moduleName,
-            AdhBadge.moduleName,
-            AdhCredentials.moduleName,
-            AdhLocale.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhResourceArea.moduleName,
-            AdhUser.moduleName
-        ])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
-            adhTopLevelStateProvider
-                .when("login", () : AdhTopLevelState.IAreaInput => {
-                    return {
-                        templateUrl: "/static/js/templates/Login.html"
-                    };
-                })
-                .when("password_reset", () : AdhTopLevelState.IAreaInput => {
-                    return {
-                        templateUrl: "/static/js/templates/PasswordReset.html",
-                        reverse: (data) => {
-                            return {
-                                path: data["_path"],
-                                search: {
-                                    path: data["path"]
-                                }
-                            };
-                        }
-                    };
-                })
-                .when("create_password_reset", () : AdhTopLevelState.IAreaInput => {
-                    return {
-                        templateUrl: "/static/js/templates/CreatePasswordReset.html"
-                    };
-                })
-                .when("register", () : AdhTopLevelState.IAreaInput => {
-                    return {
-                        templateUrl: "/static/js/templates/Register.html"
-                    };
-                })
-                .when("activate", ["adhConfig", "adhUser", "adhDone", "$rootScope", "$location", activateArea]);
-        }])
-        .config(["adhResourceAreaProvider", registerRoutes()])
-        .directive("adhListUsers", ["adhCredentials", "adhConfig", userListDirective])
-        .directive("adhUserListItem", ["adhConfig", userListItemDirective])
-        .directive("adhUserProfile", [
-            "adhConfig",
-            "adhCredentials",
-            "adhHttp",
-            "adhPermissions",
-            "adhTopLevelState",
-            "adhUser",
-            "adhGetBadges",
-            userProfileDirective])
-        .directive("adhLogin", ["adhConfig", "adhUser", "adhTopLevelState", "adhShowError", loginDirective])
-        .directive("adhPasswordReset", ["adhConfig", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", passwordResetDirective])
-        .directive("adhCreatePasswordReset", [
-            "adhConfig", "adhCredentials", "adhHttp", "adhUser", "adhTopLevelState", "adhShowError", createPasswordResetDirective])
-        .directive("adhRegister", ["adhConfig", "adhCredentials", "adhUser", "adhTopLevelState", "adhShowError", registerDirective])
-        .directive("adhUserIndicator", ["adhConfig", "adhResourceArea", "adhTopLevelState", "$location", indicatorDirective])
-        .directive("adhUserMeta", ["adhConfig", "adhResourceArea", "adhGetBadges", metaDirective])
-        .directive("adhUserMessage", ["adhConfig", "adhHttp", userMessageDirective])
-        .directive("adhUserDetailColumn", ["adhPermissions", "adhConfig", userDetailColumnDirective])
-        .directive("adhUserListingColumn", ["adhConfig", userListingColumnDirective])
-        .directive("adhUserManagementHeader", ["adhConfig", adhUserManagementHeaderDirective]);
 };

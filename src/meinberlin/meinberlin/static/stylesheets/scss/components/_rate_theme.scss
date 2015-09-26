@@ -2,14 +2,13 @@
     color: $color-text-introvert;
 
     .rate-difference,
-    .rate-pro,
-    .rate-contra {
+    .rate-button-container {
         float: left;
     }
 
     .rate-difference {
-        line-height: 24px / $font-size-small * 1em;
-        margin: 0 (4px / $font-size-small * 1em) 0 (8px / $font-size-small * 1em);
+        @include rem(line-height, 24px);
+        @include rem(margin, 0 4px 0 8px);
 
         &,
         &.is-positive,
@@ -43,7 +42,7 @@
         &:after {
             @extend .icon-voting:before;
             cursor: not-allowed;
-            line-height: 1.35em;
+            line-height: 1.35;
             font-size: 150%;
         }
 

@@ -17,8 +17,8 @@ A simple box containing text.
 ```
 */
 .textbox {
-    padding: 1em;
-    margin-bottom: 1em;
+    @include rem(padding, 1rem);
+    @include rem(margin-bottom, 1rem);
     background-color: $color-structure-introvert;
 
     .m-unobtrusive {
@@ -75,7 +75,7 @@ Dialog for login related flow (login, register, password reset).
 }
 
 .login-form {
-    margin-bottom: 1em;
+    @include rem(margin-bottom, 1rem);
 
     label {
         display: block;
@@ -94,15 +94,15 @@ Dialog for login related flow (login, register, password reset).
     }
 
     input[type="submit"] {
-        margin-top: 24px / $font-size-normal * 1em;
+        @include rem(margin-top, 24px);
     }
 }
 
 .login-title {
+    @include rem(margin, 0 0 2rem);
     font-size: 100%;
     font-weight: normal;
     line-height: inherit;
-    margin: 0 0 2em;
     text-align: left;
 }
 
@@ -110,7 +110,7 @@ Dialog for login related flow (login, register, password reset).
     position: relative;
 
     .login-check-input {
-        margin-bottom: 24px / $font-size-normal * 1em;
+        @include rem(margin-bottom, 24px);
     }
 
     .input-error {
@@ -122,8 +122,8 @@ Dialog for login related flow (login, register, password reset).
 }
 
 .login-info {
-    font-size: $font-size-small;
-    margin: (24px / $font-size-small * 1em) 0 (28px / $font-size-small * 1em);
+    @include rem(font-size, $font-size-small);
+    @include rem(margin, 24px 0 28px);
 
     a {
         text-decoration: none;
@@ -131,12 +131,12 @@ Dialog for login related flow (login, register, password reset).
 }
 
 .login-cancel {
+    @include rem(font-size, $font-size-plus);
+    @include rem(margin-bottom, 24px);
+    @include rem(margin-top, 160px);
     color: $color-text-highlight-introvert;
     display: block;
-    font-size: $font-size-plus;
     font-variant: small-caps;
-    margin-bottom: 24px / $font-size-normal * 1em;
-    margin-top: 160px / $font-size-plus * 1em;
     text-decoration: none;
     text-transform: lowercase;
 

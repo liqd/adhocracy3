@@ -1,10 +1,10 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import JasmineHelpers = require("../../JasmineHelpers");
+import * as JasmineHelpers from "../../JasmineHelpers";
 
-import AdhCommentAdapter = require("./Adapter");
+import * as AdhCommentAdapter from "./Adapter";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
 
 
 export var register = () => {

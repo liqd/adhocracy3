@@ -12,13 +12,13 @@
 
     .comment-create-form-text,
     .comment-edit-form-text {
+        @include rem(min-height, 70px);
         margin: 0;
-        min-height: 70px / $font-size-normal * 1em;
     }
 
     .form-footer-button {
-        font-size: $font-size-small;
-        line-height: 24px / $font-size-small * 1em;
+        @include rem(font-size, $font-size-small);
+        @include rem(line-height, 24px);
         padding: 0;
         text-transform: capitalize;
     }
@@ -39,13 +39,13 @@
 }
 
 .comment {
-    padding: 0 (10px / $font-size-normal * 1em);
+    @include rem(padding, 0 10px);
 }
 
 .comment-content,
 .comment-create-form-text,
 .comment-edit-form-text {
-    font-size: $font-size-small;
+    @include rem(font-size, $font-size-small);
     line-height: $line-height-large;
 }
 
@@ -55,7 +55,7 @@
 
 .comment-children-create-form,
 .comment-children-edit-form {
-    margin-bottom: 20px / $font-size-normal * 1em;
+    @include rem(margin-bottom, 20px);
 
     .comment-create-form, & {
         background: transparent;
@@ -69,6 +69,6 @@
 }
 
 .comment-main {
-    margin-bottom: 24px / $font-size-normal * 1em;
+    @include rem(margin-bottom, 24px);
     padding-bottom: 0;
 }

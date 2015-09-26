@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhMarkdown = require("./Markdown");
+import * as AdhMarkdown from "./Markdown";
 
 
 export var register = () => {

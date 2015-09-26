@@ -46,9 +46,9 @@ category: Widgets
 
     .tab-button,
     &.is-active .tab-button {
+        @include rem(font-size, $font-size-small);
         background: $color-background-base-introvert;
         color: $color-text-highlight-introvert;
-        font-size: $font-size-small;
         top: 0;
         margin: 0;
         padding-top: 0;
@@ -148,36 +148,36 @@ parent: phase-header
 ```
 */
 .phase-header {
-    margin-bottom: 10px / $font-size-normal * 1em;
+    @include rem(margin-bottom, 10px);
 }
 
 .phase {
-    font-size: $font-size-small;
+    @include rem(padding, 10px);
+    @include rem(font-size, $font-size-small);
     color: $color-text-normal;
     background: $color-background-base-introvert;
-    padding: 10px / $font-size-small * 1em;
 
     [class^="icon"] {
-        font-size: 130%;
-        margin-right: 0.5em;
+        @include rem(font-size, 1.11rem);
+        @include rem(margin-right, 6px);
     }
 }
 
 .phase-title {
+    @include rem(font-size, $font-size-normal);
     margin: 0;
-    font-size: $font-size-normal;
 }
 
 .phase-process-type {
-    margin-bottom: 0.8em;
+    @include rem(margin-bottom, 0.8rem);
 }
 
 .phase-description {
-    margin-bottom: 1.5em;
+    @include rem(margin-bottom, 1.5rem);
 }
 
 .phase-availability {
-    margin-right: 3em;
+    @include rem(margin-right, 3rem);
 }
 
 .phase-availability-summary {

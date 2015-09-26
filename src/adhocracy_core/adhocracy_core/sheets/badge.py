@@ -187,7 +187,10 @@ def create_unique_badge_assignment_validator(badge_ref: Reference,
             badge = badge_sheet_values['badge']
             badge_name = get_sheet_field(badge, IName, 'name')
             obj = badge_sheet_values['object']
-            if new_badge_name == badge_name and new_object == obj:
+            updating_current_assignment = context == badge_assignment
+            if new_badge_name == badge_name \
+               and new_object == obj \
+               and not updating_current_assignment:
                 raise colander.Invalid(badge_ref, 'Badge already assigned')
 
     return validator

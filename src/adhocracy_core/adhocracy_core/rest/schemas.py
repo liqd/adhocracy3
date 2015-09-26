@@ -13,7 +13,7 @@ from substanced.util import find_catalog
 from substanced.util import find_service
 from hypatia.field import FieldIndex
 from hypatia.keyword import KeywordIndex
-from zope.interface.interface import InterfaceClass
+from zope import interface
 from adhocracy_core.interfaces import FieldComparator
 from adhocracy_core.interfaces import FieldSequenceComparator
 from adhocracy_core.interfaces import IResource
@@ -60,6 +60,16 @@ from adhocracy_core.utils import unflatten_multipart_request
 
 resolver = DottedNameResolver()
 
+
+INDEX_EXAMPLE_VALUES = {
+    'default': 'str',
+    'reference': Base(),
+    'creator': Base(),
+    'item_creation_date': datetime.now(),
+    'rate': 1,
+    'rates': 1,
+    'interfaces': interface.Interface,
+}
 
 class UpdatedResourcesSchema(colander.Schema):
 
@@ -350,22 +360,22 @@ class PoolQueryDepth(SchemaNode):
     arbitrary depth.
     """
 
-    schema_type = colander.String
-    validator = colander.Regex(r'^(\d+|all)$')
-    missing = '1'
+    schema_type = colander.Integer
+    missing = 1
+    validator=colander.Range(min=1)
 
 
 @colander.deferred
 def deferred_validate_aggregateby(node: SchemaNode, kw):
-    """Validate if `value` is an catalog index with `unique_values`."""
+    """Validate if `value` is an catalog index name`."""
     # TODO In the future we may have indexes where aggregateby doesn't make
     # sense, e.g. username or email. We should have a blacklist to prohibit
     # calling aggregateby on such indexes.
     context = kw['context']
     indexes = _get_indexes(context)
-    valid_indexes = [x.__name__ for x in indexes
-                     if 'unique_values' in x.__dir__()]
-    return colander.OneOf(valid_indexes)
+    index_names = [x.__name__ for x in indexes
+                   if hasattr(x, 'unique_values')]
+    return colander.OneOf(index_names)
 
 
 @colander.deferred
@@ -412,7 +422,7 @@ class GETPoolRequestSchema(colander.Schema):
     # Elements in this schema were multiple values should be allowed:
     # sheet, aggregateby, tag.
 
-    depth = PoolQueryDepth(missing=colander.drop)
+    depth = PoolQueryDepth()
     elements = PoolElementsForm(missing=colander.drop)
     count = SchemaNode(colander.Boolean(), missing=colander.drop)
     sort = SchemaNode(colander.String(),
@@ -434,15 +444,17 @@ class GETPoolRequestSchema(colander.Schema):
         TODO: CHANGE API according to internal SearchQuery api.
              refactor to follow coding guideline better.
         """
+        depth_cstruct = cstruct.get('depth', None)
+        if depth_cstruct == 'all':
+            cstruct['depth'] = 100
         appstruct = super().deserialize(cstruct)
         search_query = {}
         if appstruct:
             search_query['root'] = self.bindings['context']
         if 'depth' in appstruct:
-            depth_bbb = appstruct['depth']
-            depth = None
-            if depth_bbb != 'all':
-                depth = int(depth_bbb)
+            depth = appstruct['depth']
+            if depth == 100:
+                depth = None
             search_query['depth'] = depth
         if 'elements' in appstruct:
             elements = appstruct.get('elements')
@@ -511,8 +523,8 @@ def add_arbitrary_filter_nodes(cstruct: dict,
         else:
             continue  # pragma: no cover
         index = catalogs.get_index(index_name)
-        value_type = _get_index_example_value(index)
-        node = create_arbitrary_filter_node(index, value_type, query)
+        example_value = _get_index_example_value(index)
+        node = create_arbitrary_filter_node(index, example_value, query)
         _add_node(schema, node, filter_name)
     return schema
 
@@ -549,17 +561,13 @@ def _is_arbitrary_filter(name: str, catalogs: ICatalogsService) -> bool:
 
 
 def _get_index_example_value(index: SDIndex) -> object:
-    """Return example entry from `index` or None."""
+    """Return example entry from `index` or None if `index` is None."""
     if index is None:
-        return
-    if 'unique_values' in index.__dir__():
-        indexed_values = index.unique_values()
-        if len(indexed_values) > 0:
-            return indexed_values[0]
-        else:
-            return
-    elif isinstance(index, ReferenceIndex): # pragma: no cover
-        return Base()
+        return None
+    if index.__name__ in INDEX_EXAMPLE_VALUES:
+        return INDEX_EXAMPLE_VALUES[index.__name__]
+    else:
+        return INDEX_EXAMPLE_VALUES['default']
 
 
 def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
@@ -568,54 +576,54 @@ def _add_node(schema: SchemaNode, node: SchemaNode, name: str):
     schema.add(node)
 
 
-@dispatch(object, str, str)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+@dispatch((FieldIndex, KeywordIndex), str, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
     return SingleLine()
 
 
-@dispatch(object, int, (int, str))  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+@dispatch((FieldIndex, KeywordIndex), int, (int, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
     return Integer()
 
 
-@dispatch(object, bool, (bool, str))  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+@dispatch((FieldIndex, KeywordIndex), bool, (bool, str))  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
     return Boolean()
 
 
 @dispatch(FieldIndex, bool, list)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+def create_arbitrary_filter_node(index, example_value, query):
     if query[0] in FieldSequenceComparator.__members__:
         return FieldComparableBooleans()
     else:
         return FieldComparableBoolean()
 
 
-@dispatch(object, datetime, str)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+@dispatch((FieldIndex, KeywordIndex), datetime, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
     return DateTime()
 
 
 @dispatch(FieldIndex, datetime, list)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+def create_arbitrary_filter_node(index, example_value, query):
     if query[0] in FieldSequenceComparator.__members__:
         return FieldComparableDateTimes()
     else:
         return FieldComparableDateTime()
 
 
-@dispatch(KeywordIndex, InterfaceClass, str)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+@dispatch(KeywordIndex, interface.interface.InterfaceClass, str)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
     return Interface()
 
 
 @dispatch(ReferenceIndex, object, str)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+def create_arbitrary_filter_node(index, example_value, query):
     return Resource()
 
 
 @dispatch(KeywordIndex, int, list)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+def create_arbitrary_filter_node(index, example_value, query):
     if query[0] in KeywordSequenceComparator.__members__:
         return KeywordComparableIntegers()
     else:
@@ -623,7 +631,7 @@ def create_arbitrary_filter_node(index, value_type, query):
 
 
 @dispatch(FieldIndex, int, list)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+def create_arbitrary_filter_node(index, example_value, query):
     if query[0] in FieldSequenceComparator.__members__:
         return FieldComparableIntegers()
     else:
@@ -631,7 +639,7 @@ def create_arbitrary_filter_node(index, value_type, query):
 
 
 @dispatch(KeywordIndex, str, list)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+def create_arbitrary_filter_node(index, example_value, query):
     if query[0] in KeywordSequenceComparator.__members__:
         return KeywordComparableSingleLines()
     else:
@@ -639,15 +647,15 @@ def create_arbitrary_filter_node(index, value_type, query):
 
 
 @dispatch(FieldIndex, str, list)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+def create_arbitrary_filter_node(index, example_value, query):
     if query[0] in FieldSequenceComparator.__members__:
         return FieldComparableSingleLines()
     else:
         return FieldComparableSingleLine()
 
 
-@dispatch(KeywordIndex, InterfaceClass, list)  # flake8: noqa
-def create_arbitrary_filter_node(index, value_type, query):
+@dispatch(KeywordIndex, interface.interface.InterfaceClass, list)  # flake8: noqa
+def create_arbitrary_filter_node(index, example_value, query):
     if query[0] in KeywordSequenceComparator.__members__:
         return KeywordComparableInterfaces()
     else:

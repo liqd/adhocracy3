@@ -12,11 +12,11 @@ category: Widgets
 </div>
 */
 .image-upload {
-    margin: 1.4em 0;
+    @include rem(margin, 1.4rem 0);
 }
 
 .image-upload-preview {
+    @include rem(margin, 0.7rem 0);
+    @include rem(max-height, 10rem);
     display: block;
-    max-height: 10em;
-    margin: 0.7em 0;
 }

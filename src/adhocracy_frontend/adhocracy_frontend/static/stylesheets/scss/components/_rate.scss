@@ -10,7 +10,7 @@ A like-button with counter.
 The button has the is-rate-button-active state.
 
 ```html_example
-<div class="like">
+<div class="like" style="margin-bottom: 10px">
     <span class="like-difference">+4</span>
     <a class="like-button">Like</a>
 </div>
@@ -36,14 +36,15 @@ The button has the is-rate-button-active state.
 }
 
 $line-height: (24/12);
-$arrow-width: 1em;
+$arrow-width: 1rem;
 
 .like-button {
     @include inline-block;
-    font-size: $font-size-small;
+    @include rem(font-size, $font-size-small);
+    @include rem(min-width, 100px);
+    @include rem(padding, 0 10px);
     position: relative;
     margin-left: $arrow-width;
-    padding: 0 0.83333333em;
     text-transform: uppercase;
     line-height: $line-height;
     background-color: $color-brand-one-normal;
@@ -51,17 +52,16 @@ $arrow-width: 1em;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
-    min-width: 100px / $font-size-small * 1em;
 
     &:before {
+        @include rem(border-right, $arrow-width solid $color-brand-one-normal);
+        border-top: $line-height/2 * 1em solid $color-structure-transparent;
+        border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
         content: "";
         position: absolute;
         left: -$arrow-width;
         width: 0;
         height: 0;
-        border-top: $line-height/2 * 1em solid $color-structure-transparent;
-        border-bottom: $line-height/2 * 1em solid $color-structure-transparent;
-        border-right: $arrow-width solid $color-brand-one-normal;
         border-left: 0;
     }
 
@@ -124,16 +124,65 @@ the `is-disabled` state.
 
 ```html_example
 <div class="rate">
-    <span class="rate-difference is-positive">1</span>
-    <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
-    <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+    <span class="rate-difference is-positive">3</span>
+    <span class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </span>
+    <span class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </span>
 </div>
 
 <div class="rate is-disabled">
-    <span class="rate-difference is-positive">1</span>
-    <a href="" class="rate-pro is-rate-button-active is-disabled"><i class="icon-vote-up" title="Vote up"></i></a>
-    <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
+    <span class="rate-difference is-positive">3</span>
+    <span class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </span>
+    <span class="rate-button-container">
+        <a href="" class="rate-contra is-disabled"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </span>
 </div>
+
+<div class="rate m-show-results-persist">
+    <span class="rate-difference is-positive">3</span>
+    <span class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </span>
+    <span class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </span>
+</div>
+
+<div class="rate m-show-results-hover">
+    <span class="rate-difference is-positive">3</span>
+    <span class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </span>
+    <span class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </span>
+</div>
+Hover show results
+<div class="rate is-cast m-show-results-click">
+    <span class="rate-difference is-positive">3</span>
+    <span class="rate-button-container">
+        <a href="" class="rate-pro is-rate-button-active"><i class="icon-vote-up" title="Vote up"></i></a>
+        <span class="rate-results">+6</span>
+    </span>
+    <span class="rate-button-container">
+        <a href="" class="rate-contra"><i class="icon-vote-down" title="Vote down"></i></a>
+        <span class="rate-results">-3</span>
+    </span>
+</div>
+Click show results
 ```
 */
 
@@ -144,6 +193,30 @@ the `is-disabled` state.
 
         &.is-disabled {
             cursor: not-allowed;
+        }
+    }
+
+    .rate-button-container {
+        @include inline-block;
+        position: relative;
+    }
+
+    .rate-results {
+        @include rem(font-size, $font-size-small);
+        @include rem(padding-top, 3px);
+        display: block;
+        position: absolute;
+        text-align: center;
+        visibility: hidden;
+        width: 100%;
+    }
+
+    &.m-show-results-persist,
+    &:hover.m-show-results-hover,
+    &:focus.m-show-results-hover,
+    &.is-cast.m-show-results-click {
+        .rate-results {
+            visibility: visible;
         }
     }
 
