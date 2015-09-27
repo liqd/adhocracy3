@@ -256,12 +256,10 @@ To upload a new version of an asset, the frontend sends a PUT request with
 enctype="multipart/form-data" to the asset URL. The PUT request may contain
 the same keys as a POST request used to create a new asset.
 
-The `data:adhocracy_core.sheets.asset.IAssetData:data` key is required,
+The `data:adhocracy_core.sheets.asset.IAssetData:data` and
+`data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type` key is required,
 since the only use case for a PUT request is uploading a new version of the
 binary data (everything else is just metadata).
-
-The `data:adhocracy_core.sheets.asset.IAssetMetadata:mime_type` may be
-omitted if the new MIME type is the same as the old one.
 
 If the `content_type` key is given, it *must* be identical to the current
 content type of the asset (changing the type of resources is generally not

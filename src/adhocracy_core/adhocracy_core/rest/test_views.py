@@ -1466,6 +1466,15 @@ class TestAssetsServiceRESTView:
         from adhocracy_core.rest.views import AssetsServiceRESTView
         return AssetsServiceRESTView(context, request)
 
+
+    def test_create(self, context, request_):
+        from .views import SimpleRESTView
+        from .schemas import POSTAssetRequestSchema
+        inst = self.make_one(context, request_)
+        assert issubclass(inst.__class__, SimpleRESTView)
+        assert inst.validation_POST == (POSTAssetRequestSchema, [])
+
+
     def test_post_valid(self, request_, context):
         request_.root = context
         child = testing.DummyResource(__provides__=IResourceX)
@@ -1486,14 +1495,21 @@ class TestAssetsServiceRESTView:
 
 class TestAssetRESTView:
 
-    def make_one(self, context, request_):
+    def make_one(self, context, request):
         from adhocracy_core.rest.views import AssetRESTView
-        return AssetRESTView(context, request_)
+        return AssetRESTView(context, request)
+
+    def test_create(self, context, request_):
+        from .views import SimpleRESTView
+        from .schemas import PUTAssetRequestSchema
+        inst = self.make_one(context, request_)
+        assert issubclass(inst.__class__, SimpleRESTView)
+        assert inst.validation_PUT == (PUTAssetRequestSchema, [])
 
     def test_put_valid_no_sheets(self, monkeypatch, request_, context,
                                  mock_sheet):
         from adhocracy_core.rest import views
-        mock_validate = Mock(spec=views.validate_and_complete_asset)
+        mock_validate = Mock(spec=views.store_asset_meta_and_add_downloads)
         monkeypatch.setattr(views, 'validate_and_complete_asset',
                             mock_validate)
         request_.registry.content.get_sheets_edit.return_value = [mock_sheet]

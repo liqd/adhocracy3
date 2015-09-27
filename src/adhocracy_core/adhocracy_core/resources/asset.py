@@ -41,9 +41,9 @@ class IAsset(ISimple):
     """A generic asset (binary file)."""
 
 
-def validate_and_complete_asset(context: IAsset,
-                                registry: Registry,
-                                options: dict={}):
+def store_asset_meta_and_add_downloads(context: IAsset,
+                                       registry: Registry,
+                                       options: dict={}):
     """Complete the initialization of an asset and ensure that it's valid."""
     data_sheet = get_sheet(context, IAssetData, registry=registry)
     data_appstruct = data_sheet.get()
@@ -52,34 +52,12 @@ def validate_and_complete_asset(context: IAsset,
     metadata_appstruct = metadata_sheet.get()
     file = data_appstruct['data']
     if not file:
-        return  # to facilitate testing
-    _validate_mime_type(file, metadata_appstruct, metadata_sheet)
+        return None  # ease testing
     _store_size_and_filename_as_metadata(file,
                                          metadata_appstruct,
                                          metadata_sheet,
                                          registry=registry)
     _add_downloads_as_children(context, metadata_sheet, registry)
-
-
-def _validate_mime_type(file: File,
-                        metadata_appstruct: dict,
-                        metadata_sheet: IAssetMetadata):
-    detected_mime_type = file.mimetype
-    claimed_mime_type = metadata_appstruct['mime_type']
-    if detected_mime_type != claimed_mime_type:
-        _raise_mime_type_error(
-            metadata_sheet,
-            'Claimed MIME type is {} but file content seems to be {}'.format(
-                claimed_mime_type, detected_mime_type))
-    mime_type_validator = metadata_sheet.meta.mime_type_validator
-    if mime_type_validator is None:
-        _raise_mime_type_error(
-            metadata_sheet,
-            'Sheet is abstract and does\'t allow storing data')
-    if not mime_type_validator(detected_mime_type):
-        _raise_mime_type_error(
-            metadata_sheet,
-            'Invalid MIME type for this sheet: {}'.format(detected_mime_type))
 
 
 def _raise_mime_type_error(metadata_sheet: IAssetMetadata, msg: str):
@@ -136,7 +114,7 @@ asset_meta = pool_meta._replace(
     ),
     use_autonaming=True,
     permission_create='create_asset',
-    after_creation=[validate_and_complete_asset],
+    after_creation=[store_asset_meta_and_add_downloads],
 )
 
 

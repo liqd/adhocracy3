@@ -10,11 +10,10 @@ class TestImageMetadataSheet:
         from .image import image_metadata_meta
         return image_metadata_meta
 
-    def test_create(self, meta):
-        from .image import IImageMetadata
-        from .image import image_mime_type_validator
-        assert meta.isheet is IImageMetadata
-        assert meta.mime_type_validator is image_mime_type_validator
+    def test_meta(self, meta):
+        from . import image
+        assert meta.isheet is image.IImageMetadata
+        assert meta.schema_class == image.ImageMetadataSchema
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
@@ -26,6 +25,11 @@ class TestImageMetadataSheet:
                               'detail': None,
                               'thumbnail': None}
 
+    def test_validate_mime_type(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        validator = inst.schema['mime_type'].validator
+        assert validator.choices == ('image/gif', 'image/jpeg', 'image/png')
+
     @mark.usefixtures('integration')
     def test_includeme_register(self, meta):
         from adhocracy_core.utils import get_sheet
@@ -33,13 +37,6 @@ class TestImageMetadataSheet:
         assert get_sheet(context, meta.isheet)
 
 
-def test_image_mime_type_validator():
-    from adhocracy_core.sheets.image import image_mime_type_validator
-    assert image_mime_type_validator('image/jpeg') is True
-    assert image_mime_type_validator('image/png') is True
-    assert image_mime_type_validator('image/blah') is False
-    assert image_mime_type_validator('') is False
-    assert image_mime_type_validator(None) is False
 
 
 class TestImageReference:

@@ -27,7 +27,7 @@ class TestAsset:
         assert meta.extended_sheets == (
             adhocracy_core.sheets.asset.IAssetMetadata,)
         assert meta.use_autonaming
-        assert asset.validate_and_complete_asset in meta.after_creation
+        assert asset.store_asset_meta_and_add_downloads in meta.after_creation
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta):
@@ -85,8 +85,8 @@ class TestValidateAndCompleteAsset:
                                        run_after_creation=False)
 
     def call_fut(self, *args):
-        from .asset import validate_and_complete_asset
-        return validate_and_complete_asset(*args)
+        from .asset import store_asset_meta_and_add_downloads
+        return store_asset_meta_and_add_downloads(*args)
 
     def test_add_download_raw(self, pool, registry):
         from adhocracy_core.sheets.asset import IAssetMetadata
@@ -110,32 +110,5 @@ class TestValidateAndCompleteAsset:
         detail = metadata.get()['detail']
         assert IAssetDownload.providedBy(detail)
 
-    def test_mime_type_mismatch(self, pool, registry):
-        asset = self._make_asset(pool, registry,
-                                 mime_type='text/plain',
-                                 mime_type_in_file='wrong')
-        with raises(colander.Invalid) as err_info:
-            self.call_fut(asset, registry)
-        assert 'Claimed MIME type' in err_info.value.msg
 
-    def test_invalid_mime_type(self, pool, registry):
-        from adhocracy_core.sheets.asset import IAssetMetadata
-        asset = self._make_asset(pool, registry)
-        sheets_meta = registry.content.sheets_meta
-        sheets_meta[IAssetMetadata] = sheets_meta[IAssetMetadata]._replace(
-            mime_type_validator=lambda x: False)
-        with raises(colander.Invalid) as err_info:
-            self.call_fut(asset, registry)
-        assert 'Invalid MIME type' in err_info.value.msg
-
-    def test_abstract_sheet(self, pool, registry):
-        from adhocracy_core.resources.asset import IAsset
-        from adhocracy_core.sheets.asset import IAssetMetadata
-        asset = self._make_asset(pool, registry)
-        metas = registry.content.sheets_meta
-        metas[IAssetMetadata] = metas[IAssetMetadata]._replace(
-            mime_type_validator=None)
-        with raises(colander.Invalid) as err_info:
-            self.call_fut(asset, registry)
-        assert 'Sheet is abstract' in err_info.value.msg
 

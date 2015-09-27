@@ -60,8 +60,6 @@ class SheetMetadata(namedtuple('SheetMetadata',
                                 'editable',
                                 'creatable',
                                 'create_mandatory',
-                                'mime_type_validator',
-                                'image_sizes',
                                 ])):
 
     """Metadata to register a sheet type to set/get resource data.
@@ -92,15 +90,6 @@ class SheetMetadata(namedtuple('SheetMetadata',
     create_mandatory:
         This Sheet must be set if you create (post) a new resource
 
-    IAsset-related fields:
-    ----------------------
-
-    mime_type_validator:
-        callable that takes an string and returns a bool, checking whether
-        the MIME type of the asset is valid
-    image_sizes:
-        optional dictionary from names to :class:`Dimensions`, e.g.
-        ``{ 'thumbnail': Dimensions(width=100, height=50) }``
     """
 
 

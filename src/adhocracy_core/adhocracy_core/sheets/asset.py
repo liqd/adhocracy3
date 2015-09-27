@@ -74,7 +74,6 @@ class AssetMetadataSchema(colander.MappingSchema):
 asset_metadata_meta = sheet_meta._replace(
     isheet=IAssetMetadata,
     schema_class=AssetMetadataSchema,
-    mime_type_validator=lambda dummy: True,
 )
 
 

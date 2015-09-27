@@ -31,7 +31,7 @@ from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.resources.asset import IAssetsService
-from adhocracy_core.resources.asset import validate_and_complete_asset
+from adhocracy_core.resources.asset import store_asset_meta_and_add_downloads
 from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
@@ -46,7 +46,9 @@ from adhocracy_core.rest.schemas import POSTCreatePasswordResetRequestSchema
 from adhocracy_core.rest.schemas import POSTPasswordResetRequestSchema
 from adhocracy_core.rest.schemas import POSTReportAbuseViewRequestSchema
 from adhocracy_core.rest.schemas import POSTResourceRequestSchema
+from adhocracy_core.rest.schemas import POSTAssetRequestSchema
 from adhocracy_core.rest.schemas import PUTResourceRequestSchema
+from adhocracy_core.rest.schemas import PUTAssetRequestSchema
 from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
@@ -715,6 +717,8 @@ class AssetsServiceRESTView(PoolRESTView):
 
     """View allowing multipart requests for asset upload."""
 
+    validation_POST = (POSTAssetRequestSchema, [])
+
     @view_config(request_method='POST',
                  permission='create_asset',
                  accept='multipart/form-data')
@@ -731,13 +735,15 @@ class AssetRESTView(SimpleRESTView):
 
     """View for assets, allows PUTting new versions via multipart."""
 
+    validation_PUT = (PUTAssetRequestSchema, [])
+
     @view_config(request_method='PUT',
                  permission='create_asset',
                  accept='multipart/form-data')
     def put(self) -> dict:
         """HTTP PUT."""
         result = super().put()
-        validate_and_complete_asset(self.context, self.request.registry)
+        store_asset_meta_and_add_downloads(self.context, self.request.registry)
         return result
 
 
