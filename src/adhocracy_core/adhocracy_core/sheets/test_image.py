@@ -3,22 +3,16 @@ from pytest import fixture
 from pytest import mark
 
 
-@fixture
-def integration(config):
-    config.include('adhocracy_core.content')
-    config.include('adhocracy_core.sheets.image')
-
-
 class TestImageMetadataSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.image import image_metadata_meta
+        from .image import image_metadata_meta
         return image_metadata_meta
 
     def test_create(self, meta):
-        from adhocracy_core.sheets.image import IImageMetadata
-        from adhocracy_core.sheets.image import image_mime_type_validator
+        from .image import IImageMetadata
+        from .image import image_mime_type_validator
         assert meta.isheet is IImageMetadata
         assert meta.mime_type_validator is image_mime_type_validator
 
@@ -32,6 +26,12 @@ class TestImageMetadataSheet:
                               'detail': None,
                               'thumbnail': None}
 
+    @mark.usefixtures('integration')
+    def test_includeme_register(self, meta):
+        from adhocracy_core.utils import get_sheet
+        context = testing.DummyResource(__provides__=meta.isheet)
+        assert get_sheet(context, meta.isheet)
+
 
 def test_image_mime_type_validator():
     from adhocracy_core.sheets.image import image_mime_type_validator
@@ -42,15 +42,6 @@ def test_image_mime_type_validator():
     assert image_mime_type_validator(None) is False
 
 
-@mark.usefixtures('integration')
-def test_includeme_register__image_sheet(registry):
-    from adhocracy_core.sheets.image import IImageMetadata
-    from adhocracy_core.utils import get_sheet
-    context = testing.DummyResource(__provides__=IImageMetadata)
-    inst = get_sheet(context, IImageMetadata, registry=registry)
-    assert inst.meta.isheet is IImageMetadata
-
-
 class TestImageReference:
 
     @fixture
@@ -59,12 +50,11 @@ class TestImageReference:
         return image_reference_meta
 
     def test_meta(self, meta):
-      from .image import IImageReference
-      from .image import ImageReferenceSchema
+      from . import image
       from adhocracy_core.sheets import AnnotationRessourceSheet
       assert meta.sheet_class == AnnotationRessourceSheet
-      assert meta.isheet == IImageReference
-      assert meta.schema_class == ImageReferenceSchema
+      assert meta.isheet == image.IImageReference
+      assert meta.schema_class == image.ImageReferenceSchema
       assert meta.editable is True
 
     def test_create(self, meta, context):
@@ -79,5 +69,3 @@ class TestImageReference:
         from adhocracy_core.utils import get_sheet
         context = testing.DummyResource(__provides__=meta.isheet)
         assert get_sheet(context, meta.isheet, registry=registry)
-
-
