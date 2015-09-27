@@ -877,6 +877,9 @@ mkFieldType = (field : MetaApi.ISheetField) : FieldType => {
     case "adhocracy_core.schema.Reference":
         resultType = "string";
         break;
+    case "adhocracy_core.schema.Resource":
+        resultType = "string";
+        break;
     case "adhocracy_core.schema.PostPool":
         resultType = "string";
         break;

@@ -10,6 +10,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.sheets import workflow
 from adhocracy_core.sheets.asset import IAssetMetadata
+from adhocracy_core.sheets.asset import AssetMetadataSchema
 from adhocracy_core.sheets.asset import asset_metadata_meta
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
@@ -20,6 +21,7 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
+from adhocracy_core.schema import Resource
 
 
 class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -280,6 +282,12 @@ class IIntroImageMetadata(IAssetMetadata):
     """Marker interface for intro images."""
 
 
+class IntroImageSchema(AssetMetadataSchema):
+
+    thumbnail = Resource(dimensions=Dimensions(width=105, height=90))
+    detail = Resource(dimensions=Dimensions(width=800, height=350))
+
+
 def _intro_image_mime_type_validator(mime_type: str) -> bool:
     return mime_type in ('image/gif', 'image/jpeg', 'image/png')
 
@@ -287,8 +295,7 @@ def _intro_image_mime_type_validator(mime_type: str) -> bool:
 intro_image_metadata_meta = asset_metadata_meta._replace(
     isheet=IIntroImageMetadata,
     mime_type_validator=_intro_image_mime_type_validator,
-    image_sizes={'thumbnail': Dimensions(width=105, height=90),
-                 'detail': Dimensions(width=800, height=350)},
+    schema_class=IntroImageSchema,
 )
 
 

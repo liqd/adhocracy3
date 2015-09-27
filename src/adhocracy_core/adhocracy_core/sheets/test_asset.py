@@ -90,7 +90,8 @@ class TestIAssetMetadata:
         assert inst.get() == {'attached_to': [],
                               'filename': '',
                               'mime_type': '',
-                              'size': 0}
+                              'size': 0,
+                              'raw': None}
 
     def test_get_with_backreference(self, meta, context, sheet_catalogs,
                                     search_result):
@@ -98,21 +99,18 @@ class TestIAssetMetadata:
         attacher = testing.DummyResource()
         sheet_catalogs.search.return_value =\
             search_result._replace(elements=[attacher])
-        assert inst.get() == {'attached_to': [attacher],
-                              'filename': '',
-                              'mime_type': '',
-                              'size': 0}
+        assert inst.get()['attached_to'] == [attacher]
 
     def test_set_and_get(self, meta, context):
         inst = meta.sheet_class(meta, context)
         inst.set({'filename': 'dummy.jpg',
                   'mime_type': 'image/jpeg',
                   'size': 890828},
-                 omit_readonly=False)
-        assert inst.get() == {'attached_to': [],
-                              'filename': 'dummy.jpg',
-                              'mime_type': 'image/jpeg',
-                              'size': 890828}
+                  omit_readonly=False)
+        appstruct = inst.get()
+        assert appstruct['filename'] == 'dummy.jpg'
+        assert appstruct['mime_type'] == 'image/jpeg'
+        assert appstruct['size'] == 890828
 
 
 class TestAssetFileDownload:

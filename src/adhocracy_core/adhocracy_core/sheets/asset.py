@@ -20,6 +20,7 @@ from adhocracy_core.schema import Integer
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Resource
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 from adhocracy_core.utils import get_sheet_field
@@ -67,11 +68,13 @@ class AssetMetadataSchema(colander.MappingSchema):
     attached_to = UniqueReferences(readonly=True,
                                    backref=True,
                                    reftype=AssetReference)
+    raw = Resource(readonly=True)
 
 
 asset_metadata_meta = sheet_meta._replace(
     isheet=IAssetMetadata,
     schema_class=AssetMetadataSchema,
+    mime_type_validator=lambda dummy: True,
 )
 
 

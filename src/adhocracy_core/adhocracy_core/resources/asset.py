@@ -15,7 +15,6 @@ from adhocracy_core.resources.simple import simple_meta
 from adhocracy_core.sheets.asset import AssetFileDownload
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
-from adhocracy_core.sheets.name import IName
 from adhocracy_core.utils import get_matching_isheet
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import raise_colander_style_error
@@ -32,7 +31,8 @@ class IAssetDownload(ISimple):
 asset_download_meta = simple_meta._replace(
     content_name='AssetDownload',
     iresource=IAssetDownload,
-    basic_sheets=(IName, IAssetData),
+    use_autonaming=True,
+    basic_sheets=(IAssetData,),
 )
 
 
@@ -99,32 +99,27 @@ def _store_size_and_filename_as_metadata(file: File,
 
 
 def _add_downloads_as_children(context: IAsset,
-                               metadata_sheet: IAssetMetadata,
+                               sheet: IAssetMetadata,
                                registry: Registry):
-    """
-    Add raw and possible resized download objects as children of an asset.
-
-    If a child with the same name already exists, it will be deleted and
-    replaced.
-    """
-    _create_asset_download(context=context, name='raw', registry=registry)
-    if metadata_sheet.meta.image_sizes:  # pragma: no branch
-        for name, dimensions in metadata_sheet.meta.image_sizes.items():
-            _create_asset_download(context=context, name=name,
-                                   registry=registry, dimensions=dimensions)
+    """Add raw and possible resized download objects to `context`."""
+    raw_download = _create_asset_download(context, registry)
+    appstruct = {'raw': raw_download}
+    size_fields = (f for f in sheet.schema if hasattr(f, 'dimensions'))
+    for field in size_fields:
+        download = _create_asset_download(context, registry, field.dimensions)
+        appstruct[field.name] = download
+    sheet.set(appstruct)
 
 
-def _create_asset_download(context: IAsset, name: str, registry: Registry,
-                           dimensions: Dimensions=None) -> dict:
+def _create_asset_download(context: IAsset, registry: Registry,
+                           dimensions: Dimensions=None) -> IAssetDownload:
     file_download = AssetFileDownload(dimensions)
-    if name in context:
-        del context[name]
-    appstructs = {IName.__identifier__: {'name': name},
-                  IAssetData.__identifier__: {'data': file_download}}
-    registry.content.create(IAssetDownload.__identifier__,
-                            parent=context,
-                            appstructs=appstructs,
-                            registry=registry)
+    appstructs = {IAssetData.__identifier__: {'data': file_download}}
+    download = registry.content.create(IAssetDownload.__identifier__,
+                                       parent=context,
+                                       appstructs=appstructs,
+                                       registry=registry)
+    return download
 
 
 asset_meta = pool_meta._replace(

@@ -21,14 +21,16 @@ class TestImageMetadataSheet:
         from adhocracy_core.sheets.image import image_mime_type_validator
         assert meta.isheet is IImageMetadata
         assert meta.mime_type_validator is image_mime_type_validator
-        assert 'detail' in meta.image_sizes
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'attached_to': [],
                               'filename': '',
                               'mime_type': '',
-                              'size': 0}
+                              'size': 0,
+                              'raw': None,
+                              'detail': None,
+                              'thumbnail': None}
 
 
 def test_image_mime_type_validator():

@@ -78,8 +78,8 @@ We can ask the pool for the location of the asset pool::
     'http://localhost/process/assets/'
 
 
-Asset Subtypes, MIME Type Validators, and Images Size Mappers
--------------------------------------------------------------
+Asset Subtypes, MIME Type Validators, resizing
+----------------------------------------------
 
 Note: this section is mostly backend-specific.
 
@@ -96,18 +96,6 @@ for an example.
 
 In the examples that follow, we will use the subclassed example resource type
 and sheet.
-
-The backend can resize and crop images to different target formats. To do
-this, add an `image_sizes` field to the metadata of your subclassed sheet.
-`adhocracy_core.sheets.image` shows how to do that too. For example,
-if we have::
-
-    image_sizes={'thumbnail': Dimensions(width=100, height=50),
-                 'detail': Dimensions(width=500, height=250)},
-
-This means that the image will be made available in 'thumbnail' and in
-'detail' size, each with the specified dimensions, as well as in its original
-(raw) size.
 
 The image will be automatically resized to all of the specified sizes. If
 the target aspect ratio is different from the original aspect ratio, the size
@@ -188,11 +176,15 @@ the asset::
     'adhocracy_core.resources.image.IImage'
     >>> resp_data['data']['adhocracy_core.sheets.metadata.IMetadata']['modification_date']
     '20...'
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.image.IImageMetadata'])
+    >>> resp_image_meta = resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']
+    >>> pprint(resp_image_meta)
     {'attached_to': [],
+     'detail': 'http://localhost/process/assets/0000000/0000001/',
      'filename': 'python.jpg',
      'mime_type': 'image/jpeg',
-     'size': '159041'}
+     'raw': 'http://localhost/process/assets/0000000/0000000/',
+     'size': '159041',
+     'thumbnail': 'http://localhost/process/assets/0000000/0000002/'}
 
 The actual binary data is *not* part of that JSON document::
 
@@ -202,7 +194,7 @@ The actual binary data is *not* part of that JSON document::
 To retrieve the raw uploaded data, the frontend must instead GET the `raw`
 child of the asset::
 
-    >>> resp_data = testapp.get(pic_path + 'raw')
+    >>> resp_data = testapp.get(resp_image_meta['raw'])
     >>> resp_data.content_type
     'image/jpeg'
     >>> original_size = len(resp_data.body)
@@ -213,7 +205,7 @@ In case of images, it can retrieve the image in one of the predefined
 cropped sizes by asking for one of the keys defined by the ImageSizeMapper as
 child element::
 
-    >>> resp_data = testapp.get(pic_path + 'thumbnail')
+    >>> resp_data = testapp.get(resp_image_meta['thumbnail'])
     >>> resp_data.content_type
     'image/jpeg'
     >>> thumbnail_size = len(resp_data.body)
@@ -309,15 +301,13 @@ If we download the image metadata again, we see that filename and size have
 changed accordingly::
 
     >>> resp_data = testapp.get(pic_path).json
-    >>> pprint(resp_data['data']['adhocracy_core.sheets.image.IImageMetadata'])
-    {'attached_to': ['...0/VERSION_0000001/'],
-     'filename': 'python2.jpg',
-     'mime_type': 'image/jpeg',
-     'size': '112107'}
+    >>> resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']['size']
+    '112107'
 
 Predefined scaled+cropped views are automatically updated as well::
 
-    >>> resp_data = testapp.get(pic_path + 'thumbnail')
+    >>> thumbnail = resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']['thumbnail']
+    >>> resp_data = testapp.get(thumbnail)
     >>> len(resp_data.body) > 2000
     True
     >>> len(resp_data.body) == thumbnail_size
