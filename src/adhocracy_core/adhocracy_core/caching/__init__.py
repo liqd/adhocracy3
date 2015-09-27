@@ -256,18 +256,20 @@ class HTTPCacheStrategyWeakAdapter(HTTPCacheStrategyBaseAdapter):
 
 
 @implementer(IHTTPCacheStrategy)
-class HTTPCacheStrategyWeakAssetDownloadAdapter(HTTPCacheStrategyBaseAdapter):
+class HTTPCacheStrategyStrongAdapter(HTTPCacheStrategyBaseAdapter):
 
-    """Weak strategy adapter for :class:`IAssetDownload`."""
+    """Strong strategy adapter to set http cache header.
 
-    browser_max_age = 60 * 5
+    mode without-proxy-cache: browser cache forever
+
+    mode with-proxy-cache: browser cache forever, proxy cache forever but force
+                           revalidate
+    """
+
+    browser_max_age = 60 * 60 * 24 * 30 * 12
     proxy_max_age = 60 * 60 * 24 * 30 * 12
+    vary = ('Accept-Encoding', 'X-User-Path', 'X-User-Token')
     etags = (etag_modified, etag_userid, etag_blocked)
-
-    def __init__(self, context, request):
-        """Initialize self."""
-        parent = context.__parent__  # reuse parent cache header
-        super().__init__(parent, request)
 
 
 def purge_varnish_after_commit_hook(success: bool, registry: Registry,
@@ -313,11 +315,11 @@ def includeme(config):
                             IResource,
                             config.registry,
                             'HEAD')
-    register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
+    register_cache_strategy(HTTPCacheStrategyStrongAdapter,
                             IAssetDownload,
                             config.registry,
                             'GET')
-    register_cache_strategy(HTTPCacheStrategyWeakAssetDownloadAdapter,
+    register_cache_strategy(HTTPCacheStrategyStrongAdapter,
                             IAssetDownload,
                             config.registry,
                             'HEAD')
