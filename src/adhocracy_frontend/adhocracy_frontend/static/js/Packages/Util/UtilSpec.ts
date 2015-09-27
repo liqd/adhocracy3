@@ -1,10 +1,10 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import JasmineHelpers = require("../../JasmineHelpers");
+import * as JasmineHelpers from "../../JasmineHelpers";
 
-import q = require("q");
+import * as q from "q";
 
-import AdhUtil = require("./Util");
+import * as AdhUtil from "./Util";
 
 export var register = () => {
     describe("Util", () => {

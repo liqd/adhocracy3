@@ -220,7 +220,7 @@ SYSTEM_PRINCIPALS = ['everyone',
 
 class Role(AdhocracySchemaNode):
 
-    """Permssion :term:`role` name.
+    """Permission :term:`role` name.
 
     Example value: 'reader'
     """

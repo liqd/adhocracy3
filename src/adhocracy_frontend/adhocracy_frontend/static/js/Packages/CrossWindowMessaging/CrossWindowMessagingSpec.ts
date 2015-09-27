@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhCrossWindowMessaging = require("./CrossWindowMessaging");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCrossWindowMessaging from "./CrossWindowMessaging";
 
 
 export var register = () => {

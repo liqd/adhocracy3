@@ -1,26 +1,20 @@
 /// <reference path="../../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAbuse = require("../../../Abuse/Abuse");
-import AdhComment = require("../../../Comment/Comment");
-import AdhConfig = require("../../../Config/Config");
-import AdhHttp = require("../../../Http/Http");
-import AdhMovingColumns = require("../../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../../Permissions/Permissions");
-import AdhProcess = require("../../../Process/Process");
-import AdhResourceArea = require("../../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../../Util/Util");
+import * as AdhConfig from "../../../Config/Config";
+import * as AdhHttp from "../../../Http/Http";
+import * as AdhMovingColumns from "../../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../../Permissions/Permissions";
+import * as AdhResourceArea from "../../../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../../Util/Util";
 
-import AdhMeinBerlinBurgerhaushaltProcess = require("../Process/Process");
-import AdhMeinBerlinProposal = require("../../../Proposal/Proposal");
-
-import RIComment = require("../../../../Resources_/adhocracy_core/resources/comment/IComment");
-import RICommentVersion = require("../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIBurgerhaushaltProcess = require("../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess");
-import RIProposal = require("../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal");
-import RIProposalVersion = require("../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion");
-import SIComment = require("../../../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIWorkflow = require("../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import RIComment from "../../../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIBurgerhaushaltProcess from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProcess";
+import RIProposal from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposal";
+import RIProposalVersion from "../../../../Resources_/adhocracy_meinberlin/resources/burgerhaushalt/IProposalVersion";
+import * as SIComment from "../../../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIWorkflow from "../../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MeinBerlin/Burgerhaushalt/Workbench";
 
@@ -219,33 +213,4 @@ export var registerRoutes = (
                 });
             };
         }]);
-};
-
-export var moduleName = "adhMeinBerlinBurgerhaushaltWorkbench";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhAbuse.moduleName,
-            AdhComment.moduleName,
-            AdhHttp.moduleName,
-            AdhMeinBerlinBurgerhaushaltProcess.moduleName,
-            AdhMeinBerlinProposal.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhResourceAreaProvider", registerRoutes(RIBurgerhaushaltProcess.content_type)])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIBurgerhaushaltProcess.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mein-berlin-burgerhaushalt-workbench></adh-mein-berlin-burgerhaushalt-workbench>");
-            }];
-        }])
-        .directive("adhMeinBerlinBurgerhaushaltWorkbench", ["adhTopLevelState", "adhConfig", "adhHttp", burgerhaushaltWorkbenchDirective])
-        .directive("adhMeinBerlinBurgerhaushaltProposalDetailColumn", [
-            "adhConfig", "adhPermissions", burgerhaushaltProposalDetailColumnDirective])
-        .directive("adhMeinBerlinBurgerhaushaltProposalCreateColumn", ["adhConfig", burgerhaushaltProposalCreateColumnDirective])
-        .directive("adhMeinBerlinBurgerhaushaltProposalEditColumn", ["adhConfig", burgerhaushaltProposalEditColumnDirective])
-        .directive("adhMeinBerlinBurgerhaushaltDetailColumn", ["adhConfig", burgerhaushaltDetailColumnDirective]);
 };

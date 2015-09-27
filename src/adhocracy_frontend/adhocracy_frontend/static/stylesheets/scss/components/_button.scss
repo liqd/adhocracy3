@@ -1,12 +1,12 @@
 @mixin button-base {
     @include inline-block;
+    @include rem(font-size, $font-size-normal);
+    @include rem(height, $button-height);
     @include text-align(center);
     border: 0;
     cursor: pointer;
-    font-size: $font-size-normal;
     font-weight: $font-weight-normal;
-    height: $button-height * 1em;
-    line-height: $button-height;
+    line-height: $button-line-height;
     overflow: hidden;
     padding: 0;
     text-decoration: none;
@@ -105,8 +105,8 @@ be used instead.
 .button-cta,
 .button-cta-secondary {
     @include button-base;
-    padding: 0 1em;
-    min-width: 110px / $font-size-normal * 1em;
+    @include rem(min-width, 110px);
+    @include rem(padding, 0 1rem)
 }
 
 .button-cta {
@@ -135,11 +135,11 @@ be used instead.
 }
 
 .button-cta-secondary {
+    @include rem(height, $button-height + 4px);
     background: transparent;
     border: 2px solid $color-button-cta-base;
     color: $color-button-cta-base;
-    height: $button-height + (4px / $font-size-normal * 1em);
-    line-height: $button-height;
+    line-height: $button-line-height;
 
     &:hover,
     &:focus {

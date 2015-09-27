@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhWebSocket = require("./WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhWebSocket from "./WebSocket";
 
 
 var config: AdhConfig.IService = <any>{

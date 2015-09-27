@@ -3,7 +3,7 @@
     padding-bottom: 0;
 
     .login-info {
-        margin-top: 24px / $font-size-small * 1em;
+        @include rem(margin-top, 24px);
     }
 
     input[type="submit"] {
@@ -13,8 +13,8 @@
 }
 
 .login-cancel {
+    @include rem(font-size, $font-size-small);
     font-variant: normal;
-    font-size: $font-size-small;
     margin-top: 0;
     text-transform: capitalize;
 }

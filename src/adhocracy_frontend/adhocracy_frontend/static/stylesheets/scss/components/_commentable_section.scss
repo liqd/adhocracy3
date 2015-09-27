@@ -14,13 +14,13 @@ A mixin to show comments somewhere
 
 @mixin show-comments {
     @include disguised-link;
+    @include rem(font-size, $font-size-small);
     @include inline-block;
-    font-size: $font-size-small;
     text-align: center;
 
     i {
+        @include rem(font-size, 15px);
         display: block;
-        font-size: 15px / $font-size-small * 1em;
         line-height: 1;
     }
 }
@@ -57,7 +57,7 @@ States:
 */
 
 .commentable-section {
-    padding: 1em (48px / $font-size-normal * 1em) (30px / $font-size-normal * 1em) 1em;
+    @include rem(padding, 1rem 48px 30px 1rem);
     position: relative;
 
     > p {
@@ -74,14 +74,14 @@ States:
 
     .commentable-section-show-comments {
         @include show-comments;
-        max-width: 36 / 14 * 1em;
+        @include rem(max-width, 36px);
+        @include rem(right, 1rem);
+        @include rem(top, 1rem);
         position: absolute;
-        right: 1em;
-        top: 1em;
     }
 
     @media print {
-        padding: 0 0 1em;
+        @include rem(padding, 0 0 1rem);
 
         .commentable-section-show-comments {
             display: none;

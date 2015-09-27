@@ -2,10 +2,10 @@
     position: relative;
 
     &:before {
+        @include rem(font-size, $font-size-small);
+        @include rem(border-right, 1rem solid transparent);
+        @include rem(border-top, 1rem solid $color-brand-one-normal);
         content: "";
-        border-right: 1em solid transparent;
-        border-top: 1em solid $color-brand-one-normal;
-        font-size: $font-size-small;
         height: 0;
         left: 0;
         position: absolute;

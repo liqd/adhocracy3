@@ -16,12 +16,6 @@ class TestProposal:
         assert meta.element_types == (resources.bplan.IProposalVersion,)
         assert meta.item_type == resources.bplan.IProposalVersion
         assert meta.permission_create == 'create_proposal'
-        assert meta.basic_sheets == (adhocracy_core.sheets.tags.ITags,
-                                     adhocracy_core.sheets.versions.IVersions,
-                                     adhocracy_core.sheets.pool.IPool,
-                                     adhocracy_core.sheets.metadata.IMetadata,
-                                     adhocracy_core.sheets.workflow.IWorkflowAssignment,
-                                     )
         assert meta.use_autonaming
         assert meta.autonaming_prefix == 'proposal_'
         assert meta.workflow_name == 'bplan_private'

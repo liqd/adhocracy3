@@ -27,16 +27,16 @@ A Meta list of items, often with icons
 
 .meta-list {
     @include container;
+    @include rem(padding, 0 0 20px);
     margin: 0;
-    padding: 0 0 1.66666666em;
     list-style: none;
 }
 
 .meta-list-item {
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-right, 10px);
     color: $color-text-introvert;
-    font-size: $font-size-small;
     float: left;
-    margin-right: 0.83333333em;
 
     i {
         font-size: 140%;
@@ -46,8 +46,8 @@ A Meta list of items, often with icons
     }
 
     @media print {
+        @include rem(font-size, $font-size-normal);
         float: none;
-        font-size: $font-size-normal;
 
         i:not(.m-definition-before):not(.m-definition-after), &.meta-list-item-rate {
             display: none;

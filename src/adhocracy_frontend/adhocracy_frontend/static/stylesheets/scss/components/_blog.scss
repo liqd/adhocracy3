@@ -1,9 +1,9 @@
 .blog-tabs {
+    @include rem(font-size, $font-size-small);
+    @include rem(line-height, 30px);
     border: 2px solid $color-structure-normal;
     border-width: 2px 0 3px;
     clear: left;
-    font-size: $font-size-small;
-    line-height: 30px / $font-size-small * 1em;
     overflow: hidden;
     text-transform: uppercase;
 }
@@ -36,16 +36,16 @@
 .blog {
     .document-form {
         @include opacity(1);
+        @include rem(padding, 1rem);
         background: $color-background-base-introvert;
-        padding: 1em;
 
         .title, .paragraph, .blog-post-edit-title {
-            margin-bottom: 10px / $font-size-normal * 1em;
+            @include rem(margin-bottom, 10px);
         }
 
         .paragraph {
+            @include rem(font-size, $font-size-small);
             background: $color-background-base;
-            font-size: $font-size-small;
             line-height: 1.5;
         }
 
@@ -65,16 +65,16 @@
     }
 
     .listing-elements {
+        @include rem(margin, 20px);
         border-left: 1px solid $color-brand-one-normal;
-        margin: 20px / $font-size-normal * 1em;
     }
 }
 
 .blog-post {
-    margin-bottom: 30px / $font-size-normal * 1em;
+    @include rem(margin-bottom, 30px);
 
     .document-form {
-        padding: 0 0 0 8px;
+        @include rem(padding, 0 0 0 8px);
         background: transparent;
 
         .paragraph {
@@ -84,28 +84,28 @@
 }
 
 .blog-post-header {
+    @include rem(padding-left, 8px);
     overflow: hidden;
-    padding-left: 8px;
 }
 
 .blog-post-title {
+    @include rem(font-size, $font-size-smaller);
+    @include rem(line-height, 15px);
+    @include rem(padding, 0 20px);
     background: $color-brand-one-normal;
     float: left;
-    font-size: $font-size-smaller;
-    line-height: 15px / $font-size-smaller * 1em;
     font-weight: $font-weight-normal;
     margin: 0;
     text-transform: uppercase;
-    padding: 0 20px / $font-size-small * 1em;
     position: relative;
 
     &:before {
-        border-top: 7.5px / $font-size-smaller * 1em solid transparent;
-        border-right: 8px solid $color-brand-one-normal;
-        border-bottom: 7.5px / $font-size-smaller * 1em solid transparent;
+        @include rem(border-top, 7.5px solid transparent);
+        @include rem(border-right, 8px solid $color-brand-one-normal);
+        @include rem(border-bottom, 7.5px solid transparent);
+        @include rem(left, -8px);
         content: "";
         height: 0;
-        left: -8px;
         position: absolute;
         top: 0;
         width: 0;
@@ -113,9 +113,9 @@
 }
 
 .blog-post-meta {
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-left, 8px);
     color: $color-text-introvert;
-    font-size: $font-size-small;
-    margin-left: 8px;
 
     a {
         text-decoration: none;
@@ -127,14 +127,14 @@
 }
 
 .blog-post-actions {
+    @include rem(font-size, $font-size-small);
     float: right;
-    font-size: $font-size-small;
-    line-height: 15px / $font-size-small * 1em;
+    line-height: 1.25;
 }
 
 .blog-post-actions-item {
+    @include rem(margin-left, 14px);
     color: $color-text-introvert;
-    margin-left: 14px / $font-size-small * 1em;
     text-decoration: none;
 
     &:hover {
@@ -143,8 +143,8 @@
 }
 
 .blog-post-paragraph {
-    padding: 10px 8px;
-    font-size: $font-size-small;
+    @include rem(font-size, $font-size-small);
+    @include rem(padding, 10px 8px);
 
     p {
         line-height: 1.5;
@@ -155,12 +155,12 @@
     }
 
     h1, h2, h3, h4, h5 {
+        @include rem(margin, 0 0 0.5rem);
         font-weight: $font-weight-extrovert;
-        margin: 0 0 0.5em;
     }
 }
 
 .show-create-form-button {
+    @include rem(margin, 20px 20px 0);
     float: right;
-    margin: (20px / $font-size-normal * 1em) (20px / $font-size-normal * 1em) 0;
 }

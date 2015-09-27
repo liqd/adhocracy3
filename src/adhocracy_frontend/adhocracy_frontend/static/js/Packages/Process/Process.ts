@@ -1,12 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhUtil = require("../Util/Util");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhUtil from "../Util/Util";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 
-import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
-import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/Process";
 
@@ -124,17 +124,4 @@ export var processViewDirective = (
             });
         }
     };
-};
-
-
-export var moduleName = "adhProcess";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhTopLevelState.moduleName
-        ])
-        .provider("adhProcess", Provider)
-        .directive("adhWorkflowSwitch", ["adhConfig", "adhHttp", "$window", workflowSwitchDirective])
-        .directive("adhProcessView", ["adhTopLevelState", "adhProcess", "$compile", processViewDirective]);
 };

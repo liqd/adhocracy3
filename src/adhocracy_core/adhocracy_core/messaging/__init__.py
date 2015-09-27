@@ -182,7 +182,7 @@ class Messenger:
                             'Aktivierung Deines Nutzerkontos')
         body_txt = _('mail_account_verification_body_txt',
                      mapping=mapping,
-                     default='${activation_path}')
+                     default='${frontend_url}${activation_path}')
         self.send_mail(subject=subject,
                        recipients=[user.email],
                        body=body_txt,

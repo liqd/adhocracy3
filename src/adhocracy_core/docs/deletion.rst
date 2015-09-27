@@ -134,6 +134,7 @@ Start adhocracy app and log in some users::
     >>> participant = getfixture('app_participant')
     >>> moderator = getfixture('app_moderator')
     >>> admin = getfixture('app_admin')
+    >>> log = getfixture('log')
 
 Lets create some content::
 

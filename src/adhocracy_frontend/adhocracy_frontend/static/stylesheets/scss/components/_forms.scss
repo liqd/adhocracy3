@@ -86,10 +86,10 @@ input[type="time"],
 input[type="number"],
 select,
 textarea {
+    @include rem(margin-bottom, 0.5rem);
+    @include rem(padding, 0.25rem 1rem);
     display: block;
     width: 100%;
-    margin-bottom: 0.5em;
-    padding: 0.25em $font-size-normal;
     border: 1px solid $color-structure-border;
     color: $color-text-normal;
     background-color: $color-background-base;
@@ -100,7 +100,7 @@ textarea {
     }
 
     &.m-title {
-        font-size: $font-size-large;
+        @include rem(font-size, $font-size-large);
     }
 
     &:focus {
@@ -176,13 +176,13 @@ Class to add styling to a label when the label itself is used as a container.
 
 .label-text {
     @include inline-block;
-    padding-bottom: 0.5em;
+    @include rem(padding-bottom, 0.5rem);
 }
 
 .input-error {
+    @include rem(font-size, $font-size-small);
     display: block;
     color: $color-function-invalid;
-    font-size: $font-size-small;
 }
 
 /*doc
@@ -276,8 +276,8 @@ This error concerns the whole form.
 ```
 */
 .form-error {
-    margin: 1em 0;
-    padding: 0 1em;
+    @include rem(margin, 1rem 0);
+    @include rem(padding, 0 1rem);
     border-top: 1px solid $color-structure-border;
     border-bottom: 1px solid $color-structure-border;
     background: $color-structure-introvert;

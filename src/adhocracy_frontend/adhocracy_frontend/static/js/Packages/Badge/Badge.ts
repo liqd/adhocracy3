@@ -1,19 +1,19 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhHttp = require("../Http/Http");
-import AdhEmbed = require("../Embed/Embed");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhHttp from "../Http/Http";
+import * as AdhUtil from "../Util/Util";
 
-import RIBadgeAssignment = require("../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment");
-import SIBadgeable = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeable");
-import SIBadgeAssignment = require("../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment");
-import SIDescription = require("../../Resources_/adhocracy_core/sheets/description/IDescription");
-import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
-import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SITitle = require("../../Resources_/adhocracy_core/sheets/title/ITitle");
+import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
+import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
+import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
+import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
+import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
 
 var pkgLocation = "/Badge";
 
@@ -31,8 +31,13 @@ export var getBadgesFactory = (
     adhHttp : AdhHttp.Service<any>,
     $q : angular.IQService
 ) : IGetBadges => (
-    resource : SIBadgeable.HasSheet
+    resource : SIBadgeable.HasSheet,
+    includeParent? : boolean
 ) : angular.IPromise<IBadge[]> => {
+    if (typeof includeParent === "undefined") {
+        includeParent = !!resource.content_type.match(/Version$/);
+    }
+
     var assignmentPaths = resource.data[SIBadgeable.nick].assignments;
 
     var getBadge = (assignmentPath : string) => {
@@ -48,7 +53,17 @@ export var getBadgesFactory = (
         });
     };
 
-    return $q.all(_.map(assignmentPaths, getBadge));
+    if (includeParent) {
+        var parentPath = AdhUtil.parentPath(resource.path);
+
+        return adhHttp.get(parentPath).then((parentResource) => {
+            var parentAssignments = parentResource.data[SIBadgeable.nick].assignments;
+            assignmentPaths = assignmentPaths.concat(parentAssignments);
+            return $q.all(_.map(assignmentPaths, getBadge));
+        });
+    } else {
+        return $q.all(_.map(assignmentPaths, getBadge));
+    }
 };
 
 
@@ -157,22 +172,4 @@ export var badgeAssignmentEditDirective = (
             };
         }
     };
-};
-
-export var moduleName = "adhBadge";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName
-        ])
-        .config(["adhEmbedProvider", (adhEmbedProvider: AdhEmbed.Provider) => {
-            adhEmbedProvider.embeddableDirectives.push("badge-assignment-create");
-            adhEmbedProvider.embeddableDirectives.push("badge-assignment-edit");
-        }])
-        .factory("adhGetBadges", ["adhHttp", "$q", getBadgesFactory])
-        .directive("adhBadgeAssignmentCreate", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentCreateDirective])
-        .directive("adhBadgeAssignmentEdit", ["adhConfig", "adhHttp", "$q", "adhCredentials", badgeAssignmentEditDirective]);
 };

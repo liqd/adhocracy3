@@ -55,8 +55,8 @@ class Client:
                 self._connect_and_receive_and_log_messages()
             except (WebSocketConnectionClosedException, ConnectionError,
                     OSError) as err:
-                logger.warning('Problem connecting to Websocket server: %s',
-                               exception_to_str(err))
+                logger.info('Problem connecting to Websocket server: %s',
+                            exception_to_str(err))
                 self._is_running = False
                 time.sleep(1)
             except WebSocketException as err:  # pragma: no cover
@@ -176,7 +176,7 @@ def includeme(config):
 
     You need to set the ws server url in your settings to make this work::
 
-        adhocracy.ws_url =  ws://localhost:8080
+        adhocracy.ws_url =  ws://localhost:6561
 
     """
     settings = config.registry.settings

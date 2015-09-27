@@ -1,4 +1,4 @@
-import AdhConfig = require("../../Config/Config");
+import * as AdhConfig from "../../Config/Config";
 
 export var pkgLocation = "/MeinBerlin/Phase";
 
@@ -29,13 +29,4 @@ export var phaseDirective = (adhConfig : AdhConfig.IService) => {
             phase: "="
         }
     };
-};
-
-
-export var moduleName = "adhMeinBerlinPhase";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [])
-        .directive("adhMeinBerlinPhase", ["adhConfig", phaseDirective]);
 };

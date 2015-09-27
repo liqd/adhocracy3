@@ -10,9 +10,9 @@ var _s : any = require("underscore.string");
 
 declare var process : any;
 
-import Base = require("./ResourcesBase");
-import UtilR = require("./mkResources/Util");
-import MetaApi = require("./Packages/Http/MetaApi");
+import * as Base from "./ResourcesBase";
+import * as UtilR from "./mkResources/Util";
+import * as MetaApi from "./Packages/Http/MetaApi";
 
 
 
@@ -242,9 +242,9 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
     var headerFooter = (relativeRoot : string, contents : string) : string => {
         var header = "";
         header += "/* tslint:disable:variable-name */\n\n";
-        header += "import Base = require(\"" + canonicalizePath(relativeRoot + "../ResourcesBase") + "\");\n";
-        header += "import PreliminaryNames = require(\"" +
-            canonicalizePath(relativeRoot + "../Packages/PreliminaryNames/PreliminaryNames") + "\");\n\n";
+        header += "import * as Base from \"" + canonicalizePath(relativeRoot + "../ResourcesBase") + "\";\n";
+        header += "import * as PreliminaryNames from \"" +
+            canonicalizePath(relativeRoot + "../Packages/PreliminaryNames/PreliminaryNames") + "\";\n\n";
 
         var footer = "";
         footer += "/* tslint:enable:variable-name */\n";
@@ -459,6 +459,8 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         }
     };
 
+    sheetI += "import * as _ from \"lodash\";\n\n";
+
     sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
 
     sheetI += "export class Sheet extends Base.Sheet {\n";
@@ -476,8 +478,10 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     sheetI += mkFieldSignatures(sheet.fields, "    public ", ";\n") + "\n";
     sheetI += "}\n\n";
 
-    sheetI += "export interface HasSheet {\n";
+    sheetI += "export interface HasSheet extends Base.IResource {\n";
     sheetI += "    data : { \"" + modulePath + "\" : Sheet }\n";
+    sheetI += "    path : string;\n";
+    sheetI += "    content_type : string;\n";
     sheetI += "}\n\n";
 
     hasSheetI += mkSheetSetter(sheet.nick, sheet.fields, "HasSheet");
@@ -726,7 +730,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     resourceC += mkDataDeclaration("    ") + "\n\n";
     resourceC += mkGettersSetters("    ") + "\n";
     resourceC += "}\n\n";
-    resourceC += "export = " + mkResourceClassName(mkNick(modulePath, metaApi)) + ";\n\n";
+    resourceC += "export default " + mkResourceClassName(mkNick(modulePath, metaApi)) + ";\n\n";
 
     modules[modulePath] = resourceC;
 };
@@ -755,7 +759,13 @@ mkImportStatement = (modulePath : string, relativeRoot : string, metaApi : MetaA
     var tsModName = mkModuleName(modulePath, metaApi);
     var tsModPath = pyModuleToTsModule(modulePath);
     var tsModPathCanonicalized = canonicalizePath(relativeRoot + tsModPath);
-    return "import " + tsModName + " = require(\"" + tsModPathCanonicalized + "\");\n";
+
+    // FIXME: have a better indicator for this distinction
+    if (tsModName[0] === "R") {
+        return "import " + tsModName + " from \"" + tsModPathCanonicalized + "\";\n";
+    } else {
+        return "import * as " + tsModName + " from \"" + tsModPathCanonicalized + "\";\n";
+    }
 };
 
 mkNick = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
@@ -999,7 +1009,7 @@ isWriteableField = (field) => field.editable || field.creatable || field.create_
 mkdirForFile = (filepath : string) : void => {
     var dirpath : string[] = _s.words(filepath, "/");
     dirpath.pop();
-    _fs.mkdirSync(dirpath.join("/"), 0755, true);
+    _fs.mkdirSync(dirpath.join("/"), 0o755, true);
 };
 
 pyModuleToTsModule = (filepath : string) : string =>

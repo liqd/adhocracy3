@@ -5,15 +5,26 @@ from adhocracy_core import root_factory
 
 
 def includeme(config):
-    """Setup adhocracy extension."""
-    # include adhocracy_core
-    config.include('adhocracy_spd')
-    # commit to allow overriding pyramid config
+    """Setup adhocracy extension.
+
+    The kit package should be exactly like the spd package but with different
+    root permissions and default translations for the emails.
+    """
+    # copied from adhocracy_spd (without resources and translations)
+    config.include('adhocracy_core')
     config.commit()
+    config.include('.sheets')
+    config.include('.workflows')
+    config.include('.evolution')
+
+    # add translations
+    config.add_translation_dirs('adhocracy_core:locale/')
+
+    # copoied from adhocracy_spd.resources resources
+    config.include('adhocracy-spd.resources.digital_leben')
+
     # include kit resource types
     config.include('.resources')
-    # add translations
-    config.add_translation_dirs('adhocracy_spd:locale/')
 
 
 def main(global_config, **settings):

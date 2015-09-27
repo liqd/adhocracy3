@@ -29,10 +29,10 @@ $thumbnail-height: 90px;
 
 .proposal-list-item {
     @include container;
+    @include rem(padding, 1rem 1.25rem 1.25rem 0.875rem);
     display: block;
     border-bottom: 2px solid $color-structure-normal;
     line-height: 1;
-    padding: 1em 1.25em 1.125em 0.875em;
     position: relative;
 
     // reset link styling
@@ -68,13 +68,13 @@ $thumbnail-height: 90px;
 }
 
 .proposal-list-item-username {
-    font-size: $font-size-small;
-    margin-bottom: 15px / $font-size-small * 1em;
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-bottom, 15px);
 }
 
 .proposal-list-item-title {
-    font-size: $font-size-plus;
+    @include rem(font-size, $font-size-plus);
+    @include rem(margin-bottom, 15px);
     font-weight: $font-weight-normal;
-    margin-bottom: 15px / $font-size-plus * 1em;
 }
 

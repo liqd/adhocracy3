@@ -1,10 +1,10 @@
 @mixin icon-button($base-font-size: $font-size-small) {
     @include inline-block;
+    @include rem(line-height, 24px);
+    @include rem(min-width, 24px);
+    @include rem(padding, 0 8px);
     background: $color-background-base-introvert;
     color: $color-text-introvert;
-    line-height: 24px / $base-font-size * 1em;
-    min-width: 24px / $base-font-size * 1em;
-    padding: 0 (8px / $base-font-size * 1em);
 
     &:hover, &:focus {
         color: $color-text-highlight-normal;
@@ -18,9 +18,9 @@
 }
 
 .button {
-    font-size: $font-size-small;
-    height: 24px / $font-size-small * 1em;
-    line-height: 24px / $font-size-small * 1em;
+    @include rem(font-size, $font-size-small);
+    @include rem(height, 24px);
+    @include rem(line-height, 24px);
 
     &:focus, &:hover {
         text-decoration: underline;
@@ -34,9 +34,10 @@
 }
 
 .button-cta {
-    @include border-radius(1em);
+    @include border-radius($font-size-normal);
+    @include border-radius(1rem);
+    @include rem(padding, 0 30px);
     font-weight: $font-weight-extrovert;
-    padding: 0 (30px / $font-size-normal * 1em);
 }
 
 .button, .button-cta, .button-cta-secondary {

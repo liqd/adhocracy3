@@ -1,16 +1,15 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import AdhConfig = require("../Config/Config");
-import AdhEmbed = require("../Embed/Embed");
-import AdhHttp = require("../Http/Http");
-import AdhProcess = require("../Process/Process");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhEmbed from "../Embed/Embed";
+import * as AdhHttp from "../Http/Http";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RIProcess = require("../../Resources_/adhocracy_core/resources/process/IProcess");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import RIProcess from "../../Resources_/adhocracy_core/resources/process/IProcess";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
 var pkgLocation = "/ResourceArea";
 
@@ -239,7 +238,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return this.$q.all(_.map(paths, (path) => {
             return this.adhHttp.get(this.adhConfig.rest_url + path);
-        })).then((resources) => {
+        })).then((resources : ResourcesBase.Resource[]) => {
             for (var i = 0; i < resources.length; i++) {
                 if (resources[i].isInstanceOf(RIProcess.content_type)) {
                     return resources[i];
@@ -418,25 +417,4 @@ export var directive = (adhResourceArea : Service, $compile : angular.ICompileSe
             });
         }
     };
-};
-
-
-export var moduleName = "adhResourceArea";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhEmbed.moduleName,
-            AdhHttp.moduleName,
-            AdhProcess.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
-            adhTopLevelStateProvider
-                .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
-        }])
-        .provider("adhResourceArea", Provider)
-        .directive("adhResourceArea", ["adhResourceArea", "$compile", directive])
-        .filter("adhParentPath", () => AdhUtil.parentPath)
-        .filter("adhResourceUrl", ["adhConfig", resourceUrl]);
 };

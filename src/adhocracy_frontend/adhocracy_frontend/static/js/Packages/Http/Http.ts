@@ -3,26 +3,25 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import AdhConfig = require("../Config/Config");
-import AdhCredentials = require("../User/Credentials");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResourceUtil = require("../Util/ResourceUtil");
-import AdhUtil = require("../Util/Util");
-import AdhWebSocket = require("../WebSocket/WebSocket");
+import * as AdhConfig from "../Config/Config";
+import * as AdhCredentials from "../User/Credentials";
+import * as AdhPreliminaryNames from "../PreliminaryNames/PreliminaryNames";
+import * as AdhResourceUtil from "../Util/ResourceUtil";
+import * as AdhUtil from "../Util/Util";
 
-import ResourcesBase = require("../../ResourcesBase");
+import * as ResourcesBase from "../../ResourcesBase";
 
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+import * as SIMetadata from "../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SITag from "../../Resources_/adhocracy_core/sheets/tags/ITag";
+import * as SIVersionable from "../../Resources_/adhocracy_core/sheets/versions/IVersionable";
 
-import AdhCache = require("./Cache");
-import AdhConvert = require("./Convert");
-import AdhError = require("./Error");
-import AdhMetaApi = require("./MetaApi");
-import AdhTransaction = require("./Transaction");
+import * as AdhCache from "./Cache";
+import * as AdhConvert from "./Convert";
+import * as AdhError from "./Error";
+import * as AdhMetaApi from "./MetaApi";
+import * as AdhTransaction from "./Transaction";
 
 // re-exports
 export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
@@ -165,7 +164,7 @@ export class Service<Content extends ResourcesBase.Resource> {
 
         return this.adhCache.memoize(path, "OPTIONS",
             () => this.adhCredentials.ready.then(
-                () => this.$http({method: "OPTIONS", url: path, headers: headers})
+                () => this.$http({method: "OPTIONS", url: path, headers: <any>headers})
             )
         ).then((response) => {
             if (typeof config.importOptions === "undefined" || config.importOptions) {
@@ -185,7 +184,7 @@ export class Service<Content extends ResourcesBase.Resource> {
 
         return this.adhCredentials.ready.then(() => this.$http.get(path, {
             params : params,
-            headers : headers
+            headers : <any>headers
         }));
     }
 
@@ -229,7 +228,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         this.adhCache.invalidate(path);
 
         return this.adhCredentials.ready.then(() => this.$http.put(path, obj, {
-            headers: headers
+            headers: <any>headers
         }));
     }
 
@@ -284,12 +283,12 @@ export class Service<Content extends ResourcesBase.Resource> {
                     method: "POST",
                     url: path,
                     data: obj,
-                    headers: _.assign({"Content-Type": undefined}, headers),
+                    headers: <any>_.assign({"Content-Type": undefined}, headers),
                     transformRequest: undefined
                 });
             } else {
                 return _self.$http.post(path, obj, {
-                    headers: headers
+                    headers: <any>headers
                 });
             }
         });
@@ -586,27 +585,4 @@ export var busyDirective = (adhConfig : AdhConfig.IService, adhBusy : Busy) => {
             scope.busy = adhBusy;
         }
     };
-};
-
-
-export var moduleName = "adhHttp";
-
-export var register = (angular, config, metaApi) => {
-    angular
-        .module(moduleName, [
-            AdhCredentials.moduleName,
-            AdhPreliminaryNames.moduleName,
-            AdhWebSocket.moduleName,
-            "angular-cache",
-        ])
-        .config(["$httpProvider", ($httpProvider) => {
-            $httpProvider.interceptors.push(["adhHttpBusy", (adhHttpBusy : Busy) => adhHttpBusy.createInterceptor()]);
-        }])
-        .service("adhHttpBusy", ["$q", Busy])
-        .directive("adhHttpBusy", ["adhConfig", "adhHttpBusy", busyDirective])
-        .service("adhHttp", [
-            "$http", "$q", "$timeout", "adhCredentials", "adhMetaApi", "adhPreliminaryNames", "adhConfig", "adhCache", Service])
-        .service("adhCache", ["$q", "adhConfig", "adhWebSocket", "CacheFactory", AdhCache.Service])
-        .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
-        .filter("adhFormatError", () => AdhError.formatError);
 };

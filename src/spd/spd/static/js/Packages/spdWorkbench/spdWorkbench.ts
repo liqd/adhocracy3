@@ -1,26 +1,22 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAbuse = require("../Abuse/Abuse");
-import AdhComment = require("../Comment/Comment");
-import AdhConfig = require("../Config/Config");
-import AdhDocument = require("../Document/Document");
-import AdhHttp = require("../Http/Http");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhProcess = require("../Process/Process");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIDigitalLebenProcess = require("../../Resources_/adhocracy_spd/resources/digital_leben/IProcess");
-import RIDocument = require("../../Resources_/adhocracy_core/resources/document/IDocument");
-import RIDocumentVersion = require("../../Resources_/adhocracy_core/resources/document/IDocumentVersion");
-import RIParagraph = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraph");
-import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion");
-import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
+import RIComment from "../../Resources_/adhocracy_core/resources/comment/IComment";
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIDigitalLebenProcess from "../../Resources_/adhocracy_spd/resources/digital_leben/IProcess";
+import RIDocument from "../../Resources_/adhocracy_core/resources/document/IDocument";
+import RIDocumentVersion from "../../Resources_/adhocracy_core/resources/document/IDocumentVersion";
+import RIParagraph from "../../Resources_/adhocracy_core/resources/paragraph/IParagraph";
+import RIParagraphVersion from "../../Resources_/adhocracy_core/resources/paragraph/IParagraphVersion";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIParagraph from "../../Resources_/adhocracy_core/sheets/document/IParagraph";
 
 var pkgLocation = "/spdWorkbench";
 
@@ -105,120 +101,94 @@ export var processDetailAnnounceColumnDirective = (
 };
 
 
-export var moduleName = "adhSPDWorkbench";
-
-export var register = (angular) => {
-    var processType = RIDigitalLebenProcess.content_type;
-
-    angular
-        .module(moduleName, [
-            AdhAbuse.moduleName,
-            AdhComment.moduleName,
-            AdhDocument.moduleName,
-            AdhHttp.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-spd-workbench></adh-spd-workbench>");
-            }];
-        }])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .default(RIDigitalLebenProcess, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide"
-                })
-                .default(RIDigitalLebenProcess, "create_document", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide"
-                })
-                .specific(RIDigitalLebenProcess, "create_document", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIDigitalLebenProcess) => {
-                        return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
-                                throw 401;
-                            } else {
-                                return {};
-                            }
-                        });
-                    }])
-                .defaultVersionable(RIDocument, RIDocumentVersion, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide"
-                })
-                .specificVersionable(RIDocument, RIDocumentVersion, "", processType, "", [
-                    () => (item : RIDocument, version : RIDocumentVersion) => {
+export var registerRoutes = (
+    processType : string = "",
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+    adhResourceAreaProvider
+        .default(RIDigitalLebenProcess, "", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide"
+        })
+        .default(RIDigitalLebenProcess, "create_document", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide"
+        })
+        .specific(RIDigitalLebenProcess, "create_document", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (resource : RIDigitalLebenProcess) => {
+                return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
+                        return {};
+                    }
+                });
+            }])
+        .defaultVersionable(RIDocument, RIDocumentVersion, "", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(RIDocument, RIDocumentVersion, "", processType, context, [
+            () => (item : RIDocument, version : RIDocumentVersion) => {
+                return {
+                    documentUrl: version.path
+                };
+            }])
+        .defaultVersionable(RIDocument, RIDocumentVersion, "edit", processType, context, {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        })
+        .specificVersionable(RIDocument, RIDocumentVersion, "edit", processType, context, [
+            "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIDocument, version : RIDocumentVersion) => {
+                return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
+                    if (!options.POST) {
+                        throw 401;
+                    } else {
                         return {
                             documentUrl: version.path
                         };
-                    }])
-                .defaultVersionable(RIDocument, RIDocumentVersion, "edit", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-show-hide"
-                })
-                .specificVersionable(RIDocument, RIDocumentVersion, "edit", processType, "", [
-                    "adhHttp", (adhHttp : AdhHttp.Service<any>) => (item : RIDocument, version : RIDocumentVersion) => {
-                        return adhHttp.options(item.path).then((options : AdhHttp.IOptions) => {
-                            if (!options.POST) {
-                                throw 401;
-                            } else {
-                                return {
-                                    documentUrl: version.path
-                                };
-                            }
-                        });
-                    }])
-                .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-show"
-                })
-                .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, "", [
-                    () => (item : RIParagraph, version : RIParagraphVersion) => {
-                        var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
-                        return {
-                            commentableUrl: version.path,
-                            commentCloseUrl: documentUrl,
-                            documentUrl: documentUrl
-                        };
-                    }])
-                .defaultVersionable(RIComment, RICommentVersion, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-show"
-                })
-                .specificVersionable(RIComment, RICommentVersion, "", processType, "", ["adhHttp", "$q", (
-                    adhHttp : AdhHttp.Service<any>,
-                    $q : angular.IQService
-                ) => {
-                    var getCommentableUrl = (resource) : angular.IPromise<any> => {
-                        if (resource.content_type !== RICommentVersion.content_type) {
-                            return $q.when(resource);
-                        } else {
-                            var url = resource.data[SIComment.nick].refers_to;
-                            return adhHttp.get(url).then(getCommentableUrl);
-                        }
-                    };
+                    }
+                });
+            }])
+        .defaultVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-show"
+        })
+        .specificVersionable(RIParagraph, RIParagraphVersion, "comments", processType, context, [
+            () => (item : RIParagraph, version : RIParagraphVersion) => {
+                var documentUrl = _.last(_.sortBy(version.data[SIParagraph.nick].documents));
+                return {
+                    commentableUrl: version.path,
+                    commentCloseUrl: documentUrl,
+                    documentUrl: documentUrl
+                };
+            }])
+        .defaultVersionable(RIComment, RICommentVersion, "", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-show"
+        })
+        .specificVersionable(RIComment, RICommentVersion, "", processType, context, ["adhHttp", "$q", (
+            adhHttp : AdhHttp.Service<any>,
+            $q : angular.IQService
+        ) => {
+            var getCommentableUrl = (resource) : angular.IPromise<any> => {
+                if (resource.content_type !== RICommentVersion.content_type) {
+                    return $q.when(resource);
+                } else {
+                    var url = resource.data[SIComment.nick].refers_to;
+                    return adhHttp.get(url).then(getCommentableUrl);
+                }
+            };
 
-                    return (item : RIComment, version : RICommentVersion) => {
-                        return getCommentableUrl(version).then((commentable) => {
-                            var documentUrl = _.last(_.sortBy(commentable.data[SIParagraph.nick].documents));
-                            return {
-                                commentableUrl: commentable.path,
-                                commentCloseUrl: documentUrl,
-                                documentUrl: documentUrl
-                            };
-                        });
+            return (item : RIComment, version : RICommentVersion) => {
+                return getCommentableUrl(version).then((commentable) => {
+                    var documentUrl = _.last(_.sortBy(commentable.data[SIParagraph.nick].documents));
+                    return {
+                        commentableUrl: commentable.path,
+                        commentCloseUrl: documentUrl,
+                        documentUrl: documentUrl
                     };
-                }]);
-        }])
-        .directive("adhSpdWorkbench", ["adhConfig", "adhTopLevelState", spdWorkbenchDirective])
-        .directive("adhDocumentDetailColumn", ["adhConfig", "adhPermissions", documentDetailColumnDirective])
-        .directive("adhDocumentCreateColumn", ["adhConfig", documentCreateColumnDirective])
-        .directive("adhDocumentEditColumn", ["adhConfig", documentEditColumnDirective])
-        .directive("adhSpdProcessDetailColumn", ["adhConfig", "adhPermissions", processDetailColumnDirective])
-        .directive("adhSpdProcessDetailAnnounceColumn", ["adhConfig", processDetailAnnounceColumnDirective]);
+                });
+            };
+        }]);
 };

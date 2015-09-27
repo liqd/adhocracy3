@@ -28,8 +28,8 @@ A section with a additional annotation, typically displayed in a second column.
     .annotated-section-body,
     .annotated-section-annotation {
         @include inline-block;
+        @include rem(font-size, $font-size-normal);
         vertical-align: top;
-        font-size: $font-size-normal;
     }
 
     .annotated-section-body {
@@ -38,7 +38,7 @@ A section with a additional annotation, typically displayed in a second column.
     }
 
     .annotated-section-annotation {
-        margin-bottom: 2em;
+        @include rem(margin-bottom, 2rem);
         width: $annotation-width;
     }
 }

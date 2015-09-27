@@ -17,8 +17,8 @@
 }
 
 .mein-berlin-proposal-form-upper {
+    @include rem(padding, 1rem);
     background: $color-background-base;
-    padding: 1em;
 }
 
 .mein-berlin-proposal-detail {
@@ -31,68 +31,68 @@
 .mein-berlin-proposal-badge-descriptions,
 .mein-berlin-proposal-detail-body {
     @include clearfix;
+    @include rem(padding, 0 10px);
     background: $color-background-base;
-    padding: 0 (10px / $font-size-normal * 1em);
 }
 
 .mein-berlin-proposal-detail-body-comments {
+    @include rem(padding-left, 40px);
     float: right;
-    padding-left: 40px / $font-size-small * 1em;
     text-align: center;
 
     &, a {
+        @include rem(font-size, $font-size-small);
         color: $color-text-highlight-introvert;
-        font-size: $font-size-small;
     }
 
     [class*=icon-] {
+        @include rem(font-size, 17px);
+        @include rem(line-height, 17px);
         display: block;
-        line-height: 17px;
-        font-size: 17px;
     }
 }
 
 .mein-berlin-proposal-detail-body-comments-icon {
+    @include rem(font-size, 20px);
     display: block;
-    font-size: 20px;
 }
 
 .mein-berlin-proposal-detail-header {
-    padding-top: 30px / $font-size-normal * 1em;
+    @include rem(padding-top, 30px);
 
     .mein-berlin-proposal-detail-header-title {
+        @include rem(font-size, $font-size-normal);
+        @include rem(margin, 0 0 30px);
         color: $color-text-normal;
-        font-size: $font-size-normal;
         font-weight: $font-weight-extrovert;
-        margin: 0 0 (30px / $font-size-normal * 1em);
     }
 
     .badge {
+        @include rem(top, -20px);
         position: relative;
-        top: -20px / $font-size-small * 1em;
     }
 }
 
 .mein-berlin-proposal-detail-detail {
-    margin-bottom: 30px / $font-size-normal * 1em;
+    @include rem(margin-bottom, 30px);
     padding-right: 15%;
     white-space: pre-line;
 }
 
 .mein-berlin-proposal-detail-meta-item,
 .mein-berlin-proposal-detail-author {
+    @include rem(font-size, $font-size-small);
     color: $color-text-introvert;
-    font-size: $font-size-small;
 }
 
 .mein-berlin-proposal-detail-author {
-    margin-bottom: 30px / $font-size-small * 1em;
+    @include rem(margin-bottom, 30px);
 }
 
 .mein-berlin-proposal-detail-meta {
     @include clearfix;
+    @include rem(margin, 0 0 40px);
     list-style-type: none;
-    margin: 0 0 (40px / $font-size-normal * 1em);
     padding: 0;
 
     .mein-berlin-proposal-detail-meta-item {
@@ -108,7 +108,7 @@
     }
 
     .mein-berlin-proposal-detail-meta-item-icon {
-        margin-right: 8px;
+        @include rem(margin-right, 8px);
         vertical-align: middle;
     }
 
@@ -171,9 +171,9 @@ as metadata.  It serves as an entry to a detail view.
 
 .meinberlin-proposal-list-item {
     @include clearfix;
+    @include rem(padding, 10px);
     color: $color-text-normal;
     display: block;
-    padding: 10px / $font-size-normal * 1em;
     text-decoration: none;
 
     &:hover, &:focus {
@@ -189,7 +189,7 @@ as metadata.  It serves as an entry to a detail view.
     }
 
     .badge {
-        margin-left: 20px / $font-size-small * 1em;
+        @include rem(margin-left, 20px);
     }
 }
 
@@ -206,7 +206,7 @@ as metadata.  It serves as an entry to a detail view.
 .meinberlin-alexanderplatz-proposal-list-item,
 .section-jump-cover {
     .badge {
-        margin-bottom: 20px / $font-size-small * 1em;
+        @include rem(margin-bottom, 20px);
     }
 }
 
@@ -217,22 +217,22 @@ as metadata.  It serves as an entry to a detail view.
 }
 
 .meinberlin-proposal-list-item-title {
-    font-size: $font-size-normal;
-    margin: 0 0 (15px / $font-size-normal * 1em);
+    @include rem(font-size, $font-size-normal);
+    @include rem(margin, 0 0 15px);
 }
 
 .meinberlin-proposal-list-meta-item {
-    margin-bottom: 15px / $font-size-small * 1em;
-    font-size: $font-size-small;
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-bottom, 15px);
 }
 
 .meinberlin-proposal-list-meta-item-icon {
-    font-size: $font-size-normal;
-    margin-right: 8px / $font-size-normal * 1em;
+    @include rem(font-size, $font-size-small);
+    @include rem(margin-right, 8px);
 }
 
 .mein-berlin-proposal-form-footer {
     .form-footer-button {
-        padding-left: 10px / $font-size-normal * 1em;
+        @include rem(padding-left, 10px);
     }
 }

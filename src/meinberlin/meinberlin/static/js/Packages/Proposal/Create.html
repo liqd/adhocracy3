@@ -46,12 +46,19 @@
         <label data-ng-if="isKiezkasse || isBurgerhaushalt">
             <span class="label-text">{{ "TR__MEINBERLIN_BUDGET" | translate }}</span>
             <input
+                data-ng-if="isKiezkasse"
                 type="number"
                 data-ng-model="data.budget"
                 name="budget"
                 min="0"
                 max="50000"
                 required="required" />
+            <input
+                data-ng-if="isBurgerhaushalt"
+                type="number"
+                data-ng-model="data.budget"
+                name="budget"
+                min="0" />
             <span class="input-error" data-ng-show="showError(meinBerlinProposalForm, meinBerlinProposalForm.budget, 'required')">
                 {{ "TR__MEINBERLIN_ERROR_REQUIRED_BUDGET" | translate }}
             </span>

@@ -1,23 +1,18 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAbuse = require("../Abuse/Abuse");
-import AdhComment = require("../Comment/Comment");
-import AdhConfig = require("../Config/Config");
-import AdhHttp = require("../Http/Http");
-import AdhListing = require("../Listing/Listing");
-import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
-import AdhMovingColumns = require("../MovingColumns/MovingColumns");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhResourceArea = require("../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUser = require("../User/User");
-import AdhUtil = require("../Util/Util");
+import * as AdhConfig from "../Config/Config";
+import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../Permissions/Permissions";
+import * as AdhResourceArea from "../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
+import * as AdhUtil from "../Util/Util";
 
-import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
-import RIProcess = require("../../Resources_/adhocracy_mercator/resources/mercator/IProcess");
-import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
-import SIWorkflow = require("../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import RICommentVersion from "../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIMercatorProposalVersion from "../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion";
+import RIProcess from "../../Resources_/adhocracy_mercator/resources/mercator/IProcess";
+import * as SIComment from "../../Resources_/adhocracy_core/sheets/comment/IComment";
+import * as SIWorkflow from "../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/MercatorWorkbench";
 
@@ -177,99 +172,69 @@ export var mercatorProposalListingColumnDirective = (
 };
 
 
-export var moduleName = "adhMercatorWorkbench";
+export var registerRoutes = (
+    processType : string = "",
+    context : string = ""
+) => (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+    adhResourceAreaProvider
+        .default(RICommentVersion, "", processType, context, {
+            space: "content",
+            movingColumns: "is-collapse-show-show"
+        })
+        .specific(RICommentVersion, "", processType, context, ["adhHttp", "$q", (
+            adhHttp : AdhHttp.Service<any>,
+            $q : angular.IQService
+        ) => (resource : RICommentVersion) => {
+            var specifics = {};
+            specifics["commentUrl"] = resource.path;
 
-export var register = (angular) => {
-    var processType = RIProcess.content_type;
+            var getCommentableUrl = (resource) : angular.IPromise<any> => {
+                if (resource.content_type !== RICommentVersion.content_type) {
+                    return $q.when(resource);
+                } else {
+                    var url = resource.data[SIComment.nick].refers_to;
+                    return adhHttp.get(url).then(getCommentableUrl);
+                }
+            };
 
-    angular
-        .module(moduleName, [
-            AdhAbuse.moduleName,
-            AdhComment.moduleName,
-            AdhHttp.moduleName,
-            AdhListing.moduleName,
-            AdhMercatorProposal.moduleName,
-            AdhMovingColumns.moduleName,
-            AdhPermissions.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName,
-            AdhUser.moduleName
-        ])
-        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
-            adhResourceAreaProvider
-                .default(RICommentVersion, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-collapse-show-show"
-                })
-                .specific(RICommentVersion, "", processType, "", ["adhHttp", "$q", (
-                    adhHttp : AdhHttp.Service<any>,
-                    $q : angular.IQService
-                ) => (resource : RICommentVersion) => {
-                    var specifics = {};
-                    specifics["commentUrl"] = resource.path;
+            return getCommentableUrl(resource).then((commentable) => {
+                specifics["commentableUrl"] = commentable.path;
 
-                    var getCommentableUrl = (resource) : angular.IPromise<any> => {
-                        if (resource.content_type !== RICommentVersion.content_type) {
-                            return $q.when(resource);
-                        } else {
-                            var url = resource.data[SIComment.nick].refers_to;
-                            return adhHttp.get(url).then(getCommentableUrl);
-                        }
-                    };
-
-                    return getCommentableUrl(resource).then((commentable) => {
-                        specifics["commentableUrl"] = commentable.path;
-
-                        if (commentable.content_type === RIMercatorProposalVersion.content_type) {
-                            specifics["proposalUrl"] = specifics["commentableUrl"];
-                            specifics["commentCloseUrl"] = specifics["commentableUrl"];
-                        } else {
-                            var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
-                            var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
-                            return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
-                                specifics["proposalUrl"] = proposalUrl;
-                                specifics["commentCloseUrl"] = proposalUrl;
-                            });
-                        }
-                    })
-                    .then(() => specifics);
-                }])
-                .default(RIProcess, "", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide",
-                    proposalUrl: "",  // not used by default, but should be overridable
-                    focus: "0"
-                })
-                .default(RIProcess, "create_proposal", processType, "", {
-                    space: "content",
-                    movingColumns: "is-show-hide-hide"
-                })
-                .specific(RIProcess, "create_proposal", processType, "", ["adhHttp",
-                    (adhHttp : AdhHttp.Service<any>) => {
-                        return (resource : RIProcess) => {
-                            return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
-                                if (!options.POST) {
-                                    throw 401;
-                                } else {
-                                    return {};
-                                }
-                            });
-                        };
-                    }]
-                );
+                if (commentable.content_type === RIMercatorProposalVersion.content_type) {
+                    specifics["proposalUrl"] = specifics["commentableUrl"];
+                    specifics["commentCloseUrl"] = specifics["commentableUrl"];
+                } else {
+                    var subResourceUrl = AdhUtil.parentPath(specifics["commentableUrl"]);
+                    var proposalItemUrl = AdhUtil.parentPath(subResourceUrl);
+                    return adhHttp.getNewestVersionPathNoFork(proposalItemUrl).then((proposalUrl) => {
+                        specifics["proposalUrl"] = proposalUrl;
+                        specifics["commentCloseUrl"] = proposalUrl;
+                    });
+                }
+            })
+            .then(() => specifics);
         }])
-        .config(["adhProcessProvider", (adhProcessProvider) => {
-            adhProcessProvider.templateFactories[processType] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-mercator-workbench></adh-mercator-workbench>");
-            }];
-        }])
-        .directive("adhMercatorWorkbench", ["adhConfig", "adhTopLevelState", mercatorWorkbenchDirective])
-        .directive("adhMercatorProposalCreateColumn", [
-            "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalCreateColumnDirective])
-        .directive("adhMercatorProposalDetailColumn", [
-            "$window", "adhTopLevelState", "adhPermissions", "adhConfig", mercatorProposalDetailColumnDirective])
-        .directive("adhMercatorProposalEditColumn", [
-            "adhConfig", "adhResourceUrlFilter", "$location", mercatorProposalEditColumnDirective])
-        .directive("adhMercatorProposalListingColumn",
-            ["adhConfig", "adhHttp", "adhTopLevelState", mercatorProposalListingColumnDirective]);
+        .default(RIProcess, "", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide",
+            proposalUrl: "",  // not used by default, but should be overridable
+            focus: "0"
+        })
+        .default(RIProcess, "create_proposal", processType, context, {
+            space: "content",
+            movingColumns: "is-show-hide-hide"
+        })
+        .specific(RIProcess, "create_proposal", processType, context, ["adhHttp",
+            (adhHttp : AdhHttp.Service<any>) => {
+                return (resource : RIProcess) => {
+                    return adhHttp.options(resource.path).then((options : AdhHttp.IOptions) => {
+                        if (!options.POST) {
+                            throw 401;
+                        } else {
+                            return {};
+                        }
+                    });
+                };
+            }]
+        );
 };
