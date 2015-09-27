@@ -1,19 +1,18 @@
 /// <reference path="../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhComment = require("../../Comment/Comment");
-import AdhConfig = require("../../Config/Config");
-import AdhHttp = require("../../Http/Http");
-import AdhMovingColumns = require("../../MovingColumns/MovingColumns");
-import AdhPermissions = require("../../Permissions/Permissions");
-import AdhProcess = require("../../Process/Process");
-import AdhResourceArea = require("../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../Util/Util");
+import * as AdhConfig from "../../Config/Config";
+import * as AdhHttp from "../../Http/Http";
+import * as AdhMovingColumns from "../../MovingColumns/MovingColumns";
+import * as AdhPermissions from "../../Permissions/Permissions";
+import * as AdhProcess from "../../Process/Process";
+import * as AdhResourceArea from "../../ResourceArea/ResourceArea";
+import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Util/Util";
 
-import RIS1Process = require("../../../Resources_/adhocracy_s1/resources/s1/IProcess");
-import RIProposal = require("../../../Resources_/adhocracy_s1/resources/s1/IProposal");
-import RIProposalVersion = require("../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion");
-import SIWorkflowAssignment = require("../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import RIS1Process from "../../../Resources_/adhocracy_s1/resources/s1/IProcess";
+import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
+import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
+import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/S1/Workbench";
 
@@ -318,32 +317,4 @@ export var registerRoutes = (
                 };
             };
         });
-};
-
-
-export var moduleName = "adhS1Workbench";
-
-export var register = (angular) => {
-    angular
-        .module(moduleName, [
-            AdhComment.moduleName,
-            AdhHttp.moduleName,
-            AdhProcess.moduleName,
-            AdhResourceArea.moduleName,
-            AdhTopLevelState.moduleName
-        ])
-        .config(["adhResourceAreaProvider", registerRoutes(RIS1Process.content_type)])
-        .config(["adhProcessProvider", (adhProcessProvider : AdhProcess.Provider) => {
-            adhProcessProvider.templateFactories[RIS1Process.content_type] = ["$q", ($q : angular.IQService) => {
-                return $q.when("<adh-s1-workbench></adh-s1-workbench>");
-            }];
-        }])
-        .directive("adhS1Workbench", ["adhConfig", "adhTopLevelState", s1WorkbenchDirective])
-        .directive("adhS1Landing", ["adhConfig", s1LandingDirective])
-        .directive("adhS1CurrentColumn", ["adhConfig", "adhHttp", s1CurrentColumnDirective])
-        .directive("adhS1NextColumn", ["adhConfig", "adhHttp", s1NextColumnDirective])
-        .directive("adhS1ArchiveColumn", ["adhConfig", "adhHttp", s1ArchiveColumnDirective])
-        .directive("adhS1ProposalDetailColumn", ["adhConfig", "adhPermissions", s1ProposalDetailColumnDirective])
-        .directive("adhS1ProposalCreateColumn", ["adhConfig", s1ProposalCreateColumnDirective])
-        .directive("adhS1ProposalEditColumn", ["adhConfig", s1ProposalEditColumnDirective]);
 };

@@ -11,6 +11,7 @@ import * as AdhPreliminaryNamesModule from "../PreliminaryNames/Module";
 import * as AdhRateModule from "../Rate/Module";
 import * as AdhResourceWidgetsModule from "../ResourceWidgets/Module";
 import * as AdhTopLevelStateModule from "../TopLevelState/Module";
+import * as AdhUserModule from "../User/Module";
 
 import * as AdhListing from "../Listing/Listing";
 
@@ -35,7 +36,8 @@ export var register = (angular) => {
             AdhPreliminaryNamesModule.moduleName,
             AdhRateModule.moduleName,
             AdhResourceWidgetsModule.moduleName,
-            AdhTopLevelStateModule.moduleName
+            AdhTopLevelStateModule.moduleName,
+            AdhUserModule.moduleName
         ])
         .directive("adhCommentListingPartial",
             ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
@@ -59,5 +61,5 @@ export var register = (angular) => {
                     adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhTopLevelState, $window, $q);
                 return widget.createRecursionDirective(adhRecursionHelper);
             }])
-        .directive("adhCommentColumn", ["adhConfig", AdhComment.commentColumnDirective]);
+        .directive("adhCommentColumn", ["adhConfig", "adhUser", AdhComment.commentColumnDirective]);
 };

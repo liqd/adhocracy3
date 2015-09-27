@@ -1,28 +1,26 @@
 /// <reference path="../../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import AdhAngularHelpers = require("../../AngularHelpers/AngularHelpers");
-import AdhBadge = require("../../Badge/Badge");
-import AdhConfig = require("../../Config/Config");
-import AdhHttp = require("../../Http/Http");
-import AdhPermissions = require("../../Permissions/Permissions");
-import AdhPreliminaryNames = require("../../PreliminaryNames/PreliminaryNames");
-import AdhProcess = require("../../Process/Process");
-import AdhRate = require("../../Rate/Rate");
-import AdhResourceArea = require("../../ResourceArea/ResourceArea");
-import AdhTopLevelState = require("../../TopLevelState/TopLevelState");
-import AdhUtil = require("../../Util/Util");
+import * as AdhBadge from "../../Badge/Badge";
+import * as AdhConfig from "../../Config/Config";
+import * as AdhHttp from "../../Http/Http";
+import * as AdhPermissions from "../../Permissions/Permissions";
+import * as AdhPreliminaryNames from "../../PreliminaryNames/PreliminaryNames";
+import * as AdhProcess from "../../Process/Process";
+import * as AdhRate from "../../Rate/Rate";
+import * as AdhTopLevelState from "../../TopLevelState/TopLevelState";
+import * as AdhUtil from "../../Util/Util";
 
-import RICommentVersion = require("../../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
-import RIProposal = require("../../../Resources_/adhocracy_s1/resources/s1/IProposal");
-import RIProposalVersion = require("../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion");
-import SICommentable = require("../../../Resources_/adhocracy_core/sheets/comment/ICommentable");
-import SIDescription = require("../../../Resources_/adhocracy_core/sheets/description/IDescription");
-import SIMetadata = require("../../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIPool = require("../../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SIRateable = require("../../../Resources_/adhocracy_core/sheets/rate/IRateable");
-import SITitle = require("../../../Resources_/adhocracy_core/sheets/title/ITitle");
-import SIVersionable = require("../../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SIWorkflowAssignment = require("../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment");
+import RICommentVersion from "../../../Resources_/adhocracy_core/resources/comment/ICommentVersion";
+import RIProposal from "../../../Resources_/adhocracy_s1/resources/s1/IProposal";
+import RIProposalVersion from "../../../Resources_/adhocracy_s1/resources/s1/IProposalVersion";
+import * as SICommentable from "../../../Resources_/adhocracy_core/sheets/comment/ICommentable";
+import * as SIDescription from "../../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIMetadata from "../../../Resources_/adhocracy_core/sheets/metadata/IMetadata";
+import * as SIPool from "../../../Resources_/adhocracy_core/sheets/pool/IPool";
+import * as SIRateable from "../../../Resources_/adhocracy_core/sheets/rate/IRateable";
+import * as SITitle from "../../../Resources_/adhocracy_core/sheets/title/ITitle";
+import * as SIVersionable from "../../../Resources_/adhocracy_core/sheets/versions/IVersionable";
+import * as SIWorkflowAssignment from "../../../Resources_/adhocracy_core/sheets/workflow/IWorkflowAssignment";
 
 var pkgLocation = "/S1/Proposal";
 
@@ -40,6 +38,7 @@ export interface IScope extends angular.IScope {
         commentCount : number;
         assignments : AdhBadge.IBadge[];
         workflowState : string;
+        decisionDate : string;
     };
 }
 
@@ -83,7 +82,7 @@ var bindPath = (
             $q.all([
                 adhHttp.get(AdhUtil.parentPath(value)),
                 adhHttp.get(value)
-            ]).then((args) => {
+            ]).then((args : any) => {
                 var item : RIProposal = args[0];
                 var version : RIProposalVersion = args[1];
 
@@ -99,7 +98,7 @@ var bindPath = (
                     getCommentCount(version),
                     adhGetBadges(version),
                     adhRate.fetchAggregatedRates(rateableSheet.post_pool, version.path)
-                ]).then((args) => {
+                ]).then((args : any) => {
                     var commentCount = args[0];
                     var badgeAssignments = args[1];
                     // FIXME: an adapter should take care of this
@@ -342,51 +341,4 @@ export var listingDirective = (
             }
         }
     };
-};
-
-
-export var moduleName = "adhS1Proposal";
-
-export var register = (angular) => {
-    angular.module(moduleName, [
-        AdhAngularHelpers.moduleName,
-        AdhBadge.moduleName,
-        AdhHttp.moduleName,
-        AdhPermissions.moduleName,
-        AdhPreliminaryNames.moduleName,
-        AdhRate.moduleName,
-        AdhResourceArea.moduleName,
-        AdhTopLevelState.moduleName
-    ])
-    .directive("adhS1ProposalDetail", [
-        "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", detailDirective])
-    .directive("adhS1ProposalListItem", [
-        "adhConfig", "adhHttp", "adhPermissions", "adhRate", "adhTopLevelState", "adhGetBadges", "$q", listItemDirective])
-    .directive("adhS1ProposalCreate", [
-        "adhConfig",
-        "adhHttp",
-        "adhPreliminaryNames",
-        "adhTopLevelState",
-        "adhShowError",
-        "adhSubmitIfValid",
-        "adhResourceUrlFilter",
-        "$location",
-        createDirective
-    ])
-    .directive("adhS1ProposalEdit", [
-        "adhConfig",
-        "adhHttp",
-        "adhPermissions",
-        "adhPreliminaryNames",
-        "adhRate",
-        "adhResourceUrlFilter",
-        "adhShowError",
-        "adhSubmitIfValid",
-        "adhTopLevelState",
-        "adhGetBadges",
-        "$location",
-        "$q",
-        editDirective
-    ])
-    .directive("adhS1ProposalListing", ["adhConfig", "adhTopLevelState", listingDirective]);
 };
