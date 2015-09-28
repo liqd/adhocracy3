@@ -37,6 +37,7 @@ from adhocracy_core.resources.badge import IBadgeAssignmentsService
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.proposal import IProposal
 from adhocracy_core.resources.process import IProcess
+from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.catalog import ICatalogsService
 
 
@@ -428,6 +429,31 @@ def _has_follower(version: IItemVersion, registry: Registry) -> bool:
     return followed_by != []
 
 
+@log_migration
+def update_asset_download_childs(root):  # pragma: no cover
+    """Readd asset downloads and update IAssetMetadata sheet."""
+    from adhocracy_core.sheets.asset import IAssetMetadata
+    from adhocracy_core.sheets.image import IImageMetadata
+    from adhocracy_core.resources.asset import add_metadata_and_download
+    from adhocracy_core.resources.image import add_image_size_downloads
+    registry = get_current_registry(root)
+    catalogs = find_service(root, 'catalogs')
+    assets = _search_for_interfaces(catalogs, IAsset)
+    count = len(assets)
+    for index, asset in enumerate(assets):
+        logger.info('Migrating resource {0} of {1}'.format(index + 1, count))
+        old_downloads = [x for x in asset]
+        for old in old_downloads:
+            del asset[old]
+        try:
+            if IAssetMetadata.providedBy(asset):
+                add_metadata_and_download(asset, registry)
+            if IImageMetadata.providedBy(asset):
+                add_image_size_downloads(asset, registry)
+        except AttributeError:
+            logger.warn('Asset {} has no downloads to migrate.'.format(asset))
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -446,3 +472,4 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(migrate_rate_sheet_to_attribute_storage)
     config.add_evolution_step(move_autoname_last_counters_to_attributes)
     config.add_evolution_step(remove_empty_first_versions)
+    config.add_evolution_step(update_asset_download_childs)
