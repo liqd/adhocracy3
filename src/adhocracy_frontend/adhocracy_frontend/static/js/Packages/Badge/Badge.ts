@@ -5,12 +5,15 @@ import * as _ from "lodash";
 import * as AdhConfig from "../Config/Config";
 import * as AdhCredentials from "../User/Credentials";
 import * as AdhHttp from "../Http/Http";
+import * as AdhMovingColumns from "../MovingColumns/MovingColumns";
+import * as AdhTopLevelState from "../TopLevelState/TopLevelState";
 import * as AdhUtil from "../Util/Util";
 
 import RIBadgeAssignment from "../../Resources_/adhocracy_core/resources/badge/IBadgeAssignment";
 import * as SIBadgeable from "../../Resources_/adhocracy_core/sheets/badge/IBadgeable";
 import * as SIBadgeAssignment from "../../Resources_/adhocracy_core/sheets/badge/IBadgeAssignment";
 import * as SIDescription from "../../Resources_/adhocracy_core/sheets/description/IDescription";
+import * as SIHasBadgesPool from "../../Resources_/adhocracy_core/sheets/badge/IHasBadgesPool";
 import * as SIName from "../../Resources_/adhocracy_core/sheets/name/IName";
 import * as SIPool from "../../Resources_/adhocracy_core/sheets/pool/IPool";
 import * as SITitle from "../../Resources_/adhocracy_core/sheets/title/ITitle";
@@ -106,6 +109,10 @@ export var bindPath = (
                 });
             }
         });
+    } else {
+        adhHttp.get(scope.badgeablePath).then((badgeable) => {
+            scope.poolPath = badgeable.data[SIBadgeable.nick].post_pool;
+        });
     }
 };
 
@@ -133,8 +140,9 @@ export var badgeAssignmentCreateDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
             badgesPath: "@",
-            poolPath: "@",
-            badgeablePath: "@"
+            badgeablePath: "@",
+            onSubmit: "=?",
+            onCancel: "=?"
         },
         link: (scope, element) => {
             bindPath(adhHttp, $q)(scope);
@@ -144,7 +152,21 @@ export var badgeAssignmentCreateDirective = (
                     content_type: RIBadgeAssignment.content_type,
                     data: {}
                 };
-                return adhHttp.post(scope.poolPath, fill(postdata, scope, adhCredentials.userPath));
+                return adhHttp.post(scope.poolPath, fill(postdata, scope, adhCredentials.userPath))
+                    .then((response) => {
+                        scope.serverError = null;
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    }, (response) => {
+                        scope.serverError = response[0].description;
+                    });
+            };
+
+            scope.cancel = () => {
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
             };
         }
     };
@@ -161,14 +183,92 @@ export var badgeAssignmentEditDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
             path: "@",
-            badgesPath: "@"
+            badgesPath: "@",
+            onSubmit: "=?",
+            onCancel: "=?"
         },
         link: (scope, element) => {
             bindPath(adhHttp, $q)(scope, "path");
 
+            scope.delete = () => {
+                return adhHttp.delete(scope.path, RIBadgeAssignment.content_type)
+                    .then(() => {
+                        scope.serverError = null;
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    }, (response) => {
+                        scope.serverError = response[0].description;
+                    });
+            };
+
             scope.submit = () => {
                 var resource = scope.resource;
-                return adhHttp.put(resource.path, fill(resource, scope, adhCredentials.userPath));
+                return adhHttp.put(resource.path, fill(resource, scope, adhCredentials.userPath))
+                    .then((response) => {
+                        scope.serverError = null;
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    }, (response) => {
+                        scope.serverError = response[0].description;
+                    });
+            };
+
+            scope.cancel = () => {
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
+            };
+        }
+    };
+};
+
+export var badgeAssignmentDirective = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    $q : angular.IQService,
+    adhCredentials : AdhCredentials.Service,
+    adhTopLevelState : AdhTopLevelState.Service
+) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Wrapper.html",
+        require: "^adhMovingColumn",
+        scope: {
+            path: "@",
+            onSubmit: "=?",
+            onCancel: "=?"
+        },
+        link: (scope, element, attrs, column : AdhMovingColumns.MovingColumnController) => {
+            scope.badgeablePath = scope.path;
+
+            var processUrl = adhTopLevelState.get("processUrl");
+            var promise1 = adhHttp.get(processUrl).then((resource) => {
+                scope.badgesPath = resource.data[SIHasBadgesPool.nick].badges_pool;
+            });
+
+            var promise2 = adhHttp.get(scope.path).then((resource) => {
+                scope.options = resource.data[SIBadgeable.nick].assignments;
+            });
+
+            $q.all([promise1, promise2]).then(() => {
+                scope.ready = true;
+            });
+
+            scope.submit = () => {
+                column.hideOverlay("badges");
+                column.alert("TR__BADGE_ASSIGNMENT_UPDATED", "success");
+                if (scope.onSubmit) {
+                    scope.onSubmit();
+                }
+            };
+
+            scope.cancel = () => {
+                column.hideOverlay("badges");
+                if (scope.onCancel) {
+                    scope.onCancel();
+                }
             };
         }
     };
