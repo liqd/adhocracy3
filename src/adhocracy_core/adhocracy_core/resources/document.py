@@ -79,6 +79,7 @@ class IGeoDocument(IDocument):
 
 geo_document_meta = document_meta._replace(
     iresource=IGeoDocument,
+    item_type=IGeoDocumentVersion,
     element_types=(ITag,
                    IParagraph,
                    IGeoDocumentVersion)
