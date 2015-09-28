@@ -78,7 +78,7 @@ var bindPath = (
                     getCommentCount(resource),
                     adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
                     adhGetBadges(resource)
-                ]).then((args) => {
+                ]).then((args : any[]) => {
                     var commentCount = args[0];
                     var rates = args[1];
                     var assignments = args[2];
