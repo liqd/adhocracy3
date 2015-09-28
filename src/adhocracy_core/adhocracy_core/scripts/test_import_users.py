@@ -1,12 +1,18 @@
+import json
+import os
+
+from pyramid.request import Request
 from pytest import fixture
 from pytest import mark
-from adhocracy_core.resources.root import IRootPool
-from pyramid.request import Request
 from substanced.interfaces import IUserLocator
+from substanced.util import find_service
 from tempfile import mkstemp
-import os
-import json
 import pytest
+
+from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_sheet_field
+
 
 @mark.usefixtures('integration')
 class TestImportUsers:
@@ -25,7 +31,7 @@ class TestImportUsers:
         from adhocracy_core.scripts.import_users import _import_users
         return _import_users(root, registry, filename)
 
-    
+
     def test_create(self, context, registry, log):
         from pyramid.traversal import resource_path
         self._tempfd, filename = mkstemp()
@@ -48,6 +54,25 @@ class TestImportUsers:
         alice_user_id = resource_path(alice)
         groups = locator.get_groups(alice_user_id)
         assert groups == [god_group]
+        bob = locator.get_user_by_login('Bob')
+        default_group = context['principals']['groups']['authenticated']
+        bob_user_id = resource_path(bob)
+        groups = locator.get_groups(bob_user_id)
+        assert groups == [default_group]
+
+
+    def test_create_default_values(self, context, registry, log):
+        from pyramid.traversal import resource_path
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Bob', 'email': 'bob@example.org',
+                 'initial-password': 'weakpassword2'}
+            ]))
+        locator = self._get_user_locator(context, registry)
+
+        self.call_fut(context, registry, filename)
+
         bob = locator.get_user_by_login('Bob')
         default_group = context['principals']['groups']['authenticated']
         bob_user_id = resource_path(bob)
@@ -196,6 +221,35 @@ class TestImportUsers:
         with pytest.raises(ValueError):
             self.call_fut(context, registry, filename)
 
+    def test_update_badges(self, context, registry, log):
+        from adhocracy_core import sheets
+        self._tempfd, filename = mkstemp()
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'alice@example.org',
+                 'initial-password': 'weakpassword1', 'roles': ['contributor'],
+                 'groups': ['gods'], 'badges': ['Moderator', 'Beginner']},
+            ]))
+        locator = self._get_user_locator(context, registry)
+        self.call_fut(context, registry, filename)
+
+        with open(filename, 'w') as f:
+            f.write(json.dumps([
+                {'name': 'Alice', 'email': 'alice@example.org',
+                 'badges': ['Expert']}]))
+
+        self.call_fut(context, registry, filename)
+        alice = locator.get_user_by_login('Alice')
+        assignments = find_service(alice, 'badge_assignments').values()
+        assert len(assignments) == 1
+
+        assignment = assignments[0]
+        assignment_sheet = get_sheet(assignment, sheets.badge.IBadgeAssignment)
+        badge = context['principals']['badges']['expert']
+        assert assignment_sheet.get() == {'object': alice,
+                                          'badge': badge,
+                                          'subject': alice}
+
     def test_create_and_send_invitation_mail(self, context, registry, mock_messenger):
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
@@ -223,8 +277,6 @@ class TestImportUsers:
     def test_create_and_create_and_assign_badge(self, context, registry,
                                                 mock_messenger):
         from adhocracy_core import sheets
-        from adhocracy_core.utils import get_sheet
-        from adhocracy_core.utils import get_sheet_field
         registry.messenger = mock_messenger
         self._tempfd, filename = mkstemp()
         with open(filename, 'w') as f:
@@ -312,5 +364,3 @@ class TestImportUsers:
     def teardown_method(self, method):
         if hasattr(self, 'tempfd'):
             os.close(self._tempfd)
-
-
