@@ -5,6 +5,7 @@ import colander
 
 
 
+@mark.usefixtures('log')
 class TestJSONHTTPException:
 
     @fixture
@@ -106,6 +107,7 @@ class TestJSONHTTPException:
         assert "{'X-User-Token': '<hidden>'}" in str(log)
 
 
+@mark.usefixtures('log')
 class TestHandleErrorX0XException:
 
     def call_fut(self, error, request):
@@ -119,6 +121,7 @@ class TestHandleErrorX0XException:
         assert error is result_error
 
 
+@mark.usefixtures('log')
 class TestHandleError40X_exception:
 
     @fixture
@@ -175,6 +178,7 @@ class TestHandleError40X_exception:
         assert '400' in resp.json['errors'][0]['description']
 
 
+@mark.usefixtures('log')
 class TestHandleError400ColanderInvalid:
 
     def make_one(self, error, request):
@@ -203,6 +207,7 @@ class TestHandleError400ColanderInvalid:
         assert json.loads(inst.body.decode()) == wanted
 
 
+@mark.usefixtures('log')
 class TestHandleError400URLDecodeError:
 
     def make_one(self, error, request):
@@ -228,6 +233,7 @@ class TestHandleError400URLDecodeError:
             assert json.loads(inst.body.decode()) == wanted
 
 
+@mark.usefixtures('log')
 class TestHandleError500Exception:
 
     def make_one(self, error, request_):
@@ -248,6 +254,7 @@ class TestHandleError500Exception:
         assert message['errors'][0]['name'] == ''
 
 
+@mark.usefixtures('log')
 class TestHandleAutoUpdateNoForkAllowed400Exception:
 
     def make_one(self, error, request_):
@@ -280,6 +287,7 @@ class TestHandleAutoUpdateNoForkAllowed400Exception:
         assert inst.json == wanted
 
 
+@mark.usefixtures('log')
 class TestHandleError410:
 
     @fixture
@@ -321,6 +329,7 @@ class TestHandleError410:
         assert inst.json_body['modified_by'].endswith('user/')
 
 
+@mark.usefixtures('log')
 class TestHandleError400:
 
     @fixture

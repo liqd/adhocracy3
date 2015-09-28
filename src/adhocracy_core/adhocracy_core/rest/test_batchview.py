@@ -3,8 +3,8 @@ import json
 from pyramid.request import Request
 from pytest import fixture
 from pytest import raises
+from pytest import mark
 from unittest.mock import Mock
-from testfixtures import LogCapture
 
 
 class DummySubresponse:
@@ -34,6 +34,7 @@ class TestBatchItemResponse:
         assert inst.to_dict() == {'code': 200, 'body': {}}
 
 
+@mark.usefixtures('log')
 class TestBatchView:
 
     @fixture
@@ -223,8 +224,7 @@ class TestBatchView:
         mock_invoke_subrequest.side_effect = RuntimeError('Bad luck')
         inst = self.make_one(context, request_)
         with raises(JSONHTTPClientError) as err:
-            with LogCapture() as log:
-                inst.post()
+            inst.post()
         assert err.value.status_code == 500
 
     def _make_batch_response(self, code=200, title='Ok', path=None,
