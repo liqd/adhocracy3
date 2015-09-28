@@ -268,7 +268,7 @@ export class Service {
 
                     this.blockTemplate = false;
                 })
-                .finally<void>(() => {
+                .finally(() => {
                     this.lock = false;
                 });
         }

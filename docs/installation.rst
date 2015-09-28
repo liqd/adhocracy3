@@ -111,3 +111,6 @@ Run test suites
 Run test suite::
 
     bin/polytester
+
+.. NOTE:: You need to have chrome/chromium installed in order to run the
+   acceptance tests.

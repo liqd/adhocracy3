@@ -123,7 +123,7 @@ var bindPath = (
                     adhRate.fetchAggregatedRates(rateableSheet.post_pool, resource.path),
                     getPolygon(),
                     adhGetBadges(resource)
-                ]).then((args) => {
+                ]).then((args : any[]) => {
                     var commentCount = args[0];
                     var rates = args[1];
                     var polygon = args[2];

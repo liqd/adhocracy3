@@ -238,7 +238,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return this.$q.all(_.map(paths, (path) => {
             return this.adhHttp.get(this.adhConfig.rest_url + path);
-        })).then((resources) => {
+        })).then((resources : ResourcesBase.Resource[]) => {
             for (var i = 0; i < resources.length; i++) {
                 if (resources[i].isInstanceOf(RIProcess.content_type)) {
                     return resources[i];
