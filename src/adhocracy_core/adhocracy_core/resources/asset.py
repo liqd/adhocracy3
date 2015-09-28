@@ -1,38 +1,59 @@
 """Resources for managing assets."""
 
-from pyramid.registry import Registry
 from substanced.file import File
+from pyramid.registry import Registry
+from pyramid.response import FileResponse
+from pyramid.traversal import find_interface
 from zope.deprecation import deprecated
 
-from adhocracy_core.interfaces import Dimensions
+from adhocracy_core.exceptions import RuntimeConfigurationError
 from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources.base import Base
 from adhocracy_core.resources.pool import pool_meta
 from adhocracy_core.resources.service import service_meta
-from adhocracy_core.resources.simple import simple_meta
-from adhocracy_core.sheets.asset import AssetFileDownload
+from adhocracy_core.resources import resource_meta
 from adhocracy_core.sheets.asset import IAssetData
 from adhocracy_core.sheets.asset import IAssetMetadata
 from adhocracy_core.utils import get_matching_isheet
 from adhocracy_core.utils import get_sheet
-from adhocracy_core.utils import raise_colander_style_error
+from adhocracy_core.utils import get_sheet_field
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.asset
 import adhocracy_core.sheets.title
 
 
-class IAssetDownload(ISimple):
+class IAssetDownload(IResource):
 
     """Downloadable binary file for Assets."""
 
 
-asset_download_meta = simple_meta._replace(
+class AssetDownload(Base):
+
+    """Allow downloading the first asset file in the term:`lineage`."""
+
+    def get_response(self, registry: Registry=None) -> FileResponse:
+        """Return response with binary content of the asset data."""
+        file = self._get_asset_file_in_lineage(registry)
+        return file.get_response()
+
+    def _get_asset_file_in_lineage(self, registry) -> File:
+        asset = find_interface(self, IAssetData)
+        if asset is None:
+            msg = 'No IAssetData in lineage of {}'.format(self)
+            raise RuntimeConfigurationError(details=msg)
+        return get_sheet_field(asset, IAssetData, 'data', registry)
+
+
+asset_download_meta = resource_meta._replace(
     content_name='AssetDownload',
     iresource=IAssetDownload,
     use_autonaming=True,
-    basic_sheets=(IAssetData,),
+    content_class=AssetDownload,
+    permission_create='create_asset_download'
 )
 
 
@@ -41,63 +62,19 @@ class IAsset(ISimple):
     """A generic asset (binary file)."""
 
 
-def store_asset_meta_and_add_downloads(context: IAsset,
-                                       registry: Registry,
-                                       options: dict={}):
-    """Complete the initialization of an asset and ensure that it's valid."""
-    data_sheet = get_sheet(context, IAssetData, registry=registry)
-    data_appstruct = data_sheet.get()
-    metadata_isheet = get_matching_isheet(context, IAssetMetadata)
-    metadata_sheet = get_sheet(context, metadata_isheet, registry=registry)
-    metadata_appstruct = metadata_sheet.get()
-    file = data_appstruct['data']
-    if not file:
-        return None  # ease testing
-    _store_size_and_filename_as_metadata(file,
-                                         metadata_appstruct,
-                                         metadata_sheet,
-                                         registry=registry)
-    _add_downloads_as_children(context, metadata_sheet, registry)
-
-
-def _raise_mime_type_error(metadata_sheet: IAssetMetadata, msg: str):
-        raise_colander_style_error(metadata_sheet.meta.isheet,
-                                   'mime_type',
-                                   msg)
-
-
-def _store_size_and_filename_as_metadata(file: File,
-                                         metadata_appstruct: dict,
-                                         metadata_sheet: IAssetMetadata,
-                                         registry: Registry):
-    metadata_appstruct['size'] = file.size
-    metadata_appstruct['filename'] = file.title
-    metadata_sheet.set(metadata_appstruct,
-                       omit_readonly=False)
-
-
-def _add_downloads_as_children(context: IAsset,
-                               sheet: IAssetMetadata,
-                               registry: Registry):
-    """Add raw and possible resized download objects to `context`."""
-    raw_download = _create_asset_download(context, registry)
-    appstruct = {'raw': raw_download}
-    size_fields = (f for f in sheet.schema if hasattr(f, 'dimensions'))
-    for field in size_fields:
-        download = _create_asset_download(context, registry, field.dimensions)
-        appstruct[field.name] = download
-    sheet.set(appstruct)
-
-
-def _create_asset_download(context: IAsset, registry: Registry,
-                           dimensions: Dimensions=None) -> IAssetDownload:
-    file_download = AssetFileDownload(dimensions)
-    appstructs = {IAssetData.__identifier__: {'data': file_download}}
-    download = registry.content.create(IAssetDownload.__identifier__,
-                                       parent=context,
-                                       appstructs=appstructs,
-                                       registry=registry)
-    return download
+def add_metadata_and_download(context: IAsset, registry: Registry, **kwargs):
+    """Store asset file metadata and add `raw` download to `context`."""
+    file = get_sheet_field(context, IAssetData, 'data', registry=registry)
+    meta_isheet = get_matching_isheet(context, IAssetMetadata)
+    meta_sheet = get_sheet(context, meta_isheet, registry=registry)
+    raw_download = registry.content.create(IAssetDownload.__identifier__,
+                                           parent=context)
+    meta_appstruct = {
+        'size': file.size,
+        'filename': file.title,
+        'raw': raw_download,
+    }
+    meta_sheet.set(meta_appstruct, omit_readonly=False)
 
 
 asset_meta = pool_meta._replace(
@@ -114,7 +91,7 @@ asset_meta = pool_meta._replace(
     ),
     use_autonaming=True,
     permission_create='create_asset',
-    after_creation=[store_asset_meta_and_add_downloads],
+    after_creation=(add_metadata_and_download,),
 )
 
 

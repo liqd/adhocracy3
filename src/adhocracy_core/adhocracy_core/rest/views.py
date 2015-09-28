@@ -31,7 +31,6 @@ from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.asset import IAssetDownload
 from adhocracy_core.resources.asset import IAssetsService
-from adhocracy_core.resources.asset import store_asset_meta_and_add_downloads
 from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.resources.principal import IPasswordReset
 from adhocracy_core.resources.badge import IBadgeAssignmentsService
@@ -57,7 +56,6 @@ from adhocracy_core.rest.schemas import add_arbitrary_filter_nodes
 from adhocracy_core.rest.exceptions import error_entry
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
-from adhocracy_core.sheets.asset import retrieve_asset_file
 from adhocracy_core.sheets.badge import get_assignable_badges
 from adhocracy_core.sheets.badge import IBadgeAssignment
 from adhocracy_core.sheets.metadata import IMetadata
@@ -742,29 +740,22 @@ class AssetRESTView(SimpleRESTView):
                  accept='multipart/form-data')
     def put(self) -> dict:
         """HTTP PUT."""
-        result = super().put()
-        store_asset_meta_and_add_downloads(self.context, self.request.registry)
-        return result
+        return super().put()
 
 
 @view_defaults(
     renderer='json',
     context=IAssetDownload,
 )
-class AssetDownloadRESTView(SimpleRESTView):
+class AssetDownloadRESTView(ResourceRESTView):
 
-    """
-    View for downloading assets as binary blobs.
-
-    Allows GET, but no POST or PUT.
-    """
+    """View for downloading assets as binary blobs."""
 
     @view_config(request_method='GET',
                  permission='view')
     def get(self) -> dict:
-        """Get asset data (unless deleted or hidden)."""
-        file = retrieve_asset_file(self.context, self.request.registry)
-        response = file.get_response(self.context, self.request.registry)
+        """Get asset data."""
+        response = self.context.get_response(self.request.registry)
         self.ensure_caching_headers(response)
         return response
 
@@ -773,14 +764,6 @@ class AssetDownloadRESTView(SimpleRESTView):
         response.cache_control = self.request.response.cache_control
         response.etag = self.request.response.etag
         response.last_modified = self.request.response.last_modified
-
-    def put(self) -> dict:
-        """HTTP PUT."""
-        raise HTTPMethodNotAllowed()
-
-    def post(self) -> dict:
-        """HTTP POST."""
-        raise HTTPMethodNotAllowed()
 
 
 @view_defaults(

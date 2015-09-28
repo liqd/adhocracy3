@@ -3,7 +3,56 @@ from unittest.mock import Mock
 from pytest import fixture
 from pytest import mark
 from pytest import raises
-import colander
+from pyramid import testing
+
+
+class TestAssetDownload:
+
+    @fixture
+    def registry(self, registry_with_content, mock_sheet):
+        registry = registry_with_content
+        registry.content.get_sheet.return_value = mock_sheet
+        return registry
+
+    @fixture
+    def meta(self):
+        from .asset import asset_download_meta
+        return asset_download_meta
+
+    @fixture
+    def asset(self):
+      from adhocracy_core.sheets.asset import IAssetData
+      return testing.DummyResource(__provides__=IAssetData)
+
+    @fixture
+    def inst(self, meta):
+        inst = meta.content_class()
+        return inst
+
+    def test_meta(self, meta):
+        from adhocracy_core.interfaces import IResource
+        from . import asset
+        assert meta.iresource is asset.IAssetDownload
+        assert meta.iresource.isOrExtends(IResource)
+        assert meta.content_class == asset.AssetDownload
+        assert meta.permission_create == 'create_asset_download'
+        assert meta.use_autonaming
+
+    def test_get_response_return_asset_parent_data(self, inst, registry,
+                                                   mock_sheet, asset):
+        asset['download'] = inst
+        file = Mock()
+        mock_sheet.get.return_value = {'data': file}
+        assert inst.get_response(registry) == file.get_response.return_value
+
+    def test_get_response_raise_if_no_asset_parent(self, inst, registry):
+        from adhocracy_core.exceptions import RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            assert inst.get_response(registry)
+
+    @mark.usefixtures('integration')
+    def test_create(self, registry, meta):
+        assert registry.content.create(meta.iresource.__identifier__)
 
 
 class TestAsset:
@@ -27,11 +76,24 @@ class TestAsset:
         assert meta.extended_sheets == (
             adhocracy_core.sheets.asset.IAssetMetadata,)
         assert meta.use_autonaming
-        assert asset.store_asset_meta_and_add_downloads in meta.after_creation
+        assert meta.after_creation == (asset.add_metadata_and_download,)
 
     @mark.usefixtures('integration')
-    def test_create(self, registry, meta):
-        assert registry.content.create(meta.iresource.__identifier__)
+    def test_create(self, registry, meta, pool):
+        from adhocracy_core.sheets.asset import IAssetData
+        from adhocracy_core.sheets.asset import IAssetMetadata
+        from .asset import IAssetDownload
+        from adhocracy_core.utils import get_sheet
+        file = Mock(mimetype='image/png', size=100, title='title')
+        appstructs = {IAssetData.__identifier__: {'data': file}}
+        res = registry.content.create(meta.iresource.__identifier__,
+                                      appstructs=appstructs,
+                                      parent=pool)
+        meta = get_sheet(res, IAssetMetadata).get()
+        assert meta['filename'] == 'title'
+        assert meta['size'] == 100
+        assert meta['raw'] == res['0000000']
+        assert IAssetDownload.providedBy(meta['raw'])
 
 
 class TestAssetsService:
@@ -58,57 +120,4 @@ class TestAssetsService:
         from .asset import add_assets_service
         add_assets_service(pool, registry, {})
         assert find_service(pool, 'assets')
-
-
-@mark.usefixtures('integration')
-class TestValidateAndCompleteAsset:
-
-    def _make_asset(self, pool, registry,
-                    mime_type='image/png',
-                    mime_type_in_file='image/png',
-                    resource_type=None,
-                    asset_metadata_sheet=None):
-        from .asset import IAsset
-        from adhocracy_core.sheets.asset import IAssetData
-        from adhocracy_core.sheets.asset import IAssetMetadata
-        resource_type = resource_type or IAsset
-        asset_metadata_sheet = asset_metadata_sheet or IAssetMetadata
-        mock_file = Mock()
-        mock_file.mimetype = mime_type_in_file
-        appstructs = {IAssetData.__identifier__: {
-                          'data': mock_file},
-                      asset_metadata_sheet.__identifier__: {
-                          'mime_type': mime_type}}
-        return registry.content.create(resource_type.__identifier__,
-                                       appstructs=appstructs,
-                                       parent=pool,
-                                       run_after_creation=False)
-
-    def call_fut(self, *args):
-        from .asset import store_asset_meta_and_add_downloads
-        return store_asset_meta_and_add_downloads(*args)
-
-    def test_add_download_raw(self, pool, registry):
-        from adhocracy_core.sheets.asset import IAssetMetadata
-        from .asset import IAssetDownload
-        asset = self._make_asset(pool, registry, )
-        self.call_fut(asset, registry)
-        metadata = registry.content.get_sheet(asset, IAssetMetadata)
-        raw = metadata.get()['raw']
-        assert IAssetDownload.providedBy(raw)
-
-    def test_add_downloads_for_image_resize(self, pool, registry):
-        # TODO refactor && move this test to .test_image
-        from .image import IImage
-        from adhocracy_core.sheets.image import IImageMetadata
-        from .asset import IAssetDownload
-        asset = self._make_asset(pool, registry,
-                                 resource_type=IImage,
-                                 asset_metadata_sheet=IImageMetadata)
-        self.call_fut(asset, registry)
-        metadata = registry.content.get_sheet(asset, IImageMetadata)
-        detail = metadata.get()['detail']
-        assert IAssetDownload.providedBy(detail)
-
-
 

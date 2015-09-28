@@ -1466,7 +1466,6 @@ class TestAssetsServiceRESTView:
         from adhocracy_core.rest.views import AssetsServiceRESTView
         return AssetsServiceRESTView(context, request)
 
-
     def test_create(self, context, request_):
         from .views import SimpleRESTView
         from .schemas import POSTAssetRequestSchema
@@ -1474,13 +1473,10 @@ class TestAssetsServiceRESTView:
         assert issubclass(inst.__class__, SimpleRESTView)
         assert inst.validation_POST == (POSTAssetRequestSchema, [])
 
-
     def test_post_valid(self, request_, context):
         request_.root = context
-        child = testing.DummyResource(__provides__=IResourceX)
-        child.__parent__ = context
-        child.__name__ = 'child'
-        request_.registry.content.create.return_value = child
+        context['child'] = testing.DummyResource(__provides__=IResourceX)
+        request_.registry.content.create.return_value = context['child']
         request_.validated = {'content_type': IResourceX, 'data': {}}
         inst = self.make_one(context, request_)
         response = inst.post()
@@ -1506,16 +1502,10 @@ class TestAssetRESTView:
         assert issubclass(inst.__class__, SimpleRESTView)
         assert inst.validation_PUT == (PUTAssetRequestSchema, [])
 
-    def test_put_valid_no_sheets(self, monkeypatch, request_, context,
-                                 mock_sheet):
-        from adhocracy_core.rest import views
-        mock_validate = Mock(spec=views.store_asset_meta_and_add_downloads)
-        monkeypatch.setattr(views, 'validate_and_complete_asset',
-                            mock_validate)
-        request_.registry.content.get_sheets_edit.return_value = [mock_sheet]
-        request_.validated = {"content_type": "X", "data": {}}
+    def test_put_valid_no_sheets(self, request_, context):
         inst = self.make_one(context, request_)
         response = inst.put()
+
         wanted = {'path': request_.application_url + '/',
                   'content_type': IResource.__identifier__,
                   'updated_resources': {'changed_descendants': [],
@@ -1523,7 +1513,6 @@ class TestAssetRESTView:
                                         'modified': [],
                                         'removed': []}}
         assert wanted == response
-        assert mock_validate.called
 
 
 class TestAssetDownloadRESTView:
@@ -1532,17 +1521,12 @@ class TestAssetDownloadRESTView:
         from adhocracy_core.rest.views import AssetDownloadRESTView
         return AssetDownloadRESTView(context, request_)
 
-    def test_get_ensure_caching_headers_called(self, monkeypatch, request_,
-                                               context):
-        from adhocracy_core.rest import views
-        mock_file = Mock()
-        mock_retrieve = Mock(return_value=mock_file)
-        mock_response = Mock()
-        mock_file.get_response = Mock(return_value=mock_response)
-        monkeypatch.setattr(views, 'retrieve_asset_file', mock_retrieve)
+    def test_get(self, request_, context):
+        context.get_response = Mock()
         inst = self.make_one(context, request_)
         inst.ensure_caching_headers = Mock()
         inst.get()
+        context.get_response.assert_called_with(request_.registry)
         assert inst.ensure_caching_headers.called
 
     def test_ensure_caching_headers(self, context, request_):
@@ -1555,17 +1539,6 @@ class TestAssetDownloadRESTView:
         assert response.last_modified == 'last_modified'
         assert response.etag == 'etag'
         assert response.cache_control == 'cache_control'
-
-    def test_get_valid_with_sheets(self, monkeypatch, request_, context):
-        from adhocracy_core.rest import views
-        mock_file = Mock()
-        mock_retrieve = Mock(spec=views.retrieve_asset_file,
-                             return_value=mock_file)
-        mock_response = Mock()
-        mock_file.get_response = Mock(return_value=mock_response)
-        monkeypatch.setattr(views, 'retrieve_asset_file', mock_retrieve)
-        inst = self.make_one(context, request_)
-        assert inst.get() == mock_response
 
 
 class TestCreatePasswordResetView:

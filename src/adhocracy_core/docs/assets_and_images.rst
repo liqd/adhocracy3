@@ -290,8 +290,6 @@ As usual, the response lists the resources affected by the transaction::
     ['changed_descendants', 'created', 'modified', 'removed']
     >>> resp_data['updated_resources']['modified']
     ['http://localhost/process/assets/0000000/']
-    >>> updated_resources['created'] == updated_resources['removed'] == []
-    True
     >>> 'http://localhost/process/' in updated_resources['changed_descendants']
     True
 
