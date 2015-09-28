@@ -76,7 +76,7 @@ class TestAsset:
         assert meta.extended_sheets == (
             adhocracy_core.sheets.asset.IAssetMetadata,)
         assert meta.use_autonaming
-        assert meta.after_creation == (asset.add_metadata_and_download,)
+        assert meta.after_creation == (asset.add_metadata,)
 
     @mark.usefixtures('integration')
     def test_create(self, registry, meta, pool):
@@ -92,8 +92,6 @@ class TestAsset:
         meta = get_sheet(res, IAssetMetadata).get()
         assert meta['filename'] == 'title'
         assert meta['size'] == 100
-        assert meta['raw'] == res['0000000']
-        assert IAssetDownload.providedBy(meta['raw'])
 
 
 class TestAssetsService:

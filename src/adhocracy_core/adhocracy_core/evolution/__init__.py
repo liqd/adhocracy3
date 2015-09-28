@@ -434,7 +434,7 @@ def update_asset_download_childs(root):  # pragma: no cover
     """Readd asset downloads and update IAssetMetadata sheet."""
     from adhocracy_core.sheets.asset import IAssetMetadata
     from adhocracy_core.sheets.image import IImageMetadata
-    from adhocracy_core.resources.asset import add_metadata_and_download
+    from adhocracy_core.resources.asset import add_metadata
     from adhocracy_core.resources.image import add_image_size_downloads
     registry = get_current_registry(root)
     catalogs = find_service(root, 'catalogs')
@@ -447,7 +447,7 @@ def update_asset_download_childs(root):  # pragma: no cover
             del asset[old]
         try:
             if IAssetMetadata.providedBy(asset):
-                add_metadata_and_download(asset, registry)
+                add_metadata(asset, registry)
             if IImageMetadata.providedBy(asset):
                 add_image_size_downloads(asset, registry)
         except AttributeError:

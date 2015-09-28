@@ -56,7 +56,7 @@ class TestIAssetMetadata:
                               'filename': '',
                               'mime_type': '',
                               'size': 0,
-                              'raw': None}
+                              }
 
     def test_get_with_backreference(self, meta, context, sheet_catalogs,
                                     search_result):

@@ -21,7 +21,6 @@ class TestImageMetadataSheet:
                               'filename': '',
                               'mime_type': '',
                               'size': 0,
-                              'raw': None,
                               'detail': None,
                               'thumbnail': None}
 

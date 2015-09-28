@@ -146,7 +146,7 @@ class TestImage:
         assert meta.is_implicit_addable is True
         assert meta.extended_sheets ==\
                (adhocracy_core.sheets.image.IImageMetadata,)
-        assert meta.after_creation == (asset.add_metadata_and_download,
+        assert meta.after_creation == (asset.add_metadata,
                                        image.add_image_size_downloads,
                                        )
 
@@ -156,7 +156,6 @@ class TestImage:
         from adhocracy_core.sheets.asset import IAssetData
         from adhocracy_core.sheets.image import IImageMetadata
         from .image import IImageDownload
-        from .asset import IAssetDownload
         from adhocracy_core.utils import get_sheet
         file = Mock(mimetype='image/png', size=100, title='title')
         appstructs = {IAssetData.__identifier__: {'data': file}}
@@ -166,11 +165,9 @@ class TestImage:
         meta = get_sheet(res, IImageMetadata).get()
         assert meta['filename'] == 'title'
         assert meta['size'] == 100
-        assert meta['raw'] == res['0000000']
-        assert IAssetDownload.providedBy(meta['raw'])
-        assert meta['detail'] == res['0000001']
+        assert meta['detail'] == res['0000000']
         assert IImageDownload.providedBy(meta['detail'])
-        assert res['0000001'].dimensions == Dimensions(height=800, width=800)
-        assert meta['thumbnail'] == res['0000002']
+        assert meta['detail'].dimensions == Dimensions(height=800, width=800)
+        assert meta['thumbnail'] == res['0000001']
         assert meta['thumbnail'].dimensions == Dimensions(height=100, width=100)
 

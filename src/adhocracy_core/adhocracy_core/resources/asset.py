@@ -62,17 +62,14 @@ class IAsset(ISimple):
     """A generic asset (binary file)."""
 
 
-def add_metadata_and_download(context: IAsset, registry: Registry, **kwargs):
+def add_metadata(context: IAsset, registry: Registry, **kwargs):
     """Store asset file metadata and add `raw` download to `context`."""
     file = get_sheet_field(context, IAssetData, 'data', registry=registry)
     meta_isheet = get_matching_isheet(context, IAssetMetadata)
     meta_sheet = get_sheet(context, meta_isheet, registry=registry)
-    raw_download = registry.content.create(IAssetDownload.__identifier__,
-                                           parent=context)
     meta_appstruct = {
         'size': file.size,
         'filename': file.title,
-        'raw': raw_download,
     }
     meta_sheet.set(meta_appstruct, omit_readonly=False)
 
@@ -91,7 +88,7 @@ asset_meta = pool_meta._replace(
     ),
     use_autonaming=True,
     permission_create='create_asset',
-    after_creation=(add_metadata_and_download,),
+    after_creation=(add_metadata,),
 )
 
 

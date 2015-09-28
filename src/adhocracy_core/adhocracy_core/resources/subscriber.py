@@ -22,7 +22,7 @@ from adhocracy_core.interfaces import IResourceSheetModified
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IPasswordReset
-from adhocracy_core.resources.asset import add_metadata_and_download
+from adhocracy_core.resources.asset import add_metadata
 from adhocracy_core.resources.asset import IAsset
 from adhocracy_core.resources.image import add_image_size_downloads
 from adhocracy_core.resources.image import IImage
@@ -263,7 +263,7 @@ def autoupdate_tag_has_new_version(event):
 
 def update_asset_download(event):
     """Update asset download."""
-    add_metadata_and_download(event.object, event.registry)
+    add_metadata(event.object, event.registry)
 
 
 def update_image_downloads(event):

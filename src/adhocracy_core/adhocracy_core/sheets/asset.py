@@ -12,7 +12,6 @@ from adhocracy_core.schema import Integer
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import UniqueReferences
-from adhocracy_core.schema import Resource
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 
@@ -59,7 +58,6 @@ class AssetMetadataSchema(colander.MappingSchema):
     attached_to = UniqueReferences(readonly=True,
                                    backref=True,
                                    reftype=AssetReference)
-    raw = Resource(readonly=True)
 
 
 asset_metadata_meta = sheet_meta._replace(

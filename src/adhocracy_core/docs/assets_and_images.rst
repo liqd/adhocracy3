@@ -164,7 +164,6 @@ Downloading Assets
 Assets can be downloaded in different ways:
 
   * As a JSON document containing just the metadata
-  * As raw document containing the uploaded "blob"
   * In case of images, in one of the cropped sizes defined by the
     ImageSizeMapper
 
@@ -179,39 +178,30 @@ the asset::
     >>> resp_image_meta = resp_data['data']['adhocracy_core.sheets.image.IImageMetadata']
     >>> pprint(resp_image_meta)
     {'attached_to': [],
-     'detail': 'http://localhost/process/assets/0000000/0000001/',
+     'detail': 'http://localhost/process/assets/0000000/0000000/',
      'filename': 'python.jpg',
      'mime_type': 'image/jpeg',
-     'raw': 'http://localhost/process/assets/0000000/0000000/',
      'size': '159041',
-     'thumbnail': 'http://localhost/process/assets/0000000/0000002/'}
+     'thumbnail': 'http://localhost/process/assets/0000000/0000001/'}
 
 The actual binary data is *not* part of that JSON document::
 
     >>> 'adhocracy_core.sheets.asset.IAssetData' in resp_data['data']
     False
 
-To retrieve the raw uploaded data, the frontend must instead GET the `raw`
-child of the asset::
-
-    >>> resp_data = testapp.get(resp_image_meta['raw'])
-    >>> resp_data.content_type
-    'image/jpeg'
-    >>> original_size = len(resp_data.body)
-    >>> original_size
-    159041
-
-In case of images, it can retrieve the image in one of the predefined
+In case of images, it can retrieve the image binary data in one of the predefined
 cropped sizes by asking for one of the keys defined by the ImageSizeMapper as
 child element::
-
-    >>> resp_data = testapp.get(resp_image_meta['thumbnail'])
+    >>> resp_data = testapp.get(resp_image_meta['detail'])
     >>> resp_data.content_type
     'image/jpeg'
+    >>> detail_size = len(resp_data.body)
+
+    >>> resp_data = testapp.get(resp_image_meta['thumbnail'])
     >>> thumbnail_size = len(resp_data.body)
     >>> thumbnail_size > 2000
     True
-    >>> thumbnail_size < original_size
+    >>> thumbnail_size < detail_size
     True
 
 
