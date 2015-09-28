@@ -109,6 +109,10 @@ export var bindPath = (
                 });
             }
         });
+    } else {
+        adhHttp.get(scope.badgeablePath).then((badgeable) => {
+            scope.poolPath = badgeable.data[SIBadgeable.nick].post_pool;
+        });
     }
 };
 
@@ -136,7 +140,6 @@ export var badgeAssignmentCreateDirective = (
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Assignment.html",
         scope: {
             badgesPath: "@",
-            poolPath: "@",
             badgeablePath: "@",
             onSubmit: "=?",
             onCancel: "=?"
@@ -234,7 +237,6 @@ export var badgeAssignmentDirective = (
             });
 
             var promise2 = adhHttp.get(scope.path).then((resource) => {
-                scope.poolPath = resource.data[SIBadgeable.nick].post_pool;
                 scope.options = resource.data[SIBadgeable.nick].assignments;
             });
 
