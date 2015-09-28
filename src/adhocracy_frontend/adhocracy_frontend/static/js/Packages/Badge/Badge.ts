@@ -190,6 +190,18 @@ export var badgeAssignmentEditDirective = (
         link: (scope, element) => {
             bindPath(adhHttp, $q)(scope, "path");
 
+            scope.delete = () => {
+                return adhHttp.delete(scope.path, RIBadgeAssignment.content_type)
+                    .then(() => {
+                        scope.serverError = null;
+                        if (scope.onSubmit) {
+                            scope.onSubmit();
+                        }
+                    }, (response) => {
+                        scope.serverError = response[0].description;
+                    });
+            };
+
             scope.submit = () => {
                 var resource = scope.resource;
                 return adhHttp.put(resource.path, fill(resource, scope, adhCredentials.userPath))
