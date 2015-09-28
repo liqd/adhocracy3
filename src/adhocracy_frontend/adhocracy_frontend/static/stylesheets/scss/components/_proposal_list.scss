@@ -20,6 +20,20 @@ A proposal list item. How a proposal appears when in a list
         </ul>
     </div>
 </a>
+2 columns
+<a class="proposal-list-item" href="#">
+    <div class="proposal-list-item-col-left">
+        <h3 class="proposal-list-item-title">Title here</h3>
+        <p class="proposal-list-item-username">Username</p>
+    </div>
+    <div class="proposal-list-item-col-right">
+        <ul class="meta-list">
+            <li class="meta-list-item">
+                <i class="icon-speechbubbles"></i> 0 Comments
+            </li>
+        </ul>
+    </div>
+</a>
 ```
 */
 
@@ -78,3 +92,10 @@ $thumbnail-height: 90px;
     font-weight: $font-weight-normal;
 }
 
+.proposal-list-item-col-left {
+    @include span(8 of 12 first);
+}
+
+.proposal-list-item-col-right {
+    @include span(4 of 12 last);
+}
