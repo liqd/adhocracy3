@@ -14,25 +14,30 @@ from substanced.evolution import add_evolution_step
 from substanced.util import find_service
 from substanced.interfaces import IFolder
 
-from adhocracy_core.utils import get_sheet
-from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import search_query
-from adhocracy_core.interfaces import ResourceMetadata
-from adhocracy_core.sheets.pool import IPool
-from adhocracy_core.interfaces import ISimple
-from adhocracy_core.sheets.title import ITitle
-from adhocracy_core.sheets.badge import IHasBadgesPool
-from adhocracy_core.sheets.badge import IBadgeable
-from adhocracy_core.sheets.principal import IUserExtended
-from adhocracy_core.sheets.workflow import IWorkflowAssignment
-from adhocracy_core.resources.pool import IBasicPool
-from adhocracy_core.resources.asset import IPoolWithAssets
-from adhocracy_core.resources.badge import add_badges_service
-from adhocracy_core.resources.badge import add_badge_assignments_service
-from adhocracy_core.resources.principal import IUser
-from adhocracy_core.resources.proposal import IProposal
-from adhocracy_core.resources.process import IProcess
 from adhocracy_core.catalog import ICatalogsService
+from adhocracy_core.interfaces import IResource
+from adhocracy_core.interfaces import ISimple
+from adhocracy_core.interfaces import ResourceMetadata
+from adhocracy_core.interfaces import search_query
+from adhocracy_core.resources.asset import IPoolWithAssets
+from adhocracy_core.resources.badge import add_badge_assignments_service
+from adhocracy_core.resources.badge import add_badges_service
+from adhocracy_core.resources.comment import ICommentVersion
+from adhocracy_core.resources.pool import IBasicPool
+from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.process import IProcess
+from adhocracy_core.resources.proposal import IProposal
+from adhocracy_core.resources.proposal import IProposalVersion
+from adhocracy_core.resources.relation import add_relationsservice
+from adhocracy_core.sheets.badge import IBadgeable
+from adhocracy_core.sheets.badge import IHasBadgesPool
+from adhocracy_core.sheets.pool import IPool
+from adhocracy_core.sheets.principal import IUserExtended
+from adhocracy_core.sheets.relation import ICanPolarize
+from adhocracy_core.sheets.relation import IPolarizable
+from adhocracy_core.sheets.title import ITitle
+from adhocracy_core.sheets.workflow import IWorkflowAssignment
+from adhocracy_core.utils import get_sheet
 
 
 logger = logging.getLogger(__name__)
@@ -294,6 +299,25 @@ def add_workflow_assignment_sheet_to_pools_simples(root):  # pragma: no cover
     migrate_new_sheet(root, ISimple, IWorkflowAssignment)
 
 
+@log_migration
+def make_proposalversions_polarizable(root):  # pragma: no cover
+    """Make proposals polarizable and add relations pool."""
+    catalogs = find_service(root, 'catalogs')
+    proposals = _search_for_interfaces(catalogs, IProposal)
+    registry = get_current_registry(root)
+    for proposal in proposals:
+        if 'relations' not in proposal:
+            logger.info('add relations pool to {0}'.format(proposal))
+            add_relationsservice(proposal, registry, {})
+    migrate_new_sheet(root, IProposalVersion, IPolarizable)
+
+
+@log_migration
+def add_icanpolarize_sheet_to_comments(root):  # pragma: no cover
+    """Make comments ICanPolarize."""
+    migrate_new_sheet(root, ICommentVersion, ICanPolarize)
+
+
 def includeme(config):  # pragma: no cover
     """Register evolution utilities and add evolution steps."""
     config.add_directive('add_evolution_step', add_evolution_step)
@@ -308,3 +332,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(remove_name_sheet_from_items)
     config.add_evolution_step(add_workflow_assignment_sheet_to_pools_simples)
     config.add_evolution_step(make_proposals_badgeable)
+    config.add_evolution_step(make_proposalversions_polarizable)
+    config.add_evolution_step(add_icanpolarize_sheet_to_comments)
