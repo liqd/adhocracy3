@@ -39,6 +39,7 @@ class TestProposalVersion:
                 adhocracy_core.sheets.description.IDescription,
                 adhocracy_core.sheets.comment.ICommentable,
                 adhocracy_core.sheets.rate.IRateable,
+                adhocracy_core.sheets.relation.IPolarizable,
                 burgerhaushalt.IProposal,
                 adhocracy_core.sheets.geo.IPoint,
                 )
