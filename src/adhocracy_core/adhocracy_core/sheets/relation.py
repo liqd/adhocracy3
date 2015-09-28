@@ -9,6 +9,7 @@ from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import PostPool
 from adhocracy_core.schema import Reference as ReferenceSchema
 from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Reference
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_meta
 
@@ -72,9 +73,20 @@ polarization_meta = sheet_meta._replace(isheet=IPolarization,
                                         create_mandatory=True)
 
 
+class CanPolarizePolarizationReference(SheetToSheet):
+
+    """Reference from comment version to the polarization."""
+
+    source_isheet = ICanPolarize
+    source_isheet_field = 'polarization'
+    target_isheet = IPolarization
+
+
 class CanPolarizeSchema(colander.MappingSchema):
 
     """CanPolarize sheet data structure."""
+
+    polarization = Reference(reftype=CanPolarizePolarizationReference)
 
 
 can_polarize_meta = sheet_meta._replace(isheet=ICanPolarize,
