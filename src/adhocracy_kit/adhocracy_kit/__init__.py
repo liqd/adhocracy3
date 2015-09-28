@@ -13,15 +13,15 @@ def includeme(config):
     # copied from adhocracy_spd (without resources and translations)
     config.include('adhocracy_core')
     config.commit()
-    config.include('.sheets')
-    config.include('.workflows')
-    config.include('.evolution')
+    config.include('adhocracy_spd.sheets')
+    config.include('adhocracy_spd.workflows')
+    config.include('adhocracy_spd.evolution')
 
     # add translations
     config.add_translation_dirs('adhocracy_core:locale/')
 
     # copoied from adhocracy_spd.resources resources
-    config.include('adhocracy-spd.resources.digital_leben')
+    config.include('adhocracy_spd.resources.digital_leben')
 
     # include kit resource types
     config.include('.resources')
